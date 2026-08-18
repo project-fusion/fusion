@@ -5,49 +5,20 @@ import {
   type HelixConsoleEvent,
   HelixElement,
 } from '@helix-io/core'
+import '@helix-io/web/splitter'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html, nothing } from 'lit'
+import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixSandboxPreview } from '../preview/sandbox-preview.js'
 import type { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
 import type { HelixSandboxTerminal } from '../terminal/sandbox-terminal.js'
 import { styles } from './sandbox-root.css.js'
 
-/** How far one arrow press moves the split, in percent. */
-const STEP = 2
-
-/**
- * Bounds for a pane that is open.
- *
- * Not the whole range: past these a pane closes rather than shrinking further.
- * A divider that stops dead at fifteen percent gives a reader no way to put a
- * pane away, and inching one down to a sliver is nobody's intent.
- */
 /** Where the divider sits, and how tall the panel is, before anyone moves them.
-    Named because `applySizes` falls back to them and the properties default to
+    Named because the properties default to them and `applyPanel` falls back to
     them, and two copies of a default drift. */
 const DEFAULT_SPLIT = 50
 const DEFAULT_PANEL = 192
-
-/* A divider goes where it is put, all the way to either end.
- *
- * There were floors here, fifteen per cent and eighty-five, with a snap past
- * half of each: inside the floor the drag stuck, and only well past it did the
- * pane close. Two rules over one gesture, and the seam between them is a jump.
- * Measured on a 1166px area, the editor held at 175px and then went to nothing
- * in one frame, which reads as the drag having been dropped rather than as a
- * pane being put away.
- *
- * A floor is protection against leaving a pane too narrow to use, and it is not
- * worth what it costs: the divider stays in the grid at either extreme, so a
- * pane taken to nothing comes back with the same gesture that closed it, and a
- * pane left at 3% is a thing someone did on purpose. Closed is now somewhere a
- * drag can arrive at rather than somewhere it is thrown. */
-const MIN = 0
-const MAX = 100
-
-/** How far one arrow press moves the panel, in pixels. */
-const PANEL_STEP = 16
 
 /** The most of the sandbox the panel may take, leaving the panes above it. */
 const PANEL_MAX = 0.8
@@ -68,9 +39,32 @@ const PANEL_MAX = 0.8
  * a pane rendering the example as JSX, and guessing would have put the text of
  * a React component into the preview.
  *
- * The split is a real `role="separator"` with `aria-valuenow`, movable by
- * pointer and by arrow keys, because a divider that only responds to dragging
- * is unusable without a mouse. Home and End jump to the bounds.
+ * **The dividers are two nested `helix-splitter`s, not a grid this element
+ * drags itself.** It had its own: a five row grid, a stylesheet written to on
+ * every pointer move, three pointer handlers, a keyboard handler reading which
+ * axes each divider was allowed to move, and a corner placed by hand into the
+ * cell where two tracks met. All of it is the splitter's now, including the
+ * corner, which arrives on its own wherever a nested splitter crosses the one it
+ * is in.
+ *
+ * The panes are the inner splitter and the panel is the outer one, which is the
+ * order that makes the panel span the full width: the outer divider runs edge to
+ * edge and the inner stops at it.
+ *
+ * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
+ * A splitter that owned its own position would leave this element reporting one
+ * arrangement and showing another, and a consumer restoring a saved layout
+ * writes to these two properties. Each splitter announces where it wants to go
+ * and this answers, which is the same contract a form control has with a
+ * framework.
+ *
+ * **The panel is in pixels here and a percentage in the splitter, and the
+ * conversion belongs here.** A terminal wants a number of lines rather than a
+ * share of the window, so its height should not change when the window does. A
+ * splitter has no business knowing that, so it stays percentage-pure and this
+ * element, which does know what is in the panel, holds the box and converts.
+ * That is also what keeps a stored `panelSize` from a previous visit meaning
+ * what it meant when it was written.
  *
  * @since 0.1.0
  * @status experimental
@@ -85,9 +79,12 @@ const PANEL_MAX = 0.8
  * @slot panel - A panel under both panes, usually a terminal.
  * @slot status - A status bar, spanning both panes at the bottom.
  *
+ * @csspart body - The splitter holding the panes above the panel.
  * @csspart corner - The handle where the two dividers cross.
  * @csspart pane - Either pane.
- * @csspart separator - The draggable divider.
+ * @csspart panel - The box holding whatever was slotted as the panel.
+ * @csspart panes - The splitter holding the source and preview panes.
+ * @csspart separator - Either divider.
  *
  * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
  * @cssproperty --sandbox-separator-color - Color of the divider.
@@ -128,13 +125,10 @@ export class HelixSandbox extends HelixElement {
   @property({ attribute: 'separator-label' })
   separatorLabel = 'Resize source pane'
 
-  @state()
-  private dragging = false
-
   /**
    * Whether anything is in the panel region.
    *
-   * The dividers around the panel are only meaningful when there is a panel to
+   * The divider above the panel is only meaningful when there is a panel to
    * size, and there is no way to ask in CSS: `:host(:has([slot="panel"]))` is
    * invalid, and the server has no children to look at. `slotchange` is the
    * platform answering on the client, which is where a divider is any use.
@@ -142,33 +136,87 @@ export class HelixSandbox extends HelixElement {
   @state()
   private hasPanel = false
 
-  /** Which axes the drag in progress is moving, if any. */
-  private drag: 'block' | 'both' | 'inline' | null = null
+  /**
+   * The body's height, which is what a pixel panel is a fraction of.
+   *
+   * The panel is given in pixels and the splitter takes a percentage, so the two
+   * only agree at one height: let the window change without recomputing and a
+   * panel asked for at 192px quietly keeps whatever share of the old height that
+   * was.
+   *
+   * **Measured at render rather than cached from the observer**, which is the
+   * second design here. The first held the number the observer last reported and
+   * was correct only while the observer was firing, and a `ResizeObserver`
+   * callback is delivered from the rendering lifecycle: a background tab runs
+   * none, so the value went stale with nothing to say so. Reading the box at
+   * render leaves one source of truth, and the observer's only job is to say
+   * that a render is due.
+   *
+   * Cheap, because renders are rare. A drag no longer goes through this element
+   * at all: the splitter follows the pointer itself and announces once, when it
+   * settles.
+   */
+  private bodyHeight = 0
 
   /**
-   * The sizes the sandbox was given, which a double click returns it to.
+   * Asks for a render when the body changes size.
+   *
+   * The box watched is the splitter itself, not the panel. Its size changes when
+   * the window does and not when the divider moves, so answering it cannot feed
+   * back into the position that answered it.
+   */
+  private readonly watch =
+    typeof ResizeObserver === 'undefined'
+      ? undefined
+      : new ResizeObserver(() => {
+          this.requestUpdate()
+        })
+
+  /** The panel as a share of the body, which is what the splitter takes. */
+  private get panelShare(): number {
+    const size = Number.isFinite(this.panelSize) ? this.panelSize : DEFAULT_PANEL
+    if (this.bodyHeight <= 0) {
+      return 0
+    }
+    return Math.min(PANEL_MAX * 100, Math.max(0, (size / this.bodyHeight) * 100))
+  }
+
+  /**
+   * Where the outer divider goes: everything the panel is not.
+   *
+   * A hundred with no panel, which puts the divider on the floor of the sandbox
+   * with the panes filling it. The line itself is hidden by the stylesheet in
+   * that case, because a boundary needs two sides.
+   */
+  private get panelPosition(): number {
+    return this.hasPanel ? 100 - this.panelShare : 100
+  }
+
+  /**
+   * The arrangement the sandbox was given, which a double click returns it to.
    *
    * What the consumer wrote, not the property defaults. A sandbox opened at
    * `split="30"` was arranged that way on purpose, and a reset that ignored it
    * would be resetting to somebody else's idea of the arrangement.
    */
-  private initial: { panel: number; split: number } | null = null
+  private home: { panel: number; split: number } | null = null
 
-  /**
-   * The sandbox's box, measured once when a drag starts.
-   *
-   * Measuring per move is a forced layout on every pointer event, in the middle
-   * of a gesture whose whole job is to stay ahead of the pointer. None of it
-   * moves while dragging: the sandbox is where it was, and the panel's floor is
-   * the status bar, which is not going anywhere either.
-   */
-  private origin: {
-    bottom: number
-    height: number
-    left: number
-    top: number
-    width: number
-  } | null = null
+  /** Where the panel divider goes on a reset, in the splitter's own units. */
+  private get homePanelPosition(): number {
+    const panel = this.home?.panel
+    if (!this.hasPanel || panel === undefined || this.bodyHeight <= 0) {
+      return 100
+    }
+    return 100 - Math.min(PANEL_MAX * 100, Math.max(0, (panel / this.bodyHeight) * 100))
+  }
+
+  /** `panel-collapsed-size` in the units the splitter works in. */
+  private get panelSliver(): number {
+    if (this.bodyHeight <= 0) {
+      return 0
+    }
+    return Math.min(100, Math.max(0, (this.panelCollapsedSize / this.bodyHeight) * 100))
+  }
 
   /**
    * Whether a change came from inside this sandbox's source region.
@@ -281,36 +329,6 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * The split a drag has reached, held inside the sandbox.
-   *
-   * It follows the pointer the whole way and stops at the edges, so closing a
-   * pane is the end of the movement rather than a separate thing that happens
-   * to it.
-   */
-  private clamp(next: number): number {
-    return Math.min(MAX, Math.max(MIN, next))
-  }
-
-  /**
-   * Keeps the panel between the floor its consumer set and a ceiling that
-   * leaves the panes above it.
-   *
-   * The floor is `panelCollapsedSize`, which is nothing unless someone says
-   * otherwise: a panel whose tabs are the way to open it again wants a line of
-   * itself left behind, and only whoever put the tabs there knows how much. It
-   * is a floor the drag arrives at rather than a value it is thrown to, which
-   * is the difference between a pane being put away and a drag being dropped.
-   *
-   * The ceiling is skipped when the height is zero, which means the sandbox has
-   * not been laid out: multiplying that by a ratio gives zero, and clamping to
-   * it would close the panel rather than bound it.
-   */
-  private clampPanel(next: number, height: number): number {
-    const floored = Math.max(this.panelCollapsedSize, next)
-    return height > 0 ? Math.min(height * PANEL_MAX, floored) : floored
-  }
-
-  /**
    * The orientation in force.
    *
    * Unset is horizontal, and stays unset: the default is the absent attribute,
@@ -320,53 +338,6 @@ export class HelixSandbox extends HelixElement {
     return this.orientation ?? 'horizontal'
   }
 
-  /**
-   * Moves a divider by the keyboard.
-   *
-   * One handler for all three, reading which axes the divider it came from is
-   * allowed to move. The corner takes both, and each arrow moves the axis it
-   * points along, which is the only reading of a diagonal handle that a
-   * keyboard has.
-   */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const moves = (event.currentTarget as HTMLElement).dataset.drag ?? 'inline'
-    const inline = moves !== 'block'
-    const block = moves !== 'inline'
-    const back = this.axis === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
-    const forward = this.axis === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
-    const height = this.getBoundingClientRect().height
-
-    if (inline && (event.key === back || event.key === forward)) {
-      this.split = this.clamp(this.split + (event.key === back ? -STEP : STEP))
-    } else if (block && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-      // Up grows the panel, because the panel's edge is what moves and it is
-      // moving up. Down shrinks it.
-      const step = event.key === 'ArrowUp' ? PANEL_STEP : -PANEL_STEP
-      this.panelSize = this.clampPanel(this.panelSize + step, height)
-    } else if (event.key === 'Home' || event.key === 'End') {
-      if (inline) {
-        this.split = event.key === 'Home' ? MIN : MAX
-      }
-      if (block && !inline) {
-        this.panelSize = this.clampPanel(
-          event.key === 'Home' ? this.panelCollapsedSize : height * PANEL_MAX,
-          height,
-        )
-      }
-    } else {
-      return
-    }
-
-    event.preventDefault()
-  }
-
-  /**
-   * Puts a divider back where it started.
-   *
-   * Only the axes that divider moves, so double clicking the panel's divider
-   * leaves the split alone. The corner answers for both, which is the only
-   * reading of a double click on a handle that moves both.
-   */
   /**
    * Says the arrangement has settled, so a consumer can keep it.
    *
@@ -388,98 +359,45 @@ export class HelixSandbox extends HelixElement {
     )
   }
 
-  private readonly handleDoubleClick = (event: MouseEvent): void => {
-    const moves = (event.currentTarget as HTMLElement).dataset.drag ?? 'inline'
-    const initial = this.initial
-    if (!initial) {
+  /**
+   * Answers a divider that has asked to move.
+   *
+   * Both splitters are controlled from here, so neither applies anything on its
+   * own: each announces where it wants to go and this decides. That is what
+   * keeps `split` and `panelSize` the truth about the arrangement rather than a
+   * stale copy of it.
+   *
+   * `target` against `currentTarget`, because a source pane's own change bubbles
+   * up through these same elements on its way to the host. Only a splitter
+   * speaking for itself is one of ours, and only those are stopped: the sandbox
+   * announces `arrangement` and a consumer never sees the two inside it.
+   */
+  private readonly handlePanesChange = (event: Event): void => {
+    if (event.target !== event.currentTarget) {
       return
     }
-    if (moves !== 'block') {
-      this.split = initial.split
+    const { name, value } = (event as HelixChangeEvent).detail
+    event.stopPropagation()
+    if (name !== 'position') {
+      return
     }
-    if (moves !== 'inline') {
-      this.panelSize = initial.panel
-    }
+    this.split = Number(value)
     this.settled()
   }
 
-  private readonly handlePointerDown = (event: PointerEvent): void => {
-    const handle = event.currentTarget as HTMLElement
-    this.drag = (handle.dataset.drag as 'block' | 'both' | 'inline') ?? 'inline'
-    this.dragging = true
-    const box = this.getBoundingClientRect()
-    this.origin = {
-      bottom: box.bottom,
-      height: box.height,
-      left: box.left,
-      top: box.top,
-      width: box.width,
-    }
-    // Capture on the divider, so a fast drag that outruns the pointer does not
-    // drop the gesture the moment the cursor leaves it.
-    handle.setPointerCapture(event.pointerId)
-  }
-
-  /**
-   * Follows the pointer, without going through a render.
-   *
-   * The sizes are written straight into the stylesheet rather than assigned to
-   * the properties. A drag is a stream of events, and putting each one through
-   * an update cycle means a render, a re-render of every slotted pane's host
-   * bindings, and a style write, to move a divider by a pixel. Writing the two
-   * custom properties is the only part of that which changes anything, and the
-   * properties are set once at the end so the element still ends up saying what
-   * it is showing.
-   *
-   * The box comes from `origin`, measured when the drag started, so no pointer
-   * event forces a layout to ask where the sandbox is.
-   */
-  private readonly handlePointerMove = (event: PointerEvent): void => {
-    const box = this.origin
-    if (!this.drag || !box) {
+  private readonly handlePanelChange = (event: Event): void => {
+    if (event.target !== event.currentTarget) {
       return
     }
-    let { panelSize: panel, split } = this
-    if (this.drag !== 'block') {
-      split = this.clamp(
-        this.axis === 'horizontal'
-          ? ((event.clientX - box.left) / box.width) * 100
-          : ((event.clientY - box.top) / box.height) * 100,
-      )
+    const { name, value } = (event as HelixChangeEvent).detail
+    event.stopPropagation()
+    if (name !== 'position' || this.bodyHeight <= 0) {
+      return
     }
-    if (this.drag !== 'inline') {
-      // From the bottom of the sandbox rather than the top: what the pointer is
-      // holding is the panel's upper edge, and the status bar under it is a
-      // fixed cost that never enters the arithmetic.
-      panel = this.clampPanel(box.bottom - event.clientY - this.statusHeight, box.height)
-    }
-    this.pending = { panel, split }
-    this.applySizes(split, panel)
-  }
-
-  /**
-   * Height of anything below the panel, which the panel's own height excludes.
-   *
-   * Read once per drag along with the box. A status bar does not resize while
-   * a divider is being dragged.
-   */
-  private statusHeight = 0
-
-  /** The sizes the drag has reached, to be committed when it ends. */
-  private pending: { panel: number; split: number } | null = null
-
-  private readonly handlePointerUp = (event: PointerEvent): void => {
-    // The properties catch up with what the stylesheet has been showing, so
-    // the element reports the size it is at and a re-render keeps it.
-    if (this.pending) {
-      this.panelSize = this.pending.panel
-      this.split = this.pending.split
-      this.pending = null
-    }
-    this.dragging = false
-    this.drag = null
-    this.origin = null
-    ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+    // Back into pixels, which is what this element promises and what a consumer
+    // stored. The divider's position is the panes' share, so the panel is the
+    // rest of it.
+    this.panelSize = Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight)
     this.settled()
   }
 
@@ -490,82 +408,45 @@ export class HelixSandbox extends HelixElement {
     this.addEventListener('helix-change', this.handleSourceChange)
   }
 
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.removeEventListener('helix-caret', this.handleCaret)
-    this.removeEventListener('helix-console', this.handleConsole)
-    this.removeEventListener('helix-change', this.handleSourceChange)
-  }
-
+  /**
+   * Takes the body's height before each render, so the conversion is current.
+   *
+   * Guarded on `hasUpdated`, because there is no shadow root to measure before
+   * the first render, and on the method existing, because the server's element
+   * shim carries attributes but not tree traversal.
+   */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.toggleAttribute('data-dragging', this.dragging)
-  }
-
-  /**
-   * Writes the sizes into the shadow root's own stylesheet.
-   *
-   * Into a `<style>` rather than onto `this.style`, because an inline style on
-   * the host is an attribute the element gives itself once it upgrades, and a
-   * React consumer's server markup does not have it: hydration reports the
-   * mismatch and does not patch it up. The shadow root is not part of the tree
-   * React hydrates.
-   *
-   * Filled imperatively because Lit rejects expressions inside `<style>`, which
-   * is why the template carries a static empty one. The server renders the
-   * stylesheet's own defaults, which are the same values these properties
-   * default to.
-   */
-  private applySizes(split = this.split, panel = this.panelSize): void {
-    const sheet = this.renderRoot.querySelector<HTMLStyleElement>('#sizes')
-    if (!sheet) {
+    if (!this.hasUpdated || typeof this.renderRoot?.querySelector !== 'function') {
       return
     }
-    /* Guarded, and this is worth more than it looks. These go into custom
-       properties, which accept nearly anything at parse time and only fail
-       where they are used: substituted into `grid-template-columns`, a value
-       that is not a length makes that declaration invalid at computed-value
-       time, and an invalid `grid-template-columns` falls back to its initial
-       value of `none`. The grid then auto-places, so one bad number does not
-       misplace one track, it throws the whole template away.
-
-       Measured, a consumer passing `undefined` for `split` to mean "whatever
-       the default is" wrote `undefined%` and turned three columns of 50/2/rest
-       into 719/75/373. Falling back to the property's own default keeps a
-       mistake local to the thing that was wrong. */
-    const across = Number.isFinite(split) ? split : DEFAULT_SPLIT
-    const down = Number.isFinite(panel) ? panel : DEFAULT_PANEL
-    sheet.textContent = `:host { --_sandbox-split: ${across}%; --_sandbox-panel: ${down}px; }`
-
-    /* Which panes are shut, for the dividers beside them. A boundary needs two
-       sides, and once a pane is at nothing its divider is a line at the edge of
-       the sandbox with nothing behind it: it reads as the border of a pane that
-       is not there any more.
-
-       Written here rather than in `updated`, because a drag moves the
-       stylesheet without touching the properties until it ends, and a line that
-       waited for the release would still be drawn while the pane it belongs to
-       was being closed. */
-    const shut = [across <= 0 ? 'inline' : '', down <= 0 ? 'block' : ''].filter(Boolean).join(' ')
-    if (shut) {
-      this.dataset.collapsed = shut
-    } else {
-      delete this.dataset.collapsed
+    const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
+    if (body) {
+      this.bodyHeight = body.getBoundingClientRect().height
     }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.applySizes()
     this.readPanel()
-    this.initial = { panel: this.panelSize, split: this.split }
+    this.home = {
+      panel: Number.isFinite(this.panelSize) ? this.panelSize : DEFAULT_PANEL,
+      split: Number.isFinite(this.split) ? this.split : DEFAULT_SPLIT,
+    }
+    const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
+    if (body) {
+      this.bodyHeight = body.getBoundingClientRect().height
+      this.watch?.observe(body)
+      this.requestUpdate()
+    }
   }
 
-  protected override updated(changed: PropertyValues): void {
-    super.updated(changed)
-    if (changed.has('panelSize') || changed.has('split')) {
-      this.applySizes()
-    }
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('helix-caret', this.handleCaret)
+    this.removeEventListener('helix-console', this.handleConsole)
+    this.removeEventListener('helix-change', this.handleSourceChange)
+    this.watch?.disconnect()
   }
 
   /**
@@ -580,69 +461,40 @@ export class HelixSandbox extends HelixElement {
    */
   private readonly readPanel = (): void => {
     this.hasPanel = this.querySelector(':scope > [slot="panel"]') !== null
-    this.statusHeight = this.statusBars[0]?.getBoundingClientRect().height ?? 0
   }
 
   protected override render(): TemplateResult {
     const vertical = this.axis === 'vertical'
-    return html`<style id="sizes"></style>
-      <slot name="toolbar"></slot>
-      <div part="pane" data-pane="source"><slot name="source"></slot></div>
-      <div
-        part="separator"
-        data-drag="inline"
-        role="separator"
-        tabindex="0"
-        aria-label=${this.separatorLabel}
-        aria-orientation=${vertical ? 'horizontal' : 'vertical'}
-        aria-valuemax="100"
-        aria-valuemin="0"
-        aria-valuenow=${Math.round(this.split)}
-        @dblclick=${this.handleDoubleClick}
-        @keydown=${this.handleKeydown}
-        @pointerdown=${this.handlePointerDown}
-        @pointermove=${this.handlePointerMove}
-        @pointerup=${this.handlePointerUp}
-      ></div>
-      <div part="pane" data-pane="preview"><slot name="preview"></slot></div>
-      ${
-        this.hasPanel
-          ? html`<div
-              part="separator"
-              data-drag="block"
-              data-axis="block"
-              role="separator"
-              tabindex="0"
-              aria-label=${this.panelLabel}
-              aria-orientation="horizontal"
-              aria-valuenow=${Math.round(this.panelSize)}
-              @dblclick=${this.handleDoubleClick}
-              @keydown=${this.handleKeydown}
-              @pointerdown=${this.handlePointerDown}
-              @pointermove=${this.handlePointerMove}
-              @pointerup=${this.handlePointerUp}
-            ></div>`
-          : nothing
-      }
-      ${
-        // Only where the two dividers actually cross. Stacked, they are
-        // parallel and there is no corner to take hold of.
-        this.hasPanel && !vertical
-          ? html`<div
-              part="corner"
-              data-drag="both"
-              role="separator"
-              tabindex="0"
-              aria-label=${this.cornerLabel}
-              @dblclick=${this.handleDoubleClick}
-              @keydown=${this.handleKeydown}
-              @pointerdown=${this.handlePointerDown}
-              @pointermove=${this.handlePointerMove}
-              @pointerup=${this.handlePointerUp}
-            ></div>`
-          : nothing
-      }
-      <slot name="panel" @slotchange=${this.readPanel}></slot>
+    const split = Number.isFinite(this.split) ? this.split : DEFAULT_SPLIT
+    return html`<slot name="toolbar"></slot>
+      <helix-splitter
+        part="body"
+        ?data-panel=${this.hasPanel}
+        exportparts="separator, corner"
+        orientation="vertical"
+        collapsed-size=${this.panelSliver}
+        corner-label=${this.cornerLabel}
+        label=${this.panelLabel}
+        default-position=${this.homePanelPosition}
+        min=${100 - PANEL_MAX * 100}
+        .position=${this.panelPosition}
+        @helix-change=${this.handlePanelChange}
+      >
+        <helix-splitter
+          slot="start"
+          part="panes"
+          exportparts="separator"
+          default-position=${this.home?.split ?? split}
+          label=${this.separatorLabel}
+          orientation=${vertical ? 'vertical' : 'horizontal'}
+          .position=${split}
+          @helix-change=${this.handlePanesChange}
+        >
+          <div part="pane" data-pane="source" slot="start"><slot name="source"></slot></div>
+          <div part="pane" data-pane="preview" slot="end"><slot name="preview"></slot></div>
+        </helix-splitter>
+        <div part="panel" slot="end"><slot name="panel" @slotchange=${this.readPanel}></slot></div>
+      </helix-splitter>
       <slot name="status"></slot>`
   }
 

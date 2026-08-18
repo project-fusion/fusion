@@ -887,7 +887,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Coordination is by event, the same way the accordion does it: a source pane\ndispatches `SourceChange`, which bubbles, and the sandbox hands the value to\nwhatever preview is slotted into it. Neither child knows the other exists, so\neither can be replaced or used alone.\n\nThe event carries the pane's `name`, which is what lets one sandbox hold\nseveral panes without the root identifying senders by reference. `html` is\nthe preview's markup and `css` is its stylesheet. A pane named anything else\nis showing something rather than driving it, and is ignored: the sandbox has\na pane rendering the example as JSX, and guessing would have put the text of\na React component into the preview.\n\nThe split is a real `role=\"separator\"` with `aria-valuenow`, movable by\npointer and by arrow keys, because a divider that only responds to dragging\nis unusable without a mouse. Home and End jump to the bounds.",
+          "description": "Coordination is by event, the same way the accordion does it: a source pane\ndispatches `SourceChange`, which bubbles, and the sandbox hands the value to\nwhatever preview is slotted into it. Neither child knows the other exists, so\neither can be replaced or used alone.\n\nThe event carries the pane's `name`, which is what lets one sandbox hold\nseveral panes without the root identifying senders by reference. `html` is\nthe preview's markup and `css` is its stylesheet. A pane named anything else\nis showing something rather than driving it, and is ignored: the sandbox has\na pane rendering the example as JSX, and guessing would have put the text of\na React component into the preview.\n\n**The dividers are two nested `helix-splitter`s, not a grid this element\ndrags itself.** It had its own: a five row grid, a stylesheet written to on\nevery pointer move, three pointer handlers, a keyboard handler reading which\naxes each divider was allowed to move, and a corner placed by hand into the\ncell where two tracks met. All of it is the splitter's now, including the\ncorner, which arrives on its own wherever a nested splitter crosses the one it\nis in.\n\nThe panes are the inner splitter and the panel is the outer one, which is the\norder that makes the panel span the full width: the outer divider runs edge to\nedge and the inner stops at it.\n\n**Both are controlled from here, so `split` and `panel-size` stay the truth.**\nA splitter that owned its own position would leave this element reporting one\narrangement and showing another, and a consumer restoring a saved layout\nwrites to these two properties. Each splitter announces where it wants to go\nand this answers, which is the same contract a form control has with a\nframework.\n\n**The panel is in pixels here and a percentage in the splitter, and the\nconversion belongs here.** A terminal wants a number of lines rather than a\nshare of the window, so its height should not change when the window does. A\nsplitter has no business knowing that, so it stays percentage-pure and this\nelement, which does know what is in the panel, holds the box and converts.\nThat is also what keeps a stored `panelSize` from a previous visit meaning\nwhat it meant when it was written.",
           "name": "HelixSandbox",
           "cssProperties": [
             {
@@ -901,6 +901,10 @@
           ],
           "cssParts": [
             {
+              "description": "The splitter holding the panes above the panel.",
+              "name": "body"
+            },
+            {
               "description": "The handle where the two dividers cross.",
               "name": "corner"
             },
@@ -909,7 +913,15 @@
               "name": "pane"
             },
             {
-              "description": "The draggable divider.",
+              "description": "The box holding whatever was slotted as the panel.",
+              "name": "panel"
+            },
+            {
+              "description": "The splitter holding the source and preview panes.",
+              "name": "panes"
+            },
+            {
+              "description": "Either divider.",
               "name": "separator"
             }
           ],
@@ -1008,52 +1020,80 @@
             },
             {
               "kind": "field",
-              "name": "dragging",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false"
-            },
-            {
-              "kind": "field",
               "name": "hasPanel",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether anything is in the panel region.\n\nThe dividers around the panel are only meaningful when there is a panel to\nsize, and there is no way to ask in CSS: `:host(:has([slot=\"panel\"]))` is\ninvalid, and the server has no children to look at. `slotchange` is the\nplatform answering on the client, which is where a divider is any use."
+              "description": "Whether anything is in the panel region.\n\nThe divider above the panel is only meaningful when there is a panel to\nsize, and there is no way to ask in CSS: `:host(:has([slot=\"panel\"]))` is\ninvalid, and the server has no children to look at. `slotchange` is the\nplatform answering on the client, which is where a divider is any use."
             },
             {
               "kind": "field",
-              "name": "drag",
+              "name": "bodyHeight",
               "type": {
-                "text": "'block' | 'both' | 'inline' | null"
+                "text": "number"
               },
               "privacy": "private",
-              "default": "null",
-              "description": "Which axes the drag in progress is moving, if any."
+              "default": "0",
+              "description": "The body's height, which is what a pixel panel is a fraction of.\n\nThe panel is given in pixels and the splitter takes a percentage, so the two\nonly agree at one height: let the window change without recomputing and a\npanel asked for at 192px quietly keeps whatever share of the old height that\nwas.\n\n**Measured at render rather than cached from the observer**, which is the\nsecond design here. The first held the number the observer last reported and\nwas correct only while the observer was firing, and a `ResizeObserver`\ncallback is delivered from the rendering lifecycle: a background tab runs\nnone, so the value went stale with nothing to say so. Reading the box at\nrender leaves one source of truth, and the observer's only job is to say\nthat a render is due.\n\nCheap, because renders are rare. A drag no longer goes through this element\nat all: the splitter follows the pointer itself and announces once, when it\nsettles."
             },
             {
               "kind": "field",
-              "name": "initial",
+              "name": "watch",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Asks for a render when the body changes size.\n\nThe box watched is the splitter itself, not the panel. Its size changes when\nthe window does and not when the divider moves, so answering it cannot feed\nback into the position that answered it."
+            },
+            {
+              "kind": "field",
+              "name": "panelShare",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The panel as a share of the body, which is what the splitter takes.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "panelPosition",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "Where the outer divider goes: everything the panel is not.\n\nA hundred with no panel, which puts the divider on the floor of the sandbox\nwith the panes filling it. The line itself is hidden by the stylesheet in\nthat case, because a boundary needs two sides.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "home",
               "type": {
                 "text": "{ panel: number; split: number } | null"
               },
               "privacy": "private",
               "default": "null",
-              "description": "The sizes the sandbox was given, which a double click returns it to.\n\nWhat the consumer wrote, not the property defaults. A sandbox opened at\n`split=\"30\"` was arranged that way on purpose, and a reset that ignored it\nwould be resetting to somebody else's idea of the arrangement."
+              "description": "The arrangement the sandbox was given, which a double click returns it to.\n\nWhat the consumer wrote, not the property defaults. A sandbox opened at\n`split=\"30\"` was arranged that way on purpose, and a reset that ignored it\nwould be resetting to somebody else's idea of the arrangement."
             },
             {
               "kind": "field",
-              "name": "origin",
+              "name": "homePanelPosition",
               "type": {
-                "text": "{\n    bottom: number\n    height: number\n    left: number\n    top: number\n    width: number\n  } | null"
+                "text": "number"
               },
               "privacy": "private",
-              "default": "null",
-              "description": "The sandbox's box, measured once when a drag starts.\n\nMeasuring per move is a forced layout on every pointer event, in the middle\nof a gesture whose whole job is to stay ahead of the pointer. None of it\nmoves while dragging: the sandbox is where it was, and the panel's floor is\nthe status bar, which is not going anywhere either."
+              "description": "Where the panel divider goes on a reset, in the splitter's own units.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "panelSliver",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "`panel-collapsed-size` in the units the splitter works in.",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -1142,50 +1182,6 @@
               "readonly": true
             },
             {
-              "kind": "method",
-              "name": "clamp",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "number"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "next",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "description": "The split a drag has reached, held inside the sandbox.\n\nIt follows the pointer the whole way and stops at the edges, so closing a\npane is the end of the movement rather than a separate thing that happens\nto it."
-            },
-            {
-              "kind": "method",
-              "name": "clampPanel",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "number"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "next",
-                  "type": {
-                    "text": "number"
-                  }
-                },
-                {
-                  "name": "height",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "description": "Keeps the panel between the floor its consumer set and a ceiling that\nleaves the panes above it.\n\nThe floor is `panelCollapsedSize`, which is nothing unless someone says\notherwise: a panel whose tabs are the way to open it again wants a line of\nitself left behind, and only whoever put the tabs there knows how much. It\nis a floor the drag arrives at rather than a value it is thrown to, which\nis the difference between a pane being put away and a drag being dropped.\n\nThe ceiling is skipped when the height is zero, which means the sandbox has\nnot been laid out: multiplying that by a ratio gives zero, and clamping to\nit would close the panel rather than bound it."
-            },
-            {
               "kind": "field",
               "name": "axis",
               "type": {
@@ -1194,13 +1190,6 @@
               "privacy": "private",
               "description": "The orientation in force.\n\nUnset is horizontal, and stays unset: the default is the absent attribute,\nso a reflected default cannot appear on the host after hydration.",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Moves a divider by the keyboard.\n\nOne handler for all three, reading which axes the divider it came from is\nallowed to move. The corner takes both, and each arrow moves the axis it\npoints along, which is the only reading of a diagonal handle that a\nkeyboard has."
             },
             {
               "kind": "method",
@@ -1215,69 +1204,16 @@
             },
             {
               "kind": "field",
-              "name": "handleDoubleClick",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handlePointerDown",
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "handlePointerMove",
+              "name": "handlePanesChange",
               "privacy": "private",
               "readonly": true,
-              "description": "Follows the pointer, without going through a render.\n\nThe sizes are written straight into the stylesheet rather than assigned to\nthe properties. A drag is a stream of events, and putting each one through\nan update cycle means a render, a re-render of every slotted pane's host\nbindings, and a style write, to move a divider by a pixel. Writing the two\ncustom properties is the only part of that which changes anything, and the\nproperties are set once at the end so the element still ends up saying what\nit is showing.\n\nThe box comes from `origin`, measured when the drag started, so no pointer\nevent forces a layout to ask where the sandbox is."
+              "description": "Answers a divider that has asked to move.\n\nBoth splitters are controlled from here, so neither applies anything on its\nown: each announces where it wants to go and this decides. That is what\nkeeps `split` and `panelSize` the truth about the arrangement rather than a\nstale copy of it.\n\n`target` against `currentTarget`, because a source pane's own change bubbles\nup through these same elements on its way to the host. Only a splitter\nspeaking for itself is one of ours, and only those are stopped: the sandbox\nannounces `arrangement` and a consumer never sees the two inside it."
             },
             {
               "kind": "field",
-              "name": "statusHeight",
-              "type": {
-                "text": "number"
-              },
-              "privacy": "private",
-              "default": "0",
-              "description": "Height of anything below the panel, which the panel's own height excludes.\n\nRead once per drag along with the box. A status bar does not resize while\na divider is being dragged."
-            },
-            {
-              "kind": "field",
-              "name": "pending",
-              "type": {
-                "text": "{ panel: number; split: number } | null"
-              },
-              "privacy": "private",
-              "default": "null",
-              "description": "The sizes the drag has reached, to be committed when it ends."
-            },
-            {
-              "kind": "field",
-              "name": "handlePointerUp",
+              "name": "handlePanelChange",
               "privacy": "private",
               "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "applySizes",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "split",
-                  "default": "this.split"
-                },
-                {
-                  "name": "panel",
-                  "default": "this.panelSize"
-                }
-              ],
-              "description": "Writes the sizes into the shadow root's own stylesheet.\n\nInto a `<style>` rather than onto `this.style`, because an inline style on\nthe host is an attribute the element gives itself once it upgrades, and a\nReact consumer's server markup does not have it: hydration reports the\nmismatch and does not patch it up. The shadow root is not part of the tree\nReact hydrates.\n\nFilled imperatively because Lit rejects expressions inside `<style>`, which\nis why the template carries a static empty one. The server renders the\nstylesheet's own defaults, which are the same values these properties\ndefault to."
             },
             {
               "kind": "field",

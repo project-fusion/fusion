@@ -118,6 +118,10 @@ export class HelixBaseMenuItem extends HelixElement {
    * the row still drilled in. A framework filling a submenu on demand hit that
    * every time. `Tree.Item` backs `branch` the same way for the same reason.
    *
+   * Kept in step by `readSubmenu`, which is bound in the template rather than
+   * once at first render. See the note there: bound once, a single drill-in left
+   * it false for good.
+   *
    * False on the server is the right answer rather than a safe one: the server
    * cannot know whether a submenu was slotted, and a row that served an
    * `aria-haspopup` it might not have would be a promise made to a screen
@@ -128,11 +132,29 @@ export class HelixBaseMenuItem extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.readSubmenu()
+  }
+
+  /**
+   * Re-reads whether anything is in the submenu, from whichever slot is current.
+   *
+   * **Bound in the template, and it has to be.** It was `addEventListener` on
+   * the slot found at `firstUpdated`, which is a different element from the one
+   * showing a moment later: this row renders a `slot[name="submenu"]` in two
+   * template branches, one for the row and one for the page it opens, and moving
+   * between them makes Lit build a new slot and throw the old one away. The
+   * listener stayed on the discarded slot, and the discarded slot fired
+   * `slotchange` on its way out with nothing assigned to it any more. So one
+   * drill-in set `submenu` false and nothing was left listening to set it back:
+   * every caret in the menu vanished and every row stopped opening. Reported
+   * from a recording of the sandbox's Environment menu.
+   *
+   * The live slot is asked rather than `event.target`, so it does not matter
+   * which of the two fired or in what order.
+   */
+  private readonly readSubmenu = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="submenu"]')
     this.submenu = (slot?.assignedElements().length ?? 0) > 0
-    slot?.addEventListener('slotchange', () => {
-      this.submenu = slot.assignedElements().length > 0
-    })
   }
 
   /**
@@ -170,7 +192,7 @@ export class HelixBaseMenuItem extends HelixElement {
     // its rows are assigned to and nothing else. Its own row belongs to the
     // page above.
     if (this.showingSubmenu) {
-      return html`<slot name="submenu"></slot>`
+      return html`<slot name="submenu" @slotchange=${this.readSubmenu}></slot>`
     }
     // Not on the page showing, so there is nothing to draw. Rendering nothing
     // rather than hiding it with an attribute, because the attribute would be
@@ -227,7 +249,7 @@ export class HelixBaseMenuItem extends HelixElement {
               : html`<span part="mark" aria-hidden="true"></span>`
         }
       </div>
-      <slot name="submenu"></slot>`
+      <slot name="submenu" @slotchange=${this.readSubmenu}></slot>`
   }
 }
 

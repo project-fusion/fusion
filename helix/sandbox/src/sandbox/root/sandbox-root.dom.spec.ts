@@ -213,111 +213,138 @@ describe('sandbox coordination', () => {
   })
 })
 
-describe('sandbox divider', () => {
-  const press = (host: HTMLElement, key: string): KeyboardEvent => {
+type Splitter = HTMLElement & { position: number; updateComplete: Promise<unknown> }
+
+/** The two splitters the sandbox arranges: the panes inside the panel. */
+const panes = (host: HTMLElement): Splitter => part(host, 'panes') as Splitter
+const body = (host: HTMLElement): Splitter => part(host, 'body') as Splitter
+const bar = (splitter: Splitter): HTMLElement =>
+  splitter.shadowRoot?.querySelector('[part="separator"]') as HTMLElement
+
+describe('sandbox dividers', () => {
+  const press = async (
+    host: Updatable,
+    splitter: Splitter,
+    key: string,
+  ): Promise<KeyboardEvent> => {
     const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
-    part(host, 'separator')?.dispatchEvent(event)
+    bar(splitter).dispatchEvent(event)
+    await splitter.updateComplete
+    await host.updateComplete
     return event
   }
 
-  test('is a separator that reports where it is', async () => {
-    const sandbox = (await mount(wired)) as Updatable & { split: number }
-    const separator = part(sandbox, 'separator')
-    expect(separator?.getAttribute('role')).toBe('separator')
-    // Whatever the split is, not whatever number it happens to start at: the
-    // assertion that matters is that the two agree, and pinning the literal
-    // meant a change of default read as a broken separator.
-    expect(separator?.getAttribute('aria-valuenow')).toBe(String(sandbox.split))
-    // Focusable, because a divider only a mouse can move is unusable without one.
-    expect(separator?.getAttribute('tabindex')).toBe('0')
+  test('two splitters, the panes nested inside the panel', async () => {
+    // The order is what makes the panel span the full width: the outer divider
+    // runs edge to edge and the inner one stops at it.
+    const sandbox = await mount(wired)
+    expect(body(sandbox).tagName).toBe('HELIX-SPLITTER')
+    expect(panes(sandbox).tagName).toBe('HELIX-SPLITTER')
+    expect(body(sandbox).getAttribute('orientation')).toBe('vertical')
+    expect(panes(sandbox).contains(part(sandbox, 'pane') as Node)).toBe(true)
+    expect(body(sandbox).contains(panes(sandbox))).toBe(true)
   })
 
-  test('arrow keys move the split', async () => {
-    // By a step from wherever it was, which is the behavior. The step is the
-    // component's and the starting point is a default, and a spec that names
-    // both fails when either moves for reasons that are not this one.
+  test('the panes divider reports the split it was given', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    expect(bar(panes(sandbox)).getAttribute('role')).toBe('separator')
+    // Whatever the split is, not whatever number it happens to start at.
+    expect(bar(panes(sandbox)).getAttribute('aria-valuenow')).toBe(String(sandbox.split))
+    expect(bar(panes(sandbox)).getAttribute('tabindex')).toBe('0')
+  })
+
+  test('arrow keys move the split, and the sandbox is what answers', async () => {
+    // The splitter is controlled from here, so it applies nothing on its own:
+    // it announces, this sets `split`, and the number it reports is the truth.
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const start = sandbox.split
-    press(sandbox, 'ArrowRight')
-    await sandbox.updateComplete
+    await press(sandbox, panes(sandbox), 'ArrowRight')
     const step = sandbox.split - start
     expect(step).toBeGreaterThan(0)
+    expect(panes(sandbox).position).toBe(sandbox.split)
 
-    press(sandbox, 'ArrowLeft')
-    press(sandbox, 'ArrowLeft')
-    await sandbox.updateComplete
+    await press(sandbox, panes(sandbox), 'ArrowLeft')
+    await press(sandbox, panes(sandbox), 'ArrowLeft')
     expect(sandbox.split).toBe(start - step)
   })
 
   test('the split reaches both ends and stops there', async () => {
-    /* It used to stop short, at fifteen and eighty-five, with a snap to nothing
-       once a drag went half as far again. Two rules over one gesture, and the
-       seam between them was a jump: the pane held at a floor and then vanished
-       in a frame. It goes where it is put now, and the ends are ends rather
-       than places to be thrown from. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
-    press(sandbox, 'Home')
-    await sandbox.updateComplete
+    await press(sandbox, panes(sandbox), 'Home')
     expect(sandbox.split).toBe(0)
 
-    press(sandbox, 'End')
-    await sandbox.updateComplete
+    await press(sandbox, panes(sandbox), 'End')
     expect(sandbox.split).toBe(100)
 
-    // And no further, in either direction.
-    press(sandbox, 'ArrowRight')
-    await sandbox.updateComplete
+    await press(sandbox, panes(sandbox), 'ArrowRight')
     expect(sandbox.split).toBe(100)
   })
 
-  test('a size that is not a number does not take the grid with it', async () => {
-    /* These go into custom properties and are substituted into
-       `grid-template-columns`. A custom property holds nearly anything at parse
-       time and fails only where it is used, and an invalid template falls back
-       to `none`, so the grid stops being three columns and auto-places instead:
-       one bad number cost the whole layout rather than one track. A consumer
-       setting `split` to `undefined` to mean "the default" is what found it. */
+  test('a split that is not a number falls back rather than breaking the layout', async () => {
+    // A consumer passing `undefined` to mean "the default" is what found this
+    // when the number went into `grid-template-columns`: one bad value threw the
+    // whole template away. The grid is gone and the guard is not.
     const sandbox = (await mount(wired)) as Updatable & { split: number }
-    const sizes = () => sandbox.shadowRoot?.querySelector('#sizes')?.textContent ?? ''
-
     sandbox.split = undefined as unknown as number
     await sandbox.updateComplete
-    expect(sizes()).not.toContain('undefined')
-    expect(sizes()).toContain('--_sandbox-split: 50%')
+    expect(panes(sandbox).position).toBe(50)
 
     sandbox.split = Number.NaN
     await sandbox.updateComplete
-    expect(sizes()).not.toContain('NaN')
-    expect(sizes()).toContain('--_sandbox-split: 50%')
+    expect(panes(sandbox).position).toBe(50)
 
-    // And a real one still gets through.
     sandbox.split = 30
     await sandbox.updateComplete
-    expect(sizes()).toContain('--_sandbox-split: 30%')
+    expect(panes(sandbox).position).toBe(30)
   })
 
-  test('a pane at nothing says so, for the divider beside it', async () => {
-    /* A boundary needs two sides. With a pane at zero its divider is a rule at
-       the edge of the sandbox with empty space behind it, which reads as the
-       border of a pane that is no longer there, so the styling turns it off and
-       needs to know. The line itself cannot be asserted here: happy-dom has no
-       layout and no cascade to speak of, so this covers the flag and a browser
-       covers the paint. */
+  test('the panel divider is only there when there is a panel to size', async () => {
+    // A boundary needs two sides. The element stays and the stylesheet hides it,
+    // which is a paint a browser has to check; this covers the flag it reads.
+    // On the splitter, never on the host: `hasPanel` is answered at hydration,
+    // so an attribute here that the server's markup lacked is a mismatch React
+    // reports and refuses to patch. Measured on the real site before it moved.
+    const bare = await mount(wired)
+    expect(bare.hasAttribute('data-panel')).toBe(false)
+    expect(body(bare).hasAttribute('data-panel')).toBe(false)
+
+    const full = await mount(withPanel)
+    expect(full.hasAttribute('data-panel')).toBe(false)
+    expect(body(full).hasAttribute('data-panel')).toBe(true)
+  })
+
+  test('the corner arrives on its own where the two dividers cross', async () => {
+    const sandbox = await mount(withPanel)
+    await body(sandbox).updateComplete
+    await sandbox.updateComplete
+    expect(body(sandbox).shadowRoot?.querySelector('[part="corner"]')).not.toBeNull()
+  })
+
+  test('and not when the panes are stacked, where the two run parallel', async () => {
+    const sandbox = await mount(
+      withPanel.replace('<helix-sandbox>', '<helix-sandbox orientation="vertical">'),
+    )
+    await body(sandbox).updateComplete
+    await sandbox.updateComplete
+    expect(body(sandbox).shadowRoot?.querySelector('[part="corner"]')).toBeNull()
+  })
+
+  test('the arrangement is announced once, and the splitters inside are not', async () => {
+    // A consumer stores one arrangement. What the two elements inside said to
+    // each other on the way there is not their business.
     const sandbox = (await mount(wired)) as Updatable & { split: number }
-    expect(sandbox.dataset.collapsed).toBeUndefined()
-
-    sandbox.split = 0
-    await sandbox.updateComplete
-    expect(sandbox.dataset.collapsed).toBe('inline')
-
-    sandbox.split = 40
-    await sandbox.updateComplete
-    expect(sandbox.dataset.collapsed).toBeUndefined()
+    const named: string[] = []
+    sandbox.addEventListener('helix-change', (event) => {
+      named.push((event as CustomEvent<{ name: string }>).detail.name)
+    })
+    await press(sandbox, panes(sandbox), 'ArrowRight')
+    expect(named).toEqual(['arrangement'])
   })
 
   test('an unrelated key is left alone', async () => {
     const sandbox = await mount(wired)
-    expect(press(sandbox, 'PageDown').defaultPrevented).toBe(false)
+    const event = await press(sandbox as Updatable, panes(sandbox), 'PageDown')
+    expect(event.defaultPrevented).toBe(false)
   })
 })
 
@@ -385,67 +412,22 @@ describe('sandbox source editing', () => {
   })
 
   describe('sandbox dividers', () => {
-    test('the panel dividers appear only when there is a panel to size', async () => {
-      // There is no asking in CSS, `:host(:has([slot="panel"]))` being invalid,
-      // and nothing to ask on the server. `slotchange` is what answers.
-      const bare = (await mount(wired)) as Updatable
-      expect(bare.shadowRoot?.querySelector('[part="corner"]')).toBeNull()
-
-      const full = (await mount(withPanel)) as Updatable
-      await full.updateComplete
-      expect(full.shadowRoot?.querySelector('[part="separator"][data-axis="block"]')).not.toBeNull()
-      expect(full.shadowRoot?.querySelector('[part="corner"]')).not.toBeNull()
-    })
-
-    test('each divider answers only the arrows it can move', async () => {
-      const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number; split: number }
-      await sandbox.updateComplete
-      const start = sandbox.split
-      const press = async (selector: string, key: string) => {
-        sandbox.shadowRoot
-          ?.querySelector(selector)
-          ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
-        await sandbox.updateComplete
-      }
-
-      await press('[part="separator"][data-drag="inline"]', 'ArrowLeft')
-      const moved = sandbox.split
-      expect(moved).toBeLessThan(start)
-      await press('[part="separator"][data-drag="inline"]', 'ArrowUp')
-      expect(sandbox.panelSize).toBe(192)
-
-      await press('[part="separator"][data-axis="block"]', 'ArrowUp')
-      expect(sandbox.panelSize).toBe(208)
-      // Still where the inline divider left it: this one moves the other axis.
-      await press('[part="separator"][data-axis="block"]', 'ArrowLeft')
-      expect(sandbox.split).toBe(moved)
-    })
-
-    test('the corner answers both, each arrow along its own axis', async () => {
-      const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number; split: number }
-      await sandbox.updateComplete
-      const press = async (key: string) => {
-        sandbox.shadowRoot
-          ?.querySelector('[part="corner"]')
-          ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
-        await sandbox.updateComplete
-      }
-      const start = sandbox.split
-      await press('ArrowRight')
-      expect(sandbox.split).toBeGreaterThan(start)
-      await press('ArrowUp')
-      expect(sandbox.panelSize).toBe(208)
-    })
-
-    test('the corner is a separator with a name, and claims no single orientation', async () => {
-      // `aria-orientation` has no value meaning "both", and inventing one says
-      // less than saying nothing: the label is what carries it.
+    test('the corner carries the name this element gave it', async () => {
+      // The splitter draws it, so the label has to reach it from here: it is the
+      // one part of the corner that knows what the two panes are.
       const sandbox = (await mount(withPanel)) as Updatable
+      const outer = part(sandbox, 'body') as Updatable
+      await outer.updateComplete
       await sandbox.updateComplete
-      const corner = sandbox.shadowRoot?.querySelector('[part="corner"]')
+      const corner = outer.shadowRoot?.querySelector('[part="corner"]')
       expect(corner?.getAttribute('role')).toBe('separator')
-      expect(corner?.getAttribute('aria-orientation')).toBeNull()
       expect(corner?.getAttribute('aria-label')).toBe('Resize panes and panel')
     })
+
+    /* The panel's own geometry is not asserted here, and cannot be. It is given
+       in pixels and handed to the splitter as a share of the body, so it needs a
+       measured height, and happy-dom lays nothing out: every box is zero, the
+       share is zero, and the conversion refuses rather than dividing by it. A
+       browser covers it. */
   })
 })

@@ -1191,3 +1191,10 @@ helix-drawer helix-tree {
 .statusMark helix-icon {
   --icon-size: 0.875rem;
 }
+
+/* The mark on the sandbox's confirmation. The dialog sizes it; the colour is the
+   product's to say, and this one warns rather than destroys: changing the
+   environment converts what was written, it does not throw it away. */
+.dialogWarning {
+  color: var(--helix-color-warning);
+}

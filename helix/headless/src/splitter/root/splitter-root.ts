@@ -257,8 +257,30 @@ export class HelixBaseSplitter extends HelixElement {
    */
   private opened: number | undefined = undefined
 
-  /** Where the divider was when the element first rendered, for a reset. */
-  private initial: number | undefined = undefined
+  /**
+   * Where the gesture has moved to, whether or not it was applied. See `move`.
+   *
+   * `@state`, because the divider is drawn from it while a drag is under way.
+   */
+  @state()
+  private reached: number | undefined = undefined
+
+  /**
+   * The position to draw, which is not always the position to report.
+   *
+   * A controlled splitter applies nothing, so `position` holds still for the
+   * whole gesture and the divider stayed where it was until the pointer came up
+   * and the consumer answered: it jumped to the end rather than following the
+   * hand. Reported as resizing that was not seamless and did not work as it had.
+   *
+   * So a drag draws itself. The number is not announced until it settles, which
+   * is the rule that has not changed, and the consumer's answer takes over the
+   * moment they give one. It is what the sandbox did for itself before it used
+   * this component: write the size on every pointer move, tell anyone once.
+   */
+  private get showing(): number {
+    return this.dragging && this.reached !== undefined ? this.clamp(this.reached) : this.position
+  }
 
   /**
    * Whether this divider is being moved right now, by anything.
@@ -347,14 +369,20 @@ export class HelixBaseSplitter extends HelixElement {
   }
 
   /**
-   * Whether a shut pane has gone entirely, leaving the divider on the edge.
+   * Whether the divider is against an edge with nothing beside it.
    *
-   * Not the same question as `collapsed`, and the stylesheet needs both: a pane
-   * shut down to a sliver still has a boundary worth drawing, and one shut to
-   * nothing has the container's own edge there instead.
+   * Geometry, not state, which is the second answer here: it asked whether the
+   * pane was `collapsed`, and a divider driven to the edge by a consumer setting
+   * `position` is just as flush and drew a line anyway. What the stylesheet
+   * needs to know is whether there is a pane on both sides, and that is a fact
+   * about where the divider is however it got there.
+   *
+   * Still not the same question as `collapsed`: a pane shut to a sliver has a
+   * boundary worth drawing, and one shut to nothing has the container's own edge
+   * there instead.
    */
   private get flush(): boolean {
-    return this.collapsed !== undefined && this.sliver === 0
+    return this.sliver === 0 && this.shutAt(this.position) !== undefined
   }
 
   private shutAt(position: number): 'end' | 'start' | undefined {
@@ -386,6 +414,14 @@ export class HelixBaseSplitter extends HelixElement {
    */
   private move(next: number): void {
     const wanted = this.clamp(next)
+    /* Where the gesture has reached, recorded before anything decides whether to
+       apply it. A controlled splitter applies nothing, so its `position` is
+       whatever the consumer last said, and settling at *that* announces the
+       number it already had: the drag ended where it began and the divider never
+       moved. Reported as a splitter that could not be dragged at all, and it was
+       every controlled one. The keyboard was fine because it computes its next
+       position rather than reading it back. */
+    this.reached = wanted
     if (wanted === this.position || this.positionIsControlled) {
       return
     }
@@ -431,7 +467,13 @@ export class HelixBaseSplitter extends HelixElement {
          them is not made to care about the other. */
       requestControlledChange({
         apply: (value) => {
-          if (this.collapsedIsControlled) {
+          /* A consumer who owns `position` owns the geometry, and collapse is
+             geometry: applied here it would win over the number they set, and
+             `position` would report the edge forever after. Latched once by a
+             drag, a controlled splitter could never be reopened by its own
+             consumer. They collapse it by saying `collapsed`, like everything
+             else they own. */
+          if (this.collapsedIsControlled || this.positionIsControlled) {
             return
           }
           const previous = this.collapsed
@@ -464,6 +506,8 @@ export class HelixBaseSplitter extends HelixElement {
        which on a fast gesture is immediately. */
     separator.setPointerCapture(event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
+    // Cleared, so a number from the last gesture cannot settle this one.
+    this.reached = undefined
     // On the press rather than the first move, so holding it still says so too.
     this.dragging = true
     event.preventDefault()
@@ -493,7 +537,8 @@ export class HelixBaseSplitter extends HelixElement {
     }
     this.origin = null
     this.dragging = false
-    this.settle(this.position)
+    this.settle(this.reached ?? this.position)
+    this.reached = undefined
   }
 
   /**
@@ -540,11 +585,19 @@ export class HelixBaseSplitter extends HelixElement {
 
   /** Puts the divider back where the markup put it. */
   private reset(): void {
-    if (this.initial === undefined) {
-      return
-    }
-    this.move(this.initial)
-    this.settle(this.initial)
+    /* `default-position`, not the position at first render, which is what this
+       read and which is only the same thing when nobody owns the position. A
+       consumer who does owns what it was on that first frame too, and theirs can
+       be a number they cannot compute yet: the sandbox sizes its panel in pixels
+       and has no box to divide by until it has rendered once, so the divider
+       recorded "panel closed" as home and a double click on the crossing shut
+       the panel instead of restoring it. Reported.
+
+       Declared rather than remembered, so it is a value a consumer can state and
+       change, and it needs no capture at all. */
+    const home = this.clamp(this.defaultPosition)
+    this.move(home)
+    this.settle(home)
   }
 
   private readonly handleDoubleClick = (): void => {
@@ -644,6 +697,8 @@ export class HelixBaseSplitter extends HelixElement {
     handle.setPointerCapture(event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
     crossing.by.opened = crossing.by.collapsed ? undefined : crossing.by.position
+    this.reached = undefined
+    crossing.by.reached = undefined
     /* Both of them, on the press. The nested one is reachable here because it is
        the same class, and this is the whole of what the corner needs beyond
        `moveTo`: a divider being moved looks like one. */
@@ -695,8 +750,10 @@ export class HelixBaseSplitter extends HelixElement {
       handle.releasePointerCapture(event.pointerId)
     }
     this.cornerOrigin = null
-    this.moveTo(this.position, true)
-    origin.by.moveTo(origin.by.position, true)
+    this.moveTo(this.reached ?? this.position, true)
+    origin.by.moveTo(origin.by.reached ?? origin.by.position, true)
+    this.reached = undefined
+    origin.by.reached = undefined
     this.leaveSeparator(event)
   }
 
@@ -782,9 +839,11 @@ export class HelixBaseSplitter extends HelixElement {
     } else {
       delete this.dataset.collapsed
     }
-    if (this.outer && this.position !== this.crossedAt) {
-      this.crossedAt = this.position
-      this.outer.cross(this, this.position)
+    /* `showing` rather than `position`, so a corner drawn on the splitter above
+       follows this divider through a drag instead of catching up at the end. */
+    if (this.outer && this.showing !== this.crossedAt) {
+      this.crossedAt = this.showing
+      this.outer.cross(this, this.showing)
     }
   }
 
@@ -797,13 +856,10 @@ export class HelixBaseSplitter extends HelixElement {
     if (this.collapsedMode === undefined) {
       this.collapsedMode = this.collapsedState !== undefined
     }
-    if (this.initial === undefined) {
-      this.initial = this.position
-    }
   }
 
   protected override render(): TemplateResult {
-    const position = this.position
+    const position = this.showing
     return html`<div part="start" style="--_splitter-position: ${position}%">
         <slot name="start"></slot>
       </div>

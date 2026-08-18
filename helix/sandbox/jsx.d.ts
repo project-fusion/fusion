@@ -700,9 +700,32 @@ export type CustomElements = {
    * a pane rendering the example as JSX, and guessing would have put the text of
    * a React component into the preview.
    *
-   * The split is a real `role="separator"` with `aria-valuenow`, movable by
-   * pointer and by arrow keys, because a divider that only responds to dragging
-   * is unusable without a mouse. Home and End jump to the bounds.
+   * **The dividers are two nested `helix-splitter`s, not a grid this element
+   * drags itself.** It had its own: a five row grid, a stylesheet written to on
+   * every pointer move, three pointer handlers, a keyboard handler reading which
+   * axes each divider was allowed to move, and a corner placed by hand into the
+   * cell where two tracks met. All of it is the splitter's now, including the
+   * corner, which arrives on its own wherever a nested splitter crosses the one it
+   * is in.
+   *
+   * The panes are the inner splitter and the panel is the outer one, which is the
+   * order that makes the panel span the full width: the outer divider runs edge to
+   * edge and the inner stops at it.
+   *
+   * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
+   * A splitter that owned its own position would leave this element reporting one
+   * arrangement and showing another, and a consumer restoring a saved layout
+   * writes to these two properties. Each splitter announces where it wants to go
+   * and this answers, which is the same contract a form control has with a
+   * framework.
+   *
+   * **The panel is in pixels here and a percentage in the splitter, and the
+   * conversion belongs here.** A terminal wants a number of lines rather than a
+   * share of the window, so its height should not change when the window does. A
+   * splitter has no business knowing that, so it stays percentage-pure and this
+   * element, which does know what is in the panel, holds the box and converts.
+   * That is also what keeps a stored `panelSize` from a previous visit meaning
+   * what it meant when it was written.
    *
    * ## Attributes & Properties
    *
@@ -747,9 +770,12 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `body`: The splitter holding the panes above the panel.
    * - `corner`: The handle where the two dividers cross.
    * - `pane`: Either pane.
-   * - `separator`: The draggable divider.
+   * - `panel`: The box holding whatever was slotted as the panel.
+   * - `panes`: The splitter holding the source and preview panes.
+   * - `separator`: Either divider.
    */
   "helix-sandbox": Partial<
     HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
@@ -1147,9 +1173,32 @@ export type CustomElementsSolidJs = {
    * a pane rendering the example as JSX, and guessing would have put the text of
    * a React component into the preview.
    *
-   * The split is a real `role="separator"` with `aria-valuenow`, movable by
-   * pointer and by arrow keys, because a divider that only responds to dragging
-   * is unusable without a mouse. Home and End jump to the bounds.
+   * **The dividers are two nested `helix-splitter`s, not a grid this element
+   * drags itself.** It had its own: a five row grid, a stylesheet written to on
+   * every pointer move, three pointer handlers, a keyboard handler reading which
+   * axes each divider was allowed to move, and a corner placed by hand into the
+   * cell where two tracks met. All of it is the splitter's now, including the
+   * corner, which arrives on its own wherever a nested splitter crosses the one it
+   * is in.
+   *
+   * The panes are the inner splitter and the panel is the outer one, which is the
+   * order that makes the panel span the full width: the outer divider runs edge to
+   * edge and the inner stops at it.
+   *
+   * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
+   * A splitter that owned its own position would leave this element reporting one
+   * arrangement and showing another, and a consumer restoring a saved layout
+   * writes to these two properties. Each splitter announces where it wants to go
+   * and this answers, which is the same contract a form control has with a
+   * framework.
+   *
+   * **The panel is in pixels here and a percentage in the splitter, and the
+   * conversion belongs here.** A terminal wants a number of lines rather than a
+   * share of the window, so its height should not change when the window does. A
+   * splitter has no business knowing that, so it stays percentage-pure and this
+   * element, which does know what is in the panel, holds the box and converts.
+   * That is also what keeps a stored `panelSize` from a previous visit meaning
+   * what it meant when it was written.
    *
    * ## Attributes & Properties
    *
@@ -1194,9 +1243,12 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `body`: The splitter holding the panes above the panel.
    * - `corner`: The handle where the two dividers cross.
    * - `pane`: Either pane.
-   * - `separator`: The draggable divider.
+   * - `panel`: The box holding whatever was slotted as the panel.
+   * - `panes`: The splitter holding the source and preview panes.
+   * - `separator`: Either divider.
    */
   "helix-sandbox": Partial<
     HelixSandboxProps &

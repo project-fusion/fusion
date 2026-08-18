@@ -1,0 +1,40 @@
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-button
+  appearance="danger"
+  command="--show"
+  commandfor="discard"
+  fill="standard"
+>Discard changes</helix-button>
+
+<helix-dialog
+  align="center"
+  id="discard"
+  label="Discard changes"
+  size="sm"
+>
+  <helix-icon
+    name="warning-fill"
+    slot="icon"
+  ></helix-icon>
+  <h2 slot="header">Discard changes?</h2>
+  Nine edits have not been saved. Closing now leaves them behind.
+  <helix-flex
+    gap="sm"
+    slot="footer"
+  >
+    <helix-button
+      appearance="danger"
+      fill="standard"
+    >Discard</helix-button>
+    <helix-button
+      appearance="secondary"
+      command="--close"
+      commandfor="discard"
+      fill="standard"
+    >Keep editing</helix-button>
+  </helix-flex>
+</helix-dialog>

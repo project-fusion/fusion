@@ -52,6 +52,8 @@ import '../../listbox/index.js'
  * @csspart trigger - The closed control, which says what is chosen.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
+ * @csspart items - The scrolling box of options, forwarded from the listbox.
+ * @csspart empty - What shows with no options in it, forwarded from the listbox.
  * @csspart hint - Help under the trigger.
  * @csspart feedback - What is wrong with it.
  */

@@ -86,3 +86,43 @@ describe('menu', () => {
     expect(row?.getAttribute('aria-checked')).toBe('false')
   })
 })
+
+describe('menu submenus, coming and going', () => {
+  const nested = async (): Promise<Menu> =>
+    (await mount(
+      `<helix-menu label="Settings"><button slot="trigger">Open</button>
+        <helix-menu-item value="environment">Environment
+          <helix-menu-item slot="submenu" value="html">HTML</helix-menu-item>
+          <helix-menu-item slot="submenu" value="tsx">TSX</helix-menu-item>
+        </helix-menu-item>
+      </helix-menu>`,
+    )) as Menu
+
+  const row = (host: Menu): HTMLElement & { hasSubmenu: boolean; showingSubmenu: boolean } =>
+    host.querySelector('helix-menu-item') as HTMLElement & {
+      hasSubmenu: boolean
+      showingSubmenu: boolean
+    }
+
+  test('a row with rows under it says so', async () => {
+    const host = await nested()
+    await (row(host) as unknown as Menu).updateComplete
+    expect(row(host).hasSubmenu).toBe(true)
+  })
+
+  /* **Drilling in and back out cannot be asserted here, and a spec that says it
+     can is worse than none.** The fault it would cover is that the row renders a
+     `slot[name="submenu"]` in two template branches, so moving between them
+     makes Lit build a new slot and discard the old one, and the discarded slot
+     fires `slotchange` on its way out with nothing assigned. A listener bound
+     once at first render is still on that slot and sets `hasSubmenu` false for
+     good: every caret goes and every row stops opening.
+   *
+     Written as a spec it passed against the broken build as readily as the
+     fixed one, measured both ways, because happy-dom neither rebuilds the slot
+     nor fires the departing `slotchange`. It is checked in a browser instead:
+     with the listener bound once, the four rows of the sandbox's Environment
+     menu went from `hasSubmenu` true to false after a single drilldown and the
+     carets vanished; bound in the template, they survive that and a second
+     drilldown still opens. */
+})

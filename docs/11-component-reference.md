@@ -966,6 +966,7 @@ dialog rather than being a div somebody positioned.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `align` | `align` | `'center' \| 'start' \| undefined` | - | - | Whether the panel's contents run from the start or centre on it. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
@@ -994,6 +995,7 @@ dialog rather than being a div somebody positioned.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The dialog's content. |
+| `icon` | A single mark above the title, for a dialog that warns. |
 | `header` | The title, and anything beside it. |
 | `footer` | The actions. |
 
@@ -1007,6 +1009,7 @@ dialog rather than being a div somebody positioned.
 
 | Property | Description |
 | --- | --- |
+| `--dialog-icon-size` | How big the mark above the title is. |
 | `--dialog-inline-size` | Width of the panel. |
 | `--dialog-inset` | Padding inside the panel. |
 
@@ -2349,6 +2352,9 @@ reach through both boundaries and a consumer styles it as the select it is.
 | Part | Description |
 | --- | --- |
 | `control` | The select. |
+| `label` | The words beside the number, forwarded from the select. |
+| `trigger` | The closed control, forwarded from the select. |
+| `value` | The chosen size inside the trigger, forwarded from the select. |
 
 ### Summary — `helix-pagination-summary`
 
@@ -2740,6 +2746,8 @@ from the field it came out of.
 | `trigger` | The closed control, which says what is chosen. |
 | `surface` | The floating panel. |
 | `listbox` | The list inside it. |
+| `items` | The scrolling box of options, forwarded from the listbox. |
+| `empty` | What shows with no options in it, forwarded from the listbox. |
 | `hint` | Help under the trigger. |
 | `feedback` | What is wrong with it. |
 

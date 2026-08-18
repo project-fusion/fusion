@@ -52,6 +52,7 @@ import { property } from 'lit/decorators.js'
  * nothing when pointed at a custom one.
  *
  * @slot - The dialog's content.
+ * @slot icon - A single mark above the title, for a dialog that warns.
  * @slot header - The title, and anything beside it.
  * @slot footer - The actions.
  *
@@ -232,6 +233,7 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
       @click=${this.handleBackdrop}
       @close=${this.handleClose}
     >
+      <slot name="icon"></slot>
       <slot name="header"></slot>
       <slot></slot>
       <slot name="footer"></slot>

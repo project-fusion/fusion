@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../../index.js'
 
@@ -8,27 +8,60 @@ const markup = ssr(html`<helix-sandbox>
   <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
 </helix-sandbox>`)
 
+/**
+ * The divider inside a named splitter, rather than the first one in the file.
+ *
+ * There are two now, nested, and the outer one comes first: a spec reaching for
+ * "the separator" got the panel's and read its bounds as the panes'.
+ *
+ * `withoutStyles` first, and that is not tidiness. Declarative shadow DOM inlines
+ * each component's stylesheet into the very markup being searched, and this one
+ * names `[part="panes"]` in a selector: the search found the CSS, started from
+ * there, and the next divider after it was the panel's again.
+ */
+const bare = withoutStyles(markup)
+
+const dividerIn = (part: string): string => {
+  const at = bare.indexOf(`part="${part}"`)
+  expect(at).toBeGreaterThan(-1)
+  const divider = /<div\s+part="separator"[^>]*>/.exec(bare.slice(at))
+  return divider?.[0] ?? ''
+}
+
 describe('sandbox server output', () => {
   test('renders without reading children it cannot see', () => {
     // The coordination listener is attached on connect, which the server never
     // calls, so rendering at all proves nothing walks the tree.
-    // The host is the split, so there is no container part: the shadow root
-    // holds two panes and the divider between them.
     expect(hasPart(markup, 'pane')).toBe(true)
-    expect(hasPart(markup, 'separator')).toBe(true)
+    expect(hasPart(markup, 'body')).toBe(true)
+    expect(hasPart(markup, 'panes')).toBe(true)
   })
 
-  test('the divider ships with its full state, not just a role', () => {
-    const separator = partTag(markup, 'separator')
+  test('the panes divider ships with its full state, not just a role', () => {
+    const separator = dividerIn('panes')
     expect(separator).toContain('role="separator"')
     // A position, whatever the default is. Pinning the number made a change of
     // default read as a divider that had stopped reporting itself.
     expect(separator).toMatch(/aria-valuenow="\d+"/)
-    // 0, not the fifteen a drag stops at: past that floor the pane closes, so
-    // nothing is a position a reader can reach and the range has to say so.
+    // 0, not a floor a drag stops at: past that a pane closes, so nothing is a
+    // position a reader can reach and the range has to say so.
     expect(separator).toContain('aria-valuemin="0"')
     expect(separator).toContain('aria-valuemax="100"')
     expect(separator).toContain('tabindex="0"')
+  })
+
+  test('the panel divider is served on the floor, with no panel to size', () => {
+    // `hasPanel` is a question about the tree, which a server cannot ask, so the
+    // panel starts shut and the divider starts flush against the bottom. The
+    // stylesheet takes it away entirely once the client says there is one.
+    const separator = dividerIn('body')
+    expect(separator).toContain('aria-valuenow="100"')
+    expect(separator).toContain('data-flush')
+  })
+
+  test('no corner is served, because a crossing is a fact about the tree', () => {
+    expect(hasPart(markup, 'panes')).toBe(true)
+    expect(hasPart(markup, 'corner')).toBe(false)
   })
 
   test('the source pane is a labelled textarea in the served markup', () => {
@@ -36,18 +69,8 @@ describe('sandbox server output', () => {
     expect(withoutStyles(markup)).toContain('<textarea')
   })
 
-  test('the served split matches the property default, so nothing shifts', () => {
-    // The split cannot be an inline style: that is an attribute the element
-    // would give itself on upgrade, which a React consumer's markup never has.
-    // It is set from a `<style>` in the shadow root instead, and the stylesheet
-    // carries the same figure as a fallback so the served markup already
-    // agrees.
-    //
-    // Read from what was served rather than written here twice. The invariant
-    // is that the two agree, and a spec naming the number states the default in
-    // a third place that then has to be kept in step with the other two.
-    const served = /aria-valuenow="(\d+)"/.exec(partTag(markup, 'separator') ?? '')?.[1]
-    expect(served).toBeDefined()
-    expect(markup).toContain(`var(--_sandbox-split, ${served}%)`)
+  test('the host carries only what the consumer wrote', () => {
+    // `data-panel` is mirrored once the element upgrades, never served.
+    expect(hostAttributes(markup, 'helix-sandbox')).toEqual([])
   })
 })

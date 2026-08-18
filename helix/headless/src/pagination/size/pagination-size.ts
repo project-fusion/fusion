@@ -62,6 +62,9 @@ import '../../select/index.js'
  * @documentation https://helix.fusion.dev/components/pagination
  *
  * @csspart control - The select.
+ * @csspart label - The words beside the number, forwarded from the select.
+ * @csspart trigger - The closed control, forwarded from the select.
+ * @csspart value - The chosen size inside the trigger, forwarded from the select.
  *
  * @event {HelixChangeEvent} helix-change - Fired before the size changes, and cancelable. The only way to refuse one.
  */

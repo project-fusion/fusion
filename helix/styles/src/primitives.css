@@ -151,7 +151,15 @@
      75, so it is the same amber: lightness carries the contrast and the extra
      chroma keeps it from reading as brown on the way down. Measured after:
      3.31 on the tint, 3.74 as a border, 3.74 on a light toast. */
-  --_helix-warning-500: oklch(0.62 0.185 75);
+  /* Brightened to `l 0.70`, deliberately, and the note it replaces is worth
+     keeping in view: this was taken down to 0.62 to clear the 3:1 a non-text
+     mark needs, measured on a callout's own ten percent tint. At 0.70 that
+     surface measures about 2.7:1, so a warning mark on a tinted background no
+     longer clears it. Chosen anyway: amber at 0.62 read as brown against the
+     other severities, and a warning that nobody registers as one is its own
+     failure. Where the ratio has to hold, `--callout-background-color` and the
+     per-component hooks take a darker value. */
+  --_helix-warning-500: oklch(0.7 0.185 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
   /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
      ramp uses. A severity had exactly one value each, which is what a color
@@ -180,6 +188,10 @@
 
   --_helix-info-400: oklch(from var(--_helix-info-500) calc(l + 0.12) c h);
   --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
+  /* Back to the shared `+ 0.12` now the light arm carries the brightness: from
+     0.70 that lands the dark arm at 0.82, measured at 9.62:1 on the sandbox's
+     own background and 7.99:1 on a dark callout tint. Further clips, red pinned
+     at 255 while green climbs, which moves the hue rather than the brightness. */
   --_helix-warning-400: oklch(from var(--_helix-warning-500) calc(l + 0.12) c h);
   --_helix-danger-400: oklch(from var(--_helix-danger-500) calc(l + 0.12) c h);
 

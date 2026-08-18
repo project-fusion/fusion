@@ -444,3 +444,111 @@ describe('splitter collapsing', () => {
     expect(host.collapsed).toBe('start')
   })
 })
+
+describe('splitter under a consumer that owns the position', () => {
+  const drag = async (host: Splitter, from: number, to: number): Promise<void> => {
+    const bar = separator(host)
+    const box = host.getBoundingClientRect()
+    const at = (type: string, fraction: number) =>
+      bar.dispatchEvent(
+        new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: box.left + box.width * fraction,
+          clientY: box.top + box.height * fraction,
+        }) as PointerEvent,
+      )
+    let held = false
+    bar.setPointerCapture = () => {
+      held = true
+    }
+    bar.releasePointerCapture = () => {
+      held = false
+    }
+    bar.hasPointerCapture = () => held
+    at('pointerdown', from)
+    at('pointermove', to)
+    at('pointerup', to)
+    await host.updateComplete
+  }
+
+  test('a controlled splitter can still be dragged, and says where to', async () => {
+    /* It could not. `move` refuses to apply anything when the consumer owns the
+       position, so `position` never changed during the drag, and letting go
+       settled at *that*: the announcement carried the number it started with and
+       the divider never moved. Every controlled splitter, and nothing exercised
+       one until the sandbox did. */
+    const host = await splitter('position="50"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    let asked = ''
+    host.addEventListener('helix-change', (event) => {
+      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
+      if (detail.name === 'position') {
+        asked = detail.value
+      }
+    })
+    await drag(host, 0.5, 0.25)
+    expect(asked).toBe('25')
+    // And applied nothing itself, which is the other half of being controlled.
+    expect(host.position).toBe(50)
+  })
+
+  test('and draws the drag as it happens, without announcing it', async () => {
+    /* Applying nothing is right; drawing nothing is not. The divider held still
+       for the whole gesture and jumped when the pointer came up and the consumer
+       answered, which is a drag that does not follow the hand. Reported against
+       the sandbox after it became the first controlled consumer.
+
+       The rule that has not changed is when it *tells* anyone: once, at the end.
+       This is what the sandbox did for itself before it used this component. */
+    const host = await splitter('position="50"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    const said: string[] = []
+    host.addEventListener('helix-change', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const bar = separator(host)
+    const at = (type: string, fraction: number) =>
+      bar.dispatchEvent(
+        new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: 200 * fraction,
+          clientY: 50,
+        }) as PointerEvent,
+      )
+    let held = false
+    bar.setPointerCapture = () => {
+      held = true
+    }
+    bar.releasePointerCapture = () => {
+      held = false
+    }
+    bar.hasPointerCapture = () => held
+
+    at('pointerdown', 0.5)
+    at('pointermove', 0.8)
+    await host.updateComplete
+    // Drawn at the pointer, reported as the consumer's value, and silent so far.
+    expect(part(host, 'start')?.getAttribute('style')).toContain('80%')
+    expect(host.position).toBe(50)
+    expect(said).toEqual([])
+
+    at('pointerup', 0.8)
+    await host.updateComplete
+    expect(said).toEqual(['80'])
+  })
+
+  test('an uncontrolled one is unchanged by the same path', async () => {
+    const host = await splitter('default-position="50"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    await drag(host, 0.5, 0.75)
+    expect(host.position).toBe(75)
+  })
+})

@@ -12,6 +12,7 @@ import {
 } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
+  HelixDialog,
   HelixDrawer,
   HelixInput,
   HelixMenu,
@@ -149,6 +150,16 @@ export function SandboxWorkbench({ families }: Props) {
   /* What is in the editor now, and in which language, so the effect below can
      tell "a new example arrived" from "the same one, asked for differently". */
   const seeded = useRef<{ example: string; syntax: Syntax } | null>(null)
+  /* The markup as the example handed it over, which is what "edited" is measured
+     against. A flag set on the first keystroke would stay set after the reader
+     put it back, and typing a character and deleting it is not a change worth
+     stopping anyone over. */
+  const pristine = useRef('')
+  /* An environment change a reader has been asked about but not yet agreed to.
+     Held rather than applied, because the conversion is the thing being
+     confirmed and doing it first would leave nothing to cancel. */
+  const [pendingSyntax, setPendingSyntax] = useState<Syntax | null>(null)
+  const confirmSyntax = useRef<HelixDialog | null>(null)
   /* Where the divider is, held here rather than left on the element. Hiding the
      editor drives the split to zero, so showing it again has to put a number
      back, and the number it has to put back is the one it had. This was
@@ -317,23 +328,45 @@ export function SandboxWorkbench({ families }: Props) {
       setCss(event.detail.value)
     }
   })
+  /**
+   * Switches the language the example is written in.
+   *
+   * Split out because two callers reach it now: the menu, where there is nothing
+   * to lose, and the confirmation below, where the reader has said to go ahead.
+   */
+  const applySyntax = (next: Syntax) => {
+    setSyntax(next)
+    setPane('source')
+    const element = sandbox.current
+    window.localStorage.setItem(
+      ARRANGEMENT,
+      JSON.stringify({
+        panelSize: element?.panelSize,
+        split: element?.split,
+        syntax: next,
+      }),
+    )
+  }
+
+  /* Escape and the backdrop close it too, and neither goes through a button.
+     `open` is a prop here, so a close this file did not hear about would leave
+     the dialog shut and the state saying it was open, and the next edit would
+     reopen it. */
+  useHelixEvent(confirmSyntax, 'helix-close', () => {
+    setPendingSyntax(null)
+  })
+
   // One listener for the whole menu: the value says which setting and, where
   // it drilled down, which option.
   useHelixEvent(settings, 'helix-select', (event) => {
     const [setting, option] = event.detail.value.split(':')
     if (setting === 'syntax' && option) {
       const next = option as Syntax
-      setSyntax(next)
-      setPane('source')
-      const element = sandbox.current
-      window.localStorage.setItem(
-        ARRANGEMENT,
-        JSON.stringify({
-          panelSize: element?.panelSize,
-          split: element?.split,
-          syntax: next,
-        }),
-      )
+      if (next !== syntax && markup !== pristine.current) {
+        setPendingSyntax(next)
+        return
+      }
+      applySyntax(next)
     } else if (setting === 'layout' && option) {
       setLayout(option as 'padded' | 'centered' | 'fullscreen')
     } else if (setting === 'direction' && option) {
@@ -494,7 +527,9 @@ export function SandboxWorkbench({ families }: Props) {
       if (meant) {
         arrived.current = null
       }
-      setMarkup(carried?.markup ?? (syntax === 'html' ? example.html : htmlToJsx(example.html)))
+      const seed = carried?.markup ?? (syntax === 'html' ? example.html : htmlToJsx(example.html))
+      pristine.current = seed
+      setMarkup(seed)
       /* The example's own stylesheet where it ships one, and the placeholder
          where it does not. Pushed at the preview here as well as in the effect
          that follows every edit: that effect runs after this render, so seeding
@@ -509,7 +544,14 @@ export function SandboxWorkbench({ families }: Props) {
       terminal.current?.clear()
     } else if (last.syntax !== syntax) {
       // The same text in the other language, so edits survive the switch.
-      setMarkup((current) => (syntax === 'html' ? jsxToHtml(current) : htmlToJsx(current)))
+      setMarkup((current) => {
+        const converted = syntax === 'html' ? jsxToHtml(current) : htmlToJsx(current)
+        /* The baseline moves with it. What came out of the converter is the new
+           "untouched", or the next switch would compare this language's text
+           against the last one's and call every document edited. */
+        pristine.current = converted
+        return converted
+      })
     }
     seeded.current = { example: address, syntax }
   }, [example, family, syntax])
@@ -1018,6 +1060,51 @@ export function SandboxWorkbench({ families }: Props) {
             ></helix-sandbox-status-bar>
           )}
         </helix-sandbox>
+
+        {/* Asked before the conversion, not after.
+ 
+            Changing the environment does not throw the text away, it runs it
+            through `htmlToJsx` or `jsxToHtml`, and that is the problem: the
+            converters do not reproduce half-typed markup, so a document with
+            work in it can come back altered in ways nobody asked for. Untouched,
+            there is nothing to lose and the switch is silent.
+ 
+            Rendered always rather than gated on `pendingSyntax`, because a
+            dialog that unmounts cannot animate out, and `open` is what drives
+            `showModal()`. */}
+        <helix-dialog
+          align="center"
+          label="Change environment"
+          open={pendingSyntax !== null}
+          ref={confirmSyntax}
+          size="sm"
+        >
+          <helix-icon className="dialogWarning" name="warning-fill" slot="icon"></helix-icon>
+          <h2 slot="header">Change environment?</h2>
+          You have edited this example.
+          <helix-flex gap="sm" slot="footer">
+            <helix-button
+              appearance="primary"
+              fill="standard"
+              onClick={() => {
+                const next = pendingSyntax
+                setPendingSyntax(null)
+                if (next) {
+                  applySyntax(next)
+                }
+              }}
+            >
+              Change anyway
+            </helix-button>
+            <helix-button
+              appearance="secondary"
+              fill="standard"
+              onClick={() => setPendingSyntax(null)}
+            >
+              Keep editing
+            </helix-button>
+          </helix-flex>
+        </helix-dialog>
 
         {/* A real drawer on a phone: focus trapped, Escape closes, page behind
             covered. The CSS transform it replaced was none of those. */}

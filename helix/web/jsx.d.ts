@@ -2057,6 +2057,8 @@ export type HelixDialogHelixCloseElementEvent =
 export type HelixDialogProps = {
   /** How wide the panel is allowed to be. */
   size?: HelixDialog["size"];
+  /** Whether the panel's contents run from the start or centre on it. */
+  align?: HelixDialog["align"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -2119,6 +2121,8 @@ instead. */
 export type HelixDialogSolidJsProps = {
   /** How wide the panel is allowed to be. */
   "prop:size"?: HelixDialog["size"];
+  /** Whether the panel's contents run from the start or centre on it. */
+  "prop:align"?: HelixDialog["align"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -8770,6 +8774,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `size`: How wide the panel is allowed to be.
+   * - `align`: Whether the panel's contents run from the start or centre on it.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -8828,6 +8833,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
    *
@@ -8850,6 +8856,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
    *
@@ -10765,6 +10772,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `control`: The select.
+   * - `label`: The words beside the number, forwarded from the select.
+   * - `trigger`: The closed control, forwarded from the select.
+   * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
   "helix-pagination-size": Partial<
     HelixPaginationSizeProps & BaseProps<HelixPaginationSize> & BaseEvents
@@ -11406,6 +11416,8 @@ export type CustomElements = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */
@@ -14596,6 +14608,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `size`: How wide the panel is allowed to be.
+   * - `align`: Whether the panel's contents run from the start or centre on it.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -14654,6 +14667,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
    *
@@ -14676,6 +14690,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
    *
@@ -16666,6 +16681,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `control`: The select.
+   * - `label`: The words beside the number, forwarded from the select.
+   * - `trigger`: The closed control, forwarded from the select.
+   * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
   "helix-pagination-size": Partial<
     HelixPaginationSizeProps &
@@ -17332,6 +17350,8 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */
@@ -19261,6 +19281,8 @@ export type CustomCssProperties = {
   "--checkbox-card-background-color"?: string;
   /** Edge around one. */
   "--checkbox-card-border-color"?: string;
+  /** How big the mark above the title is. */
+  "--dialog-icon-size"?: string;
   /** Width of the panel. */
   "--dialog-inline-size"?: string;
   /** Padding inside the panel. */

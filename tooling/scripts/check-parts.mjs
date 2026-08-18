@@ -67,7 +67,18 @@ for (const tier of TIERS) {
        render side so a part named in prose is not counted as one. */
     const documented = [...text.matchAll(/@csspart\s+([a-z0-9-]+)/g)].map((m) => m[1])
     const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
-    const rendered = [...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1])
+    /* `exportparts` publishes a part too, and until the sandbox forwarded the
+       splitter's divider nothing here did: a part reached through it read as
+       documented-but-never-rendered, and the fix would have been to stop
+       documenting a part consumers can style. The exposed name is what they
+       write, so an aliased `inner: outer` counts as `outer`. */
+    const forwarded = [...code.matchAll(/exportparts="([^"]+)"/g)].flatMap((m) =>
+      m[1]
+        .split(',')
+        .map((one) => one.split(':').pop()?.trim() ?? '')
+        .filter(Boolean),
+    )
+    const rendered = [...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]), ...forwarded]
     components.set(name, {
       bases: [...base.matchAll(/(\w+)/g)].map((m) => m[1]),
       documented,

@@ -315,3 +315,47 @@
     animation: none;
   }
 }
+
+/* The mark above the title, for a dialog that warns.
+ *
+ * A slot rather than something a consumer puts inside the header, and the
+ * difference is who owns the size. Slotted into the header it is an icon in a
+ * heading, which is a different thing at a different scale, and every consumer
+ * would pick their own. Here the dialog says how big a mark above a title is,
+ * once, and every warning in a product matches.
+ *
+ * Bare, like the header and the footer: an unassigned slot generates no box, so
+ * a dialog with no mark has no empty band where one is not.
+ *
+ * `display: block` and a fixed box, because what is slotted is usually an
+ * `<helix-icon>` sized for a line of text. Sizing it here rather than asking for
+ * an icon that is already large keeps the markup the same as everywhere else. */
+::slotted([slot="icon"]) {
+  block-size: var(--dialog-icon-size, calc(var(--helix-size-icon-lg) * 2));
+  display: block;
+  inline-size: var(--dialog-icon-size, calc(var(--helix-size-icon-lg) * 2));
+}
+
+/* Centred, and it has to be on the panel rather than on each region.
+ *
+ * The dialog's own content is a bare slot, so what a consumer writes there is
+ * usually a text node, and `::slotted()` matches elements only: a rule per
+ * region could reach the header and the footer and never the sentence between
+ * them. `text-align` on the panel inherits to all three, text nodes included.
+ *
+ * The footer is the exception and needs saying twice, because it is a flex
+ * container and `text-align` does not place flex items. */
+:host([align="center"]) [part="dialog"] {
+  text-align: center;
+}
+
+:host([align="center"]) ::slotted([slot="footer"]) {
+  justify-content: center;
+}
+
+/* A block box is not centred by `text-align`, so the mark is placed rather than
+   aligned. `fit-content`, or a block at the panel's full width has nothing to
+   centre. */
+:host([align="center"]) ::slotted([slot="icon"]) {
+  margin-inline: auto;
+}

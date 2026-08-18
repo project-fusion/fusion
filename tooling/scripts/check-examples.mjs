@@ -125,17 +125,29 @@ for (const family of families) {
      applied in the preview and missing from the file a reader takes away; a
      link with no stylesheet is a promise to a file that is not there. */
   for (const file of files) {
-    const linked = /<link\b[^>]*\brel=(["'])stylesheet\1/i.test(
-      readFileSync(join(dir, file), 'utf8'),
-    )
+    const markup = readFileSync(join(dir, file), 'utf8')
+    const link = /<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>/is.exec(markup)
     const sheet = entries.includes(file.replace(/\.html$/, '.css'))
-    if (sheet && !linked) {
+    if (sheet && !link) {
       problems.push(
         `${family}/${file}: ships ${file.replace(/\.html$/, '.css')} without linking it`,
       )
     }
-    if (linked && !sheet) {
+    if (link && !sheet) {
       problems.push(`${family}/${file}: links a stylesheet that is not beside it`)
+    }
+    /* And it links `styles.css`, whatever the file beside it is called.
+       The pair on disk is keyed by slug, `nested.html` and `nested.css`, and the
+       sandbox shows them as `index.html` and `styles.css`. Twenty three examples
+       linked the slug and seven linked `styles.css`, so the link a reader could
+       see named a file they could not: it looked like the stylesheet in the tab
+       beside it was not the one being applied. The name a reader is shown is the
+       name the markup should say. */
+    const href = link ? /\bhref=(["'])([^"']+)\1/i.exec(link[0])?.[2] : undefined
+    if (href && href !== 'styles.css') {
+      problems.push(
+        `${family}/${file}: links \`${href}\`, which is not the \`styles.css\` a reader sees`,
+      )
     }
   }
 

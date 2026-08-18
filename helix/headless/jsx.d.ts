@@ -7910,6 +7910,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
    *
@@ -9932,6 +9933,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `control`: The select.
+   * - `label`: The words beside the number, forwarded from the select.
+   * - `trigger`: The closed control, forwarded from the select.
+   * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
   "helix-base-pagination-size": Partial<
     HelixBasePaginationSizeProps &
@@ -10591,6 +10595,8 @@ export type CustomElements = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */
@@ -13782,6 +13788,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The dialog's content.
+   * - `icon`: A single mark above the title, for a dialog that warns.
    * - `header`: The title, and anything beside it.
    * - `footer`: The actions.
    *
@@ -15873,6 +15880,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `control`: The select.
+   * - `label`: The words beside the number, forwarded from the select.
+   * - `trigger`: The closed control, forwarded from the select.
+   * - `value`: The chosen size inside the trigger, forwarded from the select.
    */
   "helix-base-pagination-size": Partial<
     HelixBasePaginationSizeProps &
@@ -16549,6 +16559,8 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The closed control, which says what is chosen.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows with no options in it, forwarded from the listbox.
    * - `hint`: Help under the trigger.
    * - `feedback`: What is wrong with it.
    */

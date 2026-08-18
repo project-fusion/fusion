@@ -8262,6 +8262,10 @@
           "name": "HelixDialog",
           "cssProperties": [
             {
+              "description": "How big the mark above the title is.",
+              "name": "--dialog-icon-size"
+            },
+            {
               "description": "Width of the panel.",
               "name": "--dialog-inline-size"
             },
@@ -8279,6 +8283,16 @@
               },
               "description": "How wide the panel is allowed to be.",
               "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "type": {
+                "text": "'center' | 'start' | undefined"
+              },
+              "description": "Whether the panel's contents run from the start or centre on it.",
+              "attribute": "align",
               "reflects": true
             },
             {
@@ -8620,6 +8634,14 @@
               "fieldName": "size"
             },
             {
+              "name": "align",
+              "type": {
+                "text": "'center' | 'start' | undefined"
+              },
+              "description": "Whether the panel's contents run from the start or centre on it.",
+              "fieldName": "align"
+            },
+            {
               "name": "open",
               "type": {
                 "text": "boolean"
@@ -8695,6 +8717,14 @@
             {
               "description": "The dialog's content.",
               "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseDialog",
+                "module": "src/dialog/root/dialog-root.ts"
+              }
+            },
+            {
+              "description": "A single mark above the title, for a dialog that warns.",
+              "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseDialog",
                 "module": "src/dialog/root/dialog-root.ts"
@@ -18316,7 +18346,18 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether anything is slotted into `submenu`. Read after first render.\n\nState rather than a getter over `children`, which is what it was: read\nduring `render()` with nothing to re-read it, a submenu arriving after the\nrow's first render produced no caret and no `aria-haspopup` while selecting\nthe row still drilled in. A framework filling a submenu on demand hit that\nevery time. `Tree.Item` backs `branch` the same way for the same reason.\n\nFalse on the server is the right answer rather than a safe one: the server\ncannot know whether a submenu was slotted, and a row that served an\n`aria-haspopup` it might not have would be a promise made to a screen\nreader on the strength of a guess.",
+              "description": "Whether anything is slotted into `submenu`. Read after first render.\n\nState rather than a getter over `children`, which is what it was: read\nduring `render()` with nothing to re-read it, a submenu arriving after the\nrow's first render produced no caret and no `aria-haspopup` while selecting\nthe row still drilled in. A framework filling a submenu on demand hit that\nevery time. `Tree.Item` backs `branch` the same way for the same reason.\n\nKept in step by `readSubmenu`, which is bound in the template rather than\nonce at first render. See the note there: bound once, a single drill-in left\nit false for good.\n\nFalse on the server is the right answer rather than a safe one: the server\ncannot know whether a submenu was slotted, and a row that served an\n`aria-haspopup` it might not have would be a promise made to a screen\nreader on the strength of a guess.",
+              "inheritedFrom": {
+                "name": "HelixBaseMenuItem",
+                "module": "src/menu/item/menu-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readSubmenu",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Re-reads whether anything is in the submenu, from whichever slot is current.\n\n**Bound in the template, and it has to be.** It was `addEventListener` on\nthe slot found at `firstUpdated`, which is a different element from the one\nshowing a moment later: this row renders a `slot[name=\"submenu\"]` in two\ntemplate branches, one for the row and one for the page it opens, and moving\nbetween them makes Lit build a new slot and throw the old one away. The\nlistener stayed on the discarded slot, and the discarded slot fired\n`slotchange` on its way out with nothing assigned to it any more. So one\ndrill-in set `submenu` false and nothing was left listening to set it back:\nevery caret in the menu vanished and every row stopped opening. Reported\nfrom a recording of the sandbox's Environment menu.\n\nThe live slot is asked rather than `event.target`, so it does not matter\nwhich of the two fired or in what order.",
               "inheritedFrom": {
                 "name": "HelixBaseMenuItem",
                 "module": "src/menu/item/menu-item.ts"
@@ -22431,6 +22472,30 @@
             {
               "description": "The select.",
               "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBasePaginationSize",
+                "module": "src/pagination/size/pagination-size.ts"
+              }
+            },
+            {
+              "description": "The words beside the number, forwarded from the select.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBasePaginationSize",
+                "module": "src/pagination/size/pagination-size.ts"
+              }
+            },
+            {
+              "description": "The closed control, forwarded from the select.",
+              "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixBasePaginationSize",
+                "module": "src/pagination/size/pagination-size.ts"
+              }
+            },
+            {
+              "description": "The chosen size inside the trigger, forwarded from the select.",
+              "name": "value",
               "inheritedFrom": {
                 "name": "HelixBasePaginationSize",
                 "module": "src/pagination/size/pagination-size.ts"
@@ -26836,6 +26901,22 @@
               }
             },
             {
+              "description": "The scrolling box of options, forwarded from the listbox.",
+              "name": "items",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "description": "What shows with no options in it, forwarded from the listbox.",
+              "name": "empty",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
               "description": "Help under the trigger.",
               "name": "hint",
               "inheritedFrom": {
@@ -28861,13 +28942,27 @@
             },
             {
               "kind": "field",
-              "name": "initial",
+              "name": "reached",
               "type": {
                 "text": "number | undefined"
               },
               "privacy": "private",
               "default": "undefined",
-              "description": "Where the divider was when the element first rendered, for a reset.",
+              "description": "Where the gesture has moved to, whether or not it was applied. See `move`.\n\n`@state`, because the divider is drawn from it while a drag is under way.",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showing",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The position to draw, which is not always the position to report.\n\nA controlled splitter applies nothing, so `position` holds still for the\nwhole gesture and the divider stayed where it was until the pointer came up\nand the consumer answered: it jumped to the end rather than following the\nhand. Reported as resizing that was not seamless and did not work as it had.\n\nSo a drag draws itself. The number is not announced until it settles, which\nis the rule that has not changed, and the consumer's answer takes over the\nmoment they give one. It is what the sandbox did for itself before it used\nthis component: write the size on every pointer move, tell anyone once.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"
@@ -29007,7 +29102,7 @@
                 "text": "boolean"
               },
               "privacy": "private",
-              "description": "Whether a shut pane has gone entirely, leaving the divider on the edge.\n\nNot the same question as `collapsed`, and the stylesheet needs both: a pane\nshut down to a sliver still has a boundary worth drawing, and one shut to\nnothing has the container's own edge there instead.",
+              "description": "Whether the divider is against an edge with nothing beside it.\n\nGeometry, not state, which is the second answer here: it asked whether the\npane was `collapsed`, and a divider driven to the edge by a consumer setting\n`position` is just as flush and drew a line anyway. What the stylesheet\nneeds to know is whether there is a pane on both sides, and that is a fact\nabout where the divider is however it got there.\n\nStill not the same question as `collapsed`: a pane shut to a sliver has a\nboundary worth drawing, and one shut to nothing has the container's own edge\nthere instead.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",

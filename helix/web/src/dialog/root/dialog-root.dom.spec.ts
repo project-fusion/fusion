@@ -190,3 +190,45 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('dialog framing', () => {
+  const framed = async (extra = ''): Promise<Dialog> =>
+    (await mount(
+      `<helix-dialog label="Discard changes" ${extra}>
+        <span slot="icon">!</span>
+        <h2 slot="header">Discard changes?</h2>
+        Nine edits have not been saved.
+        <span slot="footer">actions</span>
+      </helix-dialog>`,
+    )) as Dialog
+
+  test('the mark sits above the title, in its own slot', async () => {
+    // Its own, rather than something a consumer nests in the header: slotted
+    // into a heading it is an icon at a heading's scale, and every product
+    // would pick a different one. The dialog owns how big a mark is.
+    const host = await framed()
+    const slots = [...(host.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) =>
+      one.getAttribute('name'),
+    )
+    expect(slots).toEqual(['icon', 'header', null, 'footer'])
+  })
+
+  test('and a dialog with no mark has no empty band where one is not', async () => {
+    // Bare, like the header and the footer. An unassigned slot generates no box.
+    const host = await dialog()
+    const icon = host.shadowRoot?.querySelector('slot[name="icon"]') as HTMLSlotElement
+    expect(icon.assignedNodes().length).toBe(0)
+  })
+
+  test('centring is one property for the panel, not one per region', async () => {
+    // The regions are never mixed: a dialog that asks a short question centres
+    // all four together, and one holding a form runs all four from the start.
+    const host = await framed('align="center"')
+    expect(host.getAttribute('align')).toBe('center')
+  })
+
+  test('unset stays unset, so no default is reflected onto the host', async () => {
+    const host = await framed()
+    expect(host.hasAttribute('align')).toBe(false)
+  })
+})
