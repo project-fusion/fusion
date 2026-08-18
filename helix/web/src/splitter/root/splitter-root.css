@@ -34,50 +34,106 @@
   overflow: auto;
 }
 
-/* The divider. A line to look at and a target to hit are different sizes, so the
-   line is drawn by a border and the box around it is the target: at the border's
-   own width this is a one pixel pointer target, which is the fault every
-   hand-rolled splitter has. */
+/* The divider, and three faults measured at once.
+ *
+ * It was a box as wide as the target with the line drawn on its leading *edge*,
+ * which put every one of the eight pixels on one side of the line: 0px of grab
+ * before it and 7px after, so reaching for the seam from the left missed. It was
+ * also a real flex item, so its whole width came out of the second pane and the
+ * two were eight pixels apart at a position of fifty. And hovering lit the whole
+ * eight pixel box beside a one pixel line, which read as the divider changing
+ * width and jumping sideways.
+ *
+ * All three are the same mistake: the box was doing the drawing. Now the box is
+ * only the target, centred on the seam and costing the layout nothing, and the
+ * line is drawn inside it.
+ *
+ * `margin-inline` pulls back exactly half the width on each side, so the element
+ * contributes zero and the panes are the percentage they were asked for. It
+ * overlaps both of them by four pixels, which is the point: a target has to
+ * straddle the thing it grabs. `z-index` because the second pane is painted
+ * after this and would otherwise cover the half of it that reaches underneath. */
 [part="separator"] {
   background-color: transparent;
-  border-inline-start: var(--helix-border-thin) solid
-    var(--splitter-color, var(--helix-color-border));
   box-sizing: border-box;
   cursor: col-resize;
   flex: none;
   inline-size: var(--splitter-target, var(--helix-space-xs));
+  margin-inline: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
+  position: relative;
   /* The pointer stays with the divider once it has it, and a drag that crosses
      a pane must not select the text under it. */
   touch-action: none;
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
+  z-index: var(--helix-layer-raised);
+}
+
+/* The line, centred in the target rather than drawn on its edge, so the two are
+   concentric and thickening one does not move the other. */
+[part="separator"]::before {
+  background-color: var(--splitter-color, var(--helix-color-border));
+  content: "";
+  inline-size: var(--helix-border-thin);
+  inset-block: 0;
+  inset-inline-start: 50%;
+  position: absolute;
+  translate: -50%;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    inline-size var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :host([orientation="vertical"]) [part="separator"] {
   block-size: var(--splitter-target, var(--helix-space-xs));
-  border-block-start: var(--helix-border-thin) solid
-    var(--splitter-color, var(--helix-color-border));
-  border-inline-start: none;
   cursor: row-resize;
+  inline-size: auto;
+  margin-block: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
+  margin-inline: 0;
+}
+
+:host([orientation="vertical"]) [part="separator"]::before {
+  block-size: var(--helix-border-thin);
+  inline-size: auto;
+  inset-block-start: 50%;
+  inset-inline: 0;
+  translate: 0 -50%;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    block-size var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **What lights is the divider, not the target.** The target is eight pixels of
+   hit area and the divider is a line, and lighting the first to say something
+   about the second made the line appear to change width. The line thickens and
+   darkens instead: it is the thing being pointed at, so it is the thing that
+   answers. */
+[part="separator"]:hover::before,
+[part="separator"]:focus-visible::before {
+  background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
+  inline-size: var(--helix-border-thick);
+}
+
+:host([orientation="vertical"]) [part="separator"]:hover::before,
+:host([orientation="vertical"]) [part="separator"]:focus-visible::before {
+  block-size: var(--helix-border-thick);
   inline-size: auto;
 }
 
-/* It says it can be moved before it is touched, which a hairline does not. The
-   whole target lights rather than the line, so the thing that answers the
-   pointer is the thing that changed. */
-[part="separator"]:hover {
-  background-color: var(--splitter-hover-color, var(--helix-color-surface-sunken));
+/* On the line as well, for the same reason: a ring around the target would be a
+   rectangle drawn over both panes, around something that is not eight pixels
+   wide. */
+[part="separator"]:focus-visible {
+  outline: none;
 }
 
-[part="separator"]:focus-visible {
+[part="separator"]:focus-visible::before {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  /* Inset, because the divider is a sliver between two panes and an outset ring
-     would be drawn over both of them. */
-  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="separator"] {
+  [part="separator"]::before,
+  :host([orientation="vertical"]) [part="separator"]::before {
     transition: none;
   }
 }
