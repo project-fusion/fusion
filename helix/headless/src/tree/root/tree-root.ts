@@ -67,9 +67,21 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
 
   private watcher: MutationObserver | undefined
 
-  /** Every item, in the order a reader moving down would meet them. */
+  /**
+   * Every item, in the order a reader moving down would meet them.
+   *
+   * Selected by tag rather than by walking everything and filtering. `'*'` built
+   * an array of every descendant element in the tree, labels and icons and
+   * whatever a consumer slotted into a row included, and threw most of it away;
+   * on a tree of any size that is the array a single arrow press rebuilds.
+   *
+   * The two tag names rather than `instanceof` on everything: a styled
+   * `helix-tree-item` extends the base, so both names are needed, and the
+   * `instanceof` stays as the type guard because a consumer can write either
+   * tag and neither selector proves what the element is.
+   */
   private get items(): HelixBaseTreeItem[] {
-    return [...this.querySelectorAll('*')].filter(
+    return [...this.querySelectorAll('helix-tree-item, helix-base-tree-item')].filter(
       (node): node is HelixBaseTreeItem => node instanceof HelixBaseTreeItem,
     )
   }

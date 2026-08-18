@@ -17,23 +17,47 @@
   inline-size: var(--skeleton-size, var(--helix-size-control));
 }
 
+/* The base fill, and nothing animated on this element at all.
+ *
+ * The sweep was `background-position` on a gradient, which repaints the element
+ * every frame rather than compositing, forever, once per skeleton. A loading
+ * state is by definition many of them at once and on a page already busy doing
+ * the thing they are standing in for, which makes it the worst place in the
+ * library to repaint on a timer. */
 [part="skeleton"] {
-  /* Derived, like five of the seven animating sheets in this tier. A raw
-     duration in a shorthand is a theme that slows its motion and leaves this
-     one behind. */
-  animation: helix-skeleton-sweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  block-size: 100%;
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  inline-size: 100%;
+  /* The containing block for the sweep, and the clip that keeps it inside the
+     corner radius. */
+  overflow: hidden;
+  position: relative;
+}
+
+/* The sweep, on a layer of its own so it can be moved rather than redrawn.
+ *
+ * `translate` is composited: the gradient is painted once and the compositor
+ * slides it, where `background-position` re-rasterises the element on every
+ * frame. Same effect, same duration, same easing.
+ *
+ * Twice the width and travelling its own width, so the highlight enters from
+ * before the element and leaves past the end of it rather than appearing and
+ * vanishing at the edges. */
+[part="skeleton"]::after {
+  animation: helix-skeleton-sweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-image: linear-gradient(
     90deg,
     transparent 0%,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent) 50%,
     transparent 100%
   );
-  background-size: 200% 100%;
-  block-size: 100%;
-  border-radius: var(--helix-radii-sm);
-  display: block;
-  inline-size: 100%;
+  content: "";
+  inline-size: 200%;
+  inset-block: 0;
+  inset-inline-start: 0;
+  position: absolute;
 }
 
 :host([shape="text"]) [part="skeleton"] {
@@ -46,18 +70,18 @@
 
 @keyframes helix-skeleton-sweep {
   from {
-    background-position: 200% 0;
+    translate: -50% 0;
   }
 
   to {
-    background-position: -200% 0;
+    translate: 50% 0;
   }
 }
 
 /* The sweep is the whole effect, so with motion reduced the placeholder simply
    sits there rather than animating something else instead. */
 @media (prefers-reduced-motion: reduce) {
-  [part="skeleton"] {
+  [part="skeleton"]::after {
     animation: none;
     background-image: none;
   }

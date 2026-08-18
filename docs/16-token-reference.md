@@ -80,8 +80,8 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 38 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 96 |
-| `--helix-radii-md` | `var(--_helix-seed-radii)` | 8 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 100 |
+| `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 46 |
 

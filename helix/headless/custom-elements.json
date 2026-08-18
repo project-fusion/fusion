@@ -25594,7 +25594,7 @@
                 "text": "HelixBaseTreeItem[]"
               },
               "privacy": "private",
-              "description": "Every item, in the order a reader moving down would meet them.",
+              "description": "Every item, in the order a reader moving down would meet them.\n\nSelected by tag rather than by walking everything and filtering. `'*'` built\nan array of every descendant element in the tree, labels and icons and\nwhatever a consumer slotted into a row included, and threw most of it away;\non a tree of any size that is the array a single arrow press rebuilds.\n\nThe two tag names rather than `instanceof` on everything: a styled\n`helix-tree-item` extends the base, so both names are needed, and the\n`instanceof` stays as the type guard because a consumer can write either\ntag and neither selector proves what the element is.",
               "readonly": true
             },
             {

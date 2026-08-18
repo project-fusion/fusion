@@ -82,16 +82,15 @@ export class HelixGrid extends HelixElement {
       : ''
   }
 
+  /* `updated` alone, where there was a `firstUpdated` beside it doing the same
+     thing. Lit puts every initial property into the first `changed`, so a grid
+     with a `min` ran `applyTemplate` twice on every mount, and one without it
+     ran it once to write the empty string an empty `<style>` already held. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('min')) {
       this.applyTemplate()
     }
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.applyTemplate()
   }
 
   protected override render(): TemplateResult {

@@ -9,7 +9,10 @@
 
 :host([appearance="outlined"]) {
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  /* The house radius, for the reason `Card` records. The inventory taken after
+     that sweep found this and `Callout` as the only two in-flow containers left
+     on `md`. */
+  border-radius: var(--helix-radii-sm);
 }
 
 slot[name="icon"]::slotted(*) {
