@@ -221,7 +221,12 @@
  * a ring over a photograph or a tinted callout would carry a plug of page
  * colour with it. A mask removes the middle instead of covering it. */
 :host([appearance="ring"]) [part="track"] {
-  --_ring-hole: calc(50% - var(--progress-ring-width, var(--helix-space-2xs)));
+  /* The bar's own height, so a ring and a bar in one interface are the same
+     weight. It was `space-2xs`, a spacing token standing in for a stroke, which
+     drew the ring at half the bar and made the two read as different components
+     rather than one value in two shapes. `--helix-size-progress` also follows
+     the density seed, which a spacing token does not. */
+  --_ring-hole: calc(50% - var(--progress-ring-width, var(--helix-size-progress)));
 
   background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
   block-size: var(--progress-ring-size, 4rem);
@@ -265,6 +270,50 @@
      declaration the ring inherits rather than at either of them. */
   transform-origin: center;
   transition: --_progress-fraction var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+/* Round ends, so the sweep reads as a stroke rather than as a slice of pie.
+ *
+ * This is what "look like the spinner" costs in a conic gradient: a gradient has
+ * hard radial edges and no notion of a cap, so each end is drawn as a disc of
+ * its own.
+ *
+ * **Both caps are full-size layers with the dot painted at the top**, not small
+ * boxes moved into place. A positioned dot was tried first and the moving one
+ * would not go: rotating a box that sits at the top of the ring turns it about
+ * *its own* centre, not the ring's, so the cap spun on the spot while the arc
+ * travelled. A layer the size of the whole ring has the ring's centre for an
+ * origin by construction, and the dot rides its top edge, which is how a cap
+ * lands at an arbitrary angle with no trigonometry in the stylesheet.
+ *
+ * The trailing one turns by the same fraction the sweep uses, so it is always
+ * exactly at the arc's end however the value moves. */
+:host([appearance="ring"]) [part="indicator"] {
+  --_ring-stroke: var(--progress-ring-width, var(--helix-size-progress));
+  --_ring-cap: radial-gradient(
+    circle at 50% calc(var(--_ring-stroke) / 2),
+    var(--progress-color, var(--helix-color-primary)) calc(var(--_ring-stroke) / 2),
+    transparent 0
+  );
+}
+
+:host([appearance="ring"]) [part="indicator"]::before,
+:host([appearance="ring"]) [part="indicator"]::after {
+  background-image: var(--_ring-cap);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+:host([appearance="ring"]) [part="indicator"]::after {
+  rotate: calc(var(--_progress-fraction) * 1turn);
+}
+
+/* Nothing to cap while it is running: the indeterminate arc already fades at
+   both ends, and a pair of hard discs on a fading edge is two ideas at once. */
+:host([appearance="ring"][indeterminate]) [part="indicator"]::before,
+:host([appearance="ring"][indeterminate]) [part="indicator"]::after {
+  content: none;
 }
 
 /* In the middle, where a dial puts its reading, and the grid is what centres it

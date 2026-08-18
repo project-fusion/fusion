@@ -10,7 +10,6 @@
    `grid`, and the host cannot be both. */
 [part="row"] {
   align-items: center;
-  column-gap: var(--helix-space-sm);
   display: grid;
   grid-template-columns: auto 1fr auto;
   padding: var(--list-item-inset, var(--helix-space-sm) var(--helix-space-md));
@@ -24,9 +23,15 @@
    Two is the most this row ever has, a label and its supporting line, and a
    second implicit track is zero tall when there is only one, so the same rule
    centres correctly either way. */
+/* The leading mark carries its own trailing gap, so a row without one costs
+   nothing for it. A `column-gap` on the grid is drawn beside a zero-width
+   column just the same: measured on an ordered list, the text sat 28px in
+   where the row's own inset is 16, the extra twelve being a gap next to a
+   column holding nothing. Same fault the toast had, and the same fix. */
 slot[name="start"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   grid-column: 1;
+  margin-inline-end: var(--helix-space-sm);
   grid-row: 1 / span 2;
 }
 

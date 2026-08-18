@@ -33,7 +33,10 @@
  */
 :host([kind="ordered"]),
 :host([kind="unordered"]) {
-  padding-inline-start: var(--list-marker-gutter, var(--helix-space-xl));
+  /* Wide enough for a two-digit marker and no wider. It was `space-xl`, which
+     is 32px for a glyph about fourteen across, so a numbered list read as a
+     column of numbers and a separate column of words. */
+  padding-inline-start: var(--list-marker-gutter, var(--helix-space-lg));
 }
 
 :host([kind="ordered"]) ::slotted(*),
