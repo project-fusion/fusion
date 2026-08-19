@@ -12,7 +12,7 @@ import '../../slider/index.js'
 import { styles } from './color-picker-root.css.js'
 
 /**
- * @summary Picks a colour, from a square and two ramps.
+ * @summary Picks a color, from a square and two ramps.
  *
  * @description
  * **The square is painted in three layers, not composited from elements**: the
@@ -29,8 +29,8 @@ import { styles } from './color-picker-root.css.js'
  * ring is drawn on the square rather than on them, so it lands where the reader
  * is looking.
  *
- * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
- * background is just a different colour, and the one thing a preview owes a
+ * **Every chip sits on a checkerboard.** A color with alpha painted on a solid
+ * background is just a different color, and the one thing a preview owes a
  * reader is the difference between "pale blue" and "blue, half transparent".
  *
  * No padding and no surface of its own. Flat on a page it takes the space it is

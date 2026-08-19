@@ -11,7 +11,7 @@ import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './color-input-root.css.js'
 
 /**
- * @summary A colour, typed in any syntax or picked from a panel.
+ * @summary A color, typed in any syntax or picked from a panel.
  *
  * @description
  * The frame is the field rather than the input, so the trigger sits inside the
@@ -19,7 +19,7 @@ import { styles } from './color-input-root.css.js'
  * control.
  *
  * **The trigger fills the trailing end rather than sitting in it as an icon.** A
- * colour field has one thing to show and it is a colour, so the swatch takes the
+ * color field has one thing to show and it is a color, so the swatch takes the
  * height of the control and reads as a block of it. It is the one field here
  * whose trailing affordance is the value itself: Date Input's calendar mark
  * stands for an action, and an action stretched to field height is a large icon

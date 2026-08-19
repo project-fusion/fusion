@@ -873,7 +873,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a colour: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "attribute": "tone",
               "reflects": true,
               "inheritedFrom": {
@@ -1019,7 +1019,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning' | undefined"
               },
-              "description": "Which colour the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a colour, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic colour. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a colour: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
+              "description": "Which color the band wears.\n\n**This was `severity` and it was claiming more than it did.** Severity is a\njudgement about the message, and elsewhere in this library it carries one:\n`Callout` reads `SEVERITIES` for an icon and a label, so `severity=\"danger\"`\nputs a mark beside the text and names it to a screen reader. Here it did\nnone of that. It set a color, the live region stayed polite either way, and\nnothing about the announcement's semantics moved. A property that only\nchanges the paint should say so.\n\n`tone` is the word this library already uses for exactly that, and `Tag`\nmade the identical rename for the identical reason: `appearance` is a\ntreatment, `tone` is semantic color. The set matches `Tag`'s so the two\nagree, with `neutral` as the resting value and `primary` for a band that is\nabout the product rather than about a state.\n\n`neutral` is what an unset announcement already looked like, said out loud\nso a consumer can put a band back to it from markup, and `surface` is the\none value that is not a color: it lifts the band onto the surface step\ninstead of the sunken one, for a strip carrying something that is not a\nstate at all.",
               "fieldName": "tone",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
@@ -6936,7 +6936,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol.\n\n**The trigger fills the trailing end rather than sitting in it as an icon.** A\ncolour field has one thing to show and it is a colour, so the swatch takes the\nheight of the control and reads as a block of it. It is the one field here\nwhose trailing affordance is the value itself: Date Input's calendar mark\nstands for an action, and an action stretched to field height is a large icon\nand nothing more.\n\n**The panel has no padding, and clips instead.** The square runs to its edge\nand takes the panel's rounded corners from being clipped by it, rather than\nsitting inset with a band of overlay showing on all four sides. The picker\npads its own lower rows.",
+          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol.\n\n**The trigger fills the trailing end rather than sitting in it as an icon.** A\ncolor field has one thing to show and it is a color, so the swatch takes the\nheight of the control and reads as a block of it. It is the one field here\nwhose trailing affordance is the value itself: Date Input's calendar mark\nstands for an action, and an action stretched to field height is a large icon\nand nothing more.\n\n**The panel has no padding, and clips instead.** The square runs to its edge\nand takes the panel's rounded corners from being clipped by it, rather than\nsitting inset with a band of overlay showing on all four sides. The picker\npads its own lower rows.",
           "name": "HelixColorInput",
           "cssProperties": [
             {
@@ -7484,7 +7484,7 @@
               "type": {
                 "text": "'swatch' | undefined"
               },
-              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of colour that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a colour among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the colour is the answer rather than a setting.",
+              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of color that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a color among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the color is the answer rather than a setting.",
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
@@ -7499,7 +7499,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.",
+              "description": "Whether the color carries an alpha channel.",
               "attribute": "alpha",
               "reflects": true,
               "inheritedFrom": {
@@ -7543,7 +7543,7 @@
                 "text": "string"
               },
               "default": "'#000000'",
-              "description": "What the field says before a colour is in it.",
+              "description": "What the field says before a color is in it.",
               "attribute": "placeholder",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -7557,7 +7557,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the picker, as a comma-separated list.",
+              "description": "Colors offered under the picker, as a comma-separated list.",
               "attribute": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -7598,7 +7598,7 @@
               },
               "privacy": "private",
               "default": "''",
-              "description": "The last value that was a colour.\n\nHalf-typed input reaches here on every keystroke and most of it is not a\ncolour, so the picker is given the last thing that was one rather than a\nfallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,\n`#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,\nred, blue, blue, **red**, green, because two of those are colours and the\nones between are not. Holding the last good one takes the flicker out and\nleaves the square on blue until green arrives.\n\nNot state, because it is only ever read on a render the value already\ncaused. The same reasoning Date Input records for its calendar, which will\nnot follow a date until the field says something complete.",
+              "description": "The last value that was a color.\n\nHalf-typed input reaches here on every keystroke and most of it is not a\ncolor, so the picker is given the last thing that was one rather than a\nfallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,\n`#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,\nred, blue, blue, **red**, green, because two of those are colors and the\nones between are not. Holding the last good one takes the flicker out and\nleaves the square on blue until green arrives.\n\nNot state, because it is only ever read on a render the value already\ncaused. The same reasoning Date Input records for its calendar, which will\nnot follow a date until the field says something complete.",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
                 "module": "src/color-input/root/color-input-root.ts"
@@ -7638,7 +7638,7 @@
                 "text": "string"
               },
               "privacy": "private",
-              "description": "What the picker should show, which is only ever a colour.",
+              "description": "What the picker should show, which is only ever a color.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -7652,7 +7652,7 @@
                 "text": "string"
               },
               "privacy": "private",
-              "description": "What the trigger's swatch paints, which is only ever a colour.",
+              "description": "What the trigger's swatch paints, which is only ever a color.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -7736,7 +7736,7 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
-              "description": "Escape shuts the panel without moving the colour.",
+              "description": "Escape shuts the panel without moving the color.",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
                 "module": "src/color-input/root/color-input-root.ts"
@@ -7965,7 +7965,7 @@
             "name": "HelixBaseColorInput",
             "package": "@helix-io/headless"
           },
-          "summary": "A colour, typed in any syntax or picked from a panel.",
+          "summary": "A color, typed in any syntax or picked from a panel.",
           "helix": {
             "category": "forms",
             "since": "0.1.0",
@@ -8090,7 +8090,7 @@
               "type": {
                 "text": "'swatch' | undefined"
               },
-              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of colour that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a colour among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the colour is the answer rather than a setting.",
+              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of color that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a color among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the color is the answer rather than a setting.",
               "fieldName": "appearance",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8103,7 +8103,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.",
+              "description": "Whether the color carries an alpha channel.",
               "fieldName": "alpha",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8142,7 +8142,7 @@
                 "text": "string"
               },
               "default": "'#000000'",
-              "description": "What the field says before a colour is in it.",
+              "description": "What the field says before a color is in it.",
               "fieldName": "placeholder",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8155,7 +8155,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the picker, as a comma-separated list.",
+              "description": "Colors offered under the picker, as a comma-separated list.",
               "fieldName": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8254,7 +8254,7 @@
               }
             },
             {
-              "description": "The chip showing the colour, inside the trigger.",
+              "description": "The chip showing the color, inside the trigger.",
               "name": "preview",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8270,7 +8270,7 @@
               }
             },
             {
-              "description": "The colour picker inside it.",
+              "description": "The color picker inside it.",
               "name": "picker",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -8283,7 +8283,7 @@
               "type": {
                 "text": "HelixChangeEvent"
               },
-              "description": "Fired when the colour changes.",
+              "description": "Fired when the color changes.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {
@@ -8380,7 +8380,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The square is painted in three layers, not composited from elements**: the\nhue underneath, white sliding in from the left to take the saturation out,\nblack rising from the bottom to take the brightness out. One element, one\ndeclaration, and it repaints as the hue moves because the hue is a custom\nproperty the tier below writes.\n\n**The two range inputs over it are invisible and still there.** Not\n`display: none` and not `visibility: hidden`, either of which would take them\nout of the tab order and out of the accessibility tree, which is the entire\nreason a square built this way is reachable at all. They carry\n`pointer-events: none` so the square answers the pointer itself, and the focus\nring is drawn on the square rather than on them, so it lands where the reader\nis looking.\n\n**Every chip sits on a checkerboard.** A colour with alpha painted on a solid\nbackground is just a different colour, and the one thing a preview owes a\nreader is the difference between \"pale blue\" and \"blue, half transparent\".\n\nNo padding and no surface of its own. Flat on a page it takes the space it is\ngiven, and in Color Input's panel the panel supplies both: a picker that\nbrought its own card would be a card inside a card there.",
+          "description": "**The square is painted in three layers, not composited from elements**: the\nhue underneath, white sliding in from the left to take the saturation out,\nblack rising from the bottom to take the brightness out. One element, one\ndeclaration, and it repaints as the hue moves because the hue is a custom\nproperty the tier below writes.\n\n**The two range inputs over it are invisible and still there.** Not\n`display: none` and not `visibility: hidden`, either of which would take them\nout of the tab order and out of the accessibility tree, which is the entire\nreason a square built this way is reachable at all. They carry\n`pointer-events: none` so the square answers the pointer itself, and the focus\nring is drawn on the square rather than on them, so it lands where the reader\nis looking.\n\n**Every chip sits on a checkerboard.** A color with alpha painted on a solid\nbackground is just a different color, and the one thing a preview owes a\nreader is the difference between \"pale blue\" and \"blue, half transparent\".\n\nNo padding and no surface of its own. Flat on a page it takes the space it is\ngiven, and in Color Input's panel the panel supplies both: a picker that\nbrought its own card would be a card inside a card there.",
           "name": "HelixColorPicker",
           "cssProperties": [
             {
@@ -8575,7 +8575,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "description": "Whether the color carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "attribute": "alpha",
               "reflects": true,
               "inheritedFrom": {
@@ -8605,7 +8605,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nColor Input sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Color Input dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
+              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the color as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a color and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nColor Input sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Color Input dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
               "attribute": "no-value",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -8647,7 +8647,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the picker, as a comma-separated list.",
+              "description": "Colors offered under the picker, as a comma-separated list.",
               "attribute": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -8661,7 +8661,7 @@
                 "text": "Color | undefined"
               },
               "privacy": "private",
-              "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead.",
+              "description": "The color the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -8675,7 +8675,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered.",
+              "description": "Whether this browser can sample a color off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -8715,7 +8715,7 @@
                 "text": "boolean"
               },
               "privacy": "private",
-              "description": "Whether the tools row holds anything at all.\n\nThe group is withheld rather than rendered empty, because it is an element\nwith a role and a name: an empty group labelled \"Colour tools\" announces\nnothing, and the footer cannot tell it is empty either, so the row kept its\npadding with nothing in it.",
+              "description": "Whether the tools row holds anything at all.\n\nThe group is withheld rather than rendered empty, because it is an element\nwith a role and a name: an empty group labelled \"Color tools\" announces\nnothing, and the footer cannot tell it is empty either, so the row kept its\npadding with nothing in it.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -8729,7 +8729,7 @@
                 "text": "string[]"
               },
               "privacy": "private",
-              "description": "The presets, as written, with anything that is not a colour dropped.",
+              "description": "The presets, as written, with anything that is not a color dropped.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -8744,7 +8744,7 @@
               },
               "privacy": "private",
               "default": "''",
-              "description": "The last value that was a colour.\n\nHalf-typed input reaches the row on every keystroke and most of it is not a\ncolour, so the square is given the last thing that was one. Typing `#00ff00`\na character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,\n`#00ff00`: two of those are colours and the ones between are not, so without\nthis the square walks red, blue, red, green. Color Input keeps the same\nguard for its own field, each local to the input it protects.",
+              "description": "The last value that was a color.\n\nHalf-typed input reaches the row on every keystroke and most of it is not a\ncolor, so the square is given the last thing that was one. Typing `#00ff00`\na character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,\n`#00ff00`: two of those are colors and the ones between are not, so without\nthis the square walks red, blue, red, green. Color Input keeps the same\nguard for its own field, each local to the input it protects.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -8755,7 +8755,7 @@
               "name": "handleValueInput",
               "privacy": "private",
               "readonly": true,
-              "description": "Takes what was typed, and lets the square follow only a whole colour.",
+              "description": "Takes what was typed, and lets the square follow only a whole color.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -8778,7 +8778,7 @@
               "privacy": "private",
               "readonly": true,
               "default": "new CopyController(this)",
-              "description": "Copying the value, which is the one thing here worth taking away.\n\nA reader who has just built a colour wants it in a stylesheet, and the\nalternative is selecting text out of a field that may not be on screen. The\nchip is the obvious target: it is the colour, at the size of a control, and\nit had no job at all before this.\n\nThe controller rather than the four lines it replaces, because a copy button\nis coming and the two share everything that is easy to get wrong: the write,\nthe confirmation, the timer that ends it, the event, and a failure that is\ncorrectly silent.",
+              "description": "Copying the value, which is the one thing here worth taking away.\n\nA reader who has just built a color wants it in a stylesheet, and the\nalternative is selecting text out of a field that may not be on screen. The\nchip is the obvious target: it is the color, at the size of a control, and\nit had no job at all before this.\n\nThe controller rather than the four lines it replaces, because a copy button\nis coming and the two share everything that is easy to get wrong: the write,\nthe confirmation, the timer that ends it, the event, and a failure that is\ncorrectly silent.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -8811,7 +8811,7 @@
               "name": "handleEyeDropper",
               "privacy": "private",
               "readonly": true,
-              "description": "Samples a colour from anywhere on the screen.\n\n`helix-sample-start` and `helix-sample-end` bracket it, because whatever is\nholding this picker may need to get out of the way: `EyeDropper` takes the\npointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath. This\nelement cannot know it is in a panel, so it says what it is doing and lets\nwhatever does know decide.",
+              "description": "Samples a color from anywhere on the screen.\n\n`helix-sample-start` and `helix-sample-end` bracket it, because whatever is\nholding this picker may need to get out of the way: `EyeDropper` takes the\npointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath. This\nelement cannot know it is in a panel, so it says what it is doing and lets\nwhatever does know decide.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -9092,7 +9092,7 @@
             "name": "HelixBaseColorPicker",
             "package": "@helix-io/headless"
           },
-          "summary": "Picks a colour, from a square and two ramps.",
+          "summary": "Picks a color, from a square and two ramps.",
           "helix": {
             "category": "forms",
             "since": "0.1.0",
@@ -9154,7 +9154,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
+              "description": "Whether the color carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "fieldName": "alpha",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9180,7 +9180,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nColor Input sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Color Input dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
+              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the color as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a color and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nColor Input sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Color Input dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
               "fieldName": "noValue",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9219,7 +9219,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Colours offered under the picker, as a comma-separated list.",
+              "description": "Colors offered under the picker, as a comma-separated list.",
               "fieldName": "swatches",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9263,7 +9263,7 @@
               }
             },
             {
-              "description": "The mark showing where in the square the colour sits.",
+              "description": "The mark showing where in the square the color sits.",
               "name": "grid-handle",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9295,7 +9295,7 @@
               }
             },
             {
-              "description": "The chip of the current colour, which copies it when pressed.",
+              "description": "The chip of the current color, which copies it when pressed.",
               "name": "sample",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9327,7 +9327,7 @@
               }
             },
             {
-              "description": "The control that samples a colour from the screen.",
+              "description": "The control that samples a color from the screen.",
               "name": "eyedropper",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9343,7 +9343,7 @@
               }
             },
             {
-              "description": "The colour as text, which can be typed or pasted.",
+              "description": "The color as text, which can be typed or pasted.",
               "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -9380,7 +9380,7 @@
               "type": {
                 "text": "HelixChangeEvent"
               },
-              "description": "Fired when the colour changes.",
+              "description": "Fired when the color changes.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {
@@ -9392,7 +9392,7 @@
               "type": {
                 "text": "HelixCopyEvent"
               },
-              "description": "Fired when the colour is put on the clipboard.",
+              "description": "Fired when the color is put on the clipboard.",
               "name": "helix-copy",
               "reactProp": "onhelix-copy",
               "inheritedFrom": {
@@ -13093,7 +13093,7 @@
               "name": "--divider-thickness"
             },
             {
-              "description": "Colour of the rule.",
+              "description": "Color of the rule.",
               "name": "--divider-color"
             },
             {
@@ -22586,7 +22586,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The bar `Progress` draws, at twice the height and on the house corner rather\nthan its pill.\n\nIt shipped at the progress height, on the argument that the two stand beside\neach other in a panel. Rendered side by side that turned out backwards: they\n*are* two unrelated controls, and a reader telling a level from a task at a\nglance is the point rather than the cost. A meter also carries more, a fill\nand a mark at each threshold, and at eight pixels those marks are hairlines.\nAt sixteen they are unmistakable.\n\nThe corner is the ticks' doing: they cut the fill into segments, and a\npill-ended bar comes out as a run whose outer ends are round and whose inner\nends are square. `radii-full` on an eight pixel bar was a four pixel pill\nanyway, so this is only a change at all because the bar grew.\n\nWhat else differs is what the colour means. A progress bar is one colour because\nthere is one thing to say; a meter's fill takes the success, warning or danger\ntone from the band its reading falls in, and only once thresholds have been\ndeclared. An unbanded meter is neutral, because a gauge with nothing said\nabout it is a reading rather than good news.\n\nA tick marks each threshold, so the reading can be placed against the bands\nwithout seeing colour at all.\n\nA reading past either end squares the corner it ran out at, which is the\nconvention for a quantity continuing past the frame it is drawn in. The bar\nitself stops, because that is what an end is; the words and the accessible\nreading are what say how far past.",
+          "description": "The bar `Progress` draws, at twice the height and on the house corner rather\nthan its pill.\n\nIt shipped at the progress height, on the argument that the two stand beside\neach other in a panel. Rendered side by side that turned out backwards: they\n*are* two unrelated controls, and a reader telling a level from a task at a\nglance is the point rather than the cost. A meter also carries more, a fill\nand a mark at each threshold, and at eight pixels those marks are hairlines.\nAt sixteen they are unmistakable.\n\nThe corner is the ticks' doing: they cut the fill into segments, and a\npill-ended bar comes out as a run whose outer ends are round and whose inner\nends are square. `radii-full` on an eight pixel bar was a four pixel pill\nanyway, so this is only a change at all because the bar grew.\n\nWhat else differs is what the color means. A progress bar is one color because\nthere is one thing to say; a meter's fill takes the success, warning or danger\ntone from the band its reading falls in, and only once thresholds have been\ndeclared. An unbanded meter is neutral, because a gauge with nothing said\nabout it is a reading rather than good news.\n\nA tick marks each threshold, so the reading can be placed against the bands\nwithout seeing color at all.\n\nA reading past either end squares the corner it ran out at, which is the\nconvention for a quantity continuing past the frame it is drawn in. The bar\nitself stops, because that is what an end is; the words and the accessible\nreading are what say how far past.",
           "name": "HelixMeter",
           "cssProperties": [
             {
@@ -22758,7 +22758,7 @@
               "type": {
                 "text": "MeterBand | undefined"
               },
-              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being coloured, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
+              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being colored, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
               "attribute": "band",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
@@ -23120,7 +23120,7 @@
               "type": {
                 "text": "MeterBand | undefined"
               },
-              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being coloured, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
+              "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being colored, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
               "fieldName": "band",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
@@ -25949,7 +25949,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "One box for every control in the row, arrows and numbers alike, so the run has\na single rhythm and the steps sit at the numbers' height rather than between\nthem. Square, because a page number is one or two characters and a box sized\nto the widest would leave the short ones swimming; `min-inline-size` rather\nthan a fixed one, so page 100 grows instead of overflowing.\n\nFigures are tabular throughout. A page number is the one thing here that\nchanges under the pointer, and proportional digits make the whole row shuffle\nas it does.\n\nThe current page is a raised chip rather than a brand fill, which is the\ntreatment `Tabs` gives its selected tab. Brand on a page number claims more\nthan the state deserves: it is not a choice the reader made about anything,\nit is where they happen to be standing, and a row of grey numbers with one\nblue one reads as the blue one being an action.\n\nSelected on `aria-current` rather than on a second attribute saying the same\nthing: the state is already in the accessibility tree, and a `data-current`\nbeside it would be two places to keep in step.\n\nThe gap takes the same box as everything else in the row and only sits back a\nshade in colour. It is a control, so it answers hover and focus like one; it\nis a way through rather than a destination, so it does not compete.",
+          "description": "One box for every control in the row, arrows and numbers alike, so the run has\na single rhythm and the steps sit at the numbers' height rather than between\nthem. Square, because a page number is one or two characters and a box sized\nto the widest would leave the short ones swimming; `min-inline-size` rather\nthan a fixed one, so page 100 grows instead of overflowing.\n\nFigures are tabular throughout. A page number is the one thing here that\nchanges under the pointer, and proportional digits make the whole row shuffle\nas it does.\n\nThe current page is a raised chip rather than a brand fill, which is the\ntreatment `Tabs` gives its selected tab. Brand on a page number claims more\nthan the state deserves: it is not a choice the reader made about anything,\nit is where they happen to be standing, and a row of grey numbers with one\nblue one reads as the blue one being an action.\n\nSelected on `aria-current` rather than on a second attribute saying the same\nthing: the state is already in the accessibility tree, and a `data-current`\nbeside it would be two places to keep in step.\n\nThe gap takes the same box as everything else in the row and only sits back a\nshade in color. It is a control, so it answers hover and focus like one; it\nis a way through rather than a destination, so it does not compete.",
           "name": "HelixPagination",
           "cssProperties": [
             {
@@ -33047,7 +33047,7 @@
               "name": "--slider-marker-color"
             },
             {
-              "description": "The whole track, for a slider whose colour is the value.",
+              "description": "The whole track, for a slider whose color is the value.",
               "name": "--slider-track-image"
             }
           ],
@@ -38776,7 +38776,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "attribute": "tone",
               "reflects": true
             },
@@ -38786,7 +38786,7 @@
               "type": {
                 "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because colour and fill were welded together.",
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -38941,7 +38941,7 @@
               "type": {
                 "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
-              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic colour, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
+              "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "fieldName": "tone"
             },
             {
@@ -38949,7 +38949,7 @@
               "type": {
                 "text": "'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because colour and fill were welded together.",
+              "description": "How much of the tone the tag wears.\n\n- `subtle` is the default: a wash of the tone with the label in it, for a\n  tag that labels something rather than warning about it.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  that has to be seen first.\n- `outlined` is the tone at its edge only, for a dense set where filling\n  each of them turns a list into a mosaic.\n\nIndependent of `tone` on purpose: an outlined danger tag and a solid danger\ntag are both sensible, and until these were two properties you could ask\nfor neither, because color and fill were welded together.",
               "fieldName": "appearance"
             },
             {

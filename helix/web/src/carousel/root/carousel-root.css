@@ -335,11 +335,11 @@
 
   /* **One duration and one curve for both, which is the whole of the fix.**
    *
-   * Colour ran over `fast` and size over `normal`, 120ms against 200ms, so the
+   * Color ran over `fast` and size over `normal`, 120ms against 200ms, so the
    * two halves of one change finished 80ms apart: the arriving dot was fully
    * blue while still four fifths grown, and the leaving one fully grey while
    * still a fifth wide. Measured across the handoff, the middle of every move
-   * was a fat grey stub beside a short blue one, and the colour arriving ahead
+   * was a fat grey stub beside a short blue one, and the color arriving ahead
    * of the shape is what read as a jump rather than as a glide. Stated once so
    * they cannot drift apart again.
    *
@@ -379,7 +379,7 @@
 /* Neutral, not brand. This is the one `border-strong` in the library that was
    never a border: it is the fill of an inactive dot. Brand is taken, by
    `[data-current]` directly above, so a hovered dot in brand would be the same
-   colour as the current one and the set would read as having two. */
+   color as the current one and the set would read as having two. */
 [part="indicator"]:hover {
   background-color: var(--helix-color-foreground-muted);
 }

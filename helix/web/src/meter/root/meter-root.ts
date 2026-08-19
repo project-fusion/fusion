@@ -22,14 +22,14 @@ import { styles } from './meter-root.css.js'
  * ends are square. `radii-full` on an eight pixel bar was a four pixel pill
  * anyway, so this is only a change at all because the bar grew.
  *
- * What else differs is what the colour means. A progress bar is one colour because
+ * What else differs is what the color means. A progress bar is one color because
  * there is one thing to say; a meter's fill takes the success, warning or danger
  * tone from the band its reading falls in, and only once thresholds have been
  * declared. An unbanded meter is neutral, because a gauge with nothing said
  * about it is a reading rather than good news.
  *
  * A tick marks each threshold, so the reading can be placed against the bands
- * without seeing colour at all.
+ * without seeing color at all.
  *
  * A reading past either end squares the corner it ran out at, which is the
  * convention for a quantity continuing past the frame it is drawn in. The bar

@@ -102,7 +102,7 @@
  * framed, which is exactly the argument the gallery's own note makes for when an
  * edge earns its place: it is the only mark here doing work no other state
  * claims. The box already reserves a transparent border, so nothing moves when
- * it is coloured in.
+ * it is colored in.
  *
  * The hover rule is repeated rather than left to the cascade, so the chip keeps
  * its own surface under the pointer. It is already the one you are on and does

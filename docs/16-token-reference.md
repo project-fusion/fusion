@@ -22,7 +22,7 @@ Currently unread anywhere: `--helix-radii-lg`, `--helix-leading-loose`, `--helix
 
 ## color
 
-Every colour, resolved through `light-dark()` so a theme needs no second file.
+Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|

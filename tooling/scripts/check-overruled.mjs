@@ -18,7 +18,7 @@
  * **It has happened twice, and cost hours both times.** Outline styled its links
  * `foreground-muted` from the day it was written, and `:where(a)` in the base
  * layer painted every one of them brand blue and underlined instead. By the
- * comment left beside the workaround, no outline had ever shown the colour the
+ * comment left beside the workaround, no outline had ever shown the color the
  * component asked for. Dialog's header size was lifted into the base layer for
  * the same reason and the component kept a `font-size` beside it that read as
  * the deciding value and was not: changing it moved nothing, which is a

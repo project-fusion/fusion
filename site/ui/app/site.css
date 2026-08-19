@@ -42,15 +42,15 @@
   /* The measured field, in one place.
    *
    * Two surfaces draw it: every card's drawing, as SVG dots in `artGridDot`,
-   * and the hero, as a repeating background. They have to be the same colour or
+   * and the hero, as a repeating background. They have to be the same color or
    * the page has two textures that nearly match, which is worse than having one
    * or having neither.
    *
    * Per mode, because one alpha cannot serve both. A dot is a tiny mark against
    * a large field and small marks do not carry equally in the two directions:
    * near-black at 11% on white all but vanishes, while near-white at 11% on
-   * black is already a visible field. `light-dark()` takes colours only, so the
-   * strength lives in the colour rather than in an opacity, and `color-mix`
+   * black is already a visible field. `light-dark()` takes colors only, so the
+   * strength lives in the color rather than in an opacity, and `color-mix`
    * keeps it derived from the foreground token rather than hardcoded to a grey. */
   --site-lattice: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 20%, transparent),
@@ -382,7 +382,7 @@ helix-drawer {
   --site-inset: var(--helix-space-2xl);
 }
 
-/* The page's own colour, and it runs up behind the masthead.
+/* The page's own color, and it runs up behind the masthead.
  *
  * The header is `position: sticky`, so it takes a row in flow and the hero
  * would otherwise begin under it, leaving a white strip above the brand. The
@@ -412,7 +412,7 @@ helix-drawer {
   /* The header's own height plus the hairline under it. `--helix-size-header`
      is the bar, not the box: the border is a further pixel of flow, so pulling
      up by the token alone left a one pixel band of page above the hero. It is
-     invisible while the two are the same colour and would not stay invisible if
+     invisible while the two are the same color and would not stay invisible if
      the hero ever takes one of its own again. */
   margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
   min-block-size: 28rem;
@@ -463,15 +463,15 @@ helix-drawer {
  *
  * Two dozen of the field's own dots go primary for a couple of seconds each, on
  * long staggered cycles, so the texture is never quite still without anything
- * on it ever moving. It is the one place on the page the brand colour appears
- * at rest, which is the whole trick: the hero is the background colour now, and
+ * on it ever moving. It is the one place on the page the brand color appears
+ * at rest, which is the whole trick: the hero is the background color now, and
  * a flat field that large wants a reason to be looked at that is not another
  * heading.
  *
  * Drawn on top of the lattice rather than replacing a dot in it, because a
  * background is one image and cannot have two dozen of its tiles animated
  * separately. The grey dot stays underneath and the primary one is the same
- * size at rest, so what a reader sees is a dot changing colour rather than a
+ * size at rest, so what a reader sees is a dot changing color rather than a
  * second mark arriving next to one. */
 .designHeroField {
   inset: 0;
@@ -655,7 +655,7 @@ helix-drawer {
 /* The masthead over the hero, and only while it is over it.
  *
  * The bar is transparent there, so everything slotted into it is sitting on the
- * brand and resolving its colour against a page it is no longer over. Light DOM,
+ * brand and resolving its color against a page it is no longer over. Light DOM,
  * so a descendant selector reaches all of it, and `currentColor` carries it into
  * the icon button. The component restores its own background on `[data-scrolled]`
  * and this stops at the same moment for the same reason. */
@@ -761,7 +761,7 @@ helix-drawer {
  * the button's own fill gives in `base.css`: a percentage of the foreground is
  * a step away from whatever it sits on in either mode, which a fixed neutral
  * cannot be. Three steps only — 0.12, 0.28, 0.55 — and the top one is
- * deliberately short of the real text colour, because a solid bar standing in
+ * deliberately short of the real text color, because a solid bar standing in
  * for text has no counters and reads heavier than the words it represents. */
 .artPage {
   fill: var(--helix-color-background);
@@ -788,7 +788,7 @@ helix-drawer {
    rather than lifts, and it flips on its own when the mode changes.
 
    Pulled back in light mode by the same amount as `artSolid`, for the same
-   reason and to keep the two in step. They are the same colour doing two jobs,
+   reason and to keep the two in step. They are the same color doing two jobs,
    so softening one and not the other left the tooltip as the single pure-black
    mark on the sheet, which read as an oversight rather than as an inversion. */
 .artInverse {
@@ -812,8 +812,8 @@ helix-drawer {
  *
  * This was `primary`, which put a blue mark on roughly half the grid — a
  * selected date, a slider's fill, every solid button, a toast's leading edge.
- * Colour there was decoration rather than information: forty of the fifty-four
- * families have no semantic colour, so the accent was only ever saying "this
+ * Color there was decoration rather than information: forty of the fifty-four
+ * families have no semantic color, so the accent was only ever saying "this
  * one is emphasised", which weight says just as well and more quietly.
  *
  * `surface-inverse` rather than `foreground`, because the thing being drawn is
@@ -851,18 +851,18 @@ helix-drawer {
  * equally in the two directions: near-black at 11% on white all but vanishes,
  * while near-white at 11% on black is already a visible field. The same number
  * was chosen in dark, checked in dark, and left light mode with no lattice at
- * all. `light-dark()` takes colours only, so the strength has to live in the
- * colour rather than in `fill-opacity`, and `color-mix` keeps it derived from
+ * all. `light-dark()` takes colors only, so the strength has to live in the
+ * color rather than in `fill-opacity`, and `color-mix` keeps it derived from
  * the foreground token rather than hardcoded to a grey. */
 .artGridDot {
   fill: var(--site-lattice);
 }
 
-/* Softened in light mode only, at the colour rather than at the three alphas.
+/* Softened in light mode only, at the color rather than at the three alphas.
  *
  * The top step is a bar standing in for a line of text, and at full foreground
  * it is heavier than the words it represents, because real type has counters
- * and a stem width and a solid bar has neither. Lifting the colour 14% toward
+ * and a stem width and a solid bar has neither. Lifting the color 14% toward
  * the page scales all three steps by the same factor, so the 0.12 / 0.28 / 0.55
  * ladder keeps its ratios and only its absolute weight comes down. Dark mode
  * keeps the token: there the bars sit on black and are already the quiet end. */
@@ -889,7 +889,7 @@ helix-drawer {
 /* Depth, for the panels that genuinely float. Black in both modes rather than
    `foreground`, because a shadow is absence of light and a white shadow on a
    dark page is a glow. Heavier in dark for the same reason the border had to be
-   quieter there: the surface it falls on is closer to the shadow's own colour. */
+   quieter there: the surface it falls on is closer to the shadow's own color. */
 .componentArt {
   --art-shadow: light-dark(oklch(0 0 0 / 0.16), oklch(0 0 0 / 0.55));
 }
@@ -1768,7 +1768,7 @@ helix-drawer helix-tree {
   --icon-size: 0.875rem;
 }
 
-/* The mark on the sandbox's confirmation. The dialog sizes it; the colour is the
+/* The mark on the sandbox's confirmation. The dialog sizes it; the color is the
    product's to say, and this one warns rather than destroys: changing the
    environment converts what was written, it does not throw it away. */
 .dialogWarning {

@@ -95,7 +95,7 @@
 }
 
 /* Monotone, which is what the note under the checked rule has always claimed:
-   colour is reserved for state, and being ticked is an answer rather than a
+   color is reserved for state, and being ticked is an answer rather than a
    state. Both of these named `--helix-color-primary`, so the comment and the
    code disagreed and the code won, and a box that turns brand-blue under a
    pointer says "recommended" about whichever one it happens to be over. Same

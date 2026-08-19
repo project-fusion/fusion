@@ -43,7 +43,7 @@ export class HelixDialog extends HelixBaseDialog {
    *
    * **This was `appearance`, and it was the wrong word.** Everywhere else in the
    * library `appearance` says how a thing *reads*: plain against outlined,
-   * flat against material, surface against a page's own colour. Here it said how
+   * flat against material, surface against a page's own color. Here it said how
    * wide the panel is, which its own description admitted in as many words.
    *
    * `size` is right despite the rule that controls have no size, because that

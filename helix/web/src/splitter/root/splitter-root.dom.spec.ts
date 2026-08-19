@@ -299,8 +299,8 @@ describe('splitter while it moves', () => {
     // to be the later of the two: they tie on specificity, and a tie is settled
     // by order alone.
     //
-    // Against the declared text rather than a computed colour, because happy-dom
-    // resolves no cascade to ask. The colours themselves were checked in a
+    // Against the declared text rather than a computed color, because happy-dom
+    // resolves no cascade to ask. The colors themselves were checked in a
     // browser, where reading one straight after flipping the attribute returns
     // the transition mid-flight and lies.
     const declared = (customElements.get('helix-splitter') as unknown as { styles: unknown }).styles

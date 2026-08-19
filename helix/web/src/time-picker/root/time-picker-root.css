@@ -42,7 +42,7 @@
  * selection keeps the listbox's own treatment, which is a row being pointed at
  * rather than a terminus.
  *
- * The label colour goes with the fill. A foreground picked to sit on a surface
+ * The label color goes with the fill. A foreground picked to sit on a surface
  * does not sit on the accent, and this is the one place in this component where
  * a row stops being a row on the panel. */
 :host([mode="range"]) [part="option"][selected]::part(item) {

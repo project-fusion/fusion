@@ -32,8 +32,8 @@ const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl']
  *
  * Not black, which is what `<input type="color">` opens on. Black is
  * `brightness: 0`, and from there the hue ramp moves nothing and the square is
- * one flat colour: the whole thing is dead until the reader happens to raise
- * brightness first. Pure red is the nearest colour where everything answers the
+ * one flat color: the whole thing is dead until the reader happens to raise
+ * brightness first. Pure red is the nearest color where everything answers the
  * first thing touched.
  */
 const START: Color = { alpha: 100, brightness: 100, hue: 0, saturation: 100 }
@@ -44,7 +44,7 @@ interface EyeDropperConstructor {
 }
 
 /**
- * @summary Picks a colour, from a square and two ramps.
+ * @summary Picks a color, from a square and two ramps.
  *
  * @description
  * **The picker itself, with no field around it.** Color Input is this element in
@@ -63,15 +63,15 @@ interface EyeDropperConstructor {
  * to stop helping.
  *
  * **The working model is HSB, and the value is derived from it.** The reverse
- * loses colours: black is `brightness: 0`, whose hue and saturation are both
+ * loses colors: black is `brightness: 0`, whose hue and saturation are both
  * undefined, so a reader who drags to the bottom of the square and back would
- * get grey where they had red. Holding the model means a colour survives a trip
+ * get grey where they had red. Holding the model means a color survives a trip
  * through one that has no hue. A value arriving from outside is read into the
  * model once, which is the only moment the conversion runs in that direction.
  *
  * **Every syntax is read; the one `format` names is written.** `#f00`,
  * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all
- * colours. Named colours are the exception, and deliberately: resolving
+ * colors. Named colors are the exception, and deliberately: resolving
  * `rebeccapurple` means shipping a table of a hundred and forty or asking the
  * browser, and there is no browser during a server render.
  *
@@ -81,21 +81,21 @@ interface EyeDropperConstructor {
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *
- * @event {HelixChangeEvent} helix-change - Fired when the colour changes.
- * @event {HelixCopyEvent} helix-copy - Fired when the colour is put on the clipboard.
+ * @event {HelixChangeEvent} helix-change - Fired when the color changes.
+ * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
  *
  * @csspart grid - The saturation and brightness square.
- * @csspart grid-handle - The mark showing where in the square the colour sits.
+ * @csspart grid-handle - The mark showing where in the square the color sits.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
  * @csspart grid-brightness - The range input for its vertical axis.
  * @csspart controls - The row under the square.
- * @csspart sample - The chip of the current colour, which copies it when pressed.
+ * @csspart sample - The chip of the current color, which copies it when pressed.
  * @csspart channels - The ramps beside it.
  * @csspart channel - One ramp.
  * @csspart actions - The group holding the eyedropper and the syntax toggle.
- * @csspart eyedropper - The control that samples a colour from the screen.
+ * @csspart eyedropper - The control that samples a color from the screen.
  * @csspart footer - The row holding the value and the tools.
- * @csspart value - The colour as text, which can be typed or pasted.
+ * @csspart value - The color as text, which can be typed or pasted.
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart swatches - The row of presets.
  * @csspart swatch - One preset.
@@ -116,7 +116,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   invalid = false
 
   /**
-   * Whether the colour carries an alpha channel.
+   * Whether the color carries an alpha channel.
    *
    * Off by default, because it widens every value written, and a consumer who
    * did not ask for transparency should not have to strip a byte off each one.
@@ -136,9 +136,9 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   /**
    * Whether to leave the value out, for a picker whose value is stated elsewhere.
    *
-   * The row reads the colour as text and lets it be typed or pasted, which is
+   * The row reads the color as text and lets it be typed or pasted, which is
    * what makes this element complete standing on a page: a square and two ramps
-   * can build a colour and cannot state one, and a reader who has a hex already
+   * can build a color and cannot state one, and a reader who has a hex already
    * should not have to find it by dragging.
    *
    * Color Input sets this, because its field is that input. Two editable fields
@@ -159,12 +159,12 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   @property({ attribute: 'no-eyedropper', type: Boolean })
   noEyedropper = false
 
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   @property()
   swatches = ''
 
   /**
-   * The colour the reader has moved to, or nothing while they have moved none.
+   * The color the reader has moved to, or nothing while they have moved none.
    *
    * Held rather than re-read, which is the whole point: see the class
    * description. Cleared whenever a value arrives from anywhere else, so the
@@ -174,7 +174,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   private moved: Color | undefined
 
   /**
-   * Whether this browser can sample a colour off the screen.
+   * Whether this browser can sample a color off the screen.
    *
    * Settled after the first render rather than at construction, because there is
    * no `window` on the server, and a button that ships in the markup and does
@@ -196,7 +196,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   get color(): Color {
     /* `settled` between the value and the start, so a half-typed value leaves
        the square where the last whole one put it rather than throwing it back to
-       red. Only reached where the value itself is not a colour. */
+       red. Only reached where the value itself is not a color. */
     return this.moved ?? parseColor(this.value) ?? parseColor(this.settled) ?? START
   }
 
@@ -204,7 +204,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * Whether the tools row holds anything at all.
    *
    * The group is withheld rather than rendered empty, because it is an element
-   * with a role and a name: an empty group labelled "Colour tools" announces
+   * with a role and a name: an empty group labelled "Color tools" announces
    * nothing, and the footer cannot tell it is empty either, so the row kept its
    * padding with nothing in it.
    */
@@ -212,24 +212,24 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
     return (this.sampling && !this.noEyedropper) || !this.noFormat
   }
 
-  /** The presets, as written, with anything that is not a colour dropped. */
+  /** The presets, as written, with anything that is not a color dropped. */
   private get presets(): string[] {
     return splitColors(this.swatches).filter((one) => parseColor(one) !== null)
   }
 
   /**
-   * The last value that was a colour.
+   * The last value that was a color.
    *
    * Half-typed input reaches the row on every keystroke and most of it is not a
-   * colour, so the square is given the last thing that was one. Typing `#00ff00`
+   * color, so the square is given the last thing that was one. Typing `#00ff00`
    * a character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,
-   * `#00ff00`: two of those are colours and the ones between are not, so without
+   * `#00ff00`: two of those are colors and the ones between are not, so without
    * this the square walks red, blue, red, green. Color Input keeps the same
    * guard for its own field, each local to the input it protects.
    */
   private settled = ''
 
-  /** Takes what was typed, and lets the square follow only a whole colour. */
+  /** Takes what was typed, and lets the square follow only a whole color. */
   private readonly handleValueInput = (event: Event): void => {
     const typed = (event.target as HTMLInputElement).value
     const parsed = parseColor(typed)
@@ -250,9 +250,9 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   /**
    * Copying the value, which is the one thing here worth taking away.
    *
-   * A reader who has just built a colour wants it in a stylesheet, and the
+   * A reader who has just built a color wants it in a stylesheet, and the
    * alternative is selecting text out of a field that may not be on screen. The
-   * chip is the obvious target: it is the colour, at the size of a control, and
+   * chip is the obvious target: it is the color, at the size of a control, and
    * it had no job at all before this.
    *
    * The controller rather than the four lines it replaces, because a copy button
@@ -279,7 +279,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   }
 
   /**
-   * Samples a colour from anywhere on the screen.
+   * Samples a color from anywhere on the screen.
    *
    * `helix-sample-start` and `helix-sample-end` bracket it, because whatever is
    * holding this picker may need to get out of the way: `EyeDropper` takes the
@@ -463,7 +463,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
         }
         ${
           this.tools
-            ? html`<helix-button-group part="actions" label="Colour tools">
+            ? html`<helix-button-group part="actions" label="Color tools">
                 ${
                   this.sampling && !this.noEyedropper
                     ? html`<helix-button

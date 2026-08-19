@@ -17,7 +17,7 @@ import '../../color-picker/index.js'
 import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js'
 
 /**
- * @summary A colour, typed in any syntax or picked from a panel.
+ * @summary A color, typed in any syntax or picked from a panel.
  *
  * @description
  * **The picker is `helix-color-picker`, not a second one written here.** It owns the
@@ -35,7 +35,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  *
  * **Every syntax is read; the one `format` names is written.** `#f00`,
  * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)` and
- * `hsl(0 100% 50%)` are all colours, and a field that refuses one because it
+ * `hsl(0 100% 50%)` are all colors, and a field that refuses one because it
  * prefers another is arguing with the person using it. What the field *shows* is
  * the value itself, for the reason Date Input gives about its dates: half-typed
  * input does not survive a round trip through a formatter.
@@ -50,16 +50,16 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
  *
- * @event {HelixChangeEvent} helix-change - Fired when the colour changes.
+ * @event {HelixChangeEvent} helix-change - Fired when the color changes.
  * @event {HelixOpenEvent} helix-open - Fired when the panel opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
  * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input carrying the value. Absent in `swatch`.
  * @csspart trigger - The control that opens the panel.
- * @csspart preview - The chip showing the colour, inside the trigger.
+ * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
- * @csspart picker - The colour picker inside it.
+ * @csspart picker - The color picker inside it.
  */
 @customElement('helix-base-color-input')
 export class HelixBaseColorInput extends MixinControllerOpen(
@@ -68,9 +68,9 @@ export class HelixBaseColorInput extends MixinControllerOpen(
   /**
    * Whether the field is a text box with a swatch on it, or only the swatch.
    *
-   * `swatch` is the native control's shape: a block of colour that opens a
+   * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
-   * asks for a colour among twenty other questions, where a hex in a box is
+   * asks for a color among twenty other questions, where a hex in a box is
    * eleven characters of noise next to the thing itself.
    *
    * It also settles where the value is stated. The default field *is* the input,
@@ -80,12 +80,12 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    *
    * The trade is real and is the reason this is not the default: a swatch cannot
    * be read or pasted into without opening the panel, which is worse for a form
-   * where the colour is the answer rather than a setting.
+   * where the color is the answer rather than a setting.
    */
   @property({ reflect: true })
   appearance?: 'swatch'
 
-  /** Whether the colour carries an alpha channel. */
+  /** Whether the color carries an alpha channel. */
   @property({ reflect: true, type: Boolean })
   alpha = false
 
@@ -97,11 +97,11 @@ export class HelixBaseColorInput extends MixinControllerOpen(
   @property({ attribute: 'no-format', type: Boolean })
   noFormat = false
 
-  /** What the field says before a colour is in it. */
+  /** What the field says before a color is in it. */
   @property()
   placeholder = '#000000'
 
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   @property()
   swatches = ''
 
@@ -136,13 +136,13 @@ export class HelixBaseColorInput extends MixinControllerOpen(
   })
 
   /**
-   * The last value that was a colour.
+   * The last value that was a color.
    *
    * Half-typed input reaches here on every keystroke and most of it is not a
-   * colour, so the picker is given the last thing that was one rather than a
+   * color, so the picker is given the last thing that was one rather than a
    * fallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,
    * `#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,
-   * red, blue, blue, **red**, green, because two of those are colours and the
+   * red, blue, blue, **red**, green, because two of those are colors and the
    * ones between are not. Holding the last good one takes the flicker out and
    * leaves the square on blue until green arrives.
    *
@@ -174,12 +174,12 @@ export class HelixBaseColorInput extends MixinControllerOpen(
     return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
   }
 
-  /** What the picker should show, which is only ever a colour. */
+  /** What the picker should show, which is only ever a color. */
   private get picked(): string {
     return parseColor(this.value) ? this.value : this.settled
   }
 
-  /** What the trigger's swatch paints, which is only ever a colour. */
+  /** What the trigger's swatch paints, which is only ever a color. */
   private get painted(): string {
     const parsed = parseColor(this.value)
     return parsed ? toCss(parsed) : 'transparent'
@@ -238,13 +238,13 @@ export class HelixBaseColorInput extends MixinControllerOpen(
     }
     const control = this.control
     /* Checked here rather than left to the input, which is `text` and has no
-       idea what a colour is. `type="color"` is what was given up to own the
+       idea what a color is. `type="color"` is what was given up to own the
        panel, and it would not have helped: it has no invalid state, because it
        cannot hold one. */
     if (this.value !== '' && parseColor(this.value) === null) {
       this.internals.setValidity(
         { badInput: true },
-        'Enter a colour, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
+        'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
         anchor,
       )
     } else if (control) {
@@ -252,7 +252,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
     } else {
       /* A swatch has no native validity of its own, so `required` is the only
          thing left to check and this element has to check it: an empty value on
-         a required field is the one state a block of colour can be wrong in. */
+         a required field is the one state a block of color can be wrong in. */
       this.internals.setValidity(
         this.required && this.value === '' ? { valueMissing: true } : {},
         this.required && this.value === '' ? 'Choose a color.' : '',
@@ -262,7 +262,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
     this.refreshFeedback()
   }
 
-  /** Escape shuts the panel without moving the colour. */
+  /** Escape shuts the panel without moving the color. */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape' && this.open) {
       event.stopPropagation()
@@ -306,7 +306,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
   /*
    * The picker is told `no-value` because the field above it is that input.
    *
-   * Standing on a page, helix-color-picker states its own colour as text: a square and
+   * Standing on a page, helix-color-picker states its own color as text: a square and
    * two ramps can build one and cannot state one, and a reader who already has a
    * hex should not have to find it by dragging. Here that row would be a second
    * editable field for the same value, which is two places to type with no

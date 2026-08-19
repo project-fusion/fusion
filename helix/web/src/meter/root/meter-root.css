@@ -75,7 +75,7 @@
   transform-origin: right center;
 }
 
-/* The three bands. Colour is the obvious half and the ticks below are the other:
+/* The three bands. Color is the obvious half and the ticks below are the other:
    a reading that only says "poor" in red says nothing to a reader who cannot see
    red, and says nothing at all in a screenshot printed in grey. */
 [part="indicator"][data-band="good"] {
@@ -232,7 +232,7 @@
 /* A tick is a segment of the same circle rather than a mark placed on it: one
    unit of a hundred, pushed round to where the threshold falls. No trigonometry,
    and it stays right at any radius and any thickness. Drawn in the page's own
-   ground rather than a line colour, so it reads as a gap in the groove, which is
+   ground rather than a line color, so it reads as a gap in the groove, which is
    what a scale mark on a dial is. */
 :host([shape="arc"]) [part="tick"],
 :host([shape="ring"]) [part="tick"] {
@@ -245,7 +245,7 @@
   stroke-dashoffset: calc(var(--_meter-along) * -1);
 }
 
-/* The bands colour the arc the same way they colour the bar, since the band is
+/* The bands color the arc the same way they color the bar, since the band is
    already resolved and written onto the element that carries the reading. */
 :host([shape="arc"]) [part="indicator"][data-band="good"],
 :host([shape="ring"]) [part="indicator"][data-band="good"] {

@@ -263,7 +263,7 @@ export const contentArt: Record<string, ReactNode> = {
    * that has to be read rather than recognised has already failed at thumbnail
    * size.
    *
-   * The bands are colour in the component and cannot be here, since the gallery
+   * The bands are color in the component and cannot be here, since the gallery
    * is monotone throughout and says so at the top of `core.tsx`. The marks are
    * what the component draws for the same reason: a reading that only says
    * "poor" in red says nothing to a reader who cannot see red.
@@ -286,7 +286,7 @@ export const contentArt: Record<string, ReactNode> = {
       />
       {/* Two units wide against an eight tall track, which is what the component
           uses: any wider and a threshold near the end reads as part of the fill.
-          Drawn in the page's own colour, so they cut the fill rather than sit on
+          Drawn in the page's own color, so they cut the fill rather than sit on
           it, which is how the component draws them too. */}
       <rect className="artPage" height="8" width="2" x="152" y="96" />
       <rect className="artPage" height="8" width="2" x="216" y="96" />

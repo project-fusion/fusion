@@ -20,7 +20,7 @@
    with its own rule and panes below it, merges into the bar underneath without
    one. `--app-header-border-color` is that decision, transparent by default.
 
-   Declared and coloured rather than absent and added, so turning it on cannot
+   Declared and colored rather than absent and added, so turning it on cannot
    shift the page by a pixel: the border box is reserved either way, which is
    the same reason the hover ring on a card is an outline. */
 :host {
@@ -67,7 +67,7 @@
  * still wins where it is set, in both states, which is how a consumer tints a
  * scrolled bar to match their hero.
  *
- * Content colour is the consumer's. A pale wordmark over a dark hero is
+ * Content color is the consumer's. A pale wordmark over a dark hero is
  * `data-color-mode` on the header, the same way the toast inverts itself. */
 :host([appearance="transparent"]) {
   background-color: var(--app-header-background, transparent);

@@ -46,25 +46,25 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-base-announcement')
 export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
   /**
-   * Which colour the band wears.
+   * Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
    * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
-   * none of that. It set a colour, the live region stayed polite either way, and
+   * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
    * made the identical rename for the identical reason: `appearance` is a
-   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
    * so a consumer can put a band back to it from markup, and `surface` is the
-   * one value that is not a colour: it lifts the band onto the surface step
+   * one value that is not a color: it lifts the band onto the surface step
    * instead of the sunken one, for a strip carrying something that is not a
    * state at all.
    */

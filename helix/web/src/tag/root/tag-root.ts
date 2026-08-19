@@ -35,7 +35,7 @@ export class HelixTag extends HelixBaseTag {
    *
    * This was called `appearance`, and it never was one. Everywhere else in the
    * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-   * `tone` is semantic colour, which is what these five are and what
+   * `tone` is semantic color, which is what these five are and what
    * `helix-text` already calls them. One axis was wearing the other's name, and
    * the axis it should have held did not exist.
    */
@@ -54,7 +54,7 @@ export class HelixTag extends HelixBaseTag {
    *
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and until these were two properties you could ask
-   * for neither, because colour and fill were welded together.
+   * for neither, because color and fill were welded together.
    */
   @property({ reflect: true })
   appearance?: 'outlined' | 'solid' | 'subtle'

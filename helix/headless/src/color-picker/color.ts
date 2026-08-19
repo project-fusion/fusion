@@ -1,5 +1,5 @@
 /**
- * Reading and writing the colour syntaxes a field is allowed to hold.
+ * Reading and writing the color syntaxes a field is allowed to hold.
  *
  * **The working model is HSB**, hue and saturation and brightness, because that
  * is what the panel is: a square of saturation against brightness with a hue
@@ -25,7 +25,7 @@
  * with no DOM in it: this is the half worth testing directly.
  */
 
-/** A colour as the panel holds it. Alpha and the two percentages are 0 to 100. */
+/** A color as the panel holds it. Alpha and the two percentages are 0 to 100. */
 export interface Color {
   alpha: number
   brightness: number
@@ -108,7 +108,7 @@ export const toRgb = (color: Color): { blue: number; green: number; red: number 
   }
 }
 
-/** HSB to HSL, which is a different pair of numbers for the same colour. */
+/** HSB to HSL, which is a different pair of numbers for the same color. */
 const toHsl = (color: Color): { hue: number; lightness: number; saturation: number } => {
   const saturation = color.saturation / 100
   const brightness = color.brightness / 100
@@ -125,17 +125,17 @@ const toHsl = (color: Color): { hue: number; lightness: number; saturation: numb
 }
 
 /**
- * Splits a comma-separated list of colours, ignoring the commas inside them.
+ * Splits a comma-separated list of colors, ignoring the commas inside them.
  *
  * A plain `split(',')` is what this was, and it cannot hold the legacy syntaxes:
  * `#ef4444, rgb(249 115 22), rgba(34,197,94,.5)` came apart into six fragments,
- * four of them not colours, and the row quietly rendered three swatches instead
+ * four of them not colors, and the row quietly rendered three swatches instead
  * of four. The modern space-separated forms survived it, which is what made the
  * list look like it worked.
  *
  * Depth rather than a regular expression, because the thing that matters is
  * whether a comma is inside a function call and that is exactly what a counter
- * answers. No colour syntax nests, so a single counter is enough.
+ * answers. No color syntax nests, so a single counter is enough.
  */
 export const splitColors = (value: string): string[] => {
   const found: string[] = []
@@ -159,9 +159,9 @@ export const splitColors = (value: string): string[] => {
 }
 
 /**
- * Any of the syntaxes to the working model, or `null` where it is not a colour.
+ * Any of the syntaxes to the working model, or `null` where it is not a color.
  *
- * Named colours are not here. Resolving `rebeccapurple` means either shipping
+ * Named colors are not here. Resolving `rebeccapurple` means either shipping
  * the table of a hundred and forty or asking the browser, and the browser is not
  * present on the server: a field that accepted a name client-side and rejected
  * it during a server render would be worse than one that never took it.
@@ -263,7 +263,7 @@ export const formatColor = (color: Color, format: ColorFormat, withAlpha: boolea
   return withAlpha ? hex + byte(Math.round(alpha * 255)) : hex
 }
 
-/** The colour as CSS, for the swatches and the tracks. Always with its alpha. */
+/** The color as CSS, for the swatches and the tracks. Always with its alpha. */
 export const toCss = (color: Color): string => {
   const { blue, green, red } = toRgb(color)
   return `rgb(${red} ${green} ${blue} / ${clamp(color.alpha, 0, 100)}%)`

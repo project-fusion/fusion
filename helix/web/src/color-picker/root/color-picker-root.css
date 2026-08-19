@@ -13,10 +13,10 @@
   padding-block-end: var(--color-picker-inset, var(--helix-space-none));
 }
 
-/* The chip of the current colour, and every preset: one square, two sizes.
+/* The chip of the current color, and every preset: one square, two sizes.
  *
- * A checkerboard behind the colour rather than a solid, so a colour carrying
- * alpha reads as partly transparent instead of as a slightly different colour.
+ * A checkerboard behind the color rather than a solid, so a color carrying
+ * alpha reads as partly transparent instead of as a slightly different color.
  * Two gradients rather than an image, because a data URI would be a second thing
  * to theme and this one only ever needs two greys. */
 [part="sample"],
@@ -45,7 +45,7 @@
  * the bottom to take the brightness out. The hue is `--_hue`, written by the
  * tier below, so the square repaints as the ramp moves.
  *
- * The hue is raw `hsl()` and takes no token. Every other colour in this file is
+ * The hue is raw `hsl()` and takes no token. Every other color in this file is
  * a role a theme may change; the wheel is not one, and a themed picker would be
  * one that lies about what it selects. */
 [part="grid"] {
@@ -60,7 +60,7 @@
   touch-action: none;
 }
 
-/* Where the colour is. Positioned from the two channels, which is the same pair
+/* Where the color is. Positioned from the two channels, which is the same pair
    of numbers the two ranges hold: nothing here measures anything. */
 [part="grid-handle"] {
   block-size: var(--helix-size-icon-sm);
@@ -150,9 +150,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* A press, and a mark over the colour for as long as it lasts. The mark is drawn
+/* A press, and a mark over the color for as long as it lasts. The mark is drawn
    rather than slotted, the same stencil the checkbox uses, and it sits on a wash
-   of the page so a tick lands legibly on any colour underneath it. */
+   of the page so a tick lands legibly on any color underneath it. */
 [part="sample"][data-copied] {
   scale: 0.94;
 }
@@ -195,7 +195,7 @@
   white-space: nowrap;
 }
 
-/* Each track is painted with the colours it chooses, through the one hook Slider
+/* Each track is painted with the colors it chooses, through the one hook Slider
    publishes for it. */
 [part="channel"][data-channel="hue"] {
   --slider-track-image: linear-gradient(
@@ -210,7 +210,7 @@
   );
 }
 
-/* The checkerboard again, under a ramp from clear to the colour itself, because
+/* The checkerboard again, under a ramp from clear to the color itself, because
    an opacity track drawn on a solid shows the same bar at every value the
    background happens to match. */
 [part="channel"][data-channel="alpha"] {
@@ -228,7 +228,7 @@
 }
 
 /* No fill and no unfilled remainder: on these two the track is the value rather
-   than a measure of it, so a coloured half would be a second reading of
+   than a measure of it, so a colored half would be a second reading of
    something the ramp already says. */
 [part="channel"] {
   --slider-fill-color: transparent;
@@ -263,11 +263,11 @@
  * Full width because there are two of them and the row is theirs. Sized to their
  * labels they were a glyph and a three-letter word floating at one end of a
  * panel, with the swatches under them starting somewhere else again. */
-/* The value and the tools share the row: the colour as text on the left, the
+/* The value and the tools share the row: the color as text on the left, the
  * two controls on the right.
  *
  * The text is what makes this element complete standing on a page. A square and
- * two ramps can build a colour and cannot state one, and a reader who already
+ * two ramps can build a color and cannot state one, and a reader who already
  * has a hex should not have to find it by dragging. Color Input sets `no-value`
  * and the tools then take the row, since its own field is that input. */
 [part="footer"] {
@@ -309,9 +309,9 @@
 
 /* Wrong, and the field says so. The one picker of the three with a box of its
    own, so the error goes where an error goes on every other field in the
-   library rather than onto the square, which is a picture of a colour space and
+   library rather than onto the square, which is a picture of a color space and
    not an answer. Hover and focus named as well, so the border cannot be taken
-   back to grey by the pointer or to blue by the caret: one edge, one colour,
+   back to grey by the pointer or to blue by the caret: one edge, one color,
    the arrangement Input records. */
 :host([invalid]) [part="value"],
 :host([invalid]) [part="value"]:hover,
@@ -341,7 +341,7 @@
 }
 
 /* Under a rule, because they are a different kind of thing from everything
-   above: the square and the ramps build a colour and these hand one over
+   above: the square and the ramps build a color and these hand one over
    finished. Its own row rather than sharing one with the tools, which is what it
    did and which put eight swatches and two buttons on a line that had room for
    about half of it. */
@@ -372,7 +372,7 @@
 
 /* The one in use is not marked at all.
  *
- * It carried a ring, which is a focus ring in another colour sitting permanently
+ * It carried a ring, which is a focus ring in another color sitting permanently
  * on one swatch: a row of eight then has a mark on it before anything is
  * touched, and pressing another moves the mark rather than doing something. What
  * the swatch is chosen *for* is already showing, twice, on the chip and in the

@@ -17,7 +17,7 @@ describe('meter server output', () => {
     expect(partTag(ssr(banded), 'indicator')).toContain('--_meter-fraction: 0.94')
   })
 
-  test('and so is its band, rather than being coloured on hydration', () => {
+  test('and so is its band, rather than being colored on hydration', () => {
     expect(partTag(ssr(banded), 'indicator')).toContain('data-band="poor"')
   })
 

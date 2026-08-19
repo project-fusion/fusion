@@ -216,7 +216,7 @@
  *
  * The same four selectors Input carries, and for the reason it records at
  * length: the focus rule owns the `outline` and nothing here was changing its
- * colour, so a focused field with an error came out as a red border inside a
+ * color, so a focused field with an error came out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
  * and the ring are one edge, so when one turns they both do.
  *

@@ -39,7 +39,7 @@ describe('input color', () => {
   test('the picker states no value of its own, because the field is that input', async () => {
     /* Two editable fields for one value is two places to type with no answer to
        which one is authoritative or which has the caret. The field stays the
-       input, because a form wants the colour readable and pasteable without
+       input, because a form wants the color readable and pasteable without
        opening a panel. */
     const host = await field()
     const picker = part(host, 'picker') as HTMLElement
@@ -70,7 +70,7 @@ describe('input color', () => {
     expect(scope.getElementById('control')).toBe(trigger)
   })
 
-  test('a required swatch is checked here, since a block of colour has no validity', async () => {
+  test('a required swatch is checked here, since a block of color has no validity', async () => {
     const empty = await field('appearance="swatch" required')
     expect(internals(empty).validationMessage).toBe('Choose a color.')
     const filled = await field('appearance="swatch" default-value="#ff0000" required')
@@ -111,7 +111,7 @@ describe('input color', () => {
     expect(said).toEqual(['#00ff00'])
   })
 
-  test('a pasted colour lands in the picker, in any syntax', async () => {
+  test('a pasted color lands in the picker, in any syntax', async () => {
     for (const [written, hue] of [
       ['rgb(0 255 0)', '120'],
       ['#00ff00', '120'],
@@ -130,8 +130,8 @@ describe('input color', () => {
   test('and half-typed input does not throw the square around on the way', async () => {
     /* Measured before this: typing `#00ff00` one character at a time walked the
        square red, red, red, blue, blue, RED, green, because `#00f` and `#00ff`
-       are colours and `#00ff0` is not. The picker is handed the last value that
-       was a colour rather than a fallback, so it holds on blue until green
+       are colors and `#00ff0` is not. The picker is handed the last value that
+       was a color rather than a fallback, so it holds on blue until green
        arrives. The same reasoning Date Input records for its calendar. */
     const host = await field()
     const seen: string[] = []
@@ -144,7 +144,7 @@ describe('input color', () => {
     }
     // Never back to red once it has left it.
     expect(seen).toEqual(['0', '0', '0', '240', '240', '240', '120'])
-    // And the field kept every character, including the ones that were not colours.
+    // And the field kept every character, including the ones that were not colors.
     expect(host.value).toBe('#00ff00')
   })
 
@@ -156,7 +156,7 @@ describe('input color', () => {
     }
   })
 
-  test('something that is not a colour is invalid, and says what one looks like', async () => {
+  test('something that is not a color is invalid, and says what one looks like', async () => {
     const host = await field()
     await type(host, 'rebeccapurple')
     expect(internals(host).validationMessage).toContain('#ff0000')
@@ -167,7 +167,7 @@ describe('input color', () => {
     expect(internals(host).validationMessage).toBe('')
   })
 
-  test('the preview is clear before a colour is in it', async () => {
+  test('the preview is clear before a color is in it', async () => {
     const empty = await field()
     expect(part(empty, 'preview')?.getAttribute('style')).toContain('transparent')
     const set = await field('default-value="rgb(255 0 0)"')

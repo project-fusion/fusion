@@ -22,7 +22,7 @@ import { styles } from './divider-root.css.js'
  *
  * @cssproperty --divider-color - Color of the rule.
  * @cssproperty --divider-thickness - Thickness of the rule.
- * @cssproperty --divider-color - Colour of the rule.
+ * @cssproperty --divider-color - Color of the rule.
  * @cssproperty --divider-inset - Space taken off both ends of it.
  * @cssproperty --divider-inset-end - Off the far end only.
  * @cssproperty --divider-inset-start - Off the near end only.

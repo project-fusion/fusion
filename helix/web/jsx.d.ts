@@ -510,25 +510,25 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixAnnouncement["dismissLabel"];
-  /** Which colour the band wears.
+  /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
 `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
-none of that. It set a colour, the live region stayed polite either way, and
+none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
 made the identical rename for the identical reason: `appearance` is a
-treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
 so a consumer can put a band back to it from markup, and `surface` is the
-one value that is not a colour: it lifts the band onto the surface step
+one value that is not a color: it lifts the band onto the surface step
 instead of the sunken one, for a strip carrying something that is not a
 state at all. */
   tone?: HelixAnnouncement["tone"];
@@ -554,25 +554,25 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixAnnouncement["dismissLabel"];
-  /** Which colour the band wears.
+  /** Which color the band wears.
 
 **This was `severity` and it was claiming more than it did.** Severity is a
 judgement about the message, and elsewhere in this library it carries one:
 `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
 puts a mark beside the text and names it to a screen reader. Here it did
-none of that. It set a colour, the live region stayed polite either way, and
+none of that. It set a color, the live region stayed polite either way, and
 nothing about the announcement's semantics moved. A property that only
 changes the paint should say so.
 
 `tone` is the word this library already uses for exactly that, and `Tag`
 made the identical rename for the identical reason: `appearance` is a
-treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+treatment, `tone` is semantic color. The set matches `Tag`'s so the two
 agree, with `neutral` as the resting value and `primary` for a band that is
 about the product rather than about a state.
 
 `neutral` is what an unset announcement already looked like, said out loud
 so a consumer can put a band back to it from markup, and `surface` is the
-one value that is not a colour: it lifts the band onto the surface step
+one value that is not a color: it lifts the band onto the surface step
 instead of the sunken one, for a strip carrying something that is not a
 state at all. */
   "prop:tone"?: HelixAnnouncement["tone"];
@@ -1874,9 +1874,9 @@ being four of a kind rather than four of three kinds. */
   required?: HelixColorInput["required"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
-`swatch` is the native control's shape: a block of colour that opens a
+`swatch` is the native control's shape: a block of color that opens a
 picker, with no text beside it. It is what a toolbar wants, and a form that
-asks for a colour among twenty other questions, where a hex in a box is
+asks for a color among twenty other questions, where a hex in a box is
 eleven characters of noise next to the thing itself.
 
 It also settles where the value is stated. The default field *is* the input,
@@ -1886,9 +1886,9 @@ readable and typeable exactly once, in whichever of the two is present.
 
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
-where the colour is the answer rather than a setting. */
+where the color is the answer rather than a setting. */
   appearance?: HelixColorInput["appearance"];
-  /** Whether the colour carries an alpha channel. */
+  /** Whether the color carries an alpha channel. */
   alpha?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
   format?: HelixColorInput["format"];
@@ -1896,9 +1896,9 @@ where the colour is the answer rather than a setting. */
   "no-format"?: HelixColorInput["noFormat"];
   /** Whether the reader may change the format from the panel. */
   noFormat?: HelixColorInput["noFormat"];
-  /** What the field says before a colour is in it. */
+  /** What the field says before a color is in it. */
   placeholder?: HelixColorInput["placeholder"];
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   swatches?: HelixColorInput["swatches"];
   /** Accessible name for the control that opens the panel. */
   "trigger-label"?: HelixColorInput["triggerLabel"];
@@ -1948,7 +1948,7 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixColorInput["onValueChange"];
 
-  /** Fired when the colour changes. */
+  /** Fired when the color changes. */
   "onhelix-change"?: (e: HelixColorInputHelixChangeElementEvent) => void;
   /** Fired when the panel opens. */
   "onhelix-open"?: (e: HelixColorInputHelixOpenElementEvent) => void;
@@ -2010,9 +2010,9 @@ being four of a kind rather than four of three kinds. */
   "prop:required"?: HelixColorInput["required"];
   /** Whether the field is a text box with a swatch on it, or only the swatch.
 
-`swatch` is the native control's shape: a block of colour that opens a
+`swatch` is the native control's shape: a block of color that opens a
 picker, with no text beside it. It is what a toolbar wants, and a form that
-asks for a colour among twenty other questions, where a hex in a box is
+asks for a color among twenty other questions, where a hex in a box is
 eleven characters of noise next to the thing itself.
 
 It also settles where the value is stated. The default field *is* the input,
@@ -2022,9 +2022,9 @@ readable and typeable exactly once, in whichever of the two is present.
 
 The trade is real and is the reason this is not the default: a swatch cannot
 be read or pasted into without opening the panel, which is worse for a form
-where the colour is the answer rather than a setting. */
+where the color is the answer rather than a setting. */
   "prop:appearance"?: HelixColorInput["appearance"];
-  /** Whether the colour carries an alpha channel. */
+  /** Whether the color carries an alpha channel. */
   "prop:alpha"?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
   "prop:format"?: HelixColorInput["format"];
@@ -2032,9 +2032,9 @@ where the colour is the answer rather than a setting. */
   "bool:no-format"?: HelixColorInput["noFormat"];
   /** Whether the reader may change the format from the panel. */
   "prop:noFormat"?: HelixColorInput["noFormat"];
-  /** What the field says before a colour is in it. */
+  /** What the field says before a color is in it. */
   "prop:placeholder"?: HelixColorInput["placeholder"];
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   "prop:swatches"?: HelixColorInput["swatches"];
   /** Accessible name for the control that opens the panel. */
   "attr:trigger-label"?: HelixColorInput["triggerLabel"];
@@ -2083,7 +2083,7 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixColorInput["onValueChange"];
-  /** Fired when the colour changes. */
+  /** Fired when the color changes. */
   "on:helix-change"?: (e: HelixColorInputHelixChangeElementEvent) => void;
   /** Fired when the panel opens. */
   "on:helix-open"?: (e: HelixColorInputHelixOpenElementEvent) => void;
@@ -2134,7 +2134,7 @@ second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
   invalid?: HelixColorPicker["invalid"];
-  /** Whether the colour carries an alpha channel.
+  /** Whether the color carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
@@ -2146,9 +2146,9 @@ Only what is written. Everything is read whatever this says, so a picker on
   format?: HelixColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
-The row reads the colour as text and lets it be typed or pasted, which is
+The row reads the color as text and lets it be typed or pasted, which is
 what makes this element complete standing on a page: a square and two ramps
-can build a colour and cannot state one, and a reader who has a hex already
+can build a color and cannot state one, and a reader who has a hex already
 should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
@@ -2160,9 +2160,9 @@ without opening a panel. */
   "no-value"?: HelixColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
-The row reads the colour as text and lets it be typed or pasted, which is
+The row reads the color as text and lets it be typed or pasted, which is
 what makes this element complete standing on a page: a square and two ramps
-can build a colour and cannot state one, and a reader who has a hex already
+can build a color and cannot state one, and a reader who has a hex already
 should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
@@ -2180,7 +2180,7 @@ without opening a panel. */
   "no-eyedropper"?: HelixColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
   noEyedropper?: HelixColorPicker["noEyedropper"];
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   swatches?: HelixColorPicker["swatches"];
   /** Whether the control is non-interactive.
 
@@ -2219,9 +2219,9 @@ it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   onValueChange?: HelixColorPicker["onValueChange"];
 
-  /** Fired when the colour changes. */
+  /** Fired when the color changes. */
   "onhelix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
-  /** Fired when the colour is put on the clipboard. */
+  /** Fired when the color is put on the clipboard. */
   "onhelix-copy"?: (e: HelixColorPickerHelixCopyElementEvent) => void;
 };
 
@@ -2251,7 +2251,7 @@ second message inside the panel would be the same error said twice. What is
 left for the picker is the one thing the field cannot draw from outside, the
 mark on the answer itself. */
   "prop:invalid"?: HelixColorPicker["invalid"];
-  /** Whether the colour carries an alpha channel.
+  /** Whether the color carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
@@ -2263,9 +2263,9 @@ Only what is written. Everything is read whatever this says, so a picker on
   "prop:format"?: HelixColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
-The row reads the colour as text and lets it be typed or pasted, which is
+The row reads the color as text and lets it be typed or pasted, which is
 what makes this element complete standing on a page: a square and two ramps
-can build a colour and cannot state one, and a reader who has a hex already
+can build a color and cannot state one, and a reader who has a hex already
 should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
@@ -2277,9 +2277,9 @@ without opening a panel. */
   "bool:no-value"?: HelixColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
-The row reads the colour as text and lets it be typed or pasted, which is
+The row reads the color as text and lets it be typed or pasted, which is
 what makes this element complete standing on a page: a square and two ramps
-can build a colour and cannot state one, and a reader who has a hex already
+can build a color and cannot state one, and a reader who has a hex already
 should not have to find it by dragging.
 
 Color Input sets this, because its field is that input. Two editable fields
@@ -2297,7 +2297,7 @@ without opening a panel. */
   "bool:no-eyedropper"?: HelixColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
   "prop:noEyedropper"?: HelixColorPicker["noEyedropper"];
-  /** Colours offered under the picker, as a comma-separated list. */
+  /** Colors offered under the picker, as a comma-separated list. */
   "prop:swatches"?: HelixColorPicker["swatches"];
   /** Whether the control is non-interactive.
 
@@ -2335,9 +2335,9 @@ because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
   "prop:onValueChange"?: HelixColorPicker["onValueChange"];
-  /** Fired when the colour changes. */
+  /** Fired when the color changes. */
   "on:helix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
-  /** Fired when the colour is put on the clipboard. */
+  /** Fired when the color is put on the clipboard. */
   "on:helix-copy"?: (e: HelixColorPickerHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -4682,7 +4682,7 @@ answer, and asking them to encode it as thresholds so this can decode it
 again is a worse API than letting them say it.
 
 Not reflected. Nothing selects on it: the band reaches the stylesheet as
-`data-band` on the fill, because that is the element being coloured, so
+`data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
   band?: HelixMeter["band"];
@@ -4768,7 +4768,7 @@ answer, and asking them to encode it as thresholds so this can decode it
 again is a worse API than letting them say it.
 
 Not reflected. Nothing selects on it: the band reaches the stylesheet as
-`data-band` on the fill, because that is the element being coloured, so
+`data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
   "prop:band"?: HelixMeter["band"];
@@ -7576,7 +7576,7 @@ export type HelixTagProps = {
 
 This was called `appearance`, and it never was one. Everywhere else in the
 library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-`tone` is semantic colour, which is what these five are and what
+`tone` is semantic color, which is what these five are and what
 `helix-text` already calls them. One axis was wearing the other's name, and
 the axis it should have held did not exist. */
   tone?: HelixTag["tone"];
@@ -7591,7 +7591,7 @@ the axis it should have held did not exist. */
 
 Independent of `tone` on purpose: an outlined danger tag and a solid danger
 tag are both sensible, and until these were two properties you could ask
-for neither, because colour and fill were welded together. */
+for neither, because color and fill were welded together. */
   appearance?: HelixTag["appearance"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixTag["dismissible"];
@@ -7619,7 +7619,7 @@ export type HelixTagSolidJsProps = {
 
 This was called `appearance`, and it never was one. Everywhere else in the
 library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-`tone` is semantic colour, which is what these five are and what
+`tone` is semantic color, which is what these five are and what
 `helix-text` already calls them. One axis was wearing the other's name, and
 the axis it should have held did not exist. */
   "prop:tone"?: HelixTag["tone"];
@@ -7634,7 +7634,7 @@ the axis it should have held did not exist. */
 
 Independent of `tone` on purpose: an outlined danger tag and a solid danger
 tag are both sensible, and until these were two properties you could ask
-for neither, because colour and fill were welded together. */
+for neither, because color and fill were welded together. */
   "prop:appearance"?: HelixTag["appearance"];
   /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixTag["dismissible"];
@@ -9480,25 +9480,25 @@ export type CustomElements = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
-   * - `tone`: Which colour the band wears.
+   * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
    * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
-   * none of that. It set a colour, the live region stayed polite either way, and
+   * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
    * made the identical rename for the identical reason: `appearance` is a
-   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
    * so a consumer can put a band back to it from markup, and `surface` is the
-   * one value that is not a colour: it lifts the band onto the surface step
+   * one value that is not a color: it lifts the band onto the surface step
    * instead of the sunken one, for a strip carrying something that is not a
    * state at all.
    *
@@ -10534,7 +10534,7 @@ export type CustomElements = {
    * control.
    *
    * **The trigger fills the trailing end rather than sitting in it as an icon.** A
-   * colour field has one thing to show and it is a colour, so the swatch takes the
+   * color field has one thing to show and it is a color, so the swatch takes the
    * height of the control and reads as a block of it. It is the one field here
    * whose trailing affordance is the value itself: Date Input's calendar mark
    * stands for an action, and an action stretched to field height is a large icon
@@ -10590,9 +10590,9 @@ export type CustomElements = {
    * - `required`: Whether the form refuses to submit without it.
    * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
-   * `swatch` is the native control's shape: a block of colour that opens a
+   * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
-   * asks for a colour among twenty other questions, where a hex in a box is
+   * asks for a color among twenty other questions, where a hex in a box is
    * eleven characters of noise next to the thing itself.
    *
    * It also settles where the value is stated. The default field *is* the input,
@@ -10602,12 +10602,12 @@ export type CustomElements = {
    *
    * The trade is real and is the reason this is not the default: a swatch cannot
    * be read or pasted into without opening the panel, which is worse for a form
-   * where the colour is the answer rather than a setting.
-   * - `alpha`: Whether the colour carries an alpha channel.
+   * where the color is the answer rather than a setting.
+   * - `alpha`: Whether the color carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
-   * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `placeholder`: What the field says before a color is in it.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -10665,7 +10665,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the colour changes.
+   * - `helix-change`: Fired when the color changes.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -10724,9 +10724,9 @@ export type CustomElements = {
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input carrying the value. Absent in `swatch`.
    * - `trigger`: The control that opens the panel.
-   * - `preview`: The chip showing the colour, inside the trigger.
+   * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The colour picker inside it.
+   * - `picker`: The color picker inside it.
    */
   "helix-color-input": Partial<
     HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
@@ -10747,8 +10747,8 @@ export type CustomElements = {
    * ring is drawn on the square rather than on them, so it lands where the reader
    * is looking.
    *
-   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
-   * background is just a different colour, and the one thing a preview owes a
+   * **Every chip sits on a checkerboard.** A color with alpha painted on a solid
+   * background is just a different color, and the one thing a preview owes a
    * reader is the difference between "pale blue" and "blue, half transparent".
    *
    * No padding and no surface of its own. Flat on a page it takes the space it is
@@ -10779,7 +10779,7 @@ export type CustomElements = {
    * second message inside the panel would be the same error said twice. What is
    * left for the picker is the one thing the field cannot draw from outside, the
    * mark on the answer itself.
-   * - `alpha`: Whether the colour carries an alpha channel.
+   * - `alpha`: Whether the color carries an alpha channel.
    *
    * Off by default, because it widens every value written, and a consumer who
    * did not ask for transparency should not have to strip a byte off each one.
@@ -10789,9 +10789,9 @@ export type CustomElements = {
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
    * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
    *
-   * The row reads the colour as text and lets it be typed or pasted, which is
+   * The row reads the color as text and lets it be typed or pasted, which is
    * what makes this element complete standing on a page: a square and two ramps
-   * can build a colour and cannot state one, and a reader who has a hex already
+   * can build a color and cannot state one, and a reader who has a hex already
    * should not have to find it by dragging.
    *
    * Color Input sets this, because its field is that input. Two editable fields
@@ -10802,7 +10802,7 @@ export type CustomElements = {
    * without opening a panel.
    * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
-   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -10848,8 +10848,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the colour changes.
-   * - `helix-copy`: Fired when the colour is put on the clipboard.
+   * - `helix-change`: Fired when the color changes.
+   * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Methods
    *
@@ -10889,17 +10889,17 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-handle`: The mark showing where in the square the color sits.
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, which copies it when pressed.
+   * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
-   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `eyedropper`: The control that samples a color from the screen.
    * - `footer`: The row holding the value and the tools.
-   * - `value`: The colour as text, which can be typed or pasted.
+   * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
@@ -11434,7 +11434,7 @@ export type CustomElements = {
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
@@ -12744,14 +12744,14 @@ export type CustomElements = {
    * ends are square. `radii-full` on an eight pixel bar was a four pixel pill
    * anyway, so this is only a change at all because the bar grew.
    *
-   * What else differs is what the colour means. A progress bar is one colour because
+   * What else differs is what the color means. A progress bar is one color because
    * there is one thing to say; a meter's fill takes the success, warning or danger
    * tone from the band its reading falls in, and only once thresholds have been
    * declared. An unbanded meter is neutral, because a gauge with nothing said
    * about it is a reading rather than good news.
    *
    * A tick marks each threshold, so the reading can be placed against the bands
-   * without seeing colour at all.
+   * without seeing color at all.
    *
    * A reading past either end squares the corner it ran out at, which is the
    * convention for a quantity continuing past the frame it is drawn in. The bar
@@ -12801,7 +12801,7 @@ export type CustomElements = {
    * again is a worse API than letting them say it.
    *
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
-   * `data-band` on the fill, because that is the element being coloured, so
+   * `data-band` on the fill, because that is the element being colored, so
    * reflecting here would write an attribute onto the host for no reader. Third
    * time this rule has caught something today.
    * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
@@ -13211,7 +13211,7 @@ export type CustomElements = {
    * beside it would be two places to keep in step.
    *
    * The gap takes the same box as everything else in the row and only sits back a
-   * shade in colour. It is a control, so it answers hover and focus like one; it
+   * shade in color. It is a control, so it answers hover and focus like one; it
    * is a way through rather than a destination, so it does not compete.
    *
    * ## Attributes & Properties
@@ -14353,7 +14353,7 @@ export type CustomElements = {
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
-   * - `--slider-track-image`: The whole track, for a slider whose colour is the value. (default: `undefined`)
+   * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -15040,7 +15040,7 @@ export type CustomElements = {
    *
    * This was called `appearance`, and it never was one. Everywhere else in the
    * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-   * `tone` is semantic colour, which is what these five are and what
+   * `tone` is semantic color, which is what these five are and what
    * `helix-text` already calls them. One axis was wearing the other's name, and
    * the axis it should have held did not exist.
    * - `appearance`: How much of the tone the tag wears.
@@ -15054,7 +15054,7 @@ export type CustomElements = {
    *
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and until these were two properties you could ask
-   * for neither, because colour and fill were welded together.
+   * for neither, because color and fill were welded together.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -16521,25 +16521,25 @@ export type CustomElementsSolidJs = {
    * derive one rather than dash-casing it, so this would otherwise be
    * reachable only as `dismisslabel`, which nobody would guess and no linter
    * would catch.
-   * - `tone`: Which colour the band wears.
+   * - `tone`: Which color the band wears.
    *
    * **This was `severity` and it was claiming more than it did.** Severity is a
    * judgement about the message, and elsewhere in this library it carries one:
    * `Callout` reads `SEVERITIES` for an icon and a label, so `severity="danger"`
    * puts a mark beside the text and names it to a screen reader. Here it did
-   * none of that. It set a colour, the live region stayed polite either way, and
+   * none of that. It set a color, the live region stayed polite either way, and
    * nothing about the announcement's semantics moved. A property that only
    * changes the paint should say so.
    *
    * `tone` is the word this library already uses for exactly that, and `Tag`
    * made the identical rename for the identical reason: `appearance` is a
-   * treatment, `tone` is semantic colour. The set matches `Tag`'s so the two
+   * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
    * agree, with `neutral` as the resting value and `primary` for a band that is
    * about the product rather than about a state.
    *
    * `neutral` is what an unset announcement already looked like, said out loud
    * so a consumer can put a band back to it from markup, and `surface` is the
-   * one value that is not a colour: it lifts the band onto the surface step
+   * one value that is not a color: it lifts the band onto the surface step
    * instead of the sunken one, for a strip carrying something that is not a
    * state at all.
    *
@@ -17621,7 +17621,7 @@ export type CustomElementsSolidJs = {
    * control.
    *
    * **The trigger fills the trailing end rather than sitting in it as an icon.** A
-   * colour field has one thing to show and it is a colour, so the swatch takes the
+   * color field has one thing to show and it is a color, so the swatch takes the
    * height of the control and reads as a block of it. It is the one field here
    * whose trailing affordance is the value itself: Date Input's calendar mark
    * stands for an action, and an action stretched to field height is a large icon
@@ -17677,9 +17677,9 @@ export type CustomElementsSolidJs = {
    * - `required`: Whether the form refuses to submit without it.
    * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
-   * `swatch` is the native control's shape: a block of colour that opens a
+   * `swatch` is the native control's shape: a block of color that opens a
    * picker, with no text beside it. It is what a toolbar wants, and a form that
-   * asks for a colour among twenty other questions, where a hex in a box is
+   * asks for a color among twenty other questions, where a hex in a box is
    * eleven characters of noise next to the thing itself.
    *
    * It also settles where the value is stated. The default field *is* the input,
@@ -17689,12 +17689,12 @@ export type CustomElementsSolidJs = {
    *
    * The trade is real and is the reason this is not the default: a swatch cannot
    * be read or pasted into without opening the panel, which is worse for a form
-   * where the colour is the answer rather than a setting.
-   * - `alpha`: Whether the colour carries an alpha channel.
+   * where the color is the answer rather than a setting.
+   * - `alpha`: Whether the color carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
-   * - `placeholder`: What the field says before a colour is in it.
-   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `placeholder`: What the field says before a color is in it.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -17752,7 +17752,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the colour changes.
+   * - `helix-change`: Fired when the color changes.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -17811,9 +17811,9 @@ export type CustomElementsSolidJs = {
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input carrying the value. Absent in `swatch`.
    * - `trigger`: The control that opens the panel.
-   * - `preview`: The chip showing the colour, inside the trigger.
+   * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The colour picker inside it.
+   * - `picker`: The color picker inside it.
    */
   "helix-color-input": Partial<
     HelixColorInputProps &
@@ -17837,8 +17837,8 @@ export type CustomElementsSolidJs = {
    * ring is drawn on the square rather than on them, so it lands where the reader
    * is looking.
    *
-   * **Every chip sits on a checkerboard.** A colour with alpha painted on a solid
-   * background is just a different colour, and the one thing a preview owes a
+   * **Every chip sits on a checkerboard.** A color with alpha painted on a solid
+   * background is just a different color, and the one thing a preview owes a
    * reader is the difference between "pale blue" and "blue, half transparent".
    *
    * No padding and no surface of its own. Flat on a page it takes the space it is
@@ -17869,7 +17869,7 @@ export type CustomElementsSolidJs = {
    * second message inside the panel would be the same error said twice. What is
    * left for the picker is the one thing the field cannot draw from outside, the
    * mark on the answer itself.
-   * - `alpha`: Whether the colour carries an alpha channel.
+   * - `alpha`: Whether the color carries an alpha channel.
    *
    * Off by default, because it widens every value written, and a consumer who
    * did not ask for transparency should not have to strip a byte off each one.
@@ -17879,9 +17879,9 @@ export type CustomElementsSolidJs = {
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
    * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
    *
-   * The row reads the colour as text and lets it be typed or pasted, which is
+   * The row reads the color as text and lets it be typed or pasted, which is
    * what makes this element complete standing on a page: a square and two ramps
-   * can build a colour and cannot state one, and a reader who has a hex already
+   * can build a color and cannot state one, and a reader who has a hex already
    * should not have to find it by dragging.
    *
    * Color Input sets this, because its field is that input. Two editable fields
@@ -17892,7 +17892,7 @@ export type CustomElementsSolidJs = {
    * without opening a panel.
    * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
-   * - `swatches`: Colours offered under the picker, as a comma-separated list.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -17938,8 +17938,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired when the colour changes.
-   * - `helix-copy`: Fired when the colour is put on the clipboard.
+   * - `helix-change`: Fired when the color changes.
+   * - `helix-copy`: Fired when the color is put on the clipboard.
    *
    * ## Methods
    *
@@ -17979,17 +17979,17 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `grid`: The saturation and brightness square.
-   * - `grid-handle`: The mark showing where in the square the colour sits.
+   * - `grid-handle`: The mark showing where in the square the color sits.
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
-   * - `sample`: The chip of the current colour, which copies it when pressed.
+   * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
-   * - `eyedropper`: The control that samples a colour from the screen.
+   * - `eyedropper`: The control that samples a color from the screen.
    * - `footer`: The row holding the value and the tools.
-   * - `value`: The colour as text, which can be typed or pasted.
+   * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
@@ -18536,7 +18536,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
-   * - `--divider-color`: Colour of the rule. (default: `undefined`)
+   * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
@@ -19898,14 +19898,14 @@ export type CustomElementsSolidJs = {
    * ends are square. `radii-full` on an eight pixel bar was a four pixel pill
    * anyway, so this is only a change at all because the bar grew.
    *
-   * What else differs is what the colour means. A progress bar is one colour because
+   * What else differs is what the color means. A progress bar is one color because
    * there is one thing to say; a meter's fill takes the success, warning or danger
    * tone from the band its reading falls in, and only once thresholds have been
    * declared. An unbanded meter is neutral, because a gauge with nothing said
    * about it is a reading rather than good news.
    *
    * A tick marks each threshold, so the reading can be placed against the bands
-   * without seeing colour at all.
+   * without seeing color at all.
    *
    * A reading past either end squares the corner it ran out at, which is the
    * convention for a quantity continuing past the frame it is drawn in. The bar
@@ -19955,7 +19955,7 @@ export type CustomElementsSolidJs = {
    * again is a worse API than letting them say it.
    *
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
-   * `data-band` on the fill, because that is the element being coloured, so
+   * `data-band` on the fill, because that is the element being colored, so
    * reflecting here would write an attribute onto the host for no reader. Third
    * time this rule has caught something today.
    * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
@@ -20385,7 +20385,7 @@ export type CustomElementsSolidJs = {
    * beside it would be two places to keep in step.
    *
    * The gap takes the same box as everything else in the row and only sits back a
-   * shade in colour. It is a control, so it answers hover and focus like one; it
+   * shade in color. It is a control, so it answers hover and focus like one; it
    * is a way through rather than a destination, so it does not compete.
    *
    * ## Attributes & Properties
@@ -21564,7 +21564,7 @@ export type CustomElementsSolidJs = {
    * - `--slider-track-color`: The part not yet chosen. (default: `undefined`)
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
-   * - `--slider-track-image`: The whole track, for a slider whose colour is the value. (default: `undefined`)
+   * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22287,7 +22287,7 @@ export type CustomElementsSolidJs = {
    *
    * This was called `appearance`, and it never was one. Everywhere else in the
    * library `appearance` is a treatment (`outlined`, `elevated`, `plain`) and
-   * `tone` is semantic colour, which is what these five are and what
+   * `tone` is semantic color, which is what these five are and what
    * `helix-text` already calls them. One axis was wearing the other's name, and
    * the axis it should have held did not exist.
    * - `appearance`: How much of the tone the tag wears.
@@ -22301,7 +22301,7 @@ export type CustomElementsSolidJs = {
    *
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and until these were two properties you could ask
-   * for neither, because colour and fill were welded together.
+   * for neither, because color and fill were welded together.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -23904,7 +23904,7 @@ export type CustomCssProperties = {
   "--slider-fill-color"?: string;
   /** The ticks along the track. */
   "--slider-marker-color"?: string;
-  /** The whole track, for a slider whose colour is the value. */
+  /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
   /** The line between the panes. */
   "--splitter-color"?: string;

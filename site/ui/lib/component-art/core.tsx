@@ -13,14 +13,14 @@ import type { CSSProperties, ReactNode } from 'react'
  *   `helix/styles/src/tokens.css` rather than argued about. Control 40, tag 24,
  *   checkbox 20, badge 16, switch 24 by 42, icon 20, header 56, track 4.
  * - **Radii are 4, 8 and 12.** The seed is `0.5rem`, so that is the ladder.
- * - **Every colour is a semantic token**, through the `art*` classes in
+ * - **Every color is a semantic token**, through the `art*` classes in
  *   `site.css`. A floating panel is `surface-overlay`, a dimmed page is
  *   `overlay`, a tooltip is `surface-inverse`. Ink is the one exception and
  *   stays a percentage of `foreground`, at 0.12, 0.28 or 0.55. Three steps, and
  *   a fourth is a sign the shape wanted a surface token instead.
  * - **Monotone throughout.** There is no accent. Emphasis is `artSolid`, which
  *   is `surface-inverse`: a near-black plate in light and a near-white one in
- *   dark, carrying `foreground-inverse` for anything on it. Colour here was
+ *   dark, carrying `foreground-inverse` for anything on it. Color here was
  *   only ever saying "this one is emphasised", on about half the grid, which
  *   weight says as well and more quietly.
  * - **Every card sits on the same dot lattice**, drawn once in `index.tsx` at
@@ -303,8 +303,8 @@ export const coreArt: Record<string, ReactNode> = {
   /**
    * Two chips at the real 24 pixel tag height.
    *
-   * Each is one colour at two strengths, which is how Tag derives its own look:
-   * the fill at 12%, the label at 55%. Both are the same colour, because with
+   * Each is one color at two strengths, which is how Tag derives its own look:
+   * the fill at 12%, the label at 55%. Both are the same color, because with
    * the palette monotone an accented chip and a neutral one are the same
    * drawing, and implying a distinction the picture cannot show is worse than
    * not implying one.

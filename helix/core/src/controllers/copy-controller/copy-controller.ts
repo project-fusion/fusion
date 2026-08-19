@@ -64,7 +64,7 @@ const write = async (text: string): Promise<boolean> => {
  * Puts text on the clipboard and holds a confirmation for a moment.
  *
  * A controller rather than a component, because copying is a behaviour and not a
- * shape. Colour's chip is a swatch that copies, and a copy button is a button
+ * shape. Color's chip is a swatch that copies, and a copy button is a button
  * that copies, and those two have nothing in common to look at: what they share
  * is the write, the confirmation that follows it, the timer that ends it and the
  * event that announces it. Written twice, the second one would get the failure

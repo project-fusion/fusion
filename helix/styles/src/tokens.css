@@ -163,7 +163,7 @@
    *
    * `border-accent` resolved to `var(--_helix-brand-500)`, which is what
    * `--helix-color-primary` resolves to and what `--helix-color-focus-ring`
-   * resolves to. Three names, one colour, measured identical. A name in front
+   * resolves to. Three names, one color, measured identical. A name in front
    * of a name is not a token, it is a place for two components to disagree
    * about which one to reach for.
    *
@@ -171,7 +171,7 @@
    * point jump in grey that communicates "slightly more" and nothing else. It
    * read as the control getting heavier rather than as the control being
    * pointed at, and it was the library's only reason to own a second neutral
-   * line colour.
+   * line color.
    *
    * So: one resting hairline, and interaction is the brand, said as `primary`
    * at the seventeen sites that used to say one of the other two. An author now
@@ -431,7 +431,7 @@
      reads as two unrelated controls. Rendered side by side that turned out
      backwards: they *are* two unrelated controls, and a reader telling a level
      from a task at a glance is the point rather than the cost. A progress bar is
-     thin, transient and one colour; a run of meters under it reads as readings.
+     thin, transient and one color; a run of meters under it reads as readings.
 
      The other half is that a meter carries more. A progress bar draws one
      quantity; a meter draws a fill, a mark at each threshold and a band, and at

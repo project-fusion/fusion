@@ -26,12 +26,12 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * with `<meter>`.** The platform defaults `optimum` to the midpoint and both
  * thresholds to the ends, so a bare `<meter value="20" max="100">` computes as
  * optimum and every browser paints it green. A gauge with nothing said about it
- * is not good news; it is a reading. Declared thresholds turn the colour on.
+ * is not good news; it is a reading. Declared thresholds turn the color on.
  *
- * **And the bands are drawn as well as coloured.** A tick sits at `low` and at
- * `high`, so the reading can be placed against them without seeing colour at
+ * **And the bands are drawn as well as colored.** A tick sits at `low` and at
+ * `high`, so the reading can be placed against them without seeing color at
  * all, which is the same call the carousel's current dot makes by lengthening
- * rather than only changing colour.
+ * rather than only changing color.
  *
  * @since 0.1.0
  * @status experimental
@@ -112,7 +112,7 @@ export class HelixBaseMeter extends HelixElement {
    * again is a worse API than letting them say it.
    *
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
-   * `data-band` on the fill, because that is the element being coloured, so
+   * `data-band` on the fill, because that is the element being colored, so
    * reflecting here would write an attribute onto the host for no reader. Third
    * time this rule has caught something today.
    */

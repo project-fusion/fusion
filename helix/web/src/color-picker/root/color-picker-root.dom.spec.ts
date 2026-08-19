@@ -92,7 +92,7 @@ describe('color syntaxes', () => {
     expect(host.value).toBe('#ff0000')
   })
 
-  test('a name is not a colour here, and is left alone rather than half read', async () => {
+  test('a name is not a color here, and is left alone rather than half read', async () => {
     // Resolving `rebeccapurple` means shipping a table of a hundred and forty or
     // asking a browser that is not there during a server render.
     const host = await picker('default-value="rebeccapurple"')
@@ -121,13 +121,13 @@ describe('color picker', () => {
     expect(part(host, 'grid-handle')?.getAttribute('aria-hidden')).toBe('true')
   })
 
-  test('moving an axis moves the colour', async () => {
+  test('moving an axis moves the color', async () => {
     const host = await picker('default-value="#ff0000"')
     await axis(host, 'brightness', 50)
     expect(host.value).toBe('#800000')
   })
 
-  test('a hue survives a trip through a colour that has none', async () => {
+  test('a hue survives a trip through a color that has none', async () => {
     // The reason the model is the state rather than a reading of the value.
     // Black is brightness 0, whose hue and saturation are both undefined, so
     // re-deriving from the hex turns a green dragged down into a grey coming up.
@@ -140,7 +140,7 @@ describe('color picker', () => {
 
   test('nothing chosen starts somewhere every control can move from', async () => {
     // Not black, which is where `<input type="color">` starts: from there the
-    // hue ramp moves nothing and the square is one flat colour.
+    // hue ramp moves nothing and the square is one flat color.
     const host = await picker()
     await ramp(host, 'hue', 120)
     expect(host.value).toBe('#00ff00')
@@ -161,8 +161,8 @@ describe('color picker', () => {
     expect(clear.shadowRoot?.querySelector('[data-channel="alpha"]')).not.toBeNull()
   })
 
-  test('presets render, and only the ones that are colours', async () => {
-    const host = await picker('swatches="#ff0000, not-a-colour, rgb(0 255 0)"')
+  test('presets render, and only the ones that are colors', async () => {
+    const host = await picker('swatches="#ff0000, not-a-color, rgb(0 255 0)"')
     expect(
       [...(host.shadowRoot?.querySelectorAll('[part="swatch"]') ?? [])].map((one) =>
         one.getAttribute('aria-label'),
@@ -198,7 +198,7 @@ describe('color picker', () => {
   })
 
   test('the chosen preset is not marked with a ring, but is still announced', async () => {
-    // A ring on one swatch is a focus ring in another colour sitting there
+    // A ring on one swatch is a focus ring in another color sitting there
     // permanently, and what the swatch was chosen for is already showing on the
     // chip. A screen reader has neither, so `aria-pressed` stays.
     const host = await picker('default-value="#00ff00" swatches="#ff0000,#00ff00"')
@@ -283,7 +283,7 @@ describe('color picker', () => {
   })
 
   test('the value is stated as text, which is what completes a picker on a page', async () => {
-    // A square and two ramps can build a colour and cannot state one, and a
+    // A square and two ramps can build a color and cannot state one, and a
     // reader who already has a hex should not have to find it by dragging.
     const host = await picker('default-value="#ff0000"')
     expect((part(host, 'value') as HTMLInputElement).value).toBe('#ff0000')
@@ -303,9 +303,9 @@ describe('color picker', () => {
   })
 
   test('and half-typed input does not throw the square around', async () => {
-    /* `#00f` and `#00ff` are colours and `#00ff0` is not, so re-reading the
+    /* `#00f` and `#00ff` are colors and `#00ff0` is not, so re-reading the
        square from the value on every keystroke walks it red, blue, red, green.
-       The last whole colour holds it until the next one arrives. */
+       The last whole color holds it until the next one arrives. */
     const host = await picker()
     const field = part(host, 'value') as HTMLInputElement
     const seen: string[] = []

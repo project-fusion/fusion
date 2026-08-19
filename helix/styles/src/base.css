@@ -398,7 +398,7 @@ helix-text[tone="danger"] {
  * thing that crosses a shadow boundary without being aimed at it.
  *
  * A named fill wins outright, hover included, which is why `:hover` reads the
- * hook as well. A consumer who names an exact colour and then watches it change
+ * hook as well. A consumer who names an exact color and then watches it change
  * under the pointer has been given a hook that half works.
  */
 [data-button] {
@@ -924,11 +924,11 @@ helix-toggle[disabled]::part(item) {
   /* Drawn transparent at rest rather than appearing on hover.
    *
    * The hover set `outline: 2px solid` outright, so the card's border faded to
-   * the brand colour through the transition it already carries and the outline
+   * the brand color through the transition it already carries and the outline
    * around it snapped on in the same instant. Two halves of one gesture moving
    * at different speeds is what a reader notices even when they cannot say
    * what. An outline takes no space at any width, so keeping it there and
-   * colouring it costs nothing and gives the transition something to move.
+   * coloring it costs nothing and gives the transition something to move.
    *
    * `border-thin`, so the ring is two pixels in total rather than three: the
    * card's own one, plus one outside it. Thick was making the widest ring in
@@ -963,7 +963,7 @@ helix-toggle[disabled]::part(item) {
  * it.
  *
  * And the ring is the whole signal. There was a `shadow-md` here too, which
- * put three things on one hover: a coloured ring, a cast shadow, and whatever
+ * put three things on one hover: a colored ring, a cast shadow, and whatever
  * the card's own content does. A shadow says "this is above the page", which
  * the card already was, so it was answering a question nobody asked while the
  * ring answered the real one.
@@ -972,7 +972,7 @@ helix-toggle[disabled]::part(item) {
  * this file sets the same property at the same zero specificity, and later
  * wins, so a focused card keeps the focus ring's own 2px offset. That offset is
  * the entire difference between the two states, since both are drawn in the
- * same colour: hovered is flush, focused is detached. If the focus ring ever
+ * same color: hovered is flush, focused is detached. If the focus ring ever
  * loses its offset, these two become indistinguishable and a keyboard user
  * cannot tell where they are. */
 :where([data-card]):hover {

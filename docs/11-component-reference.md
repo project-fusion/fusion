@@ -123,7 +123,7 @@ band across the top of the page, not a box that happens to be wide.
 | --- | --- | --- | --- | --- | --- |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'surface' \| 'warning' \| undefined` | - | `HelixBaseAnnouncement` | Which colour the band wears. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'surface' \| 'warning' \| undefined` | - | `HelixBaseAnnouncement` | Which color the band wears. |
 
 #### Methods
 
@@ -867,7 +867,7 @@ line per answer rather than hunting along a row.
 
 ### Root — `helix-color-input`
 
-A colour, typed in any syntax or picked from a panel.
+A color, typed in any syntax or picked from a panel.
 
 Extends `HelixBaseColorInput`.
 
@@ -876,7 +876,7 @@ same box as the text and the focus ring is drawn once around the whole
 control.
 
 **The trigger fills the trailing end rather than sitting in it as an icon.** A
-colour field has one thing to show and it is a colour, so the swatch takes the
+color field has one thing to show and it is a color, so the swatch takes the
 height of the control and reads as a block of it. It is the one field here
 whose trailing affordance is the value itself: Date Input's calendar mark
 stands for an action, and an action stretched to field height is a large icon
@@ -891,7 +891,7 @@ pads its own lower rows.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorInput` | Whether the colour carries an alpha channel. |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorInput` | Whether the color carries an alpha channel. |
 | `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
@@ -910,10 +910,10 @@ pads its own lower rows.
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseColorInput` | What the field says before a colour is in it. |
+| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseColorInput` | What the field says before a color is in it. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colours offered under the picker, as a comma-separated list. |
+| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colors offered under the picker, as a comma-separated list. |
 | `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
@@ -933,7 +933,7 @@ pads its own lower rows.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
+| `helix-change` | `HelixChangeEvent` | Fired when the color changes. |
 | `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
 
@@ -952,9 +952,9 @@ pads its own lower rows.
 | `field` | The box holding the text and the trigger. |
 | `control` | The text input carrying the value. Absent in `swatch`. |
 | `trigger` | The control that opens the panel. |
-| `preview` | The chip showing the colour, inside the trigger. |
+| `preview` | The chip showing the color, inside the trigger. |
 | `surface` | The floating panel. |
-| `picker` | The colour picker inside it. |
+| `picker` | The color picker inside it. |
 
 #### Custom properties
 
@@ -969,7 +969,7 @@ pads its own lower rows.
 
 ### Root — `helix-color-picker`
 
-Picks a colour, from a square and two ramps.
+Picks a color, from a square and two ramps.
 
 Extends `HelixBaseColorPicker`.
 
@@ -987,8 +987,8 @@ reason a square built this way is reachable at all. They carry
 ring is drawn on the square rather than on them, so it lands where the reader
 is looking.
 
-**Every chip sits on a checkerboard.** A colour with alpha painted on a solid
-background is just a different colour, and the one thing a preview owes a
+**Every chip sits on a checkerboard.** A color with alpha painted on a solid
+background is just a different color, and the one thing a preview owes a
 reader is the difference between "pale blue" and "blue, half transparent".
 
 No padding and no surface of its own. Flat on a page it takes the space it is
@@ -999,7 +999,7 @@ brought its own card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the colour carries an alpha channel. |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the color carries an alpha channel. |
 | `color` | - | `Color` | - | `HelixBaseColorPicker` | Where the picker stands: what was moved, or what the value says, or the start. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -1014,7 +1014,7 @@ brought its own card would be a card inside a card there.
 | `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the reader may change the format. |
 | `noValue` | `no-value` | `boolean` | `false` | `HelixBaseColorPicker` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorPicker` | Colours offered under the picker, as a comma-separated list. |
+| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorPicker` | Colors offered under the picker, as a comma-separated list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
@@ -1031,25 +1031,25 @@ brought its own card would be a card inside a card there.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
-| `helix-copy` | `HelixCopyEvent` | Fired when the colour is put on the clipboard. |
+| `helix-change` | `HelixChangeEvent` | Fired when the color changes. |
+| `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `grid` | The saturation and brightness square. |
-| `grid-handle` | The mark showing where in the square the colour sits. |
+| `grid-handle` | The mark showing where in the square the color sits. |
 | `grid-saturation` | The range input for the square's horizontal axis. |
 | `grid-brightness` | The range input for its vertical axis. |
 | `controls` | The row under the square. |
-| `sample` | The chip of the current colour, which copies it when pressed. |
+| `sample` | The chip of the current color, which copies it when pressed. |
 | `channels` | The ramps beside it. |
 | `channel` | One ramp. |
 | `actions` | The group holding the eyedropper and the syntax toggle. |
-| `eyedropper` | The control that samples a colour from the screen. |
+| `eyedropper` | The control that samples a color from the screen. |
 | `footer` | The row holding the value and the tools. |
-| `value` | The colour as text, which can be typed or pasted. |
+| `value` | The color as text, which can be typed or pasted. |
 | `format` | The control that changes the syntax the value is written in. |
 | `swatches` | The row of presets. |
 | `swatch` | One preset. |
@@ -1359,7 +1359,7 @@ tall that is.
 | --- | --- |
 | `--divider-color` | Color of the rule. |
 | `--divider-thickness` | Thickness of the rule. |
-| `--divider-color` | Colour of the rule. |
+| `--divider-color` | Color of the rule. |
 | `--divider-inset` | Space taken off both ends of it. |
 | `--divider-inset-end` | Off the far end only. |
 | `--divider-inset-start` | Off the near end only. |
@@ -2296,14 +2296,14 @@ pill-ended bar comes out as a run whose outer ends are round and whose inner
 ends are square. `radii-full` on an eight pixel bar was a four pixel pill
 anyway, so this is only a change at all because the bar grew.
 
-What else differs is what the colour means. A progress bar is one colour because
+What else differs is what the color means. A progress bar is one color because
 there is one thing to say; a meter's fill takes the success, warning or danger
 tone from the band its reading falls in, and only once thresholds have been
 declared. An unbanded meter is neutral, because a gauge with nothing said
 about it is a reading rather than good news.
 
 A tick marks each threshold, so the reading can be placed against the bands
-without seeing colour at all.
+without seeing color at all.
 
 A reading past either end squares the corner it ran out at, which is the
 convention for a quantity continuing past the frame it is drawn in. The bar
@@ -2633,7 +2633,7 @@ thing: the state is already in the accessibility tree, and a `data-current`
 beside it would be two places to keep in step.
 
 The gap takes the same box as everything else in the row and only sits back a
-shade in colour. It is a control, so it answers hover and focus like one; it
+shade in color. It is a control, so it answers hover and focus like one; it
 is a way through rather than a destination, so it does not compete.
 
 #### Properties
@@ -3319,7 +3319,7 @@ the thumb being dragged.
 | `--slider-track-color` | The part not yet chosen. |
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
-| `--slider-track-image` | The whole track, for a slider whose colour is the value. |
+| `--slider-track-image` | The whole track, for a slider whose color is the value. |
 
 ## Splitter
 

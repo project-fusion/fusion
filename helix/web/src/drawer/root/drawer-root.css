@@ -64,7 +64,7 @@
 /* **No `appearance`, and a drawer is the reason the word does not fit.**
  *
  * There was one, `surface` against `plain`, and `plain` painted the panel the
- * page's own colour. Two things killed it. It was invisible to half of all
+ * page's own color. Two things killed it. It was invisible to half of all
  * readers: `--helix-color-surface-overlay` and `--helix-color-background` are
  * both `neutral-0` in light mode, so measured, the two appearances rendered the
  * identical `oklch(1 0 0)` and only dark mode could tell them apart. And what it

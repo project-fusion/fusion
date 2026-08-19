@@ -355,13 +355,19 @@ export function ComponentBrowser({
                 reads as a control that is half broken rather than as a choice.
                 `data-button-fill="standard"` keeps both at
                 `--helix-size-button`, so the halves are equal rather than sized
-                by how long their words happen to be. */}
+                by how long their words happen to be.
+
+                One word each, and the second is a noun rather than a verb. A
+                button group is two links, and links get read out of context: a
+                reader listing the page's links hears the label alone, with no
+                hero around it to say what `Explore` would have meant. `Sandbox`
+                survives that because it names the place it goes. */}
             <helix-button-group>
               <Link data-button data-button-fill="standard" href="/design/components/button">
-                Get Started
+                Start
               </Link>
               <Link data-button data-button-fill="standard" href="/design/sandbox">
-                Open the Sandbox
+                Sandbox
               </Link>
             </helix-button-group>
           </helix-flex>

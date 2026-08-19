@@ -28,7 +28,7 @@ import { styles } from './pagination-root.css.js'
  * beside it would be two places to keep in step.
  *
  * The gap takes the same box as everything else in the row and only sits back a
- * shade in colour. It is a control, so it answers hover and focus like one; it
+ * shade in color. It is a control, so it answers hover and focus like one; it
  * is a way through rather than a destination, so it does not compete.
  *
  * @since 0.1.0

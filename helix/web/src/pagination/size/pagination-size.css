@@ -22,7 +22,7 @@
    declarations here and needs no property on `Select`, no wrapper, and nothing
    written into the consumer's markup.
 
-   This is the same mechanism `Breadcrumb` uses to colour a slotted link, argued
+   This is the same mechanism `Breadcrumb` uses to color a slotted link, argued
    there: the shadow root's own rules are the weakest thing that can style a
    host, which is exactly what makes a component's layout adjustable by whatever
    places it. */

@@ -133,7 +133,7 @@ export const formsArt: Record<string, ReactNode> = {
           code, and a field showing a word here would be the wrong picture. */}
       <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="64" x="64" y="76" />
       {/* The chip. `artSolid`, because it is the one mark on this card standing
-          for a colour that was chosen rather than for furniture. */}
+          for a color that was chosen rather than for furniture. */}
       <rect className="artSolid" height="14" rx="3" width="14" x="240" y="73" />
       {/* The panel: three tracks, each with its handle somewhere different, and
           the top one moving. The pitch is 26, which is what puts the three in
@@ -200,10 +200,10 @@ export const formsArt: Record<string, ReactNode> = {
      shapes are all a reader can see anyway, and drawing seven columns of
      numbers would be a picture of text. */
   /**
-   * A field with a chip of the colour at its trailing end, and the three tracks
+   * A field with a chip of the color at its trailing end, and the three tracks
    * it opens below.
    *
-   * Tonal rather than coloured, like every card here. A hue ramp is the one
+   * Tonal rather than colored, like every card here. A hue ramp is the one
    * thing this component has that a picture could show literally, and showing it
    * would make this the only card on the page painted in something other than
    * the ink: the row would read as one card lit up and the rest switched off.
@@ -213,7 +213,7 @@ export const formsArt: Record<string, ReactNode> = {
   /**
    * The square, and the ramp under it.
    *
-   * Tonal rather than coloured, like every card here. A hue ramp is the one
+   * Tonal rather than colored, like every card here. A hue ramp is the one
    * thing this component has that a picture could show literally, and showing it
    * would make this the only card in the gallery painted in something other than
    * the ink: the row would read as one card lit up and the rest switched off.
@@ -222,7 +222,7 @@ export const formsArt: Record<string, ReactNode> = {
   'color-picker': (
     <>
       {/* Light at the top left, dark along the bottom, which is the shape of a
-          saturation and brightness square whatever colour it is drawn in. */}
+          saturation and brightness square whatever color it is drawn in. */}
       <rect className="artSunken" height="96" rx="4" width="224" x="48" y="48" />
       <rect className="artInk" fillOpacity="0.28" height="96" rx="4" width="224" x="48" y="48" />
       <rect className="artEdge" height="95" rx="4" width="223" x="48.5" y="48.5" />

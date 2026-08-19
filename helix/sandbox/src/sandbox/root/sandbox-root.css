@@ -53,7 +53,7 @@
  *
  * A splitter is a flex container with no height of its own, so slotted into a
  * pane it sizes to its contents: the preview is an iframe, an iframe's intrinsic
- * height is 150px, and that is what the whole pane became. The colour mode then
+ * height is 150px, and that is what the whole pane became. The color mode then
  * looked like it only painted part of the preview, because the preview *was*
  * only that part, with the pane's own background under the rest. The divider was
  * 150px tall for the same reason, which left most of the seam ungrabbable. */
@@ -65,7 +65,7 @@
  *
  * A boundary needs two sides. With the panel slot empty the outer divider is a
  * rule along the floor of the sandbox with nothing behind it, which reads as the
- * border of a pane that is not there. `display: none` rather than a colour,
+ * border of a pane that is not there. `display: none` rather than a color,
  * because there is also nothing to drag: the position is pinned at a hundred
  * until something is slotted.
  *

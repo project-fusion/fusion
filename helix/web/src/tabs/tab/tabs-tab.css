@@ -40,7 +40,7 @@
   white-space: nowrap;
 }
 
-/* A wash under the pointer, not a colour change alone.
+/* A wash under the pointer, not a color change alone.
  *
  * Hover only darkened the label, which is the quietest answer a control can
  * give and is invisible on a tab that is already at full foreground: the

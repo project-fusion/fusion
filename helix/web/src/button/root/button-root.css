@@ -89,8 +89,8 @@
 /* Hover deepens the wash rather than drawing a line that was not there.
  *
  * A named fill wins outright, hover included, which is why this reads the hook
- * as well: a consumer who names an exact colour and then watches it change under
- * the pointer has been given a hook that half works. Wanting a different colour
+ * as well: a consumer who names an exact color and then watches it change under
+ * the pointer has been given a hook that half works. Wanting a different color
  * on hover is one line and the same hook, on the host, where a custom property
  * crosses into this tree. */
 [part="button"]:hover {

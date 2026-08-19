@@ -14,7 +14,7 @@
 }
 
 /* Ruled rather than plain, because blur is only visible on detail: a smooth
-   gradient blurs to itself, so a band of flat colour would show the
+   gradient blurs to itself, so a band of flat color would show the
    translucency and none of the blur. The heading is set large for the same
    reason, so its strokes pass under the bar rather than beside it.
 
@@ -64,7 +64,7 @@
    Dark rather than the accent the other two use. An inverted bar over a
    mid-tone hero is the worst of both: the wordmark reads as pale-on-blue and
    the current navigation item comes out as a black pill, because a raised
-   surface in a dark scheme is a dark surface. The colour behind a transparent
+   surface in a dark scheme is a dark surface. The color behind a transparent
    bar is the consumer's decision and the bar has to be told which way it went;
    picking a hero that is actually dark is what makes that legible here.
 

@@ -46,22 +46,22 @@
   --_announcement-color: var(--helix-color-danger);
 }
 
-/* The tone colours the band rather than the text, which has to stay
+/* The tone colors the band rather than the text, which has to stay
    readable at body size across the full width.
  *
  * **Opaque, and mixed against the page rather than into it.** These were
  * `color-mix(... , transparent)`, so the band was a translucent film: whatever
  * sat behind it came through, and two announcements over different content were
- * two different colours. Mixed with `--helix-color-background` instead, the
- * result is a real colour that renders the same wherever it is, and it still
+ * two different colors. Mixed with `--helix-color-background` instead, the
+ * result is a real color that renders the same wherever it is, and it still
  * follows the theme because both halves are tokens.
  *
- * The gradient is a small tilt of the same colour, lighter at the start of the
+ * The gradient is a small tilt of the same color, lighter at the start of the
  * inline axis, so a band the width of a page has some direction to it rather
- * than reading as a flat slab. Two steps of the one colour, not two colours. */
+ * than reading as a flat slab. Two steps of the one color, not two colors. */
 /* Said as well as defaulted, so a band can be put back to neutral from markup
    rather than by removing an attribute. It resolves to the resting fill above,
-   which is why it names no colour of its own: the rule below is keyed on
+   which is why it names no color of its own: the rule below is keyed on
    `[tone]` matching *any* value, so neutral has to opt back out of the tint. */
 :host([tone="neutral"]) {
   background-image: none;
@@ -74,7 +74,7 @@
  * groove the page runs into. `surface` reads as a card laid on it instead, for
  * a band carrying something that is not a state at all: a product note, a
  * heading strip, a row of controls. It is the only tone that names no
- * `--_announcement-color`, because there is no colour in it to carry. */
+ * `--_announcement-color`, because there is no color in it to carry. */
 :host([tone="surface"]) {
   background-color: var(--helix-color-surface);
   background-image: none;
@@ -83,7 +83,7 @@
 
 /* The brand, for a band that is about the product rather than about a state.
    `info` and this are the same hue while the seed is blue and are not the same
-   thing: `info` is a fixed semantic colour and this follows whatever the theme
+   thing: `info` is a fixed semantic color and this follows whatever the theme
    is seeded with. */
 :host([tone="primary"]) {
   --_announcement-color: var(--helix-color-primary);
@@ -164,7 +164,7 @@
 
 /* A well under the pointer, the same one the toast's control gets. Mixed from
    the foreground, because the band's own fill *is* `surface-sunken` on an
-   unsevered announcement: the well was the identical colour to what it sat on
+   unsevered announcement: the well was the identical color to what it sat on
    and there was no well at all. */
 [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);

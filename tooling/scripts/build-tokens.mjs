@@ -53,7 +53,7 @@ const CATEGORIES = [
 /** What each category is for, since a name alone does not say. */
 const PURPOSE = {
   border: 'Widths for a rule or an outline.',
-  color: 'Every colour, resolved through `light-dark()` so a theme needs no second file.',
+  color: 'Every color, resolved through `light-dark()` so a theme needs no second file.',
   duration: 'How long something takes.',
   easing: 'The shape of the curve it takes it along.',
   font: 'The three families.',
@@ -85,7 +85,7 @@ const walk = (dir, found = []) => {
 }
 
 /* Every read of every token, across the tiers and the site. The declaration
-   file is skipped or each token would count itself, and the syntax colours are
+   file is skipped or each token would count itself, and the syntax colors are
    read from TypeScript rather than from a stylesheet, which is why the sweep is
    not CSS only. */
 const reads = new Map()

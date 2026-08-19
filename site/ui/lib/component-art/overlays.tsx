@@ -306,7 +306,7 @@ export const overlaysArt: Record<string, ReactNode> = {
    *
    * The hairline down the left is the component's own: a repeating background
    * rather than a border, with each item carrying a transparent
-   * `border-inline-start` that the current one colours in. So the marker sits
+   * `border-inline-start` that the current one colors in. So the marker sits
    * *on* the rule rather than beside it.
    */
   outline: (

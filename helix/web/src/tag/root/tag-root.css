@@ -32,7 +32,7 @@
    * The label is the tone mixed *towards the foreground* rather than the tone
    * itself. At full strength on a wash of the same hue, four of the five tones
    * failed 4.5:1 at 12px: primary 3.68, success 3.33, warning 2.24, danger
-   * 4.00, with only neutral passing. That is what colouring text with a hue and
+   * 4.00, with only neutral passing. That is what coloring text with a hue and
    * then washing the background with the same hue does, and no choice of hue
    * fixes it. Darkening the label is what opens the gap back up. */
   --_tag-fill: color-mix(in oklab, var(--_tag-color) 14%, var(--helix-color-background));
@@ -133,9 +133,9 @@
 
 /* The category a tag belongs to, before the label it qualifies.
  *
- * Heavier than the label rather than a different colour, because it is the same
+ * Heavier than the label rather than a different color, because it is the same
  * kind of word doing a different job: `Priority: high` is one phrase, and
- * colouring the first half would make it two things sitting next to each other.
+ * coloring the first half would make it two things sitting next to each other.
  * Weight says "this names what follows" without leaving the sentence.
  *
  * A rule between the two rather than a gap, since a gap alone reads as an

@@ -59,8 +59,8 @@ describe('tag', () => {
 
 describe('tag prefix', () => {
   test('a category sits before the label and is weightier than it', async () => {
-    // The same kind of word doing a different job, so weight rather than colour:
-    // `Priority: high` is one phrase, and colouring half makes it two things.
+    // The same kind of word doing a different job, so weight rather than color:
+    // `Priority: high` is one phrase, and coloring half makes it two things.
     const tag = await mount('<helix-tag><span slot="prefix">Priority</span>High</helix-tag>')
     expect(slotted(tag, 'prefix')[0]?.textContent).toBe('Priority')
     /* The label is read off the host rather than through `slotted`, which

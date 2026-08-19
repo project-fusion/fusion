@@ -120,7 +120,7 @@
  *
  * Every separator sits on the same layer, so where two cross, the deeper one
  * wins on document order: at rest that is invisible, because both lines are one
- * pixel of the same colour and the overlap is a single pixel nobody sees. It
+ * pixel of the same color and the overlap is a single pixel nobody sees. It
  * stops being invisible the moment one of them is hovered. A hovered divider is
  * two pixels and dark, and the light one crossing it starts exactly at its
  * centre, so it repaints the right half of the dark stroke and leaves a notch
@@ -166,7 +166,7 @@
 /* **And a divider that is actually moving goes primary.**
  *
  * Hover is a question and a drag is an answer, so they should not look the
- * same. It also has a job the hover colour cannot do: a corner moves two
+ * same. It also has a job the hover color cannot do: a corner moves two
  * dividers at once, one of them nowhere near the pointer, and the accent is what
  * makes the pair read as one gesture rather than as a line that happened to
  * darken.
@@ -294,7 +294,7 @@
  * for is the moment the pointer arrives, where a cursor change is the only
  * thing a plain divider offers and a cursor is easy to miss.
  *
- * **And it answers alone.** The line keeps its colour and its width in this
+ * **And it answers alone.** The line keeps its color and its width in this
  * shape, which is what the `:not([appearance="grip"])` on the interest rules
  * above is doing. Two marks responding to one pointer reads as two things.
  *
@@ -343,7 +343,7 @@
 /* And a drag goes accent, for the reason the corner records: hover is a
    question and a drag is an answer, and a corner moving two dividers at once
    needs the pair to read as one gesture. The only thing that ever changes
-   colour in this shape. */
+   color in this shape. */
 :host([appearance="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }

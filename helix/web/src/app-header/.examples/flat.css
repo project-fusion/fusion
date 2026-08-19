@@ -14,7 +14,7 @@
 }
 
 /* Ruled rather than plain, because blur is only visible on detail: a smooth
-   gradient blurs to itself, so a band of flat colour would show the
+   gradient blurs to itself, so a band of flat color would show the
    translucency and none of the blur. The heading is set large for the same
    reason, so its strokes pass under the bar rather than beside it.
 

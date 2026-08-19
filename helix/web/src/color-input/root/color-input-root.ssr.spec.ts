@@ -18,12 +18,12 @@ describe('input color server output', () => {
     expect(hasPart(markup, 'trigger')).toBe(true)
   })
 
-  test('the colour is already in the field, so nothing jumps on hydration', () => {
+  test('the color is already in the field, so nothing jumps on hydration', () => {
     expect(partTag(markup, 'control')).toContain('name="brand"')
     expect(markup).toContain('#3366ff')
   })
 
-  test('the preview carries the colour on the server', () => {
+  test('the preview carries the color on the server', () => {
     // Not read back from a computed style, which does not exist here: the swatch
     // is painted from a custom property written into the markup.
     expect(partTag(markup, 'preview')).toContain('51 102 255')

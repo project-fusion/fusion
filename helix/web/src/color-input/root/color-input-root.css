@@ -24,9 +24,9 @@
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
    phone chooses are all the platform's.
 
-   The field's own face, not mono. Mono was here on the argument that a colour is
+   The field's own face, not mono. Mono was here on the argument that a color is
    a code, which is true of the syntax and not of the field: nobody scans a
-   column of colours for alignment, and one field in a form set in a different
+   column of colors for alignment, and one field in a form set in a different
    typeface reads as a mistake in the form. The syntax toggle in the panel keeps
    mono, where it is genuinely a token rather than a word. */
 [part="control"] {
@@ -61,7 +61,7 @@
 /* The trigger fills the trailing end of the field rather than sitting in it as
  * an icon.
  *
- * A colour field has one thing to show and it is a colour, so the swatch is
+ * A color field has one thing to show and it is a color, so the swatch is
  * given the height of the control and reads as a block of it rather than as a
  * mark beside the text. It is the one field here whose trailing affordance is
  * the value: Date Input's calendar mark stands for an action, and an action
@@ -86,8 +86,8 @@
   cursor: not-allowed;
 }
 
-/* A checkerboard behind it, so a colour carrying alpha reads as partly
-   transparent rather than as a slightly different colour. Bordered only on the
+/* A checkerboard behind it, so a color carrying alpha reads as partly
+   transparent rather than as a slightly different color. Bordered only on the
    leading edge: the other three are the field's own. */
 [part="preview"] {
   background-image:
@@ -193,14 +193,14 @@
   }
 }
 
-/* The swatch shape: the block of colour is the whole control.
+/* The swatch shape: the block of color is the whole control.
  *
  * The native `<input type="color">` in one line of layout. The field stops being
  * a box with something in it and becomes the thing itself, so the frame, the
  * fill and the inset all come off and the preview takes the height it was going
  * to fill anyway.
  *
- * `inline-size: auto` on the host, because a colour swatch has a size rather
+ * `inline-size: auto` on the host, because a color swatch has a size rather
  * than a width to fill: stretched across a form column it is a banner, and the
  * one thing this appearance exists for is to be small. A consumer who wants it
  * wider sets `--color-input-swatch-size`. */
@@ -240,7 +240,7 @@
  *
  * The same four selectors Input carries, and for the reason it records at
  * length: the focus rule owns the `outline` and nothing here was changing its
- * colour, so a focused field with an error came out as a red border inside a
+ * color, so a focused field with an error came out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
  * and the ring are one edge, so when one turns they both do.
  *

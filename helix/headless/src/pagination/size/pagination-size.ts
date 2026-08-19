@@ -31,7 +31,7 @@ import '../../select/index.js'
  * and a reader meets both in the same footer as a table's filters. Consistency
  * is the whole product here, and it wins.
  *
- * What it takes back with it: the caret is `Select`'s again rather than a colour
+ * What it takes back with it: the caret is `Select`'s again rather than a color
  * literal baked into a data URI, because a background image cannot read
  * `currentColor`, and the label is a real `<label for>` against the trigger's
  * own id, which `Select` already renders and already tests.

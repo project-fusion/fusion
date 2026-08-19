@@ -103,7 +103,7 @@ describe('meter bands', () => {
     expect(band(host)).not.toBeNull()
   })
 
-  test('a tick marks each threshold, so the bands read without colour', async () => {
+  test('a tick marks each threshold, so the bands read without color', async () => {
     const host = await meter('high="80" low="50" value="34"')
     const ticks = [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])]
     expect(ticks).toHaveLength(2)

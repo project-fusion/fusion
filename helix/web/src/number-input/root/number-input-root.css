@@ -104,7 +104,7 @@
 }
 
 /* A unit or an icon at either end, and it had no rules at all: slotted content
-   sat in the field's own colour, shrank when the field was narrow, and butted
+   sat in the field's own color, shrank when the field was narrow, and butted
    straight against the stepper because the padding that separates the number
    from the edges is on the control rather than around the region.
  *

@@ -238,7 +238,7 @@
  * no icon dependency. The argument held until the mark was wrong: a cross says
  * "dismiss this", which is what a tag's control does, and taking a file out of a
  * set that is about to be uploaded is a delete. The set has a trash can and the
- * component now uses it, the same way the colour picker uses its eyedropper.
+ * component now uses it, the same way the color picker uses its eyedropper.
  *
  * `danger` on hover only. A row of red bins is a list that looks like a warning,
  * where the same mark in the muted foreground is a control that is available. */
@@ -323,7 +323,7 @@
  *
  * The same four selectors Input carries, and for the reason it records at
  * length: the focus rule owns the `outline` and nothing here was changing its
- * colour, so a focused field with an error came out as a red border inside a
+ * color, so a focused field with an error came out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
  * and the ring are one edge, so when one turns they both do.
  *
