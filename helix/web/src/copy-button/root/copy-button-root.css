@@ -1,0 +1,24 @@
+/* The confirmation must not resize the button.
+ *
+ * Both slots occupy the same cell and one is hidden, so the box is the larger
+ * of the two at rest and never changes on a press. Swapping content in a flow
+ * layout instead makes the button jump under the pointer at the moment a reader
+ * is looking at it for reassurance, which reads as a second, accidental press.
+ */
+[part="button"] {
+  display: inline-grid;
+  place-items: center;
+}
+
+[part="button"] > slot {
+  grid-area: 1 / 1;
+}
+
+[part="button"] > slot[hidden] {
+  display: none;
+}
+
+/* The confirmation is the one moment this control is allowed to be loud. */
+[part="button"][data-copied] {
+  color: var(--helix-color-success);
+}

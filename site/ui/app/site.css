@@ -1296,18 +1296,145 @@ helix-drawer {
    centered in that track rather than filling it: a reference read at the full
    width of a desktop is a line nobody can track back from. */
 .docsShell {
+  /* The header's inset, not the page's clamp. The chrome runs the width of the
+     window and sits at a fixed distance from its edge; the gallery already
+     matches it, and a reference page that did not would read as a different
+     site one navigation away. */
+  --site-inset: var(--helix-space-2xl);
+
+  /* Both rails the same width, which is what centres the column between them.
+     They were 15 and 13, so the middle track was two rem off centre and the
+     prose inside it inherited the error. Equal is not a coincidence to be
+     maintained by hand: it is one number used twice. */
+  --docs-rail: 15rem;
+
   align-items: start;
   display: grid;
   gap: var(--helix-space-2xl);
-  grid-template-columns: 15rem minmax(0, 1fr) 13rem;
+  grid-template-columns: var(--docs-rail) minmax(0, 1fr) var(--docs-rail);
   padding-block: var(--helix-space-2xl);
   padding-inline: var(--site-inset);
 }
 
+/* The rails fold away before the measure does. A reference is readable with no
+   navigation beside it and unreadable at half the width, so what goes first is
+   the part a reader can do without. */
+@media (width < 90rem) {
+  .docsShell {
+    grid-template-columns: var(--docs-rail) minmax(0, 1fr);
+  }
+  .docsRail {
+    display: none;
+  }
+}
+
+@media (width < 64rem) {
+  .docsShell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .docsNav {
+    display: none;
+  }
+}
+
 .docsMain {
   margin-inline: auto;
-  max-inline-size: 54rem;
+  /* The measure, in the unit that means it. `54rem` was a guess that happened
+     to be near it; `80ch` is the thing itself, and it tracks the font rather
+     than needing to be re-guessed when the font changes. */
+  max-inline-size: 80ch;
   min-inline-size: 0;
+}
+
+/* The heading and what can be done to the document, on one line. `wrap` so a
+   long family name and two controls do not force the row to overflow. */
+.docsTitle {
+  flex-wrap: wrap;
+}
+
+/* One tier at a time, chosen in preferences and applied here.
+ *
+ * Both are rendered. The preference lives in `localStorage`, the page is static
+ * and server-rendered, and the server cannot read it: filtering in React would
+ * mean the server rendering one tier and the client wanting the other, which is
+ * a hydration mismatch on every reference page. So the markup carries both and
+ * a document attribute decides, which costs a little HTML and cannot disagree
+ * with itself.
+ *
+ * `display: none` rather than `visibility` or a clip, because the hidden tier
+ * has to leave the accessibility tree as well as the page. A reader being read
+ * the styled API does not want the base one read out underneath it, and an
+ * anchor in the rail pointing at a section that is not shown is a rail that
+ * lies about the page.
+ *
+ * Styled is the default and is expressed as the absence of the attribute, so
+ * the document's resting state is the common answer. */
+:root:not([data-api-tier="base"]) .docsShell [data-tier="headless"] {
+  display: none;
+}
+
+:root[data-api-tier="base"] .docsShell [data-tier="styled"] {
+  display: none;
+}
+
+/* Tall enough to be worth looking at, and bounded so the reference below it is
+   still reachable by scrolling rather than by patience. */
+.docsPreview {
+  block-size: 32rem;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  overflow: hidden;
+}
+
+.docsPreviewSource {
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+/* The bar between the preview and the editor. It sits inside the source region
+   rather than in the sandbox's `toolbar` slot, which spans both panes above
+   them: a bar over the whole thing is not a bar between the two. */
+.docsPreviewBar {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+.docsPreviewTab {
+  background: none;
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+/* Pushed to the far end, so the tabs stay a group and the action is plainly not
+   one of them. */
+.docsPreviewCopy {
+  margin-inline-start: auto;
+}
+
+.docsPreviewTab[aria-pressed="true"] {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+.docsCode {
+  background-color: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  margin: 0;
+  overflow-x: auto;
+  padding: var(--helix-space-sm) var(--helix-space-md);
 }
 
 /* Sticky under the header, and no taller than what is left of the viewport, so

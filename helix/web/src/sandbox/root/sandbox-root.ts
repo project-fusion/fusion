@@ -5,7 +5,7 @@ import {
   type HelixConsoleEvent,
   HelixElement,
 } from '@helix-io/core'
-import '@helix-io/web/splitter'
+import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -79,8 +79,8 @@ const PANEL_MAX = 0.8
  *
  * @event {HelixChangeEvent} helix-change - Fired when a divider is let go, with the new arrangement.
  *
- * @slot source - The editable source pane.
- * @slot preview - The live preview.
+ * @slot source - The editable source pane. First unless `lead` says otherwise.
+ * @slot preview - The live preview. Second unless `lead` says otherwise.
  * @slot toolbar - A bar across the top, spanning both panes.
  * @slot panel - A panel under both panes, usually a terminal.
  * @slot status - A status bar, spanning both panes at the bottom.
@@ -93,6 +93,7 @@ const PANEL_MAX = 0.8
  * @csspart separator - Either divider.
  *
  * @cssproperty --sandbox-min-block-size - Minimum height of the sandbox.
+ * @cssproperty --sandbox-grab - The invisible width of a divider's drag target.
  * @cssproperty --sandbox-separator-color - Color of the divider.
  */
 @customElement('helix-sandbox')
@@ -100,6 +101,26 @@ export class HelixSandbox extends HelixElement {
   /** Whether the panes sit side by side or stacked. */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * Which pane comes first, before the divider.
+   *
+   * A sandbox is read in one of two directions and the two are not a
+   * preference. A workbench is a place to write, so the source leads and the
+   * preview answers it. A reference page is a place to look, so the preview
+   * leads and the source is what a reader opens if they want to know how it was
+   * done. Same component, opposite reading order, and no consumer should have
+   * to slot a preview into a hole named `source` to get it.
+   *
+   * Not reflected, because no rule selects on it: the panes already carry
+   * `data-pane`, which is what the stylesheet reaches for, and swapping the
+   * names below keeps that true whichever way round they sit.
+   *
+   * `split` follows the lead pane rather than the source, so `split="30"` means
+   * the same thing in both directions: thirty percent to whatever comes first.
+   */
+  @property()
+  lead: 'source' | 'preview' = 'source'
 
   /** Percentage of the sandbox given to the source pane. */
   @property({ attribute: 'split', type: Number })
@@ -471,6 +492,8 @@ export class HelixSandbox extends HelixElement {
 
   protected override render(): TemplateResult {
     const vertical = this.axis === 'vertical'
+    const first = this.lead === 'preview' ? 'preview' : 'source'
+    const second = first === 'preview' ? 'source' : 'preview'
     const split = Number.isFinite(this.split) ? this.split : DEFAULT_SPLIT
     return html`<slot name="toolbar"></slot>
       <helix-splitter
@@ -496,8 +519,16 @@ export class HelixSandbox extends HelixElement {
           .position=${split}
           @helix-change=${this.handlePanesChange}
         >
-          <div part="pane" data-pane="source" slot="start"><slot name="source"></slot></div>
-          <div part="pane" data-pane="preview" slot="end"><slot name="preview"></slot></div>
+          ${
+            /* The slot names swap with the panes, so each pane keeps its own
+               `data-pane` and the stylesheet needs to know nothing about the
+               order. Rendering both slots in both positions would be two
+               elements answering to one name, and an assignment goes to the
+               first. */
+            ''
+          }
+          <div part="pane" data-pane=${first} slot="start"><slot name=${first}></slot></div>
+          <div part="pane" data-pane=${second} slot="end"><slot name=${second}></slot></div>
         </helix-splitter>
         <div part="panel" slot="end"><slot name="panel" @slotchange=${this.readPanel}></slot></div>
       </helix-splitter>

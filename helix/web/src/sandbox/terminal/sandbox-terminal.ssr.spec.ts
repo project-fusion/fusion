@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { hasPart, hostTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
-import '../../index.js'
+import '../index.js'
 
 const markup = ssr(html`<helix-sandbox-terminal></helix-sandbox-terminal>`)
 

@@ -20,6 +20,20 @@ export interface ApiMember {
   type: string
 }
 
+/**
+ * A property, which carries a default where an attribute does not.
+ *
+ * Separate from `ApiMember` rather than an optional field on it, because a slot
+ * and a CSS part have no default and a column of empty cells is a table saying
+ * the data is missing rather than that the concept does not apply.
+ */
+export interface PropertyDoc {
+  default: string
+  description: string
+  name: string
+  type: string
+}
+
 export interface EventDoc {
   description: string
   name: string
@@ -34,6 +48,8 @@ export interface Element {
   description: string
   events: EventDoc[]
   label: string
+  methods: ApiMember[]
+  properties: PropertyDoc[]
   slots: ApiMember[]
   summary: string
   tagName: string
@@ -43,6 +59,8 @@ export interface Element {
 export interface Example {
   /** The example's own stylesheet, or empty where it needs none. */
   css: string
+  /** One line from the example's `@summary` comment, or empty where unwritten. */
+  description: string
   html: string
   label: string
   slug: string
@@ -63,9 +81,14 @@ export interface Family {
 }
 
 interface RawNamed {
+  default?: string
   description?: string
+  kind?: string
   name?: string
+  parameters?: { name?: string; type?: { text?: string } }[]
+  privacy?: string
   reactProp?: string
+  return?: { type?: { text?: string } }
   type?: { text?: string }
 }
 
@@ -79,9 +102,11 @@ interface RawDeclaration {
     aliases?: string[]
     category?: string
     documentation?: string
+    examples?: { description?: string; slug?: string }[]
     since?: string
     status?: string
   }
+  members?: RawNamed[]
   modulePath?: string
   slots?: RawNamed[]
   summary?: string
@@ -105,6 +130,63 @@ const withoutUndefined = (text: string): string =>
     .map((part) => part.trim())
     .filter((part) => part !== 'undefined')
     .join(' | ')
+
+/**
+ * A method the platform calls, rather than one a consumer does.
+ *
+ * `formResetCallback` and its siblings are public because the platform has to
+ * reach them, and they are 55 of the 152 public methods in the library:
+ * documenting them puts a reader's own `focus()` and `show()` in a minority on
+ * their own component's page. Matching the suffix rather than listing the names
+ * covers the custom-element lifecycle and the form-associated one together, and
+ * keeps covering them when the platform adds a third.
+ */
+const PLATFORM_CALLBACK = /Callback$/
+
+/** Public only. Private and protected are the component's business. */
+const isPublic = (row: RawNamed): boolean => row.privacy === undefined || row.privacy === 'public'
+
+/**
+ * Properties, with the default each one falls back to.
+ *
+ * Fields rather than attributes, which is the change this page needed: an
+ * attribute carries no default in the manifest, so the old table could say a
+ * component took `appearance` and never what it did when you left it alone.
+ */
+const properties = (rows: RawNamed[] | undefined): PropertyDoc[] =>
+  (rows ?? [])
+    .filter((row) => row.kind === 'field' && isPublic(row))
+    .map((row) => ({
+      /* `undefined` is not a default, it is the absence of one, and the
+         analyzer records the initialiser verbatim. Printed, the column reads
+         "undefined" for every optional property, which is a table telling a
+         reader a word rather than a value. Blank says the same thing and says
+         it quietly. */
+      default: row.default === 'undefined' ? '' : (row.default ?? ''),
+      description: row.description ?? '',
+      name: row.name ?? '',
+      type: withoutUndefined(row.type?.text ?? ''),
+    }))
+
+/**
+ * Methods, typed by the signature a caller writes rather than by a return type
+ * alone. `(next: string) => boolean` says what to pass; `boolean` does not.
+ */
+const methods = (rows: RawNamed[] | undefined): ApiMember[] =>
+  (rows ?? [])
+    .filter(
+      (row) => row.kind === 'method' && isPublic(row) && !PLATFORM_CALLBACK.test(row.name ?? ''),
+    )
+    .map((row) => {
+      const args = (row.parameters ?? [])
+        .map((arg) => `${arg.name ?? ''}: ${arg.type?.text ?? 'unknown'}`)
+        .join(', ')
+      return {
+        description: row.description ?? '',
+        name: row.name ?? '',
+        type: `(${args}) => ${row.return?.type?.text ?? 'void'}`,
+      }
+    })
 
 const members = (rows: RawNamed[] | undefined): ApiMember[] =>
   (rows ?? []).map((row) => ({
@@ -145,7 +227,16 @@ const MANIFESTS = [
  * hover or a media query, and teaches a reader to write the one thing the
  * library exists to avoid.
  */
-const examplesOf = (slug: string): Example[] => {
+const examplesOf = (slug: string, declared: RawDeclaration['helix']): Example[] => {
+  /* The prose comes from the manifest, the markup from disk.
+   *
+   * The plugin reads the same folder and records what each example is; the
+   * payload stays on disk because it is large and the manifest is parsed by
+   * everything. Keyed by slug so the two halves cannot drift into each other's
+   * order. */
+  const described = new Map(
+    (declared?.examples ?? []).map((entry) => [entry.slug ?? '', entry.description ?? '']),
+  )
   const dir = join(REPO, 'helix/web/src', slug, '.examples')
   if (!existsSync(dir)) {
     return []
@@ -158,6 +249,7 @@ const examplesOf = (slug: string): Example[] => {
       const stylesheet = join(dir, `${slugged}.css`)
       return {
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
+        description: described.get(slugged) ?? '',
         html: readFileSync(join(dir, file), 'utf8').trim(),
         // The canonical example reads as "Preview": it is the component's
         // headline, not a named variant sitting beside the others.
@@ -202,6 +294,8 @@ const build = (): Family[] => {
               type: event.type?.text ?? '',
             })),
             label: displayName(entry.tagName as string),
+            methods: methods(entry.members),
+            properties: properties(entry.members),
             slots: members(entry.slots),
             summary: entry.summary ?? '',
             tagName: entry.tagName as string,
@@ -214,7 +308,7 @@ const build = (): Family[] => {
               Number(a.tier === 'headless') - Number(b.tier === 'headless') ||
               a.tagName.localeCompare(b.tagName),
           ),
-        examples: examplesOf(slug),
+        examples: examplesOf(slug, root.helix),
         label: startCase(slug),
         since: root.helix?.since ?? '',
         slug,

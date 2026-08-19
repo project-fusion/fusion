@@ -3,6 +3,7 @@ import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { composition } from './plugins/composition.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
+import { examples } from './plugins/examples.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
@@ -58,6 +59,9 @@ export const createHelixCemConfig = ({
     helixTier(tier),
     composition(),
     metadata(),
+    // After `composition`, which is what decides a declaration is the family's
+    // root, and examples hang off the root rather than off every part.
+    examples(),
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
     reactEvents(),
@@ -128,4 +132,13 @@ export {
   isCustomElement,
 } from './types.js'
 export type { ConventionLintOptions }
-export { composition, conventionLint, declaredEvents, helixTier, jsxImports, metadata, reactEvents }
+export {
+  composition,
+  conventionLint,
+  declaredEvents,
+  examples,
+  helixTier,
+  jsxImports,
+  metadata,
+  reactEvents,
+}

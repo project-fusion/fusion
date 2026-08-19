@@ -431,3 +431,32 @@ describe('sandbox source editing', () => {
        browser covers it. */
   })
 })
+
+describe('lead', () => {
+  const panes = (sandbox: Awaited<ReturnType<typeof mount>>): (string | null)[] =>
+    [...(sandbox.shadowRoot?.querySelectorAll('[part="pane"]') ?? [])].map((pane) =>
+      pane.getAttribute('data-pane'),
+    )
+
+  test('the source leads by default, which is what a workbench wants', async () => {
+    const sandbox = await mount('<helix-sandbox></helix-sandbox>')
+    expect(panes(sandbox)).toEqual(['source', 'preview'])
+  })
+
+  test('the preview leads when asked, which is what a reference page wants', async () => {
+    const sandbox = await mount('<helix-sandbox lead="preview"></helix-sandbox>')
+    expect(panes(sandbox)).toEqual(['preview', 'source'])
+  })
+
+  /* The slot has to travel with the pane. Leaving `name="source"` in the first
+     position and only relabelling the box would put the consumer's preview in
+     the pane marked source, which is the bug this property exists to avoid. */
+  test('the slot moves with the pane, so content is never orphaned', async () => {
+    const sandbox = await mount(
+      '<helix-sandbox lead="preview"><p slot="preview">shown</p></helix-sandbox>',
+    )
+    const slot = sandbox.shadowRoot?.querySelector('[data-pane="preview"] slot') as HTMLSlotElement
+    expect(slot.name).toBe('preview')
+    expect(slot.assignedElements().map((node) => node.textContent)).toEqual(['shown'])
+  })
+})

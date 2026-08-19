@@ -19,6 +19,7 @@ import type {
   HelixBaseCheckboxGroup,
   HelixBaseColorInput,
   HelixBaseColorPicker,
+  HelixBaseCopyButton,
   HelixBaseDateInput,
   HelixBaseDatePicker,
   HelixBaseDialog,
@@ -1787,6 +1788,191 @@ fire at all. */
   "on:helix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
   "on:helix-copy"?: (e: HelixBaseColorPickerHelixCopyElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseCopyButton` component event */
+export type HelixBaseCopyButtonElementEvent<E = Event> = TypedEvent<
+  HelixBaseCopyButton,
+  E
+>;
+/** `helix-copy` event type */
+export type HelixBaseCopyButtonHelixCopyElementEvent =
+  HelixBaseCopyButtonElementEvent<HelixCopyEvent>;
+
+export type HelixBaseCopyButtonProps = {
+  /** What goes on the clipboard. */
+  value?: HelixBaseCopyButton["value"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgement call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  label?: HelixBaseCopyButton["label"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "copied-label"?: HelixBaseCopyButton["copiedLabel"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  copiedLabel?: HelixBaseCopyButton["copiedLabel"];
+  /** What activating the button does to its form. */
+  type?: HelixBaseCopyButton["type"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixBaseCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixBaseCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixBaseCopyButton["commandFor"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseCopyButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseCopyButton["name"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixBaseCopyButton["focusable"];
+
+  /** Fired after the clipboard write succeeds. */
+  "onhelix-copy"?: (e: HelixBaseCopyButtonHelixCopyElementEvent) => void;
+};
+
+export type HelixBaseCopyButtonSolidJsProps = {
+  /** What goes on the clipboard. */
+  "prop:value"?: HelixBaseCopyButton["value"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgement call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  "prop:label"?: HelixBaseCopyButton["label"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "attr:copied-label"?: HelixBaseCopyButton["copiedLabel"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "prop:copiedLabel"?: HelixBaseCopyButton["copiedLabel"];
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixBaseCopyButton["type"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixBaseCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixBaseCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixBaseCopyButton["commandFor"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseCopyButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseCopyButton["name"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixBaseCopyButton["focusable"];
+  /** Fired after the clipboard write succeeds. */
+  "on:helix-copy"?: (e: HelixBaseCopyButtonHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6351,6 +6537,15 @@ being the one that asserts the host carries nothing nobody wrote. */
   textContent?: string | number;
 };
 
+/** `HelixBaseSteps` component event */
+export type HelixBaseStepsElementEvent<E = Event> = TypedEvent<
+  HelixBaseSteps,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseStepsHelixChangeElementEvent =
+  HelixBaseStepsElementEvent<HelixChangeEvent>;
+
 export type HelixBaseStepsProps = {
   /** Accessible name for the sequence.
 
@@ -6359,9 +6554,15 @@ needs a name of its own rather than borrowing the heading above it. */
   label?: HelixBaseSteps["label"];
   /** Which way the steps run.
 
-Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape with room under a step
-for what the stage holds. */
+Absent is a row, which is what a form header wants, with each name under
+its mark: beside them there is a word in the rule's path and the line would
+be struck through it. `vertical` stacks them, names beside their marks,
+which is the shape with room under a step for what the stage holds.
+
+Each axis has one arrangement rather than a second property offering both
+in both. Of those four combinations three are ones nobody should pick, and
+a property whose job is mostly to be left alone is a property that mostly
+catches people out. */
   orientation?: HelixBaseSteps["orientation"];
   /** What each step is marked with.
 
@@ -6374,18 +6575,29 @@ nothing about whether it is finished.
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
   appearance?: HelixBaseSteps["appearance"];
-  /** Where a step's name sits against its marker.
+  /** Which item is current, by its `value`.
 
-Absent is under the marker, which is the shape a row of stages wants: the
-rule runs unbroken between the marks and the names hang below it. `beside`
-puts the name next to its mark, for a column, where there is no width to
-save and a name under its mark would sit in the line's path.
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
 
-On the list rather than on each step, for the reason density is on a region
-rather than on each control: a row where one name is beside its marker and
-the next is under it is a row nobody meant, and said once it is unwritable
-rather than merely discouraged. */
-  labels?: HelixBaseSteps["labels"];
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  active?: HelixBaseSteps["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "default-active"?: HelixBaseSteps["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  defaultActive?: HelixBaseSteps["defaultActive"];
+  /** The consumer's callback, invoked after the change is applied. */
+  onActiveChange?: HelixBaseSteps["onActiveChange"];
+
+  /** Fired when the active step changes. */
+  "onhelix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
 };
 
 export type HelixBaseStepsSolidJsProps = {
@@ -6396,9 +6608,15 @@ needs a name of its own rather than borrowing the heading above it. */
   "prop:label"?: HelixBaseSteps["label"];
   /** Which way the steps run.
 
-Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape with room under a step
-for what the stage holds. */
+Absent is a row, which is what a form header wants, with each name under
+its mark: beside them there is a word in the rule's path and the line would
+be struck through it. `vertical` stacks them, names beside their marks,
+which is the shape with room under a step for what the stage holds.
+
+Each axis has one arrangement rather than a second property offering both
+in both. Of those four combinations three are ones nobody should pick, and
+a property whose job is mostly to be left alone is a property that mostly
+catches people out. */
   "prop:orientation"?: HelixBaseSteps["orientation"];
   /** What each step is marked with.
 
@@ -6411,18 +6629,28 @@ nothing about whether it is finished.
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
   "prop:appearance"?: HelixBaseSteps["appearance"];
-  /** Where a step's name sits against its marker.
+  /** Which item is current, by its `value`.
 
-Absent is under the marker, which is the shape a row of stages wants: the
-rule runs unbroken between the marks and the names hang below it. `beside`
-puts the name next to its mark, for a column, where there is no width to
-save and a name under its mark would sit in the line's path.
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
 
-On the list rather than on each step, for the reason density is on a region
-rather than on each control: a row where one name is beside its marker and
-the next is under it is a row nobody meant, and said once it is unwritable
-rather than merely discouraged. */
-  "prop:labels"?: HelixBaseSteps["labels"];
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  "prop:active"?: HelixBaseSteps["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "attr:default-active"?: HelixBaseSteps["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "prop:defaultActive"?: HelixBaseSteps["defaultActive"];
+  /** The consumer's callback, invoked after the change is applied. */
+  "prop:onActiveChange"?: HelixBaseSteps["onActiveChange"];
+  /** Fired when the active step changes. */
+  "on:helix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10014,6 +10242,140 @@ export type CustomElements = {
    */
   "helix-base-color-picker": Partial<
     HelixBaseColorPickerProps & BaseProps<HelixBaseColorPicker> & BaseEvents
+  >;
+
+  /**
+   * **The confirmation is the component.** Writing to the clipboard is three
+   * lines; what makes this worth an element is that the platform gives a reader
+   * no feedback at all. A press that copies and looks identical to a press that
+   * failed is a control nobody trusts, so they press it again, and the second
+   * press is indistinguishable from the first.
+   *
+   * **Announced after the write, never before.** A clipboard write is a
+   * permission the browser may refuse, and it is refused for real reasons: an
+   * insecure origin, a document that is not focused, a user agent that requires a
+   * gesture this press did not qualify as. So the confirmation and the event both
+   * wait for the promise, and a refusal leaves the button exactly as it was.
+   * `HelixCopyEvent` is not cancelable for the same reason: by the time there is
+   * anything to say, it has already happened.
+   *
+   * **An icon button, extending IconButton.** Both of this button's faces are
+   * icons and it never carries a word, so it is the square control rather than a
+   * text button that happens to hold a glyph: it inherits the square box, and
+   * with it the rule that an icon-only control must be named. `label` is not
+   * optional here for the same reason it is not optional there, and the two
+   * faces make it sharper: the accessible name has to describe the press, not
+   * whichever picture is showing when a reader arrives.
+   *
+   * `data-copied`, not a reflected `copied`. State never reflects here: a
+   * serialized `copied` attribute would come back from a paste as a button
+   * claiming to have copied something it never held.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What goes on the clipboard.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgement call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `type`: What activating the button does to its form.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-copy`: Fired after the clipboard write succeeds.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The resting icon. Falls back to a clipboard.
+   * - `copied`: What replaces it once the write succeeds. Falls back to a check.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `button`: The inner button.
+   */
+  "helix-base-copy-button": Partial<
+    HelixBaseCopyButtonProps & BaseProps<HelixBaseCopyButton> & BaseEvents
   >;
 
   /**
@@ -13857,17 +14219,24 @@ export type CustomElements = {
   >;
 
   /**
-   * **Each step states its own position, and nothing here coordinates them.** A
-   * step is `complete`, or `current`, or neither, and it says so on itself. The
-   * alternative is an `active` index on this element, which reads better in
-   * markup and cannot render on a server: this element would have to count its
-   * slotted children to know which one is third, and the server has no children
-   * to count. A stepper whose state appears only after hydration is a stepper
-   * that flashes every stage as unvisited on first paint.
+   * **`active` names where the reader is. `complete` stays on each step.** They
+   * are two different facts and only one of them is positional. Deriving both
+   * from a position is the obvious design and it is wrong the first time anybody
+   * steps back: return to stage one of three and stages one and two are still
+   * finished, while "everything before the active one" says only the first is.
+   * So this element drives `current` and never touches `complete`.
    *
-   * The consequence is that the numbering is not JavaScript either. It is a CSS
-   * counter in the tier above, which the browser resolves at layout with no
-   * script at all, so the third step reads "3" in the server's own markup.
+   * **`active` is optional, and a sequence without it still renders.** Left
+   * unset, each step's own `current` stands and nothing here overwrites it, which
+   * is what lets the whole sequence be right in the server's markup: this element
+   * would have to count its slotted children to know which one is third, and the
+   * server has no children to count. Set it, and it wins, because it is a
+   * statement about the sequence where the attribute on a step is a statement
+   * about one step.
+   *
+   * That is also why the numbering is not JavaScript. It is a CSS counter in the
+   * tier above, which the browser resolves at layout with no script at all, so
+   * the third step reads "3" in the server's own markup.
    *
    * **The connector belongs to the step, not to the list.** Each one draws the
    * line that arrives at it and hides it when it is first, the same arrangement
@@ -13889,9 +14258,15 @@ export type CustomElements = {
    * needs a name of its own rather than borrowing the heading above it.
    * - `orientation`: Which way the steps run.
    *
-   * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape with room under a step
-   * for what the stage holds.
+   * Absent is a row, which is what a form header wants, with each name under
+   * its mark: beside them there is a word in the rule's path and the line would
+   * be struck through it. `vertical` stacks them, names beside their marks,
+   * which is the shape with room under a step for what the stage holds.
+   *
+   * Each axis has one arrangement rather than a second property offering both
+   * in both. Of those four combinations three are ones nobody should pick, and
+   * a property whose job is mostly to be left alone is a property that mostly
+   * catches people out.
    * - `appearance`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
@@ -13902,23 +14277,44 @@ export type CustomElements = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
-   * - `labels`: Where a step's name sits against its marker.
+   * - `active`: Which item is current, by its `value`.
    *
-   * Absent is under the marker, which is the shape a row of stages wants: the
-   * rule runs unbroken between the marks and the names hang below it. `beside`
-   * puts the name next to its mark, for a column, where there is no width to
-   * save and a name under its mark would sit in the line's path.
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
    *
-   * On the list rather than on each step, for the reason density is on a region
-   * rather than on each control: a row where one name is beside its marker and
-   * the next is under it is a row nobody meant, and said once it is unwritable
-   * rather than merely discouraged.
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the active step changes.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    */
   "helix-base-steps": Partial<
     HelixBaseStepsProps & BaseProps<HelixBaseSteps> & BaseEvents
@@ -13930,6 +14326,12 @@ export type CustomElements = {
    * marker is `aria-hidden` decoration, so wrapping it in the button would add
    * hit area and no meaning: the accessible name would be the text either way,
    * and what is pressable would stop being the same shape as what is readable.
+   *
+   * It is `helix-button`, not a `<button>` this element resets and dresses. The
+   * hover wash, the focus ring, the disabled treatment and the way the label sits
+   * against an icon are all decisions the button already carries, and a second
+   * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+   * shape: transparent until it is pointed at.
    *
    * It says nothing about where a reader may go. Every step is pressable and
    * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
@@ -14003,7 +14405,7 @@ export type CustomElements = {
    *
    * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is the button.
+   * - `label`: The step's name, which is a `helix-button`.
    * - `description`: The line under it.
    * - `lead`: The half line arriving from the step before.
    * - `trail`: The half line running on to the next.
@@ -17277,6 +17679,143 @@ export type CustomElementsSolidJs = {
     HelixBaseColorPickerProps &
       HelixBaseColorPickerSolidJsProps &
       BaseProps<HelixBaseColorPicker> &
+      BaseEvents
+  >;
+
+  /**
+   * **The confirmation is the component.** Writing to the clipboard is three
+   * lines; what makes this worth an element is that the platform gives a reader
+   * no feedback at all. A press that copies and looks identical to a press that
+   * failed is a control nobody trusts, so they press it again, and the second
+   * press is indistinguishable from the first.
+   *
+   * **Announced after the write, never before.** A clipboard write is a
+   * permission the browser may refuse, and it is refused for real reasons: an
+   * insecure origin, a document that is not focused, a user agent that requires a
+   * gesture this press did not qualify as. So the confirmation and the event both
+   * wait for the promise, and a refusal leaves the button exactly as it was.
+   * `HelixCopyEvent` is not cancelable for the same reason: by the time there is
+   * anything to say, it has already happened.
+   *
+   * **An icon button, extending IconButton.** Both of this button's faces are
+   * icons and it never carries a word, so it is the square control rather than a
+   * text button that happens to hold a glyph: it inherits the square box, and
+   * with it the rule that an icon-only control must be named. `label` is not
+   * optional here for the same reason it is not optional there, and the two
+   * faces make it sharper: the accessible name has to describe the press, not
+   * whichever picture is showing when a reader arrives.
+   *
+   * `data-copied`, not a reflected `copied`. State never reflects here: a
+   * serialized `copied` attribute would come back from a paste as a button
+   * claiming to have copied something it never held.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What goes on the clipboard.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgement call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `type`: What activating the button does to its form.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-copy`: Fired after the clipboard write succeeds.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The resting icon. Falls back to a clipboard.
+   * - `copied`: What replaces it once the write succeeds. Falls back to a check.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `button`: The inner button.
+   */
+  "helix-base-copy-button": Partial<
+    HelixBaseCopyButtonProps &
+      HelixBaseCopyButtonSolidJsProps &
+      BaseProps<HelixBaseCopyButton> &
       BaseEvents
   >;
 
@@ -21237,17 +21776,24 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * **Each step states its own position, and nothing here coordinates them.** A
-   * step is `complete`, or `current`, or neither, and it says so on itself. The
-   * alternative is an `active` index on this element, which reads better in
-   * markup and cannot render on a server: this element would have to count its
-   * slotted children to know which one is third, and the server has no children
-   * to count. A stepper whose state appears only after hydration is a stepper
-   * that flashes every stage as unvisited on first paint.
+   * **`active` names where the reader is. `complete` stays on each step.** They
+   * are two different facts and only one of them is positional. Deriving both
+   * from a position is the obvious design and it is wrong the first time anybody
+   * steps back: return to stage one of three and stages one and two are still
+   * finished, while "everything before the active one" says only the first is.
+   * So this element drives `current` and never touches `complete`.
    *
-   * The consequence is that the numbering is not JavaScript either. It is a CSS
-   * counter in the tier above, which the browser resolves at layout with no
-   * script at all, so the third step reads "3" in the server's own markup.
+   * **`active` is optional, and a sequence without it still renders.** Left
+   * unset, each step's own `current` stands and nothing here overwrites it, which
+   * is what lets the whole sequence be right in the server's markup: this element
+   * would have to count its slotted children to know which one is third, and the
+   * server has no children to count. Set it, and it wins, because it is a
+   * statement about the sequence where the attribute on a step is a statement
+   * about one step.
+   *
+   * That is also why the numbering is not JavaScript. It is a CSS counter in the
+   * tier above, which the browser resolves at layout with no script at all, so
+   * the third step reads "3" in the server's own markup.
    *
    * **The connector belongs to the step, not to the list.** Each one draws the
    * line that arrives at it and hides it when it is first, the same arrangement
@@ -21269,9 +21815,15 @@ export type CustomElementsSolidJs = {
    * needs a name of its own rather than borrowing the heading above it.
    * - `orientation`: Which way the steps run.
    *
-   * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape with room under a step
-   * for what the stage holds.
+   * Absent is a row, which is what a form header wants, with each name under
+   * its mark: beside them there is a word in the rule's path and the line would
+   * be struck through it. `vertical` stacks them, names beside their marks,
+   * which is the shape with room under a step for what the stage holds.
+   *
+   * Each axis has one arrangement rather than a second property offering both
+   * in both. Of those four combinations three are ones nobody should pick, and
+   * a property whose job is mostly to be left alone is a property that mostly
+   * catches people out.
    * - `appearance`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
@@ -21282,23 +21834,44 @@ export type CustomElementsSolidJs = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
-   * - `labels`: Where a step's name sits against its marker.
+   * - `active`: Which item is current, by its `value`.
    *
-   * Absent is under the marker, which is the shape a row of stages wants: the
-   * rule runs unbroken between the marks and the names hang below it. `beside`
-   * puts the name next to its mark, for a column, where there is no width to
-   * save and a name under its mark would sit in the line's path.
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
    *
-   * On the list rather than on each step, for the reason density is on a region
-   * rather than on each control: a row where one name is beside its marker and
-   * the next is under it is a row nobody meant, and said once it is unwritable
-   * rather than merely discouraged.
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the active step changes.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    */
   "helix-base-steps": Partial<
     HelixBaseStepsProps &
@@ -21313,6 +21886,12 @@ export type CustomElementsSolidJs = {
    * marker is `aria-hidden` decoration, so wrapping it in the button would add
    * hit area and no meaning: the accessible name would be the text either way,
    * and what is pressable would stop being the same shape as what is readable.
+   *
+   * It is `helix-button`, not a `<button>` this element resets and dresses. The
+   * hover wash, the focus ring, the disabled treatment and the way the label sits
+   * against an icon are all decisions the button already carries, and a second
+   * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+   * shape: transparent until it is pointed at.
    *
    * It says nothing about where a reader may go. Every step is pressable and
    * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
@@ -21386,7 +21965,7 @@ export type CustomElementsSolidJs = {
    *
    * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is the button.
+   * - `label`: The step's name, which is a `helix-button`.
    * - `description`: The line under it.
    * - `lead`: The half line arriving from the step before.
    * - `trail`: The half line running on to the next.

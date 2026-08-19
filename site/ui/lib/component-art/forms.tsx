@@ -243,6 +243,42 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * Square at the control height, and the glyph is all of it.
+   *
+   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
+   * icon: the card read as a hamburger button and the subject became what the
+   * button opens rather than what the button is. Three dots is the one mark in
+   * common use that means "this control's content is an icon, and the icon is
+   * not the point", and nothing else in the gallery uses it.
+   */
+  /**
+   * Two marks in one place, which is the component.
+   *
+   * The clipboard is the resting state and the check is the confirmation, and
+   * they sit on the same centre because that is exactly how the element renders
+   * them: one grid cell, one hidden. Drawn side by side the picture would
+   * promise a button that grows on a press, which is the thing the stylesheet
+   * exists to prevent.
+   */
+  'copy-button': (
+    <>
+      <g className="artMotion artLift">
+        <rect className="artLine" fill="none" height="40" rx="5" width="40" x="140" y="80" />
+        <rect className="artLine" fill="none" height="20" rx="3" width="16" x="152" y="90" />
+        <path className="artOn" d="M154 88h12" strokeLinecap="round" strokeWidth="2" />
+      </g>
+      <path
+        className="artOn artFade"
+        d="M186 96l5 5 9-9"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </>
+  ),
+
   'date-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
@@ -365,15 +401,6 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
-   * Square at the control height, and the glyph is all of it.
-   *
-   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
-   * icon: the card read as a hamburger button and the subject became what the
-   * button opens rather than what the button is. Three dots is the one mark in
-   * common use that means "this control's content is an icon, and the icon is
-   * not the point", and nothing else in the gallery uses it.
-   */
   'icon-button': (
     <>
       <g className="artMotion artLift">

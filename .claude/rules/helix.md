@@ -620,17 +620,54 @@ wrappers drift from the element API the first time someone adds a property.
 
 ## The sandbox
 
-`@helix-io/sandbox` ships the sandbox elements; `sandbox/ui` is the Next site
-that renders them. Both dev and production work the same way as the marketing
-site, with element registration in one client component.
+`@helix-io/web` ships the sandbox shell and `@helix-io/sandbox` the editor and
+the spec runner; `site/ui` is the Next site that renders them. Both dev and
+production work the same way as the marketing site, with element registration in
+one client component.
 
-- **A separate package, never the component library.** The previous Helix
-  exported `HelixSandboxEditorBase`, `HelixSandboxTerminalBase`,
-  `HelixSandboxResizeHandleBase`, and seven more from `helix/web`'s public
-  barrel: 119 kB of 1.22 MB, roughly a tenth of the library, shipped to every
-  consumer as tooling for one internal site. Single tier, because the headless
-  and styled split exists so a consumer can bring their own presentation, and
-  nobody reskins a dev tool.
+- **The shell ships from `helix/web`; the editor does not.** *Reversed 19 Aug
+  2026.* This read "a separate package, never the component library", against
+  the previous Helix having exported ten sandbox classes from `helix/web`'s
+  public barrel: 119 kB of 1.22 MB, a tenth of the library, shipped to every
+  consumer as tooling for one internal site.
+
+  **That measurement was taken when the barrel was the only way in.** Subpath
+  exports and honestly declared `sideEffects` are what changed it: a consumer
+  importing `@helix-io/web/card` never sees a sandbox. The cost the old rule was
+  protecting against is now opt-in, and what is left is a question about what
+  the thing *is* rather than what it weighs.
+
+  So `Sandbox` is a component, under `@category tooling`, single tier. It earns
+  that by the same test as everything else: behaviour, state and API. Pane-size
+  memory across a content change, panel collapse, `hasPanel` so an omitted panel
+  paints no band, and separator labels. Single tier because the headless and
+  styled split exists so a consumer can bring their own presentation, and nobody
+  reskins a dev tool.
+
+  **And the name is honest, which was checked rather than assumed.**
+  `Sandbox.Preview` hardcodes `sandbox="allow-scripts allow-forms"` on its frame
+  and never `allow-same-origin`: the component *is* the boundary, not a layout
+  that happens to sit near one. Had the isolation stayed behind, the name would
+  have had to go with it.
+
+- **`editor` and `specs` stayed in `@helix-io/sandbox`.** The editor carries
+  CodeMirror, about 4 MB installed against a design system of roughly the same
+  size, and a `dependencies` entry is paid at install time by every consumer
+  whether or not they import it. **That is the one cost a subpath export cannot
+  solve**, and it is the whole reason the split falls where it does rather than
+  at the package boundary. The spec runner imports and runs this repository's
+  own spec files, so it is internal by definition rather than by weight.
+
+- **Which pane leads is a property, not a slot order.** `lead="preview"` puts the
+  preview first. Two consumers legitimately disagree: a workbench is a place to
+  write, so the source leads and the preview answers it; a reference page is a
+  place to look, so the preview leads and the source is what a reader opens if
+  they want to know how it was done. **The slot name travels with the pane**, so
+  each keeps its own `data-pane` and the stylesheet needs to know nothing about
+  the order. Relabelling the box while leaving `name="source"` in the first
+  position would put the consumer's preview into the pane marked source, which is
+  the bug the property exists to prevent. `split` follows the lead pane, so
+  `split="30"` means the same thing in both directions.
 - **The preview renders into the light DOM.** `createRenderRoot()` returns
   `this`. A shadow root would cut the preview off from the base layer, so a
   heading would come out at the browser's default size and a link in the wrong
@@ -649,9 +686,12 @@ Two copies of the library are on that page and they are not the same build.
 
 The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
 module graph from `helix/web/dist`, so `bun run dev:watch` rebuilds it and HMR
-shows it immediately. **The preview does not.** It runs `frame.js`, a 400 kB
+shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
 classic-script IIFE built by `bun run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
+It was 400 kB before the sandbox shell moved into `@helix-io/web`, which the
+frame imports whole: the shell now rides in every preview, which is what lets an
+example render a `<helix-sandbox>` at all.
 
 Both halves of that had to be fixed, and the second is the one that is easy to
 miss: a bundle nothing rebuilds, and a bundle that, once rebuilt, still cannot
@@ -715,10 +755,39 @@ import, so it cannot be steered off the path.
 
 Two page kinds, kept apart on purpose:
 
-- **`/components/<family>` is the API**, read from the manifest and nothing
-  else. No examples: it answers what a component can do, and a reference page
-  that starts collecting pictures stops being complete.
+- **`/components/<family>` is the whole component**: what it is, how to import
+  it, the headline example running, the API, and the list of every other
+  example. *Reversed 19 Aug 2026.* This read "the API, read from the manifest
+  and nothing else. No examples: a reference page that starts collecting
+  pictures stops being complete." What the split actually produced was two
+  pages a reader had to hold in their head at once, the tables here and the
+  pictures elsewhere, and no page that answered "what is this and how do I use
+  it" without a navigation in the middle of the answer. Completeness was never
+  the thing at risk; the manifest still decides what the tables say, and a
+  picture beside them cannot make them less complete.
 - **`/components/<family>/<example>` is the sandbox**, one example, editable.
+  Still the place an example is *changed*. The reference page is where the
+  headline one is *seen*.
+
+**Which tier a reference page documents is a preference, not a route.**
+`Base`/`Styled` lives in the preferences drawer beside colour mode, keyed
+`fusion-api-tier`, and styled is the default because it is the tier almost
+everyone consumes and because it is a superset: styled extends base, so its
+tables already contain every member base would show.
+
+The page renders **both** tiers and a `data-api-tier` attribute on the document
+hides one. That is not a shortcut. The preference is in `localStorage`, the
+reference pages are static and server-rendered, and the server cannot read it,
+so filtering in React would mean the server rendering one tier while the client
+wants the other: a hydration mismatch on every component page. Marking both and
+letting CSS choose costs a little HTML and cannot disagree with itself, which is
+the same trade colour mode already makes.
+
+`display: none`, never a clip. The hidden tier has to leave the accessibility
+tree as well as the page, or a reader being read the styled API gets the base one
+read out underneath it and the rail points at sections that are not shown.
+Styled is expressed as the *absence* of the attribute, so the document's resting
+state is the common answer.
 
 Examples are `.examples/*.html` beside the component. `default.html` is the
 headline preview and reads as "Preview"; every other slug is a named variant.
@@ -736,6 +805,27 @@ A comment about the *example's own scaffolding* is different and stays, cut to a
 line: `<!-- Preview frame: the submit is swallowed. -->` exists so nobody copies
 `onsubmit="event.preventDefault()"` into production. A comment about the
 component does not.
+
+**One more comment is allowed, and it is marked.** `<!-- @summary … -->` is the
+example's one-line description, read by the `helix-examples` plugin into the
+manifest and shown in the Examples table. It has to be marked rather than
+positional precisely because of the paragraph above: a leading comment already
+means "scaffolding", and read by position the Form example's description would
+tell a reader it is about a swallowed submit. `@summary` rather than
+`@description`, because that is already this codebase's word for a single line.
+
+**Examples reach the manifest, not the site.** `helix-examples` walks
+`src/<family>/.examples` and records slug and description on the family's root
+declaration. The docs site used to walk that folder itself, which put the
+knowledge in the wrong place: the site is a consumer, and it was reaching past
+the published interface into the library's source tree to find out what a
+component ships. The markup stays on disk: it is the sandbox's payload, it is
+large, and every consumer parses this manifest whether or not it renders one.
+
+A family with an `index.ts` and no `.examples` fails `check:examples`. That is
+what makes a directory a family, the same question the package's `exports` map
+asks, which is why `field/` is exempt and why moving the sandbox into
+`helix/web` obliged it to ship an example.
 
 There is no check for this. The line is between prose about the component and
 prose that is merely content, which no word count can see, and the two examples

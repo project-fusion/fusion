@@ -8,12 +8,12 @@ import { toolingArt } from './tooling'
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * All sixty-six families have an entry, and the five files are split by kind
- * rather than by anything the build cares about: one file of sixty-six is hard
+ * All sixty-seven families have an entry, and the five files are split by kind
+ * rather than by anything the build cares about: one file of sixty-seven is hard
  * to navigate and every entry would sit beside a neighbour it has nothing to do
  * with. The system they all obey is documented at the top of `core.tsx`.
  *
- * **Sixty-six, not the sixty-four folders in `helix/web/src`.** The catalog is
+ * **Sixty-seven, not the sixty-six folders in `helix/web/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@helix-io/sandbox`. Counting directories is how five families were missed on
  * the first pass, and the count that matters is whatever `getFamilies` returns.

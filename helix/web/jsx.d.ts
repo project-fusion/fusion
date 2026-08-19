@@ -23,6 +23,8 @@ import type {
   HelixColorInput,
   HelixColorPicker,
   HelixCompleteEvent,
+  HelixConsoleEvent,
+  HelixCopyButton,
   HelixCopyEvent,
   HelixDateInput,
   HelixDatePicker,
@@ -65,6 +67,12 @@ import type {
   HelixQuote,
   HelixRadio,
   HelixRadioGroup,
+  HelixSandbox,
+  HelixSandboxPreview,
+  HelixSandboxSource,
+  HelixSandboxStatusBar,
+  HelixSandboxTerminal,
+  HelixSandboxToolbar,
   HelixSelect,
   HelixSelectEvent,
   HelixSkeleton,
@@ -2341,6 +2349,191 @@ fire at all. */
   "on:helix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
   "on:helix-copy"?: (e: HelixColorPickerHelixCopyElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCopyButton` component event */
+export type HelixCopyButtonElementEvent<E = Event> = TypedEvent<
+  HelixCopyButton,
+  E
+>;
+/** `helix-copy` event type */
+export type HelixCopyButtonHelixCopyElementEvent =
+  HelixCopyButtonElementEvent<HelixCopyEvent>;
+
+export type HelixCopyButtonProps = {
+  /** What goes on the clipboard. */
+  value?: HelixCopyButton["value"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgement call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  label?: HelixCopyButton["label"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "copied-label"?: HelixCopyButton["copiedLabel"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  copiedLabel?: HelixCopyButton["copiedLabel"];
+  /** What activating the button does to its form. */
+  type?: HelixCopyButton["type"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixCopyButton["commandFor"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixCopyButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixCopyButton["name"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixCopyButton["focusable"];
+
+  /** Fired after the clipboard write succeeds. */
+  "onhelix-copy"?: (e: HelixCopyButtonHelixCopyElementEvent) => void;
+};
+
+export type HelixCopyButtonSolidJsProps = {
+  /** What goes on the clipboard. */
+  "prop:value"?: HelixCopyButton["value"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgement call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  "prop:label"?: HelixCopyButton["label"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "attr:copied-label"?: HelixCopyButton["copiedLabel"];
+  /** What it is called, and says, after one.
+
+`attribute` written out, because Lit lowercases a property name rather than
+dash-casing it, and `copiedlabel` is not what anyone would type. */
+  "prop:copiedLabel"?: HelixCopyButton["copiedLabel"];
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixCopyButton["type"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixCopyButton["commandFor"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixCopyButton["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixCopyButton["name"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixCopyButton["focusable"];
+  /** Fired after the clipboard write succeeds. */
+  "on:helix-copy"?: (e: HelixCopyButtonHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6336,6 +6529,287 @@ card with no box loses the only thing that says you may pick several. */
   textContent?: string | number;
 };
 
+/** `HelixSandboxPreview` component event */
+export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
+  HelixSandboxPreview,
+  E
+>;
+/** `helix-console` event type */
+export type HelixSandboxPreviewHelixConsoleElementEvent =
+  HelixSandboxPreviewElementEvent<HelixConsoleEvent>;
+
+export type HelixSandboxPreviewProps = {
+  /** Document the frame loads, which brings the styles and the elements. */
+  src?: HelixSandboxPreview["src"];
+  /** Markup to render. */
+  source?: HelixSandboxPreview["source"];
+  /** Stylesheet applied inside the frame, alongside the markup. */
+  styles?: HelixSandboxPreview["styles"];
+  /** Accessible name for the frame. */
+  label?: HelixSandboxPreview["label"];
+  /** Writing direction inside the frame. */
+  direction?: HelixSandboxPreview["direction"];
+  /** How the example is placed in the frame. */
+  layout?: HelixSandboxPreview["layout"];
+
+  /** Relayed from the frame, one per console call. */
+  "onhelix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
+};
+
+export type HelixSandboxPreviewSolidJsProps = {
+  /** Document the frame loads, which brings the styles and the elements. */
+  "prop:src"?: HelixSandboxPreview["src"];
+  /** Markup to render. */
+  "prop:source"?: HelixSandboxPreview["source"];
+  /** Stylesheet applied inside the frame, alongside the markup. */
+  "prop:styles"?: HelixSandboxPreview["styles"];
+  /** Accessible name for the frame. */
+  "prop:label"?: HelixSandboxPreview["label"];
+  /** Writing direction inside the frame. */
+  "prop:direction"?: HelixSandboxPreview["direction"];
+  /** How the example is placed in the frame. */
+  "prop:layout"?: HelixSandboxPreview["layout"];
+  /** Relayed from the frame, one per console call. */
+  "on:helix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSandbox` component event */
+export type HelixSandboxElementEvent<E = Event> = TypedEvent<HelixSandbox, E>;
+/** `helix-change` event type */
+export type HelixSandboxHelixChangeElementEvent =
+  HelixSandboxElementEvent<HelixChangeEvent>;
+
+export type HelixSandboxProps = {
+  /** Whether the panes sit side by side or stacked. */
+  orientation?: HelixSandbox["orientation"];
+  /** Which pane comes first, before the divider.
+
+A sandbox is read in one of two directions and the two are not a
+preference. A workbench is a place to write, so the source leads and the
+preview answers it. A reference page is a place to look, so the preview
+leads and the source is what a reader opens if they want to know how it was
+done. Same component, opposite reading order, and no consumer should have
+to slot a preview into a hole named `source` to get it.
+
+Not reflected, because no rule selects on it: the panes already carry
+`data-pane`, which is what the stylesheet reaches for, and swapping the
+names below keeps that true whichever way round they sit.
+
+`split` follows the lead pane rather than the source, so `split="30"` means
+the same thing in both directions: thirty percent to whatever comes first. */
+  lead?: HelixSandbox["lead"];
+  /** Percentage of the sandbox given to the source pane. */
+  split?: HelixSandbox["split"];
+  /** Height of the panel, in pixels. */
+  "panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  panelSize?: HelixSandbox["panelSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "panel-collapsed-size"?: HelixSandbox["panelCollapsedSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  panelCollapsedSize?: HelixSandbox["panelCollapsedSize"];
+  /** Accessible name for the panel's divider. */
+  "panel-label"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the panel's divider. */
+  panelLabel?: HelixSandbox["panelLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  cornerLabel?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider. */
+  "separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  separatorLabel?: HelixSandbox["separatorLabel"];
+
+  /** Fired when a divider is let go, with the new arrangement. */
+  "onhelix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
+};
+
+export type HelixSandboxSolidJsProps = {
+  /** Whether the panes sit side by side or stacked. */
+  "prop:orientation"?: HelixSandbox["orientation"];
+  /** Which pane comes first, before the divider.
+
+A sandbox is read in one of two directions and the two are not a
+preference. A workbench is a place to write, so the source leads and the
+preview answers it. A reference page is a place to look, so the preview
+leads and the source is what a reader opens if they want to know how it was
+done. Same component, opposite reading order, and no consumer should have
+to slot a preview into a hole named `source` to get it.
+
+Not reflected, because no rule selects on it: the panes already carry
+`data-pane`, which is what the stylesheet reaches for, and swapping the
+names below keeps that true whichever way round they sit.
+
+`split` follows the lead pane rather than the source, so `split="30"` means
+the same thing in both directions: thirty percent to whatever comes first. */
+  "prop:lead"?: HelixSandbox["lead"];
+  /** Percentage of the sandbox given to the source pane. */
+  "prop:split"?: HelixSandbox["split"];
+  /** Height of the panel, in pixels. */
+  "attr:panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  "prop:panelSize"?: HelixSandbox["panelSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "attr:panel-collapsed-size"?: HelixSandbox["panelCollapsedSize"];
+  /** What the panel's height becomes when it is closed.
+
+Zero closes it outright. A panel whose contents include the control that
+reopens it, a row of tabs being the usual one, wants that row left showing,
+and only whoever slotted it knows how tall that is. */
+  "prop:panelCollapsedSize"?: HelixSandbox["panelCollapsedSize"];
+  /** Accessible name for the panel's divider. */
+  "attr:panel-label"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the panel's divider. */
+  "prop:panelLabel"?: HelixSandbox["panelLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "attr:corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "prop:cornerLabel"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider. */
+  "attr:separator-label"?: HelixSandbox["separatorLabel"];
+  /** Accessible name for the divider. */
+  "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+  /** Fired when a divider is let go, with the new arrangement. */
+  "on:helix-change"?: (e: HelixSandboxHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSandboxSource` component event */
+export type HelixSandboxSourceElementEvent<E = Event> = TypedEvent<
+  HelixSandboxSource,
+  E
+>;
+/** `helix-change` event type */
+export type HelixSandboxSourceHelixChangeElementEvent =
+  HelixSandboxSourceElementEvent<HelixChangeEvent>;
+
+export type HelixSandboxSourceProps = {
+  /** The source being edited. */
+  value?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes.
+
+Not reflected: nothing selects on it, so it keeps a real default instead. */
+  name?: HelixSandboxSource["name"];
+  /** Accessible name for the editable region. */
+  "field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  fieldLabel?: HelixSandboxSource["fieldLabel"];
+  /** Whether Tab indents rather than moving focus. */
+  "tab-indents"?: HelixSandboxSource["tabIndents"];
+  /** Whether Tab indents rather than moving focus. */
+  tabIndents?: HelixSandboxSource["tabIndents"];
+
+  /** Fired when the source is edited. */
+  "onhelix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
+};
+
+export type HelixSandboxSourceSolidJsProps = {
+  /** The source being edited. */
+  "prop:value"?: HelixSandboxSource["value"];
+  /** Which source this pane holds, echoed in every `SourceChange`.
+
+`html` and `css` are what the sandbox root routes on; any other name is
+passed through untouched for a consumer wiring their own panes.
+
+Not reflected: nothing selects on it, so it keeps a real default instead. */
+  "prop:name"?: HelixSandboxSource["name"];
+  /** Accessible name for the editable region. */
+  "attr:field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  "prop:fieldLabel"?: HelixSandboxSource["fieldLabel"];
+  /** Whether Tab indents rather than moving focus. */
+  "bool:tab-indents"?: HelixSandboxSource["tabIndents"];
+  /** Whether Tab indents rather than moving focus. */
+  "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
+  /** Fired when the source is edited. */
+  "on:helix-change"?: (e: HelixSandboxSourceHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixSandboxStatusBarProps = {
+  /** One-based column of the cursor. Absent shows no readout. */
+  column?: HelixSandboxStatusBar["column"];
+  /** The language being edited, as a name or one the editor knows. */
+  language?: HelixSandboxStatusBar["language"];
+  /** One-based line of the cursor. Absent shows no readout. */
+  line?: HelixSandboxStatusBar["line"];
+};
+
+export type HelixSandboxStatusBarSolidJsProps = {
+  /** One-based column of the cursor. Absent shows no readout. */
+  "prop:column"?: HelixSandboxStatusBar["column"];
+  /** The language being edited, as a name or one the editor knows. */
+  "prop:language"?: HelixSandboxStatusBar["language"];
+  /** One-based line of the cursor. Absent shows no readout. */
+  "prop:line"?: HelixSandboxStatusBar["line"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixSandboxTerminalProps = {
+  /** What to show before anything has been written. */
+  "empty-label"?: HelixSandboxTerminal["emptyLabel"];
+  /** What to show before anything has been written. */
+  emptyLabel?: HelixSandboxTerminal["emptyLabel"];
+  /** Accessible name for the log. */
+  label?: HelixSandboxTerminal["label"];
+};
+
+export type HelixSandboxTerminalSolidJsProps = {
+  /** What to show before anything has been written. */
+  "attr:empty-label"?: HelixSandboxTerminal["emptyLabel"];
+  /** What to show before anything has been written. */
+  "prop:emptyLabel"?: HelixSandboxTerminal["emptyLabel"];
+  /** Accessible name for the log. */
+  "prop:label"?: HelixSandboxTerminal["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixSandboxToolbarProps = {};
+
+export type HelixSandboxToolbarSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixSelect` component event */
 export type HelixSelectElementEvent<E = Event> = TypedEvent<HelixSelect, E>;
 /** `helix-change` event type */
@@ -7119,7 +7593,31 @@ being the one that asserts the host carries nothing nobody wrote. */
   textContent?: string | number;
 };
 
+/** `HelixSteps` component event */
+export type HelixStepsElementEvent<E = Event> = TypedEvent<HelixSteps, E>;
+/** `helix-change` event type */
+export type HelixStepsHelixChangeElementEvent =
+  HelixStepsElementEvent<HelixChangeEvent>;
+
 export type HelixStepsProps = {
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  active?: HelixSteps["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "default-active"?: HelixSteps["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  defaultActive?: HelixSteps["defaultActive"];
   /** Accessible name for the sequence.
 
 A list of stages is a landmark a reader arrives at out of order, so it
@@ -7127,9 +7625,15 @@ needs a name of its own rather than borrowing the heading above it. */
   label?: HelixSteps["label"];
   /** Which way the steps run.
 
-Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape with room under a step
-for what the stage holds. */
+Absent is a row, which is what a form header wants, with each name under
+its mark: beside them there is a word in the rule's path and the line would
+be struck through it. `vertical` stacks them, names beside their marks,
+which is the shape with room under a step for what the stage holds.
+
+Each axis has one arrangement rather than a second property offering both
+in both. Of those four combinations three are ones nobody should pick, and
+a property whose job is mostly to be left alone is a property that mostly
+catches people out. */
   orientation?: HelixSteps["orientation"];
   /** What each step is marked with.
 
@@ -7142,21 +7646,32 @@ nothing about whether it is finished.
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
   appearance?: HelixSteps["appearance"];
-  /** Where a step's name sits against its marker.
+  /** The consumer's callback, invoked after the change is applied. */
+  onActiveChange?: HelixSteps["onActiveChange"];
 
-Absent is under the marker, which is the shape a row of stages wants: the
-rule runs unbroken between the marks and the names hang below it. `beside`
-puts the name next to its mark, for a column, where there is no width to
-save and a name under its mark would sit in the line's path.
-
-On the list rather than on each step, for the reason density is on a region
-rather than on each control: a row where one name is beside its marker and
-the next is under it is a row nobody meant, and said once it is unwritable
-rather than merely discouraged. */
-  labels?: HelixSteps["labels"];
+  /** Fired when the active step changes. */
+  "onhelix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
 };
 
 export type HelixStepsSolidJsProps = {
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  "prop:active"?: HelixSteps["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "attr:default-active"?: HelixSteps["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "prop:defaultActive"?: HelixSteps["defaultActive"];
   /** Accessible name for the sequence.
 
 A list of stages is a landmark a reader arrives at out of order, so it
@@ -7164,9 +7679,15 @@ needs a name of its own rather than borrowing the heading above it. */
   "prop:label"?: HelixSteps["label"];
   /** Which way the steps run.
 
-Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape with room under a step
-for what the stage holds. */
+Absent is a row, which is what a form header wants, with each name under
+its mark: beside them there is a word in the rule's path and the line would
+be struck through it. `vertical` stacks them, names beside their marks,
+which is the shape with room under a step for what the stage holds.
+
+Each axis has one arrangement rather than a second property offering both
+in both. Of those four combinations three are ones nobody should pick, and
+a property whose job is mostly to be left alone is a property that mostly
+catches people out. */
   "prop:orientation"?: HelixSteps["orientation"];
   /** What each step is marked with.
 
@@ -7179,18 +7700,10 @@ nothing about whether it is finished.
 order is the point, a form that says "step 3 of 5" beside it, or a sequence
 a reader is told to come back to by number. */
   "prop:appearance"?: HelixSteps["appearance"];
-  /** Where a step's name sits against its marker.
-
-Absent is under the marker, which is the shape a row of stages wants: the
-rule runs unbroken between the marks and the names hang below it. `beside`
-puts the name next to its mark, for a column, where there is no width to
-save and a name under its mark would sit in the line's path.
-
-On the list rather than on each step, for the reason density is on a region
-rather than on each control: a row where one name is beside its marker and
-the next is under it is a row nobody meant, and said once it is unwritable
-rather than merely discouraged. */
-  "prop:labels"?: HelixSteps["labels"];
+  /** The consumer's callback, invoked after the change is applied. */
+  "prop:onActiveChange"?: HelixSteps["onActiveChange"];
+  /** Fired when the active step changes. */
+  "on:helix-change"?: (e: HelixStepsHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11028,6 +11541,119 @@ export type CustomElements = {
   >;
 
   /**
+   * Takes the icon button's square box, then stacks its two faces in one grid
+   * cell so the press never changes the button's size. See the stylesheet: a
+   * control that resizes under the pointer at the moment a reader is looking at
+   * it for reassurance reads as a second, accidental press.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What goes on the clipboard.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgement call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `type`: What activating the button does to its form.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-copy`: Fired after the clipboard write succeeds.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The resting icon. Falls back to a clipboard.
+   * - `copied`: What replaces it once the write succeeds. Falls back to a check.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `button`: The inner button.
+   */
+  "helix-copy-button": Partial<
+    HelixCopyButtonProps & BaseProps<HelixCopyButton> & BaseEvents
+  >;
+
+  /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
    * control. The trigger is a mark within that box rather than a button beside it:
@@ -14109,6 +14735,374 @@ export type CustomElements = {
   "helix-radio": Partial<HelixRadioProps & BaseProps<HelixRadio> & BaseEvents>;
 
   /**
+   * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
+   * provides. That document imports whatever the examples need, listens for a
+   * render message, and writes the markup into itself.
+   *
+   * **A frame rather than the page.** Rendering into the page meant an example
+   * was styled by whatever surrounded it, which flatters the preview and lies
+   * about it: an example that restyles `helix-card` restyled the sandbox too, a
+   * script in an example ran against the real document, and a stray
+   * `position: fixed` escaped the pane. It also left nothing to capture console
+   * output from, and the terminal has to come from somewhere.
+   *
+   * The cost is that the frame starts empty. Styles and element definitions do
+   * not cross into it, because a document has its own stylesheets and a window
+   * has its own custom element registry, so `src` has to load them. That is the
+   * consumer's document rather than something guessed at here.
+   *
+   * **The source is not trusted, and the frame is what makes that safe.**
+   * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
+   * policy defaults to `self` and this frame has an opaque origin, so it is not
+   * `self` and the default denies it. A component inside the preview that copies
+   * to the clipboard is otherwise a control that silently does nothing, which is
+   * how this was found. Nothing else is granted, and a copy still needs the
+   * reader's own gesture.
+   *
+   * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+   * an opaque origin: script in an example cannot reach this page, its storage,
+   * its cookies, or the editor the source was typed into. Without it they could,
+   * measured, through an `onerror` handler on an image that fails to load, which
+   * `innerHTML` does not strip the way it refuses a `<script>` tag.
+   *
+   * That is what lets a sandbox hold markup a reader pasted from somewhere, or
+   * one day arrived in a shared link, rather than only what its owner typed.
+   *
+   * `allow-forms` is granted because examples have forms in them and a submit
+   * that silently does nothing is a worse lie than one that navigates a frame
+   * nobody is looking at. Top-level navigation, popups and modals are not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Document the frame loads, which brings the styles and the elements.
+   * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
+   * - `label`: Accessible name for the frame.
+   * - `direction`: Writing direction inside the frame.
+   * - `layout`: How the example is placed in the frame.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-console`: Relayed from the frame, one per console call.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `reload() => void`: Loads the frame's document again, and re-sends the example to it.
+   *
+   * For a bundle that has changed underneath a page nobody reloaded. The frame
+   * carries its own build of the component library, as a classic script it ran
+   * once at load, so a rebuilt bundle reaches a tab that is already open
+   * exactly never: the sandbox around it hot-reloads and the preview inside it
+   * keeps running whatever it started with, which reads as a component fix that
+   * did not work.
+   *
+   * Nothing needs to be resent by the caller. Clearing `ready` and reassigning
+   * `src` puts this back in the state it was in before the first load, and the
+   * new document announces itself the same way the first one did.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The iframe.
+   */
+  "helix-sandbox-preview": Partial<
+    HelixSandboxPreviewProps & BaseProps<HelixSandboxPreview> & BaseEvents
+  >;
+
+  /**
+   * Coordination is by event, the same way the accordion does it: a source pane
+   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * whatever preview is slotted into it. Neither child knows the other exists, so
+   * either can be replaced or used alone.
+   *
+   * The event carries the pane's `name`, which is what lets one sandbox hold
+   * several panes without the root identifying senders by reference. `html` is
+   * the preview's markup and `css` is its stylesheet. A pane named anything else
+   * is showing something rather than driving it, and is ignored: the sandbox has
+   * a pane rendering the example as JSX, and guessing would have put the text of
+   * a React component into the preview.
+   *
+   * **The dividers are two nested `helix-splitter`s, not a grid this element
+   * drags itself.** It had its own: a five row grid, a stylesheet written to on
+   * every pointer move, three pointer handlers, a keyboard handler reading which
+   * axes each divider was allowed to move, and a corner placed by hand into the
+   * cell where two tracks met. All of it is the splitter's now, including the
+   * corner, which arrives on its own wherever a nested splitter crosses the one it
+   * is in.
+   *
+   * The panes are the inner splitter and the panel is the outer one, which is the
+   * order that makes the panel span the full width: the outer divider runs edge to
+   * edge and the inner stops at it.
+   *
+   * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
+   * A splitter that owned its own position would leave this element reporting one
+   * arrangement and showing another, and a consumer restoring a saved layout
+   * writes to these two properties. Each splitter announces where it wants to go
+   * and this answers, which is the same contract a form control has with a
+   * framework.
+   *
+   * **The panel is in pixels here and a percentage in the splitter, and the
+   * conversion belongs here.** A terminal wants a number of lines rather than a
+   * share of the window, so its height should not change when the window does. A
+   * splitter has no business knowing that, so it stays percentage-pure and this
+   * element, which does know what is in the panel, holds the box and converts.
+   * That is also what keeps a stored `panelSize` from a previous visit meaning
+   * what it meant when it was written.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Whether the panes sit side by side or stacked.
+   * - `lead`: Which pane comes first, before the divider.
+   *
+   * A sandbox is read in one of two directions and the two are not a
+   * preference. A workbench is a place to write, so the source leads and the
+   * preview answers it. A reference page is a place to look, so the preview
+   * leads and the source is what a reader opens if they want to know how it was
+   * done. Same component, opposite reading order, and no consumer should have
+   * to slot a preview into a hole named `source` to get it.
+   *
+   * Not reflected, because no rule selects on it: the panes already carry
+   * `data-pane`, which is what the stylesheet reaches for, and swapping the
+   * names below keeps that true whichever way round they sit.
+   *
+   * `split` follows the lead pane rather than the source, so `split="30"` means
+   * the same thing in both directions: thirty percent to whatever comes first.
+   * - `split`: Percentage of the sandbox given to the source pane.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
+   *
+   * Zero closes it outright. A panel whose contents include the control that
+   * reopens it, a row of tabs being the usual one, wants that row left showing,
+   * and only whoever slotted it knows how tall that is.
+   * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `source`: The editable source pane. First unless `lead` says otherwise.
+   * - `preview`: The live preview. Second unless `lead` says otherwise.
+   * - `toolbar`: A bar across the top, spanning both panes.
+   * - `panel`: A panel under both panes, usually a terminal.
+   * - `status`: A status bar, spanning both panes at the bottom.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-min-block-size`: Minimum height of the sandbox. (default: `undefined`)
+   * - `--sandbox-grab`: The invisible width of a divider's drag target. (default: `undefined`)
+   * - `--sandbox-separator-color`: Color of the divider. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `body`: The splitter holding the panes above the panel.
+   * - `corner`: The handle where the two dividers cross.
+   * - `pane`: Either pane.
+   * - `panel`: The box holding whatever was slotted as the panel.
+   * - `panes`: The splitter holding the source and preview panes.
+   * - `separator`: Either divider.
+   */
+  "helix-sandbox": Partial<
+    HelixSandboxProps & BaseProps<HelixSandbox> & BaseEvents
+  >;
+
+  /**
+   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+   * reader support all come from the platform, and every one of them is
+   * expensive to rebuild and easy to get subtly wrong.
+   *
+   * Tab inserts two spaces rather than leaving the field, because a code pane
+   * that cannot indent is not one. Escape then Tab still moves focus out, which
+   * is the documented escape hatch for exactly this trade.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   *
+   * Not reflected: nothing selects on it, so it keeps a real default instead.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the source is edited.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `source`: The editable region.
+   */
+  "helix-sandbox-source": Partial<
+    HelixSandboxSourceProps & BaseProps<HelixSandboxSource> & BaseEvents
+  >;
+
+  /**
+   * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
+   * on every keystroke and every arrow press, the sandbox hears it and writes the
+   * position here. Nothing about that reaches the consumer's framework, which is
+   * the point. A caret position routed through React state would re-render the
+   * workbench on every cursor move, to update two numbers.
+   *
+   * **Not a live region.** The readout changes on every keystroke, so announcing
+   * it would talk over the reader continuously while they type. It is text they
+   * can navigate to, which is what a status bar is in every editor that has one.
+   *
+   * A readout with nothing to say is not rendered at all rather than rendered
+   * empty, or the bar keeps a gap where a value is not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `column`: One-based column of the cursor. Absent shows no readout.
+   * - `language`: The language being edited, as a name or one the editor knows.
+   * - `line`: One-based line of the cursor. Absent shows no readout.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start of the bar.
+   * - `end`: Items after the readouts, at the end of the bar.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `caret`: The line and column readout.
+   * - `language`: The language readout.
+   */
+  "helix-sandbox-status-bar": Partial<
+    HelixSandboxStatusBarProps & BaseProps<HelixSandboxStatusBar> & BaseEvents
+  >;
+
+  /**
+   * Fed by the sandbox, which hears `helix-console` from the preview and hands it
+   * here. The preview is a separate document, so what arrives has already crossed
+   * `postMessage`: text, not values.
+   *
+   * **Repeats collapse.** An example with a render loop can write the same
+   * warning hundreds of times, and two hundred identical lines say nothing that
+   * one line and a count does not. Only consecutive repeats collapse, so the
+   * order of what happened survives.
+   *
+   * A `role="log"` rather than a live region by hand. It is the semantic for an
+   * append-only stream, and it means a reader is told about new output without
+   * the whole panel being re-announced each time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `empty-label`/`emptyLabel`: What to show before anything has been written.
+   * - `label`: Accessible name for the log.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `write(detail: ConsoleDetail) => void`: Adds a line, collapsing it into the one above when they are identical.
+   *
+   * `write` rather than `append`, which every element already has from
+   * `ParentNode` and which takes nodes. Shadowing it would break
+   * `terminal.append(node)` for anyone who reasonably expected the DOM method.
+   * - `clear() => void`: Empties the log.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `log`: The scrolling region.
+   * - `entry`: One line.
+   * - `level`: The level a line came in at.
+   * - `message`: The text of a line.
+   * - `count`: How many times a repeated line arrived.
+   * - `empty`: Shown while nothing has been written.
+   */
+  "helix-sandbox-terminal": Partial<
+    HelixSandboxTerminalProps & BaseProps<HelixSandboxTerminal> & BaseEvents
+  >;
+
+  /**
+   * Spans the source pane and the preview together, so what it holds is about the
+   * sandbox rather than about one side of it. The files go at the start and the
+   * menus at the end, which is the arrangement every editor has settled on.
+   *
+   * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
+   * for the whole group, and it is for a set of controls of the same kind. This
+   * holds a tab list, which owns its own arrow-key behavior and would lose it.
+   * Use `helix-toolbar` where the contents really are a row of buttons.
+   *
+   * Both slots are bare, so an unfilled one generates no box and costs no gap.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start, usually the files.
+   * - `end`: Items at the end, usually menus.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   * - `--sandbox-toolbar-size`: The bar's height. Defaults to a large control. (default: `undefined`)
+   */
+  "helix-sandbox-toolbar": Partial<
+    HelixSandboxToolbarProps & BaseProps<HelixSandboxToolbar> & BaseEvents
+  >;
+
+  /**
    * The trigger wears the same frame as an `Input`, because in a form it stands
    * in a row with them and a control that looks like a button among fields reads
    * as an action rather than an answer.
@@ -14716,19 +15710,44 @@ export type CustomElements = {
    * is drawn by the browser at layout and is right in the server's markup with no
    * script involved. Reordering the steps renumbers them; nothing has to be told.
    *
+   * A step's name is a `helix-button`, so what it looks like under the pointer,
+   * with focus, and when refused are Button's decisions and Button's hooks. There
+   * is no `--steps-hover-color`: `--button-background-color` is that hook, and a
+   * second name for it here would be a second thing to keep in step.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the sequence.
    *
    * A list of stages is a landmark a reader arrives at out of order, so it
    * needs a name of its own rather than borrowing the heading above it.
    * - `orientation`: Which way the steps run.
    *
-   * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape with room under a step
-   * for what the stage holds.
+   * Absent is a row, which is what a form header wants, with each name under
+   * its mark: beside them there is a word in the rule's path and the line would
+   * be struck through it. `vertical` stacks them, names beside their marks,
+   * which is the shape with room under a step for what the stage holds.
+   *
+   * Each axis has one arrangement rather than a second property offering both
+   * in both. Of those four combinations three are ones nobody should pick, and
+   * a property whose job is mostly to be left alone is a property that mostly
+   * catches people out.
    * - `appearance`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
@@ -14739,23 +15758,30 @@ export type CustomElements = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
-   * - `labels`: Where a step's name sits against its marker.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
-   * Absent is under the marker, which is the shape a row of stages wants: the
-   * rule runs unbroken between the marks and the names hang below it. `beside`
-   * puts the name next to its mark, for a column, where there is no width to
-   * save and a name under its mark would sit in the line's path.
+   * ## Events
    *
-   * On the list rather than on each step, for the reason density is on a region
-   * rather than on each control: a row where one name is beside its marker and
-   * the next is under it is a row nobody meant, and said once it is unwritable
-   * rather than merely discouraged.
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the active step changes.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Custom Properties
    *
@@ -14764,7 +15790,6 @@ export type CustomElements = {
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
    * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
    * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
-   * - `--steps-hover-color`: Wash behind a step under the pointer. (default: `undefined`)
    * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
    * - `--steps-current-color`: The mark on the current step. (default: `undefined`)
    */
@@ -14809,7 +15834,7 @@ export type CustomElements = {
    *
    * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is the button.
+   * - `label`: The step's name, which is a `helix-button`.
    * - `description`: The line under it.
    * - `lead`: The half line arriving from the step before.
    * - `trail`: The half line running on to the next.
@@ -18227,6 +19252,122 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Takes the icon button's square box, then stacks its two faces in one grid
+   * cell so the press never changes the button's size. See the stylesheet: a
+   * control that resizes under the pointer at the moment a reader is looking at
+   * it for reassurance reads as a second, accidental press.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What goes on the clipboard.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgement call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `type`: What activating the button does to its form.
+   * - `command`: What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-copy`: Fired after the clipboard write succeeds.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The resting icon. Falls back to a clipboard.
+   * - `copied`: What replaces it once the write succeeds. Falls back to a check.
+   * - `start`: Content before the label, usually an icon.
+   * - `end`: Content after the label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
+   * - `button`: The inner button.
+   */
+  "helix-copy-button": Partial<
+    HelixCopyButtonProps &
+      HelixCopyButtonSolidJsProps &
+      BaseProps<HelixCopyButton> &
+      BaseEvents
+  >;
+
+  /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
    * control. The trigger is a mark within that box rather than a button beside it:
@@ -21420,6 +22561,392 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
+   * provides. That document imports whatever the examples need, listens for a
+   * render message, and writes the markup into itself.
+   *
+   * **A frame rather than the page.** Rendering into the page meant an example
+   * was styled by whatever surrounded it, which flatters the preview and lies
+   * about it: an example that restyles `helix-card` restyled the sandbox too, a
+   * script in an example ran against the real document, and a stray
+   * `position: fixed` escaped the pane. It also left nothing to capture console
+   * output from, and the terminal has to come from somewhere.
+   *
+   * The cost is that the frame starts empty. Styles and element definitions do
+   * not cross into it, because a document has its own stylesheets and a window
+   * has its own custom element registry, so `src` has to load them. That is the
+   * consumer's document rather than something guessed at here.
+   *
+   * **The source is not trusted, and the frame is what makes that safe.**
+   * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
+   * policy defaults to `self` and this frame has an opaque origin, so it is not
+   * `self` and the default denies it. A component inside the preview that copies
+   * to the clipboard is otherwise a control that silently does nothing, which is
+   * how this was found. Nothing else is granted, and a copy still needs the
+   * reader's own gesture.
+   *
+   * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+   * an opaque origin: script in an example cannot reach this page, its storage,
+   * its cookies, or the editor the source was typed into. Without it they could,
+   * measured, through an `onerror` handler on an image that fails to load, which
+   * `innerHTML` does not strip the way it refuses a `<script>` tag.
+   *
+   * That is what lets a sandbox hold markup a reader pasted from somewhere, or
+   * one day arrived in a shared link, rather than only what its owner typed.
+   *
+   * `allow-forms` is granted because examples have forms in them and a submit
+   * that silently does nothing is a worse lie than one that navigates a frame
+   * nobody is looking at. Top-level navigation, popups and modals are not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Document the frame loads, which brings the styles and the elements.
+   * - `source`: Markup to render.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
+   * - `label`: Accessible name for the frame.
+   * - `direction`: Writing direction inside the frame.
+   * - `layout`: How the example is placed in the frame.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-console`: Relayed from the frame, one per console call.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `reload() => void`: Loads the frame's document again, and re-sends the example to it.
+   *
+   * For a bundle that has changed underneath a page nobody reloaded. The frame
+   * carries its own build of the component library, as a classic script it ran
+   * once at load, so a rebuilt bundle reaches a tab that is already open
+   * exactly never: the sandbox around it hot-reloads and the preview inside it
+   * keeps running whatever it started with, which reads as a component fix that
+   * did not work.
+   *
+   * Nothing needs to be resent by the caller. Clearing `ready` and reassigning
+   * `src` puts this back in the state it was in before the first load, and the
+   * new document announces itself the same way the first one did.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `frame`: The iframe.
+   */
+  "helix-sandbox-preview": Partial<
+    HelixSandboxPreviewProps &
+      HelixSandboxPreviewSolidJsProps &
+      BaseProps<HelixSandboxPreview> &
+      BaseEvents
+  >;
+
+  /**
+   * Coordination is by event, the same way the accordion does it: a source pane
+   * dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+   * whatever preview is slotted into it. Neither child knows the other exists, so
+   * either can be replaced or used alone.
+   *
+   * The event carries the pane's `name`, which is what lets one sandbox hold
+   * several panes without the root identifying senders by reference. `html` is
+   * the preview's markup and `css` is its stylesheet. A pane named anything else
+   * is showing something rather than driving it, and is ignored: the sandbox has
+   * a pane rendering the example as JSX, and guessing would have put the text of
+   * a React component into the preview.
+   *
+   * **The dividers are two nested `helix-splitter`s, not a grid this element
+   * drags itself.** It had its own: a five row grid, a stylesheet written to on
+   * every pointer move, three pointer handlers, a keyboard handler reading which
+   * axes each divider was allowed to move, and a corner placed by hand into the
+   * cell where two tracks met. All of it is the splitter's now, including the
+   * corner, which arrives on its own wherever a nested splitter crosses the one it
+   * is in.
+   *
+   * The panes are the inner splitter and the panel is the outer one, which is the
+   * order that makes the panel span the full width: the outer divider runs edge to
+   * edge and the inner stops at it.
+   *
+   * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
+   * A splitter that owned its own position would leave this element reporting one
+   * arrangement and showing another, and a consumer restoring a saved layout
+   * writes to these two properties. Each splitter announces where it wants to go
+   * and this answers, which is the same contract a form control has with a
+   * framework.
+   *
+   * **The panel is in pixels here and a percentage in the splitter, and the
+   * conversion belongs here.** A terminal wants a number of lines rather than a
+   * share of the window, so its height should not change when the window does. A
+   * splitter has no business knowing that, so it stays percentage-pure and this
+   * element, which does know what is in the panel, holds the box and converts.
+   * That is also what keeps a stored `panelSize` from a previous visit meaning
+   * what it meant when it was written.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Whether the panes sit side by side or stacked.
+   * - `lead`: Which pane comes first, before the divider.
+   *
+   * A sandbox is read in one of two directions and the two are not a
+   * preference. A workbench is a place to write, so the source leads and the
+   * preview answers it. A reference page is a place to look, so the preview
+   * leads and the source is what a reader opens if they want to know how it was
+   * done. Same component, opposite reading order, and no consumer should have
+   * to slot a preview into a hole named `source` to get it.
+   *
+   * Not reflected, because no rule selects on it: the panes already carry
+   * `data-pane`, which is what the stylesheet reaches for, and swapping the
+   * names below keeps that true whichever way round they sit.
+   *
+   * `split` follows the lead pane rather than the source, so `split="30"` means
+   * the same thing in both directions: thirty percent to whatever comes first.
+   * - `split`: Percentage of the sandbox given to the source pane.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
+   *
+   * Zero closes it outright. A panel whose contents include the control that
+   * reopens it, a row of tabs being the usual one, wants that row left showing,
+   * and only whoever slotted it knows how tall that is.
+   * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when a divider is let go, with the new arrangement.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `source`: The editable source pane. First unless `lead` says otherwise.
+   * - `preview`: The live preview. Second unless `lead` says otherwise.
+   * - `toolbar`: A bar across the top, spanning both panes.
+   * - `panel`: A panel under both panes, usually a terminal.
+   * - `status`: A status bar, spanning both panes at the bottom.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-min-block-size`: Minimum height of the sandbox. (default: `undefined`)
+   * - `--sandbox-grab`: The invisible width of a divider's drag target. (default: `undefined`)
+   * - `--sandbox-separator-color`: Color of the divider. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `body`: The splitter holding the panes above the panel.
+   * - `corner`: The handle where the two dividers cross.
+   * - `pane`: Either pane.
+   * - `panel`: The box holding whatever was slotted as the panel.
+   * - `panes`: The splitter holding the source and preview panes.
+   * - `separator`: Either divider.
+   */
+  "helix-sandbox": Partial<
+    HelixSandboxProps &
+      HelixSandboxSolidJsProps &
+      BaseProps<HelixSandbox> &
+      BaseEvents
+  >;
+
+  /**
+   * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+   * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+   * reader support all come from the platform, and every one of them is
+   * expensive to rebuild and easy to get subtly wrong.
+   *
+   * Tab inserts two spaces rather than leaving the field, because a code pane
+   * that cannot indent is not one. Escape then Tab still moves focus out, which
+   * is the documented escape hatch for exactly this trade.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: The source being edited.
+   * - `name`: Which source this pane holds, echoed in every `SourceChange`.
+   *
+   * `html` and `css` are what the sandbox root routes on; any other name is
+   * passed through untouched for a consumer wiring their own panes.
+   *
+   * Not reflected: nothing selects on it, so it keeps a real default instead.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the source is edited.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sandbox-source-background`: Fill behind the source. (default: `undefined`)
+   * - `--sandbox-source-min-block-size`: Minimum height of the pane. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `source`: The editable region.
+   */
+  "helix-sandbox-source": Partial<
+    HelixSandboxSourceProps &
+      HelixSandboxSourceSolidJsProps &
+      BaseProps<HelixSandboxSource> &
+      BaseEvents
+  >;
+
+  /**
+   * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
+   * on every keystroke and every arrow press, the sandbox hears it and writes the
+   * position here. Nothing about that reaches the consumer's framework, which is
+   * the point. A caret position routed through React state would re-render the
+   * workbench on every cursor move, to update two numbers.
+   *
+   * **Not a live region.** The readout changes on every keystroke, so announcing
+   * it would talk over the reader continuously while they type. It is text they
+   * can navigate to, which is what a status bar is in every editor that has one.
+   *
+   * A readout with nothing to say is not rendered at all rather than rendered
+   * empty, or the bar keeps a gap where a value is not.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `column`: One-based column of the cursor. Absent shows no readout.
+   * - `language`: The language being edited, as a name or one the editor knows.
+   * - `line`: One-based line of the cursor. Absent shows no readout.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start of the bar.
+   * - `end`: Items after the readouts, at the end of the bar.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--status-bar-color`: Color of the bar's text. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `caret`: The line and column readout.
+   * - `language`: The language readout.
+   */
+  "helix-sandbox-status-bar": Partial<
+    HelixSandboxStatusBarProps &
+      HelixSandboxStatusBarSolidJsProps &
+      BaseProps<HelixSandboxStatusBar> &
+      BaseEvents
+  >;
+
+  /**
+   * Fed by the sandbox, which hears `helix-console` from the preview and hands it
+   * here. The preview is a separate document, so what arrives has already crossed
+   * `postMessage`: text, not values.
+   *
+   * **Repeats collapse.** An example with a render loop can write the same
+   * warning hundreds of times, and two hundred identical lines say nothing that
+   * one line and a count does not. Only consecutive repeats collapse, so the
+   * order of what happened survives.
+   *
+   * A `role="log"` rather than a live region by hand. It is the semantic for an
+   * append-only stream, and it means a reader is told about new output without
+   * the whole panel being re-announced each time.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `empty-label`/`emptyLabel`: What to show before anything has been written.
+   * - `label`: Accessible name for the log.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `write(detail: ConsoleDetail) => void`: Adds a line, collapsing it into the one above when they are identical.
+   *
+   * `write` rather than `append`, which every element already has from
+   * `ParentNode` and which takes nodes. Shadowing it would break
+   * `terminal.append(node)` for anyone who reasonably expected the DOM method.
+   * - `clear() => void`: Empties the log.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--terminal-size`: Height of the scrolling region. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `log`: The scrolling region.
+   * - `entry`: One line.
+   * - `level`: The level a line came in at.
+   * - `message`: The text of a line.
+   * - `count`: How many times a repeated line arrived.
+   * - `empty`: Shown while nothing has been written.
+   */
+  "helix-sandbox-terminal": Partial<
+    HelixSandboxTerminalProps &
+      HelixSandboxTerminalSolidJsProps &
+      BaseProps<HelixSandboxTerminal> &
+      BaseEvents
+  >;
+
+  /**
+   * Spans the source pane and the preview together, so what it holds is about the
+   * sandbox rather than about one side of it. The files go at the start and the
+   * menus at the end, which is the arrangement every editor has settled on.
+   *
+   * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
+   * for the whole group, and it is for a set of controls of the same kind. This
+   * holds a tab list, which owns its own arrow-key behavior and would lose it.
+   * Use `helix-toolbar` where the contents really are a row of buttons.
+   *
+   * Both slots are bare, so an unfilled one generates no box and costs no gap.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Items at the start, usually the files.
+   * - `end`: Items at the end, usually menus.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--toolbar-gap`: Space between items. (default: `undefined`)
+   * - `--sandbox-toolbar-size`: The bar's height. Defaults to a large control. (default: `undefined`)
+   */
+  "helix-sandbox-toolbar": Partial<
+    HelixSandboxToolbarProps &
+      HelixSandboxToolbarSolidJsProps &
+      BaseProps<HelixSandboxToolbar> &
+      BaseEvents
+  >;
+
+  /**
    * The trigger wears the same frame as an `Input`, because in a form it stands
    * in a row with them and a control that looks like a button among fields reads
    * as an action rather than an answer.
@@ -22044,19 +23571,44 @@ export type CustomElementsSolidJs = {
    * is drawn by the browser at layout and is right in the server's markup with no
    * script involved. Reordering the steps renumbers them; nothing has to be told.
    *
+   * A step's name is a `helix-button`, so what it looks like under the pointer,
+   * with focus, and when refused are Button's decisions and Button's hooks. There
+   * is no `--steps-hover-color`: `--button-background-color` is that hook, and a
+   * second name for it here would be a second thing to keep in step.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
    * - `label`: Accessible name for the sequence.
    *
    * A list of stages is a landmark a reader arrives at out of order, so it
    * needs a name of its own rather than borrowing the heading above it.
    * - `orientation`: Which way the steps run.
    *
-   * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape with room under a step
-   * for what the stage holds.
+   * Absent is a row, which is what a form header wants, with each name under
+   * its mark: beside them there is a word in the rule's path and the line would
+   * be struck through it. `vertical` stacks them, names beside their marks,
+   * which is the shape with room under a step for what the stage holds.
+   *
+   * Each axis has one arrangement rather than a second property offering both
+   * in both. Of those four combinations three are ones nobody should pick, and
+   * a property whose job is mostly to be left alone is a property that mostly
+   * catches people out.
    * - `appearance`: What each step is marked with.
    *
    * Absent is the state itself: a check where a stage is done, a target where
@@ -22067,23 +23619,30 @@ export type CustomElementsSolidJs = {
    * `numeric` is the older convention and is still the right one where the
    * order is the point, a form that says "step 3 of 5" beside it, or a sequence
    * a reader is told to come back to by number.
-   * - `labels`: Where a step's name sits against its marker.
+   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
-   * Absent is under the marker, which is the shape a row of stages wants: the
-   * rule runs unbroken between the marks and the names hang below it. `beside`
-   * puts the name next to its mark, for a column, where there is no width to
-   * save and a name under its mark would sit in the line's path.
+   * ## Events
    *
-   * On the list rather than on each step, for the reason density is on a region
-   * rather than on each control: a row where one name is beside its marker and
-   * the next is under it is a row nobody meant, and said once it is unwritable
-   * rather than merely discouraged.
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the active step changes.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
    *
    * ## CSS Custom Properties
    *
@@ -22092,7 +23651,6 @@ export type CustomElementsSolidJs = {
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
    * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
    * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
-   * - `--steps-hover-color`: Wash behind a step under the pointer. (default: `undefined`)
    * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
    * - `--steps-current-color`: The mark on the current step. (default: `undefined`)
    */
@@ -22142,7 +23700,7 @@ export type CustomElementsSolidJs = {
    *
    * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is the button.
+   * - `label`: The step's name, which is a `helix-button`.
    * - `description`: The line under it.
    * - `lead`: The half line arriving from the step before.
    * - `trail`: The half line running on to the next.
@@ -24230,6 +25788,24 @@ export type CustomCssProperties = {
   "--radio-card-background-color"?: string;
   /** Edge around one. */
   "--radio-card-border-color"?: string;
+  /** Minimum height of the sandbox. */
+  "--sandbox-min-block-size"?: string;
+  /** The invisible width of a divider's drag target. */
+  "--sandbox-grab"?: string;
+  /** Color of the divider. */
+  "--sandbox-separator-color"?: string;
+  /** Fill behind the source. */
+  "--sandbox-source-background"?: string;
+  /** Minimum height of the pane. */
+  "--sandbox-source-min-block-size"?: string;
+  /** Color of the bar's text. */
+  "--status-bar-color"?: string;
+  /** Height of the scrolling region. */
+  "--terminal-size"?: string;
+  /** Space between items. */
+  "--toolbar-gap"?: string;
+  /** The bar's height. Defaults to a large control. */
+  "--sandbox-toolbar-size"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
@@ -24268,8 +25844,6 @@ export type CustomCssProperties = {
   "--steps-marker-size"?: string;
   /** The rule running through the steps. */
   "--steps-connector-color"?: string;
-  /** Wash behind a step under the pointer. */
-  "--steps-hover-color"?: string;
   /** The mark on a finished step. */
   "--steps-complete-color"?: string;
   /** The mark on the current step. */
@@ -24314,8 +25888,6 @@ export type CustomCssProperties = {
   "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
-  /** Space between controls. */
-  "--toolbar-gap"?: string;
   /** Fill of the bubble. */
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */

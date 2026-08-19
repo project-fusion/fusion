@@ -64,6 +64,18 @@ export interface HelixMetadata {
   /** URL of the component's documentation page. */
   documentation?: string
 
+  /**
+   * The family's examples, from the `.examples` folder beside its source.
+   *
+   * The list and the prose, not the markup: the HTML and CSS stay on disk for
+   * the sandbox to load, because they are large and every consumer of this
+   * manifest would parse them whether or not it renders one.
+   *
+   * Only on the root declaration. An example belongs to the family rather than
+   * to any one element in it.
+   */
+  examples?: { description?: string; slug: string }[]
+
   /** Version the component was introduced in. */
   since?: string
 

@@ -3,19 +3,16 @@
 // The editor is on its own path: it carries CodeMirror, and the site's
 // element registration runs on every page.
 import '@helix-io/sandbox/editor'
-import {
-  type HelixSandbox,
-  type HelixSandboxPreview,
-  type HelixSandboxTerminal,
-  htmlToJsx,
-  jsxToHtml,
-} from '@helix-io/sandbox'
+import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
   HelixDialog,
   HelixDrawer,
   HelixInput,
   HelixMenu,
+  HelixSandbox,
+  HelixSandboxPreview,
+  HelixSandboxTerminal,
   HelixSplitter,
   HelixTabs,
   HelixToggleGroup,
