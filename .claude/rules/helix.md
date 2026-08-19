@@ -159,11 +159,41 @@ Two things follow for the component:
 `Avatar` had this before it was written down: its default slot falls back to
 the initials derived from `name`. `Tooltip` follows it.
 
+**`::slotted()` never matches fallback content, so a component styles its own.**
+The selector matches *assigned* nodes, and fallback is not assigned: it belongs
+to the shadow tree that wrote it. So a base class styling `::slotted(svg)` for
+the icon a consumer passes reaches nothing when a subclass draws that icon
+itself.
+
+Measured on `CopyButton`, which extends `IconButton` and supplies a clipboard
+and a check as slot fallbacks: both glyphs rendered, both inherited the right
+colour, and both came out 0x0, because the only rule sizing an icon was
+`IconButton`'s `::slotted()` one. A correctly sized, correctly coloured button
+containing nothing.
+
+This is the same class of failure as `:host(:has())` above and as a `[part=]`
+selector for a part nothing renders: valid CSS, matches nothing, no error and no
+warning. The fix is a rule in the component's own sheet using the same token the
+slotted path resolves to, so an icon a consumer passes and one the component
+draws come out identical.
+
 **Reflect only what CSS selects on.** Reflection exists so a selector can reach a
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare
 `target rel` pair into every button ever rendered. `appearance`, `size`,
 `disabled`, and `orientation` reflect; the rest do not.
+
+**And a reflected property takes no default.** The two together are what write
+onto every host: `Tree.chevronPlacement` reflected and defaulted to `'start'`,
+so the server's markup carried `chevron-placement="start"` for every tree
+anybody rendered, including the ones nobody had configured. Declare it optional
+and let the resting arrangement be the attribute's absence, which is what
+`orientation` already does. The stylesheet then only asks about the departure:
+`:host([chevron-placement="end"])` and nothing for the other case.
+
+`tree-root.ssr.spec.ts` caught it, asserting that the host carries only what the
+consumer wrote. That assertion is worth having on any component whose host takes
+attributes, because it fails on a property added years after it was written.
 
 ### State never reflects, and native is where that comes from
 
@@ -355,10 +385,21 @@ moved nothing, and finding that cost an afternoon.
 
 So the split:
 
-- **`helix/styles` holds helpers**, keyed on `data-`: `data-button`, `data-text`,
-  `data-navigation-item`, `data-prose`. A recipe pairing a helper with the
-  component (`[data-button], helix-button`) is one decision written for two
-  surfaces and is fine.
+- **`helix/styles` holds helpers**, keyed on `data-`: `data-button`, `data-link`,
+  `data-text`, `data-navigation-item`, `data-prose`. A recipe pairing a helper
+  with the component (`[data-button], helix-button`) is one decision written for
+  two surfaces and is fine.
+
+  **A helper needs its base case, not only its variants.** `[data-link]` had
+  none: `data-link="subtle"` and `"quiet"` were written as departures from the
+  prose anchor rule, and that rule is scoped to `[data-prose]`, so a plain
+  `data-link` outside prose selected nothing and the anchor fell through to the
+  browser's default underlined blue. Every non-prose anchor on the site, and
+  invisible for months precisely because the variants existed and worked. The
+  bare attribute now joins `:where([data-prose] a)` in the same rule: the prose
+  half stays at zero specificity so a consumer's class beats it, the attribute
+  half is `0-1-0` so it beats the element reset, and the variants are the same
+  weight and follow in source order, which is what lets them keep winning.
 - **A component holds its own styling**, including the light-DOM content it
   slots. If the base layer also names that content, the component cannot.
 - **Prose theming is opt-in behind `[data-prose]`.** The base layer still resets
@@ -413,6 +454,21 @@ never edit one.
   class is what the analyzer reads.
 - **Plugins are objects, not factories.** The analyzer's `Config` type says
   otherwise and is wrong; passing factories fails silently.
+- **The manifest records paths, never URLs.** `helix-source` derives a family's
+  source directory from its module path, the way `helix-composition` derives the
+  group and the part from the same string, so it cannot disagree with where the
+  file is and it survives a move. What it stores is
+  `helix/web/src/accordion`; the site composes
+  `{repository}/tree/{ref}/{path}`.
+
+  **The split is about versioning and is worth keeping even before it matters.**
+  Documentation will be versioned and a reader will choose the version, so the
+  ref belongs to whoever renders the link. A URL baked into the manifest makes
+  every archived page point at today's source, which is the one thing a
+  versioned reference must not do. What is durable is where a directory sits in
+  the repository; what is not is which commit anyone wants to read.
+  `site/ui/lib/source.ts` is the only file a version selector has to touch.
+
 - **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
   own copy and two copies produce types `exactOptionalPropertyTypes` will not
   unify.
@@ -584,6 +640,23 @@ wrappers drift from the element API the first time someone adds a property.
 - **Namespaces mean composition, never variation.** `Card.Root` contains
   `Card.Header`. An icon-only button is not a part of Button, so `IconButton` is
   top-level. Variants are props; alternatives are separate components.
+
+  `Code` and `CodeBlock` are the same call. One flows with a sentence and must
+  never scroll; the other is a figure with its own box, its own overflow, a name
+  and something to copy. `Code.Block` would say the second is part of the first,
+  and it is not.
+
+  **`CodeBlock` holds no parser, and that is the interesting half.** Syntax
+  highlighting is `@helix-io/sandbox/highlight`, a Lezer parse and a tree walk
+  with no editor mounted and no DOM required, so it runs during a build and a
+  static page ships coloured markup with no JavaScript spent on it. Those
+  grammars are already in that package for the editor, so nothing new is
+  installed; putting them in `helix/web` would put CodeMirror in every
+  consumer's `dependencies`, which is about 4 MB paid at install time whatever
+  anyone imports. `CodeBlock` renders a `<slot>`, so highlighted markup drops
+  straight in and the component stays free of it. A snippet on a reference page
+  and the same snippet in the sandbox are then coloured by one grammar rather
+  than two that agree by coincidence.
 - **A group is a part when it is the control, and a family when it arranges
   them.** The test is whether the group reports a form value.
 
