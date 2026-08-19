@@ -158,3 +158,61 @@
   block-size: 100%;
   inline-size: 100%;
 }
+
+/* The pulse: no arc, and the middle carries the motion on its own.
+ *
+ * The turning rim is the one thing this component was named for, and it is
+ * wrong around a wordmark: a logo with something orbiting it reads as chrome
+ * bolted to the brand rather than as the brand waiting. Take the arc away and
+ * what is left is already the shape, because the ring and the mark have been
+ * breathing under the turn since the day the turn was written. This appearance
+ * is those two, uncovered.
+ *
+ * The ring takes the mark's amplitude rather than its own. Its shallow swell was
+ * tuned to sit under a moving arc, where it only had to keep the middle from
+ * being dead; with nothing over it, 0.12 to 0.24 is a circle that appears not to
+ * move. And it has to carry the whole thing on its own whenever nothing is
+ * slotted, which is the case every consumer gets before they add their logo. */
+:host([appearance="pulse"]) [part="indicator"] {
+  display: none;
+}
+
+:host([appearance="pulse"]) [part="svg"] {
+  animation: none;
+}
+
+:host([appearance="pulse"]) [part="track"] {
+  animation: helix-loader-pulse-ring 2.4s ease-in-out infinite;
+  /* Stated, because the resting value is the one the shallow swell used and a
+     ring that is the only mark on screen cannot be a twelfth of an opacity. */
+  opacity: 0.45;
+}
+
+@keyframes helix-loader-pulse-ring {
+  0%,
+  100% {
+    opacity: 0.45;
+    scale: 0.94;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* And here reduced motion can stop entirely, where the turn cannot.
+ *
+ * The rule above slows the arc to a crawl instead of halting it, because a
+ * spinner frozen mid-turn reads as a page that has hung. A ring and a mark
+ * sitting still read as a ring and a mark: there is no arrested movement to
+ * misread, so the honest answer to "do not move things" is not to. The `busy`
+ * state is on the host through `ElementInternals` and is what actually
+ * announces the wait, so nothing is lost by going still. */
+@media (prefers-reduced-motion: reduce) {
+  :host([appearance="pulse"]) [part="track"] {
+    animation: none;
+    opacity: 0.45;
+    scale: 1;
+  }
+}

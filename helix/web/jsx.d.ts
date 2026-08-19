@@ -5107,6 +5107,20 @@ fire at all. */
 };
 
 export type HelixLoaderProps = {
+  /** How the waiting is drawn.
+
+Unset is the turning arc, which is what most waits want and what this
+component was called for years.
+
+`pulse` takes the arc away and lets the middle carry the motion on its own:
+the ring stays as the quiet outline and swells, and whatever is slotted
+swells with it, in step. It is the shape for a wait that has a mark to
+show, a splash or a first paint behind a wordmark, where a rotating rim
+around a logo reads as chrome bolted to the brand.
+
+That the component can now be drawn without anything spinning is why it is
+no longer called Spinner: the old name described one appearance of two. */
+  appearance?: HelixLoader["appearance"];
   /** Diameter relative to the surrounding text. */
   size?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
@@ -5114,6 +5128,20 @@ export type HelixLoaderProps = {
 };
 
 export type HelixLoaderSolidJsProps = {
+  /** How the waiting is drawn.
+
+Unset is the turning arc, which is what most waits want and what this
+component was called for years.
+
+`pulse` takes the arc away and lets the middle carry the motion on its own:
+the ring stays as the quiet outline and swells, and whatever is slotted
+swells with it, in step. It is the shape for a wait that has a mark to
+show, a splash or a first paint behind a wordmark, where a rotating rim
+around a logo reads as chrome bolted to the brand.
+
+That the component can now be drawn without anything spinning is why it is
+no longer called Spinner: the old name described one appearance of two. */
+  "prop:appearance"?: HelixLoader["appearance"];
   /** Diameter relative to the surrounding text. */
   "prop:size"?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
@@ -12917,6 +12945,19 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the waiting is drawn.
+   *
+   * Unset is the turning arc, which is what most waits want and what this
+   * component was called for years.
+   *
+   * `pulse` takes the arc away and lets the middle carry the motion on its own:
+   * the ring stays as the quiet outline and swells, and whatever is slotted
+   * swells with it, in step. It is the shape for a wait that has a mark to
+   * show, a splash or a first paint behind a wordmark, where a rotating rim
+   * around a logo reads as chrome bolted to the brand.
+   *
+   * That the component can now be drawn without anything spinning is why it is
+   * no longer called Spinner: the old name described one appearance of two.
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    *
@@ -20040,6 +20081,19 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: How the waiting is drawn.
+   *
+   * Unset is the turning arc, which is what most waits want and what this
+   * component was called for years.
+   *
+   * `pulse` takes the arc away and lets the middle carry the motion on its own:
+   * the ring stays as the quiet outline and swells, and whatever is slotted
+   * swells with it, in step. It is the shape for a wait that has a mark to
+   * show, a splash or a first paint behind a wordmark, where a rotating rim
+   * around a logo reads as chrome bolted to the brand.
+   *
+   * That the component can now be drawn without anything spinning is why it is
+   * no longer called Spinner: the old name described one appearance of two.
    * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    *

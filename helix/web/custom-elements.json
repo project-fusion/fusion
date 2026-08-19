@@ -25224,6 +25224,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'pulse' | undefined"
+              },
+              "description": "How the waiting is drawn.\n\nUnset is the turning arc, which is what most waits want and what this\ncomponent was called for years.\n\n`pulse` takes the arc away and lets the middle carry the motion on its own:\nthe ring stays as the quiet outline and swells, and whatever is slotted\nswells with it, in step. It is the shape for a wait that has a mark to\nshow, a splash or a first paint behind a wordmark, where a rotating rim\naround a logo reads as chrome bolted to the brand.\n\nThat the component can now be drawn without anything spinning is why it is\nno longer called Spinner: the old name described one appearance of two.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "size",
               "type": {
                 "text": "'sm' | 'md' | 'lg' | undefined"
@@ -25317,6 +25327,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'pulse' | undefined"
+              },
+              "description": "How the waiting is drawn.\n\nUnset is the turning arc, which is what most waits want and what this\ncomponent was called for years.\n\n`pulse` takes the arc away and lets the middle carry the motion on its own:\nthe ring stays as the quiet outline and swells, and whatever is slotted\nswells with it, in step. It is the shape for a wait that has a mark to\nshow, a splash or a first paint behind a wordmark, where a rotating rim\naround a logo reads as chrome bolted to the brand.\n\nThat the component can now be drawn without anything spinning is why it is\nno longer called Spinner: the old name described one appearance of two.",
+              "fieldName": "appearance"
+            },
             {
               "name": "size",
               "type": {

@@ -2381,6 +2381,7 @@ to say so.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'pulse' \| undefined` | - | - | How the waiting is drawn. |
 | `label` | `label` | `string` | `'Loading'` | `HelixBaseLoader` | Accessible name, announced while the work is outstanding. |
 | `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
 
