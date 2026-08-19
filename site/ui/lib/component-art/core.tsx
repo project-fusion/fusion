@@ -98,9 +98,13 @@ export const coreArt: Record<string, ReactNode> = {
     <>
       <circle className="artSunken" cx="160" cy="100" r="28" />
       <circle className="artPage" cx="180" cy="80" r="12" />
-      {/* No motion class. A badge's mark is not a state it toggles into, it is
-          what the component *is*, so it is simply always there. */}
-      <circle className="artSolid" cx="180" cy="80" r="8" />
+      {/* The mark presses. It carried no motion class on the argument that a
+          badge's mark is not a state it toggles into, which was right about the
+          old `artMark`: that one faded up from nothing, and a mark appearing is
+          exactly the claim a badge should not make. `artMark` is a press now,
+          from full size back to full size, so it says "this one" without ever
+          saying "this just arrived". */}
+      <circle className="artSolid artMotion artMark" cx="180" cy="80" r="8" />
     </>
   ),
 
@@ -183,8 +187,10 @@ export const coreArt: Record<string, ReactNode> = {
   /** Two keys at their real height, with the depth on the inside. */
   kbd: (
     <>
+      {/* Both caps press together, because a chord is struck rather than typed.
+          `artMark` carries no stagger, which is what makes it the right one. */}
       {[128, 168].map((x) => (
-        <g key={x}>
+        <g className="artMotion artMark" key={x}>
           <rect className="artSunken" height="24" rx="4" width="24" x={x} y="88" />
           <rect className="artEdge" height="23" rx="4" width="23" x={x + 0.5} y="88.5" />
           <rect className="artRule" height="2" rx="1" width="22" x={x + 1} y="108" />
@@ -226,8 +232,23 @@ export const coreArt: Record<string, ReactNode> = {
           <stop offset="0.5" stopColor="var(--helix-color-foreground)" stopOpacity="0.14" />
           <stop offset="1" stopColor="var(--helix-color-foreground)" stopOpacity="0" />
         </linearGradient>
+        {/* The three shapes again, written out, rather than a `use` pointed at
+            the group above.
+         *
+         * That is what it was, and it is why this card had no sweep at all. A
+         * `clipPath` may hold shapes, `text` and `use`, but the `use` has to
+         * reference a *basic shape*: pointed at a `<g>` it contributes no
+         * geometry, so the clip is empty, and an empty clip does not mean "do
+         * not clip", it means clip everything. The band was traversing the card
+         * on schedule the whole time with every pixel of it discarded.
+         *
+         * Nothing warns. The markup is well formed, the id resolves, the
+         * element exists, and the only symptom is that a thing you cannot see
+         * is not there. */}
         <clipPath id="helixArtSkeletonClip">
-          <use href="#helixArtSkeleton" />
+          <circle cx="80" cy="100" r="20" />
+          <rect height="14" rx="7" width="64" x="116" y="86" />
+          <rect height="14" rx="7" width="112" x="116" y="108" />
         </clipPath>
       </defs>
       <use className="artInk" fillOpacity="0.12" href="#helixArtSkeleton" />

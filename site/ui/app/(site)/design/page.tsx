@@ -42,7 +42,7 @@ export default function Page() {
           { label: 'examples', value: examples },
         ].map((stat) => (
           <helix-flex direction="column" key={stat.label}>
-            <helix-text as="h2" appearance="heading">
+            <helix-text appearance="heading" as="h2">
               {stat.value}
             </helix-text>
             <helix-text appearance="caption" tone="subtle">
@@ -52,11 +52,11 @@ export default function Page() {
         ))}
       </helix-flex>
 
-      <helix-flex direction="column" gap="lg">
-        <helix-text as="h2" appearance="subheading">
+      <helix-flex className="componentsSection" direction="column" gap="lg">
+        <helix-text appearance="subheading" as="h2">
           Components
         </helix-text>
-        <helix-grid gap="md" min="17rem">
+        <helix-grid className="familyGrid" columns={3} gap="2xl">
           {families.map((family) => (
             <Link
               aria-label={family.label}
@@ -68,7 +68,7 @@ export default function Page() {
               <helix-card appearance="outlined">
                 <ComponentArt slug={family.slug} />
                 <helix-flex align="center" gap="sm" justify="between" slot="header">
-                  <helix-text as="h3" appearance="title">
+                  <helix-text appearance="title" as="h3">
                     {family.label}
                   </helix-text>
                   {/* A mark rather than a word. Every component in this list is

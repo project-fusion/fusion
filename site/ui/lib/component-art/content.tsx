@@ -18,9 +18,22 @@ import type { CSSProperties, ReactNode } from 'react'
  * Spinner is drawn at `spinner-lg` rather than `md`, because at `md` its eight
  * marks would be under two pixels each.
  *
- * Most of this group is `static`: Divider, Text, Quote, Blockquote, Flex, Grid,
- * Icon and Stat do not move, because the components do not. That is the largest
- * bucket in the motion system and it is the point of having one.
+ * **Most of this group declares no archetype, and still moves.** Avatar,
+ * Blockquote, Flex, Grid, Icon, Quote, Stat and Text have no runtime behaviour
+ * to replay: a type scale is not climbed one line at a time. Each of them briefly carried an
+ * `artRow` anyway, and a stagger that means nothing is worse than no stagger,
+ * because it teaches a reader that the stagger means nothing.
+ *
+ * They take the baseline in `site.css` instead, which is selected with `:has()`
+ * rather than opted into: a drawing that declares no archetype gets it, and one
+ * that declares an archetype does not. So the way to say "this component does
+ * nothing at runtime" is to write no motion at all, which is also the way to
+ * say nothing, and the two cannot drift apart.
+ *
+ * Callout, Divider, Empty, List, Progress, Skeleton, Spinner and Splitter do
+ * have something of their own. Divider is the one that moved off the baseline
+ * after the fact: it has a single dimension worth animating, and the baseline
+ * was scaling the whole drawing instead of the rule that is its subject.
  */
 export const contentArt: Record<string, ReactNode> = {
   /**
@@ -81,9 +94,41 @@ export const contentArt: Record<string, ReactNode> = {
    */
   divider: (
     <>
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="160" x="48" y="84" />
-      <rect className="artRule" height="1" width="224" x="48" y="100" />
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="176" x="48" y="108" />
+      {/* Centred, all three. They were flush left at 48 while the rule ran 48 to
+          272, so the one element already centred was the only one that looked
+          wrong: two lines hanging left under a rule reaching further right than
+          either of them. Each is centred on 160 now, and the only ragged thing
+          left is the line lengths, which is what a line length is for. */}
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="160" x="80" y="84" />
+      {/* The rule draws itself out, from the middle, and 224 is where it ends
+          rather than where it starts.
+       *
+       * At rest it is 176, which is exactly the width of the longer line below
+       * it: the rule spans its content and no further. Hovered it reaches 224,
+       * running 48 to 272, which is the full measure every other drawing in the
+       * gallery is built out to. So the gesture is the rule going from "as wide
+       * as what it divides" to "as wide as the frame allows", and both ends of
+       * it are a number that already meant something rather than a percentage
+       * picked to be visible.
+       *
+       * `artFill` rather than the baseline swell, because a divider has exactly
+       * one dimension worth moving and the baseline was scaling the whole
+       * drawing, the two lines included. Those hold still now: the rule is the
+       * component and the lines are only there to be divided.
+       *
+       * `transform-origin` overridden to `center`. `artFill` pivots at `left
+       * center`, which is right for a value growing out of a track's start and
+       * wrong for a rule that has no start: off a fixed left end it would
+       * extend rightward, which is a progress bar. */}
+      <rect
+        className="artRule artMotion artFill"
+        height="1"
+        style={{ '--art-grow': 224 / 176, transformOrigin: 'center' } as CSSProperties}
+        width="176"
+        x="72"
+        y="100"
+      />
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="176" x="72" y="108" />
     </>
   ),
 
@@ -292,8 +337,31 @@ export const contentArt: Record<string, ReactNode> = {
    */
   splitter: (
     <>
-      <rect className="artSunken" height="96" rx="4" width="104" x="48" y="52" />
-      <rect className="artSunken" height="96" rx="4" width="112" x="160" y="52" />
+      {/* All three move, because a divider that slides across two panes which
+          stay put is not a splitter, it is a line on top of a picture of one.
+          The panes are what the drag is *for*.
+       *
+       * The numbers are one number. The divider travels 24, so the left pane
+       * has to end 24 wider (128 over 104, a scale of 1.231 from its left edge)
+       * and the right 24 narrower (88 over 112, 0.786 from its right edge).
+       * Each pane keeps its outer edge nailed down and gives way at the seam,
+       * which is what `transform-origin` is doing on both.
+       *
+       * `artFill` takes a scale under one, which it had never been asked for
+       * before: the sustain interpolates the delta rather than the scale, so a
+       * value below one shrinks toward the hold exactly as one above it grows. */}
+      <g
+        className="artMotion artFill"
+        style={{ '--art-grow': 1.231, transformOrigin: 'left center' } as CSSProperties}
+      >
+        <rect className="artSunken" height="96" rx="4" width="104" x="48" y="52" />
+      </g>
+      <g
+        className="artMotion artFill"
+        style={{ '--art-grow': 0.786, transformOrigin: 'right center' } as CSSProperties}
+      >
+        <rect className="artSunken" height="96" rx="4" width="112" x="160" y="52" />
+      </g>
       <rect
         className="artSolid artMotion artTravel"
         height="96"

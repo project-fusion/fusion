@@ -68,14 +68,14 @@ export const overlaysArt: Record<string, ReactNode> = {
    * this height, holding a mark, some nav and an action", and the page under it
    * was the biggest thing in the frame while contributing none of that.
    *
-   * **Static, and it is the only card in the set that has to be.** Everything
-   * else here either performs its own interaction on hover or is a component
-   * that genuinely does not move. A masthead is neither: it moves nothing, but
-   * the controls in it obviously do, so it invites a token gesture. It had one,
-   * the trailing action lifting on hover, and a header whose button floats off
-   * the bar is a picture of a bug. The note that used to sit over that lift
-   * already said chrome that animates is wrong; it just did not follow it far
-   * enough. A page can scroll under this bar and nothing in the frame moves.
+   * **The bar is static and its contents are not**, which is a narrower claim
+   * than the one that used to be here. That claim was that the whole card had
+   * to hold still, and it came from the right instinct answered too broadly:
+   * the thing that must not move is the masthead, because a header that drifts
+   * on its own page is a picture of a bug. It had exactly that once, the
+   * trailing action lifting off the bar. What a mark, two links and an action
+   * do instead is arrive in the order they are laid out in, which says nothing
+   * about the bar going anywhere.
    */
   'app-header': (
     <>
@@ -88,13 +88,22 @@ export const overlaysArt: Record<string, ReactNode> = {
 
           `artRule` rather than `artEdge` because it is a rule. Rules in this
           gallery are filled rects at one unit, so they never half-render at a
-          fractional scale the way a stroke does. */}
+          fractional scale the way a stroke does.
+
+          Neither the bar nor the rule carries a motion class. Only what the bar
+          holds does. */}
       <rect className="artSurface" height="56" width="232" x="44" y="72" />
       <rect className="artRule" height="1" width="232" x="44" y="128" />
-      <rect className="artSolid" height="20" rx="4" width="20" x="60" y="90" />
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="32" x="96" y="96" />
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="28" x="140" y="96" />
-      <rect className="artRaised" height="20" rx="4" width="44" x="212" y="90" />
+      <g className="artMotion artRow" style={{ '--art-i': 0 } as CSSProperties}>
+        <rect className="artSolid" height="20" rx="4" width="20" x="60" y="90" />
+      </g>
+      <g className="artMotion artRow" style={{ '--art-i': 1 } as CSSProperties}>
+        <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="32" x="96" y="96" />
+        <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="28" x="140" y="96" />
+      </g>
+      <g className="artMotion artRow" style={{ '--art-i': 2 } as CSSProperties}>
+        <rect className="artRaised" height="20" rx="4" width="44" x="212" y="90" />
+      </g>
     </>
   ),
 
@@ -470,14 +479,30 @@ export const overlaysArt: Record<string, ReactNode> = {
     <>
       <rect className="artSunken" height="24" rx="4" width="24" x="100" y="112" />
       <rect className="artEdge" height="23" rx="4" width="23" x="100.5" y="112.5" />
+      {/* It scales up out of the target and carries no arrow.
+       *
+       * The arrow was a tail pointing at the square below, which is a thing
+       * the component can draw and is not what makes a tooltip legible here:
+       * at card size it read as a notch in the panel's underside. What says
+       * "this belongs to that" is the scale origin. Growing from `center
+       * bottom`, directly above the target, is the same gesture the real
+       * component performs, and it needs no second mark to explain it.
+       *
+       * Shift zeroed, scale raised. The shared swell drifts five units down,
+       * which on a panel anchored to something reads as it coming loose. */}
       <g
         className="artMotion artOpen"
-        style={{ transformOrigin: 'center bottom' } as CSSProperties}
+        style={
+          {
+            '--art-swell-scale': 1.08,
+            '--art-swell-shift': '0px',
+            transformOrigin: 'center bottom',
+          } as CSSProperties
+        }
       >
         <g filter="url(#helixArtShadow)">
           <rect className="artInverse" height="32" rx="4" width="128" x="96" y="52" />
         </g>
-        <path className="artInverse" d="M104 84h16l-8 8z" />
         <rect className="artOnInverse" height="8" rx="4" width="80" x="112" y="64" />
       </g>
     </>
