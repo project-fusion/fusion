@@ -22,6 +22,7 @@ import type {
   HelixBaseColorInput,
   HelixBaseColorPicker,
   HelixBaseCombobox,
+  HelixBaseCommand,
   HelixBaseCopyButton,
   HelixBaseDateInput,
   HelixBaseDatePicker,
@@ -2168,6 +2169,141 @@ fire at all. */
   "on:helix-open"?: (e: HelixBaseComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixBaseComboboxHelixCloseElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseCommand` component event */
+export type HelixBaseCommandElementEvent<E = Event> = TypedEvent<
+  HelixBaseCommand,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseCommandHelixSelectElementEvent =
+  HelixBaseCommandElementEvent<HelixSelectEvent>;
+/** `helix-open` event type */
+export type HelixBaseCommandHelixOpenElementEvent =
+  HelixBaseCommandElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseCommandHelixCloseElementEvent =
+  HelixBaseCommandElementEvent<HelixCloseEvent>;
+
+export type HelixBaseCommandProps = {
+  /** Accessible name for the overlay, which has no visible heading. */
+  label?: HelixBaseCommand["label"];
+  /** Shown in the field before anything is typed. */
+  placeholder?: HelixBaseCommand["placeholder"];
+  /** Words shown where the filter has matched nothing. */
+  "empty-text"?: HelixBaseCommand["emptyText"];
+  /** Words shown where the filter has matched nothing. */
+  emptyText?: HelixBaseCommand["emptyText"];
+  /** The key that opens it, as `mod+k` or `shift+p` or plain `k`.
+
+Empty turns it off, for a consumer who opens the palette from a button or
+from their own shortcut handler. There is no list of defaults to fight
+with: one key, said once. */
+  hotkey?: HelixBaseCommand["hotkey"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseCommand["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseCommand["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseCommand["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseCommand["onOpenChange"];
+
+  /** Fired when a command is chosen. */
+  "onhelix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
+  /** Fired when the palette opens. */
+  "onhelix-open"?: (e: HelixBaseCommandHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixBaseCommandHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseCommandSolidJsProps = {
+  /** Accessible name for the overlay, which has no visible heading. */
+  "prop:label"?: HelixBaseCommand["label"];
+  /** Shown in the field before anything is typed. */
+  "prop:placeholder"?: HelixBaseCommand["placeholder"];
+  /** Words shown where the filter has matched nothing. */
+  "attr:empty-text"?: HelixBaseCommand["emptyText"];
+  /** Words shown where the filter has matched nothing. */
+  "prop:emptyText"?: HelixBaseCommand["emptyText"];
+  /** The key that opens it, as `mod+k` or `shift+p` or plain `k`.
+
+Empty turns it off, for a consumer who opens the palette from a button or
+from their own shortcut handler. There is no list of defaults to fight
+with: one key, said once. */
+  "prop:hotkey"?: HelixBaseCommand["hotkey"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseCommand["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseCommand["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseCommand["defaultOpen"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseCommand["onOpenChange"];
+  /** Fired when a command is chosen. */
+  "on:helix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
+  /** Fired when the palette opens. */
+  "on:helix-open"?: (e: HelixBaseCommandHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixBaseCommandHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10981,6 +11117,116 @@ export type CustomElements = {
   >;
 
   /**
+   * **The list is `helix-listbox`, filtering and all.** Listbox already owns
+   * narrowing, the empty state, the highlight over what matched,
+   * `aria-activedescendant`, scrolling an option into view and the keyboard that
+   * moves between them. Its own note says a command palette is that list again
+   * with something different opening it, and this is that something: a dialog,
+   * and a key that summons it.
+   *
+   * **The value is not kept.** A palette runs a command and forgets it: nothing
+   * here is a form control and nothing is submitted, so what it reports is that
+   * an option was chosen, once, with `helix-select`. A consumer that wants the
+   * last command remembered is a consumer with somewhere better to keep it.
+   *
+   * **The hotkey is global and the element does not have to be open to hear it.**
+   * The listener is on the document, because the point of a palette is that it
+   * answers from wherever the reader is, including from inside another control's
+   * text field. `mod` is Command on a Mac and Control elsewhere, resolved here so
+   * a consumer writes one thing.
+   *
+   * The filter is emptied as the palette closes, for the reason Combobox and
+   * Select both record: a control reopened still narrowed by the last visit's
+   * search is one whose second use starts from the first one's leftovers, and a
+   * palette is used far more often than either.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the overlay, which has no visible heading.
+   * - `placeholder`: Shown in the field before anything is typed.
+   * - `empty-text`/`emptyText`: Words shown where the filter has matched nothing.
+   * - `hotkey`: The key that opens it, as `mod+k` or `shift+p` or plain `k`.
+   *
+   * Empty turns it off, for a consumer who opens the palette from a button or
+   * from their own shortcut handler. There is no list of defaults to fight
+   * with: one key, said once.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a command is chosen.
+   * - `helix-open`: Fired when the palette opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The commands, which are `helix-option` elements and their groups.
+   * - `footer`: Under the list, for the keys a reader can press.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The overlay's own box, forwarded from the dialog.
+   * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of commands, forwarded from the listbox.
+   * - `empty`: What shows where the filter has hidden everything.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
+   * - `footer`: The row under the list.
+   */
+  "helix-base-command": Partial<
+    HelixBaseCommandProps & BaseProps<HelixBaseCommand> & BaseEvents
+  >;
+
+  /**
    * **The confirmation is the component.** Writing to the clipboard is three
    * lines; what makes this worth an element is that the platform gives a reader
    * no feedback at all. A press that copies and looks identical to a press that
@@ -18775,6 +19021,119 @@ export type CustomElementsSolidJs = {
     HelixBaseComboboxProps &
       HelixBaseComboboxSolidJsProps &
       BaseProps<HelixBaseCombobox> &
+      BaseEvents
+  >;
+
+  /**
+   * **The list is `helix-listbox`, filtering and all.** Listbox already owns
+   * narrowing, the empty state, the highlight over what matched,
+   * `aria-activedescendant`, scrolling an option into view and the keyboard that
+   * moves between them. Its own note says a command palette is that list again
+   * with something different opening it, and this is that something: a dialog,
+   * and a key that summons it.
+   *
+   * **The value is not kept.** A palette runs a command and forgets it: nothing
+   * here is a form control and nothing is submitted, so what it reports is that
+   * an option was chosen, once, with `helix-select`. A consumer that wants the
+   * last command remembered is a consumer with somewhere better to keep it.
+   *
+   * **The hotkey is global and the element does not have to be open to hear it.**
+   * The listener is on the document, because the point of a palette is that it
+   * answers from wherever the reader is, including from inside another control's
+   * text field. `mod` is Command on a Mac and Control elsewhere, resolved here so
+   * a consumer writes one thing.
+   *
+   * The filter is emptied as the palette closes, for the reason Combobox and
+   * Select both record: a control reopened still narrowed by the last visit's
+   * search is one whose second use starts from the first one's leftovers, and a
+   * palette is used far more often than either.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the overlay, which has no visible heading.
+   * - `placeholder`: Shown in the field before anything is typed.
+   * - `empty-text`/`emptyText`: Words shown where the filter has matched nothing.
+   * - `hotkey`: The key that opens it, as `mod+k` or `shift+p` or plain `k`.
+   *
+   * Empty turns it off, for a consumer who opens the palette from a button or
+   * from their own shortcut handler. There is no list of defaults to fight
+   * with: one key, said once.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when a command is chosen.
+   * - `helix-open`: Fired when the palette opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The commands, which are `helix-option` elements and their groups.
+   * - `footer`: Under the list, for the keys a reader can press.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `dialog`: The overlay's own box, forwarded from the dialog.
+   * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of commands, forwarded from the listbox.
+   * - `empty`: What shows where the filter has hidden everything.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
+   * - `footer`: The row under the list.
+   */
+  "helix-base-command": Partial<
+    HelixBaseCommandProps &
+      HelixBaseCommandSolidJsProps &
+      BaseProps<HelixBaseCommand> &
       BaseEvents
   >;
 

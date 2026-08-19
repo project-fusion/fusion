@@ -1,0 +1,70 @@
+/* The palette itself, which is the dialog's own box.
+ *
+ * `::part()` and not `[part="dialog"]`. The part is forwarded out of this
+ * element for a consumer to reach, and forwarding goes outward only: from in
+ * here the box still lives in the dialog's shadow root, and a plain attribute
+ * selector matches nothing. Measured by writing one and watching the panel stay
+ * centred.
+ *
+ * Against the top of the window rather than centred, which is where every
+ * palette a reader has used opens. A centred one moves: the list grows and
+ * shrinks as the filter narrows it, and a box centred on the viewport walks up
+ * and down the screen under the words being typed, taking the field with it.
+ * Pinned at the top, only the bottom edge moves and the field stays still. */
+helix-dialog::part(dialog) {
+  align-self: start;
+  inline-size: min(var(--command-size, 40rem), calc(100vw - var(--helix-space-xl) * 2));
+  margin-block-start: 12vh;
+  padding: var(--helix-space-none);
+}
+
+/* The list fills the panel, which is already the surface: a second border and a
+   second fill inside one would draw the shape twice. This one is in this
+   element's own shadow root, so it is selected the ordinary way. */
+[part="listbox"] {
+  --listbox-background-color: transparent;
+
+  border: none;
+  display: block;
+}
+
+/* Tall enough to be worth scanning and short enough to stay a panel. A palette
+   grown to the window is a page, and a reader looking for one command in nine
+   does not want the field to leave the top of the screen to reach it. */
+helix-listbox::part(items) {
+  /* And no fill of its own. The host's hook is transparent already, but the
+     scrolling box paints `surface` underneath it, so the panel came out in two
+     shades a hair apart: white at the field and the footer, near-white across
+     the commands. One panel, one surface. */
+  background-color: transparent;
+  border: none;
+  max-block-size: var(--command-list-size, 22rem);
+}
+
+/* The field reads as the top of the panel rather than as a control inside it:
+   the palette is a search, so its search is the first thing, edge to edge, with
+   one rule under it holding the results apart. */
+helix-listbox::part(search) {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  padding: var(--helix-space-sm);
+}
+
+helix-listbox::part(search-field) {
+  font-size: var(--helix-text-md);
+}
+
+/* The keys a reader can press, under the list. Quiet, because it is a legend
+   for the thing above it rather than part of the answer. */
+[part="footer"] {
+  align-items: center;
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+}
+
+[part="footer"][hidden] {
+  display: none;
+}

@@ -1224,6 +1224,73 @@ Input, Color Input and Date Input all take.
 | `--combobox-control-size` | Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. |
 | `--combobox-panel-size` | Width of the panel. Follows the field by default. |
 
+## Command
+
+### Root — `helix-command`
+
+A list of commands, opened from anywhere and filtered by typing.
+
+Extends `HelixBaseCommand`.
+
+The palette is a dialog holding a filterable listbox, so what this tier adds
+is where that dialog sits and how the list reads inside it. It opens against
+the top of the window rather than centred, which is where every palette a
+reader has used opens: a list that grows and shrinks as it is filtered would
+otherwise walk up and down the screen under the words being typed.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `emptyText` | `empty-text` | `string` | `'No commands'` | `HelixBaseCommand` | Words shown where the filter has matched nothing. |
+| `hotkey` | `hotkey` | `string` | `'mod+k'` | `HelixBaseCommand` | The key that opens it, as `mod+k` or `shift+p` or plain `k`. |
+| `label` | `label` | `string` | `'Commands'` | `HelixBaseCommand` | Accessible name for the overlay, which has no visible heading. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'Search commands'` | `HelixBaseCommand` | Shown in the field before anything is typed. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when a command is chosen. |
+| `helix-open` | `HelixOpenEvent` | Fired when the palette opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The commands, which are `helix-option` elements and their groups. |
+| `footer` | Under the list, for the keys a reader can press. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `dialog` | The overlay's own box, forwarded from the dialog. |
+| `listbox` | The list inside it. |
+| `items` | The scrolling box of commands, forwarded from the listbox. |
+| `empty` | What shows where the filter has hidden everything. |
+| `search` | The region holding the field that narrows the list. |
+| `search-field` | The field itself. |
+| `footer` | The row under the list. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--command-size` | How wide the palette is. Defaults to `40rem`. |
+| `--command-list-size` | How tall the list grows before it scrolls. |
+
 ## Copy Button
 
 ### Root — `helix-copy-button`
@@ -5243,17 +5310,21 @@ the row itself stays flat.
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `focusable` | - | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item holds the tree's single tab stop. |
+| `href` | `href` | `string` | `''` | `HelixBaseTreeItem` | Where this node goes, which makes its row a real link. |
 | `isBranch` | - | `boolean` | - | `HelixBaseTreeItem` | Whether this node has children. |
 | `level` | `level` | `number \| undefined` | - | `HelixBaseTreeItem` | Depth from the root, set by the tree so indentation needs no CSS nesting. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `rel` | `rel` | `string` | `''` | `HelixBaseTreeItem` | What the link declares about where it goes. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseTreeItem` | Whether this item is the current one. |
+| `target` | `target` | `string` | `''` | `HelixBaseTreeItem` | Where the link opens, for the rare row that leaves the site. |
 | `value` | `value` | `string` | `''` | `HelixBaseTreeItem` | Identifies the item to the consumer, carried in `helix-select`. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
+| `activate()` | `HelixBaseTreeItem` | Chooses this node the way a reader does, from a press or from Enter. |
 | `focusItem()` | `HelixBaseTreeItem` | Moves focus to this node. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
 | `select()` | `HelixBaseTreeItem` | Selects this node and announces it. |

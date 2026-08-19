@@ -50,8 +50,20 @@ const HIGHLIGHT = 'helix-filter-match'
  * styles, which is not a choice either: a highlight is styled from the tree its
  * text lives in, and that text lives in the consumer's document.
  */
+/**
+ * Whether this environment can paint a highlight at all.
+ *
+ * Asked before the ranges are built rather than after. Walking every shown
+ * option's text nodes to hand the result to an API that is not there is work
+ * with no output, and it is not free: a server, a test environment and an older
+ * browser all take that path, and the DOM implementations they use are not the
+ * one this was measured against.
+ */
+const paintable = (): boolean =>
+  typeof CSS !== 'undefined' && 'highlights' in CSS && typeof Highlight !== 'undefined'
+
 const paintMatches = (): void => {
-  if (typeof CSS === 'undefined' || !('highlights' in CSS) || typeof Highlight === 'undefined') {
+  if (!paintable()) {
     return
   }
   const all = [...matched.values()].flat()
@@ -531,7 +543,7 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
 
     /* And the marks, from the same needle that did the hiding: the two answers
        have to come from one place or a list can show a match it does not mark. */
-    if (needle === '') {
+    if (needle === '' || !paintable()) {
       matched.delete(this)
     } else {
       matched.set(
