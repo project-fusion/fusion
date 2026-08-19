@@ -2654,6 +2654,14 @@
         },
         {
           "kind": "js",
+          "name": "holdCaret",
+          "declaration": {
+            "name": "holdCaret",
+            "module": "./utils/restore-value/restore-value.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "restoreValue",
           "declaration": {
             "name": "restoreValue",
@@ -4841,6 +4849,24 @@
       "declarations": [
         {
           "kind": "function",
+          "name": "holdCaret",
+          "return": {
+            "type": {
+              "text": "(() => void)"
+            }
+          },
+          "parameters": [
+            {
+              "name": "control",
+              "type": {
+                "text": "TextControl"
+              }
+            }
+          ],
+          "description": "Holds the caret across a write the element does not make itself.\n\n**Lit's `.value` binding moves the caret to the end, and only a controlled\nfield notices.** Measured in Chrome with real typing: place the caret after\n`Ada` in `Ada Lovelace` and press one key, and an uncontrolled field reports\n`AdaX Lovelace` with the caret at 4, while a controlled one reports the same\ntext with the caret at 13. Editing the middle of a controlled field was\nimpossible: every keystroke threw the caret to the end.\n\nThe asymmetry is the interesting part. Uncontrolled, `handleInput` runs\n`restoreValue` after the state has moved, so the control already holds the\nnew text and the call returns early; when Lit's binding then assigns the same\nstring, Chrome leaves the selection alone. Controlled, the control has been\nput *back* to the old text while the consumer decides, so Lit assigns a\ngenuinely different string and the platform resets the selection, as it does\nfor any assignment to `value`.\n\nSo the selection is taken before the update and put back after it, mapped by\nhowever much the text grew or shrank, which is the same arithmetic\n`restoreValue` does in one step. Returned as a closure rather than a pair of\nfields so the two halves cannot be called out of order.\n\nThe binding itself has to stay: it is what Lit SSR serializes, and a field\nthat filled in at hydration would flash empty for every reader on a slow\nconnection."
+        },
+        {
+          "kind": "function",
           "name": "restoreValue",
           "return": {
             "type": {
@@ -4860,11 +4886,18 @@
                 "text": "string"
               }
             }
-          ],
-          "description": "Puts a value back into a text control without moving the reader's caret.\n\nA controlled input has to restore what the element holds whenever the native\ncontrol has moved and the answer has not followed, which is a refusal or a\nconsumer who owns the value and has not answered yet. Assigning `value` is\nhow that is done, and per spec assigning a *different* string moves the text\nentry cursor to the end. Measured: caret at index three in `abcdef`, assign\n`abcXdef`, caret at seven. Assigning the same string leaves it alone, which\nis why this was invisible until a consumer was slow.\n\nSo a React consumer holding the value in state, which commits after the\nevent, put the caret at the end of the field after every single keystroke.\nTyping in the middle of a word was impossible, and the class JSDoc claimed\nthe caret was the platform's business.\n\nThe offset is adjusted by the length difference rather than clamped, because\nthe common case is exactly one character wide: the reader typed, the element\nrestored the shorter previous string, and the caret belongs one place back.\nClamping alone would leave it one to the right of where the reader was, which\nis the same bug at a smaller size.\n\nNothing is restored when the value already matches, since the assignment\nitself is what moves the caret and there is nothing to assign."
+          ]
         }
       ],
       "exports": [
+        {
+          "kind": "js",
+          "name": "holdCaret",
+          "declaration": {
+            "name": "holdCaret",
+            "module": "src/utils/restore-value/restore-value.ts"
+          }
+        },
         {
           "kind": "js",
           "name": "restoreValue",

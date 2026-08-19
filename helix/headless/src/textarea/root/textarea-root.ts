@@ -1,6 +1,7 @@
 import {
   customElement,
   HelixFormElement,
+  holdCaret,
   MixinControllerValue,
   MixinField,
   restoreValue,
@@ -181,8 +182,33 @@ export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixForm
     }
   }
 
+  /**
+   * The caret, held across a value the consumer wrote rather than the reader.
+   *
+   * Set in `willUpdate` and spent in `updated`, because Lit's `.value` binding
+   * lands between the two and takes the selection with it. See `holdCaret`.
+   */
+  private releaseCaret: (() => void) | undefined
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* Never before the first update, which is the one the server does: there is
+       no render root to query there, and `querySelector` is not merely empty on
+       Lit's element shim, it is undefined. There is also no caret to keep before
+       anything has rendered. */
+    if (!this.hasUpdated) {
+      return
+    }
+    const control = this.control
+    if (changed.has('value') && control && this.shadowRoot?.activeElement === control) {
+      this.releaseCaret = holdCaret(control)
+    }
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.releaseCaret?.()
+    this.releaseCaret = undefined
     this.sync()
     this.grow()
   }

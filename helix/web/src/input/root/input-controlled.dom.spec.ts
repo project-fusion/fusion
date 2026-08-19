@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -15,11 +15,16 @@ type Input = HTMLElement & {
 const input = async (extra = ''): Promise<Input> =>
   (await mount(`<helix-input label="Name" ${extra}></helix-input>`)) as Input
 
+/** The real input inside, which is where a caret lives. */
+const control = (host: Input): HTMLInputElement =>
+  host.shadowRoot?.querySelector<HTMLInputElement>('[part="control"]') as HTMLInputElement
+
 /**
  * Runs a body with `console.warn` captured, and answers what it said.
  *
- * The audit is deferred by a task on purpose, so this waits one out. A test
- * that checked synchronously would pass on a warning that never arrives.
+ * The audit fires while a request is being made, so nothing here has to wait.
+ * The tick is kept because a handler answering later is part of what these
+ * assert.
  */
 const warnings = async (body: () => void | Promise<void>): Promise<string[]> => {
   const said: string[] = []
@@ -32,6 +37,47 @@ const warnings = async (body: () => void | Promise<void>): Promise<string[]> => 
     console.warn = real
   }
   return said
+}
+
+/* Browser only, and that is the finding rather than a caveat. Written first as
+   an ordinary DOM spec, it passed with the fix disabled: happy-dom does not
+   reproduce what the platform does when `value` is assigned, which is to reset
+   the selection, so the assertion held either way and guarded nothing. Under
+   `hasLayout()` it runs in real Chromium through `bun run specs:browser`, where
+   it fails without the fix. */
+if (hasLayout()) {
+  describe('a controlled field keeps the caret where the reader put it', () => {
+    /* Measured in Chrome with real typing before this was fixed: place the caret
+     after `Ada` in `Ada Lovelace`, press one key, and an uncontrolled field
+     reported `AdaX Lovelace` with the caret at 4 while a controlled one
+     reported the same text with the caret at 13. Editing the middle of a
+     controlled field was impossible.
+
+     The asymmetry is why it survived. Uncontrolled, the control already holds
+     the new text by the time Lit's `.value` binding runs, and Chrome leaves the
+     selection alone when the string is unchanged. Controlled, the control has
+     been put back to the old text while the consumer decides, so the binding
+     assigns something different and the platform resets the selection. */
+    test('a value the consumer wrote does not send the caret to the end', async () => {
+      const host = await input('value="Ada Lovelace"')
+      host.addEventListener('helix-input', (event) => {
+        host.value = (event as CustomEvent<{ value: string }>).detail.value
+      })
+      const field = control(host)
+      field.focus()
+      field.setSelectionRange(3, 3)
+
+      // What the browser does with a keystroke: the control takes the character
+      // itself, and the element hears about it afterwards.
+      field.value = 'AdaX Lovelace'
+      field.setSelectionRange(4, 4)
+      field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      await host.updateComplete
+
+      expect(host.value).toBe('AdaX Lovelace')
+      expect(field.selectionStart).toBe(4)
+    })
+  })
 }
 
 describe('a control that is controlled and unattended says so', () => {

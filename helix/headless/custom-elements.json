@@ -17460,6 +17460,15 @@
             },
             {
               "kind": "field",
+              "name": "releaseCaret",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "description": "The caret, held across a value the consumer wrote rather than the reader.\n\nSet in `willUpdate` and spent in `updated`, because Lit's `.value` binding\nlands between the two and takes the selection with it. See `holdCaret`."
+            },
+            {
+              "kind": "field",
               "name": "pattern",
               "type": {
                 "text": "string"
@@ -22545,6 +22554,15 @@
               "type": {
                 "text": "select() => void"
               }
+            },
+            {
+              "kind": "field",
+              "name": "releaseCaret",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "description": "The caret, held across a value the consumer wrote rather than the reader.\n\nSet in `willUpdate` and spent in `updated`, because Lit's `.value` binding\nlands between the two and takes the selection with it. See `holdCaret`."
             },
             {
               "kind": "field",
@@ -36320,6 +36338,15 @@
                 }
               },
               "description": "Reports the value and the validity the host stands behind."
+            },
+            {
+              "kind": "field",
+              "name": "releaseCaret",
+              "type": {
+                "text": "(() => void) | undefined"
+              },
+              "privacy": "private",
+              "description": "The caret, held across a value the consumer wrote rather than the reader.\n\nSet in `willUpdate` and spent in `updated`, because Lit's `.value` binding\nlands between the two and takes the selection with it. See `holdCaret`."
             },
             {
               "kind": "field",
