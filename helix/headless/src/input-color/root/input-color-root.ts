@@ -9,18 +9,18 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-/* Side-effect import, because this renders `<helix-color>` in its own shadow
+/* Side-effect import, because this renders `<helix-color-picker>` in its own shadow
    root and a custom element registers on import. The public tag rather than the
    base one: a consumer on the styled tier gets the styled picker, and one on the
    headless tier brings a picker of their own under that name. */
-import '../../color/index.js'
-import { type ColorFormat, parseColor, toCss } from '../../color/color.js'
+import '../../color-picker/index.js'
+import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js'
 
 /**
  * @summary A colour, typed in any syntax or picked from a panel.
  *
  * @description
- * **The picker is `helix-color`, not a second one written here.** It owns the
+ * **The picker is `helix-color-picker`, not a second one written here.** It owns the
  * square, the ramps, the eyedropper and the syntax toggle, and it is worth
  * having on its own: a settings pane wants a picker flat on the page with
  * nothing to open. This element is the field, the overlay, and the form.
@@ -42,7 +42,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color/color.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases ColorPicker, ColorField, ColourInput
+ * @aliases ColorField, ColorInput, ColourInput
  * @documentation https://helix.fusion.dev/components/input-color
  *
  * @slot trigger - The mark on the field saying a panel opens.
@@ -185,7 +185,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
    * The picker is about to take the pointer over, so the panel gets out of the
    * way and comes back after.
    *
-   * `helix-color` says what it is doing rather than reaching for a panel it
+   * `helix-color-picker` says what it is doing rather than reaching for a panel it
    * cannot know it is in. A floating panel left up during an eyedropper is one
    * the reader cannot dismiss and may well be trying to sample from underneath.
    */
@@ -289,7 +289,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
   /*
    * The picker is told `no-value` because the field above it is that input.
    *
-   * Standing on a page, helix-color states its own colour as text: a square and
+   * Standing on a page, helix-color-picker states its own colour as text: a square and
    * two ramps can build one and cannot state one, and a reader who already has a
    * hex should not have to find it by dragging. Here that row would be a second
    * editable field for the same value, which is two places to type with no
@@ -340,7 +340,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
       </div>
 
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-color
+        <helix-color-picker
           part="picker"
           ?alpha=${this.alpha}
           ?no-format=${this.noFormat}
@@ -352,7 +352,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
           @helix-change=${this.handlePickerChange}
           @helix-sample-start=${this.handleSampleStart}
           @helix-sample-end=${this.handleSampleEnd}
-        ></helix-color>
+        ></helix-color-picker>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

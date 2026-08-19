@@ -6287,7 +6287,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/color.ts",
+      "path": "src/color-picker/color.ts",
       "declarations": [
         {
           "kind": "function",
@@ -6398,7 +6398,7 @@
           "name": "toRgb",
           "declaration": {
             "name": "toRgb",
-            "module": "src/color/color.ts"
+            "module": "src/color-picker/color.ts"
           }
         },
         {
@@ -6406,7 +6406,7 @@
           "name": "splitColors",
           "declaration": {
             "name": "splitColors",
-            "module": "src/color/color.ts"
+            "module": "src/color-picker/color.ts"
           }
         },
         {
@@ -6414,7 +6414,7 @@
           "name": "parseColor",
           "declaration": {
             "name": "parseColor",
-            "module": "src/color/color.ts"
+            "module": "src/color-picker/color.ts"
           }
         },
         {
@@ -6422,7 +6422,7 @@
           "name": "formatColor",
           "declaration": {
             "name": "formatColor",
-            "module": "src/color/color.ts"
+            "module": "src/color-picker/color.ts"
           }
         },
         {
@@ -6430,14 +6430,14 @@
           "name": "toCss",
           "declaration": {
             "name": "toCss",
-            "module": "src/color/color.ts"
+            "module": "src/color-picker/color.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/index.ts",
+      "path": "src/color-picker/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -6445,7 +6445,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/color/color.js"
+            "module": "src/color-picker/color.js"
           }
         },
         {
@@ -6453,19 +6453,19 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/color/root/color-root.js"
+            "module": "src/color-picker/root/color-picker-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/root/color-root.ts",
+      "path": "src/color-picker/root/color-picker-root.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "**The picker itself, with no field around it.** Input Color is this element in\na panel behind a text field, the same way Input Date is `helix-calendar` in a\npanel: a form wants a field, and a settings pane or a toolbar wants the picker\nsitting flat on the page with nothing to open. Neither should be the other one\nwith parts hidden.\n\n**The square is two real range inputs.** Saturation and brightness are each an\n`<input type=\"range\">`, laid over the square and made invisible, and the\nhandle is drawn from their values. The pointer gets the square; the keyboard\ngets the arrow keys, Home, End and the page keys; a screen reader gets two\nsliders that announce a name and a number. All of it is the platform's, and\nnothing here implements a key handler. There is no `role=\"application\"`, which\nis the usual way this control is built and amounts to asking a screen reader\nto stop helping.\n\n**The working model is HSB, and the value is derived from it.** The reverse\nloses colours: black is `brightness: 0`, whose hue and saturation are both\nundefined, so a reader who drags to the bottom of the square and back would\nget grey where they had red. Holding the model means a colour survives a trip\nthrough one that has no hue. A value arriving from outside is read into the\nmodel once, which is the only moment the conversion runs in that direction.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all\ncolours. Named colours are the exception, and deliberately: resolving\n`rebeccapurple` means shipping a table of a hundred and forty or asking the\nbrowser, and there is no browser during a server render.",
-          "name": "HelixBaseColor",
+          "name": "HelixBaseColorPicker",
           "cssParts": [
             {
               "description": "The saturation and brightness square.",
@@ -7248,37 +7248,37 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/color",
+            "documentation": "https://helix.fusion.dev/components/color-picker",
             "aliases": [
-              "ColorPicker",
+              "Color",
               "ColorArea",
               "Swatch picker"
             ],
             "tier": "headless",
-            "group": "BaseColor",
+            "group": "BaseColorPicker",
             "part": "Root"
           },
-          "tagName": "helix-base-color",
+          "tagName": "helix-base-color-picker",
           "customElement": true,
-          "modulePath": "src/color/root/color-root.ts",
-          "definitionPath": "src/color/root/color-root.ts"
+          "modulePath": "src/color-picker/root/color-picker-root.ts",
+          "definitionPath": "src/color-picker/root/color-picker-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixBaseColor",
+          "name": "HelixBaseColorPicker",
           "declaration": {
-            "name": "HelixBaseColor",
-            "module": "src/color/root/color-root.ts"
+            "name": "HelixBaseColorPicker",
+            "module": "src/color-picker/root/color-picker-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-color",
+          "name": "helix-base-color-picker",
           "declaration": {
-            "name": "HelixBaseColor",
-            "module": "src/color/root/color-root.ts"
+            "name": "HelixBaseColorPicker",
+            "module": "src/color-picker/root/color-picker-root.ts"
           }
         }
       ]
@@ -9987,7 +9987,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/color/index.js"
+            "module": "src/color-picker/index.js"
           }
         },
         {
@@ -10299,7 +10299,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/time/index.js"
+            "module": "src/time-picker/index.js"
           }
         },
         {
@@ -10365,7 +10365,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The picker is `helix-color`, not a second one written here.** It owns the\nsquare, the ramps, the eyedropper and the syntax toggle, and it is worth\nhaving on its own: a settings pane wants a picker flat on the page with\nnothing to open. This element is the field, the overlay, and the form.\nExactly the arrangement Input Date has with `helix-calendar`.\n\n**Typed as well as picked, and the typing is the reason this is not\n`<input type=\"color\">`.** The native control gives a free picker and takes\nnearly all styling with it, which is a fair trade until a product needs the\npanel to match everything around it. What is kept from the native one is the\npart worth keeping: a real text field, so a reader who has the hex pastes it\nand never opens anything.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)` and\n`hsl(0 100% 50%)` are all colours, and a field that refuses one because it\nprefers another is arguing with the person using it. What the field *shows* is\nthe value itself, for the reason Input Date gives about its dates: half-typed\ninput does not survive a round trip through a formatter.",
+          "description": "**The picker is `helix-color-picker`, not a second one written here.** It owns the\nsquare, the ramps, the eyedropper and the syntax toggle, and it is worth\nhaving on its own: a settings pane wants a picker flat on the page with\nnothing to open. This element is the field, the overlay, and the form.\nExactly the arrangement Input Date has with `helix-calendar`.\n\n**Typed as well as picked, and the typing is the reason this is not\n`<input type=\"color\">`.** The native control gives a free picker and takes\nnearly all styling with it, which is a fair trade until a product needs the\npanel to match everything around it. What is kept from the native one is the\npart worth keeping: a real text field, so a reader who has the hex pastes it\nand never opens anything.\n\n**Every syntax is read; the one `format` names is written.** `#f00`,\n`#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)` and\n`hsl(0 100% 50%)` are all colours, and a field that refuses one because it\nprefers another is arguing with the person using it. What the field *shows* is\nthe value itself, for the reason Input Date gives about its dates: half-typed\ninput does not survive a round trip through a formatter.",
           "name": "HelixBaseInputColor",
           "cssParts": [
             {
@@ -10555,7 +10555,7 @@
               "name": "handleSampleStart",
               "privacy": "private",
               "readonly": true,
-              "description": "The picker is about to take the pointer over, so the panel gets out of the\nway and comes back after.\n\n`helix-color` says what it is doing rather than reaching for a panel it\ncannot know it is in. A floating panel left up during an eyedropper is one\nthe reader cannot dismiss and may well be trying to sample from underneath."
+              "description": "The picker is about to take the pointer over, so the panel gets out of the\nway and comes back after.\n\n`helix-color-picker` says what it is doing rather than reaching for a panel it\ncannot know it is in. A floating panel left up during an eyedropper is one\nthe reader cannot dismiss and may well be trying to sample from underneath."
             },
             {
               "kind": "field",
@@ -11570,8 +11570,8 @@
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/input-color",
             "aliases": [
-              "ColorPicker",
               "ColorField",
+              "ColorInput",
               "ColourInput"
             ],
             "tier": "headless",
@@ -16192,7 +16192,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The list is `helix-time`, not a second one written here.** It is worth\nhaving on its own, flat in a settings pane with nothing to open, and this\nelement is the field, the overlay and the form. Exactly the arrangement Input\nDate has with `helix-calendar` and Input Color with `helix-color`.\n\n**Typed as well as picked, and that is the division the list depends on.** A\nlist at a step offers the times a product actually has, and the field is how a\nreader says `09:07`. Neither is a worse version of the other: without the\nfield a step is a cage, and without the list every common time is typed out.\n\n**The value is `HH:mm` on a twenty-four hour clock, always**, because that is\nwhat a form submits, what `min` and `max` compare against, and what sorts as a\nstring. What the field *shows* is the reader's own convention while it is\nidle, and the value itself once the caret is in it: the same separation Input\nDate draws, and for the same reason, which is that `2:30 PM` cannot be typed\nback and `Intl` has no parser to make it so.",
+          "description": "**The list is `helix-time-picker`, not a second one written here.** It is worth\nhaving on its own, flat in a settings pane with nothing to open, and this\nelement is the field, the overlay and the form. Exactly the arrangement Input\nDate has with `helix-calendar` and Input Color with `helix-color-picker`.\n\n**Typed as well as picked, and that is the division the list depends on.** A\nlist at a step offers the times a product actually has, and the field is how a\nreader says `09:07`. Neither is a worse version of the other: without the\nfield a step is a cage, and without the list every common time is typed out.\n\n**The value is `HH:mm` on a twenty-four hour clock, always**, because that is\nwhat a form submits, what `min` and `max` compare against, and what sorts as a\nstring. What the field *shows* is the reader's own convention while it is\nidle, and the value itself once the caret is in it: the same separation Input\nDate draws, and for the same reason, which is that `2:30 PM` cannot be typed\nback and `Intl` has no parser to make it so.",
           "name": "HelixBaseInputTime",
           "cssParts": [
             {
@@ -16246,7 +16246,7 @@
                 "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -16256,7 +16256,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time-picker` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "attribute": "mode",
               "reflects": true
             },
@@ -17303,7 +17303,7 @@
                 "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
               "fieldName": "appearance"
             },
             {
@@ -17311,7 +17311,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time-picker` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "fieldName": "mode"
             },
             {
@@ -17539,7 +17539,6 @@
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/input-time",
             "aliases": [
-              "TimePicker",
               "TimeField",
               "TimeInput"
             ],
@@ -33437,7 +33436,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/time/index.ts",
+      "path": "src/time-picker/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -33445,14 +33444,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/time/root/time-root.js"
+            "module": "src/time-picker/root/time-picker-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/time/root/time-root.ts",
+      "path": "src/time-picker/root/time-picker-root.ts",
       "declarations": [
         {
           "kind": "function",
@@ -33536,7 +33535,7 @@
         {
           "kind": "class",
           "description": "**A list rather than three wheels**, and the reason is what a list already\nis. `helix-listbox` brings the keyboard, the typeahead, the scroll into view\nand the announcement of a set of options, and a time at a step is a set of\noptions. Three little wheels for hours, minutes and a meridiem are three\ncontrols to build, three to test, and a tab stop each for something a reader\nanswers once.\n\n**A step is what makes it a list at all.** Fifteen minutes is ninety-six rows,\nwhich a reader scrolls or types into; one minute is one thousand four hundred\nand forty, which is a listbox in name only. So the list is for the times a\nproduct actually offers, and arbitrary times are the field's job in Input\nTime, the same division Input Date draws between typing a date and using the\ncalendar.\n\n**The value is `HH:mm` on a twenty-four hour clock, always.** That is what a\nform submits and what `min` and `max` compare against, and it sorts as a\nstring, which is the whole reason the shape is that one. What each row *says*\nis the reader's own convention, from `Intl`.",
-          "name": "HelixBaseTime",
+          "name": "HelixBaseTimePicker",
           "cssParts": [
             {
               "description": "The listbox holding the times, in `list`.",
@@ -34376,19 +34375,19 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/time",
+            "documentation": "https://helix.fusion.dev/components/time-picker",
             "aliases": [
-              "TimePicker",
+              "Time",
               "TimeList"
             ],
             "tier": "headless",
-            "group": "BaseTime",
+            "group": "BaseTimePicker",
             "part": "Root"
           },
-          "tagName": "helix-base-time",
+          "tagName": "helix-base-time-picker",
           "customElement": true,
-          "modulePath": "src/time/root/time-root.ts",
-          "definitionPath": "src/time/root/time-root.ts"
+          "modulePath": "src/time-picker/root/time-picker-root.ts",
+          "definitionPath": "src/time-picker/root/time-picker-root.ts"
         }
       ],
       "exports": [
@@ -34397,7 +34396,7 @@
           "name": "isTime",
           "declaration": {
             "name": "isTime",
-            "module": "src/time/root/time-root.ts"
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
@@ -34405,7 +34404,7 @@
           "name": "toMinutes",
           "declaration": {
             "name": "toMinutes",
-            "module": "src/time/root/time-root.ts"
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
@@ -34413,7 +34412,7 @@
           "name": "fromMinutes",
           "declaration": {
             "name": "fromMinutes",
-            "module": "src/time/root/time-root.ts"
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
@@ -34421,23 +34420,23 @@
           "name": "writeTime",
           "declaration": {
             "name": "writeTime",
-            "module": "src/time/root/time-root.ts"
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
           "kind": "js",
-          "name": "HelixBaseTime",
+          "name": "HelixBaseTimePicker",
           "declaration": {
-            "name": "HelixBaseTime",
-            "module": "src/time/root/time-root.ts"
+            "name": "HelixBaseTimePicker",
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-base-time",
+          "name": "helix-base-time-picker",
           "declaration": {
-            "name": "HelixBaseTime",
-            "module": "src/time/root/time-root.ts"
+            "name": "HelixBaseTimePicker",
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         }
       ]

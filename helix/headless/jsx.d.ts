@@ -18,7 +18,7 @@ import type {
   HelixBaseCarousel,
   HelixBaseCheckbox,
   HelixBaseCheckboxGroup,
-  HelixBaseColor,
+  HelixBaseColorPicker,
   HelixBaseDialog,
   HelixBaseDivider,
   HelixBaseDrawer,
@@ -70,7 +70,7 @@ import type {
   HelixBaseTabsTab,
   HelixBaseTag,
   HelixBaseTextarea,
-  HelixBaseTime,
+  HelixBaseTimePicker,
   HelixBaseToast,
   HelixBaseToastItem,
   HelixBaseToggle,
@@ -1501,29 +1501,29 @@ instead. */
   textContent?: string | number;
 };
 
-/** `HelixBaseColor` component event */
-export type HelixBaseColorElementEvent<E = Event> = TypedEvent<
-  HelixBaseColor,
+/** `HelixBaseColorPicker` component event */
+export type HelixBaseColorPickerElementEvent<E = Event> = TypedEvent<
+  HelixBaseColorPicker,
   E
 >;
 /** `helix-change` event type */
-export type HelixBaseColorHelixChangeElementEvent =
-  HelixBaseColorElementEvent<HelixChangeEvent>;
+export type HelixBaseColorPickerHelixChangeElementEvent =
+  HelixBaseColorPickerElementEvent<HelixChangeEvent>;
 /** `helix-copy` event type */
-export type HelixBaseColorHelixCopyElementEvent =
-  HelixBaseColorElementEvent<HelixCopyEvent>;
+export type HelixBaseColorPickerHelixCopyElementEvent =
+  HelixBaseColorPickerElementEvent<HelixCopyEvent>;
 
-export type HelixBaseColorProps = {
+export type HelixBaseColorPickerProps = {
   /** Whether the colour carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
-  alpha?: HelixBaseColor["alpha"];
+  alpha?: HelixBaseColorPicker["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  format?: HelixBaseColor["format"];
+  format?: HelixBaseColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the colour as text and lets it be typed or pasted, which is
@@ -1537,7 +1537,7 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Input Color dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "no-value"?: HelixBaseColor["noValue"];
+  "no-value"?: HelixBaseColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the colour as text and lets it be typed or pasted, which is
@@ -1551,21 +1551,21 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Input Color dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  noValue?: HelixBaseColor["noValue"];
+  noValue?: HelixBaseColorPicker["noValue"];
   /** Whether the reader may change the format. */
-  "no-format"?: HelixBaseColor["noFormat"];
+  "no-format"?: HelixBaseColorPicker["noFormat"];
   /** Whether the reader may change the format. */
-  noFormat?: HelixBaseColor["noFormat"];
+  noFormat?: HelixBaseColorPicker["noFormat"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "no-eyedropper"?: HelixBaseColor["noEyedropper"];
+  "no-eyedropper"?: HelixBaseColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
-  noEyedropper?: HelixBaseColor["noEyedropper"];
+  noEyedropper?: HelixBaseColorPicker["noEyedropper"];
   /** Colours offered under the picker, as a comma-separated list. */
-  swatches?: HelixBaseColor["swatches"];
+  swatches?: HelixBaseColorPicker["swatches"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseColor["defaultValue"];
+  "default-value"?: HelixBaseColorPicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseColor["defaultValue"];
+  defaultValue?: HelixBaseColorPicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -1577,7 +1577,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseColor["value"];
+  value?: HelixBaseColorPicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1588,7 +1588,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseColor["disabled"];
+  disabled?: HelixBaseColorPicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1606,32 +1606,32 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseColor["name"];
+  name?: HelixBaseColorPicker["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
 because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
-  onValueChange?: HelixBaseColor["onValueChange"];
+  onValueChange?: HelixBaseColorPicker["onValueChange"];
 
   /** Fired when the colour changes. */
-  "onhelix-change"?: (e: HelixBaseColorHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
   /** Fired when the colour is put on the clipboard. */
-  "onhelix-copy"?: (e: HelixBaseColorHelixCopyElementEvent) => void;
+  "onhelix-copy"?: (e: HelixBaseColorPickerHelixCopyElementEvent) => void;
 };
 
-export type HelixBaseColorSolidJsProps = {
+export type HelixBaseColorPickerSolidJsProps = {
   /** Whether the colour carries an alpha channel.
 
 Off by default, because it widens every value written, and a consumer who
 did not ask for transparency should not have to strip a byte off each one. */
-  "prop:alpha"?: HelixBaseColor["alpha"];
+  "prop:alpha"?: HelixBaseColorPicker["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  "prop:format"?: HelixBaseColor["format"];
+  "prop:format"?: HelixBaseColorPicker["format"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the colour as text and lets it be typed or pasted, which is
@@ -1645,7 +1645,7 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Input Color dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "bool:no-value"?: HelixBaseColor["noValue"];
+  "bool:no-value"?: HelixBaseColorPicker["noValue"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the colour as text and lets it be typed or pasted, which is
@@ -1659,21 +1659,21 @@ answer to which one is authoritative or which has the caret. The other way
 round was considered, Input Color dropping its own field and letting this be
 the only one, and it is worse for a form: the value cannot be read or pasted
 without opening a panel. */
-  "prop:noValue"?: HelixBaseColor["noValue"];
+  "prop:noValue"?: HelixBaseColorPicker["noValue"];
   /** Whether the reader may change the format. */
-  "bool:no-format"?: HelixBaseColor["noFormat"];
+  "bool:no-format"?: HelixBaseColorPicker["noFormat"];
   /** Whether the reader may change the format. */
-  "prop:noFormat"?: HelixBaseColor["noFormat"];
+  "prop:noFormat"?: HelixBaseColorPicker["noFormat"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "bool:no-eyedropper"?: HelixBaseColor["noEyedropper"];
+  "bool:no-eyedropper"?: HelixBaseColorPicker["noEyedropper"];
   /** Whether the eyedropper is offered where the browser has one. */
-  "prop:noEyedropper"?: HelixBaseColor["noEyedropper"];
+  "prop:noEyedropper"?: HelixBaseColorPicker["noEyedropper"];
   /** Colours offered under the picker, as a comma-separated list. */
-  "prop:swatches"?: HelixBaseColor["swatches"];
+  "prop:swatches"?: HelixBaseColorPicker["swatches"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseColor["defaultValue"];
+  "attr:default-value"?: HelixBaseColorPicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseColor["defaultValue"];
+  "prop:defaultValue"?: HelixBaseColorPicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -1685,7 +1685,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseColor["value"];
+  "prop:value"?: HelixBaseColorPicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1696,7 +1696,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseColor["disabled"];
+  "prop:disabled"?: HelixBaseColorPicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -1714,18 +1714,18 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseColor["name"];
+  "prop:name"?: HelixBaseColorPicker["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
 because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
-  "prop:onValueChange"?: HelixBaseColor["onValueChange"];
+  "prop:onValueChange"?: HelixBaseColorPicker["onValueChange"];
   /** Fired when the colour changes. */
-  "on:helix-change"?: (e: HelixBaseColorHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
   /** Fired when the colour is put on the clipboard. */
-  "on:helix-copy"?: (e: HelixBaseColorHelixCopyElementEvent) => void;
+  "on:helix-copy"?: (e: HelixBaseColorPickerHelixCopyElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -3654,13 +3654,13 @@ export type HelixBaseInputTimeProps = {
 `list` offers whole times, which is what a product with slots or opening
 hours has. `wheels` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
-scrolling most of a day. `helix-time` carries the longer note on the trade. */
+scrolling most of a day. `helix-time-picker` carries the longer note on the trade. */
   appearance?: HelixBaseInputTime["appearance"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
-form submits. `helix-time` carries the longer note on the interaction and on
+form submits. `helix-time-picker` carries the longer note on the interaction and on
 why a wheel cannot do either. */
   mode?: HelixBaseInputTime["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
@@ -3812,13 +3812,13 @@ export type HelixBaseInputTimeSolidJsProps = {
 `list` offers whole times, which is what a product with slots or opening
 hours has. `wheels` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
-scrolling most of a day. `helix-time` carries the longer note on the trade. */
+scrolling most of a day. `helix-time-picker` carries the longer note on the trade. */
   "prop:appearance"?: HelixBaseInputTime["appearance"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
-form submits. `helix-time` carries the longer note on the interaction and on
+form submits. `helix-time-picker` carries the longer note on the interaction and on
 why a wheel cannot do either. */
   "prop:mode"?: HelixBaseInputTime["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
@@ -7351,23 +7351,26 @@ fire at all. */
   textContent?: string | number;
 };
 
-/** `HelixBaseTime` component event */
-export type HelixBaseTimeElementEvent<E = Event> = TypedEvent<HelixBaseTime, E>;
+/** `HelixBaseTimePicker` component event */
+export type HelixBaseTimePickerElementEvent<E = Event> = TypedEvent<
+  HelixBaseTimePicker,
+  E
+>;
 /** `helix-change` event type */
-export type HelixBaseTimeHelixChangeElementEvent =
-  HelixBaseTimeElementEvent<HelixChangeEvent>;
+export type HelixBaseTimePickerHelixChangeElementEvent =
+  HelixBaseTimePickerElementEvent<HelixChangeEvent>;
 
-export type HelixBaseTimeProps = {
+export type HelixBaseTimePickerProps = {
   /** How far apart the offered times are, in minutes.
 
 Fifteen, which is four rows an hour and ninety-six in a day: enough that a
 reader scrolls rather than hunts, and few enough that the list is a list.
 Anything under five is a thousand rows and wants a field instead. */
-  step?: HelixBaseTime["step"];
+  step?: HelixBaseTimePicker["step"];
   /** Earliest time offered, as `HH:mm`. */
-  min?: HelixBaseTime["min"];
+  min?: HelixBaseTimePicker["min"];
   /** Latest time offered, as `HH:mm`. */
-  max?: HelixBaseTime["max"];
+  max?: HelixBaseTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Calendar's `disable-dates`, and it exists for the same
@@ -7378,7 +7381,7 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "disable-times"?: HelixBaseTime["disableTimes"];
+  "disable-times"?: HelixBaseTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Calendar's `disable-dates`, and it exists for the same
@@ -7389,11 +7392,11 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  disableTimes?: HelixBaseTime["disableTimes"];
+  disableTimes?: HelixBaseTimePicker["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  locale?: HelixBaseTime["locale"];
+  locale?: HelixBaseTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
-  label?: HelixBaseTime["label"];
+  label?: HelixBaseTimePicker["label"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -7411,7 +7414,7 @@ wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
-  mode?: HelixBaseTime["mode"];
+  mode?: HelixBaseTimePicker["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -7429,11 +7432,11 @@ which is worse than not being offered it.
 
 So: `list` where the set is the point, `wheels` where any time is allowed
 and the range is a whole day. */
-  appearance?: HelixBaseTime["appearance"];
+  appearance?: HelixBaseTimePicker["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixBaseTime["defaultValue"];
+  "default-value"?: HelixBaseTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixBaseTime["defaultValue"];
+  defaultValue?: HelixBaseTimePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7445,7 +7448,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  value?: HelixBaseTime["value"];
+  value?: HelixBaseTimePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7456,7 +7459,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  disabled?: HelixBaseTime["disabled"];
+  disabled?: HelixBaseTimePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7474,30 +7477,30 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  name?: HelixBaseTime["name"];
+  name?: HelixBaseTimePicker["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
 because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
-  onValueChange?: HelixBaseTime["onValueChange"];
+  onValueChange?: HelixBaseTimePicker["onValueChange"];
 
   /** Fired when the time changes. */
-  "onhelix-change"?: (e: HelixBaseTimeHelixChangeElementEvent) => void;
+  "onhelix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
 };
 
-export type HelixBaseTimeSolidJsProps = {
+export type HelixBaseTimePickerSolidJsProps = {
   /** How far apart the offered times are, in minutes.
 
 Fifteen, which is four rows an hour and ninety-six in a day: enough that a
 reader scrolls rather than hunts, and few enough that the list is a list.
 Anything under five is a thousand rows and wants a field instead. */
-  "prop:step"?: HelixBaseTime["step"];
+  "prop:step"?: HelixBaseTimePicker["step"];
   /** Earliest time offered, as `HH:mm`. */
-  "prop:min"?: HelixBaseTime["min"];
+  "prop:min"?: HelixBaseTimePicker["min"];
   /** Latest time offered, as `HH:mm`. */
-  "prop:max"?: HelixBaseTime["max"];
+  "prop:max"?: HelixBaseTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Calendar's `disable-dates`, and it exists for the same
@@ -7508,7 +7511,7 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "attr:disable-times"?: HelixBaseTime["disableTimes"];
+  "attr:disable-times"?: HelixBaseTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Calendar's `disable-dates`, and it exists for the same
@@ -7519,11 +7522,11 @@ already gone is not two bounds.
 A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
-  "prop:disableTimes"?: HelixBaseTime["disableTimes"];
+  "prop:disableTimes"?: HelixBaseTimePicker["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
-  "prop:locale"?: HelixBaseTime["locale"];
+  "prop:locale"?: HelixBaseTimePicker["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
-  "prop:label"?: HelixBaseTime["label"];
+  "prop:label"?: HelixBaseTimePicker["label"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -7541,7 +7544,7 @@ wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
-  "prop:mode"?: HelixBaseTime["mode"];
+  "prop:mode"?: HelixBaseTimePicker["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -7559,11 +7562,11 @@ which is worse than not being offered it.
 
 So: `list` where the set is the point, `wheels` where any time is allowed
 and the range is a whole day. */
-  "prop:appearance"?: HelixBaseTime["appearance"];
+  "prop:appearance"?: HelixBaseTimePicker["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixBaseTime["defaultValue"];
+  "attr:default-value"?: HelixBaseTimePicker["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixBaseTime["defaultValue"];
+  "prop:defaultValue"?: HelixBaseTimePicker["defaultValue"];
   /** What the control holds now, and what its form submits.
 
 One property, not two. Reading gives the real value whichever mode the
@@ -7575,7 +7578,7 @@ means in React: the value is theirs and the control waits to be told.
 
 The same shape as the other three mixins, which is the point of them
 being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixBaseTime["value"];
+  "prop:value"?: HelixBaseTimePicker["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7586,7 +7589,7 @@ The mirror is below and was for a while only a sentence: this paragraph
 described it, four components had their own copies of it, and the class
 itself did nothing. Here is where it belongs, because here is where
 `disabled` is. */
-  "prop:disabled"?: HelixBaseTime["disabled"];
+  "prop:disabled"?: HelixBaseTimePicker["disabled"];
   /** Name submitted with the form.
 
 **Reflected, and it is the exception to "reflect only what CSS selects
@@ -7604,16 +7607,16 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
-  "prop:name"?: HelixBaseTime["name"];
+  "prop:name"?: HelixBaseTimePicker["name"];
   /** The consumer's callback, invoked after the value is applied.
 
 Not an attribute: it is a function. `onValueChange` and not `onChange`,
 because React reserves the latter for its own synthetic system and wires
 it to the native `change`, so a Helix event named `Change` would never
 fire at all. */
-  "prop:onValueChange"?: HelixBaseTime["onValueChange"];
+  "prop:onValueChange"?: HelixBaseTimePicker["onValueChange"];
   /** Fired when the time changes. */
-  "on:helix-change"?: (e: HelixBaseTimeHelixChangeElementEvent) => void;
+  "on:helix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9773,8 +9776,8 @@ export type CustomElements = {
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
-  "helix-base-color": Partial<
-    HelixBaseColorProps & BaseProps<HelixBaseColor> & BaseEvents
+  "helix-base-color-picker": Partial<
+    HelixBaseColorPickerProps & BaseProps<HelixBaseColorPicker> & BaseEvents
   >;
 
   /**
@@ -10368,7 +10371,7 @@ export type CustomElements = {
   >;
 
   /**
-   * **The picker is `helix-color`, not a second one written here.** It owns the
+   * **The picker is `helix-color-picker`, not a second one written here.** It owns the
    * square, the ramps, the eyedropper and the syntax toggle, and it is worth
    * having on its own: a settings pane wants a picker flat on the page with
    * nothing to open. This element is the field, the overlay, and the form.
@@ -11261,10 +11264,10 @@ export type CustomElements = {
   >;
 
   /**
-   * **The list is `helix-time`, not a second one written here.** It is worth
+   * **The list is `helix-time-picker`, not a second one written here.** It is worth
    * having on its own, flat in a settings pane with nothing to open, and this
    * element is the field, the overlay and the form. Exactly the arrangement Input
-   * Date has with `helix-calendar` and Input Color with `helix-color`.
+   * Date has with `helix-calendar` and Input Color with `helix-color-picker`.
    *
    * **Typed as well as picked, and that is the division the list depends on.** A
    * list at a step offers the times a product actually has, and the field is how a
@@ -11287,12 +11290,12 @@ export type CustomElements = {
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
    * - `mode`: How many times can be held at once.
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time` carries the longer note on the interaction and on
+   * form submits. `helix-time-picker` carries the longer note on the interaction and on
    * why a wheel cannot do either.
    * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
    *
@@ -14684,8 +14687,8 @@ export type CustomElements = {
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
    */
-  "helix-base-time": Partial<
-    HelixBaseTimeProps & BaseProps<HelixBaseTime> & BaseEvents
+  "helix-base-time-picker": Partial<
+    HelixBaseTimePickerProps & BaseProps<HelixBaseTimePicker> & BaseEvents
   >;
 
   /**
@@ -16846,10 +16849,10 @@ export type CustomElementsSolidJs = {
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
    */
-  "helix-base-color": Partial<
-    HelixBaseColorProps &
-      HelixBaseColorSolidJsProps &
-      BaseProps<HelixBaseColor> &
+  "helix-base-color-picker": Partial<
+    HelixBaseColorPickerProps &
+      HelixBaseColorPickerSolidJsProps &
+      BaseProps<HelixBaseColorPicker> &
       BaseEvents
   >;
 
@@ -17468,7 +17471,7 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * **The picker is `helix-color`, not a second one written here.** It owns the
+   * **The picker is `helix-color-picker`, not a second one written here.** It owns the
    * square, the ramps, the eyedropper and the syntax toggle, and it is worth
    * having on its own: a settings pane wants a picker flat on the page with
    * nothing to open. This element is the field, the overlay, and the form.
@@ -18376,10 +18379,10 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * **The list is `helix-time`, not a second one written here.** It is worth
+   * **The list is `helix-time-picker`, not a second one written here.** It is worth
    * having on its own, flat in a settings pane with nothing to open, and this
    * element is the field, the overlay and the form. Exactly the arrangement Input
-   * Date has with `helix-calendar` and Input Color with `helix-color`.
+   * Date has with `helix-calendar` and Input Color with `helix-color-picker`.
    *
    * **Typed as well as picked, and that is the division the list depends on.** A
    * list at a step offers the times a product actually has, and the field is how a
@@ -18402,12 +18405,12 @@ export type CustomElementsSolidJs = {
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
    * - `mode`: How many times can be held at once.
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time` carries the longer note on the interaction and on
+   * form submits. `helix-time-picker` carries the longer note on the interaction and on
    * why a wheel cannot do either.
    * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
    *
@@ -21909,10 +21912,10 @@ export type CustomElementsSolidJs = {
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it. Carries `data-between` inside a range.
    */
-  "helix-base-time": Partial<
-    HelixBaseTimeProps &
-      HelixBaseTimeSolidJsProps &
-      BaseProps<HelixBaseTime> &
+  "helix-base-time-picker": Partial<
+    HelixBaseTimePickerProps &
+      HelixBaseTimePickerSolidJsProps &
+      BaseProps<HelixBaseTimePicker> &
       BaseEvents
   >;
 

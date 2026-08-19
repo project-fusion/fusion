@@ -8231,7 +8231,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/index.ts",
+      "path": "src/color-picker/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -8239,14 +8239,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/color/root/color-root.js"
+            "module": "src/color-picker/root/color-picker-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/root/color-root.css.ts",
+      "path": "src/color-picker/root/color-picker-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -8259,39 +8259,39 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/color/root/color-root.css.ts"
+            "module": "src/color-picker/root/color-picker-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/color/root/color-root.ts",
+      "path": "src/color-picker/root/color-picker-root.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "**The square is painted in three layers, not composited from elements**: the\nhue underneath, white sliding in from the left to take the saturation out,\nblack rising from the bottom to take the brightness out. One element, one\ndeclaration, and it repaints as the hue moves because the hue is a custom\nproperty the tier below writes.\n\n**The two range inputs over it are invisible and still there.** Not\n`display: none` and not `visibility: hidden`, either of which would take them\nout of the tab order and out of the accessibility tree, which is the entire\nreason a square built this way is reachable at all. They carry\n`pointer-events: none` so the square answers the pointer itself, and the focus\nring is drawn on the square rather than on them, so it lands where the reader\nis looking.\n\n**Every chip sits on a checkerboard.** A colour with alpha painted on a solid\nbackground is just a different colour, and the one thing a preview owes a\nreader is the difference between \"pale blue\" and \"blue, half transparent\".\n\nNo padding and no surface of its own. Flat on a page it takes the space it is\ngiven, and in Input Color's panel the panel supplies both: a picker that\nbrought its own card would be a card inside a card there.",
-          "name": "HelixColor",
+          "name": "HelixColorPicker",
           "cssProperties": [
             {
               "description": "Inset of the rows under the square, and the bottom.",
-              "name": "--color-inset"
+              "name": "--color-picker-inset"
             },
             {
               "description": "Edge length of the chip that copies the value.",
-              "name": "--color-sample-size"
+              "name": "--color-picker-sample-size"
             },
             {
               "description": "Edge length of one preset.",
-              "name": "--color-swatch-size"
+              "name": "--color-picker-swatch-size"
             },
             {
               "description": "Aspect ratio of the square.",
-              "name": "--color-grid-ratio"
+              "name": "--color-picker-grid-ratio"
             },
             {
               "description": "Corner radius of the square.",
-              "name": "--color-grid-radii"
+              "name": "--color-picker-grid-radii"
             }
           ],
           "members": [
@@ -8454,8 +8454,8 @@
               "attribute": "alpha",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8469,8 +8469,8 @@
               "attribute": "format",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8483,8 +8483,8 @@
               "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nInput Color sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Input Color dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
               "attribute": "no-value",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8497,8 +8497,8 @@
               "description": "Whether the reader may change the format.",
               "attribute": "no-format",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8511,8 +8511,8 @@
               "description": "Whether the eyedropper is offered where the browser has one.",
               "attribute": "no-eyedropper",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8525,8 +8525,8 @@
               "description": "Colours offered under the picker, as a comma-separated list.",
               "attribute": "swatches",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8538,8 +8538,8 @@
               "privacy": "private",
               "description": "The colour the reader has moved to, or nothing while they have moved none.\n\nHeld rather than re-read, which is the whole point: see the class\ndescription. Cleared whenever a value arrives from anywhere else, so the\nnext reading comes from that value instead.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8552,8 +8552,8 @@
               "default": "false",
               "description": "Whether this browser can sample a colour off the screen.\n\nSettled after the first render rather than at construction, because there is\nno `window` on the server, and a button that ships in the markup and does\nnothing in Firefox is worse than one that is never offered.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8566,8 +8566,8 @@
               "default": "false",
               "description": "Whether the value on this element was produced here.\n\nThe one bit that keeps the model from being overwritten by the value it just\nproduced. Without it, dragging to the bottom of the square writes black,\nwhich reads back as hue 0 and saturation 0, and the next drag starts grey.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8579,8 +8579,8 @@
               "description": "Where the picker stands: what was moved, or what the value says, or the start.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8593,8 +8593,8 @@
               "description": "Whether the tools row holds anything at all.\n\nThe group is withheld rather than rendered empty, because it is an element\nwith a role and a name: an empty group labelled \"Colour tools\" announces\nnothing, and the footer cannot tell it is empty either, so the row kept its\npadding with nothing in it.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8607,8 +8607,8 @@
               "description": "The presets, as written, with anything that is not a colour dropped.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8621,8 +8621,8 @@
               "default": "''",
               "description": "The last value that was a colour.\n\nHalf-typed input reaches the row on every keystroke and most of it is not a\ncolour, so the square is given the last thing that was one. Typing `#00ff00`\na character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,\n`#00ff00`: two of those are colours and the ones between are not, so without\nthis the square walks red, blue, red, green. Input Color keeps the same\nguard for its own field, each local to the input it protects.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8632,8 +8632,8 @@
               "readonly": true,
               "description": "Takes what was typed, and lets the square follow only a whole colour.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8643,8 +8643,8 @@
               "readonly": true,
               "description": "Moves part of the model and announces the value that follows from it.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8655,8 +8655,8 @@
               "default": "new CopyController(this)",
               "description": "Copying the value, which is the one thing here worth taking away.\n\nA reader who has just built a colour wants it in a stylesheet, and the\nalternative is selecting text out of a field that may not be on screen. The\nchip is the obvious target: it is the colour, at the size of a control, and\nit had no job at all before this.\n\nThe controller rather than the four lines it replaces, because a copy button\nis coming and the two share everything that is easy to get wrong: the write,\nthe confirmation, the timer that ends it, the event, and a failure that is\ncorrectly silent.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8666,8 +8666,8 @@
               "readonly": true,
               "description": "Takes a preset, in this picker's syntax rather than as the preset spelled it.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8677,8 +8677,8 @@
               "readonly": true,
               "description": "Walks the format on, and rewrites the value in it.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8688,8 +8688,8 @@
               "readonly": true,
               "description": "Samples a colour from anywhere on the screen.\n\n`helix-sample-start` and `helix-sample-end` bracket it, because whatever is\nholding this picker may need to get out of the way: `EyeDropper` takes the\npointer over, and a floating panel left up during it is one the reader\ncannot dismiss and may well be trying to sample from underneath. This\nelement cannot know it is in a panel, so it says what it is doing and lets\nwhatever does know decide.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8699,8 +8699,8 @@
               "readonly": true,
               "description": "Dragging in the square.\n\nThe two ranges are the state, so this reads a point and writes to them\nrather than keeping a position of its own. Pointer capture, so a drag that\nleaves the square keeps going: leaving and coming back is how a reader\nreaches a corner, and without it the handle stops wherever the pointer left.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8725,8 +8725,8 @@
                 "text": "focus(options?: FocusOptions) => void"
               },
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8766,8 +8766,8 @@
               ],
               "description": "One of the ramps under the square.",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -8964,24 +8964,24 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseColor",
+            "name": "HelixBaseColorPicker",
             "package": "@helix-io/headless"
           },
           "summary": "Picks a colour, from a square and two ramps.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/color",
+            "documentation": "https://helix.fusion.dev/components/color-picker",
             "aliases": [
-              "ColorPicker",
+              "Color",
               "ColorArea",
               "Swatch picker"
             ],
             "tier": "styled",
-            "group": "Color",
+            "group": "ColorPicker",
             "part": "Root"
           },
-          "tagName": "helix-color",
+          "tagName": "helix-color-picker",
           "customElement": true,
           "attributes": [
             {
@@ -9018,8 +9018,8 @@
               "description": "Whether the colour carries an alpha channel.\n\nOff by default, because it widens every value written, and a consumer who\ndid not ask for transparency should not have to strip a byte off each one.",
               "fieldName": "alpha",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9031,8 +9031,8 @@
               "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a picker on\n`hex` still takes an `rgb()` handed to it and stores the hex for it.",
               "fieldName": "format",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9044,8 +9044,8 @@
               "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nInput Color sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Input Color dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
               "fieldName": "noValue",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9057,8 +9057,8 @@
               "description": "Whether the reader may change the format.",
               "fieldName": "noFormat",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9070,8 +9070,8 @@
               "description": "Whether the eyedropper is offered where the browser has one.",
               "fieldName": "noEyedropper",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9083,8 +9083,8 @@
               "description": "Colours offered under the picker, as a comma-separated list.",
               "fieldName": "swatches",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9119,120 +9119,120 @@
               "description": "The saturation and brightness square.",
               "name": "grid",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The mark showing where in the square the colour sits.",
               "name": "grid-handle",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The range input for the square's horizontal axis.",
               "name": "grid-saturation",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The range input for its vertical axis.",
               "name": "grid-brightness",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The row under the square.",
               "name": "controls",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The chip of the current colour, which copies it when pressed.",
               "name": "sample",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The ramps beside it.",
               "name": "channels",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "One ramp.",
               "name": "channel",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The group holding the eyedropper and the syntax toggle.",
               "name": "actions",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The control that samples a colour from the screen.",
               "name": "eyedropper",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The row holding the value and the tools.",
               "name": "footer",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The colour as text, which can be typed or pasted.",
               "name": "value",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The control that changes the syntax the value is written in.",
               "name": "format",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "The row of presets.",
               "name": "swatches",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
               "description": "One preset.",
               "name": "swatch",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             }
           ],
@@ -9245,8 +9245,8 @@
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             },
             {
@@ -9257,30 +9257,30 @@
               "name": "helix-copy",
               "reactProp": "onhelix-copy",
               "inheritedFrom": {
-                "name": "HelixBaseColor",
-                "module": "src/color/root/color-root.ts"
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
               }
             }
           ],
-          "modulePath": "src/color/root/color-root.ts",
-          "definitionPath": "src/color/root/color-root.ts"
+          "modulePath": "src/color-picker/root/color-picker-root.ts",
+          "definitionPath": "src/color-picker/root/color-picker-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixColor",
+          "name": "HelixColorPicker",
           "declaration": {
-            "name": "HelixColor",
-            "module": "src/color/root/color-root.ts"
+            "name": "HelixColorPicker",
+            "module": "src/color-picker/root/color-picker-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-color",
+          "name": "helix-color-picker",
           "declaration": {
-            "name": "HelixColor",
-            "module": "src/color/root/color-root.ts"
+            "name": "HelixColorPicker",
+            "module": "src/color-picker/root/color-picker-root.ts"
           }
         }
       ]
@@ -13264,7 +13264,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/color/index.js"
+            "module": "src/color-picker/index.js"
           }
         },
         {
@@ -13600,7 +13600,7 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/time/index.js"
+            "module": "src/time-picker/index.js"
           }
         },
         {
@@ -14435,7 +14435,7 @@
               "name": "handleSampleStart",
               "privacy": "private",
               "readonly": true,
-              "description": "The picker is about to take the pointer over, so the panel gets out of the\nway and comes back after.\n\n`helix-color` says what it is doing rather than reaching for a panel it\ncannot know it is in. A floating panel left up during an eyedropper is one\nthe reader cannot dismiss and may well be trying to sample from underneath.",
+              "description": "The picker is about to take the pointer over, so the panel gets out of the\nway and comes back after.\n\n`helix-color-picker` says what it is doing rather than reaching for a panel it\ncannot know it is in. A floating panel left up during an eyedropper is one\nthe reader cannot dismiss and may well be trying to sample from underneath.",
               "inheritedFrom": {
                 "name": "HelixBaseInputColor",
                 "module": "src/input-color/root/input-color-root.ts"
@@ -14721,8 +14721,8 @@
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/input-color",
             "aliases": [
-              "ColorPicker",
               "ColorField",
+              "ColorInput",
               "ColourInput"
             ],
             "tier": "styled",
@@ -20956,7 +20956,7 @@
                 "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
@@ -20970,7 +20970,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time-picker` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "attribute": "mode",
               "reflects": true,
               "inheritedFrom": {
@@ -21597,7 +21597,6 @@
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/components/input-time",
             "aliases": [
-              "TimePicker",
               "TimeField",
               "TimeInput"
             ],
@@ -21716,7 +21715,7 @@
                 "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
               "fieldName": "appearance",
               "inheritedFrom": {
                 "name": "HelixBaseInputTime",
@@ -21728,7 +21727,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time-picker` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "fieldName": "mode",
               "inheritedFrom": {
                 "name": "HelixBaseInputTime",
@@ -41874,7 +41873,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/time/index.ts",
+      "path": "src/time-picker/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -41882,14 +41881,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/time/root/time-root.js"
+            "module": "src/time-picker/root/time-picker-root.js"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/time/root/time-root.css.ts",
+      "path": "src/time-picker/root/time-picker-root.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -41902,35 +41901,35 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/time/root/time-root.css.ts"
+            "module": "src/time-picker/root/time-picker-root.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/time/root/time-root.ts",
+      "path": "src/time-picker/root/time-picker-root.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A bounded list on a surface of its own, because ninety-six rows is taller than\nanywhere it will be put. `--time-list-height` is the bound and it is a height\nrather than a count of rows: what a panel has is room, and a row count would\nhave to be recomputed every time the density changed.\n\nNo border and no fill of its own. Flat on a page it takes what it is given,\nand in Input Time's panel the panel supplies both: a list that brought its own\ncard would be a card inside a card there.",
-          "name": "HelixTime",
+          "description": "A bounded list on a surface of its own, because ninety-six rows is taller than\nanywhere it will be put. `--time-picker-list-height` is the bound and it is a height\nrather than a count of rows: what a panel has is room, and a row count would\nhave to be recomputed every time the density changed.\n\nNo border and no fill of its own. Flat on a page it takes what it is given,\nand in Input Time's panel the panel supplies both: a list that brought its own\ncard would be a card inside a card there.",
+          "name": "HelixTimePicker",
           "cssProperties": [
             {
               "description": "How tall the list is before it scrolls.",
-              "name": "--time-list-height"
+              "name": "--time-picker-list-height"
             },
             {
               "description": "How tall a wheel is. Five rows by default.",
-              "name": "--time-wheel-height"
+              "name": "--time-picker-wheel-height"
             },
             {
               "description": "Height and least width of one row in a wheel.",
-              "name": "--time-row-size"
+              "name": "--time-picker-row-size"
             },
             {
               "description": "Wash behind the times inside a range.",
-              "name": "--time-range-color"
+              "name": "--time-picker-range-color"
             }
           ],
           "members": [
@@ -42092,8 +42091,8 @@
               "description": "How far apart the offered times are, in minutes.\n\nFifteen, which is four rows an hour and ninety-six in a day: enough that a\nreader scrolls rather than hunts, and few enough that the list is a list.\nAnything under five is a thousand rows and wants a field instead.",
               "attribute": "step",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42106,8 +42105,8 @@
               "description": "Earliest time offered, as `HH:mm`.",
               "attribute": "min",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42120,8 +42119,8 @@
               "description": "Latest time offered, as `HH:mm`.",
               "attribute": "max",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42134,8 +42133,8 @@
               "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
               "attribute": "disable-times",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42148,8 +42147,8 @@
               "description": "Language tag the times are written in. Absent uses the runtime's own.",
               "attribute": "locale",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42162,8 +42161,8 @@
               "description": "Accessible name for the list, which has no visible one of its own.",
               "attribute": "label",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42176,8 +42175,8 @@
               "attribute": "mode",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42191,8 +42190,8 @@
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42205,8 +42204,8 @@
               "description": "Every time on offer, as minutes since midnight.\n\nBuilt from `min` upward rather than from midnight, so a list that starts at\n`09:00` steps from nine rather than offering `09:15` because that is where\nthe quarter hours from midnight happen to land. A step that does not divide\nthe hour is a real thing to want, twenty minutes being the obvious one, and\nthis is the reading that makes it behave.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42228,8 +42227,8 @@
               ],
               "description": "Whether a time is barred by name.\n\n`barred`, not `disabled`, for the reason Calendar records: this is a form\ncontrol and `HelixFormElement.disabled` is a boolean about the whole of it,\nso a method and a flag cannot share the name.\n\nOnly the named list. `min` and `max` are not consulted here because they\nnever produce a row to bar: `times` builds the list between them, so a time\noutside the bounds is absent rather than present and refused.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42258,8 +42257,8 @@
               ],
               "description": "Whether every offered time in an hour is barred.\n\n`shown` is the meridiem the wheel is on, so `1` means 01:00 under AM and\n13:00 under PM. Absent is a 24 hour clock, where the number is the hour.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42281,8 +42280,8 @@
               ],
               "description": "Whether every offered time in a half of the clock is barred.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42295,8 +42294,8 @@
               "description": "The times held, which is a list whether or not a mode is set.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42306,8 +42305,8 @@
               "readonly": true,
               "description": "Takes what the list announced and constrains it to what the mode allows.\n\nThe listbox is put in `multiple` for both modes, because that is what marks\nmore than one row and toggles on press. A range then differs only in what is\nkept: two, and a third pick starts again from that third one. Working out\nwhich is newest by difference rather than by position, since a toggle can\nremove as easily as add and the announced list is a set rather than a\nsequence.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42329,8 +42328,8 @@
               ],
               "description": "Whether a time falls inside a range, which is what gets banded.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42343,8 +42342,8 @@
               "description": "The three readings a wheel shows, from the value or from `min`.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42354,8 +42353,8 @@
               "readonly": true,
               "description": "Puts a changed column back together into a whole time.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42368,8 +42367,8 @@
               "description": "Every whole hour that has at least one offered time in it.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42382,8 +42381,8 @@
               "description": "Every minute offered within the hour currently shown.",
               "readonly": true,
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42399,8 +42398,8 @@
                 "text": "reveal() => void"
               },
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42425,8 +42424,8 @@
                 "text": "focus(options?: FocusOptions) => void"
               },
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42479,8 +42478,8 @@
               ],
               "description": "One wheel.\n\n`barred` is passed per column rather than read from `disableTimes` here,\nbecause a column holds a third of a time and only the caller knows the\nother two thirds. What that means differs by column and the difference is\nnot a detail: a minute is barred when *this* hour plus it is, and an hour is\nbarred only when every minute in it is, since one free minute is a reason to\nopen the wheel rather than to close it.",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42493,8 +42492,8 @@
                 }
               },
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42691,23 +42690,23 @@
             }
           ],
           "superclass": {
-            "name": "HelixBaseTime",
+            "name": "HelixBaseTimePicker",
             "package": "@helix-io/headless"
           },
           "summary": "Picks a time, from a list of them.",
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/time",
+            "documentation": "https://helix.fusion.dev/components/time-picker",
             "aliases": [
-              "TimePicker",
+              "Time",
               "TimeList"
             ],
             "tier": "styled",
-            "group": "Time",
+            "group": "TimePicker",
             "part": "Root"
           },
-          "tagName": "helix-time",
+          "tagName": "helix-time-picker",
           "customElement": true,
           "attributes": [
             {
@@ -42744,8 +42743,8 @@
               "description": "How far apart the offered times are, in minutes.\n\nFifteen, which is four rows an hour and ninety-six in a day: enough that a\nreader scrolls rather than hunts, and few enough that the list is a list.\nAnything under five is a thousand rows and wants a field instead.",
               "fieldName": "step",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42757,8 +42756,8 @@
               "description": "Earliest time offered, as `HH:mm`.",
               "fieldName": "min",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42770,8 +42769,8 @@
               "description": "Latest time offered, as `HH:mm`.",
               "fieldName": "max",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42783,8 +42782,8 @@
               "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
               "fieldName": "disableTimes",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42796,8 +42795,8 @@
               "description": "Language tag the times are written in. Absent uses the runtime's own.",
               "fieldName": "locale",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42809,8 +42808,8 @@
               "description": "Accessible name for the list, which has no visible one of its own.",
               "fieldName": "label",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42821,8 +42820,8 @@
               "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
               "fieldName": "mode",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42834,8 +42833,8 @@
               "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.",
               "fieldName": "appearance",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
@@ -42870,48 +42869,48 @@
               "description": "The listbox holding the times, in `list`.",
               "name": "list",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
               "description": "The row of columns, in `wheels`.",
               "name": "columns",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
               "description": "One of them.",
               "name": "column",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
               "description": "The scrolling column inside it, forwarded from the listbox.",
               "name": "items",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
               "description": "What it says when nothing matches, forwarded from the listbox.",
               "name": "empty",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             },
             {
               "description": "One time in it. Carries `data-between` inside a range.",
               "name": "option",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             }
           ],
@@ -42924,30 +42923,30 @@
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {
-                "name": "HelixBaseTime",
-                "module": "src/time/root/time-root.ts"
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
               }
             }
           ],
-          "modulePath": "src/time/root/time-root.ts",
-          "definitionPath": "src/time/root/time-root.ts"
+          "modulePath": "src/time-picker/root/time-picker-root.ts",
+          "definitionPath": "src/time-picker/root/time-picker-root.ts"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixTime",
+          "name": "HelixTimePicker",
           "declaration": {
-            "name": "HelixTime",
-            "module": "src/time/root/time-root.ts"
+            "name": "HelixTimePicker",
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "helix-time",
+          "name": "helix-time-picker",
           "declaration": {
-            "name": "HelixTime",
-            "module": "src/time/root/time-root.ts"
+            "name": "HelixTimePicker",
+            "module": "src/time-picker/root/time-picker-root.ts"
           }
         }
       ]

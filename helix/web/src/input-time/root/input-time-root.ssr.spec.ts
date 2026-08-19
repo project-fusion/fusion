@@ -31,6 +31,6 @@ describe('input time server output', () => {
   })
 
   test('the picker ships inside it, rather than being built on hydration', () => {
-    expect(partTag(markup, 'picker')).toContain('helix-time')
+    expect(partTag(markup, 'picker')).toContain('helix-time-picker')
   })
 })

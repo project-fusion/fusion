@@ -35,6 +35,6 @@ describe('input color server output', () => {
   })
 
   test('the picker ships inside it, rather than being built on hydration', () => {
-    expect(partTag(markup, 'picker')).toContain('helix-color')
+    expect(partTag(markup, 'picker')).toContain('helix-color-picker')
   })
 })

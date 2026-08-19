@@ -28,12 +28,12 @@ const type = async (host: InputColor, text: string): Promise<void> => {
 }
 
 describe('input color', () => {
-  test('the picker is the real helix-color, not a second one written here', async () => {
+  test('the picker is the real helix-color-picker, not a second one written here', async () => {
     // The same arrangement Input Date has with the calendar: a settings pane
     // wants the picker flat on a page, and neither should be the other one with
     // parts hidden.
     const picker = part(await field(), 'picker')
-    expect(picker?.tagName.toLowerCase()).toBe('helix-color')
+    expect(picker?.tagName.toLowerCase()).toBe('helix-color-picker')
   })
 
   test('the picker states no value of its own, because the field is that input', async () => {
@@ -183,7 +183,7 @@ describe('input color', () => {
   })
 
   test('the panel gets out of the way while the eyedropper has the pointer', async () => {
-    /* `helix-color` cannot know it is in a panel, so it says what it is doing
+    /* `helix-color-picker` cannot know it is in a panel, so it says what it is doing
        and whatever does know decides. A floating panel left up during a sample
        is one the reader cannot dismiss and may be trying to sample from
        underneath. */

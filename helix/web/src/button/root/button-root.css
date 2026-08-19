@@ -5,7 +5,7 @@
  * control and a consumer's own anchor. That pairing was real and the cost was
  * not visible until something tried to use a button inside another component: a
  * part selector crosses exactly one shadow boundary, so a document rule reaches
- * a button on the page and stops one short of a button inside `helix-color`.
+ * a button on the page and stops one short of a button inside `helix-color-picker`.
  * Measured there: no background, no border, no radius and no padding at all. No
  * component in the repo composed a button, which read as taste and was a wall.
  *

@@ -952,13 +952,13 @@ line per answer rather than hunting along a row.
 | --- | --- |
 | `--checkbox-group-gap` | Space between the boxes. |
 
-## Color
+## Color Picker
 
-### Root — `helix-color`
+### Root — `helix-color-picker`
 
 Picks a colour, from a square and two ramps.
 
-Extends `HelixBaseColor`.
+Extends `HelixBaseColorPicker`.
 
 **The square is painted in three layers, not composited from elements**: the
 hue underneath, white sliding in from the left to take the saturation out,
@@ -986,28 +986,28 @@ brought its own card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColor` | Whether the colour carries an alpha channel. |
-| `color` | - | `Color` | - | `HelixBaseColor` | Where the picker stands: what was moved, or what the value says, or the start. |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the colour carries an alpha channel. |
+| `color` | - | `Color` | - | `HelixBaseColorPicker` | Where the picker stands: what was moved, or what the value says, or the start. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColor` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `noEyedropper` | `no-eyedropper` | `boolean` | `false` | `HelixBaseColor` | Whether the eyedropper is offered where the browser has one. |
-| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColor` | Whether the reader may change the format. |
-| `noValue` | `no-value` | `boolean` | `false` | `HelixBaseColor` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
+| `noEyedropper` | `no-eyedropper` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the eyedropper is offered where the browser has one. |
+| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the reader may change the format. |
+| `noValue` | `no-value` | `boolean` | `false` | `HelixBaseColorPicker` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseColor` | Colours offered under the picker, as a comma-separated list. |
+| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorPicker` | Colours offered under the picker, as a comma-separated list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseColor` | Puts the keyboard on the square, which is the control a reader wants. |
+| `focus()` | `HelixBaseColorPicker` | Puts the keyboard on the square, which is the control a reader wants. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
@@ -1044,11 +1044,11 @@ brought its own card would be a card inside a card there.
 
 | Property | Description |
 | --- | --- |
-| `--color-inset` | Inset of the rows under the square, and the bottom. |
-| `--color-sample-size` | Edge length of the chip that copies the value. |
-| `--color-swatch-size` | Edge length of one preset. |
-| `--color-grid-ratio` | Aspect ratio of the square. |
-| `--color-grid-radii` | Corner radius of the square. |
+| `--color-picker-inset` | Inset of the rows under the square, and the bottom. |
+| `--color-picker-sample-size` | Edge length of the chip that copies the value. |
+| `--color-picker-swatch-size` | Edge length of one preset. |
+| `--color-picker-grid-ratio` | Aspect ratio of the square. |
+| `--color-picker-grid-radii` | Corner radius of the square. |
 
 ## Dialog
 
@@ -4080,16 +4080,16 @@ dragged wider than the form holding it is a field that breaks the layout.
 | --- | --- |
 | `--textarea-background-color` | Fill behind the text. |
 
-## Time
+## Time Picker
 
-### Root — `helix-time`
+### Root — `helix-time-picker`
 
 Picks a time, from a list of them.
 
-Extends `HelixBaseTime`.
+Extends `HelixBaseTimePicker`.
 
 A bounded list on a surface of its own, because ninety-six rows is taller than
-anywhere it will be put. `--time-list-height` is the bound and it is a height
+anywhere it will be put. `--time-picker-list-height` is the bound and it is a height
 rather than a count of rows: what a panel has is room, and a row count would
 have to be recomputed every time the density changed.
 
@@ -4101,34 +4101,34 @@ card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTime` | Whether the times are one list or a column each. |
+| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTime` | Times that cannot be chosen, comma separated, as `HH:mm`. |
+| `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `'Time'` | `HelixBaseTime` | Accessible name for the list, which has no visible one of its own. |
+| `label` | `label` | `string` | `'Time'` | `HelixBaseTimePicker` | Accessible name for the list, which has no visible one of its own. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseTime` | Language tag the times are written in. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `'23:59'` | `HelixBaseTime` | Latest time offered, as `HH:mm`. |
-| `min` | `min` | `string` | `'00:00'` | `HelixBaseTime` | Earliest time offered, as `HH:mm`. |
-| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTime` | How many times can be held at once. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseTimePicker` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixBaseTimePicker` | Latest time offered, as `HH:mm`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixBaseTimePicker` | Earliest time offered, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTimePicker` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `step` | `step` | `number` | `15` | `HelixBaseTime` | How far apart the offered times are, in minutes. |
+| `step` | `step` | `number` | `15` | `HelixBaseTimePicker` | How far apart the offered times are, in minutes. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods
 
 | Method | From | Description |
 | --- | --- | --- |
-| `focus()` | `HelixBaseTime` | Puts the keyboard on the list, which is the only control here. |
+| `focus()` | `HelixBaseTimePicker` | Puts the keyboard on the list, which is the only control here. |
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `reveal()` | `HelixBaseTime` | Each wheel comes to rest on its own answer. |
+| `reveal()` | `HelixBaseTimePicker` | Each wheel comes to rest on its own answer. |
 
 #### Events
 
@@ -4151,10 +4151,10 @@ card would be a card inside a card there.
 
 | Property | Description |
 | --- | --- |
-| `--time-list-height` | How tall the list is before it scrolls. |
-| `--time-wheel-height` | How tall a wheel is. Five rows by default. |
-| `--time-row-size` | Height and least width of one row in a wheel. |
-| `--time-range-color` | Wash behind the times inside a range. |
+| `--time-picker-list-height` | How tall the list is before it scrolls. |
+| `--time-picker-wheel-height` | How tall a wheel is. Five rows by default. |
+| `--time-picker-row-size` | Height and least width of one row in a wheel. |
+| `--time-picker-range-color` | Wash behind the times inside a range. |
 
 ## Toast
 

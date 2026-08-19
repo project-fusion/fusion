@@ -206,7 +206,7 @@ export const formsArt: Record<string, ReactNode> = {
    * the ink: the row would read as one card lit up and the rest switched off.
    * The square's gradient carries the idea on its own.
    */
-  color: (
+  'color-picker': (
     <>
       {/* Light at the top left, dark along the bottom, which is the shape of a
           saturation and brightness square whatever colour it is drawn in. */}
@@ -637,7 +637,7 @@ export const formsArt: Record<string, ReactNode> = {
    * the shape a reader will meet: a node graph is not a Tree, and a dial is not a
    * list of quarter hours.
    */
-  time: (
+  'time-picker': (
     <>
       <rect className="artSunken" height="140" rx="4" width="180" x="70" y="42" />
       {[0, 1, 2, 3].map((row) => (

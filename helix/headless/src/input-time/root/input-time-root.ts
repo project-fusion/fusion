@@ -14,17 +14,17 @@ import { property, state } from 'lit/decorators.js'
    the arrangement Input Date has with its calendar. */
 import '../../icon/index.js'
 import '../../tag/index.js'
-import '../../time/index.js'
-import { isTime, toMinutes, writeTime } from '../../time/root/time-root.js'
+import '../../time-picker/index.js'
+import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker-root.js'
 
 /**
  * @summary A time, typed or picked from a list.
  *
  * @description
- * **The list is `helix-time`, not a second one written here.** It is worth
+ * **The list is `helix-time-picker`, not a second one written here.** It is worth
  * having on its own, flat in a settings pane with nothing to open, and this
  * element is the field, the overlay and the form. Exactly the arrangement Input
- * Date has with `helix-calendar` and Input Color with `helix-color`.
+ * Date has with `helix-calendar` and Input Color with `helix-color-picker`.
  *
  * **Typed as well as picked, and that is the division the list depends on.** A
  * list at a step offers the times a product actually has, and the field is how a
@@ -40,7 +40,7 @@ import { isTime, toMinutes, writeTime } from '../../time/root/time-root.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases TimePicker, TimeField, TimeInput
+ * @aliases TimeField, TimeInput
  * @documentation https://helix.fusion.dev/components/input-time
  *
  * @slot trigger - The mark on the field saying a list opens.
@@ -69,7 +69,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
    */
   @property({ reflect: true })
   appearance: 'list' | 'wheels' = 'list'
@@ -79,7 +79,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time` carries the longer note on the interaction and on
+   * form submits. `helix-time-picker` carries the longer note on the interaction and on
    * why a wheel cannot do either.
    */
   @property({ reflect: true })
@@ -466,7 +466,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
       </div>
 
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-time
+        <helix-time-picker
           part="picker"
           mode=${this.mode ?? nothing}
           appearance=${this.appearance}
@@ -477,7 +477,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
           step=${this.step}
           .value=${this.picked}
           @helix-change=${this.handlePicked}
-        ></helix-time>
+        ></helix-time-picker>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

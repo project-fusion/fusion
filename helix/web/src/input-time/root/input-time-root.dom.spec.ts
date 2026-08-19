@@ -32,8 +32,8 @@ const type = async (host: InputTime, text: string): Promise<void> => {
 }
 
 describe('input time', () => {
-  test('the list is the real helix-time, not a second one written here', async () => {
-    expect(part(await field(), 'picker')?.tagName.toLowerCase()).toBe('helix-time')
+  test('the list is the real helix-time-picker, not a second one written here', async () => {
+    expect(part(await field(), 'picker')?.tagName.toLowerCase()).toBe('helix-time-picker')
   })
 
   test('the field renders the time idle and holds the value while edited', async () => {

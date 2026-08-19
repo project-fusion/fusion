@@ -6,7 +6,7 @@ import type { CSSResultGroup } from 'lit'
    which is why they are restated here. `check:composed` enforces it. */
 import '../../icon/index.js'
 import '../../tag/index.js'
-import '../../time/index.js'
+import '../../time-picker/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './input-time-root.css.js'
@@ -27,7 +27,7 @@ import { styles } from './input-time-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases TimePicker, TimeField, TimeInput
+ * @aliases TimeField, TimeInput
  * @documentation https://helix.fusion.dev/components/input-time
  *
  * @cssproperty --input-time-background-color - Fill behind the field.

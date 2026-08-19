@@ -5,7 +5,7 @@ import type { CSSResultGroup } from 'lit'
    custom element registers on import. Inherited from the base along with the
    template, which is why it has to be restated here: this file has no
    `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
-import '../../color/index.js'
+import '../../color-picker/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './input-color-root.css.js'
@@ -32,7 +32,7 @@ import { styles } from './input-color-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases ColorPicker, ColorField, ColourInput
+ * @aliases ColorField, ColorInput, ColourInput
  * @documentation https://helix.fusion.dev/components/input-color
  *
  * @cssproperty --input-color-background-color - Fill behind the field.

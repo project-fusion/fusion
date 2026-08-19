@@ -135,8 +135,8 @@
 /* Square corners on the picker's own square, since the panel is doing the
    rounding now, and the room the picker needs under it. */
 [part="picker"] {
-  --color-grid-radii: var(--helix-radii-none);
-  --color-inset: var(--helix-space-sm);
+  --color-picker-grid-radii: var(--helix-radii-none);
+  --color-picker-inset: var(--helix-space-sm);
 
   display: block;
 }
