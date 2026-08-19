@@ -88,6 +88,38 @@ export interface ControlledPropsOptions {
  *
  * Runs after the generator, so list it after `jsxTypesPlugin`.
  */
+/**
+ * The same union, written the way Solid binds an event.
+ *
+ * `on:helix-input` rather than `onhelix-input`, which is Solid's syntax for an
+ * arbitrary event name and what its half of the generated types already offers.
+ * The escape arm reads its `ref` type off `BaseProps` rather than naming
+ * React's, because this half is not React's.
+ */
+const solidArms = (properties: Controlled[], base: string, element: string): string =>
+  properties
+    .map(({ events, property }) => {
+      const handlers = events
+        .map(
+          (event) => `        "on:${event}": (event: ${base}${pascal(event)}ElementEvent) => void;`,
+        )
+        .join('\n')
+      return [
+        '    | {',
+        `        /** Declared, so the consumer owns it and answers ${events.map((event) => `\`${event}\``).join(' and ')}. */`,
+        `        ${property}: ${element}["${property}"];`,
+        handlers,
+        '      }',
+        '    | {',
+        `        ${property}: ${element}["${property}"];`,
+        `        ref: BaseProps<${element}>["ref"];`,
+        '      }',
+        `    | { ${property}?: undefined }`,
+      ].join('\n')
+    })
+    .map((arm) => `  (\n${arm}\n  )`)
+    .join(' &\n')
+
 export const controlledProps = ({
   fileName = 'jsx.d.ts',
 }: ControlledPropsOptions = {}): Plugin => ({
@@ -160,11 +192,21 @@ export const controlledProps = ({
       const entry = new RegExp(
         `("${tag}": Partial<\\s*(\\w+)Props & BaseProps<(\\w+)> & BaseEvents\\s*>)(;)`,
       )
+      /* And the Solid map, a separate set of tag entries with a separate props
+         type and `on:` for a handler. It was left unconstrained when this was
+         written, so a Solid consumer could declare ownership and answer nothing
+         while a React one could not: the same trap, guarded on one side. */
+      const solidEntry = new RegExp(
+        `("${tag}": Partial<\\s*(\\w+)Props\\s*&\\s*\\w+SolidJsProps\\s*&\\s*BaseProps<(\\w+)>\\s*&\\s*BaseEvents\\s*>)(;)`,
+      )
       const match = next.match(entry)
       if (!match) {
         continue
       }
       const [, , base, element] = match
+      if (base === undefined || element === undefined) {
+        continue
+      }
       const name = `${base}Controlled`
 
       const arms = properties
@@ -200,6 +242,14 @@ export const controlledProps = ({
           )} announces and waits, so the handler comes with it.\n */\ntype ${name} =\n${arms};`,
       )
       next = next.replace(entry, `$1 & ${name}$4`)
+
+      if (solidEntry.test(next)) {
+        const solidName = `${base}ControlledSolidJs`
+        unions.push(
+          `/** ${tag}, in Solid's dialect: \`on:\` and the event name. */\ntype ${solidName} =\n${solidArms(properties, base, element)};`,
+        )
+        next = next.replace(solidEntry, `$1 & ${solidName}$4`)
+      }
     }
 
     if (unions.length === 0) {

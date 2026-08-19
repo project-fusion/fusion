@@ -5528,3 +5528,106 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `--video-controls-color` | The ink on the bar. |
 | `--video-accent-color` | The played part of the scrubber. |
 | `--video-start-size` | Width of the mark that starts it. |
+
+## Video Playlist
+
+### Root — `helix-video-playlist`
+
+A set of clips and the one player they take turns in.
+
+Extends `HelixBaseVideoPlaylist`.
+
+Presentation only: the arrangement of the two regions and the scroller the
+entries sit in. Everything about which clip is current is the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `label` | `label` | `string` | `'Playlist'` | `HelixBaseVideoPlaylist` | Accessible name for the list, which usually has no visible heading. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestActive()` | `MixinControllerActive` | Requests a new current item, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the current entry changes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The entries. |
+| `player` | The `helix-video` they play in. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `player` | The region holding the player. |
+| `items` | The list of entries. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--video-playlist-layout` | Columns for the player and the list. |
+| `--video-playlist-size` | How tall the list gets before it scrolls. |
+
+### Item — `helix-video-playlist-item`
+
+One entry in a video playlist.
+
+Extends `HelixBaseVideoPlaylistItem`.
+
+Presentation only: the row, its thumbnail column, and the mark on the one
+playing. The base class holds what the entry is and what it announces.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `current` | - | `boolean` | `false` | `HelixBaseVideoPlaylistItem` | Whether the player is on this entry. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseVideoPlaylistItem` | Whether the entry can be chosen. |
+| `poster` | `poster` | `string` | `''` | `HelixBaseVideoPlaylistItem` | What covers the picture before this entry plays, and the row's thumbnail. |
+| `src` | `src` | `string` | `''` | `HelixBaseVideoPlaylistItem` | The file this entry plays. |
+| `text` | - | `string` | - | `HelixBaseVideoPlaylistItem` | The entry's name, which is the words and not everything in it. |
+| `value` | `value` | `string` | `''` | `HelixBaseVideoPlaylistItem` | What identifies the entry, and what `active` is compared against. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the entry is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The entry's name. |
+| `media` | A thumbnail. Falls back to an image of `poster`. |
+| `meta` | After the name. A duration, or a date. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `wrapper` | The `listitem`, which the button sits in. |
+| `item` | The row, which is a button. |
+| `media` | The leading column. |
+| `thumbnail` | The image `poster` falls back to. |
+| `label` | The name and whatever follows it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--video-playlist-item-background-color` | Fill behind a row. |
+| `--video-playlist-media-size` | Width of the thumbnail column. |

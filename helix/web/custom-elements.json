@@ -22146,6 +22146,14 @@
             "name": "*",
             "module": "src/video/index.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/video-playlist/index.js"
+          }
         }
       ]
     },
@@ -56785,6 +56793,885 @@
           "declaration": {
             "name": "HelixTree",
             "module": "src/tree/root/tree-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/video-playlist/item/video-playlist-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/video-playlist/root/video-playlist-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/item/video-playlist-item.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/video-playlist/item/video-playlist-item.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/item/video-playlist-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the row, its thumbnail column, and the mark on the one\nplaying. The base class holds what the entry is and what it announces.",
+          "name": "HelixVideoPlaylistItem",
+          "cssProperties": [
+            {
+              "description": "Fill behind a row.",
+              "name": "--video-playlist-item-background-color"
+            },
+            {
+              "description": "Width of the thumbnail column.",
+              "name": "--video-playlist-media-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What identifies the entry, and what `active` is compared against.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The file this entry plays.",
+              "attribute": "src",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What covers the picture before this entry plays, and the row's thumbnail.\n\nOne property doing both, because they are the same picture: the frame that\nstands for the clip stands for it in the list too. It is the `media` slot's\nfallback rather than something drawn beside it, which is this library's rule\nfor a content property, so a consumer with something better to show slots it\nand the two can never both appear.",
+              "attribute": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the entry can be chosen.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the player is on this entry.\n\nWritten by the playlist rather than by the entry, the way an option's\nselection is: an entry that made itself current would be a second answer to\nwhich one is playing.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "description": "The entry's name, which is the words and not everything in it.\n\n`textContent` was what this used, and it takes the whole subtree: a row with\na duration in `meta` reported \"His Girl Friday0:06\", and that string went to\nthe player and on to the lock screen. Only the nodes the consumer left\nunslotted are the name; anything named is a column beside it.\n\nLight DOM rather than `assignedNodes`, so it answers on the server too,\nwhere there is no slot to ask. `Option.text` reads its own the same way.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "choose",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseVideoPlaylistItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One entry in a video playlist.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/video-playlist",
+            "tier": "styled",
+            "group": "VideoPlaylist",
+            "part": "Item"
+          },
+          "tagName": "helix-video-playlist-item",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The entry's name.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "A thumbnail. Falls back to an image of `poster`.",
+              "name": "media",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "After the name. A duration, or a date.",
+              "name": "meta",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The `listitem`, which the button sits in.",
+              "name": "wrapper",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "The row, which is a button.",
+              "name": "item",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "The leading column.",
+              "name": "media",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "The image `poster` falls back to.",
+              "name": "thumbnail",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "description": "The name and whatever follows it.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What identifies the entry, and what `active` is compared against.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The file this entry plays.",
+              "fieldName": "src",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What covers the picture before this entry plays, and the row's thumbnail.\n\nOne property doing both, because they are the same picture: the frame that\nstands for the clip stands for it in the list too. It is the `media` slot's\nfallback rather than something drawn beside it, which is this library's rule\nfor a content property, so a consumer with something better to show slots it\nand the two can never both appear.",
+              "fieldName": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the entry can be chosen.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the entry is chosen.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistItem",
+                "module": "src/video-playlist/item/video-playlist-item.ts"
+              }
+            }
+          ],
+          "modulePath": "src/video-playlist/item/video-playlist-item.ts",
+          "definitionPath": "src/video-playlist/item/video-playlist-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixVideoPlaylistItem",
+          "declaration": {
+            "name": "HelixVideoPlaylistItem",
+            "module": "src/video-playlist/item/video-playlist-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-video-playlist-item",
+          "declaration": {
+            "name": "HelixVideoPlaylistItem",
+            "module": "src/video-playlist/item/video-playlist-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/root/video-playlist-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/video-playlist/root/video-playlist-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/root/video-playlist-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the arrangement of the two regions and the scroller the\nentries sit in. Everything about which clip is current is the base class.",
+          "name": "HelixVideoPlaylist",
+          "cssProperties": [
+            {
+              "description": "Columns for the player and the list.",
+              "name": "--video-playlist-layout"
+            },
+            {
+              "description": "How tall the list gets before it scrolls.",
+              "name": "--video-playlist-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "active",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
+              "attribute": "active",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultActive",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Initial item for uncontrolled use. Ignored once `active` is written.",
+              "attribute": "default-active",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "activeState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "activeMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `active` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "activeIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestActive",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new current item, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. Unlike a native control, nothing has moved\nby the time this runs, so refusing is simply not writing: there is\nnothing to put back.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              },
+              "type": {
+                "text": "requestActive(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveActive",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "Item | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "Item[]"
+                  }
+                }
+              ],
+              "description": "Which item is current, given what there is to choose from.\n\nThe first enabled one when `value` names nothing, which is a set before\nits consumer has chosen and a set whose current item has just been\nremoved. Disabled items are skipped in the fallback but not in the match:\na consumer who names a disabled item meant it, and quietly moving to\nanother would be the component overruling them.",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Playlist'",
+              "description": "Accessible name for the list, which usually has no visible heading.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseVideoPlaylistItem[]"
+              },
+              "privacy": "private",
+              "description": "The entries, in the order the consumer wrote them.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "player",
+              "type": {
+                "text": "(HTMLElement & { label: string; poster: string; src: string }) | null"
+              },
+              "privacy": "private",
+              "description": "The player, whichever tag the consumer slotted.\n\nAsked of the slot rather than matched by tag name: the headless tier's\nplayer is `helix-base-video` and the styled tier's is `helix-video`, and a\nconsumer bringing a third under either name should still be driven. What is\nneeded of it is `src`, which is the whole of the contract.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "step",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "by",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Moves by one, and does nothing at either end.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSelect",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleNext",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePrevious",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleEnded",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseVideoPlaylist",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A set of clips and the one player they take turns in.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/video-playlist",
+            "aliases": [
+              "Playlist",
+              "Queue",
+              "Up next"
+            ],
+            "tier": "styled",
+            "group": "VideoPlaylist",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "description": "The list beside the player rather than under it.",
+                "slug": "beside-the-player"
+              }
+            ],
+            "source": "helix/web/src/video-playlist"
+          },
+          "tagName": "helix-video-playlist",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "active",
+              "type": {
+                "text": "string"
+              },
+              "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
+              "fieldName": "active",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "name": "default-active",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Initial item for uncontrolled use. Ignored once `active` is written.",
+              "fieldName": "defaultActive",
+              "inheritedFrom": {
+                "name": "MixinControllerActive",
+                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Playlist'",
+              "description": "Accessible name for the list, which usually has no visible heading.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The entries.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "description": "The `helix-video` they play in.",
+              "name": "player",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The region holding the player.",
+              "name": "player",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            },
+            {
+              "description": "The list of entries.",
+              "name": "items",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the current entry changes, and cancelable.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylist",
+                "module": "src/video-playlist/root/video-playlist-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/video-playlist/root/video-playlist-root.ts",
+          "definitionPath": "src/video-playlist/root/video-playlist-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixVideoPlaylist",
+          "declaration": {
+            "name": "HelixVideoPlaylist",
+            "module": "src/video-playlist/root/video-playlist-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-video-playlist",
+          "declaration": {
+            "name": "HelixVideoPlaylist",
+            "module": "src/video-playlist/root/video-playlist-root.ts"
           }
         }
       ]

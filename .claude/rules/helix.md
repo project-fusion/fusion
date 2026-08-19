@@ -254,10 +254,18 @@ past every session-replay masker that knows to mask `.value` and `input[value]`.
 `<input value="Ada">` seeds; `<helix-input value="Ada">` claims ownership and
 the control goes quiet. We took React's `value`/`defaultValue` split, which is
 right for our consumers and wrong for anyone reasoning from HTML, and it caught
-six of our own examples. `requestControlledChange` therefore audits the first
-controlled request an element makes and warns if nothing answered it. Read the
-state **before** dispatching, or a consumer answering synchronously looks
-identical to one that was never there.
+six of our own examples. `requestControlledChange` therefore audits a
+controlled element that asks and is not answered. Read the state **before**
+dispatching, or a consumer answering synchronously looks identical to one that
+was never there.
+
+**It judges on the next request, not on a deadline.** It read the state back
+after `setTimeout(0)` until 19 Aug 2026, which is true of React committing a
+`setState` from a handler and false of anything slower: a consumer who answers
+by navigating, as the documentation nav does by deriving a tree's `active` from
+the route, cannot have moved the state inside one task and was accused of not
+listening. Unmoved across two requests is unanswered whatever the timing, and a
+control asked once and never again is never accused.
 
 **Shared test scaffolding lives in `web/src/testing/`**, excluded from the build
 in `tsconfig.json`. `registerDom()` is idempotent because bun runs every DOM

@@ -114,6 +114,8 @@ import type {
   HelixTree,
   HelixTreeItem,
   HelixVideo,
+  HelixVideoPlaylist,
+  HelixVideoPlaylistItem,
 } from '@helix-io/web';
 
 /**
@@ -10560,6 +10562,138 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
+/** `HelixVideoPlaylistItem` component event */
+export type HelixVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
+  HelixVideoPlaylistItem,
+  E
+>;
+/** `helix-select` event type */
+export type HelixVideoPlaylistItemHelixSelectElementEvent =
+  HelixVideoPlaylistItemElementEvent<HelixSelectEvent>;
+
+export type HelixVideoPlaylistItemProps = {
+  /** What identifies the entry, and what `active` is compared against. */
+  value?: HelixVideoPlaylistItem["value"];
+  /** The file this entry plays. */
+  src?: HelixVideoPlaylistItem["src"];
+  /** What covers the picture before this entry plays, and the row's thumbnail.
+
+One property doing both, because they are the same picture: the frame that
+stands for the clip stands for it in the list too. It is the `media` slot's
+fallback rather than something drawn beside it, which is this library's rule
+for a content property, so a consumer with something better to show slots it
+and the two can never both appear. */
+  poster?: HelixVideoPlaylistItem["poster"];
+  /** Whether the entry can be chosen. */
+  disabled?: HelixVideoPlaylistItem["disabled"];
+  /** Whether the player is on this entry.
+
+Written by the playlist rather than by the entry, the way an option's
+selection is: an entry that made itself current would be a second answer to
+which one is playing. */
+  current?: HelixVideoPlaylistItem["current"];
+
+  /** Fired when the entry is chosen. */
+  "onhelix-select"?: (e: HelixVideoPlaylistItemHelixSelectElementEvent) => void;
+};
+
+export type HelixVideoPlaylistItemSolidJsProps = {
+  /** What identifies the entry, and what `active` is compared against. */
+  "prop:value"?: HelixVideoPlaylistItem["value"];
+  /** The file this entry plays. */
+  "prop:src"?: HelixVideoPlaylistItem["src"];
+  /** What covers the picture before this entry plays, and the row's thumbnail.
+
+One property doing both, because they are the same picture: the frame that
+stands for the clip stands for it in the list too. It is the `media` slot's
+fallback rather than something drawn beside it, which is this library's rule
+for a content property, so a consumer with something better to show slots it
+and the two can never both appear. */
+  "prop:poster"?: HelixVideoPlaylistItem["poster"];
+  /** Whether the entry can be chosen. */
+  "prop:disabled"?: HelixVideoPlaylistItem["disabled"];
+  /** Whether the player is on this entry.
+
+Written by the playlist rather than by the entry, the way an option's
+selection is: an entry that made itself current would be a second answer to
+which one is playing. */
+  "prop:current"?: HelixVideoPlaylistItem["current"];
+  /** Fired when the entry is chosen. */
+  "on:helix-select"?: (
+    e: HelixVideoPlaylistItemHelixSelectElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixVideoPlaylist` component event */
+export type HelixVideoPlaylistElementEvent<E = Event> = TypedEvent<
+  HelixVideoPlaylist,
+  E
+>;
+/** `helix-change` event type */
+export type HelixVideoPlaylistHelixChangeElementEvent =
+  HelixVideoPlaylistElementEvent<HelixChangeEvent>;
+
+export type HelixVideoPlaylistProps = {
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  active?: HelixVideoPlaylist["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "default-active"?: HelixVideoPlaylist["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  defaultActive?: HelixVideoPlaylist["defaultActive"];
+  /** Accessible name for the list, which usually has no visible heading. */
+  label?: HelixVideoPlaylist["label"];
+
+  /** Fired before the current entry changes, and cancelable. */
+  "onhelix-change"?: (e: HelixVideoPlaylistHelixChangeElementEvent) => void;
+};
+
+export type HelixVideoPlaylistSolidJsProps = {
+  /** Which item is current, by its `value`.
+
+Called `active`, which is what this mixin is named for and what it was
+not: it declared `value`, so the one mixin whose whole subject is which
+item is active had no such property, and `active` meant something else
+entirely elsewhere in the library. It still does, and only there now:
+`option.active` is the option the keyboard is on, which is a different
+question from which one is chosen.
+
+An accessor pair, the same shape as the other three. Reading gives the
+real item; writing hands ownership to the consumer, so `<helix-tabs
+active="one">` is a set that stays on that tab and `default-active` is
+how markup says where to start. */
+  "prop:active"?: HelixVideoPlaylist["active"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "attr:default-active"?: HelixVideoPlaylist["defaultActive"];
+  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  "prop:defaultActive"?: HelixVideoPlaylist["defaultActive"];
+  /** Accessible name for the list, which usually has no visible heading. */
+  "prop:label"?: HelixVideoPlaylist["label"];
+  /** Fired before the current entry changes, and cancelable. */
+  "on:helix-change"?: (e: HelixVideoPlaylistHelixChangeElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixVideo` component event */
 export type HelixVideoElementEvent<E = Event> = TypedEvent<HelixVideo, E>;
 /** `helix-next` event type */
@@ -19025,6 +19159,140 @@ export type CustomElements = {
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 
   /**
+   * Presentation only: the row, its thumbnail column, and the mark on the one
+   * playing. The base class holds what the entry is and what it announces.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What identifies the entry, and what `active` is compared against.
+   * - `src`: The file this entry plays.
+   * - `poster`: What covers the picture before this entry plays, and the row's thumbnail.
+   *
+   * One property doing both, because they are the same picture: the frame that
+   * stands for the clip stands for it in the list too. It is the `media` slot's
+   * fallback rather than something drawn beside it, which is this library's rule
+   * for a content property, so a consumer with something better to show slots it
+   * and the two can never both appear.
+   * - `disabled`: Whether the entry can be chosen.
+   * - `current`: Whether the player is on this entry.
+   *
+   * Written by the playlist rather than by the entry, the way an option's
+   * selection is: an entry that made itself current would be a second answer to
+   * which one is playing. (property only)
+   * - `text`: The entry's name, which is the words and not everything in it.
+   *
+   * `textContent` was what this used, and it takes the whole subtree: a row with
+   * a duration in `meta` reported "His Girl Friday0:06", and that string went to
+   * the player and on to the lock screen. Only the nodes the consumer left
+   * unslotted are the name; anything named is a column beside it.
+   *
+   * Light DOM rather than `assignedNodes`, so it answers on the server too,
+   * where there is no slot to ask. `Option.text` reads its own the same way. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the entry is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entry's name.
+   * - `media`: A thumbnail. Falls back to an image of `poster`.
+   * - `meta`: After the name. A duration, or a date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-playlist-item-background-color`: Fill behind a row. (default: `undefined`)
+   * - `--video-playlist-media-size`: Width of the thumbnail column. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `item`: The row, which is a button.
+   * - `media`: The leading column.
+   * - `thumbnail`: The image `poster` falls back to.
+   * - `label`: The name and whatever follows it.
+   */
+  "helix-video-playlist-item": Partial<
+    HelixVideoPlaylistItemProps & BaseProps<HelixVideoPlaylistItem> & BaseEvents
+  >;
+
+  /**
+   * Presentation only: the arrangement of the two regions and the scroller the
+   * entries sit in. Everything about which clip is current is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `label`: Accessible name for the list, which usually has no visible heading.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the current entry changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   * - `player`: The `helix-video` they play in.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-playlist-layout`: Columns for the player and the list. (default: `undefined`)
+   * - `--video-playlist-size`: How tall the list gets before it scrolls. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `player`: The region holding the player.
+   * - `items`: The list of entries.
+   */
+  "helix-video-playlist": Partial<
+    HelixVideoPlaylistProps & BaseProps<HelixVideoPlaylist> & BaseEvents
+  >;
+
+  /**
    * The player is the base tier's. What this adds is the bar: where it sits, when
    * it is there, and what the two ranges look like, which is the whole reason to
    * replace a control set that cannot be styled.
@@ -19289,7 +19557,7 @@ export type CustomElementsSolidJs = {
       HelixAccordionItemSolidJsProps &
       BaseProps<HelixAccordionItem> &
       BaseEvents
-  >;
+  > & HelixAccordionItemControlledSolidJs;
 
   /**
    * Items share one rule between neighbours rather than each drawing its own, so
@@ -20243,7 +20511,7 @@ export type CustomElementsSolidJs = {
       HelixCarouselSolidJsProps &
       BaseProps<HelixCarousel> &
       BaseEvents
-  >;
+  > & HelixCarouselControlledSolidJs;
 
   /**
    * A column by default, which is what a list of choices wants: the eye scans one
@@ -20464,7 +20732,7 @@ export type CustomElementsSolidJs = {
       HelixCheckboxSolidJsProps &
       BaseProps<HelixCheckbox> &
       BaseEvents
-  >;
+  > & HelixCheckboxControlledSolidJs;
 
   /**
    * The header sits above the code rather than floating on it. Overlaid, which is
@@ -20728,7 +20996,7 @@ export type CustomElementsSolidJs = {
       HelixColorInputSolidJsProps &
       BaseProps<HelixColorInput> &
       BaseEvents
-  >;
+  > & HelixColorInputControlledSolidJs;
 
   /**
    * **The square is painted in three layers, not composited from elements**: the
@@ -20901,7 +21169,7 @@ export type CustomElementsSolidJs = {
       HelixColorPickerSolidJsProps &
       BaseProps<HelixColorPicker> &
       BaseEvents
-  >;
+  > & HelixColorPickerControlledSolidJs;
 
   /**
    * The frame is the field rather than the input, so the caret, the marks and the
@@ -21110,7 +21378,7 @@ export type CustomElementsSolidJs = {
       HelixComboboxSolidJsProps &
       BaseProps<HelixCombobox> &
       BaseEvents
-  >;
+  > & HelixComboboxControlledSolidJs;
 
   /**
    * The palette is a dialog holding a filterable listbox, so what this tier adds
@@ -21207,7 +21475,7 @@ export type CustomElementsSolidJs = {
       HelixCommandSolidJsProps &
       BaseProps<HelixCommand> &
       BaseEvents
-  >;
+  > & HelixCommandControlledSolidJs;
 
   /**
    * Takes the icon button's square box, then stacks its two faces in one grid
@@ -21543,7 +21811,7 @@ export type CustomElementsSolidJs = {
       HelixDateInputSolidJsProps &
       BaseProps<HelixDateInput> &
       BaseEvents
-  >;
+  > & HelixDateInputControlledSolidJs;
 
   /**
    * Six week rows always, so the grid keeps one height and a month change does
@@ -21694,7 +21962,7 @@ export type CustomElementsSolidJs = {
       HelixDatePickerSolidJsProps &
       BaseProps<HelixDatePicker> &
       BaseEvents
-  >;
+  > & HelixDatePickerControlledSolidJs;
 
   /**
    * The panel is `surface-overlay` with a shadow, because that is what it is: a
@@ -21798,7 +22066,7 @@ export type CustomElementsSolidJs = {
       HelixDialogSolidJsProps &
       BaseProps<HelixDialog> &
       BaseEvents
-  >;
+  > & HelixDialogControlledSolidJs;
 
   /**
    * A one-pixel rule in the border color, running the full inline size by
@@ -21956,7 +22224,7 @@ export type CustomElementsSolidJs = {
       HelixDrawerSolidJsProps &
       BaseProps<HelixDrawer> &
       BaseEvents
-  >;
+  > & HelixDrawerControlledSolidJs;
 
   /**
    * A row is a full-width band rather than an inset pill, for the reason the
@@ -22661,7 +22929,7 @@ export type CustomElementsSolidJs = {
       HelixInputSolidJsProps &
       BaseProps<HelixInput> &
       BaseEvents
-  >;
+  > & HelixInputControlledSolidJs;
 
   /**
    * Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
@@ -22970,7 +23238,7 @@ export type CustomElementsSolidJs = {
       HelixListboxSolidJsProps &
       BaseProps<HelixListbox> &
       BaseEvents
-  >;
+  > & HelixListboxControlledSolidJs;
 
   /**
    * Sized in `em`, so it matches whatever text it sits beside without being told.
@@ -23241,7 +23509,7 @@ export type CustomElementsSolidJs = {
    */
   "helix-menu": Partial<
     HelixMenuProps & HelixMenuSolidJsProps & BaseProps<HelixMenu> & BaseEvents
-  >;
+  > & HelixMenuControlledSolidJs;
 
   /**
    * The bar `Progress` draws, at twice the height and on the house corner rather
@@ -23549,7 +23817,7 @@ export type CustomElementsSolidJs = {
       HelixNumberInputSolidJsProps &
       BaseProps<HelixNumberInput> &
       BaseEvents
-  >;
+  > & HelixNumberInputControlledSolidJs;
 
   /**
    * The heading is set small and quiet, because it is a divider that happens to
@@ -23872,7 +24140,7 @@ export type CustomElementsSolidJs = {
       HelixPaginationSolidJsProps &
       BaseProps<HelixPagination> &
       BaseEvents
-  >;
+  > & HelixPaginationControlledSolidJs;
 
   /**
    * A `Select`, laid out on one row. Every other field stacks its label because it
@@ -23920,7 +24188,7 @@ export type CustomElementsSolidJs = {
       HelixPaginationSizeSolidJsProps &
       BaseProps<HelixPaginationSize> &
       BaseEvents
-  >;
+  > & HelixPaginationSizeControlledSolidJs;
 
   /**
    * Prose beside the controls rather than one of them: no box and no hover, in the
@@ -24094,7 +24362,7 @@ export type CustomElementsSolidJs = {
       HelixPinInputSolidJsProps &
       BaseProps<HelixPinInput> &
       BaseEvents
-  >;
+  > & HelixPinInputControlledSolidJs;
 
   /**
    * A surface with an inset and a shadow, and nothing about what goes in it. The
@@ -24192,7 +24460,7 @@ export type CustomElementsSolidJs = {
       HelixPopoverSolidJsProps &
       BaseProps<HelixPopover> &
       BaseEvents
-  >;
+  > & HelixPopoverControlledSolidJs;
 
   /**
    * A track and the part of it that is done. The height comes from a token rather
@@ -24511,7 +24779,7 @@ export type CustomElementsSolidJs = {
       HelixRadioGroupSolidJsProps &
       BaseProps<HelixRadioGroup> &
       BaseEvents
-  >;
+  > & HelixRadioGroupControlledSolidJs;
 
   /**
    * A circle with a dot in it, drawn here rather than by the browser for the
@@ -25179,7 +25447,7 @@ export type CustomElementsSolidJs = {
       HelixSelectSolidJsProps &
       BaseProps<HelixSelect> &
       BaseEvents
-  >;
+  > & HelixSelectControlledSolidJs;
 
   /**
    * A sweep rather than a pulse. A block fading in and out reads as something
@@ -25373,7 +25641,7 @@ export type CustomElementsSolidJs = {
       HelixSliderSolidJsProps &
       BaseProps<HelixSlider> &
       BaseEvents
-  >;
+  > & HelixSliderControlledSolidJs;
 
   /**
    * The divider is a line to look at and a box to hit, and they are different
@@ -25521,7 +25789,7 @@ export type CustomElementsSolidJs = {
       HelixSplitterSolidJsProps &
       BaseProps<HelixSplitter> &
       BaseEvents
-  >;
+  > & HelixSplitterControlledSolidJs;
 
   /**
    * Wraps rather than scrolls, and each figure keeps its own width instead of
@@ -25893,7 +26161,7 @@ export type CustomElementsSolidJs = {
       HelixSwitchSolidJsProps &
       BaseProps<HelixSwitch> &
       BaseEvents
-  >;
+  > & HelixSwitchControlledSolidJs;
 
   /**
    * Hairline rules between rows and no fill, per the rule that depth comes from a
@@ -26459,7 +26727,7 @@ export type CustomElementsSolidJs = {
       HelixTextareaSolidJsProps &
       BaseProps<HelixTextarea> &
       BaseEvents
-  >;
+  > & HelixTextareaControlledSolidJs;
 
   /**
    * The frame is the field rather than the input, so the trigger sits inside the
@@ -26654,7 +26922,7 @@ export type CustomElementsSolidJs = {
       HelixTimeInputSolidJsProps &
       BaseProps<HelixTimeInput> &
       BaseEvents
-  >;
+  > & HelixTimeInputControlledSolidJs;
 
   /**
    * A bounded list on a surface of its own, because ninety-six rows is taller than
@@ -26849,7 +27117,7 @@ export type CustomElementsSolidJs = {
       HelixTimePickerSolidJsProps &
       BaseProps<HelixTimePicker> &
       BaseEvents
-  >;
+  > & HelixTimePickerControlledSolidJs;
 
   /**
    * A surface with a shadow, because a toast sits over whatever the reader was
@@ -26937,7 +27205,7 @@ export type CustomElementsSolidJs = {
       HelixToastItemSolidJsProps &
       BaseProps<HelixToastItem> &
       BaseEvents
-  >;
+  > & HelixToastItemControlledSolidJs;
 
   /**
    * Fixed to the window, and it catches nothing: the region spans a whole edge,
@@ -27116,7 +27384,7 @@ export type CustomElementsSolidJs = {
       HelixToggleGroupSolidJsProps &
       BaseProps<HelixToggleGroup> &
       BaseEvents
-  >;
+  > & HelixToggleGroupControlledSolidJs;
 
   /**
    * Carries no background of its own. The selected look comes from the group's
@@ -27325,7 +27593,7 @@ export type CustomElementsSolidJs = {
       HelixTooltipSolidJsProps &
       BaseProps<HelixTooltip> &
       BaseEvents
-  >;
+  > & HelixTooltipControlledSolidJs;
 
   /**
    * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
@@ -27465,7 +27733,7 @@ export type CustomElementsSolidJs = {
       HelixTreeItemSolidJsProps &
       BaseProps<HelixTreeItem> &
       BaseEvents
-  >;
+  > & HelixTreeItemControlledSolidJs;
 
   /**
    * Quiet by default: no rules between rows and no fill except on the selected
@@ -27565,6 +27833,146 @@ export type CustomElementsSolidJs = {
    */
   "helix-tree": Partial<
     HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents
+  >;
+
+  /**
+   * Presentation only: the row, its thumbnail column, and the mark on the one
+   * playing. The base class holds what the entry is and what it announces.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What identifies the entry, and what `active` is compared against.
+   * - `src`: The file this entry plays.
+   * - `poster`: What covers the picture before this entry plays, and the row's thumbnail.
+   *
+   * One property doing both, because they are the same picture: the frame that
+   * stands for the clip stands for it in the list too. It is the `media` slot's
+   * fallback rather than something drawn beside it, which is this library's rule
+   * for a content property, so a consumer with something better to show slots it
+   * and the two can never both appear.
+   * - `disabled`: Whether the entry can be chosen.
+   * - `current`: Whether the player is on this entry.
+   *
+   * Written by the playlist rather than by the entry, the way an option's
+   * selection is: an entry that made itself current would be a second answer to
+   * which one is playing. (property only)
+   * - `text`: The entry's name, which is the words and not everything in it.
+   *
+   * `textContent` was what this used, and it takes the whole subtree: a row with
+   * a duration in `meta` reported "His Girl Friday0:06", and that string went to
+   * the player and on to the lock screen. Only the nodes the consumer left
+   * unslotted are the name; anything named is a column beside it.
+   *
+   * Light DOM rather than `assignedNodes`, so it answers on the server too,
+   * where there is no slot to ask. `Option.text` reads its own the same way. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the entry is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entry's name.
+   * - `media`: A thumbnail. Falls back to an image of `poster`.
+   * - `meta`: After the name. A duration, or a date.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-playlist-item-background-color`: Fill behind a row. (default: `undefined`)
+   * - `--video-playlist-media-size`: Width of the thumbnail column. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `wrapper`: The `listitem`, which the button sits in.
+   * - `item`: The row, which is a button.
+   * - `media`: The leading column.
+   * - `thumbnail`: The image `poster` falls back to.
+   * - `label`: The name and whatever follows it.
+   */
+  "helix-video-playlist-item": Partial<
+    HelixVideoPlaylistItemProps &
+      HelixVideoPlaylistItemSolidJsProps &
+      BaseProps<HelixVideoPlaylistItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Presentation only: the arrangement of the two regions and the scroller the
+   * entries sit in. Everything about which clip is current is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `active`: Which item is current, by its `value`.
+   *
+   * Called `active`, which is what this mixin is named for and what it was
+   * not: it declared `value`, so the one mixin whose whole subject is which
+   * item is active had no such property, and `active` meant something else
+   * entirely elsewhere in the library. It still does, and only there now:
+   * `option.active` is the option the keyboard is on, which is a different
+   * question from which one is chosen.
+   *
+   * An accessor pair, the same shape as the other three. Reading gives the
+   * real item; writing hands ownership to the consumer, so `<helix-tabs
+   * active="one">` is a set that stays on that tab and `default-active` is
+   * how markup says where to start.
+   * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
+   * - `label`: Accessible name for the list, which usually has no visible heading.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the current entry changes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   * - `player`: The `helix-video` they play in.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestActive(next: string) => boolean`: Requests a new current item, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. Unlike a native control, nothing has moved
+   * by the time this runs, so refusing is simply not writing: there is
+   * nothing to put back.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-playlist-layout`: Columns for the player and the list. (default: `undefined`)
+   * - `--video-playlist-size`: How tall the list gets before it scrolls. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `player`: The region holding the player.
+   * - `items`: The list of entries.
+   */
+  "helix-video-playlist": Partial<
+    HelixVideoPlaylistProps &
+      HelixVideoPlaylistSolidJsProps &
+      BaseProps<HelixVideoPlaylist> &
+      BaseEvents
   >;
 
   /**
@@ -28145,6 +28553,14 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
+  /** Fill behind a row. */
+  "--video-playlist-item-background-color"?: string;
+  /** Width of the thumbnail column. */
+  "--video-playlist-media-size"?: string;
+  /** Columns for the player and the list. */
+  "--video-playlist-layout"?: string;
+  /** How tall the list gets before it scrolls. */
+  "--video-playlist-size"?: string;
   /** The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. */
   "--video-aspect-ratio"?: string;
   /** Behind the picture, and in the letterbox bars. */
@@ -28255,6 +28671,22 @@ type HelixAccordionItemControlled =
     | { open?: undefined }
   );
 
+/** helix-accordion-item, in Solid's dialect: `on:` and the event name. */
+type HelixAccordionItemControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixAccordionItem["open"];
+        "on:helix-open": (event: HelixAccordionItemHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixAccordionItemHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixAccordionItem["open"];
+        ref: BaseProps<HelixAccordionItem>["ref"];
+      }
+    | { open?: undefined }
+  );
+
 /**
  * helix-carousel: a controlled `index` announces and waits, so the handler comes with it.
  */
@@ -28273,6 +28705,21 @@ type HelixCarouselControlled =
     | { index?: undefined }
   );
 
+/** helix-carousel, in Solid's dialect: `on:` and the event name. */
+type HelixCarouselControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-select`. */
+        index: HelixCarousel["index"];
+        "on:helix-select": (event: HelixCarouselHelixSelectElementEvent) => void;
+      }
+    | {
+        index: HelixCarousel["index"];
+        ref: BaseProps<HelixCarousel>["ref"];
+      }
+    | { index?: undefined }
+  );
+
 /**
  * helix-checkbox: a controlled `checked` announces and waits, so the handler comes with it.
  */
@@ -28287,6 +28734,21 @@ type HelixCheckboxControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         checked: HelixCheckbox["checked"];
         ref: import('react').Ref<HelixCheckbox>;
+      }
+    | { checked?: undefined }
+  );
+
+/** helix-checkbox, in Solid's dialect: `on:` and the event name. */
+type HelixCheckboxControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-toggle`. */
+        checked: HelixCheckbox["checked"];
+        "on:helix-toggle": (event: HelixCheckboxHelixToggleElementEvent) => void;
+      }
+    | {
+        checked: HelixCheckbox["checked"];
+        ref: BaseProps<HelixCheckbox>["ref"];
       }
     | { checked?: undefined }
   );
@@ -28323,6 +28785,34 @@ type HelixColorInputControlled =
     | { value?: undefined }
   );
 
+/** helix-color-input, in Solid's dialect: `on:` and the event name. */
+type HelixColorInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixColorInput["open"];
+        "on:helix-open": (event: HelixColorInputHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixColorInputHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixColorInput["open"];
+        ref: BaseProps<HelixColorInput>["ref"];
+      }
+    | { open?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixColorInput["value"];
+        "on:helix-change": (event: HelixColorInputHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixColorInput["value"];
+        ref: BaseProps<HelixColorInput>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-color-picker: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28337,6 +28827,21 @@ type HelixColorPickerControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixColorPicker["value"];
         ref: import('react').Ref<HelixColorPicker>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-color-picker, in Solid's dialect: `on:` and the event name. */
+type HelixColorPickerControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixColorPicker["value"];
+        "on:helix-change": (event: HelixColorPickerHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixColorPicker["value"];
+        ref: BaseProps<HelixColorPicker>["ref"];
       }
     | { value?: undefined }
   );
@@ -28373,6 +28878,34 @@ type HelixComboboxControlled =
     | { value?: undefined }
   );
 
+/** helix-combobox, in Solid's dialect: `on:` and the event name. */
+type HelixComboboxControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixCombobox["open"];
+        "on:helix-open": (event: HelixComboboxHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixComboboxHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixCombobox["open"];
+        ref: BaseProps<HelixCombobox>["ref"];
+      }
+    | { open?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixCombobox["value"];
+        "on:helix-change": (event: HelixComboboxHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixCombobox["value"];
+        ref: BaseProps<HelixCombobox>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-command: a controlled `open` announces and waits, so the handler comes with it.
  */
@@ -28388,6 +28921,22 @@ type HelixCommandControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         open: HelixCommand["open"];
         ref: import('react').Ref<HelixCommand>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-command, in Solid's dialect: `on:` and the event name. */
+type HelixCommandControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixCommand["open"];
+        "on:helix-open": (event: HelixCommandHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixCommandHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixCommand["open"];
+        ref: BaseProps<HelixCommand>["ref"];
       }
     | { open?: undefined }
   );
@@ -28424,6 +28973,34 @@ type HelixDateInputControlled =
     | { value?: undefined }
   );
 
+/** helix-date-input, in Solid's dialect: `on:` and the event name. */
+type HelixDateInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixDateInput["open"];
+        "on:helix-open": (event: HelixDateInputHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixDateInputHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixDateInput["open"];
+        ref: BaseProps<HelixDateInput>["ref"];
+      }
+    | { open?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixDateInput["value"];
+        "on:helix-change": (event: HelixDateInputHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixDateInput["value"];
+        ref: BaseProps<HelixDateInput>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-date-picker: a controlled `value` or `month` announces and waits, so the handler comes with it.
  */
@@ -28455,6 +29032,33 @@ type HelixDatePickerControlled =
     | { month?: undefined }
   );
 
+/** helix-date-picker, in Solid's dialect: `on:` and the event name. */
+type HelixDatePickerControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixDatePicker["value"];
+        "on:helix-change": (event: HelixDatePickerHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixDatePicker["value"];
+        ref: BaseProps<HelixDatePicker>["ref"];
+      }
+    | { value?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        month: HelixDatePicker["month"];
+        "on:helix-navigate": (event: HelixDatePickerHelixNavigateElementEvent) => void;
+      }
+    | {
+        month: HelixDatePicker["month"];
+        ref: BaseProps<HelixDatePicker>["ref"];
+      }
+    | { month?: undefined }
+  );
+
 /**
  * helix-dialog: a controlled `open` announces and waits, so the handler comes with it.
  */
@@ -28470,6 +29074,22 @@ type HelixDialogControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         open: HelixDialog["open"];
         ref: import('react').Ref<HelixDialog>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-dialog, in Solid's dialect: `on:` and the event name. */
+type HelixDialogControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixDialog["open"];
+        "on:helix-open": (event: HelixDialogHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixDialogHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixDialog["open"];
+        ref: BaseProps<HelixDialog>["ref"];
       }
     | { open?: undefined }
   );
@@ -28493,6 +29113,22 @@ type HelixDrawerControlled =
     | { open?: undefined }
   );
 
+/** helix-drawer, in Solid's dialect: `on:` and the event name. */
+type HelixDrawerControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixDrawer["open"];
+        "on:helix-open": (event: HelixDrawerHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixDrawerHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixDrawer["open"];
+        ref: BaseProps<HelixDrawer>["ref"];
+      }
+    | { open?: undefined }
+  );
+
 /**
  * helix-input: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28507,6 +29143,21 @@ type HelixInputControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixInput["value"];
         ref: import('react').Ref<HelixInput>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-input, in Solid's dialect: `on:` and the event name. */
+type HelixInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-input`. */
+        value: HelixInput["value"];
+        "on:helix-input": (event: HelixInputHelixInputElementEvent) => void;
+      }
+    | {
+        value: HelixInput["value"];
+        ref: BaseProps<HelixInput>["ref"];
       }
     | { value?: undefined }
   );
@@ -28542,6 +29193,33 @@ type HelixListboxControlled =
     | { filter?: undefined }
   );
 
+/** helix-listbox, in Solid's dialect: `on:` and the event name. */
+type HelixListboxControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixListbox["value"];
+        "on:helix-change": (event: HelixListboxHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixListbox["value"];
+        ref: BaseProps<HelixListbox>["ref"];
+      }
+    | { value?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-filter`. */
+        filter: HelixListbox["filter"];
+        "on:helix-filter": (event: HelixListboxHelixFilterElementEvent) => void;
+      }
+    | {
+        filter: HelixListbox["filter"];
+        ref: BaseProps<HelixListbox>["ref"];
+      }
+    | { filter?: undefined }
+  );
+
 /**
  * helix-menu: a controlled `open` announces and waits, so the handler comes with it.
  */
@@ -28557,6 +29235,22 @@ type HelixMenuControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         open: HelixMenu["open"];
         ref: import('react').Ref<HelixMenu>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-menu, in Solid's dialect: `on:` and the event name. */
+type HelixMenuControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixMenu["open"];
+        "on:helix-open": (event: HelixMenuHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixMenuHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixMenu["open"];
+        ref: BaseProps<HelixMenu>["ref"];
       }
     | { open?: undefined }
   );
@@ -28579,6 +29273,21 @@ type HelixNumberInputControlled =
     | { value?: undefined }
   );
 
+/** helix-number-input, in Solid's dialect: `on:` and the event name. */
+type HelixNumberInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-input`. */
+        value: HelixNumberInput["value"];
+        "on:helix-input": (event: HelixNumberInputHelixInputElementEvent) => void;
+      }
+    | {
+        value: HelixNumberInput["value"];
+        ref: BaseProps<HelixNumberInput>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-pagination: a controlled `page` announces and waits, so the handler comes with it.
  */
@@ -28593,6 +29302,21 @@ type HelixPaginationControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         page: HelixPagination["page"];
         ref: import('react').Ref<HelixPagination>;
+      }
+    | { page?: undefined }
+  );
+
+/** helix-pagination, in Solid's dialect: `on:` and the event name. */
+type HelixPaginationControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        page: HelixPagination["page"];
+        "on:helix-navigate": (event: HelixPaginationHelixNavigateElementEvent) => void;
+      }
+    | {
+        page: HelixPagination["page"];
+        ref: BaseProps<HelixPagination>["ref"];
       }
     | { page?: undefined }
   );
@@ -28615,6 +29339,21 @@ type HelixPaginationSizeControlled =
     | { value?: undefined }
   );
 
+/** helix-pagination-size, in Solid's dialect: `on:` and the event name. */
+type HelixPaginationSizeControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixPaginationSize["value"];
+        "on:helix-change": (event: HelixPaginationSizeHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixPaginationSize["value"];
+        ref: BaseProps<HelixPaginationSize>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-pin-input: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28629,6 +29368,21 @@ type HelixPinInputControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixPinInput["value"];
         ref: import('react').Ref<HelixPinInput>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-pin-input, in Solid's dialect: `on:` and the event name. */
+type HelixPinInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-input`. */
+        value: HelixPinInput["value"];
+        "on:helix-input": (event: HelixPinInputHelixInputElementEvent) => void;
+      }
+    | {
+        value: HelixPinInput["value"];
+        ref: BaseProps<HelixPinInput>["ref"];
       }
     | { value?: undefined }
   );
@@ -28652,6 +29406,22 @@ type HelixPopoverControlled =
     | { open?: undefined }
   );
 
+/** helix-popover, in Solid's dialect: `on:` and the event name. */
+type HelixPopoverControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixPopover["open"];
+        "on:helix-open": (event: HelixPopoverHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixPopoverHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixPopover["open"];
+        ref: BaseProps<HelixPopover>["ref"];
+      }
+    | { open?: undefined }
+  );
+
 /**
  * helix-radio-group: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28666,6 +29436,21 @@ type HelixRadioGroupControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixRadioGroup["value"];
         ref: import('react').Ref<HelixRadioGroup>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-radio-group, in Solid's dialect: `on:` and the event name. */
+type HelixRadioGroupControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixRadioGroup["value"];
+        "on:helix-change": (event: HelixRadioGroupHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixRadioGroup["value"];
+        ref: BaseProps<HelixRadioGroup>["ref"];
       }
     | { value?: undefined }
   );
@@ -28702,6 +29487,34 @@ type HelixSelectControlled =
     | { value?: undefined }
   );
 
+/** helix-select, in Solid's dialect: `on:` and the event name. */
+type HelixSelectControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixSelect["open"];
+        "on:helix-open": (event: HelixSelectHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixSelectHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixSelect["open"];
+        ref: BaseProps<HelixSelect>["ref"];
+      }
+    | { open?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixSelect["value"];
+        "on:helix-change": (event: HelixSelectHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixSelect["value"];
+        ref: BaseProps<HelixSelect>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-slider: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28716,6 +29529,21 @@ type HelixSliderControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixSlider["value"];
         ref: import('react').Ref<HelixSlider>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-slider, in Solid's dialect: `on:` and the event name. */
+type HelixSliderControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-input`. */
+        value: HelixSlider["value"];
+        "on:helix-input": (event: HelixSliderHelixInputElementEvent) => void;
+      }
+    | {
+        value: HelixSlider["value"];
+        ref: BaseProps<HelixSlider>["ref"];
       }
     | { value?: undefined }
   );
@@ -28751,6 +29579,33 @@ type HelixSplitterControlled =
     | { collapsed?: undefined }
   );
 
+/** helix-splitter, in Solid's dialect: `on:` and the event name. */
+type HelixSplitterControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        position: HelixSplitter["position"];
+        "on:helix-change": (event: HelixSplitterHelixChangeElementEvent) => void;
+      }
+    | {
+        position: HelixSplitter["position"];
+        ref: BaseProps<HelixSplitter>["ref"];
+      }
+    | { position?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        collapsed: HelixSplitter["collapsed"];
+        "on:helix-change": (event: HelixSplitterHelixChangeElementEvent) => void;
+      }
+    | {
+        collapsed: HelixSplitter["collapsed"];
+        ref: BaseProps<HelixSplitter>["ref"];
+      }
+    | { collapsed?: undefined }
+  );
+
 /**
  * helix-switch: a controlled `checked` announces and waits, so the handler comes with it.
  */
@@ -28769,6 +29624,21 @@ type HelixSwitchControlled =
     | { checked?: undefined }
   );
 
+/** helix-switch, in Solid's dialect: `on:` and the event name. */
+type HelixSwitchControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-toggle`. */
+        checked: HelixSwitch["checked"];
+        "on:helix-toggle": (event: HelixSwitchHelixToggleElementEvent) => void;
+      }
+    | {
+        checked: HelixSwitch["checked"];
+        ref: BaseProps<HelixSwitch>["ref"];
+      }
+    | { checked?: undefined }
+  );
+
 /**
  * helix-textarea: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28783,6 +29653,21 @@ type HelixTextareaControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixTextarea["value"];
         ref: import('react').Ref<HelixTextarea>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-textarea, in Solid's dialect: `on:` and the event name. */
+type HelixTextareaControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-input`. */
+        value: HelixTextarea["value"];
+        "on:helix-input": (event: HelixTextareaHelixInputElementEvent) => void;
+      }
+    | {
+        value: HelixTextarea["value"];
+        ref: BaseProps<HelixTextarea>["ref"];
       }
     | { value?: undefined }
   );
@@ -28819,6 +29704,34 @@ type HelixTimeInputControlled =
     | { value?: undefined }
   );
 
+/** helix-time-input, in Solid's dialect: `on:` and the event name. */
+type HelixTimeInputControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixTimeInput["open"];
+        "on:helix-open": (event: HelixTimeInputHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixTimeInputHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixTimeInput["open"];
+        ref: BaseProps<HelixTimeInput>["ref"];
+      }
+    | { open?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixTimeInput["value"];
+        "on:helix-change": (event: HelixTimeInputHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixTimeInput["value"];
+        ref: BaseProps<HelixTimeInput>["ref"];
+      }
+    | { value?: undefined }
+  );
+
 /**
  * helix-time-picker: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28833,6 +29746,21 @@ type HelixTimePickerControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixTimePicker["value"];
         ref: import('react').Ref<HelixTimePicker>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-time-picker, in Solid's dialect: `on:` and the event name. */
+type HelixTimePickerControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixTimePicker["value"];
+        "on:helix-change": (event: HelixTimePickerHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixTimePicker["value"];
+        ref: BaseProps<HelixTimePicker>["ref"];
       }
     | { value?: undefined }
   );
@@ -28855,6 +29783,21 @@ type HelixToastItemControlled =
     | { open?: undefined }
   );
 
+/** helix-toast-item, in Solid's dialect: `on:` and the event name. */
+type HelixToastItemControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-dismiss`. */
+        open: HelixToastItem["open"];
+        "on:helix-dismiss": (event: HelixToastItemHelixDismissElementEvent) => void;
+      }
+    | {
+        open: HelixToastItem["open"];
+        ref: BaseProps<HelixToastItem>["ref"];
+      }
+    | { open?: undefined }
+  );
+
 /**
  * helix-toggle-group: a controlled `value` announces and waits, so the handler comes with it.
  */
@@ -28869,6 +29812,21 @@ type HelixToggleGroupControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         value: HelixToggleGroup["value"];
         ref: import('react').Ref<HelixToggleGroup>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-toggle-group, in Solid's dialect: `on:` and the event name. */
+type HelixToggleGroupControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixToggleGroup["value"];
+        "on:helix-change": (event: HelixToggleGroupHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixToggleGroup["value"];
+        ref: BaseProps<HelixToggleGroup>["ref"];
       }
     | { value?: undefined }
   );
@@ -28892,6 +29850,22 @@ type HelixTooltipControlled =
     | { open?: undefined }
   );
 
+/** helix-tooltip, in Solid's dialect: `on:` and the event name. */
+type HelixTooltipControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixTooltip["open"];
+        "on:helix-open": (event: HelixTooltipHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixTooltipHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixTooltip["open"];
+        ref: BaseProps<HelixTooltip>["ref"];
+      }
+    | { open?: undefined }
+  );
+
 /**
  * helix-tree-item: a controlled `open` announces and waits, so the handler comes with it.
  */
@@ -28907,6 +29881,22 @@ type HelixTreeItemControlled =
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
         open: HelixTreeItem["open"];
         ref: import('react').Ref<HelixTreeItem>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-tree-item, in Solid's dialect: `on:` and the event name. */
+type HelixTreeItemControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixTreeItem["open"];
+        "on:helix-open": (event: HelixTreeItemHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixTreeItemHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixTreeItem["open"];
+        ref: BaseProps<HelixTreeItem>["ref"];
       }
     | { open?: undefined }
   );

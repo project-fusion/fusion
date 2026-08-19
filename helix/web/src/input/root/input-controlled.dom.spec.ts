@@ -42,7 +42,9 @@ describe('a control that is controlled and unattended says so', () => {
        symptom is a field that ignores typing. */
     const host = await input('value="Ada"')
     const said = await warnings(() => {
+      // Twice: unmoved across two requests is unanswered, whatever the timing.
       host.requestValue('Grace')
+      host.requestValue('Hopper')
     })
     expect(said).toHaveLength(1)
     expect(said[0]).toContain('<helix-input> is controlled')
@@ -70,6 +72,35 @@ describe('a control that is controlled and unattended says so', () => {
         host.value = value
       })
     })
+    expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
+  })
+
+  /* The case the old deadline got wrong. A consumer who answers by navigating
+     cannot have moved the state within a task, and was accused of not
+     listening: our own documentation nav derives a tree's `active` from the
+     route and does exactly this. There is no deadline now, so a slow answer is
+     an answer. */
+  test('a consumer answering long after the fact is not accused', async () => {
+    const host = await input('value="Ada"')
+    host.addEventListener('helix-input', (event) => {
+      const { value } = (event as CustomEvent<{ value: string }>).detail
+      setTimeout(() => {
+        host.value = value
+      }, 8)
+    })
+
+    const said = await warnings(async () => {
+      host.requestValue('Grace')
+      await new Promise((done) => setTimeout(done, 20))
+      host.requestValue('Hopper')
+    })
+
+    expect(said).toEqual([])
+  })
+
+  test('one request is never enough to accuse, however long nothing answers', async () => {
+    const host = await input('value="Ada"')
+
     expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
   })
 
