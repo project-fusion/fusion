@@ -23,18 +23,6 @@ export interface ControlledChangeOptions<T> {
   /** The property being requested, named as a consumer writes it. */
   label?: string | undefined
 
-  /**
-   * The consumer's callback, invoked after the change is applied.
-   *
-   * A second channel beside the event, for framework consumers. Note that a
-   * React consumer cannot supply this through plain JSX: React reserves every
-   * prop matching `on[A-Z]` for its own event system and drops the ones it does
-   * not recognize, so `onOpenChange` never reaches the element. The generated
-   * wrapper attaches a real listener instead. This is for a consumer holding a
-   * reference, or a framework that assigns properties.
-   */
-  notify?: ((next: T) => void) | undefined
-
   /** The state being requested. */
   next: T
 
@@ -109,10 +97,17 @@ const auditUnanswered = <T>(
  * Returns whether the change was applied, so a caller that needs to know
  * (a key handler deciding whether to also move focus) can ask.
  *
- * A throwing `notify` is caught and logged rather than rethrown. A consumer's
- * broken callback must not corrupt the element's state or abort the rest of a
- * coordinated update, and there is nothing useful this can do about it besides
- * make it visible.
+ * **There is one channel, and it is the event.** `onCheckedChange`,
+ * `onOpenChange`, `onValueChange` and `onActiveChange` were a second one,
+ * invoked from here once the state had been applied. They were removed on
+ * 19 Aug 2026, for working in fewer places than the thing they duplicated:
+ * React takes any `on[A-Z]` prop into its own branch and calls
+ * `addEventListener('CheckedChange', …)` with it, an event nothing dispatches,
+ * so no consumer writing JSX could reach one. The justification written beside
+ * them was that the generated React wrapper assigned them instead, and that
+ * package was deleted in `6bc8502`, which left four documented properties that
+ * only a consumer holding a reference could use. `helix-change` reaches every
+ * consumer in every framework, hydration included.
  */
 export const requestControlledChange = <T>({
   apply,
@@ -120,7 +115,6 @@ export const requestControlledChange = <T>({
   event,
   host,
   label,
-  notify,
   next,
   read,
 }: ControlledChangeOptions<T>): boolean => {
@@ -143,14 +137,6 @@ export const requestControlledChange = <T>({
   }
 
   apply(next)
-
-  if (notify) {
-    try {
-      notify(next)
-    } catch (error) {
-      console.error('A Helix change callback threw. State was applied anyway.', error)
-    }
-  }
 
   return true
 }

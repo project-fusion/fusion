@@ -575,6 +575,15 @@ The bug underneath is React's, [facebook/react#35446](https://github.com/faceboo
 open since January 2026 with a proposed fix unmerged. When it lands this becomes
 dead weight and should go.
 
+**Object and function *properties* have the same bug and are not fixed.** React
+skips everything it would have to apply imperatively while hydrating; strings,
+numbers and booleans survive only because the server wrote them as attributes.
+Binding at dispatch cannot be repeated for a property, which has to be right
+before the first paint rather than by the time somebody interacts. The design
+that would work, and why it is deliberately unbuilt, is written out beside
+`bindReactHandler`. It becomes real the first time a component declares an
+object property, and not before.
+
 `useHelixEvent` in `site/ui/lib` is no longer needed for hydration. It is still
 right where the element itself can change, which is what `useElementRef` is for.
 
@@ -587,9 +596,24 @@ reaches for first and what has to keep working once React fixes this.
 `HelixOpen` that nobody dispatches, and never reaches the property of that name
 either, because React takes the `on` branch before the one that would assign it.
 
-That last part is the whole of why `onCheckedChange` and its siblings do not
-work from JSX. They are not dropped: `addEventListener('CheckedChange', …)` is
-called, for an event nothing sends.
+That last part is why `onCheckedChange` and its siblings never worked from
+JSX, and why they are gone. They were not dropped:
+`addEventListener('CheckedChange', …)` was called, for an event nothing sends.
+
+**There is one channel per fact, and it is the event.** The four callback
+properties on the controller mixins were removed 19 Aug 2026. They duplicated
+`helix-change`, were unreachable from the JSX every React consumer writes, and
+were justified in their own comments by a generated wrapper that had already
+been deleted. A consumer who wrote one now gets a warning naming it, because
+removing a property is silent in a way removing an event is not.
+
+**And no hyphenated JSX prop is type-checked, by anyone.** TypeScript exempts a
+JSX attribute whose name is not a valid identifier from checking on an intrinsic
+element, so `onhelix-opne`, `on:helix-open` and an invented `totally-made-up`
+all compile clean against the generated types, which do reject a wrong *value*
+on a normal attribute. Measured with `tsc`. `HelixElement` therefore reads the
+props React is holding and warns, once per element, about an `on` prop attached
+to nothing. That is the only place it can be caught.
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to

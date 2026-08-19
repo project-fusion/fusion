@@ -28,16 +28,6 @@ export declare class MixinControllerCheckedInterface {
   defaultChecked: boolean
 
   /**
-   * The consumer's callback, invoked after the state is applied.
-   *
-   * A React consumer cannot pass this through JSX: React reserves every prop
-   * matching `on[A-Z]` and drops the ones it does not recognize. The generated
-   * wrapper listens for `helix-change` instead. This is for a consumer
-   * holding a reference, or a framework that assigns properties.
-   */
-  onCheckedChange: ((checked: boolean) => void) | undefined
-
-  /**
    * Requests a checked change, and reports whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
@@ -148,17 +138,6 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * The consumer's callback, invoked after the state is applied.
-     *
-     * Not an attribute: it is a function. And not reachable from React's JSX,
-     * which reserves every `on[A-Z]` prop for its own event system and drops
-     * what it does not recognize; the generated wrapper listens for the event
-     * instead.
-     */
-    @property({ attribute: false })
-    onCheckedChange: ((checked: boolean) => void) | undefined = undefined
-
-    /**
      * Requests a checked change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
@@ -189,7 +168,6 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
         host: this,
         label: 'checked',
         next,
-        notify: this.onCheckedChange,
         read: () => this.checked,
       })
     }

@@ -437,6 +437,17 @@ const registry = {
   HelixSelectEvent,
 } as const
 
+/**
+ * Every name this library dispatches.
+ *
+ * Exported so a runtime check can ask whether a name is one of ours without
+ * keeping a second list of them. `HelixElement` uses it to tell a consumer that
+ * the handler prop they wrote is attached to nothing.
+ */
+export const helixEventNames: ReadonlySet<string> = new Set(
+  Object.values(registry).map((event) => event.eventName),
+)
+
 type Registry = typeof registry
 
 /**

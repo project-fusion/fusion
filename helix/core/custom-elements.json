@@ -1424,6 +1424,15 @@
             "module": "src/events/events.ts"
           },
           "helix": {}
+        },
+        {
+          "kind": "variable",
+          "name": "helixEventNames",
+          "type": {
+            "text": "ReadonlySet<string>"
+          },
+          "default": "new Set( Object.values(registry).map((event) => event.eventName), )",
+          "description": "Every name this library dispatches.\n\nExported so a runtime check can ask whether a name is one of ours without\nkeeping a second list of them. `HelixElement` uses it to tell a consumer that\nthe handler prop they wrote is attached to nothing."
         }
       ],
       "exports": [
@@ -1520,6 +1529,14 @@
           "name": "HelixSelectEvent",
           "declaration": {
             "name": "HelixSelectEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "helixEventNames",
+          "declaration": {
+            "name": "helixEventNames",
             "module": "src/events/events.ts"
           }
         }
@@ -2813,14 +2830,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "onActiveChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "description": "The consumer's callback, invoked after the change is applied.\n\nNot reachable from React's JSX, which reserves every `on[A-Z]` prop for its\nown event system; the generated wrapper listens for the event instead."
-            },
-            {
-              "kind": "field",
               "name": "active",
               "type": {
                 "text": "string"
@@ -2880,15 +2889,6 @@
           "description": "Grafts \"which one of these is the current one\" onto a container.\n\nFor a set where one member is current and the set is not a form control:\ntabs, a tree, a nav bar, a carousel. Where it *is* a form control the value\nis submitted and belongs to `MixinControllerValue`, which is why these are\ntwo mixins and not one with a flag.\n\n**Announcing before applying is the part worth sharing.** `Tabs` and `Tree`\nboth wrote the current value straight from the item's event, so a consumer\nhad no way to refuse a change, while `Radio.Group` announced first. Neither\nwas wrong on its own and the two together are: whether a selection can be\nrefused should not depend on which component a reader is looking at.\n\n**The fallback is the other half.** Four components had written\n`items.find(match) ?? items[0]`, and it is not the obvious line it looks\nlike: it is what makes a set with a `value` naming nothing still show\nsomething, which is every set before its consumer has set one and every set\nwhose current item has just been removed. `resolveActive` also skips disabled\nitems, which the hand-written copies did not, so a set opening on a disabled\nfirst item showed it as current.",
           "name": "MixinControllerActive",
           "members": [
-            {
-              "kind": "field",
-              "name": "onActiveChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the change is applied."
-            },
             {
               "kind": "field",
               "name": "active",
@@ -3049,14 +3049,6 @@
               "description": "Initial checked state for uncontrolled use. Ignored once `checked` is set."
             },
             {
-              "kind": "field",
-              "name": "onCheckedChange",
-              "type": {
-                "text": "((checked: boolean) => void) | undefined"
-              },
-              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognize. The generated\nwrapper listens for `helix-change` instead. This is for a consumer\nholding a reference, or a framework that assigns properties."
-            },
-            {
               "kind": "method",
               "name": "requestChecked",
               "return": {
@@ -3149,15 +3141,6 @@
               },
               "privacy": "private",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "onCheckedChange",
-              "type": {
-                "text": "((checked: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the event\ninstead."
             },
             {
               "kind": "method",
@@ -3290,14 +3273,6 @@
               "description": "Whether the element is open.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the element announces changes and applies none\nof them, and waits to be told."
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "description": "The consumer's callback, invoked after the state is applied.\n\nA React consumer cannot pass this through JSX: React reserves every prop\nmatching `on[A-Z]` and drops the ones it does not recognize. The generated\nwrapper attaches a listener for `helix-open` and `helix-close` instead.\nThis is for a consumer holding a reference, or a framework that assigns\nproperties."
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -3380,15 +3355,6 @@
               },
               "privacy": "private",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead."
             },
             {
               "kind": "method",
@@ -3493,14 +3459,6 @@
               "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told."
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot reachable from React's JSX, which reserves every `on[A-Z]` prop for its\nown event system; the generated wrapper listens for `helix-change` instead."
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -3601,15 +3559,6 @@
               },
               "privacy": "private",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all."
             },
             {
               "kind": "method",
@@ -4593,13 +4542,13 @@
           },
           "parameters": [
             {
-              "name": "{\n  apply,\n  controlled,\n  event,\n  host,\n  label,\n  notify,\n  next,\n  read,\n}",
+              "name": "{\n  apply,\n  controlled,\n  event,\n  host,\n  label,\n  next,\n  read,\n}",
               "type": {
                 "text": "ControlledChangeOptions<T>"
               }
             }
           ],
-          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\nA throwing `notify` is caught and logged rather than rethrown. A consumer's\nbroken callback must not corrupt the element's state or abort the rest of a\ncoordinated update, and there is nothing useful this can do about it besides\nmake it visible."
+          "description": "Announces a change, then applies it if nobody refused.\n\nOne audited path for every stateful change in the system. The order is the\nwhole point: the event goes first and carries the state being *proposed*, so\na listener calling `preventDefault()` stops it before anything moves. A\ncomponent that mutated itself and then announced it would leave a consumer\nreacting to a decision already made.\n\nReturns whether the change was applied, so a caller that needs to know\n(a key handler deciding whether to also move focus) can ask.\n\n**There is one channel, and it is the event.** `onCheckedChange`,\n`onOpenChange`, `onValueChange` and `onActiveChange` were a second one,\ninvoked from here once the state had been applied. They were removed on\n19 Aug 2026, for working in fewer places than the thing they duplicated:\nReact takes any `on[A-Z]` prop into its own branch and calls\n`addEventListener('CheckedChange', …)` with it, an event nothing dispatches,\nso no consumer writing JSX could reach one. The justification written beside\nthem was that the generated React wrapper assigned them instead, and that\npackage was deleted in `6bc8502`, which left four documented properties that\nonly a consumer holding a reference could use. `helix-change` reaches every\nconsumer in every framework, hydration included."
         }
       ],
       "exports": [

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion-io/testing/dom'
 
 const tag = 'probe-element'
@@ -92,5 +92,67 @@ describe('the handler React is holding', () => {
     document.body.append(element)
 
     expect(() => element.dispatchEvent(new CustomEvent('helix-open'))).not.toThrow()
+  })
+})
+
+describe('a handler prop attached to nothing', () => {
+  /* TypeScript cannot see any of these: a JSX attribute whose name is not a
+     valid identifier is exempt from checking on an intrinsic element, and every
+     Helix event prop carries a hyphen. Runtime is the only place left. */
+  const warnings: string[] = []
+  const real = console.warn
+
+  beforeEach(() => {
+    warnings.length = 0
+    console.warn = (message: string) => warnings.push(message)
+  })
+
+  afterEach(() => {
+    console.warn = real
+  })
+
+  test('a misspelled event name is named, along with what nothing dispatches', () => {
+    const element = hydrated({ 'onhelix-opne': () => {} })
+
+    element.dispatchEvent(new CustomEvent('helix-open'))
+
+    expect(warnings[0]).toContain('onhelix-opne')
+    expect(warnings[0]).toContain('nothing dispatches')
+  })
+
+  test("Solid's `on:` form is called what it is, rather than reported as a typo", () => {
+    const element = hydrated({ 'on:helix-open': () => {} })
+
+    element.dispatchEvent(new CustomEvent('helix-open'))
+
+    expect(warnings[0]).toContain("Solid's syntax")
+    expect(warnings[0]).toContain('onhelix-open')
+  })
+
+  test('a removed callback property says it was removed', () => {
+    const element = hydrated({ onCheckedChange: () => {} })
+
+    element.dispatchEvent(new CustomEvent('helix-change'))
+
+    expect(warnings[0]).toContain('onCheckedChange')
+    expect(warnings[0]).toContain('removed')
+  })
+
+  test('a correct prop says nothing at all', () => {
+    const element = hydrated({ 'onhelix-open': () => {} })
+
+    element.dispatchEvent(new CustomEvent('helix-open'))
+
+    expect(warnings).toEqual([])
+  })
+
+  test('says it once, not on every keystroke', () => {
+    const element = hydrated({ 'onhelix-opne': () => {} })
+
+    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-open'))
+    element.dispatchEvent(new CustomEvent('helix-open'))
+
+    expect(warnings).toHaveLength(1)
   })
 })

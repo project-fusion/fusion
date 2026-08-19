@@ -36,14 +36,6 @@ export declare class MixinControllerValueInterface {
    */
   value: string
 
-  /**
-   * The consumer's callback, invoked after the value is applied.
-   *
-   * Not reachable from React's JSX, which reserves every `on[A-Z]` prop for its
-   * own event system; the generated wrapper listens for `helix-change` instead.
-   */
-  onValueChange: ((value: string) => void) | undefined
-
   /** Requests a new value, and reports whether the request stood. */
   requestValue(next: string): boolean
 
@@ -152,17 +144,6 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     }
 
     /**
-     * The consumer's callback, invoked after the value is applied.
-     *
-     * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-     * because React reserves the latter for its own synthetic system and wires
-     * it to the native `change`, so a Helix event named `Change` would never
-     * fire at all.
-     */
-    @property({ attribute: false })
-    onValueChange: ((value: string) => void) | undefined = undefined
-
-    /**
      * Requests a new value, and reports whether the request stood.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-change` is
@@ -188,7 +169,6 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
         host: this,
         label: 'value',
         next,
-        notify: this.onValueChange,
         read: () => this.value,
       })
     }

@@ -1,4 +1,5 @@
 import { type CSSResultOrNative, css, LitElement } from 'lit'
+import { helixEventNames } from '../events/events.js'
 
 /**
  * Applied to every Helix component's shadow root so component CSS can rely on
@@ -80,6 +81,67 @@ const reactPropsOf = (node: EventTarget): Record<string, unknown> | undefined =>
   return reactPropsKey === undefined ? undefined : (stash[reactPropsKey] as Record<string, unknown>)
 }
 
+/** Elements whose handler props have been read once. */
+const audited = new WeakSet<EventTarget>()
+
+/**
+ * Properties that were public API until 19 Aug 2026 and are events now.
+ *
+ * Worth naming for a release or two: they were documented, a consumer may have
+ * written one, and removing a property is silent in a way removing an event is
+ * not.
+ */
+const REMOVED = new Set(['onActiveChange', 'onCheckedChange', 'onOpenChange', 'onValueChange'])
+
+/**
+ * Says so when a handler prop is attached to nothing.
+ *
+ * **TypeScript will not catch any of this, and that is not our tooling's
+ * fault.** A JSX attribute whose name is not a valid identifier is exempt from
+ * checking on an intrinsic element, and every one of ours carries a hyphen. So
+ * `onhelix-opne` type-checks, `on:helix-open` type-checks, and a made-up
+ * `totally-invented` prop type-checks, all against fully generated types that
+ * do reject a wrong *value* on a normal attribute. Measured with `tsc`.
+ *
+ * That leaves runtime as the only place a typo can be caught, and React's props
+ * bag as the only place to look, which the binding above already reads. Once
+ * per element, like the controlled-change audit, and for the same reason: a
+ * warning that repeats on every keystroke is one a consumer silences.
+ *
+ * `on:helix-open` gets its own message because it is not a mistake so much as
+ * the wrong dialect. It is what the Solid types offer, correctly, and React
+ * binds it as an event named `:helix-open`.
+ */
+const auditReactProps = (host: EventTarget, props: Record<string, unknown>): void => {
+  if (audited.has(host)) {
+    return
+  }
+  audited.add(host)
+  const tag = host instanceof Element ? `<${host.localName}>` : 'A Helix element'
+  for (const key of Object.keys(props)) {
+    if (key.startsWith('on:')) {
+      console.warn(
+        `${tag} was given \`${key}\`, which is Solid's syntax. React binds the name after \`on\` ` +
+          `verbatim, so this listens for an event called \`${key.slice(2)}\`. Write \`on${key.slice(3)}\`.`,
+      )
+      continue
+    }
+    if (REMOVED.has(key)) {
+      console.warn(
+        `${tag} was given \`${key}\`, which was removed. It never worked from JSX, because React ` +
+          `binds any \`on\` prop as an event of that name. Listen for the element's change event instead.`,
+      )
+      continue
+    }
+    if (key.startsWith('on') && key.includes('-') && !helixEventNames.has(key.slice(2))) {
+      console.warn(
+        `${tag} was given \`${key}\`, and nothing dispatches \`${key.slice(2)}\`. TypeScript cannot ` +
+          `check a hyphenated JSX prop, so this is the only place it shows up.`,
+      )
+    }
+  }
+}
+
 /**
  * Binds the handler React is holding for this event, if it has not bound it.
  *
@@ -117,11 +179,45 @@ const bindReactHandler = (host: EventTarget, type: string): void => {
   if (!type.includes('-')) {
     return
   }
-  const handler = reactPropsOf(host)?.[`on${type}`]
+  const props = reactPropsOf(host)
+  if (props === undefined) {
+    return
+  }
+  auditReactProps(host, props)
+  const handler = props[`on${type}`]
   if (typeof handler === 'function') {
     host.addEventListener(type, handler as EventListener)
   }
 }
+
+/* **The same bug applies to object and function properties, and this does not
+   fix those.** React skips every prop it would have to apply imperatively while
+   hydrating, not only listeners. Strings, numbers and booleans arrive anyway,
+   because the server wrote them as attributes and Lit converts them back; an
+   object or a function is simply absent until React commits.
+
+   The trick above does not transfer, and the reason is worth stating because it
+   looks like it should. A listener only has to exist by the time somebody
+   interacts, so binding it at dispatch is late enough that hydration has
+   certainly finished and early enough to catch the event being sent. A property
+   has to be right before the first paint, and there is no equally safe late
+   moment. An earlier version of this bound at `connectedCallback` and caught
+   nothing at all, measured: an element upgrades when its definition loads, which
+   can fall either side of React's hydration.
+
+   What would work, when something needs it: in `firstUpdated`, read the props
+   bag and assign any declared reactive property (Lit hands them over as
+   `elementProperties`) whose value is an object or a function, re-checking once
+   on the next frame if React has not stashed anything yet. Assigning what React
+   will assign on its own next commit is idempotent, so the handover costs
+   nothing and needs no bookkeeping.
+
+   It is deliberately not built. No component here declares an object or array
+   property: the eight `attribute: false` properties are parent-to-child
+   coordination written at runtime, not consumer API. A fix carrying a timing
+   race, with no failing case to hold it honest, is a fix that rots. Build it
+   with the first component that needs one, and measure the race against that
+   component rather than against a guess. */
 
 /**
  * @summary Base class every Helix element extends.

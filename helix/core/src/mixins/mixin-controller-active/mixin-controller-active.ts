@@ -19,14 +19,6 @@ type Constructor<T> = new (...args: any[]) => T
  */
 export declare class MixinControllerActiveInterface {
   /**
-   * The consumer's callback, invoked after the change is applied.
-   *
-   * Not reachable from React's JSX, which reserves every `on[A-Z]` prop for its
-   * own event system; the generated wrapper listens for the event instead.
-   */
-  onActiveChange: ((value: string) => void) | undefined
-
-  /**
    * Which item is current, by its `value`.
    *
    * Reading gives the real one, in either mode. Writing hands ownership to the
@@ -76,10 +68,6 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
   // TypeScript consumers see; this class is what the manifest analyzer reads
   // when resolving inherited members into dependent packages.
   class ActiveElement extends Base {
-    /** The consumer's callback, invoked after the change is applied. */
-    @property({ attribute: false })
-    onActiveChange: ((value: string) => void) | undefined = undefined
-
     /**
      * Which item is current, by its `value`.
      *
@@ -178,7 +166,6 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
         host: this,
         label: 'active',
         next,
-        notify: this.onActiveChange,
         read: () => this.active,
       })
     }

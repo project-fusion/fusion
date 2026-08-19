@@ -28,17 +28,6 @@ export declare class MixinControllerOpenInterface {
   open: boolean
 
   /**
-   * The consumer's callback, invoked after the state is applied.
-   *
-   * A React consumer cannot pass this through JSX: React reserves every prop
-   * matching `on[A-Z]` and drops the ones it does not recognize. The generated
-   * wrapper attaches a listener for `helix-open` and `helix-close` instead.
-   * This is for a consumer holding a reference, or a framework that assigns
-   * properties.
-   */
-  onOpenChange: ((open: boolean) => void) | undefined
-
-  /**
    * Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
@@ -162,17 +151,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     }
 
     /**
-     * The consumer's callback, invoked after the state is applied.
-     *
-     * Not an attribute: it is a function. And not reachable from React's JSX,
-     * which reserves every `on[A-Z]` prop for its own event system and drops
-     * what it does not recognize; the generated wrapper listens for the events
-     * instead.
-     */
-    @property({ attribute: false })
-    onOpenChange: ((open: boolean) => void) | undefined = undefined
-
-    /**
      * Requests an open-state change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-open` or
@@ -203,7 +181,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
         host: this,
         label: 'open',
         next,
-        notify: this.onOpenChange,
         read: () => this.open,
       })
     }
