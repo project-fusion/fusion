@@ -267,3 +267,16 @@
 :host(:dir(rtl)) [part="next"] svg {
   scale: -1 1;
 }
+
+/* Off, and it says so.
+ *
+ * The grid refused every click already and nothing on the page changed, which
+ * is a calendar that looks broken rather than one that is off. The house
+ * treatment, the same half opacity every other control uses.
+ *
+ * `:host(:disabled)` rather than the attribute, so an ancestor
+ * `<fieldset disabled>` reaches it too. Listbox carries the longer note. */
+:host(:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

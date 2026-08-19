@@ -383,3 +383,15 @@
     scale: 1;
   }
 }
+
+/* Off, and it says so.
+ *
+ * The house treatment, the same half opacity every other control uses. Without
+ * it the square, the ramps and the swatches all read as live.
+ *
+ * `:host(:disabled)` rather than the attribute, so an ancestor
+ * `<fieldset disabled>` reaches it too. Listbox carries the longer note. */
+:host(:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

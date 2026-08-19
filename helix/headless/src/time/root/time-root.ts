@@ -218,6 +218,17 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
    */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
+    /* `disabled` meant nothing here beyond dropping the value at submit time,
+       the same gap the calendar had: times still took a click, the keyboard
+       still moved through the list, and nothing said the control was off. The
+       listbox is told as well, which is what greys it and takes it out of the
+       tab order, and this refuses at the source so every path in is covered by
+       one check.
+       `isDisabled` rather than `disabled`, which is only the half a consumer
+       wrote: an ancestor `<fieldset disabled>` is the other half. */
+    if (this.isDisabled) {
+      return
+    }
     const announced = (event as HelixChangeEvent).detail.value
     if (this.mode !== 'range') {
       this.requestValue(announced)
@@ -254,6 +265,9 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
 
   /** Puts a changed column back together into a whole time. */
   private readonly moveColumn = (part: 'hour' | 'meridiem' | 'minute', to: string): void => {
+    if (this.isDisabled) {
+      return
+    }
     const { hour, meridiem, minute } = this.parts
     let next = hour * 60 + minute
     if (part === 'minute') {
@@ -338,6 +352,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
       data-column=${part}
       exportparts="items"
       aria-label=${label}
+      ?disabled=${this.isDisabled}
       .value=${value}
       @helix-change=${(event: Event) => {
         event.stopPropagation()
@@ -402,6 +417,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
       part="list"
       exportparts="items, empty"
       aria-label=${this.label}
+      ?disabled=${this.isDisabled}
       ?multiple=${this.mode !== undefined}
       .value=${this.value}
       @helix-change=${this.handleChange}

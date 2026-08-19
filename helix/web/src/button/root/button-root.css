@@ -161,7 +161,16 @@
   inline-size: 100%;
 }
 
-:host([disabled]) [part="button"] {
+/* `:host(:disabled)`, not `:host([disabled])`, which is what this was.
+ *
+ * The pseudo-class matches on the element's own attribute *and* on an ancestor
+ * `<fieldset disabled>`; the attribute selector only ever sees the first. So a
+ * button in a disabled fieldset was refusing the click and still painted full
+ * primary, which reads as a button that is simply broken. Measured against
+ * every form control in the library: this was the only one still on the
+ * attribute, and the only one whose two disabled states did not match.
+ * Listbox carries the longer note. */
+:host(:disabled) [part="button"] {
   cursor: not-allowed;
   opacity: 0.5;
 }

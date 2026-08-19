@@ -226,3 +226,49 @@ describe('time holds more than one', () => {
     expect(host.shadowRoot?.querySelector('[part="column"]')).toBeNull()
   })
 })
+
+describe('time is off', () => {
+  const picker = async (attrs = ''): Promise<Time> => {
+    const host = (await mount(`<helix-time ${attrs}></helix-time>`)) as Time
+    await host.updateComplete
+    return host
+  }
+
+  test('a disabled picker takes nothing, and says so to the list it renders', async () => {
+    /* `disabled` reached the value at submit time and nothing else: rows still
+       took a click and the keyboard still moved through them. Both halves are
+       asserted, because either alone leaves the other broken. Told, so the list
+       greys and leaves the tab order; refused, so no path writes a value. */
+    const host = await picker('default-value="09:00" disabled')
+    const list = part(host, 'list') as HTMLElement
+    expect(list.hasAttribute('disabled')).toBe(true)
+
+    list.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value: '17:00' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+
+  test('and the wheels refuse on the same terms, which is a separate path in', async () => {
+    // `moveColumn` rebuilds the value from three columns and never reaches
+    // `handleChange`, so a guard on one says nothing about the other.
+    const host = await picker('appearance="wheels" default-value="09:00" disabled')
+    const column = host.shadowRoot?.querySelector('[part="column"]') as HTMLElement
+    expect(column.hasAttribute('disabled')).toBe(true)
+
+    column.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value: '17' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+})
