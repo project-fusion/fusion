@@ -51,6 +51,23 @@ describe('video', () => {
     }
   })
 
+  test('the native controls keep their own keyboard, and their own focus', async () => {
+    /* Two handlers on one press is a video that seeks twice, or plays and
+       immediately pauses. A consumer who asked for the browser's bar asked for
+       its keyboard with it, and it brings its own focus stop. */
+    const host = await player('<helix-video controls label="A clip" src="/clip.mp4"></helix-video>')
+    const stage = part(host, 'stage') as HTMLElement
+    expect(stage.hasAttribute('tabindex')).toBe(false)
+    expect(stage.hasAttribute('role')).toBe(false)
+
+    const video = part(host, 'video') as HTMLVideoElement
+    Object.defineProperty(video, 'duration', { configurable: true, value: 100 })
+    stage.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }),
+    )
+    expect(video.currentTime).toBe(0)
+  })
+
   test('there is one focus stop, and it is the picture', async () => {
     /* A video with no native controls is not focusable, and the buttons under
        it are, so without this a reader could reach Play and never the thing the

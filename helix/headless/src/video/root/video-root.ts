@@ -51,6 +51,11 @@ const clock = (seconds: number): string => {
  * They are bound on this element rather than on the document, because a video
  * is not a palette: keys belong to it only while a reader is on it.
  *
+ * **And none of them where `controls` is set.** The browser's own bar owns
+ * those keys, and two handlers on one press is a video that seeks twice or
+ * plays and immediately pauses. The focus stop goes with them, since the native
+ * controls bring their own.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -443,6 +448,13 @@ export class HelixBaseVideo extends HelixElement {
    * seeking twice for one press.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Nothing at all where the browser draws the controls. Its own bar owns
+       Space, the arrows and the rest, and two handlers on one key is a video
+       that seeks twice or plays and immediately pauses. A consumer who asked
+       for the native controls asked for the native keyboard with them. */
+    if (this.controls) {
+      return
+    }
     if ((event.target as HTMLElement)?.tagName === 'INPUT') {
       return
     }
@@ -643,9 +655,9 @@ export class HelixBaseVideo extends HelixElement {
        announces as something rather than as an unnamed div. */
     return html`<div
         part="stage"
-        tabindex="0"
-        role="group"
-        aria-label=${this.label || 'Video'}
+        tabindex=${this.controls ? nothing : '0'}
+        role=${this.controls ? nothing : 'group'}
+        aria-label=${this.controls ? nothing : this.label || 'Video'}
         @keydown=${this.handleKeydown}
       >
       <video

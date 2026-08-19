@@ -17799,6 +17799,11 @@ export type CustomElements = {
    * They are bound on this element rather than on the document, because a video
    * is not a palette: keys belong to it only while a reader is on it.
    *
+   * **And none of them where `controls` is set.** The browser's own bar owns
+   * those keys, and two handlers on one press is a video that seeks twice or
+   * plays and immediately pauses. The focus stop goes with them, since the native
+   * controls bring their own.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -26117,6 +26122,11 @@ export type CustomElementsSolidJs = {
    * arrows to seek and to change the volume, `m` to mute, `f` for fullscreen.
    * They are bound on this element rather than on the document, because a video
    * is not a palette: keys belong to it only while a reader is on it.
+   *
+   * **And none of them where `controls` is set.** The browser's own bar owns
+   * those keys, and two handlers on one press is a video that seeks twice or
+   * plays and immediately pauses. The focus stop goes with them, since the native
+   * controls bring their own.
    *
    * ## Attributes & Properties
    *
