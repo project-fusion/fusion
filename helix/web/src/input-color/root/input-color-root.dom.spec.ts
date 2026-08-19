@@ -47,6 +47,36 @@ describe('input color', () => {
     expect(picker.shadowRoot?.querySelector('[part="value"]')).toBeNull()
   })
 
+  test('the swatch appearance is the block alone, and the panel states the value', async () => {
+    /* The two shapes between them state the value exactly once. The default
+       field is the input, so the panel is told to leave its row out; a swatch
+       states nothing, so the panel keeps it. */
+    const host = await field('appearance="swatch" default-value="#ff0000"')
+    expect(host.shadowRoot?.querySelector('[part="control"]')).toBeNull()
+    const picker = part(host, 'picker') as HTMLElement
+    expect(picker.hasAttribute('no-value')).toBe(false)
+    expect(picker.shadowRoot?.querySelector('[part="value"]')).not.toBeNull()
+  })
+
+  test('and the label names the trigger there, since it is the only control', async () => {
+    // An IDREF has to resolve to something focusable, and in this shape the
+    // input it used to name does not exist.
+    const host = await field('appearance="swatch"')
+    const trigger = part(host, 'trigger') as HTMLElement
+    expect(trigger.id).toBe('control')
+    const label = host.shadowRoot?.querySelector('[part="label"]') as HTMLLabelElement
+    expect(label.htmlFor).toBe('control')
+    const scope = trigger.getRootNode() as ShadowRoot
+    expect(scope.getElementById('control')).toBe(trigger)
+  })
+
+  test('a required swatch is checked here, since a block of colour has no validity', async () => {
+    const empty = await field('appearance="swatch" required')
+    expect(internals(empty).validationMessage).toBe('Choose a colour.')
+    const filled = await field('appearance="swatch" default-value="#ff0000" required')
+    expect(internals(filled).validationMessage).toBe('')
+  })
+
   test('the value reaches the picker, and what it answers reaches the form', async () => {
     const host = await field('default-value="#ff0000" name="brand"')
     const picker = part(host, 'picker') as HTMLElement & { value: string }

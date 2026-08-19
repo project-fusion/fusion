@@ -38,7 +38,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 125 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 127 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 97 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -63,7 +63,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 147 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 151 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 173 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 165 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 160 |
@@ -81,7 +81,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 48 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 136 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 138 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 48 |
@@ -147,7 +147,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 128 |
+| `--helix-border-thin` | `1px` | 130 |
 | `--helix-border-thick` | `2px` | 35 |
 
 ## shadow
@@ -204,8 +204,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-size-control-md` | `calc(2.5rem * var(--_helix-seed-density))` | 11 |
-| `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 50 |
-| `--helix-size-control` | `var(--helix-size-control-md)` | 32 |
+| `--helix-size-control-sm` | `calc(2rem * var(--_helix-seed-density))` | 48 |
+| `--helix-size-control` | `var(--helix-size-control-md)` | 38 |
 | `--helix-size-control-lg` | `calc(3rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-button` | `calc(12.5rem * var(--_helix-seed-density))` | 4 |
 | `--helix-size-badge` | `calc(1rem * var(--_helix-seed-density))` | 2 |

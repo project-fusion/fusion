@@ -1645,6 +1645,7 @@ pads its own lower rows.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alpha` | `alpha` | `boolean` | `false` | `HelixBaseInputColor` | Whether the colour carries an alpha channel. |
+| `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseInputColor` | Whether the field is a text box with a swatch on it, or only the swatch. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -1702,7 +1703,7 @@ pads its own lower rows.
 | Part | Description |
 | --- | --- |
 | `field` | The box holding the text and the trigger. |
-| `control` | The text input carrying the value. |
+| `control` | The text input carrying the value. Absent in `swatch`. |
 | `trigger` | The control that opens the panel. |
 | `preview` | The chip showing the colour, inside the trigger. |
 | `surface` | The floating panel. |
@@ -1713,6 +1714,7 @@ pads its own lower rows.
 | Property | Description |
 | --- | --- |
 | `--input-color-background-color` | Fill behind the field. |
+| `--input-color-swatch-size` | Edge length of the block in `appearance="swatch"`. |
 | `--input-color-panel-size` | Width of the panel, and so of the square. |
 
 ## Input Date

@@ -280,7 +280,10 @@
 [part="value"] {
   all: unset;
   background-color: var(--helix-color-surface-sunken);
-  block-size: var(--helix-size-control-sm);
+  /* The height the buttons beside it take, which is the density's. It was
+     `control-sm` while they were on `control`, so the row had a short field
+     against two tall buttons and no line through the middle of anything. */
+  block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
@@ -336,6 +339,12 @@
   gap: var(--helix-space-2xs);
   margin-block-start: var(--helix-space-sm);
   padding-block-start: var(--helix-space-sm);
+  /* The inset every other row takes. This sat outside the footer and so outside
+     the one rule that applied it, and the presets ran to the panel's edge while
+     the square, the ramps and the tools above them all stopped short of it. The
+     rule stays full width, because it is a separator and a separator that stops
+     short of the edges reads as an underline on the thing above it. */
+  padding-inline: var(--color-inset, var(--helix-space-none));
 }
 
 [part="swatch"] {

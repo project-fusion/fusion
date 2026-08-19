@@ -10357,7 +10357,7 @@
               "name": "field"
             },
             {
-              "description": "The text input carrying the value.",
+              "description": "The text input carrying the value. Absent in `swatch`.",
               "name": "control"
             },
             {
@@ -10392,6 +10392,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'swatch' | undefined"
+              },
+              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of colour that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a colour among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the colour is the answer rather than a setting.",
+              "attribute": "appearance",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "alpha",
@@ -10471,6 +10481,16 @@
               "privacy": "private",
               "default": "''",
               "description": "The last value that was a colour.\n\nHalf-typed input reaches here on every keystroke and most of it is not a\ncolour, so the picker is given the last thing that was one rather than a\nfallback. Typing `#00ff00` one character at a time goes `#`, `#0`, `#00`,\n`#00f`, `#00ff`, `#00ff0`, `#00ff00`: measured, the square went red, red,\nred, blue, blue, **red**, green, because two of those are colours and the\nones between are not. Holding the last good one takes the flicker out and\nleaves the square on blue until green arrives.\n\nNot state, because it is only ever read on a render the value already\ncaused. The same reasoning Input Date records for its calendar, which will\nnot follow a date until the field says something complete."
+            },
+            {
+              "kind": "field",
+              "name": "anchor",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "description": "What the label points at and validity hangs off.\n\nThe input where there is one, the trigger where there is not. `setValidity`\nneeds an element to anchor the message to and a label needs something\nfocusable to name, and in `swatch` the trigger is the only control in the\nfield. It carries `id=\"control\"` there for the same reason.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -11319,6 +11339,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'swatch' | undefined"
+              },
+              "description": "Whether the field is a text box with a swatch on it, or only the swatch.\n\n`swatch` is the native control's shape: a block of colour that opens a\npicker, with no text beside it. It is what a toolbar wants, and a form that\nasks for a colour among twenty other questions, where a hex in a box is\neleven characters of noise next to the thing itself.\n\nIt also settles where the value is stated. The default field *is* the input,\nso the panel is told `no-value` and would otherwise show a second one. A\nswatch states nothing, so the panel keeps its own row and the value is\nreadable and typeable exactly once, in whichever of the two is present.\n\nThe trade is real and is the reason this is not the default: a swatch cannot\nbe read or pasted into without opening the panel, which is worse for a form\nwhere the colour is the answer rather than a setting.",
+              "fieldName": "appearance"
+            },
             {
               "name": "alpha",
               "type": {

@@ -192,3 +192,39 @@
     transition: none;
   }
 }
+
+/* The swatch shape: the block of colour is the whole control.
+ *
+ * The native `<input type="color">` in one line of layout. The field stops being
+ * a box with something in it and becomes the thing itself, so the frame, the
+ * fill and the inset all come off and the preview takes the height it was going
+ * to fill anyway.
+ *
+ * `inline-size: auto` on the host, because a colour swatch has a size rather
+ * than a width to fill: stretched across a form column it is a banner, and the
+ * one thing this appearance exists for is to be small. A consumer who wants it
+ * wider sets `--input-color-swatch-size`. */
+:host([appearance="swatch"]) [part="field"] {
+  background-color: transparent;
+  border: none;
+  inline-size: max-content;
+  padding-inline: var(--helix-space-none);
+}
+
+:host([appearance="swatch"]) [part="trigger"] {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  block-size: var(--input-color-swatch-size, var(--helix-size-control));
+  inline-size: var(--input-color-swatch-size, var(--helix-size-control));
+  overflow: hidden;
+}
+
+/* The ring goes on the trigger rather than around the field, since in this shape
+   they are the same box and `:focus-within` on the field would draw it twice. */
+:host([appearance="swatch"]:focus-within) [part="field"] {
+  outline: none;
+}
+
+:host([appearance="swatch"]) [part="preview"] {
+  inline-size: 100%;
+}

@@ -3046,6 +3046,22 @@ being four of a kind rather than four of three kinds. */
   label?: HelixInputColor["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixInputColor["required"];
+  /** Whether the field is a text box with a swatch on it, or only the swatch.
+
+`swatch` is the native control's shape: a block of colour that opens a
+picker, with no text beside it. It is what a toolbar wants, and a form that
+asks for a colour among twenty other questions, where a hex in a box is
+eleven characters of noise next to the thing itself.
+
+It also settles where the value is stated. The default field *is* the input,
+so the panel is told `no-value` and would otherwise show a second one. A
+swatch states nothing, so the panel keeps its own row and the value is
+readable and typeable exactly once, in whichever of the two is present.
+
+The trade is real and is the reason this is not the default: a swatch cannot
+be read or pasted into without opening the panel, which is worse for a form
+where the colour is the answer rather than a setting. */
+  appearance?: HelixInputColor["appearance"];
   /** Whether the colour carries an alpha channel. */
   alpha?: HelixInputColor["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
@@ -3166,6 +3182,22 @@ being four of a kind rather than four of three kinds. */
   "prop:label"?: HelixInputColor["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixInputColor["required"];
+  /** Whether the field is a text box with a swatch on it, or only the swatch.
+
+`swatch` is the native control's shape: a block of colour that opens a
+picker, with no text beside it. It is what a toolbar wants, and a form that
+asks for a colour among twenty other questions, where a hex in a box is
+eleven characters of noise next to the thing itself.
+
+It also settles where the value is stated. The default field *is* the input,
+so the panel is told `no-value` and would otherwise show a second one. A
+swatch states nothing, so the panel keeps its own row and the value is
+readable and typeable exactly once, in whichever of the two is present.
+
+The trade is real and is the reason this is not the default: a swatch cannot
+be read or pasted into without opening the panel, which is worse for a form
+where the colour is the answer rather than a setting. */
+  "prop:appearance"?: HelixInputColor["appearance"];
   /** Whether the colour carries an alpha channel. */
   "prop:alpha"?: HelixInputColor["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
@@ -10534,6 +10566,21 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   *
+   * `swatch` is the native control's shape: a block of colour that opens a
+   * picker, with no text beside it. It is what a toolbar wants, and a form that
+   * asks for a colour among twenty other questions, where a hex in a box is
+   * eleven characters of noise next to the thing itself.
+   *
+   * It also settles where the value is stated. The default field *is* the input,
+   * so the panel is told `no-value` and would otherwise show a second one. A
+   * swatch states nothing, so the panel keeps its own row and the value is
+   * readable and typeable exactly once, in whichever of the two is present.
+   *
+   * The trade is real and is the reason this is not the default: a swatch cannot
+   * be read or pasted into without opening the panel, which is worse for a form
+   * where the colour is the answer rather than a setting.
    * - `alpha`: Whether the colour carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
@@ -10644,6 +10691,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--input-color-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
@@ -10651,7 +10699,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the value.
+   * - `control`: The text input carrying the value. Absent in `swatch`.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
@@ -17085,6 +17133,21 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `appearance`: Whether the field is a text box with a swatch on it, or only the swatch.
+   *
+   * `swatch` is the native control's shape: a block of colour that opens a
+   * picker, with no text beside it. It is what a toolbar wants, and a form that
+   * asks for a colour among twenty other questions, where a hex in a box is
+   * eleven characters of noise next to the thing itself.
+   *
+   * It also settles where the value is stated. The default field *is* the input,
+   * so the panel is told `no-value` and would otherwise show a second one. A
+   * swatch states nothing, so the panel keeps its own row and the value is
+   * readable and typeable exactly once, in whichever of the two is present.
+   *
+   * The trade is real and is the reason this is not the default: a swatch cannot
+   * be read or pasted into without opening the panel, which is worse for a form
+   * where the colour is the answer rather than a setting.
    * - `alpha`: Whether the colour carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
@@ -17195,6 +17258,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--input-color-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
    * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
@@ -17202,7 +17266,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `field`: The box holding the text and the trigger.
-   * - `control`: The text input carrying the value.
+   * - `control`: The text input carrying the value. Absent in `swatch`.
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the colour, inside the trigger.
    * - `surface`: The floating panel.
@@ -21632,6 +21696,8 @@ export type CustomCssProperties = {
   "--icon-size"?: string;
   /** Fill behind the field. */
   "--input-color-background-color"?: string;
+  /** Edge length of the block in `appearance="swatch"`. */
+  "--input-color-swatch-size"?: string;
   /** Width of the panel, and so of the square. */
   "--input-color-panel-size"?: string;
   /** Fill behind the field. */

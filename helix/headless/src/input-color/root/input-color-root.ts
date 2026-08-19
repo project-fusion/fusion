@@ -54,7 +54,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color/color.js'
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  *
  * @csspart field - The box holding the text and the trigger.
- * @csspart control - The text input carrying the value.
+ * @csspart control - The text input carrying the value. Absent in `swatch`.
  * @csspart trigger - The control that opens the panel.
  * @csspart preview - The chip showing the colour, inside the trigger.
  * @csspart surface - The floating panel.
@@ -64,6 +64,26 @@ import { type ColorFormat, parseColor, toCss } from '../../color/color.js'
 export class HelixBaseInputColor extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * Whether the field is a text box with a swatch on it, or only the swatch.
+   *
+   * `swatch` is the native control's shape: a block of colour that opens a
+   * picker, with no text beside it. It is what a toolbar wants, and a form that
+   * asks for a colour among twenty other questions, where a hex in a box is
+   * eleven characters of noise next to the thing itself.
+   *
+   * It also settles where the value is stated. The default field *is* the input,
+   * so the panel is told `no-value` and would otherwise show a second one. A
+   * swatch states nothing, so the panel keeps its own row and the value is
+   * readable and typeable exactly once, in whichever of the two is present.
+   *
+   * The trade is real and is the reason this is not the default: a swatch cannot
+   * be read or pasted into without opening the panel, which is worse for a form
+   * where the colour is the answer rather than a setting.
+   */
+  @property({ reflect: true })
+  appearance?: 'swatch'
+
   /** Whether the colour carries an alpha channel. */
   @property({ reflect: true, type: Boolean })
   alpha = false
@@ -114,6 +134,21 @@ export class HelixBaseInputColor extends MixinControllerOpen(
    * not follow a date until the field says something complete.
    */
   private settled = ''
+
+  /**
+   * What the label points at and validity hangs off.
+   *
+   * The input where there is one, the trigger where there is not. `setValidity`
+   * needs an element to anchor the message to and a label needs something
+   * focusable to name, and in `swatch` the trigger is the only control in the
+   * field. It carries `id="control"` there for the same reason.
+   */
+  private get anchor(): HTMLElement | null {
+    if (typeof this.renderRoot?.querySelector !== 'function') {
+      return null
+    }
+    return this.control ?? this.renderRoot.querySelector<HTMLElement>('[part="trigger"]')
+  }
 
   private get control(): HTMLInputElement | null {
     if (typeof this.renderRoot?.querySelector !== 'function') {
@@ -180,10 +215,11 @@ export class HelixBaseInputColor extends MixinControllerOpen(
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
     this.internals.setFormValue(this.value)
-    const control = this.control
-    if (!control) {
+    const anchor = this.anchor
+    if (!anchor) {
       return
     }
+    const control = this.control
     /* Checked here rather than left to the input, which is `text` and has no
        idea what a colour is. `type="color"` is what was given up to own the
        panel, and it would not have helped: it has no invalid state, because it
@@ -192,10 +228,19 @@ export class HelixBaseInputColor extends MixinControllerOpen(
       this.internals.setValidity(
         { badInput: true },
         'Enter a colour, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
-        control,
+        anchor,
       )
-    } else {
+    } else if (control) {
       this.internals.setValidity(control.validity, control.validationMessage, control)
+    } else {
+      /* A swatch has no native validity of its own, so `required` is the only
+         thing left to check and this element has to check it: an empty value on
+         a required field is the one state a block of colour can be wrong in. */
+      this.internals.setValidity(
+        this.required && this.value === '' ? { valueMissing: true } : {},
+        this.required && this.value === '' ? 'Choose a colour.' : '',
+        anchor,
+      )
     }
     this.refreshFeedback()
   }
@@ -238,7 +283,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
 
   /** Puts the caret in the field, the way a label pointing at one would. */
   override focus(options?: FocusOptions): void {
-    this.control?.focus(options)
+    this.anchor?.focus(options)
   }
 
   /*
@@ -257,7 +302,10 @@ export class HelixBaseInputColor extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
-        <input
+        ${
+          this.appearance === 'swatch'
+            ? nothing
+            : html`<input
           part="control"
           id="control"
           type="text"
@@ -270,9 +318,11 @@ export class HelixBaseInputColor extends MixinControllerOpen(
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           @input=${this.handleInput}
-        />
+        />`
+        }
         <button
           part="trigger"
+          id=${this.appearance === 'swatch' ? 'control' : nothing}
           type="button"
           aria-controls="surface"
           aria-expanded=${this.open ? 'true' : 'false'}
@@ -294,7 +344,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
           part="picker"
           ?alpha=${this.alpha}
           ?no-format=${this.noFormat}
-          no-value
+          ?no-value=${this.appearance !== 'swatch'}
           .format=${this.format}
           .value=${this.picked}
           swatches=${this.swatches || nothing}
