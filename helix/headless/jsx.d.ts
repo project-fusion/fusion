@@ -9821,6 +9821,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -9874,6 +9881,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The accordion's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-accordion": Partial<
     HelixBaseAccordionProps & BaseProps<HelixBaseAccordion> & BaseEvents
@@ -9951,6 +9970,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10009,6 +10035,18 @@ export type CustomElements = {
    * - `start`: Leading content, usually a wordmark.
    * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10069,6 +10107,18 @@ export type CustomElements = {
    *
    * - `(default)`: The avatars, in the order they should be read.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10111,6 +10161,18 @@ export type CustomElements = {
    *
    * - `(default)`: Shown when there is no usable image, in place of the initials.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10152,6 +10214,18 @@ export type CustomElements = {
    *
    * - `(default)`: The element being decorated.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10183,6 +10257,18 @@ export type CustomElements = {
    *
    * - `(default)`: The quoted passage.
    * - `attribution`: Who said it, and where.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10222,6 +10308,18 @@ export type CustomElements = {
    * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
    * - `separator`: Replaces the chevron shown before this item.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10249,6 +10347,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10287,6 +10397,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The buttons in the group.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-button-group": Partial<
     HelixBaseButtonGroupProps & BaseProps<HelixBaseButtonGroup> & BaseEvents
@@ -10396,6 +10518,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10438,6 +10567,18 @@ export type CustomElements = {
    * - `icon`: Replaces the icon chosen by `severity`.
    * - `title`: A heading above the content.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10472,6 +10613,18 @@ export type CustomElements = {
    * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-card": Partial<
     HelixBaseCardProps & BaseProps<HelixBaseCard> & BaseEvents
@@ -10545,6 +10698,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10613,6 +10773,18 @@ export type CustomElements = {
    * - `(default)`: The checkboxes.
    * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10757,6 +10929,13 @@ export type CustomElements = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -10811,6 +10990,18 @@ export type CustomElements = {
    *
    * - `(default)`: The code.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -10844,6 +11035,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The code.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11038,6 +11241,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11201,6 +11411,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11430,6 +11647,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11543,6 +11767,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11682,6 +11913,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -11913,6 +12151,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12067,6 +12312,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12192,6 +12444,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12237,6 +12496,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12340,6 +12611,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12410,6 +12688,13 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus onto the row itself.
    * - `select() => void`: Announces that this row was chosen.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12480,6 +12765,13 @@ export type CustomElements = {
    * row is read before going back rather than after: a reader who drills in and
    * comes straight out should be on the row they pressed, not at the top of a
    * list they have already read.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12526,6 +12818,18 @@ export type CustomElements = {
    * - `heading`: What is missing.
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-empty": Partial<
     HelixBaseEmptyProps & BaseProps<HelixBaseEmpty> & BaseEvents
@@ -12655,6 +12959,13 @@ export type CustomElements = {
    * - `focus(options?: FocusOptions) => void`: Puts focus on the input, the way a label pointing at one would.
    * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12778,6 +13089,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -12819,6 +13137,18 @@ export type CustomElements = {
    *
    * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13002,6 +13332,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13030,6 +13367,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The key's label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13064,6 +13413,18 @@ export type CustomElements = {
    * - `(default)`: The label.
    * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13111,6 +13472,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The rows.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-list": Partial<
     HelixBaseListProps & BaseProps<HelixBaseList> & BaseEvents
@@ -13317,6 +13690,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13367,6 +13747,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13461,6 +13853,13 @@ export type CustomElements = {
    *
    * The host is not focusable: what takes focus is the row inside this shadow
    * root, and a menu moving between rows with the arrow keys has to reach it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13565,6 +13964,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13674,6 +14080,18 @@ export type CustomElements = {
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -13716,6 +14134,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The destinations, as the consumer's own links.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13881,6 +14311,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13916,6 +14353,18 @@ export type CustomElements = {
    *
    * - `(default)`: The options in this run.
    * - `label`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -13981,6 +14430,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `select() => void`: Makes this choice and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -14070,6 +14526,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -14245,6 +14713,18 @@ export type CustomElements = {
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14326,6 +14806,18 @@ export type CustomElements = {
    *
    * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14398,6 +14890,18 @@ export type CustomElements = {
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-pagination-summary": Partial<
     HelixBasePaginationSummaryProps &
@@ -14539,6 +15043,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -14638,6 +15149,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -14726,6 +15244,18 @@ export type CustomElements = {
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14785,6 +15315,18 @@ export type CustomElements = {
    *
    * - `logo`: A mark for the centre, which only reads at a high correction.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14816,6 +15358,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The quoted text.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -14950,6 +15504,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15006,6 +15567,13 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus to this choice, for the group's arrow keys.
    * - `select() => void`: Makes this choice and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15194,6 +15762,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15222,6 +15797,18 @@ export type CustomElements = {
    * Holds no `shape`. Whether a placeholder is a line, a block or a circle is
    * presentation, and putting it here would give the headless tier an appearance
    * property, which is the one thing that tier is for not having.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15386,6 +15973,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15570,6 +16164,13 @@ export type CustomElements = {
    * corner and drives them both. Nothing is read back, so neither has to know
    * anything about the other's state.
    * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15600,6 +16201,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The stats.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-stat-group": Partial<
     HelixBaseStatGroupProps & BaseProps<HelixBaseStatGroup> & BaseEvents
@@ -15653,6 +16266,18 @@ export type CustomElements = {
    * - `(default)`: The value.
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-stat": Partial<
     HelixBaseStatProps & BaseProps<HelixBaseStat> & BaseEvents
@@ -15755,6 +16380,13 @@ export type CustomElements = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-steps": Partial<
     HelixBaseStepsProps & BaseProps<HelixBaseSteps> & BaseEvents
@@ -15838,6 +16470,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `select() => void`: Announces the step, unless it is refusing.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -15980,6 +16619,13 @@ export type CustomElements = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16015,6 +16661,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The cell's content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-table-cell": Partial<
     HelixBaseTableCellProps & BaseProps<HelixBaseTableCell> & BaseEvents
@@ -16059,6 +16717,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The heading.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16110,6 +16780,18 @@ export type CustomElements = {
    *
    * - `(default)`: The table's rows.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
@@ -16138,6 +16820,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The row's cells.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-table-row": Partial<
     HelixBaseTableRowProps & BaseProps<HelixBaseTableRow> & BaseEvents
@@ -16173,6 +16867,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The panel's content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16268,6 +16974,13 @@ export type CustomElements = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16315,6 +17028,13 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16366,6 +17086,13 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16500,6 +17227,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16700,6 +17434,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -16899,6 +17640,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17014,6 +17762,13 @@ export type CustomElements = {
    * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17072,6 +17827,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17212,6 +17979,13 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17264,6 +18038,13 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus to this item.
    * - `select() => void`: Chooses this item and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17298,6 +18079,18 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The toolbar's controls.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17462,6 +18255,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17601,6 +18401,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17676,6 +18483,13 @@ export type CustomElements = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17740,7 +18554,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: `<source>` and `<track>` elements, which the video takes as its own.
+   * - `(default)`: `<source>` and `<track>` elements, which are copied into the video.
    * - `poster`: Shown over the video until it starts.
    *
    * ## Methods
@@ -17749,6 +18563,13 @@ export type CustomElements = {
    *
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17761,6 +18582,7 @@ export type CustomElements = {
    * - `play`: Play and pause.
    * - `scrubber`: Where it is, and where to go.
    * - `time`: The position and the duration.
+   * - `sound`: The speaker and its level, which are one control.
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
@@ -17854,6 +18676,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -17910,6 +18739,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The accordion's items.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-accordion": Partial<
     HelixBaseAccordionProps &
@@ -17990,6 +18831,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18051,6 +18899,18 @@ export type CustomElementsSolidJs = {
    * - `start`: Leading content, usually a wordmark.
    * - `(default)`: The middle region, usually a `Navigation`.
    * - `end`: Trailing content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18114,6 +18974,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The avatars, in the order they should be read.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18159,6 +19031,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: Shown when there is no usable image, in place of the initials.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18203,6 +19087,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The element being decorated.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18237,6 +19133,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The quoted passage.
    * - `attribution`: Who said it, and where.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18279,6 +19187,18 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
    * - `separator`: Replaces the chevron shown before this item.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18309,6 +19229,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18350,6 +19282,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The buttons in the group.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-button-group": Partial<
     HelixBaseButtonGroupProps &
@@ -18462,6 +19406,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18507,6 +19458,18 @@ export type CustomElementsSolidJs = {
    * - `icon`: Replaces the icon chosen by `severity`.
    * - `title`: A heading above the content.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18544,6 +19507,18 @@ export type CustomElementsSolidJs = {
    * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-card": Partial<
     HelixBaseCardProps &
@@ -18620,6 +19595,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `goTo(index: number) => void`: Moves to a slide, wrapping only where `loop` says to.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18691,6 +19673,18 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The checkboxes.
    * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18838,6 +19832,13 @@ export type CustomElementsSolidJs = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -18895,6 +19896,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The code.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18931,6 +19944,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The code.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -19128,6 +20153,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -19294,6 +20326,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -19526,6 +20565,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -19642,6 +20688,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -19784,6 +20837,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20018,6 +21078,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20175,6 +21242,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20303,6 +21377,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20351,6 +21432,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: Content set into the rule, such as the word between two sections.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20457,6 +21550,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20530,6 +21630,13 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus onto the row itself.
    * - `select() => void`: Announces that this row was chosen.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20603,6 +21710,13 @@ export type CustomElementsSolidJs = {
    * row is read before going back rather than after: a reader who drills in and
    * comes straight out should be on the row they pressed, not at the top of a
    * list they have already read.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20652,6 +21766,18 @@ export type CustomElementsSolidJs = {
    * - `heading`: What is missing.
    * - `(default)`: Why, and what to do about it.
    * - `actions`: The way out.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-empty": Partial<
     HelixBaseEmptyProps &
@@ -20784,6 +21910,13 @@ export type CustomElementsSolidJs = {
    * - `focus(options?: FocusOptions) => void`: Puts focus on the input, the way a label pointing at one would.
    * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20910,6 +22043,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -20954,6 +22094,18 @@ export type CustomElementsSolidJs = {
    *
    * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21140,6 +22292,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21171,6 +22330,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The key's label.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21208,6 +22379,18 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The label.
    * - `supporting`: Secondary text under the label.
    * - `end`: Trailing content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21258,6 +22441,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The rows.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-list": Partial<
     HelixBaseListProps &
@@ -21467,6 +22662,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21520,6 +22722,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21617,6 +22831,13 @@ export type CustomElementsSolidJs = {
    *
    * The host is not focusable: what takes focus is the row inside this shadow
    * root, and a menu moving between rows with the arrow keys has to reach it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21724,6 +22945,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -21836,6 +23064,18 @@ export type CustomElementsSolidJs = {
    * same property `Progress` carries, for the same reason: a percentage is a
    * fair summary of a task and a poor one of a quantity.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -21881,6 +23121,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The destinations, as the consumer's own links.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22049,6 +23301,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22087,6 +23346,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The options in this run.
    * - `label`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22155,6 +23426,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `select() => void`: Makes this choice and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22247,6 +23525,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The links, as anchors with fragment hrefs.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22425,6 +23715,18 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-navigate`: Fired before the page changes, and cancelable. The only way to refuse one.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -22509,6 +23811,18 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-change`: Fired before the size changes, and cancelable. The only way to refuse one.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -22582,6 +23896,18 @@ export type CustomElementsSolidJs = {
    * family. The root's templates are `pageLabel`, `statusLabel` and `gapLabel`,
    * which each label something; this labels nothing, it *is* the thing.
    * - `locale`: Locale for the numbers. Absent uses the runtime's own.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-pagination-summary": Partial<
     HelixBasePaginationSummaryProps &
@@ -22724,6 +24050,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22826,6 +24159,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -22917,6 +24257,18 @@ export type CustomElementsSolidJs = {
    * report progress.
    * - `fraction`: What is done, as a fraction of the whole, between 0 and 1. (property only) (readonly)
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -22979,6 +24331,18 @@ export type CustomElementsSolidJs = {
    *
    * - `logo`: A mark for the centre, which only reads at a high correction.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -23013,6 +24377,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The quoted text.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23150,6 +24526,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23209,6 +24592,13 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus to this choice, for the group's arrow keys.
    * - `select() => void`: Makes this choice and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23400,6 +24790,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23431,6 +24828,18 @@ export type CustomElementsSolidJs = {
    * Holds no `shape`. Whether a placeholder is a line, a block or a circle is
    * presentation, and putting it here would give the headless tier an appearance
    * property, which is the one thing that tier is for not having.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23598,6 +25007,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23785,6 +25201,13 @@ export type CustomElementsSolidJs = {
    * corner and drives them both. Nothing is read back, so neither has to know
    * anything about the other's state.
    * - `uncross(by: HelixBaseSplitter) => void`: Forgets a nested splitter that has left the tree. See `cross`.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -23818,6 +25241,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The stats.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-stat-group": Partial<
     HelixBaseStatGroupProps &
@@ -23874,6 +25309,18 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The value.
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-stat": Partial<
     HelixBaseStatProps &
@@ -23979,6 +25426,13 @@ export type CustomElementsSolidJs = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-steps": Partial<
     HelixBaseStepsProps &
@@ -24065,6 +25519,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `select() => void`: Announces the step, unless it is refusing.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24210,6 +25671,13 @@ export type CustomElementsSolidJs = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24248,6 +25716,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The cell's content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-table-cell": Partial<
     HelixBaseTableCellProps &
@@ -24295,6 +25775,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The heading.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24349,6 +25841,18 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The table's rows.
    *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
    * ## CSS Custom Properties
    *
    * CSS variables available for styling the component.
@@ -24380,6 +25884,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The row's cells.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    */
   "helix-base-table-row": Partial<
     HelixBaseTableRowProps &
@@ -24418,6 +25934,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The panel's content.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24516,6 +26044,13 @@ export type CustomElementsSolidJs = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24566,6 +26101,13 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus to this tab, for the list's arrow keys.
    * - `select() => void`: Selects this tab and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24620,6 +26162,13 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `dismiss() => boolean`: Announces that it should go, and reports whether the request stood.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24757,6 +26306,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -24960,6 +26516,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25162,6 +26725,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25280,6 +26850,13 @@ export type CustomElementsSolidJs = {
    * true whether or not the item hid itself first.
    * - `pause() => void`: Stops the clock, leaving whatever is left of it.
    * - `resume() => void`: Starts it again from where it stopped.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25341,6 +26918,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The messages, as `helix-toast-item` elements.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25484,6 +27073,13 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25539,6 +27135,13 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus to this item.
    * - `select() => void`: Chooses this item and announces it.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25576,6 +27179,18 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The toolbar's controls.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25743,6 +27358,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25885,6 +27507,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -25963,6 +27592,13 @@ export type CustomElementsSolidJs = {
    * a refusal and nothing moves. Unlike a native control, nothing has moved
    * by the time this runs, so refusing is simply not writing: there is
    * nothing to put back.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -26030,7 +27666,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: `<source>` and `<track>` elements, which the video takes as its own.
+   * - `(default)`: `<source>` and `<track>` elements, which are copied into the video.
    * - `poster`: Shown over the video until it starts.
    *
    * ## Methods
@@ -26039,6 +27675,13 @@ export type CustomElementsSolidJs = {
    *
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   * - `dispatchEvent(event: Event) => boolean`: Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
    *
    * ## CSS Parts
    *
@@ -26051,6 +27694,7 @@ export type CustomElementsSolidJs = {
    * - `play`: Play and pause.
    * - `scrubber`: Where it is, and where to go.
    * - `time`: The position and the duration.
+   * - `sound`: The speaker and its level, which are one control.
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.

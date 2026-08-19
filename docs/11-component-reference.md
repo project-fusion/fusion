@@ -5460,6 +5460,7 @@ to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'solid' \| 'transparent'` | `'transparent'` | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
 | `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
@@ -5490,7 +5491,7 @@ to do next.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | `<source>` and `<track>` elements, which the video takes as its own. |
+| *(default)* | `<source>` and `<track>` elements, which are copied into the video. |
 | `poster` | Shown over the video until it starts. |
 
 #### Parts
@@ -5504,6 +5505,7 @@ to do next.
 | `play` | Play and pause. |
 | `scrubber` | Where it is, and where to go. |
 | `time` | The position and the duration. |
+| `sound` | The speaker and its level, which are one control. |
 | `mute` | Sound on and off. |
 | `volume` | How loud. |
 | `captions` | Subtitles on and off. |

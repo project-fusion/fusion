@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseVideo } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import '../../icon/index.js'
 import { styles } from './video-root.css.js'
 
@@ -29,6 +30,8 @@ import { styles } from './video-root.css.js'
  * @category content
  * @documentation https://helix.fusion.dev/components/video
  *
+ * @property appearance - Whether the bar floats on the picture or sits on its own ground.
+ *
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
  * video's own once known, and `16 / 9` until then.
  * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
@@ -38,6 +41,21 @@ import { styles } from './video-root.css.js'
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixBaseVideo {
+  /**
+   * How the control bar sits on the picture.
+   *
+   * `transparent` is the default and is what a player looks like: the controls
+   * float on a gradient that darkens the frame just enough to read them, and
+   * the picture runs edge to edge behind them. `solid` gives them a bar of
+   * their own, which is what a video embedded in a document usually wants,
+   * where the player is a component on a page rather than the page itself.
+   *
+   * A presentation property, so it lives on this tier. The base element renders
+   * the same bar either way.
+   */
+  @property({ reflect: true })
+  appearance: 'solid' | 'transparent' = 'transparent'
+
   static override styles: CSSResultGroup = styles
 }
 

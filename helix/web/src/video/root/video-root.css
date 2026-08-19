@@ -71,6 +71,25 @@
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* A bar with a ground of its own, for a video embedded in a document rather
+   than a video that is the page. The gradient goes with it: two grounds is one
+   too many, and the point of this appearance is that the controls are a bar and
+   not a wash over the picture. */
+:host([appearance="solid"]) [part="controls"] {
+  background-color: var(--helix-color-surface-media);
+  color: var(--helix-color-foreground-media);
+}
+
+:host([appearance="solid"]) [part="stage"]::before {
+  content: none;
+}
+
+/* And it stays. A bar that is part of the frame does not come and go: hiding it
+   would leave a strip of the well behind it, which is worse than the bar. */
+:host([appearance="solid"][data-playing]:not(:hover):not(:focus-within)) [part="controls"] {
+  opacity: 1;
+}
+
 /* The shading reaches higher than the bar does.
  *
  * It is what makes light controls legible over a bright frame, and it needs
@@ -171,6 +190,12 @@
 [part="scrubber"],
 [part="volume"] {
   appearance: none;
+  border-radius: var(--helix-radii-full);
+  cursor: pointer;
+  margin: var(--helix-space-none);
+}
+
+[part="scrubber"] {
   background-color: color-mix(in oklab, currentColor 28%, transparent);
   background-image: linear-gradient(
     to right,
@@ -178,9 +203,6 @@
     transparent calc(var(--_video-at, 0) * 100%)
   );
   block-size: 4px;
-  border-radius: var(--helix-radii-full);
-  cursor: pointer;
-  margin: var(--helix-space-none);
 }
 
 [part="scrubber"] {
@@ -197,16 +219,81 @@
 [part="volume"] {
   --_video-at: var(--_video-level, 1);
   --_video-fill: currentColor;
-
-  flex: 0 0 auto;
-  inline-size: 3.5rem;
 }
 
-/* The speaker and its level are one control, so they sit closer to each other
-   than to anything else. Six things evenly spaced is a row with no grouping in
-   it to read. */
-[part="mute"] + [part="volume"] {
-  margin-inline-start: calc(var(--helix-space-xs) * -1 + var(--helix-space-2xs));
+/* The speaker and its level are one control, and the level stands up out of the
+   bar rather than lying along it.
+ *
+ * A horizontal level is fifty-six pixels of the row taken permanently for
+ * something a reader touches rarely, and it was the thing that read as a hole
+ * when nothing filled it. Standing it up puts it over the picture only while it
+ * is wanted, and gives the row back to the scrubber.
+ *
+ * On hover *and* focus-within. A control that appears only under a pointer is a
+ * control a keyboard cannot reach, and the level is a real range that Tab lands
+ * on. */
+[part="sound"] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+[part="volume"] {
+  /* Vertical, in the way the platform now does it: `writing-mode` turns a range
+     on its end and `direction: rtl` puts the loud end at the top. The old
+     `appearance: slider-vertical` is gone from every engine that had it. */
+  writing-mode: vertical-rl;
+
+  background-color: color-mix(in oklab, currentColor 28%, transparent);
+  background-image: linear-gradient(
+    to top,
+    var(--_video-fill) calc(var(--_video-at, 1) * 100%),
+    transparent calc(var(--_video-at, 1) * 100%)
+  );
+  /* Swapped, and that is the whole trick of `writing-mode`: it turns the
+     logical axes with the element, so `inline-size` is the tall one here and
+     `block-size` is the thin one. Written the other way round the slider came
+     out seventy-two by four, lying down as before. */
+  block-size: 4px;
+  bottom: calc(100% + var(--helix-space-2xs));
+  direction: rtl;
+  inline-size: 4.5rem;
+  /* Physical, and this is the one place in the library where that is the
+     correct choice rather than a lapse. `writing-mode` turns the element's own
+     logical axes, and an absolutely positioned box resolves its insets in its
+     own writing mode, not its container's: `inset-inline-start` became an
+     offset from the top and put the slider outside the control it belongs to.
+     `left` with a `translate` centres regardless of direction, and `bottom` has
+     no direction to be wrong about. */
+  left: 50%;
+  opacity: 0;
+  padding: var(--helix-space-none);
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: -50% 0;
+}
+
+[part="sound"]:hover [part="volume"],
+[part="sound"]:focus-within [part="volume"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The little ground it stands on, so a white track is legible over a bright
+   frame the way the bar's own controls are. */
+[part="sound"]:hover::before,
+[part="sound"]:focus-within::before {
+  background-color: var(--helix-color-overlay);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  block-size: calc(4.5rem + var(--helix-space-sm));
+  bottom: calc(100% + var(--helix-space-2xs));
+  inline-size: var(--helix-size-icon-lg);
+  left: 50%;
+  position: absolute;
+  translate: -50% 0;
 }
 
 [part="scrubber"]::-webkit-slider-thumb,
@@ -247,7 +334,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part="controls"],
-  [part="stage"]::before {
+  [part="stage"]::before,
+  [part="volume"] {
     transition: none;
   }
 }

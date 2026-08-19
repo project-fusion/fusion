@@ -57,7 +57,19 @@ const clock = (seconds: number): string => {
  * @aliases Player, Media, Movie
  * @documentation https://helix.fusion.dev/components/video
  *
- * @slot - `<source>` and `<track>` elements, which the video takes as its own.
+ * **`<source>` and `<track>` are copied into the video, not slotted into it.**
+ * A media element runs its resource selection over its own child *nodes*, and a
+ * slot is one node: the sources and the caption tracks a consumer wrote were
+ * assigned into the flattened tree and the video never saw any of them. It had
+ * no text tracks, no current source and a `readyState` of zero, so a video
+ * given sources this way did not merely lack captions, it did not play.
+ *
+ * They are copied rather than moved, because the consumer's light DOM is theirs
+ * and a framework that re-renders it would find its children gone. The copies
+ * are rebuilt whenever the slot changes and the video is asked to load again,
+ * which is what makes a `<track>` added later take effect.
+ *
+ * @slot - `<source>` and `<track>` elements, which are copied into the video.
  * @slot poster - Shown over the video until it starts.
  *
  * @csspart stage - The box holding the picture and its controls, and the focus
@@ -68,6 +80,7 @@ const clock = (seconds: number): string => {
  * @csspart play - Play and pause.
  * @csspart scrubber - Where it is, and where to go.
  * @csspart time - The position and the duration.
+ * @csspart sound - The speaker and its level, which are one control.
  * @csspart mute - Sound on and off.
  * @csspart volume - How loud.
  * @csspart captions - Subtitles on and off.
@@ -148,6 +161,10 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private hasCaptions = false
 
+  /** The sources and caption tracks to copy into the video, as the consumer wrote them. */
+  @state()
+  private media: { attrs: Record<string, string>; tag: 'source' | 'track' }[] = []
+
   private get video(): HTMLVideoElement | null {
     return this.renderRoot?.querySelector<HTMLVideoElement>('[part="video"]') ?? null
   }
@@ -174,6 +191,38 @@ export class HelixBaseVideo extends HelixElement {
     video.currentTime = Math.min(Math.max(seconds, 0), video.duration)
   }
 
+  /**
+   * Rebuilds the copies from whatever the consumer has slotted.
+   *
+   * The attribute list is explicit rather than a blind copy of every attribute:
+   * these are two elements with a known and small surface, and copying anything
+   * a consumer happened to put on one would carry their framework's own markers
+   * into a shadow root that has no use for them.
+   */
+  private readonly handleMedia = (event: Event): void => {
+    const assigned = (event.target as HTMLSlotElement).assignedElements()
+    this.media = assigned
+      .filter(
+        (node): node is HTMLSourceElement | HTMLTrackElement =>
+          node instanceof HTMLSourceElement || node instanceof HTMLTrackElement,
+      )
+      .map((node) => {
+        const tag = node instanceof HTMLTrackElement ? ('track' as const) : ('source' as const)
+        const names =
+          tag === 'track'
+            ? ['default', 'kind', 'label', 'src', 'srclang']
+            : ['media', 'sizes', 'src', 'srcset', 'type']
+        const attrs: Record<string, string> = {}
+        for (const name of names) {
+          const value = node.getAttribute(name)
+          if (value !== null) {
+            attrs[name] = value
+          }
+        }
+        return { attrs, tag }
+      })
+  }
+
   private readonly handleLoaded = (): void => {
     const video = this.video
     if (!video) {
@@ -184,6 +233,10 @@ export class HelixBaseVideo extends HelixElement {
        only a caption once the platform has parsed it, and a consumer can add
        one later. */
     this.hasCaptions = video.textTracks.length > 0
+    /* And what the first one is doing, which is not always nothing: a
+       `<track default>` starts showing without anyone pressing anything, so a
+       button that began at "off" reported the opposite of what was on screen. */
+    this.captioned = video.textTracks[0]?.mode === 'showing'
   }
 
   private readonly handleTime = (): void => {
@@ -327,6 +380,19 @@ export class HelixBaseVideo extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.toggleAttribute('data-playing', this.playing)
+    /* A media element decides what to play once, when it is created or when it
+       is told to look again. Copies that arrive after that are markup it has
+       already walked past. */
+    if (changed.has('media')) {
+      const video = this.video
+      video?.load()
+      const track = video?.textTracks[0]
+      this.hasCaptions = (video?.textTracks.length ?? 0) > 0
+      /* Read, not assumed. A `<track default>` starts showing without anyone
+         pressing anything, so a button that began at "off" was reporting the
+         opposite of what the reader could see on the picture. */
+      this.captioned = track?.mode === 'showing'
+    }
   }
 
   private renderBar(): TemplateResult {
@@ -353,6 +419,7 @@ export class HelixBaseVideo extends HelixElement {
         style=${`--_video-progress: ${done}`}
         @input=${(event: Event) => this.seek(Number((event.target as HTMLInputElement).value))}
       />
+      <span part="sound">
       <button
         part="mute"
         type="button"
@@ -385,6 +452,7 @@ export class HelixBaseVideo extends HelixElement {
           }
         }}
       />
+      </span>
       ${
         this.hasCaptions
           ? html`<button
@@ -440,8 +508,30 @@ export class HelixBaseVideo extends HelixElement {
         @pause=${this.handleState}
         @ended=${this.handleState}
       >
-        <slot></slot>
+        ${this.media.map((one) =>
+          one.tag === 'track'
+            ? html`<track
+                ?default=${'default' in one.attrs}
+                kind=${one.attrs.kind ?? nothing}
+                label=${one.attrs.label ?? nothing}
+                src=${one.attrs.src ?? nothing}
+                srclang=${one.attrs.srclang ?? nothing}
+              />`
+            : html`<source
+                media=${one.attrs.media ?? nothing}
+                sizes=${one.attrs.sizes ?? nothing}
+                src=${one.attrs.src ?? nothing}
+                srcset=${one.attrs.srcset ?? nothing}
+                type=${one.attrs.type ?? nothing}
+              />`,
+        )}
       </video>
+      <!-- Outside the video, and hidden. It exists to notice what the consumer
+           wrote, not to be rendered: a slot inside a media element is the one
+           child its resource selection sees, and a slot is not a source.
+           No backticks in here: this comment is inside a template literal, and
+           the first one ends it. -->
+      <span aria-hidden="true" hidden><slot @slotchange=${this.handleMedia}></slot></span>
       <slot name="poster" part="poster"></slot>
       ${this.controls ? nothing : this.renderBar()}
     </div>`
