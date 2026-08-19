@@ -905,10 +905,7 @@ export function SandboxWorkbench({ families }: Props) {
             ref={sandbox}
             split={showEditor ? split : 0}
           >
-            {/* One declaration for the region, rather than `size="sm"` on each
-              control in it. Nothing inside can be missed, and adding a control
-              later cannot forget. */}
-            <helix-sandbox-toolbar data-density="sm" slot="toolbar">
+            <helix-sandbox-toolbar slot="toolbar">
               {/* A toggle group, not a tab list. A tab in the toolbar would carry
                 `aria-controls` for a panel down in the source pane, and an
                 IDREF cannot leave the tab's shadow root to reach it: the
