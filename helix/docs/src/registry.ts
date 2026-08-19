@@ -72,6 +72,13 @@ export const pages: DocPage[] = [
     title: 'Server rendering',
   },
   {
+    description: 'Why a component renders its own anchor, and how to keep a router.',
+    order: 5,
+    section: 'Patterns',
+    slug: 'routing',
+    title: 'Routing and navigation',
+  },
+  {
     description: 'The two layers, the surface ladder, and what is enforced.',
     order: 1,
     section: 'Theming',

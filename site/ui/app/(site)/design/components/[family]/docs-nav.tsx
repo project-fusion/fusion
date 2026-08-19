@@ -37,26 +37,26 @@ export interface DocsNavEntry {
  * the gesture that wants the browser's own behaviour, and intercepting it would
  * take back the thing real anchors were for.
  */
+/* From the composed path rather than the target: the anchor is inside the
+   item's shadow root, so by the time the event reaches a handler out here it has
+   retargeted to the host and `event.target` is the custom element. */
+const linkFrom = (event: { nativeEvent: Event }): HTMLAnchorElement | undefined =>
+  event.nativeEvent
+    .composedPath()
+    .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement)
+
+/** The path, or nothing where the link leaves the site or opens elsewhere. */
+const internal = (link: HTMLAnchorElement | undefined): string | undefined => {
+  if (!link || link.target !== '') {
+    return undefined
+  }
+  const url = new URL(link.href)
+  return url.origin === window.location.origin ? `${url.pathname}${url.search}` : undefined
+}
+
 export function DocsNav({ active, entries }: { active: string; entries: readonly DocsNavEntry[] }) {
   const router = useRouter()
   const warmed = useRef(new Set<string>())
-
-  /* From the composed path rather than the target: the anchor is inside the
-     item's shadow root, so by the time the event reaches this handler it has
-     retargeted to the host and `event.target` is the custom element. */
-  const linkFrom = (event: { nativeEvent: Event }): HTMLAnchorElement | undefined =>
-    event.nativeEvent
-      .composedPath()
-      .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement)
-
-  /** The path, or nothing where the link leaves the site or opens elsewhere. */
-  const internal = (link: HTMLAnchorElement | undefined): string | undefined => {
-    if (!link || link.target !== '') {
-      return undefined
-    }
-    const url = new URL(link.href)
-    return url.origin === window.location.origin ? `${url.pathname}${url.search}` : undefined
-  }
 
   const navigate = useCallback(
     (event: ReactMouseEvent<HTMLElement>) => {
@@ -89,7 +89,11 @@ export function DocsNav({ active, entries }: { active: string; entries: readonly
     /* On the nav rather than on the tree, so one listener covers every row and
        nothing has to be bound as rows come and go with a branch. `pointerover`
        rather than `pointerenter`, because only the first bubbles and the rows
-       are what is being pointed at. */
+       are what is being pointed at.
+       The click rule below is about a handler standing in for a control. This
+       one delegates to real anchors, which answer Enter themselves, so a
+       keyboard handler here would either do nothing or navigate twice. */
+    // biome-ignore lint/a11y/useKeyWithClickEvents: delegates to real anchors
     <nav
       aria-label="Documentation"
       className="docsNav"

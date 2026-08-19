@@ -1,0 +1,168 @@
+# Routing and navigation
+
+Some components navigate. A tree used as a sidebar, a button that goes
+somewhere, a tab that is really a page. Those all want to be links, and a link
+inside a shadow root is where web components and framework routers disagree.
+
+This is the whole of that disagreement, and what to do about it.
+
+## A component that navigates renders its own anchor
+
+`Tree.Item` and `Button` both take an `href`, and when they have one the thing
+you press *is* an `<a>`:
+
+```html
+<helix-tree-item
+  href="/design/components/button"
+  value="button"
+>
+  Button
+</helix-tree-item>
+```
+
+That is not a detail of the implementation. It is the entire point, and what it
+buys is a list of things no amount of JavaScript reproduces:
+
+- the whole row is the target, not just the words
+- Enter works, because a focused anchor is a thing Enter activates
+- middle-click and Command-click open a tab
+- the destination appears in the status bar on hover
+- right-click offers Copy Link Address
+- a crawler follows it
+
+Before `href` existed, the docs sidebar put a `<Link>` inside each row. The
+anchor was 57px of a 240px row, so five sixths of every row did nothing, and
+Enter did nothing at all: the tree announced a selection and no anchor heard it.
+
+## `href` and a framework's `<Link>` are alternatives, not layers
+
+You cannot give a component's internal anchor to `next/link`. `<Link>` renders
+*its own* `<a>` and attaches its own handlers to it, and there is no way to hand
+that to an element that renders one inside a shadow root.
+
+So it is one or the other.
+
+## Wrapping the component in a `<Link>` is not the third option
+
+It looks like it should work, and it half does:
+
+```tsx
+{/* Don't. */}
+<Link href="/design/components/button">
+  <helix-tree-item value="button">Button</helix-tree-item>
+</Link>
+```
+
+The tree still finds its items, because it collects them with a descendant
+query rather than by looking at its children. What it costs:
+
+- **Two focus stops per row.** The anchor is focusable and so is the treeitem
+  inside it. A tree owns a single roving tab stop, and this adds a second one it
+  does not control.
+- **A `treeitem` nested inside a `link`.** Anything reading the semantics meets
+  both, in that order, for one thing.
+- **Nothing at all for a branch.** A branch contains its children, so wrapping
+  one puts every descendant anchor inside an ancestor anchor. That is invalid,
+  and browsers rearrange it.
+
+## Some roles cannot contain a link, and the fix is to move the role
+
+`treeitem` and `tab` are the two in this library. You cannot nest an anchor in
+either, and the answer is not to give up the anchor.
+
+For a tree, the role moves *onto* the anchor and the group becomes its sibling:
+
+```html
+<!-- What Tree.Item renders when it has an href -->
+<div
+  part="item"
+  role="none"
+>
+  <a
+    aria-expanded="true"
+    href="/x"
+    part="row"
+    role="treeitem"
+  >Name</a>
+  <div
+    part="group"
+    role="group"
+  >…</div>
+</div>
+```
+
+That is the navigation flavour of the tree pattern, and it is why `href` changes
+the shape of the markup rather than only adding an attribute. Without an `href`
+nothing moves: the wrapper stays the `treeitem` and holds its group, which is
+what an `<li>` holding a `<ul>` is.
+
+Tabs have no equivalent published pattern, which is worth knowing before you
+reach for one. Web Awesome hit the same wall and answered it the other way,
+telling consumers to drop the anchor and navigate in JavaScript. That works, and
+it costs every item in the list above.
+
+## Getting client-side routing back
+
+Real anchors do a full page load, because a framework only intercepts anchors it
+rendered itself. If you want its router, put it back on top rather than giving
+up the anchors:
+
+```tsx
+'use client'
+const router = useRouter()
+
+const navigate = (event) => {
+  // A modified or middle press is exactly the gesture that wants the browser's
+  // own behaviour. Taking it back is taking back the reason for real anchors.
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    return
+  }
+  // The anchor is inside a shadow root, so by the time the event gets here it
+  // has retargeted to the host: `event.target` is the custom element.
+  const link = event.nativeEvent
+    .composedPath()
+    .find((node) => node instanceof HTMLAnchorElement)
+  if (!link || link.target !== '' || new URL(link.href).origin !== location.origin) {
+    return
+  }
+  event.preventDefault()
+  router.push(new URL(link.href).pathname)
+}
+
+return <nav onClick={navigate} onPointerOver={warm}>{/* … */}</nav>
+```
+
+One listener on the container covers every row, and nothing has to be rebound as
+rows come and go.
+
+### Prefetch on approach, not on sight
+
+`<Link>` prefetches when a link enters the viewport. For a sidebar of seventy
+that is seventy requests for one navigation. Prefetching on `pointerover` and
+`focus` instead costs one, and a reader points at a row well before they press
+it:
+
+```tsx
+const warmed = useRef(new Set())
+const warm = (event) => {
+  const path = pathOf(event)
+  if (path && !warmed.current.has(path)) {
+    warmed.current.add(path)
+    router.prefetch(path)
+  }
+}
+```
+
+Prefetching is production-only in Next, so this does nothing in development. It
+is not broken.
+
+## Which components take an `href` today
+
+| Component | Notes |
+|---|---|
+| `Button` | Renders an `<a>` styled as a button. |
+| `Tree.Item` | Changes the ARIA shape, as above. A linked branch navigates from its row and opens from its chevron. |
+
+Anything else that should navigate is a gap. Slot a link into it, and press the
+row rather than the words: `Tree.Item` follows a slotted anchor from anywhere in
+the row and from the keyboard, which covers the case without an `href`.
