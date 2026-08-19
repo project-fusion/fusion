@@ -128,6 +128,29 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   @property({ attribute: 'first-day-of-week', type: Number })
   firstDayOfWeek = 0
 
+  /**
+   * How a date is written in the field: `short` through `full`, or ISO.
+   *
+   * **Setting this makes the field read-only, and that is the whole design.**
+   * What the field shows is the value, everywhere else in this component, for
+   * the reason the class gives: a document being edited must not be a rendering
+   * of something else. A range bends that and gets away with it, because the
+   * dash between its two dates is a separator this element understands, so what
+   * is shown is still what can be typed.
+   *
+   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+   * and writing a parser per locale is how a field ends up rejecting what it
+   * just displayed. So the choice is not "which format" but "formatted
+   * or typeable", and this element takes the honest half of it: with a style set
+   * the calendar is the way in, and without one the field is a text box holding
+   * exactly what it means.
+   *
+   * The value is always `YYYY-MM-DD` regardless, because that is what a form
+   * submits and what `min` and `max` compare against.
+   */
+  @property({ attribute: 'date-style' })
+  dateStyle?: 'full' | 'long' | 'medium' | 'short'
+
   /** Language tag the calendar names its months and days in. */
   @property()
   locale = ''
@@ -193,11 +216,32 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    * `multiple` shows nothing here at all. Its dates are tags beside the input
    * and the input is a draft, which is the next thing down.
    */
+  /** One date, written the way `dateStyle` asks for. */
+  private written(date: string): string {
+    if (!this.dateStyle || !isIso(date)) {
+      return date
+    }
+    /* UTC, because the dates are UTC throughout: a date parsed in a zone behind
+       Greenwich renders as the day before, which is the classic off-by-one that
+       makes a calendar disagree with the field beside it. */
+    const at = new Date(`${date}T00:00:00Z`)
+    return Number.isNaN(at.getTime())
+      ? date
+      : new Intl.DateTimeFormat(this.locale || undefined, {
+          dateStyle: this.dateStyle,
+          timeZone: 'UTC',
+        }).format(at)
+  }
+
   private get display(): string {
     if (this.mode === 'multiple') {
       return this.draft
     }
     const held = dates(this.value)
+    if (this.dateStyle) {
+      const written = held.map((one) => this.written(one))
+      return this.mode === 'range' ? written.join(' – ') : written.join(', ')
+    }
     return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
   }
 
@@ -421,7 +465,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
                     event.stopPropagation()
                     this.removeDate(date)
                   }}
-                  >${date}</helix-tag
+                  >${this.written(date)}</helix-tag
                 >`,
               )
             : nothing
@@ -437,6 +481,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
           inputmode="numeric"
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
+          ?readonly=${this.dateStyle !== undefined}
           ?required=${this.required}
           @focus=${this.handleFocus}
           @input=${this.handleInput}

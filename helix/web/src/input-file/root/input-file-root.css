@@ -64,9 +64,21 @@
   border-style: solid;
 }
 
+/* The trigger stacks whatever is slotted into it: a mark above, its label
+ * below.
+ *
+ * A drop target is a box rather than a line, so its affordance is a shape in the
+ * middle of one rather than a run of text sitting where a value would go. The
+ * default is still the plain label, because a component should not require a
+ * consumer to bring an icon before it reads correctly. */
 [part="trigger"] {
+  align-items: center;
   color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
   font-family: var(--helix-font-sans);
+  gap: var(--helix-space-2xs);
+  text-align: center;
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   /* Not `pointer`: the input above it already carries that, and a label with its
@@ -158,4 +170,20 @@
   [part="remove"] {
     transition: none;
   }
+}
+
+/* Muted, and larger than a line of text. The mark says "a place to put files"
+ * and the words say which files, so the mark carries the shape and the words
+ * carry the meaning: at the foreground's full weight the two competed.
+ *
+ * **A mark and its label are two slotted children, not one wrapper holding
+ * both.** `::slotted()` matches direct children and nothing deeper, so an icon
+ * inside a slotted `<span>` cannot be reached from here at all, and neither
+ * `::slotted(*) helix-icon` nor `slot helix-icon` reaches it either. Slotting
+ * them as siblings under the same name is what makes both this rule and the
+ * column above it work, and it is the arrangement the examples use. */
+::slotted(helix-icon[slot="trigger"]) {
+  --icon-size: var(--helix-size-icon-lg);
+
+  color: var(--helix-color-foreground-muted);
 }

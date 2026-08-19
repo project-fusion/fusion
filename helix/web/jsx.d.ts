@@ -3365,6 +3365,44 @@ first. The panel is sized by its content, so this widens it. */
   "first-day-of-week"?: HelixInputDate["firstDayOfWeek"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
   firstDayOfWeek?: HelixInputDate["firstDayOfWeek"];
+  /** How a date is written in the field: `short` through `full`, or ISO.
+
+**Setting this makes the field read-only, and that is the whole design.**
+What the field shows is the value, everywhere else in this component, for
+the reason the class gives: a document being edited must not be a rendering
+of something else. A range bends that and gets away with it, because the
+dash between its two dates is a separator this element understands, so what
+is shown is still what can be typed.
+
+`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+and writing a parser per locale is how a field ends up rejecting what it
+just displayed. So the choice is not "which format" but "formatted
+or typeable", and this element takes the honest half of it: with a style set
+the calendar is the way in, and without one the field is a text box holding
+exactly what it means.
+
+The value is always `YYYY-MM-DD` regardless, because that is what a form
+submits and what `min` and `max` compare against. */
+  "date-style"?: HelixInputDate["dateStyle"];
+  /** How a date is written in the field: `short` through `full`, or ISO.
+
+**Setting this makes the field read-only, and that is the whole design.**
+What the field shows is the value, everywhere else in this component, for
+the reason the class gives: a document being edited must not be a rendering
+of something else. A range bends that and gets away with it, because the
+dash between its two dates is a separator this element understands, so what
+is shown is still what can be typed.
+
+`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+and writing a parser per locale is how a field ends up rejecting what it
+just displayed. So the choice is not "which format" but "formatted
+or typeable", and this element takes the honest half of it: with a style set
+the calendar is the way in, and without one the field is a text box holding
+exactly what it means.
+
+The value is always `YYYY-MM-DD` regardless, because that is what a form
+submits and what `min` and `max` compare against. */
+  dateStyle?: HelixInputDate["dateStyle"];
   /** Language tag the calendar names its months and days in. */
   locale?: HelixInputDate["locale"];
   /** What the field says before a date is in it. */
@@ -3505,6 +3543,44 @@ first. The panel is sized by its content, so this widens it. */
   "attr:first-day-of-week"?: HelixInputDate["firstDayOfWeek"];
   /** First column of the week in the calendar, `0` for Sunday through `6`. */
   "prop:firstDayOfWeek"?: HelixInputDate["firstDayOfWeek"];
+  /** How a date is written in the field: `short` through `full`, or ISO.
+
+**Setting this makes the field read-only, and that is the whole design.**
+What the field shows is the value, everywhere else in this component, for
+the reason the class gives: a document being edited must not be a rendering
+of something else. A range bends that and gets away with it, because the
+dash between its two dates is a separator this element understands, so what
+is shown is still what can be typed.
+
+`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+and writing a parser per locale is how a field ends up rejecting what it
+just displayed. So the choice is not "which format" but "formatted
+or typeable", and this element takes the honest half of it: with a style set
+the calendar is the way in, and without one the field is a text box holding
+exactly what it means.
+
+The value is always `YYYY-MM-DD` regardless, because that is what a form
+submits and what `min` and `max` compare against. */
+  "attr:date-style"?: HelixInputDate["dateStyle"];
+  /** How a date is written in the field: `short` through `full`, or ISO.
+
+**Setting this makes the field read-only, and that is the whole design.**
+What the field shows is the value, everywhere else in this component, for
+the reason the class gives: a document being edited must not be a rendering
+of something else. A range bends that and gets away with it, because the
+dash between its two dates is a separator this element understands, so what
+is shown is still what can be typed.
+
+`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+and writing a parser per locale is how a field ends up rejecting what it
+just displayed. So the choice is not "which format" but "formatted
+or typeable", and this element takes the honest half of it: with a style set
+the calendar is the way in, and without one the field is a text box holding
+exactly what it means.
+
+The value is always `YYYY-MM-DD` regardless, because that is what a form
+submits and what `min` and `max` compare against. */
+  "prop:dateStyle"?: HelixInputDate["dateStyle"];
   /** Language tag the calendar names its months and days in. */
   "prop:locale"?: HelixInputDate["locale"];
   /** What the field says before a date is in it. */
@@ -10781,6 +10857,24 @@ export type CustomElements = {
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
+   * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
+   *
+   * **Setting this makes the field read-only, and that is the whole design.**
+   * What the field shows is the value, everywhere else in this component, for
+   * the reason the class gives: a document being edited must not be a rendering
+   * of something else. A range bends that and gets away with it, because the
+   * dash between its two dates is a separator this element understands, so what
+   * is shown is still what can be typed.
+   *
+   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+   * and writing a parser per locale is how a field ends up rejecting what it
+   * just displayed. So the choice is not "which format" but "formatted
+   * or typeable", and this element takes the honest half of it: with a style set
+   * the calendar is the way in, and without one the field is a text box holding
+   * exactly what it means.
+   *
+   * The value is always `YYYY-MM-DD` regardless, because that is what a form
+   * submits and what `min` and `max` compare against.
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
@@ -17351,6 +17445,24 @@ export type CustomElementsSolidJs = {
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
+   * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
+   *
+   * **Setting this makes the field read-only, and that is the whole design.**
+   * What the field shows is the value, everywhere else in this component, for
+   * the reason the class gives: a document being edited must not be a rendering
+   * of something else. A range bends that and gets away with it, because the
+   * dash between its two dates is a separator this element understands, so what
+   * is shown is still what can be typed.
+   *
+   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
+   * and writing a parser per locale is how a field ends up rejecting what it
+   * just displayed. So the choice is not "which format" but "formatted
+   * or typeable", and this element takes the honest half of it: with a style set
+   * the calendar is the way in, and without one the field is a text box holding
+   * exactly what it means.
+   *
+   * The value is always `YYYY-MM-DD` regardless, because that is what a form
+   * submits and what `min` and `max` compare against.
    * - `locale`: Language tag the calendar names its months and days in.
    * - `placeholder`: What the field says before a date is in it.
    * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.

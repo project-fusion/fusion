@@ -71,6 +71,7 @@ tag-simple
 text-b
 text-italic
 trash
+upload-simple
 user
 user-circle
 users

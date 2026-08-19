@@ -9,9 +9,17 @@
  *
  * **Every syntax here is read; three are written.** A field that refuses
  * `rgb(255 0 0)` because it prefers hex is a field arguing with the person using
- * it, and the modern space-separated forms are what a stylesheet holds now. What
- * is written back is whichever of hex, rgb or hsl the component is set to, so a
- * value stays in the shape the consumer asked for however it was entered.
+ * it, so the space-separated forms, the comma forms, `rgba` and `hsla` are all
+ * taken. What is written back is whichever of hex, rgb or hsl the component is
+ * set to, so a value stays in the shape the consumer asked for however it was
+ * entered.
+ *
+ * **What is written is the comma form.** Both are valid and the space-separated
+ * one is newer, which was the reason it was chosen first; the commas are what a
+ * reader recognises, what most code around them holds, and what pastes into
+ * anything without a second thought. A syntax a value is handed *out* in is not
+ * the place to be early. `rgba` and `hsla` come with them, since a comma form
+ * with a fourth argument is spelled that way.
  *
  * Its own module rather than sitting in the element, because it is arithmetic
  * with no DOM in it: this is the half worth testing directly.
@@ -233,17 +241,21 @@ export const parseColor = (value: string): Color | null => {
  */
 export const formatColor = (color: Color, format: ColorFormat, withAlpha: boolean): string => {
   const alpha = clamp(color.alpha, 0, 100) / 100
+  /* Two decimal places at most, and no trailing zeros: an alpha is a fraction
+     here and `0.5` is what a stylesheet holds, not `0.50` and not
+     `0.5019607843137255`. */
+  const opacity = Number(alpha.toFixed(2))
 
   if (format === 'hsl') {
     const { hue, lightness, saturation } = toHsl(color)
-    const body = `${Math.round(hue)} ${saturation}% ${lightness}%`
-    return withAlpha ? `hsl(${body} / ${Math.round(alpha * 100)}%)` : `hsl(${body})`
+    const body = `${Math.round(hue)}, ${saturation}%, ${lightness}%`
+    return withAlpha ? `hsla(${body}, ${opacity})` : `hsl(${body})`
   }
 
   const { blue, green, red } = toRgb(color)
   if (format === 'rgb') {
-    const body = `${red} ${green} ${blue}`
-    return withAlpha ? `rgb(${body} / ${Math.round(alpha * 100)}%)` : `rgb(${body})`
+    const body = `${red}, ${green}, ${blue}`
+    return withAlpha ? `rgba(${body}, ${opacity})` : `rgb(${body})`
   }
 
   const byte = (one: number): string => one.toString(16).padStart(2, '0')

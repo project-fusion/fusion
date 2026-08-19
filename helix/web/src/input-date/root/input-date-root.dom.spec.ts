@@ -351,3 +351,66 @@ describe('input date shows what it holds', () => {
     expect(host.value).toBe('2026-08-04,2026-08-18')
   })
 })
+
+describe('input date can be written out', () => {
+  const field = async (
+    attrs: string,
+  ): Promise<HTMLElement & { updateComplete: Promise<unknown>; value: string }> => {
+    const host = (await mount(
+      `<helix-input-date label="Starts" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('a style writes the date out, and the value stays ISO', async () => {
+    const host = await field('date-style="long" default-value="2026-08-04" locale="en-GB"')
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('4 August 2026')
+    expect(host.value).toBe('2026-08-04')
+  })
+
+  test('and the field goes read-only, which is the whole design', async () => {
+    /* `Intl.DateTimeFormat` formats and does not parse, so a written date cannot
+       be typed back. The choice is not which format but formatted or typeable,
+       and a field showing something it would reject is the dishonest half. */
+    const host = await field('date-style="long" default-value="2026-08-04"')
+    expect((part(host, 'control') as HTMLInputElement).readOnly).toBe(true)
+  })
+
+  test('without one it is a text box holding exactly what it means', async () => {
+    const host = await field('default-value="2026-08-04"')
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04')
+    expect((part(host, 'control') as HTMLInputElement).readOnly).toBe(false)
+  })
+
+  test('the locale is the calendar its months are named in', async () => {
+    const host = await field('date-style="long" default-value="2026-08-04" locale="fr-FR"')
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('4 août 2026')
+  })
+
+  test('a date is written in UTC, or it renders as the day before', async () => {
+    // The classic off-by-one: a date parsed in a zone behind Greenwich is the
+    // previous day by the time it is formatted, and the field then disagrees
+    // with the calendar under it.
+    const host = await field('date-style="short" default-value="2026-08-04" locale="en-GB"')
+    expect((part(host, 'control') as HTMLInputElement).value).toContain('04')
+  })
+
+  test('a range is written out on both sides of the dash', async () => {
+    const host = await field(
+      'date-style="medium" default-value="2026-08-04,2026-08-11" locale="en-GB" mode="range"',
+    )
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('4 Aug 2026 – 11 Aug 2026')
+  })
+
+  test('and a multiple writes each tag out', async () => {
+    const host = await field(
+      'date-style="medium" default-value="2026-08-04,2026-08-11" locale="en-GB" mode="multiple"',
+    )
+    const tags = [...(host.shadowRoot?.querySelectorAll('[part="date"]') ?? [])]
+    expect(tags.map((one) => one.textContent?.trim())).toEqual(['4 Aug 2026', '11 Aug 2026'])
+  })
+})

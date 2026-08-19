@@ -11723,6 +11723,15 @@
             },
             {
               "kind": "field",
+              "name": "dateStyle",
+              "type": {
+                "text": "'full' | 'long' | 'medium' | 'short' | undefined"
+              },
+              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**Setting this makes the field read-only, and that is the whole design.**\nWhat the field shows is the value, everywhere else in this component, for\nthe reason the class gives: a document being edited must not be a rendering\nof something else. A range bends that and gets away with it, because the\ndash between its two dates is a separator this element understands, so what\nis shown is still what can be typed.\n\n`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,\nand writing a parser per locale is how a field ends up rejecting what it\njust displayed. So the choice is not \"which format\" but \"formatted\nor typeable\", and this element takes the honest half of it: with a style set\nthe calendar is the way in, and without one the field is a text box holding\nexactly what it means.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
+              "attribute": "date-style"
+            },
+            {
+              "kind": "field",
               "name": "locale",
               "type": {
                 "text": "string"
@@ -11779,13 +11788,31 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "written",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One date, written the way `dateStyle` asks for."
+            },
+            {
               "kind": "field",
               "name": "display",
               "type": {
                 "text": "string"
               },
               "privacy": "private",
-              "description": "What the field shows, which is the value in every mode but one.\n\nA range reads `2026-08-04 – 2026-08-11`, because two dates separated by a\ncomma is a list and a range is a span: the comma says \"and these\", the dash\nsays \"through\". It is the one place this component shows something other\nthan the value it holds, and it is safe because the dash reads back: `dates`\ntakes a spaced dash as a separator, so what is shown is what can be typed.\n\n`multiple` shows nothing here at all. Its dates are tags beside the input\nand the input is a draft, which is the next thing down.",
               "readonly": true
             },
             {
@@ -12685,6 +12712,14 @@
               "default": "0",
               "description": "First column of the week in the calendar, `0` for Sunday through `6`.",
               "fieldName": "firstDayOfWeek"
+            },
+            {
+              "name": "date-style",
+              "type": {
+                "text": "'full' | 'long' | 'medium' | 'short' | undefined"
+              },
+              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**Setting this makes the field read-only, and that is the whole design.**\nWhat the field shows is the value, everywhere else in this component, for\nthe reason the class gives: a document being edited must not be a rendering\nof something else. A range bends that and gets away with it, because the\ndash between its two dates is a separator this element understands, so what\nis shown is still what can be typed.\n\n`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,\nand writing a parser per locale is how a field ends up rejecting what it\njust displayed. So the choice is not \"which format\" but \"formatted\nor typeable\", and this element takes the honest half of it: with a style set\nthe calendar is the way in, and without one the field is a text box holding\nexactly what it means.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
+              "fieldName": "dateStyle"
             },
             {
               "name": "locale",

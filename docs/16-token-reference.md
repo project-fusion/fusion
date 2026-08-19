@@ -33,7 +33,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 69 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 3 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 198 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 106 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 108 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 70 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
@@ -64,7 +64,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 151 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 173 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 175 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 165 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 160 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 70 |
@@ -232,7 +232,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-spinner-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 14 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 58 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 10 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 12 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 7 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 49 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 94 |

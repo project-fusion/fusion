@@ -69,13 +69,13 @@ describe('color syntaxes', () => {
   test('what is written is the format, whatever was read', async () => {
     const host = await picker('format="rgb" default-value="#ff0000"')
     await ramp(host, 'hue', 120)
-    expect(host.value).toBe('rgb(0 255 0)')
+    expect(host.value).toBe('rgb(0, 255, 0)')
   })
 
   test('hsl too, and it round trips through the model', async () => {
     const host = await picker('format="hsl" default-value="rgb(255 0 0)"')
     await ramp(host, 'hue', 240)
-    expect(host.value).toBe('hsl(240 100% 50%)')
+    expect(host.value).toBe('hsl(240, 100%, 50%)')
   })
 
   test('the toggle walks hex to rgb to hsl and back, rewriting as it goes', async () => {
@@ -83,10 +83,10 @@ describe('color syntaxes', () => {
     const toggle = part(host, 'format') as HTMLElement
     toggle.click()
     await host.updateComplete
-    expect(host.value).toBe('rgb(255 0 0)')
+    expect(host.value).toBe('rgb(255, 0, 0)')
     toggle.click()
     await host.updateComplete
-    expect(host.value).toBe('hsl(0 100% 50%)')
+    expect(host.value).toBe('hsl(0, 100%, 50%)')
     toggle.click()
     await host.updateComplete
     expect(host.value).toBe('#ff0000')
@@ -175,7 +175,7 @@ describe('color picker', () => {
     const swatch = host.shadowRoot?.querySelector('[part="swatch"]') as HTMLElement
     swatch.click()
     await host.updateComplete
-    expect(host.value).toBe('rgb(0 255 0)')
+    expect(host.value).toBe('rgb(0, 255, 0)')
   })
 
   test('presets may be written in any syntax, mixed', async () => {
@@ -262,6 +262,9 @@ describe('color picker', () => {
     field.value = 'rgb(0 255 0)'
     field.dispatchEvent(new Event('input', { bubbles: true }))
     await host.updateComplete
+    /* Kept exactly as typed, whatever `format` says. The format is the shape
+       this element writes when it produces a value; what a reader typed is
+       already a value and rewriting it under them would move the caret. */
     expect(host.value).toBe('rgb(0 255 0)')
     expect(part(host, 'grid')?.getAttribute('style')).toContain('--_hue: 120')
   })
