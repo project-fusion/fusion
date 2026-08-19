@@ -17,6 +17,9 @@ import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
    base one: a consumer on the styled tier gets the styled listbox, and one on
    the headless tier brings a listbox of their own under that name. */
 import '../../listbox/index.js'
+/* And the tags, for the same reason: `multiple` renders one per chosen option
+   and a custom element registers on import. */
+import '../../tag/index.js'
 
 /**
  * @summary A field that filters a list as it is typed into.
@@ -59,6 +62,18 @@ import '../../listbox/index.js'
  * @aliases Autocomplete, Typeahead, Search select
  * @documentation https://helix.fusion.dev/components/combobox
  *
+ * **With `multiple`, the chosen options are tags in the field.** A field that
+ * says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what
+ * is in it, and offers nothing to press to take one out: Select does that today
+ * and it is the weakest part of it. A tag apiece is one object per answer, each
+ * with its own remove control, which is what the reader already believes they
+ * are looking at.
+ *
+ * The panel stays open while more than one can be chosen, because a control
+ * that shut after each pick is one the reader has to reopen to keep using. The
+ * filter clears on each choice instead, so the next pick starts from the whole
+ * list rather than from the last search.
+ *
  * @slot - The options, which are `helix-option` elements.
  * @slot start - Before the text, for an icon.
  * @slot end - After it, for a unit or a clear button.
@@ -66,6 +81,8 @@ import '../../listbox/index.js'
  *
  * @csspart field - The box around the text and its marks.
  * @csspart control - The text field itself.
+ * @csspart tags - The row of chosen options, when `multiple` is set.
+ * @csspart tag - One chosen option.
  * @csspart indicator - The caret.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
@@ -84,6 +101,23 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   /** Text shown while nothing has been chosen. */
   @property()
   placeholder = ''
+
+  /**
+   * Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   */
+  @property({ type: Boolean })
+  multiple = false
+
+  /** What a tag's remove control is called, since the mark has no name. */
+  @property({ attribute: 'remove-label' })
+  removeLabel = 'Remove'
 
   /** Accessible name for the list, which has no visible one of its own. */
   @property({ attribute: 'list-label' })
@@ -123,10 +157,46 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
   })
 
-  /** The words of the chosen option, which is what the field shows at rest. */
-  private get chosen(): string {
-    const option = (this.listbox?.options ?? []).find((one) => one.value === this.value)
-    return option?.text ?? ''
+  /** The values chosen, in the order they were chosen. */
+  private get values(): string[] {
+    return this.value === '' ? [] : this.value.split(',')
+  }
+
+  /**
+   * The chosen options themselves, for their words.
+   *
+   * Read off the options rather than stored, because the words are the
+   * consumer's content and a copy of them goes stale the moment they change it.
+   * Select records the same.
+   *
+   * Which also decides the order the tags appear in, and it is the consumer's
+   * rather than the order they were picked: filtering the options keeps them as
+   * written. That is the more stable of the two. A set that reordered itself as
+   * it was built would move a tag out from under the pointer about to remove
+   * it, and a reader scanning for what they chose is scanning against the list
+   * they chose it from.
+   */
+  private get chosen(): { text: string; value: string }[] {
+    const wanted = new Set(this.values)
+    return (this.listbox?.options ?? [])
+      .filter((option) => wanted.has(option.value))
+      .map((option) => ({ text: option.text, value: option.value }))
+  }
+
+  /** What a single-choice field shows at rest, which the tags replace. */
+  private get word(): string {
+    return this.chosen[0]?.text ?? ''
+  }
+
+  /**
+   * Takes one value out of the set, which is what a tag's remove control does.
+   *
+   * `drop` rather than `remove`, which every element already has: `Element`
+   * defines `remove()` and a method of that name here would be overriding it,
+   * so `combobox.remove()` would stop taking the combobox out of the document.
+   */
+  private drop(value: string): void {
+    this.requestValue(this.values.filter((one) => one !== value).join(','))
   }
 
   private close(): void {
@@ -174,6 +244,22 @@ export class HelixBaseCombobox extends MixinControllerOpen(
       }
       return
     }
+    /* Backspace on an empty field takes the last tag off.
+     *
+     * Only when empty, so it never competes with deleting a character, and
+     * only the last, because that is the one the caret is against. This is the
+     * keyboard's version of pressing a tag's remove control, and without it a
+     * reader who chose four things with the keyboard has to reach for a pointer
+     * to undo one.
+     */
+    if (event.key === 'Backspace' && this.multiple && this.typed === '') {
+      const last = this.values.at(-1)
+      if (last !== undefined) {
+        event.preventDefault()
+        this.drop(last)
+      }
+      return
+    }
     /* Opening on the first arrow, before the list is asked to move: a closed
        combobox pressed Down should show its options and land on the first,
        which is one gesture to the reader and two steps here. */
@@ -192,10 +278,31 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
+    /* From the event rather than from the listbox, which is one choice behind:
+       it carries what is being *proposed*, dispatched before it is applied,
+       which is what makes it refusable. The listbox never applies it anyway,
+       since this element passes `.value` down and that is a consumer declaring
+       ownership. Select was fixed for exactly this. */
     const { value } = (event as HelixChangeEvent).detail
-    this.requestValue(value)
+    /* And nothing happens on a refusal. Refusing a change should leave the
+       control where it was, not clear the filter and shut the panel as though
+       it had been taken. */
+    if (!this.requestValue(value)) {
+      return
+    }
+    // Either way the search is spent: it found what it was for.
     this.typed = ''
-    this.close()
+    this.listbox?.requestFilter('')
+    if (!this.multiple) {
+      this.close()
+    }
+  }
+
+  /** One tag asking to be taken out of the set. */
+  private readonly handleDismiss = (event: Event): void => {
+    event.stopPropagation()
+    const tag = event.currentTarget as HTMLElement
+    this.drop(tag.dataset.value ?? '')
   }
 
   /**
@@ -232,6 +339,22 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     return html`${this.renderLabel()}
       <div part="field">
         <slot name="start"></slot>
+        ${
+          this.multiple && this.chosen.length > 0
+            ? html`<span part="tags">
+                ${this.chosen.map(
+                  (option) => html`<helix-tag
+                    part="tag"
+                    data-value=${option.value}
+                    dismiss-label=${this.removeLabel}
+                    ?dismissible=${!this.isDisabled}
+                    @helix-dismiss=${this.handleDismiss}
+                    >${option.text}</helix-tag
+                  >`,
+                )}
+              </span>`
+            : nothing
+        }
         <input
           part="control"
           id="control"
@@ -243,9 +366,10 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           aria-autocomplete="list"
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
-          placeholder=${this.placeholder || nothing}
+          aria-multiselectable=${this.multiple ? 'true' : nothing}
+          placeholder=${(this.chosen.length > 0 ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
-          .value=${this.open ? this.typed : this.chosen}
+          .value=${this.multiple || this.open ? this.typed : this.word}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
           @click=${() => !this.isDisabled && !this.open && this.requestOpen(true)}
@@ -264,6 +388,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           exportparts="items, empty"
           aria-label=${this.listLabel}
           empty-text=${this.emptyText}
+          ?multiple=${this.multiple}
           .value=${this.value}
           @helix-change=${this.handleChange}
         >

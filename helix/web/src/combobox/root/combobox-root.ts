@@ -6,6 +6,7 @@ import type { CSSResultGroup } from 'lit'
    template, which is why it is restated here: this file has no `<helix-listbox>`
    in it to remind anyone. `check:composed` enforces it. */
 import '../../listbox/index.js'
+import '../../tag/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './combobox-root.css.js'
@@ -25,6 +26,8 @@ import { styles } from './combobox-root.css.js'
  * @documentation https://helix.fusion.dev/components/combobox
  *
  * @cssproperty --combobox-background-color - Fill behind the field.
+ * @cssproperty --combobox-control-size - Smallest the text field shrinks to
+ * before it wraps below the tags. Defaults to `4ch`.
  * @cssproperty --combobox-panel-size - Width of the panel. Follows the field by default.
  */
 @customElement('helix-combobox')

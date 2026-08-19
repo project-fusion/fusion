@@ -1814,6 +1814,19 @@ export type HelixBaseComboboxHelixCloseElementEvent =
 export type HelixBaseComboboxProps = {
   /** Text shown while nothing has been chosen. */
   placeholder?: HelixBaseCombobox["placeholder"];
+  /** Whether more than one option can be chosen.
+
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  multiple?: HelixBaseCombobox["multiple"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "remove-label"?: HelixBaseCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  removeLabel?: HelixBaseCombobox["removeLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   "list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -1928,6 +1941,19 @@ fire at all. */
 export type HelixBaseComboboxSolidJsProps = {
   /** Text shown while nothing has been chosen. */
   "prop:placeholder"?: HelixBaseCombobox["placeholder"];
+  /** Whether more than one option can be chosen.
+
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  "prop:multiple"?: HelixBaseCombobox["multiple"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "attr:remove-label"?: HelixBaseCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "prop:removeLabel"?: HelixBaseCombobox["removeLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   "attr:list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -10573,6 +10599,15 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `placeholder`: Text shown while nothing has been chosen.
+   * - `multiple`: Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `open`: Whether the element is open.
@@ -10719,6 +10754,8 @@ export type CustomElements = {
    *
    * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
+   * - `tags`: The row of chosen options, when `multiple` is set.
+   * - `tag`: One chosen option.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -18239,6 +18276,15 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `placeholder`: Text shown while nothing has been chosen.
+   * - `multiple`: Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `open`: Whether the element is open.
@@ -18385,6 +18431,8 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
+   * - `tags`: The row of chosen options, when `multiple` is set.
+   * - `tag`: One chosen option.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.

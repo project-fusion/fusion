@@ -25,6 +25,72 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* With tags in it the field grows, and only then.
+ *
+ * On `:has([part="tags"])` rather than on a reflected `multiple`, which is the
+ * more accurate question and needs no attribute on the host: a `multiple`
+ * combobox with nothing chosen yet is a plain field and should look like one.
+ * Tree's row asks the same question of its own shadow content.
+ *
+ * `block-size: auto` with a floor rather than the fixed height every other
+ * field has, because the number of rows is the reader's and not the designer's:
+ * six tags wrap to three lines and a field that kept one line would clip two of
+ * them. The floor keeps a field with one tag the same height as a field with
+ * none, so a form does not jump as the first choice is made.
+ *
+ * The block padding arrives with the wrapping. At a fixed height the tags are
+ * centred by `align-items` and need none; once the box can grow, nothing is
+ * holding them off the border. */
+[part="field"]:has([part="tags"]) {
+  block-size: auto;
+  flex-wrap: wrap;
+  min-block-size: var(--helix-size-control);
+  /* Room kept at the end for the caret, which is no longer in the flow. */
+  padding-block: var(--helix-space-2xs);
+  padding-inline-end: calc(var(--helix-space-xs) + var(--helix-size-icon));
+  position: relative;
+}
+
+/* And the caret comes out of the wrap.
+ *
+ * Measured with eight tags: it is the last flex item, so it wrapped with the
+ * text field onto a third line and sat there alone against the right edge,
+ * under a row of tags, which reads as a field that has broken rather than one
+ * that has grown. It says the panel opens, which is true of the whole control
+ * and not of whichever line it landed on, so it belongs at the field's end
+ * rather than at the end of the content.
+ *
+ * Both selectors for the reason the flip rule gives: the default caret is the
+ * slot's fallback content and `::slotted()` cannot match it. */
+[part="field"]:has([part="tags"]) [part="indicator"],
+[part="field"]:has([part="tags"]) ::slotted([slot="indicator"]) {
+  inset-block-start: 50%;
+  inset-inline-end: var(--helix-space-xs);
+  position: absolute;
+  translate: 0 -50%;
+}
+
+/* Not a box of its own: `display: contents` puts the tags directly into the
+   field's flex line, so they wrap among themselves and the input wraps with
+   them. A wrapper that laid them out itself would be a second flex context
+   that wraps internally and then sits beside the input as one unbreakable
+   block, which is how a row of eight tags ends up scrolling sideways out of a
+   field it was supposed to grow. */
+[part="tags"] {
+  display: contents;
+}
+
+[part="tag"] {
+  flex: 0 0 auto;
+  max-inline-size: 100%;
+}
+
+/* The text field keeps a usable width once tags share the line with it, and
+   wraps to its own line rather than shrinking to nothing when they fill it. */
+[part="field"]:has([part="tags"]) [part="control"] {
+  flex: 1 1 var(--combobox-control-size, 4ch);
+}
+
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
    phone chooses are all the platform's. `all: unset` takes `box-sizing` with
    it, back to `content-box`, and the `border-box` every shadow root is given

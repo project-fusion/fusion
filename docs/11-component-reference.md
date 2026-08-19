@@ -1093,11 +1093,13 @@ Input, Color Input and Date Input all take.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `listLabel` | `list-label` | `string` | `'Options'` | `HelixBaseCombobox` | Accessible name for the list, which has no visible one of its own. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseCombobox` | Whether more than one option can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placeholder` | `placeholder` | `string` | `''` | `HelixBaseCombobox` | Text shown while nothing has been chosen. |
+| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseCombobox` | What a tag's remove control is called, since the mark has no name. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -1136,6 +1138,8 @@ Input, Color Input and Date Input all take.
 | --- | --- |
 | `field` | The box around the text and its marks. |
 | `control` | The text field itself. |
+| `tags` | The row of chosen options, when `multiple` is set. |
+| `tag` | One chosen option. |
 | `indicator` | The caret. |
 | `surface` | The floating panel. |
 | `listbox` | The list inside it. |
@@ -1147,6 +1151,7 @@ Input, Color Input and Date Input all take.
 | Property | Description |
 | --- | --- |
 | `--combobox-background-color` | Fill behind the field. |
+| `--combobox-control-size` | Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. |
 | `--combobox-panel-size` | Width of the panel. Follows the field by default. |
 
 ## Copy Button

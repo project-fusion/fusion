@@ -182,13 +182,126 @@ describe('combobox', () => {
   })
 })
 
+describe('combobox holding several', () => {
+  const many = async (extra = ''): Promise<Updatable> => {
+    document.body.innerHTML = `<helix-combobox label="L" multiple name="c" ${extra}>
+      <helix-option value="rs">Rust</helix-option>
+      <helix-option value="rb">Ruby</helix-option>
+      <helix-option value="go">Go</helix-option>
+    </helix-combobox>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    return host
+  }
+
+  const tags = (host: Updatable): HTMLElement[] => [
+    ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
+  ]
+
+  test('the panel stays open between picks, and the filter does not', async () => {
+    /* A control that shut after each pick is one the reader has to reopen to
+       keep using, and one that kept the search is one whose second pick starts
+       from the first pick's leftovers. */
+    const host = await many()
+    await type(host, 'ru')
+    await press(host, 'Enter')
+    expect((host as unknown as { open: boolean }).open).toBe(true)
+    expect(control(host).value).toBe('')
+
+    await type(host, 'go')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('rs,go')
+  })
+
+  test('a second press on the same option takes it back off', async () => {
+    const host = await many()
+    await type(host, 'go')
+    await press(host, 'Enter')
+    await type(host, 'go')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('')
+  })
+
+  test('Backspace on an empty field takes the last one off', async () => {
+    // The keyboard's version of pressing a tag's remove control. Without it a
+    // reader who chose four things with the keyboard needs a pointer to undo
+    // one.
+    const host = await many('default-value="rs,rb"')
+    await press(host, 'Backspace')
+    expect((host as unknown as { value: string }).value).toBe('rs')
+  })
+
+  test('and leaves the text alone when there is text to delete instead', async () => {
+    const host = await many('default-value="rs,rb"')
+    await type(host, 'go')
+    await press(host, 'Backspace')
+    expect((host as unknown as { value: string }).value).toBe('rs,rb')
+  })
+
+  test('the field shows the filter, never the words the tags already say', async () => {
+    const host = await many('default-value="rs"')
+    expect(control(host).value).toBe('')
+  })
+
+  test('the form is given the set, comma joined, and nothing when it is empty', async () => {
+    const host = await many()
+    expect(formValue(host as HTMLElement)).toBe(null)
+    await type(host, 'ru')
+    await press(host, 'Enter')
+    await type(host, 'go')
+    await press(host, 'Enter')
+    expect(formValue(host as HTMLElement)).toBe('rs,go')
+  })
+
+  test('a refused choice leaves the control exactly where it was', async () => {
+    /* Everything used to happen anyway: the filter cleared and the panel shut
+       as though the option had been taken. Select was fixed for the same. */
+    const host = await many()
+    host.addEventListener('helix-change', (event) => event.preventDefault())
+    await type(host, 'ru')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('')
+    expect(tags(host).length).toBe(0)
+    expect(control(host).value).toBe('ru')
+    expect((host as unknown as { open: boolean }).open).toBe(true)
+  })
+
+  test('the list is told it takes more than one, since a reader must be told', async () => {
+    /* Asserted on the property rather than on `aria-multiselectable`, which is
+       not an attribute: the listbox sets it through `ElementInternals`, so it
+       reaches the accessibility tree and never the markup. What this element is
+       responsible for is telling the list, and that is what is checked here. */
+    const host = await many()
+    const listbox = part(host as HTMLElement, 'listbox') as HTMLElement & { multiple: boolean }
+    expect(listbox.multiple).toBe(true)
+  })
+})
+
 if (hasLayout()) {
   describe('combobox in a browser', () => {
     /* Only in a browser, and not for layout: what this needs is slot flattening
        across two roots. The options are the combobox's light DOM, assigned to a
        slot that is itself inside a listbox in the combobox's shadow root, and
        `assignedElements({ flatten: true })` does not resolve that chain in
-       happy-dom. Select's spec says the same, for the same reason. */
+       happy-dom. Select's spec says the same, for the same reason.
+
+       The tags need it twice over: they are read off those same options, so in
+       happy-dom a combobox with a value came up holding none. */
+    const manySet = async (extra = ''): Promise<Updatable> => {
+      document.body.innerHTML = `<helix-combobox label="L" multiple name="c" ${extra}>
+        <helix-option value="rs">Rust</helix-option>
+        <helix-option value="rb">Ruby</helix-option>
+        <helix-option value="go">Go</helix-option>
+      </helix-combobox>`
+      const host = document.body.firstElementChild as Updatable
+      await settle(host)
+      return host
+    }
+
+    const tagsOf = (host: Updatable): HTMLElement[] => [
+      ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
+    ]
+
     test('the field shows the chosen option"s words, not its value', async () => {
       /* And it shows them on the first paint. The words are read off options
          that are not assigned yet when the element first renders, and slot
@@ -196,6 +309,29 @@ if (hasLayout()) {
          up empty until the slot said so. */
       const host = await combobox('default-value="rs"')
       expect(control(host).value).toBe('Rust')
+    })
+
+    test('the chosen are tags, in the order the consumer wrote them', async () => {
+      // Not the order they were picked: a set that reordered itself as it was
+      // built would move a tag out from under the pointer about to remove it.
+      const host = await manySet('default-value="go,rs"')
+      expect(tagsOf(host).map((tag) => tag.textContent?.trim())).toEqual(['Rust', 'Go'])
+    })
+
+    test('a tag asking to go takes exactly itself out', async () => {
+      const host = await manySet('default-value="rs,rb,go"')
+      const ruby = tagsOf(host).find((tag) => tag.textContent?.trim() === 'Ruby')
+      ruby?.dispatchEvent(new CustomEvent('helix-dismiss', { bubbles: true, composed: true }))
+      await settle(host)
+      expect((host as unknown as { value: string }).value).toBe('rs,go')
+    })
+
+    test('a disabled set can be read and not dismantled', async () => {
+      const host = await manySet('default-value="rs,go" disabled')
+      expect(tagsOf(host).length).toBe(2)
+      expect(
+        tagsOf(host).some((tag) => (tag as HTMLElement & { dismissible: boolean }).dismissible),
+      ).toBe(false)
     })
 
     test('the panel is told how wide its field is, because CSS cannot ask', async () => {

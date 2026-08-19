@@ -2423,6 +2423,19 @@ being four of a kind rather than four of three kinds. */
   required?: HelixCombobox["required"];
   /** Text shown while nothing has been chosen. */
   placeholder?: HelixCombobox["placeholder"];
+  /** Whether more than one option can be chosen.
+
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  multiple?: HelixCombobox["multiple"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "remove-label"?: HelixCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  removeLabel?: HelixCombobox["removeLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   "list-label"?: HelixCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -2537,6 +2550,19 @@ being four of a kind rather than four of three kinds. */
   "prop:required"?: HelixCombobox["required"];
   /** Text shown while nothing has been chosen. */
   "prop:placeholder"?: HelixCombobox["placeholder"];
+  /** Whether more than one option can be chosen.
+
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  "prop:multiple"?: HelixCombobox["multiple"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "attr:remove-label"?: HelixCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "prop:removeLabel"?: HelixCombobox["removeLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   "attr:list-label"?: HelixCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -11950,6 +11976,15 @@ export type CustomElements = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `placeholder`: Text shown while nothing has been chosen.
+   * - `multiple`: Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `disabled`: Whether the control is non-interactive.
@@ -12056,6 +12091,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--combobox-control-size`: Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
    *
    * ## CSS Parts
@@ -12064,6 +12100,8 @@ export type CustomElements = {
    *
    * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
+   * - `tags`: The row of chosen options, when `multiple` is set.
+   * - `tag`: One chosen option.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -19886,6 +19924,15 @@ export type CustomElementsSolidJs = {
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `placeholder`: Text shown while nothing has been chosen.
+   * - `multiple`: Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `disabled`: Whether the control is non-interactive.
@@ -19992,6 +20039,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--combobox-control-size`: Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. (default: `undefined`)
    * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
    *
    * ## CSS Parts
@@ -20000,6 +20048,8 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box around the text and its marks.
    * - `control`: The text field itself.
+   * - `tags`: The row of chosen options, when `multiple` is set.
+   * - `tag`: One chosen option.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -26452,6 +26502,8 @@ export type CustomCssProperties = {
   "--color-picker-grid-radii"?: string;
   /** Fill behind the field. */
   "--combobox-background-color"?: string;
+  /** Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`. */
+  "--combobox-control-size"?: string;
   /** Width of the panel. Follows the field by default. */
   "--combobox-panel-size"?: string;
   /** Fill behind the field. */

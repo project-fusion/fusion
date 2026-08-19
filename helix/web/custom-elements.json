@@ -9718,6 +9718,10 @@
               "name": "--combobox-background-color"
             },
             {
+              "description": "Smallest the text field shrinks to before it wraps below the tags. Defaults to `4ch`.",
+              "name": "--combobox-control-size"
+            },
+            {
               "description": "Width of the panel. Follows the field by default.",
               "name": "--combobox-panel-size"
             }
@@ -10260,6 +10264,34 @@
             },
             {
               "kind": "field",
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one option can be chosen.\n\nThe list already does the work: `value` comes apart on commas, a press\ntoggles rather than replaces, and the arrows move without choosing. What\nthis adds is the tags, and keeping the panel open between picks.\n\nA comma is therefore not available inside an option's value, which is the\nlistbox's contract and not this element's to change.",
+              "attribute": "multiple",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "removeLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Remove'",
+              "description": "What a tag's remove control is called, since the mark has no name.",
+              "attribute": "remove-label",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "listLabel",
               "type": {
                 "text": "string"
@@ -10326,13 +10358,64 @@
             },
             {
               "kind": "field",
+              "name": "values",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The values chosen, in the order they were chosen.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "chosen",
+              "type": {
+                "text": "{ text: string; value: string }[]"
+              },
+              "privacy": "private",
+              "description": "The chosen options themselves, for their words.\n\nRead off the options rather than stored, because the words are the\nconsumer's content and a copy of them goes stale the moment they change it.\nSelect records the same.\n\nWhich also decides the order the tags appear in, and it is the consumer's\nrather than the order they were picked: filtering the options keeps them as\nwritten. That is the more stable of the two. A set that reordered itself as\nit was built would move a tag out from under the pointer about to remove\nit, and a reader scanning for what they chose is scanning against the list\nthey chose it from.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "word",
               "type": {
                 "text": "string"
               },
               "privacy": "private",
-              "description": "The words of the chosen option, which is what the field shows at rest.",
+              "description": "What a single-choice field shows at rest, which the tags replace.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "drop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Takes one value out of the set, which is what a tag's remove control does.\n\n`drop` rather than `remove`, which every element already has: `Element`\ndefines `remove()` and a method of that name here would be overriding it,\nso `combobox.remove()` would stop taking the combobox out of the document.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -10379,6 +10462,17 @@
               "privacy": "private",
               "readonly": true,
               "description": "Takes what the list announced and stops it there.\n\nThe listbox says `helix-change` under its own name, and a consumer\nlistening on this element would otherwise hear two changes for one choice,\none of them naming a control they did not put on the page.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDismiss",
+              "privacy": "private",
+              "readonly": true,
+              "description": "One tag asking to be taken out of the set.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -10627,6 +10721,9 @@
                 "slug": "invalid"
               },
               {
+                "slug": "multiple"
+              },
+              {
                 "slug": "required"
               }
             ]
@@ -10750,6 +10847,32 @@
               }
             },
             {
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether more than one option can be chosen.\n\nThe list already does the work: `value` comes apart on commas, a press\ntoggles rather than replaces, and the arrows move without choosing. What\nthis adds is the tags, and keeping the panel open between picks.\n\nA comma is therefore not available inside an option's value, which is the\nlistbox's contract and not this element's to change.",
+              "fieldName": "multiple",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "name": "remove-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Remove'",
+              "description": "What a tag's remove control is called, since the mark has no name.",
+              "fieldName": "removeLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
               "name": "list-label",
               "type": {
                 "text": "string"
@@ -10848,6 +10971,22 @@
             {
               "description": "The text field itself.",
               "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The row of chosen options, when `multiple` is set.",
+              "name": "tags",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "One chosen option.",
+              "name": "tag",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
