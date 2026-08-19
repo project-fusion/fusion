@@ -18,7 +18,12 @@ import { styles } from './sandbox-root.css.js'
     Named because the properties default to them and `applyPanel` falls back to
     them, and two copies of a default drift. */
 const DEFAULT_SPLIT = 50
-const DEFAULT_PANEL = 192
+/* One hundred and sixty, not one hundred and ninety-two. The panel is a console
+   a reader glances at, and at 192 it opened taking forty-two percent of the
+   sandbox: the thing being previewed had less room than the log of it. Its own
+   tab bar is forty-eight of that, so this leaves about five lines, which is what
+   a console is read in. Dragging it taller is one gesture and it is remembered. */
+const DEFAULT_PANEL = 160
 
 /** The most of the sandbox the panel may take, leaving the panes above it. */
 const PANEL_MAX = 0.8
