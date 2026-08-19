@@ -1,6 +1,7 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { composition } from './plugins/composition.js'
+import { controlledProps } from './plugins/controlled-props.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
 import { examples } from './plugins/examples.js'
@@ -90,6 +91,9 @@ export const createHelixCemConfig = ({
           // Also after the generator: its `ref` type is framework-agnostic and
           // rejects the `useRef` every React consumer reaches for.
           jsxReactRef(),
+          // Last: it reads back the tag entries the generator wrote, and the
+          // requirement it adds has to sit outside their `Partial<>`.
+          controlledProps(),
         ]
       : []),
     ...plugins,
@@ -138,6 +142,7 @@ export type { ConventionLintOptions }
 export {
   composition,
   conventionLint,
+  controlledProps,
   declaredEvents,
   examples,
   helixTier,
