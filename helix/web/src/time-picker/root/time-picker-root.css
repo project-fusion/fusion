@@ -202,6 +202,59 @@
   padding-inline: var(--helix-space-md);
 }
 
+/* A wheel row is a calendar day, and for the same reason it is one there.
+ *
+ * Both are a number in a grid rather than a line of text, so the mark for
+ * "this one" is a shape around the number and not a band across the row. Full
+ * width, the fill runs to the rule between two wheels and the three columns
+ * read as one striped block; drawn on the number, the columns stay columns and
+ * the answer is three marks in a line, which is what the reader is assembling.
+ *
+ * So the row becomes the calendar's cell, carrying nothing, and the label
+ * becomes its day. `min-inline-size` rather than a fixed one, because a day is
+ * always one or two digits and a wheel also holds `AM`: fixed, the meridiem
+ * clipped. Below the row height by the same gap the calendar leaves, so a
+ * selected row does not touch the one above it. */
+[part="column"] [part="option"]::part(item) {
+  background-color: transparent;
+}
+
+[part="column"] [part="option"]::part(label) {
+  align-items: center;
+  block-size: calc(var(--_time-row) - var(--helix-space-sm));
+  /* `sm`, not `full`, which the calendar's own note argues: a pill is a shape
+     for a word, and a grid of circles reads as beads rather than as numbers. */
+  border-radius: var(--helix-radii-sm);
+  display: inline-flex;
+  justify-content: center;
+  min-inline-size: calc(var(--_time-row) - var(--helix-space-sm));
+  padding-inline: var(--helix-space-2xs);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Hover on the mark rather than the row, since the row no longer carries one.
+   The calendar's `surface-sunken`, which is what a day takes under the pointer. */
+[part="column"] [part="option"]:not([disabled]):hover::part(label),
+[part="column"] [part="option"][data-active]::part(label) {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+/* And the answer is the calendar's solid mark: `foreground-muted` rather than
+   `foreground`, which is a slab of near-black among grey numbers, and
+   `foreground-on-accent` for the digits, which is the token for words on a
+   filled control. The list appearance already reads this way for its range
+   termini, so all three surfaces now say "chosen" with one mark. */
+[part="column"] [part="option"][selected]::part(label) {
+  background-color: var(--time-picker-selected-color, var(--helix-color-foreground-muted));
+  color: var(--helix-color-foreground-on-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="column"] [part="option"]::part(label) {
+    transition: none;
+  }
+}
+
 /* No tick. A listbox marks its answer because a reader has to find it among
    options that are otherwise alike; a dial has exactly one value per column and
    it is the one in the middle, so a mark beside it says what the position

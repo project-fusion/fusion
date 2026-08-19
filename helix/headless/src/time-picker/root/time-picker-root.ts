@@ -397,9 +397,39 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     }
   }
 
+  /**
+   * Reveals once the wheels have rendered themselves.
+   *
+   * `updated` is this element's own moment, and each wheel is a `helix-listbox`
+   * that was created during this very render: its first update has been
+   * scheduled and has not run, so it has no rows and no height and `reveal`
+   * measures zero and gives up. Measured on a standalone picker, every column
+   * sat at `scrollTop: 0` with the answer nine rows down, which reads as a wheel
+   * showing the wrong time rather than as one that failed to scroll.
+   *
+   * It survived because the case that was tested was the panel, and whatever
+   * opens a panel calls `reveal` again afterwards for the separate reason the
+   * method documents. Flat on a page there is no panel and no second call.
+   *
+   * Safe to run on every update: the listbox stops as soon as the chosen row is
+   * within a pixel of centre, so a call with nothing to do costs two rect reads
+   * and changes nothing. It cannot fight a reader mid-scroll either, since
+   * scrolling a wheel changes no property and so schedules no update.
+   */
+  private async revealWhenSettled(): Promise<void> {
+    const columns = [
+      ...(this.renderRoot?.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>(
+        '[part="column"]',
+      ) ?? []),
+    ]
+    await Promise.all(columns.map((column) => column.updateComplete))
+    this.reveal()
+  }
+
   protected override updated(changed: import('lit').PropertyValues): void {
     super.updated(changed)
     this.reveal()
+    void this.revealWhenSettled()
   }
 
   /** Puts the keyboard on the list, which is the only control here. */
