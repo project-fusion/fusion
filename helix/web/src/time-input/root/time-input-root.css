@@ -206,6 +206,11 @@
   color: var(--helix-color-foreground-subtle);
   flex: none;
   margin-inline-start: auto;
+  /* Clear of the control beside it. `margin-inline-start: auto` pushes this to
+     the end of the row, where the only thing between it and the trigger was the
+     field's own 4px gap: at that distance the count and the calendar read as one
+     mark. */
+  margin-inline-end: var(--helix-space-2xs);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

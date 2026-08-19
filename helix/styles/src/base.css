@@ -468,7 +468,7 @@ helix-text[tone="danger"] {
 }
 
 /* Hover deepens the wash rather than drawing a line that was not there. */
-[data-button]:hover {
+[data-button]:not(:disabled):hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
@@ -522,7 +522,7 @@ helix-text[tone="danger"] {
   color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
-[data-button="primary"]:hover {
+[data-button="primary"]:not(:disabled):hover {
   background-color: var(--button-background-color, var(--helix-color-primary-hover));
   border-color: transparent;
 }
@@ -568,7 +568,7 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
  * buttons have always worked this way, which is why they measured identically
  * on both panels while tertiary did not, and `IconButton` was moved to it
  * earlier for the same reason. 8% wherever the resting state is transparent. */
-[data-button="tertiary"]:hover {
+[data-button="tertiary"]:not(:disabled):hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)

@@ -43387,11 +43387,10 @@
               "kind": "field",
               "name": "cue",
               "type": {
-                "text": "string"
+                "text": "DocumentFragment | undefined"
               },
               "privacy": "private",
-              "default": "''",
-              "description": "The words of the cue on screen now, or nothing between cues."
+              "description": "The cue on screen now, as nodes, or nothing between cues.\n\nNodes rather than a string, because `VTTCue.text` is the cue's *source*:\nWebVTT carries markup, and a caption file in the wild is full of it. `<v\nHildy>` names who is speaking, `<b>` and `<i>` and `<u>` mark emphasis, and\n`<c.loud>` classes a line. Rendered as text every one of those arrives on\nscreen as visible angle brackets.\n\n`getCueAsHTML` is the platform parsing its own format, so nothing here has\nto know the grammar and no cue text is ever treated as HTML: what comes\nback is a fragment the browser built, not a string anybody interpolated."
             },
             {
               "kind": "field",

@@ -93,7 +93,15 @@
  * the pointer has been given a hook that half works. Wanting a different color
  * on hover is one line and the same hook, on the host, where a custom property
  * crosses into this tree. */
-[part="button"]:hover {
+/* Every hover is gated on the control being live.
+ *
+ * Disabled said `cursor: not-allowed` and half the opacity and nothing else, so
+ * the fill still deepened under the pointer: a button that refuses the press and
+ * lights up as though it took it. `:not(:disabled)` rather than
+ * `:not([disabled])`, for the reason the disabled rule below records: the
+ * pseudo-class also matches a control inside a `<fieldset disabled>`, which the
+ * attribute never sees. */
+:host(:not(:disabled)) [part="button"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
@@ -111,7 +119,7 @@
   color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
-:host([appearance="primary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="primary"]) [part="button"]:hover {
   background-color: var(--button-background-color, var(--helix-color-primary-hover));
   border-color: transparent;
 }
@@ -131,7 +139,7 @@
  * where the token was chosen, the step is 1.11 and correct. A translucent mix
  * composites against whatever is behind it, so one value is right on every
  * surface and there is nothing to keep in sync. */
-:host([appearance="tertiary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="tertiary"]) [part="button"]:hover {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)

@@ -36,7 +36,15 @@
  * icon buttons live. A percentage of the foreground is a step away from
  * whatever it sits on in either mode, which is the argument the button recipe
  * in the base layer already makes for exactly this. */
-[part="button"]:hover {
+/* Every hover is gated on the control being live.
+ *
+ * Disabled said `cursor: not-allowed` and half the opacity and nothing else, so
+ * the fill still deepened under the pointer: a button that refuses the press and
+ * lights up as though it took it. `:not(:disabled)` rather than
+ * `:not([disabled])`, for the reason the disabled rule below records: the
+ * pseudo-class also matches a control inside a `<fieldset disabled>`, which the
+ * attribute never sees. */
+:host(:not(:disabled)) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
@@ -57,7 +65,7 @@
    variant a reader is most likely to press was the one that never answered the
    pointer. `Button` gets this from the base layer, which is why the difference
    only shows here. */
-:host([appearance="primary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="primary"]) [part="button"]:hover {
   background-color: var(--helix-color-primary-hover);
 }
 
@@ -84,7 +92,7 @@
    reach: that rule is two selectors' worth of specificity and this is three, so
    the fill won in every state and a neutral button was the one variant that did
    not answer the pointer at all. */
-:host([appearance="secondary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="secondary"]) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
 }
 

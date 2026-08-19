@@ -233,9 +233,21 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private hasCaptions = false
 
-  /** The words of the cue on screen now, or nothing between cues. */
+  /**
+   * The cue on screen now, as nodes, or nothing between cues.
+   *
+   * Nodes rather than a string, because `VTTCue.text` is the cue's *source*:
+   * WebVTT carries markup, and a caption file in the wild is full of it. `<v
+   * Hildy>` names who is speaking, `<b>` and `<i>` and `<u>` mark emphasis, and
+   * `<c.loud>` classes a line. Rendered as text every one of those arrives on
+   * screen as visible angle brackets.
+   *
+   * `getCueAsHTML` is the platform parsing its own format, so nothing here has
+   * to know the grammar and no cue text is ever treated as HTML: what comes
+   * back is a fragment the browser built, not a string anybody interpolated.
+   */
   @state()
-  private cue = ''
+  private cue: DocumentFragment | undefined
 
   @state()
   private rate = 1
@@ -466,7 +478,7 @@ export class HelixBaseVideo extends HelixElement {
   private readonly handleCue = (): void => {
     const track = this.video?.textTracks[0]
     const active = track?.activeCues?.[0]
-    this.cue = active instanceof VTTCue ? active.text : ''
+    this.cue = active instanceof VTTCue ? active.getCueAsHTML() : undefined
   }
 
   /** Turns the first caption track on or off, which is what the button means. */
@@ -481,7 +493,7 @@ export class HelixBaseVideo extends HelixElement {
        exactly what is wanted when something else is doing the drawing. */
     track.mode = next ? 'hidden' : 'disabled'
     this.captioned = next
-    this.cue = ''
+    this.cue = undefined
   }
 
   /** Steps through the speeds offered, which is what one button can do. */
@@ -913,7 +925,7 @@ export class HelixBaseVideo extends HelixElement {
            No backticks in here: this comment is inside a template literal, and
            the first one ends it. -->
       <span aria-hidden="true" hidden><slot @slotchange=${this.handleMedia}></slot></span>
-      ${this.cue === '' ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
+      ${this.cue === undefined ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
       <slot name="poster" part="poster"></slot>
       ${this.controls ? nothing : this.renderBar()}
     </div>`

@@ -20,23 +20,19 @@ helix-dialog::part(dialog) {
 
 /* One text column down the whole panel.
  *
- * The search row is this panel's heading rather than a control inside it, so
- * what a reader sees at the top is the word "Search commands", and every row
- * under it should start where that word does. It did not: the field's text
- * begins after the magnifier and the gap behind it, and the rows began at their
- * own inset, so the panel had two left edges twenty-four pixels apart and
- * nothing lined up with the thing at the top.
+ * The panel had three left edges: the rows at their own inset, the magnifier at
+ * the search row's, and the field's text a mark's width past that. The column
+ * is the magnifier's, so the rows, the group headings and the footer all begin
+ * where the mark does and the field's text is the one thing stepped off it,
+ * which is what a search row is.
  *
- * Derived rather than typed, from the three lengths that actually put the word
- * there: the row's inset, the mark, and the space after it. A number would be
- * right until one of the three moved.
+ * Lined up under the *words* instead, which was the first attempt, every row
+ * sat a mark's width in from the panel's own edge with nothing in the gutter
+ * but the magnifier: still two columns, just further right.
  *
- * It leaves the mark's column free under the field, which is where an option
- * with an icon puts its own, so a palette with icons lines up on both columns
- * rather than one. */
+ * One length, said once here and read by all four. */
 :host {
-  --_command-inset: var(--helix-space-sm);
-  --option-inset: calc(var(--_command-inset) + var(--helix-size-icon-sm) + var(--helix-space-2xs));
+  --option-inset: var(--helix-space-sm);
 }
 
 /* The list fills the panel, which is already the surface: a second border and a
@@ -67,7 +63,7 @@ helix-listbox::part(items) {
    one rule under it holding the results apart. */
 helix-listbox::part(search) {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding: var(--_command-inset);
+  padding: var(--option-inset);
 }
 
 helix-listbox::part(search-field) {
@@ -83,9 +79,7 @@ helix-listbox::part(search-field) {
   display: flex;
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-sm);
-  /* On the column, not on the panel's own inset. It is the last line of the
-     same panel, and left at the inset it started under the magnifier, which is
-     a third left edge on a panel that is meant to have one. */
+  /* The same column, being the last line of the same panel. */
   padding: var(--helix-space-xs) var(--option-inset);
 }
 
