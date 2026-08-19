@@ -1902,7 +1902,9 @@ invisible.
 | `file` | One chosen file. |
 | `detail` | Its name and its reading, stacked. |
 | `name` | Its name. |
-| `meta` | Its size and kind. |
+| `meta` | The row holding its size and kind. |
+| `size` | How big it is. |
+| `kind` | What kind of file it is. |
 | `remove` | The control that takes it back out. |
 
 #### Custom properties

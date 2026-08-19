@@ -17765,8 +17765,24 @@
               }
             },
             {
-              "description": "Its size and kind.",
+              "description": "The row holding its size and kind.",
               "name": "meta",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
+              "description": "How big it is.",
+              "name": "size",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
+              "description": "What kind of file it is.",
+              "name": "kind",
               "inheritedFrom": {
                 "name": "HelixBaseInputFile",
                 "module": "src/input-file/root/input-file-root.ts"

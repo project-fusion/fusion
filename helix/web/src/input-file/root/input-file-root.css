@@ -127,13 +127,29 @@
   min-inline-size: 0;
 }
 
-/* The size and the kind, in one line under the name. A middle dot rather than a
-   comma or a slash: it separates two readings that are not a list and not a
-   ratio, which is the whole job. */
+/* The size and the kind, as two small tags under the name.
+ *
+ * They were one line of muted text with a middle dot between them, which reads
+ * as a sentence about the file. They are not a sentence, they are two readings
+ * of it, and a tag is what this system already uses for a short fact with an
+ * edge around it. Two of them also survive a narrow card: text wraps mid-reading
+ * and tags wrap between readings.
+ *
+ * `size-tag-sm` set here rather than a density on the host, because density is a
+ * decision about a region and these are small because they are secondary to the
+ * name above them, which is a decision about this card. The token crosses the
+ * boundary on its own, which is the whole reason the tag reads it. */
 [part="meta"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  --helix-size-tag: var(--helix-size-tag-sm);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+}
+
+/* Tabular, so a column of sizes lines its digits up rather than shuffling as
+   files are added and removed. */
+[part="size"] {
   font-variant-numeric: tabular-nums;
 }
 

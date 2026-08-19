@@ -13048,8 +13048,16 @@
               "name": "name"
             },
             {
-              "description": "Its size and kind.",
+              "description": "The row holding its size and kind.",
               "name": "meta"
+            },
+            {
+              "description": "How big it is.",
+              "name": "size"
+            },
+            {
+              "description": "What kind of file it is.",
+              "name": "kind"
             },
             {
               "description": "The control that takes it back out.",

@@ -93,12 +93,13 @@ describe('input file', () => {
     })()
     control(host).dispatchEvent(new Event('change', { bubbles: true }))
     await host.updateComplete
-    const meta = [...(host.shadowRoot?.querySelectorAll('[part="meta"]') ?? [])].map((one) =>
-      one.textContent?.trim(),
-    )
-    // Binary steps, because that is what a file system reports.
-    expect(meta[0]).toBe('2 KB · PNG')
-    expect(meta[1]).toBe('1 byte · PLAIN')
+    const read = (part: string) =>
+      [...(host.shadowRoot?.querySelectorAll(`[part="${part}"]`) ?? [])].map((one) =>
+        one.textContent?.trim(),
+      )
+    // Two readings of a file rather than a sentence about it, so two tags.
+    expect(read('size')).toEqual(['2 KB', '1 byte'])
+    expect(read('kind')).toEqual(['PNG', 'PLAIN'])
   })
 
   test('one byte is a byte', async () => {
@@ -110,7 +111,7 @@ describe('input file', () => {
     })()
     control(host).dispatchEvent(new Event('change', { bubbles: true }))
     await host.updateComplete
-    expect(part(host, 'meta')?.textContent?.trim()).toBe('1 byte · PLAIN')
+    expect(part(host, 'size')?.textContent?.trim()).toBe('1 byte')
   })
 
   test('and a file the browser cannot name falls back to its extension', async () => {
@@ -124,7 +125,14 @@ describe('input file', () => {
     })()
     control(host).dispatchEvent(new Event('change', { bubbles: true }))
     await host.updateComplete
-    expect(part(host, 'meta')?.textContent?.trim()).toBe('1 byte · WEIRD')
+    expect(part(host, 'kind')?.textContent?.trim()).toBe('WEIRD')
+  })
+
+  test('the two readings are tags, not a line of text', async () => {
+    const host = await field()
+    await choose(host, 'one.txt')
+    expect(part(host, 'size')?.tagName.toLowerCase()).toBe('helix-tag')
+    expect(part(host, 'kind')?.tagName.toLowerCase()).toBe('helix-tag')
   })
 
   test('the remove control is a trash can, because taking a file out is a delete', async () => {

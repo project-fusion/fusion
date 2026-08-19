@@ -8,6 +8,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../icon/index.js'
+import '../../tag/index.js'
 
 /**
  * A file's size, at the largest unit that leaves a number worth reading.
@@ -107,7 +108,9 @@ const kind = (file: File): string => {
  * @csspart file - One chosen file.
  * @csspart detail - Its name and its reading, stacked.
  * @csspart name - Its name.
- * @csspart meta - Its size and kind.
+ * @csspart meta - The row holding its size and kind.
+ * @csspart size - How big it is.
+ * @csspart kind - What kind of file it is.
  * @csspart remove - The control that takes it back out.
  */
 @customElement('helix-base-input-file')
@@ -390,7 +393,10 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
                 (file, at) => html`<li part="file">
                   <span part="detail">
                     <span part="name">${file.name}</span>
-                    <span part="meta">${`${size(file.size, this.locale)} · ${kind(file)}`}</span>
+                    <span part="meta">
+                      <helix-tag part="size">${size(file.size, this.locale)}</helix-tag>
+                      <helix-tag part="kind">${kind(file)}</helix-tag>
+                    </span>
                   </span>
                   <button
                     part="remove"
