@@ -55,7 +55,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 6 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 17 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 18 |
-| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 99 |
+| `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 109 |
 
 ## space
 
@@ -81,7 +81,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 50 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 159 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 163 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 43 |
@@ -235,8 +235,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 22 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 53 |
-| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 106 |
-| `--helix-size-focus-offset` | `2px` | 88 |
+| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 116 |
+| `--helix-size-focus-offset` | `2px` | 94 |
 
 ## layer
 

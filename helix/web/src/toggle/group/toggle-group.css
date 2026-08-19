@@ -141,3 +141,13 @@
     transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   }
 }
+
+/* Wrong, and the strip says so. Toggle Group is the one of the three that has a
+   box already: the track its items sit in. So the error goes on that rather than
+   round it, the same way a field turns its own border, and `plain` gets an
+   outline instead because it has no border to turn.
+   The radius is the track's own, so the mark follows whatever shape it is in. */
+:host([data-invalid]) [part="track"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}

@@ -22,3 +22,24 @@
   flex-direction: row;
   flex-wrap: wrap;
 }
+
+/* Wrong, and the set says so.
+ *
+ * A group has no box of its own to turn red, which is why this was missing while
+ * every field that has one had it. What it does have is the run its members sit
+ * in, and the error is about that run rather than about any one member: "choose
+ * at least one" is not a complaint about the third checkbox.
+ *
+ * So the mark goes round the set, inset from it, which is the same shape a
+ * field's border draws and the same box the focus ring would use. Marking each
+ * member instead was the other candidate and is worse twice over: it says every
+ * option is wrong when none of them is, and it means writing state onto children
+ * the consumer rendered.
+ *
+ * `outline`, so a set that becomes invalid does not move the page: it is drawn
+ * outside the flow and the rows below it stay where they were. */
+:host([data-invalid]) [part="items"] {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline-offset: var(--helix-size-focus-offset);
+}

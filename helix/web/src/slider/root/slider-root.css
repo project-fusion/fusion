@@ -307,3 +307,22 @@
   min-inline-size: 3ch;
   text-align: end;
 }
+
+/* Wrong, and the handle says so.
+ *
+ * A slider's answer is a position, and the thumb is where that position is, so
+ * the thumb takes the mark: it is both the statement of the value and the thing
+ * a reader moves to fix it. The track was the other candidate and says the wrong
+ * thing, since a red rail reads as a dangerous *region* of the scale rather than
+ * as a value that is not allowed.
+ *
+ * A ring rather than a fill, so the thumb keeps the colour that makes it legible
+ * against the track, and on the same box the focus halo uses so a focused
+ * invalid slider is one ring rather than two. */
+:host([data-invalid]) [part="control"]::-webkit-slider-thumb {
+  box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
+}
+
+:host([data-invalid]) [part="control"]::-moz-range-thumb {
+  box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
+}
