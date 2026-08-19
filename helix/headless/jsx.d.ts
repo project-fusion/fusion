@@ -89,6 +89,7 @@ import type {
   HelixCloseEvent,
   HelixCompleteEvent,
   HelixCopyEvent,
+  HelixCreateEvent,
   HelixDismissEvent,
   HelixFilterEvent,
   HelixFormElement,
@@ -1866,6 +1867,9 @@ export type HelixBaseComboboxElementEvent<E = Event> = TypedEvent<
 /** `helix-change` event type */
 export type HelixBaseComboboxHelixChangeElementEvent =
   HelixBaseComboboxElementEvent<HelixChangeEvent>;
+/** `helix-create` event type */
+export type HelixBaseComboboxHelixCreateElementEvent =
+  HelixBaseComboboxElementEvent<HelixCreateEvent>;
 /** `helix-open` event type */
 export type HelixBaseComboboxHelixOpenElementEvent =
   HelixBaseComboboxElementEvent<HelixOpenEvent>;
@@ -1885,6 +1889,17 @@ this adds is the tags, and keeping the panel open between picks.
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
   multiple?: HelixBaseCombobox["multiple"];
+  /** Whether the reader may answer with something the list does not hold.
+
+The row appears while what is typed matches no option's words exactly, so
+it is offered next to near misses too: a reader typing "Ruby on Rails" with
+"Ruby" in the list wants the one they are typing, not the one they are
+halfway through. */
+  creatable?: HelixBaseCombobox["creatable"];
+  /** What the create row says, before the words it would add. */
+  "create-label"?: HelixBaseCombobox["createLabel"];
+  /** What the create row says, before the words it would add. */
+  createLabel?: HelixBaseCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   "remove-label"?: HelixBaseCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
@@ -1994,6 +2009,8 @@ fire at all. */
 
   /** Fired when the chosen option changes. */
   "onhelix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "onhelix-create"?: (e: HelixBaseComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
   "onhelix-open"?: (e: HelixBaseComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -2012,6 +2029,17 @@ this adds is the tags, and keeping the panel open between picks.
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
   "prop:multiple"?: HelixBaseCombobox["multiple"];
+  /** Whether the reader may answer with something the list does not hold.
+
+The row appears while what is typed matches no option's words exactly, so
+it is offered next to near misses too: a reader typing "Ruby on Rails" with
+"Ruby" in the list wants the one they are typing, not the one they are
+halfway through. */
+  "prop:creatable"?: HelixBaseCombobox["creatable"];
+  /** What the create row says, before the words it would add. */
+  "attr:create-label"?: HelixBaseCombobox["createLabel"];
+  /** What the create row says, before the words it would add. */
+  "prop:createLabel"?: HelixBaseCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   "attr:remove-label"?: HelixBaseCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
@@ -2120,6 +2148,8 @@ fire at all. */
   "prop:onValueChange"?: HelixBaseCombobox["onValueChange"];
   /** Fired when the chosen option changes. */
   "on:helix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "on:helix-create"?: (e: HelixBaseComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
   "on:helix-open"?: (e: HelixBaseComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -10752,6 +10782,13 @@ export type CustomElements = {
    *
    * A comma is therefore not available inside an option's value, which is the
    * listbox's contract and not this element's to change.
+   * - `creatable`: Whether the reader may answer with something the list does not hold.
+   *
+   * The row appears while what is typed matches no option's words exactly, so
+   * it is offered next to near misses too: a reader typing "Ruby on Rails" with
+   * "Ruby" in the list wants the one they are typing, not the one they are
+   * halfway through.
+   * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
@@ -10851,6 +10888,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -10901,6 +10939,7 @@ export type CustomElements = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -18518,6 +18557,13 @@ export type CustomElementsSolidJs = {
    *
    * A comma is therefore not available inside an option's value, which is the
    * listbox's contract and not this element's to change.
+   * - `creatable`: Whether the reader may answer with something the list does not hold.
+   *
+   * The row appears while what is typed matches no option's words exactly, so
+   * it is offered next to near misses too: a reader typing "Ruby on Rails" with
+   * "Ruby" in the list wants the one they are typing, not the one they are
+   * halfway through.
+   * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
@@ -18617,6 +18663,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -18667,6 +18714,7 @@ export type CustomElementsSolidJs = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.

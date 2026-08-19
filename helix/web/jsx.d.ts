@@ -29,6 +29,7 @@ import type {
   HelixConsoleEvent,
   HelixCopyButton,
   HelixCopyEvent,
+  HelixCreateEvent,
   HelixDateInput,
   HelixDatePicker,
   HelixDialog,
@@ -2424,6 +2425,9 @@ export type HelixComboboxElementEvent<E = Event> = TypedEvent<HelixCombobox, E>;
 /** `helix-change` event type */
 export type HelixComboboxHelixChangeElementEvent =
   HelixComboboxElementEvent<HelixChangeEvent>;
+/** `helix-create` event type */
+export type HelixComboboxHelixCreateElementEvent =
+  HelixComboboxElementEvent<HelixCreateEvent>;
 /** `helix-open` event type */
 export type HelixComboboxHelixOpenElementEvent =
   HelixComboboxElementEvent<HelixOpenEvent>;
@@ -2494,6 +2498,17 @@ this adds is the tags, and keeping the panel open between picks.
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
   multiple?: HelixCombobox["multiple"];
+  /** Whether the reader may answer with something the list does not hold.
+
+The row appears while what is typed matches no option's words exactly, so
+it is offered next to near misses too: a reader typing "Ruby on Rails" with
+"Ruby" in the list wants the one they are typing, not the one they are
+halfway through. */
+  creatable?: HelixCombobox["creatable"];
+  /** What the create row says, before the words it would add. */
+  "create-label"?: HelixCombobox["createLabel"];
+  /** What the create row says, before the words it would add. */
+  createLabel?: HelixCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   "remove-label"?: HelixCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
@@ -2552,6 +2567,8 @@ fire at all. */
 
   /** Fired when the chosen option changes. */
   "onhelix-change"?: (e: HelixComboboxHelixChangeElementEvent) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "onhelix-create"?: (e: HelixComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
   "onhelix-open"?: (e: HelixComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -2621,6 +2638,17 @@ this adds is the tags, and keeping the panel open between picks.
 A comma is therefore not available inside an option's value, which is the
 listbox's contract and not this element's to change. */
   "prop:multiple"?: HelixCombobox["multiple"];
+  /** Whether the reader may answer with something the list does not hold.
+
+The row appears while what is typed matches no option's words exactly, so
+it is offered next to near misses too: a reader typing "Ruby on Rails" with
+"Ruby" in the list wants the one they are typing, not the one they are
+halfway through. */
+  "prop:creatable"?: HelixCombobox["creatable"];
+  /** What the create row says, before the words it would add. */
+  "attr:create-label"?: HelixCombobox["createLabel"];
+  /** What the create row says, before the words it would add. */
+  "prop:createLabel"?: HelixCombobox["createLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   "attr:remove-label"?: HelixCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
@@ -2678,6 +2706,8 @@ fire at all. */
   "prop:onValueChange"?: HelixCombobox["onValueChange"];
   /** Fired when the chosen option changes. */
   "on:helix-change"?: (e: HelixComboboxHelixChangeElementEvent) => void;
+  /** Fired when the reader asks for something the list does not hold, and cancelable. */
+  "on:helix-create"?: (e: HelixComboboxHelixCreateElementEvent) => void;
   /** Fired when the panel opens. */
   "on:helix-open"?: (e: HelixComboboxHelixOpenElementEvent) => void;
   /** Fired when it closes. */
@@ -12110,6 +12140,13 @@ export type CustomElements = {
    *
    * A comma is therefore not available inside an option's value, which is the
    * listbox's contract and not this element's to change.
+   * - `creatable`: Whether the reader may answer with something the list does not hold.
+   *
+   * The row appears while what is typed matches no option's words exactly, so
+   * it is offered next to near misses too: a reader typing "Ruby on Rails" with
+   * "Ruby" in the list wants the one they are typing, not the one they are
+   * halfway through.
+   * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
@@ -12170,6 +12207,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -12228,6 +12266,7 @@ export type CustomElements = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -18336,6 +18375,8 @@ export type CustomElements = {
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    * - `--tree-gap`: Space between rows. (default: `undefined`)
    * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
+   * - `--tree-chevron-order`: Set from `chevron-placement`; read by each item. (default: `undefined`)
+   * - `--tree-chevron-gap`: Set from `chevron-placement`; the space before the chevron. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -20127,6 +20168,13 @@ export type CustomElementsSolidJs = {
    *
    * A comma is therefore not available inside an option's value, which is the
    * listbox's contract and not this element's to change.
+   * - `creatable`: Whether the reader may answer with something the list does not hold.
+   *
+   * The row appears while what is typed matches no option's words exactly, so
+   * it is offered next to near misses too: a reader typing "Ruby on Rails" with
+   * "Ruby" in the list wants the one they are typing, not the one they are
+   * halfway through.
+   * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
@@ -20187,6 +20235,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-create`: Fired when the reader asks for something the list does not hold, and cancelable.
    * - `helix-open`: Fired when the panel opens.
    * - `helix-close`: Fired when it closes.
    *
@@ -20245,6 +20294,7 @@ export type CustomElementsSolidJs = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
    * - `listbox`: The list inside it.
@@ -26574,6 +26624,8 @@ export type CustomElementsSolidJs = {
    * - `--tree-chevron-size`: Size of the chevron, and the gutter a leaf reserves. (default: `undefined`)
    * - `--tree-gap`: Space between rows. (default: `undefined`)
    * - `--tree-row-size`: Least height of a row, so rows with and without an icon match. (default: `undefined`)
+   * - `--tree-chevron-order`: Set from `chevron-placement`; read by each item. (default: `undefined`)
+   * - `--tree-chevron-gap`: Set from `chevron-placement`; the space before the chevron. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -26967,6 +27019,10 @@ export type CustomCssProperties = {
   "--tree-gap"?: string;
   /** Least height of a row, so rows with and without an icon match. */
   "--tree-row-size"?: string;
+  /** Set from `chevron-placement`; read by each item. */
+  "--tree-chevron-order"?: string;
+  /** Set from `chevron-placement`; the space before the chevron. */
+  "--tree-chevron-gap"?: string;
 };
 
 declare module "react" {

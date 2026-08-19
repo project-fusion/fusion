@@ -171,6 +171,38 @@ export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
   }
 }
 
+/** Detail carried by `helix-create`. */
+export interface CreateDetail {
+  /** What the reader typed, which is being offered as a new answer. */
+  value: string
+}
+
+/**
+ * The reader asked for something the list does not hold.
+ *
+ * Cancelable, and announced before anything is applied, because the options are
+ * the consumer's own light DOM and no component here writes into it. What the
+ * control can do is say what was asked for and take the value; putting an
+ * option in the list, or a row in a database, is the consumer's, and a consumer
+ * who validates first refuses this and adds nothing.
+ *
+ * The detail carries the text as typed, not a slug of it. Trimming or lowering
+ * it here would be this element deciding what a name means, and a consumer who
+ * wants an identifier can make one from what they were given.
+ */
+export class HelixCreateEvent extends CustomEvent<CreateDetail> {
+  static readonly eventName = 'helix-create'
+
+  constructor(detail: CreateDetail) {
+    super(HelixCreateEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-copy`. */
 export interface CopyDetail {
   /** What was put on the clipboard. */
@@ -375,6 +407,7 @@ declare global {
     'helix-complete': HelixCompleteEvent
     'helix-console': HelixConsoleEvent
     'helix-copy': HelixCopyEvent
+    'helix-create': HelixCreateEvent
     'helix-dismiss': HelixDismissEvent
     /* Both of these were declared as classes, dispatched by the calendar, the
        listbox and now the pagination, and left out of here, so the one thing

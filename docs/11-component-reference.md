@@ -1145,6 +1145,8 @@ Input, Color Input and Date Input all take.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `creatable` | `creatable` | `boolean` | `false` | `HelixBaseCombobox` | Whether the reader may answer with something the list does not hold. |
+| `createLabel` | `create-label` | `string` | `'Add'` | `HelixBaseCombobox` | What the create row says, before the words it would add. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -1185,6 +1187,7 @@ Input, Color Input and Date Input all take.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-change` | `HelixChangeEvent` | Fired when the chosen option changes. |
+| `helix-create` | `HelixCreateEvent` | Fired when the reader asks for something the list does not hold, and cancelable. |
 | `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
 | `helix-close` | `HelixCloseEvent` | Fired when it closes. |
 
@@ -1205,6 +1208,7 @@ Input, Color Input and Date Input all take.
 | `control` | The text field itself. |
 | `tags` | The row of chosen options, when `multiple` is set. |
 | `tag` | One chosen option. |
+| `create` | The row offering to add what was typed. |
 | `indicator` | The caret. |
 | `surface` | The floating panel. |
 | `listbox` | The list inside it. |
@@ -5215,6 +5219,8 @@ to it is one more thing between the reader and the label.
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 | `--tree-gap` | Space between rows. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
+| `--tree-chevron-order` | Set from `chevron-placement`; read by each item. |
+| `--tree-chevron-gap` | Set from `chevron-placement`; the space before the chevron. |
 
 ### Item — `helix-tree-item`
 

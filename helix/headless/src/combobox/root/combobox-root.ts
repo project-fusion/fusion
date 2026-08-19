@@ -1,6 +1,7 @@
 import {
   customElement,
   type HelixChangeEvent,
+  HelixCreateEvent,
   HelixFormElement,
   MixinControllerOpen,
   MixinControllerValue,
@@ -74,6 +75,18 @@ import '../../tag/index.js'
  * filter clears on each choice instead, so the next pick starts from the whole
  * list rather than from the last search.
  *
+ * **`creatable` announces, and does not write.** The options are the consumer's
+ * light DOM and nothing here puts an element into it: a component that grew the
+ * consumer's markup would be a component their framework re-renders over. What
+ * this does is offer a row saying what would be added, take the value when the
+ * reader presses it, and say so with `helix-create`. A consumer who has to
+ * validate first refuses the event and adds nothing.
+ *
+ * Which leaves a value naming no option, and that is what the words fall back
+ * to: for anything chosen the field shows the option's text if there is one and
+ * the value itself otherwise. No copy is stored, so a consumer who then adds a
+ * real option with that value has its words take over on the next render.
+ *
  * @slot - The options, which are `helix-option` elements.
  * @slot start - Before the text, for an icon.
  * @slot end - After it, for a unit or a clear button.
@@ -83,6 +96,7 @@ import '../../tag/index.js'
  * @csspart control - The text field itself.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  * @csspart tag - One chosen option.
+ * @csspart create - The row offering to add what was typed.
  * @csspart indicator - The caret.
  * @csspart surface - The floating panel.
  * @csspart listbox - The list inside it.
@@ -91,6 +105,7 @@ import '../../tag/index.js'
  * from the listbox.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the chosen option changes.
+ * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
  * @event {HelixOpenEvent} helix-open - Fired when the panel opens.
  * @event {HelixCloseEvent} helix-close - Fired when it closes.
  */
@@ -114,6 +129,21 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    */
   @property({ type: Boolean })
   multiple = false
+
+  /**
+   * Whether the reader may answer with something the list does not hold.
+   *
+   * The row appears while what is typed matches no option's words exactly, so
+   * it is offered next to near misses too: a reader typing "Ruby on Rails" with
+   * "Ruby" in the list wants the one they are typing, not the one they are
+   * halfway through.
+   */
+  @property({ type: Boolean })
+  creatable = false
+
+  /** What the create row says, before the words it would add. */
+  @property({ attribute: 'create-label' })
+  createLabel = 'Add'
 
   /** What a tag's remove control is called, since the mark has no name. */
   @property({ attribute: 'remove-label' })
@@ -169,18 +199,82 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    * consumer's content and a copy of them goes stale the moment they change it.
    * Select records the same.
    *
-   * Which also decides the order the tags appear in, and it is the consumer's
-   * rather than the order they were picked: filtering the options keeps them as
-   * written. That is the more stable of the two. A set that reordered itself as
-   * it was built would move a tag out from under the pointer about to remove
-   * it, and a reader scanning for what they chose is scanning against the list
-   * they chose it from.
+   * In the value's own order, which is the order they were chosen. It has to
+   * be: a created answer is not in the list at all, so there is no position in
+   * the list to give it. Neither order ever reshuffles what is already there,
+   * so a tag does not move out from under the pointer about to remove it.
    */
   private get chosen(): { text: string; value: string }[] {
-    const wanted = new Set(this.values)
-    return (this.listbox?.options ?? [])
-      .filter((option) => wanted.has(option.value))
-      .map((option) => ({ text: option.text, value: option.value }))
+    const options = this.listbox?.options ?? []
+    /* Nothing at all is not the same as nothing matching.
+     *
+     * On the server there are no options to look in, because they are light DOM
+     * children the server cannot see, and before the slot is assigned there are
+     * none either. Falling back there would put the raw value on screen for one
+     * paint and then swap it for the option's words, which reads as the field
+     * correcting a mistake. With options present, a value none of them carries
+     * is a created one, and showing it is the only way to show it at all. */
+    const known = options.length > 0
+    const words = new Map(options.map((option) => [option.value, option.text]))
+    return this.values
+      .filter((value) => known || words.has(value))
+      .map((value) => ({ text: words.get(value) ?? value, value }))
+  }
+
+  /**
+   * Whether the filter has left anything to choose.
+   *
+   * Read off the options rather than asked of the listbox, which keeps its own
+   * answer to this private. Both come from the same place: `hidden` is what the
+   * filter writes onto an option, and it is public because hiding one by hand
+   * is a thing a consumer may do.
+   */
+  private get showing(): boolean {
+    return (this.listbox?.options ?? []).some((option) => !option.hidden)
+  }
+
+  /**
+   * What the create row would add, or nothing where there is nothing to add.
+   *
+   * Empty where the words already name an option exactly, case aside: offering
+   * to add "Rust" under a list showing "Rust" is offering the reader a second
+   * copy of what they are looking at.
+   */
+  private get creation(): string {
+    const typed = this.typed.trim()
+    if (!this.creatable || typed === '') {
+      return ''
+    }
+    const exists = (this.listbox?.options ?? []).some(
+      (option) => option.text.trim().toLowerCase() === typed.toLowerCase(),
+    )
+    return exists ? '' : typed
+  }
+
+  /**
+   * Takes what the reader typed as an answer, once anyone listening allows it.
+   *
+   * Added to the set with `multiple` and replacing it without, which is the
+   * same rule choosing an option follows: what differs about a created answer
+   * is where it came from, not how many the field holds.
+   */
+  private create(): void {
+    const wanted = this.creation
+    if (wanted === '') {
+      return
+    }
+    if (!this.dispatchEvent(new HelixCreateEvent({ value: wanted }))) {
+      return
+    }
+    const next = this.multiple ? [...this.values, wanted].join(',') : wanted
+    if (!this.requestValue(next)) {
+      return
+    }
+    this.typed = ''
+    this.listbox?.requestFilter('')
+    if (!this.multiple) {
+      this.close()
+    }
   }
 
   /** What a single-choice field shows at rest, which the tags replace. */
@@ -258,6 +352,15 @@ export class HelixBaseCombobox extends MixinControllerOpen(
         event.preventDefault()
         this.drop(last)
       }
+      return
+    }
+    /* Enter with nothing left in the list creates, where there is anything to
+       create. Only then: with matches showing, Enter belongs to whichever one
+       the arrows are on, and a reader pressing it over a highlighted "Rust"
+       meant Rust. The row is still there to be pressed for the other case. */
+    if (event.key === 'Enter' && this.creation !== '' && !this.showing) {
+      event.preventDefault()
+      this.create()
       return
     }
     /* Opening on the first arrow, before the list is asked to move: a closed
@@ -399,6 +502,13 @@ export class HelixBaseCombobox extends MixinControllerOpen(
                it. Select was fixed for exactly this. -->
           <slot @slotchange=${() => this.requestUpdate()}></slot>
         </helix-listbox>
+        ${
+          this.creation === ''
+            ? nothing
+            : html`<button part="create" type="button" @click=${() => this.create()}>
+                ${this.createLabel} "${this.creation}"
+              </button>`
+        }
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

@@ -10756,6 +10756,34 @@
             },
             {
               "kind": "field",
+              "name": "creatable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may answer with something the list does not hold.\n\nThe row appears while what is typed matches no option's words exactly, so\nit is offered next to near misses too: a reader typing \"Ruby on Rails\" with\n\"Ruby\" in the list wants the one they are typing, not the one they are\nhalfway through.",
+              "attribute": "creatable",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "createLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Add'",
+              "description": "What the create row says, before the words it would add.",
+              "attribute": "create-label",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "removeLabel",
               "type": {
                 "text": "string"
@@ -10855,8 +10883,51 @@
                 "text": "{ text: string; value: string }[]"
               },
               "privacy": "private",
-              "description": "The chosen options themselves, for their words.\n\nRead off the options rather than stored, because the words are the\nconsumer's content and a copy of them goes stale the moment they change it.\nSelect records the same.\n\nWhich also decides the order the tags appear in, and it is the consumer's\nrather than the order they were picked: filtering the options keeps them as\nwritten. That is the more stable of the two. A set that reordered itself as\nit was built would move a tag out from under the pointer about to remove\nit, and a reader scanning for what they chose is scanning against the list\nthey chose it from.",
+              "description": "The chosen options themselves, for their words.\n\nRead off the options rather than stored, because the words are the\nconsumer's content and a copy of them goes stale the moment they change it.\nSelect records the same.\n\nIn the value's own order, which is the order they were chosen. It has to\nbe: a created answer is not in the list at all, so there is no position in\nthe list to give it. Neither order ever reshuffles what is already there,\nso a tag does not move out from under the pointer about to remove it.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the filter has left anything to choose.\n\nRead off the options rather than asked of the listbox, which keeps its own\nanswer to this private. Both come from the same place: `hidden` is what the\nfilter writes onto an option, and it is public because hiding one by hand\nis a thing a consumer may do.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "creation",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the create row would add, or nothing where there is nothing to add.\n\nEmpty where the words already name an option exactly, case aside: offering\nto add \"Rust\" under a list showing \"Rust\" is offering the reader a second\ncopy of what they are looking at.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "create",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Takes what the reader typed as an answer, once anyone listening allows it.\n\nAdded to the set with `multiple` and replacing it without, which is the\nsame rule choosing an option follows: what differs about a created answer\nis where it came from, not how many the field holds.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -11190,6 +11261,9 @@
                 "slug": "chosen"
               },
               {
+                "slug": "creatable"
+              },
+              {
                 "slug": "disabled"
               },
               {
@@ -11338,6 +11412,32 @@
               }
             },
             {
+              "name": "creatable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may answer with something the list does not hold.\n\nThe row appears while what is typed matches no option's words exactly, so\nit is offered next to near misses too: a reader typing \"Ruby on Rails\" with\n\"Ruby\" in the list wants the one they are typing, not the one they are\nhalfway through.",
+              "fieldName": "creatable",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "name": "create-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Add'",
+              "description": "What the create row says, before the words it would add.",
+              "fieldName": "createLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
               "name": "remove-label",
               "type": {
                 "text": "string"
@@ -11471,6 +11571,14 @@
               }
             },
             {
+              "description": "The row offering to add what was typed.",
+              "name": "create",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
               "description": "The caret.",
               "name": "indicator",
               "inheritedFrom": {
@@ -11519,6 +11627,18 @@
               "description": "Fired when the chosen option changes.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCreateEvent"
+              },
+              "description": "Fired when the reader asks for something the list does not hold, and cancelable.",
+              "name": "helix-create",
+              "reactProp": "onhelix-create",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -53615,6 +53735,14 @@
             {
               "description": "Least height of a row, so rows with and without an icon match.",
               "name": "--tree-row-size"
+            },
+            {
+              "description": "Set from `chevron-placement`; read by each item.",
+              "name": "--tree-chevron-order"
+            },
+            {
+              "description": "Set from `chevron-placement`; the space before the chevron.",
+              "name": "--tree-chevron-gap"
             }
           ],
           "cssParts": [

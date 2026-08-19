@@ -220,6 +220,51 @@ slot[name="end"]::slotted(*) {
   position: absolute;
 }
 
+/* The row offering to add what was typed, dressed as a row of the list rather
+ * than as a button, because that is what it stands in for: it sits under the
+ * options in the same panel and is chosen the same way. `all: unset` first,
+ * since a `<button>` arrives with a background, a border and a font of its own,
+ * every one of which would make it read as a control bolted under a list.
+ *
+ * Separated by a rule rather than by space alone. It is not one of the
+ * consumer's options and pressing it does something none of them do, and a row
+ * that looked identical to the ones above it would be an option the reader
+ * believes was in the list all along. */
+[part="create"] {
+  all: unset;
+
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  inline-size: 100%;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  text-align: start;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The same wash a hovered option takes, and for the reason that block records
+   at length: a step on the surface ladder painted the highlight in the panel's
+   own colour and it vanished. The row is standing in for an option, so it
+   highlights like one. */
+[part="create"]:hover {
+  background-color: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
+}
+
+/* Inside the panel's own edge, which the panel clips: an outline drawn outward
+   from a row flush with the surface is a ring with its outer half cut off. */
+[part="create"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 /* The list fills the panel, which is already the surface: a second border and a
    second fill inside one would draw the shape twice. */
 [part="listbox"] {
@@ -276,6 +321,10 @@ slot[name="end"]::slotted(*) {
 
 @media (prefers-reduced-motion: reduce) {
   [part="field"] {
+    transition: none;
+  }
+
+  [part="create"] {
     transition: none;
   }
 

@@ -277,6 +277,93 @@ describe('combobox holding several', () => {
   })
 })
 
+describe('combobox that takes an answer it was not given', () => {
+  const open = async (extra = ''): Promise<Updatable> => {
+    document.body.innerHTML = `<helix-combobox creatable label="L" name="c" ${extra}>
+      <helix-option value="rs">Rust</helix-option>
+      <helix-option value="rb">Ruby</helix-option>
+    </helix-combobox>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    return host
+  }
+
+  const row = (host: Updatable): HTMLElement | null =>
+    (host as HTMLElement).shadowRoot!.querySelector<HTMLElement>('[part="create"]')
+
+  test('the row is offered beside near misses, not only when nothing matches', async () => {
+    // A reader typing "Ruby on Rails" with "Ruby" in the list wants the one
+    // they are typing, not the one they are halfway through.
+    const host = await open()
+    await type(host, 'Rub')
+    expect(row(host)?.textContent?.trim()).toBe('Add "Rub"')
+    expect(shown(host)).toEqual(['Ruby'])
+  })
+
+  test('and not where it would offer a second copy of what is already there', async () => {
+    const host = await open()
+    await type(host, 'rust')
+    expect(row(host)).toBeNull()
+  })
+
+  test('nor with nothing typed, since there would be nothing to add', async () => {
+    const host = await open()
+    expect(row(host)).toBeNull()
+  })
+
+  test('it announces before it takes, and a refusal adds nothing', async () => {
+    /* The options are the consumer's own light DOM and nothing here writes into
+       it. A consumer who validates first refuses and adds nothing, and the
+       control is left exactly where it was. */
+    const host = await open()
+    host.addEventListener('helix-create', (event) => event.preventDefault())
+    await type(host, 'Zig')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('')
+    expect(control(host).value).toBe('Zig')
+    expect(row(host)).not.toBeNull()
+  })
+
+  test('what it announces is the text as typed, not a slug of it', async () => {
+    // Trimming or lowering it here would be this element deciding what a name
+    // means. A consumer who wants an identifier can make one.
+    const host = await open()
+    const heard: string[] = []
+    host.addEventListener('helix-create', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    await type(host, 'Objective C')
+    await press(host, 'Enter')
+    expect(heard).toEqual(['Objective C'])
+  })
+
+  test('taken, it becomes the value and the field says it', async () => {
+    const host = await open()
+    await type(host, 'Zig')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('Zig')
+    expect((host as unknown as { open: boolean }).open).toBe(false)
+    expect(formValue(host as HTMLElement)).toBe('Zig')
+  })
+
+  test('Enter over a highlighted option takes the option, not the row', async () => {
+    const host = await open()
+    await type(host, 'Rub')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('rb')
+  })
+
+  test('with several, a created answer joins the set rather than replacing it', async () => {
+    const host = await open('multiple')
+    await type(host, 'rub')
+    await press(host, 'Enter')
+    await type(host, 'Zig')
+    await press(host, 'Enter')
+    expect((host as unknown as { value: string }).value).toBe('rb,Zig')
+    expect((host as unknown as { open: boolean }).open).toBe(true)
+  })
+})
+
 if (hasLayout()) {
   describe('combobox in a browser', () => {
     /* Only in a browser, and not for layout: what this needs is slot flattening
@@ -311,11 +398,11 @@ if (hasLayout()) {
       expect(control(host).value).toBe('Rust')
     })
 
-    test('the chosen are tags, in the order the consumer wrote them', async () => {
-      // Not the order they were picked: a set that reordered itself as it was
-      // built would move a tag out from under the pointer about to remove it.
+    test('the chosen are tags, in the order they were chosen', async () => {
+      /* Which it has to be: with `creatable` an answer need not be in the list
+         at all, so there is no position in the list to give it. */
       const host = await manySet('default-value="go,rs"')
-      expect(tagsOf(host).map((tag) => tag.textContent?.trim())).toEqual(['Rust', 'Go'])
+      expect(tagsOf(host).map((tag) => tag.textContent?.trim())).toEqual(['Go', 'Rust'])
     })
 
     test('a tag asking to go takes exactly itself out', async () => {

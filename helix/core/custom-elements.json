@@ -1251,6 +1251,28 @@
         },
         {
           "kind": "class",
+          "description": "The reader asked for something the list does not hold.\n\nCancelable, and announced before anything is applied, because the options are\nthe consumer's own light DOM and no component here writes into it. What the\ncontrol can do is say what was asked for and take the value; putting an\noption in the list, or a row in a database, is the consumer's, and a consumer\nwho validates first refuses this and adds nothing.\n\nThe detail carries the text as typed, not a slug of it. Trimming or lowering\nit here would be this element deciding what a name means, and a consumer who\nwants an identifier can make one from what they were given.",
+          "name": "HelixCreateEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-create'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Something was copied to the clipboard.\n\nNot cancelable, and deliberately: it is announced after the write, because a\nclipboard write is a permission the platform may refuse and there is nothing\nuseful to report until it has either happened or not.",
           "name": "HelixCopyEvent",
           "members": [
@@ -1434,6 +1456,14 @@
           "name": "HelixChangeEvent",
           "declaration": {
             "name": "HelixChangeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCreateEvent",
+          "declaration": {
+            "name": "HelixCreateEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2047,6 +2077,14 @@
         },
         {
           "kind": "js",
+          "name": "CreateDetail",
+          "declaration": {
+            "name": "CreateDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "DismissDetail",
           "declaration": {
             "name": "DismissDetail",
@@ -2106,6 +2144,14 @@
           "name": "HelixCopyEvent",
           "declaration": {
             "name": "HelixCopyEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixCreateEvent",
+          "declaration": {
+            "name": "HelixCreateEvent",
             "module": "./events/events.js"
           }
         },
