@@ -5,6 +5,7 @@
 # rather than finding and pasting an SVG. A name the package does not have is
 # read from raw/, which is where marks that are not Phosphor live.
 
+airplay
 arrow-left
 arrow-right
 arrow-square-out

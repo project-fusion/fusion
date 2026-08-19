@@ -51,6 +51,55 @@ describe('video', () => {
     }
   })
 
+  test('remote is offered only once something answers, not merely where supported', async () => {
+    /* A button that opens an empty device list is worse than no button. The
+       platform answers `watchAvailability` late and often with nothing, so the
+       control waits for an actual target rather than for the API to exist. */
+    const host = await player(
+      '<helix-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-video>',
+    )
+    expect(part(host, 'remote')).toBeNull()
+  })
+
+  test('the page"s media session goes to whichever player was started last', async () => {
+    /* There is one session per page and it decides where a headset's buttons
+       land, so two players cannot both hold it. Render order is the wrong rule:
+       a reader pressing play on their headphones means the one they started. */
+    const session = navigator.mediaSession
+    if (!session) {
+      return
+    }
+    const first = await player('<helix-video label="First" src="/a.mp4"></helix-video>')
+    const second = await player('<helix-video label="Second" src="/b.mp4"></helix-video>')
+
+    ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
+    await (first as Player).updateComplete
+    expect(session.metadata?.title).toBe('First')
+
+    ;(part(second, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
+    await (second as Player).updateComplete
+    expect(session.metadata?.title).toBe('Second')
+  })
+
+  test('and a player that lost it does not clear it on the way out', async () => {
+    // Leaving the document hands the session back only if this element still
+    // holds it, or a stale player wipes the live one's metadata.
+    const session = navigator.mediaSession
+    if (!session) {
+      return
+    }
+    const first = await player('<helix-video label="First" src="/a.mp4"></helix-video>')
+    ;(part(first, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
+    await (first as Player).updateComplete
+
+    const second = await player('<helix-video label="Second" src="/b.mp4"></helix-video>')
+    ;(part(second, 'video') as HTMLVideoElement).dispatchEvent(new Event('play'))
+    await (second as Player).updateComplete
+
+    first.remove()
+    expect(session.metadata?.title).toBe('Second')
+  })
+
   test('the native controls keep their own keyboard, and their own focus', async () => {
     /* Two handlers on one press is a video that seeks twice, or plays and
        immediately pauses. A consumer who asked for the browser's bar asked for

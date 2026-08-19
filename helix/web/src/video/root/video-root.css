@@ -165,6 +165,7 @@
 [part="captions"],
 [part="speed"],
 [part="pip"],
+[part="remote"],
 [part="fullscreen"] {
   all: unset;
   --icon-size: var(--helix-size-icon-sm);
@@ -186,6 +187,7 @@
 [part="captions"]:focus-visible,
 [part="speed"]:focus-visible,
 [part="pip"]:focus-visible,
+[part="remote"]:focus-visible,
 [part="fullscreen"]:focus-visible,
 [part="scrubber"]:focus-visible,
 [part="volume"]:focus-visible {
@@ -496,4 +498,11 @@
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
   min-inline-size: var(--video-speed-size, 2.5rem);
+}
+
+/* Connected reads as on, the way the mute and fullscreen toggles do: the mark
+   goes to full ink so a reader can see at a glance that the picture is
+   somewhere else. */
+[part="remote"][aria-pressed="true"] {
+  color: var(--helix-color-primary);
 }

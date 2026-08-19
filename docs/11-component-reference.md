@@ -5489,6 +5489,7 @@ to do next.
 | `mute` | Sound on and off. |
 | `volume` | How loud. |
 | `captions` | Subtitles on and off. |
+| `remote` | Play on another device, where one is available. |
 | `speed` | Playback speed, where it was asked for. |
 | `pip` | Picture in picture, where it was asked for and exists. |
 | `fullscreen` | The whole screen, and back. |

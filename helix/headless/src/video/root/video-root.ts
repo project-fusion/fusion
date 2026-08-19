@@ -25,6 +25,22 @@ const clock = (seconds: number): string => {
 }
 
 /**
+ * Which player currently owns the page's one media session.
+ *
+ * There is exactly one `navigator.mediaSession` per page, and it decides what
+ * the lock screen shows and where a headset's buttons land. Two players cannot
+ * both have it, so the rule is written down rather than left to whichever
+ * rendered last: **whoever played most recently owns it**, which is what a
+ * reader means by "this one" when they press play on their headphones.
+ *
+ * Module scope, because the thing being shared is the page's and not any
+ * element's. A player gives it up when it leaves the document, and only if it
+ * still holds it: one that already lost the session to another must not clear
+ * that other one's metadata on its way out.
+ */
+let owner: HTMLElement | undefined
+
+/**
  * @summary Plays a video, with controls this library draws rather than the
  * browser's.
  *
@@ -74,6 +90,19 @@ const clock = (seconds: number): string => {
  * are rebuilt whenever the slot changes and the video is asked to load again,
  * which is what makes a `<track>` added later take effect.
  *
+ * **The lock screen and a headset's buttons work, and one player owns them.**
+ * There is one `navigator.mediaSession` per page, so the rule is stated rather
+ * than left to render order: whichever player was started last owns it, which
+ * is what a reader means by "this one" when they press play on their
+ * headphones. The title comes from `label` and the artwork from `poster`.
+ *
+ * **`remote` sends the picture somewhere else.** The Remote Playback API is
+ * what Safari implements for AirPlay and Chrome for Cast, so one control covers
+ * both and the platform supplies the device list. It is offered only once
+ * something has answered `watchAvailability`: a button that opens an empty list
+ * is worse than no button, and a consumer who wants none can set
+ * `disableremoteplayback` on this element.
+ *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
  * @slot poster - Shown over the video until it starts.
  *
@@ -90,6 +119,7 @@ const clock = (seconds: number): string => {
  * @csspart mute - Sound on and off.
  * @csspart volume - How loud.
  * @csspart captions - Subtitles on and off.
+ * @csspart remote - Play on another device, where one is available.
  * @csspart speed - Playback speed, where it was asked for.
  * @csspart pip - Picture in picture, where it was asked for and exists.
  * @csspart fullscreen - The whole screen, and back.
@@ -196,12 +226,31 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private rate = 1
 
+  /** Whether anything on the network offers to play this. */
+  @state()
+  private remoteAvailable = false
+
+  /** Whether it is playing somewhere else right now. */
+  @state()
+  private remoteConnected = false
+
+  /** Cancels the availability watch, since it outlives a single render. */
+  private remoteWatch: number | undefined
+
   /** The extras asked for, in order, and only the ones this platform can do. */
   private get extras(): string[] {
     const asked = this.extraControls.split(/\s+/).filter(Boolean)
     return asked.filter((one) => {
       if (one === 'pip') {
         return typeof document !== 'undefined' && document.pictureInPictureEnabled
+      }
+      /* Availability, not support. A device that can play this has to exist for
+         the button to mean anything: an AirPlay control with nothing to send to
+         is a control that opens an empty list, which is worse than no control.
+         `watchAvailability` is what answers that, and it answers late, so this
+         reads a flag the watch keeps rather than asking. */
+      if (one === 'remote') {
+        return this.remoteAvailable
       }
       return one === 'speed'
     })
@@ -324,7 +373,51 @@ export class HelixBaseVideo extends HelixElement {
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
+    if (event.type === 'play') {
+      this.claimSession()
+    }
+    if (owner === this && typeof navigator !== 'undefined' && navigator.mediaSession) {
+      navigator.mediaSession.playbackState = this.playing ? 'playing' : 'paused'
+    }
     this.dispatchEvent(new Event(event.type, { bubbles: true, composed: true }))
+  }
+
+  /**
+   * Takes the page's media session, and tells the platform what is playing.
+   *
+   * On play rather than on render, which is the ownership rule: a page with two
+   * players gives the session to whichever one the reader started, so a
+   * headset's buttons land on what they are listening to rather than on
+   * whichever came first in the markup.
+   *
+   * The handlers are what make a headset's play, pause and skip work at all.
+   * Without them a platform falls back to guessing which element was meant,
+   * which is right often enough to hide the fault and wrong exactly when there
+   * are two.
+   */
+  private claimSession(): void {
+    if (typeof navigator === 'undefined' || !navigator.mediaSession) {
+      return
+    }
+    owner = this
+    const session = navigator.mediaSession
+    session.metadata = new MediaMetadata({
+      artwork: this.poster === '' ? [] : [{ src: this.poster }],
+      title: this.label,
+    })
+    session.setActionHandler('play', () => this.toggle())
+    session.setActionHandler('pause', () => this.toggle())
+    session.setActionHandler('seekbackward', (details) => {
+      this.seek((this.video?.currentTime ?? 0) - (details.seekOffset ?? 10))
+    })
+    session.setActionHandler('seekforward', (details) => {
+      this.seek((this.video?.currentTime ?? 0) + (details.seekOffset ?? 10))
+    })
+    session.setActionHandler('seekto', (details) => {
+      if (details.seekTime !== undefined && details.seekTime !== null) {
+        this.seek(details.seekTime)
+      }
+    })
   }
 
   private readonly handleVolume = (): void => {
@@ -385,6 +478,43 @@ export class HelixBaseVideo extends HelixElement {
     const next = speeds[(at + 1) % speeds.length] ?? 1
     video.playbackRate = next
     this.rate = next
+  }
+
+  /**
+   * Starts watching for something to play this on, and stops on the way out.
+   *
+   * The Remote Playback API is the standard one, and it is what Safari
+   * implements for AirPlay and Chrome for Cast: one call covers both, where the
+   * older `webkitShowPlaybackTargetPicker` covers only the first. Firefox has
+   * neither, and `remote` simply being absent is what turns the control off
+   * there.
+   *
+   * `watchAvailability` returns an id that has to be cancelled, or the callback
+   * outlives the element that owns it.
+   */
+  private async watchRemote(): Promise<void> {
+    const remote = this.video?.remote
+    if (!remote?.watchAvailability) {
+      return
+    }
+    try {
+      this.remoteWatch = await remote.watchAvailability((available) => {
+        this.remoteAvailable = available
+      })
+    } catch {
+      /* Refused where the media is not remotable, which is a fact about the
+         source rather than an error to report: the control stays off. */
+    }
+  }
+
+  /** Opens the platform's own device picker. It has no list of its own. */
+  private async promptRemote(): Promise<void> {
+    try {
+      await this.video?.remote?.prompt()
+    } catch {
+      /* Dismissing the picker rejects, which is a reader saying no rather than
+         anything going wrong. */
+    }
   }
 
   private async togglePip(): Promise<void> {
@@ -500,6 +630,10 @@ export class HelixBaseVideo extends HelixElement {
     event.preventDefault()
   }
 
+  private readonly handleRemoteState = (): void => {
+    this.remoteConnected = this.video?.remote?.state === 'connected'
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     document.addEventListener('fullscreenchange', this.handleFullscreenChange)
@@ -508,6 +642,21 @@ export class HelixBaseVideo extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange)
+    /* The watch outlives the element unless it is cancelled, and a callback
+       holding a removed element is a leak with a `@state` write on the end. */
+    if (this.remoteWatch !== undefined) {
+      void this.video?.remote?.cancelWatchAvailability?.(this.remoteWatch)
+      this.remoteWatch = undefined
+    }
+    /* And the page's one media session goes back to nobody, but only if this
+       element is the one holding it. */
+    if (owner === this) {
+      owner = undefined
+      if (typeof navigator !== 'undefined' && navigator.mediaSession) {
+        navigator.mediaSession.metadata = null
+        navigator.mediaSession.playbackState = 'none'
+      }
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -516,6 +665,9 @@ export class HelixBaseVideo extends HelixElement {
     if (video) {
       this.silent = video.muted
       this.loudness = video.volume
+      video.remote?.addEventListener?.('connect', this.handleRemoteState)
+      video.remote?.addEventListener?.('disconnect', this.handleRemoteState)
+      void this.watchRemote()
     }
   }
 
@@ -617,8 +769,18 @@ export class HelixBaseVideo extends HelixElement {
           : nothing
       }
       ${this.extras.map((one) =>
-        one === 'speed'
+        one === 'remote'
           ? html`<button
+              part="remote"
+              type="button"
+              aria-label="Play on another device"
+              aria-pressed=${this.remoteConnected ? 'true' : 'false'}
+              @click=${() => void this.promptRemote()}
+            >
+              <helix-icon name="airplay"></helix-icon>
+            </button>`
+          : one === 'speed'
+            ? html`<button
               part="speed"
               type="button"
               aria-label="Playback speed"
@@ -626,7 +788,7 @@ export class HelixBaseVideo extends HelixElement {
             >
               ${this.rate}x
             </button>`
-          : html`<button
+            : html`<button
               part="pip"
               type="button"
               aria-label="Picture in picture"

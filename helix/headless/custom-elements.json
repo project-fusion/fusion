@@ -42921,6 +42921,10 @@
               "name": "captions"
             },
             {
+              "description": "Play on another device, where one is available.",
+              "name": "remote"
+            },
+            {
               "description": "Playback speed, where it was asked for.",
               "name": "speed"
             },
@@ -43160,6 +43164,35 @@
             },
             {
               "kind": "field",
+              "name": "remoteAvailable",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything on the network offers to play this."
+            },
+            {
+              "kind": "field",
+              "name": "remoteConnected",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether it is playing somewhere else right now."
+            },
+            {
+              "kind": "field",
+              "name": "remoteWatch",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "Cancels the availability watch, since it outlives a single render."
+            },
+            {
+              "kind": "field",
               "name": "extras",
               "type": {
                 "text": "string[]"
@@ -43248,6 +43281,17 @@
               "description": "Relayed, because none of these cross a shadow boundary on their own.\n\nThe video is inside this element's shadow root, so a consumer listening on\nthe element they wrote hears nothing at all without this. Input relays\n`change` for the same reason."
             },
             {
+              "kind": "method",
+              "name": "claimSession",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Takes the page's media session, and tells the platform what is playing.\n\nOn play rather than on render, which is the ownership rule: a page with two\nplayers gives the session to whichever one the reader started, so a\nheadset's buttons land on what they are listening to rather than on\nwhichever came first in the markup.\n\nThe handlers are what make a headset's play, pause and skip work at all.\nWithout them a platform falls back to guessing which element was meant,\nwhich is right often enough to hide the fault and wrong exactly when there\nare two."
+            },
+            {
               "kind": "field",
               "name": "handleVolume",
               "privacy": "private",
@@ -43284,6 +43328,28 @@
             },
             {
               "kind": "method",
+              "name": "watchRemote",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Starts watching for something to play this on, and stops on the way out.\n\nThe Remote Playback API is the standard one, and it is what Safari\nimplements for AirPlay and Chrome for Cast: one call covers both, where the\nolder `webkitShowPlaybackTargetPicker` covers only the first. Firefox has\nneither, and `remote` simply being absent is what turns the control off\nthere.\n\n`watchAvailability` returns an id that has to be cancelled, or the callback\noutlives the element that owns it."
+            },
+            {
+              "kind": "method",
+              "name": "promptRemote",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Opens the platform's own device picker. It has no list of its own."
+            },
+            {
+              "kind": "method",
               "name": "togglePip",
               "privacy": "private",
               "return": {
@@ -43315,6 +43381,12 @@
               "privacy": "private",
               "readonly": true,
               "description": "The keys every player uses, bound to this element rather than the document.\n\nA video is not a command palette: its keys belong to it while a reader is\non it, and a page with two videos on it would otherwise have both answering\nthe same press.\n\nNothing is taken while focus is in a range. The scrubber and the volume are\nreal inputs and the arrows are already theirs, so intercepting would mean\nseeking twice for one press."
+            },
+            {
+              "kind": "field",
+              "name": "handleRemoteState",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -43541,7 +43613,7 @@
             "category": "content",
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/video\n\n**`<source>` and `<track>` are copied into the video, not slotted into it.**\nA media element runs its resource selection over its own child *nodes*, and a\nslot is one node: the sources and the caption tracks a consumer wrote were\nassigned into the flattened tree and the video never saw any of them. It had\nno text tracks, no current source and a `readyState` of zero, so a video\ngiven sources this way did not merely lack captions, it did not play.\n\nThey are copied rather than moved, because the consumer's light DOM is theirs\nand a framework that re-renders it would find its children gone. The copies\nare rebuilt whenever the slot changes and the video is asked to load again,\nwhich is what makes a `<track>` added later take effect.",
+            "documentation": "https://helix.fusion.dev/components/video\n\n**`<source>` and `<track>` are copied into the video, not slotted into it.**\nA media element runs its resource selection over its own child *nodes*, and a\nslot is one node: the sources and the caption tracks a consumer wrote were\nassigned into the flattened tree and the video never saw any of them. It had\nno text tracks, no current source and a `readyState` of zero, so a video\ngiven sources this way did not merely lack captions, it did not play.\n\nThey are copied rather than moved, because the consumer's light DOM is theirs\nand a framework that re-renders it would find its children gone. The copies\nare rebuilt whenever the slot changes and the video is asked to load again,\nwhich is what makes a `<track>` added later take effect.\n\n**The lock screen and a headset's buttons work, and one player owns them.**\nThere is one `navigator.mediaSession` per page, so the rule is stated rather\nthan left to render order: whichever player was started last owns it, which\nis what a reader means by \"this one\" when they press play on their\nheadphones. The title comes from `label` and the artwork from `poster`.\n\n**`remote` sends the picture somewhere else.** The Remote Playback API is\nwhat Safari implements for AirPlay and Chrome for Cast, so one control covers\nboth and the platform supplies the device list. It is offered only once\nsomething has answered `watchAvailability`: a button that opens an empty list\nis worse than no button, and a consumer who wants none can set\n`disableremoteplayback` on this element.",
             "aliases": [
               "Player",
               "Media",

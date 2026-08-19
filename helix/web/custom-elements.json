@@ -56450,6 +56450,47 @@
             },
             {
               "kind": "field",
+              "name": "remoteAvailable",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything on the network offers to play this.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "remoteConnected",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether it is playing somewhere else right now.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "remoteWatch",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "Cancels the availability watch, since it outlives a single render.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "extras",
               "type": {
                 "text": "string[]"
@@ -56574,6 +56615,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "claimSession",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Takes the page's media session, and tells the platform what is playing.\n\nOn play rather than on render, which is the ownership rule: a page with two\nplayers gives the session to whichever one the reader started, so a\nheadset's buttons land on what they are listening to rather than on\nwhichever came first in the markup.\n\nThe handlers are what make a headset's play, pause and skip work at all.\nWithout them a platform falls back to guessing which element was meant,\nwhich is right often enough to hide the fault and wrong exactly when there\nare two.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleVolume",
               "privacy": "private",
@@ -56626,6 +56682,36 @@
             },
             {
               "kind": "method",
+              "name": "watchRemote",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Starts watching for something to play this on, and stops on the way out.\n\nThe Remote Playback API is the standard one, and it is what Safari\nimplements for AirPlay and Chrome for Cast: one call covers both, where the\nolder `webkitShowPlaybackTargetPicker` covers only the first. Firefox has\nneither, and `remote` simply being absent is what turns the control off\nthere.\n\n`watchAvailability` returns an id that has to be cancelled, or the callback\noutlives the element that owns it.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "promptRemote",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Opens the platform's own device picker. It has no list of its own.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "togglePip",
               "privacy": "private",
               "return": {
@@ -56669,6 +56755,16 @@
               "privacy": "private",
               "readonly": true,
               "description": "The keys every player uses, bound to this element rather than the document.\n\nA video is not a command palette: its keys belong to it while a reader is\non it, and a page with two videos on it would otherwise have both answering\nthe same press.\n\nNothing is taken while focus is in a range. The scrubber and the volume are\nreal inputs and the arrows are already theirs, so intercepting would mean\nseeking twice for one press.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleRemoteState",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -57078,6 +57174,14 @@
             {
               "description": "Subtitles on and off.",
               "name": "captions",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Play on another device, where one is available.",
+              "name": "remote",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
