@@ -116,15 +116,35 @@
   padding-inline: var(--helix-space-sm);
 }
 
-/* The name over its reading. `min-inline-size: 0` because a flex item's floor is
-   its content, so a long file name pushes the remove control off the end of the
-   card rather than wrapping: this is the declaration that lets it wrap. */
+/* The name and its readings on one line where they fit, and stacked where they
+ * do not.
+ *
+ * A column always was two lines for every file, including `raw.bin` at one byte,
+ * which is a lot of card for very little. A row always cannot work either: a
+ * file name is often long, and the name is the thing being identified.
+ *
+ * So `wrap`, and the choice is made per file by how much room the name needs.
+ * The floor is what makes it work: `overflow-wrap: anywhere` on the name means
+ * its min-content width is one character, so without a floor it would shrink to
+ * a column of letters rather than ever pushing the tags down. Sixteen
+ * characters, in `ch`, which is the unit for "this many characters" and reads as
+ * the decision it is.
+ *
+ * `min-inline-size: 0` on the container for the other half of the same problem:
+ * a flex item's floor is its content, so a long unbroken name pushes the remove
+ * control off the end of the card unless this says otherwise. */
 [part="detail"] {
+  align-items: center;
+  column-gap: var(--helix-space-sm);
   display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
+  flex-wrap: wrap;
   min-inline-size: 0;
+  row-gap: var(--helix-space-2xs);
+}
+
+[part="name"] {
+  min-inline-size: min(100%, 16ch);
 }
 
 /* The size and the kind, as two small tags under the name.
