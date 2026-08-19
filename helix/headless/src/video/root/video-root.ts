@@ -187,6 +187,20 @@ export class HelixBaseVideo extends HelixElement {
   @property({ attribute: 'speeds' })
   speeds = '0.5 1 1.5 2'
 
+  /**
+   * How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * It used to leave the moment the pointer did, which is not how a player
+   * behaves: a reader moving across the picture to reach a control watched it
+   * vanish under them. Zero turns the wait off and the bar goes immediately;
+   * a large number keeps it up for as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
+   */
+  @property({ attribute: 'idle-delay', type: Number })
+  idleDelay = 2500
+
   /** What the play control is called while it would start the video. */
   @property({ attribute: 'play-label' })
   playLabel = 'Play'
@@ -227,6 +241,12 @@ export class HelixBaseVideo extends HelixElement {
   private rate = 1
 
   /** Whether anything on the network offers to play this. */
+  /** Whether the reader has been still long enough for the bar to go. */
+  @state()
+  private idle = false
+
+  private idleTimer?: ReturnType<typeof setTimeout>
+
   @state()
   private remoteAvailable = false
 
@@ -562,6 +582,23 @@ export class HelixBaseVideo extends HelixElement {
     }
   }
 
+  /**
+   * Restarts the wait, on anything that counts as the reader being here.
+   *
+   * Pointer movement and focus both count, and both have to: a reader using the
+   * keyboard never moves a pointer, and a bar that only answered the mouse
+   * would leave them nothing to look at.
+   */
+  private readonly stir = (): void => {
+    this.idle = false
+    clearTimeout(this.idleTimer)
+    if (this.idleDelay > 0) {
+      this.idleTimer = setTimeout(() => {
+        this.idle = true
+      }, this.idleDelay)
+    }
+  }
+
   private readonly handleFullscreenChange = (): void => {
     this.full = document.fullscreenElement === this
   }
@@ -641,6 +678,7 @@ export class HelixBaseVideo extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    clearTimeout(this.idleTimer)
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange)
     /* The watch outlives the element unless it is cancelled, and a callback
        holding a removed element is a leak with a `@state` write on the end. */
@@ -687,6 +725,10 @@ export class HelixBaseVideo extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.toggleAttribute('data-playing', this.playing)
+    /* `data-idle` rather than a hover rule alone, so the stylesheet can say
+       "playing, and nobody has moved for a while" instead of "playing and the
+       pointer is not on it this instant". */
+    this.toggleAttribute('data-idle', this.idle && this.playing)
     /* A media element decides what to play once, when it is created or when it
        is told to look again. Copies that arrive after that are markup it has
        already walked past. */
@@ -821,6 +863,14 @@ export class HelixBaseVideo extends HelixElement {
         role=${this.controls ? nothing : 'group'}
         aria-label=${this.controls ? nothing : this.label || 'Video'}
         @keydown=${this.handleKeydown}
+        @pointermove=${this.stir}
+        @pointerleave=${() => {
+          /* Leaving is the one case that does not wait: the reader has gone
+             somewhere else, and there is nothing to reach for. */
+          clearTimeout(this.idleTimer)
+          this.idle = true
+        }}
+        @focusin=${this.stir}
       >
       <video
         part="video"

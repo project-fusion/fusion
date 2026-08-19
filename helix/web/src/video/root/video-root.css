@@ -106,7 +106,7 @@
 
 /* And it stays. A bar that is part of the frame does not come and go: hiding it
    would leave a strip of the well behind it, which is worse than the bar. */
-:host([appearance="solid"][data-playing]:not(:hover):not(:focus-within)) [part="controls"] {
+:host([appearance="solid"][data-idle]:not(:focus-within)) [part="controls"] {
   opacity: 1;
 }
 
@@ -136,7 +136,7 @@
 }
 
 /* And it goes with the bar it is there for. */
-:host([data-playing]:not(:hover):not(:focus-within)) [part="stage"]::before {
+:host([data-idle]:not(:focus-within)) [part="stage"]::before {
   opacity: 0;
 }
 
@@ -147,16 +147,21 @@
   content: none;
 }
 
-/* Gone while it is playing and nobody is near it. Focus counts as being near
-   it, which is what keeps the bar reachable without a pointer: a control that
-   is only there on hover is a control a keyboard cannot find. A paused video
-   keeps its bar, because a reader who stopped it is deciding what to do next.
-
-   On `data-playing`, which the element writes, because CSS cannot ask a video
+/* Gone once the video is playing and the reader has been still for a while.
+ 
+   On `data-idle`, which the element writes after a delay, rather than on
+   `:not(:hover)`. The bar used to leave the instant the pointer did, so a
+   reader crossing the picture to reach a control watched it vanish under them.
+   The element also writes `data-playing`, because CSS cannot ask a video
    whether it is playing: `paused` is a property and never an attribute, so
-   `video:not([paused])` matched every video in existence and the bar was hidden
-   always, including in the one state this rule exists to keep it visible in. */
-:host([data-playing]:not(:hover):not(:focus-within)) [part="controls"] {
+   `video:not([paused])` matched every video in existence.
+ 
+   Focus still holds it open, which is what keeps the bar reachable without a
+   pointer: a control that is only there on hover is one a keyboard cannot
+   find. And a paused video keeps its bar, because a reader who stopped it is
+   deciding what to do next, which is why `data-idle` is only ever set while
+   playing. */
+:host([data-idle]:not(:focus-within)) [part="controls"] {
   opacity: 0;
 }
 
@@ -229,6 +234,22 @@
   margin: var(--helix-space-none);
 }
 
+/* The groove is a wash of the ink, on every appearance, and the solid bar is
+   not an exception to it.
+ *
+ * It was one, reaching for `surface-raised` on the grounds that a bar with a
+ * ground of its own should cut its channel from a token rather than from a
+ * wash. Measured against the bar it sits in: `surface` is `oklch(0.21)` and
+ * `surface-raised` is `oklch(0.29)`, a step sized for a card standing off a
+ * page and invisible across four pixels. So the empty half of the track was
+ * not there, and the blue read as a line stopping at the thumb rather than as
+ * a level filling a channel. The ink at 28% lands near `oklch(0.43)` over that
+ * same bar, which is a rail a reader can see the whole of.
+ *
+ * The inset highlight went with it. `box-shadow` paints above the background,
+ * so the thing meant to say "cut into the bar" was laid over the fill as well,
+ * lightening the top of the blue for the whole of its length. A groove that
+ * reads on its own does not need it. */
 [part="scrubber"] {
   background-color: color-mix(in oklab, currentColor 28%, transparent);
   background-image: linear-gradient(
@@ -432,20 +453,8 @@
 
 /* Down where the bar has gone, so a caption is not left floating in the middle
    of nothing while a video plays unattended. */
-:host([data-playing]:not(:hover):not(:focus-within)) [part="cue"] {
+:host([data-idle]:not(:focus-within)) [part="cue"] {
   inset-block-end: var(--helix-space-lg);
-}
-
-/* On a solid bar the groove is a step *up* from the bar, not a step down into
-   it. Sunken is about the shape rather than the value: a channel cut into a
-   dark bar reads by being lighter than the bar, the way a slider's track always
-   has, and darkening it instead made the groove disappear into the ground. The
-   transparent bar has no ground to be a step from, so its track stays a wash of
-   the ink. */
-:host([appearance="solid"]) [part="scrubber"],
-:host([appearance="solid"]) [part="volume"] {
-  background-color: var(--helix-color-surface-raised);
-  box-shadow: inset 0 1px 1px color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
 }
 
 [part="poster"] {

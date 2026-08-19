@@ -20,10 +20,10 @@ import { styles } from './video-root.css.js'
  * video is the component's size and the controls belong to it.
  *
  * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
- * while playing and untouched, shown on hover, and shown whenever anything
- * inside it has focus, which is what keeps it reachable without a pointer. A
- * paused video keeps its bar, because a reader who stopped it is deciding what
- * to do next.
+ * once a playing video has gone `idle-delay` without being touched, shown again
+ * the moment the pointer moves, and shown whenever anything inside it has
+ * focus, which is what keeps it reachable without a pointer. A paused video
+ * keeps its bar, because a reader who stopped it is deciding what to do next.
  *
  * @since 0.1.0
  * @status experimental

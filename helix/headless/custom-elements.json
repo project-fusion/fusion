@@ -43053,6 +43053,16 @@
             },
             {
               "kind": "field",
+              "name": "idleDelay",
+              "type": {
+                "text": "number"
+              },
+              "default": "2500",
+              "description": "How long the bar waits after the pointer stops before it goes, in ms.\n\nIt used to leave the moment the pointer did, which is not how a player\nbehaves: a reader moving across the picture to reach a control watched it\nvanish under them. Zero turns the wait off and the bar goes immediately;\na large number keeps it up for as long as anyone is likely to look.\n\nThe wait is only ever about *idling*. A video that is paused keeps its bar\nregardless, because a reader who stopped it is deciding what to do next.",
+              "attribute": "idle-delay"
+            },
+            {
+              "kind": "field",
               "name": "playLabel",
               "type": {
                 "text": "string"
@@ -43164,13 +43174,30 @@
             },
             {
               "kind": "field",
-              "name": "remoteAvailable",
+              "name": "idle",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether anything on the network offers to play this."
+              "description": "Whether the reader has been still long enough for the bar to go."
+            },
+            {
+              "kind": "field",
+              "name": "idleTimer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "remoteAvailable",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
             },
             {
               "kind": "field",
@@ -43368,6 +43395,13 @@
                 }
               },
               "description": "Into fullscreen and back, and quiet about being refused.\n\n`requestFullscreen` rejects rather than returning false, and the two\nrefusals a consumer will actually meet are a Permissions Policy that does\nnot grant `fullscreen` to the frame the player is in, and a call without\nuser activation. Both are `TypeError: Permissions check failed`, which is\nthe same message for two different causes.\n\nIt was `void`ed, so a refusal became an unhandled rejection: the button did\nnothing and said nothing, and the console entry it left named neither the\nelement nor the reason. Caught here, the state stays honest because\n`aria-pressed` follows `fullscreenchange` rather than this call, so a\nrefused request leaves a button that correctly reports \"not fullscreen\"."
+            },
+            {
+              "kind": "field",
+              "name": "stir",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Restarts the wait, on anything that counts as the reader being here.\n\nPointer movement and focus both count, and both have to: a reader using the\nkeyboard never moves a pointer, and a bar that only answered the mouse\nwould leave them nothing to look at."
             },
             {
               "kind": "field",
@@ -43584,6 +43618,15 @@
               "default": "'0.5 1 1.5 2'",
               "description": "The speeds offered, slowest first, as multipliers of normal.",
               "fieldName": "speeds"
+            },
+            {
+              "name": "idle-delay",
+              "type": {
+                "text": "number"
+              },
+              "default": "2500",
+              "description": "How long the bar waits after the pointer stops before it goes, in ms.\n\nIt used to leave the moment the pointer did, which is not how a player\nbehaves: a reader moving across the picture to reach a control watched it\nvanish under them. Zero turns the wait off and the bar goes immediately;\na large number keeps it up for as long as anyone is likely to look.\n\nThe wait is only ever about *idling*. A video that is paused keeps its bar\nregardless, because a reader who stopped it is deciding what to do next.",
+              "fieldName": "idleDelay"
             },
             {
               "name": "play-label",

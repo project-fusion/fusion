@@ -2037,6 +2037,9 @@
               },
               {
                 "slug": "group"
+              },
+              {
+                "slug": "image"
               }
             ],
             "source": "helix/web/src/avatar"
@@ -56106,7 +56109,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The player is the base tier's. What this adds is the bar: where it sits, when\nit is there, and what the two ranges look like, which is the whole reason to\nreplace a control set that cannot be styled.\n\n**The bar is over the picture, not under it.** A bar in the layout would move\neverything below the video by its own height and would leave a strip of page\ncolour under a picture that is meant to be the whole of it. Over it, the\nvideo is the component's size and the controls belong to it.\n\n**It goes when nobody is using it, and comes back for the keyboard.** Hidden\nwhile playing and untouched, shown on hover, and shown whenever anything\ninside it has focus, which is what keeps it reachable without a pointer. A\npaused video keeps its bar, because a reader who stopped it is deciding what\nto do next.",
+          "description": "The player is the base tier's. What this adds is the bar: where it sits, when\nit is there, and what the two ranges look like, which is the whole reason to\nreplace a control set that cannot be styled.\n\n**The bar is over the picture, not under it.** A bar in the layout would move\neverything below the video by its own height and would leave a strip of page\ncolour under a picture that is meant to be the whole of it. Over it, the\nvideo is the component's size and the controls belong to it.\n\n**It goes when nobody is using it, and comes back for the keyboard.** Hidden\nonce a playing video has gone `idle-delay` without being touched, shown again\nthe moment the pointer moves, and shown whenever anything inside it has\nfocus, which is what keeps it reachable without a pointer. A paused video\nkeeps its bar, because a reader who stopped it is deciding what to do next.",
           "name": "HelixVideo",
           "cssProperties": [
             {
@@ -56291,6 +56294,20 @@
             },
             {
               "kind": "field",
+              "name": "idleDelay",
+              "type": {
+                "text": "number"
+              },
+              "default": "2500",
+              "description": "How long the bar waits after the pointer stops before it goes, in ms.\n\nIt used to leave the moment the pointer did, which is not how a player\nbehaves: a reader moving across the picture to reach a control watched it\nvanish under them. Zero turns the wait off and the bar goes immediately;\na large number keeps it up for as long as anyone is likely to look.\n\nThe wait is only ever about *idling*. A video that is paused keeps its bar\nregardless, because a reader who stopped it is deciding what to do next.",
+              "attribute": "idle-delay",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "playLabel",
               "type": {
                 "text": "string"
@@ -56450,13 +56467,38 @@
             },
             {
               "kind": "field",
+              "name": "idle",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the reader has been still long enough for the bar to go.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "idleTimer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "remoteAvailable",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
               "default": "false",
-              "description": "Whether anything on the network offers to play this.",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -56741,6 +56783,17 @@
             },
             {
               "kind": "field",
+              "name": "stir",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Restarts the wait, on anything that counts as the reader being here.\n\nPointer movement and focus both count, and both have to: a reader using the\nkeyboard never moves a pointer, and a bar that only answered the mouse\nwould leave them nothing to look at.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleFullscreenChange",
               "privacy": "private",
               "readonly": true,
@@ -56989,6 +57042,19 @@
               "default": "'0.5 1 1.5 2'",
               "description": "The speeds offered, slowest first, as multipliers of normal.",
               "fieldName": "speeds",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "idle-delay",
+              "type": {
+                "text": "number"
+              },
+              "default": "2500",
+              "description": "How long the bar waits after the pointer stops before it goes, in ms.\n\nIt used to leave the moment the pointer did, which is not how a player\nbehaves: a reader moving across the picture to reach a control watched it\nvanish under them. Zero turns the wait off and the bar goes immediately;\na large number keeps it up for as long as anyone is likely to look.\n\nThe wait is only ever about *idling*. A video that is paused keeps its bar\nregardless, because a reader who stopped it is deciding what to do next.",
+              "fieldName": "idleDelay",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"

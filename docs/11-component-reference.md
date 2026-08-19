@@ -5428,10 +5428,10 @@ colour under a picture that is meant to be the whole of it. Over it, the
 video is the component's size and the controls belong to it.
 
 **It goes when nobody is using it, and comes back for the keyboard.** Hidden
-while playing and untouched, shown on hover, and shown whenever anything
-inside it has focus, which is what keeps it reachable without a pointer. A
-paused video keeps its bar, because a reader who stopped it is deciding what
-to do next.
+once a playing video has gone `idle-delay` without being touched, shown again
+the moment the pointer moves, and shown whenever anything inside it has
+focus, which is what keeps it reachable without a pointer. A paused video
+keeps its bar, because a reader who stopped it is deciding what to do next.
 
 #### Properties
 
@@ -5440,6 +5440,7 @@ to do next.
 | `appearance` | `appearance` | `'plain' \| 'shadow' \| 'solid'` | `'shadow'` | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
 | `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |
+| `idleDelay` | `idle-delay` | `number` | `2500` | `HelixBaseVideo` | How long the bar waits after the pointer stops before it goes, in ms. |
 | `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
 | `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |

@@ -68,11 +68,23 @@
    bar is the consumer's decision and the bar has to be told which way it went;
    picking a hero that is actually dark is what makes that legible here.
 
-   No `color-scheme` on the band itself, which was the first attempt and turned
-   it light gray: `--helix-color-surface-inverse` is a `light-dark()` pair, so
-   declaring a dark scheme on the element flipped the very token being used to
-   make it dark. The header carries `data-color-mode="dark"` instead, which is
-   the half that needed telling. */
+   **`surface-inverse` cannot say "dark".** It says "the opposite of the page",
+   which is neutral-900 in light mode and neutral-100 in dark, so in dark mode
+   this hero came out near-white with white text on it and a light-inked bar
+   floating over the top: the example inverted along with the page it was meant
+   to stand against.
+
+   A dark scheme on the band is the answer, and it failed the first time for a
+   reason that looked like the opposite: `color-scheme: dark` was declared while
+   the background still read `surface-inverse`, so the scheme flipped the very
+   token being used to make it dark and the band went light gray. The two
+   halves belong together. `data-color-mode="dark"` sets the scheme on this
+   subtree, and a plain `surface` under it is neutral-900 in either mode, which
+   is what light mode was already getting.
+
+   Nothing else in the file moves, because `foreground-on-accent` is
+   neutral-0 with no second arm: the heading and the rules of the grid were
+   white before this and are white after it. */
 .band {
-  background-color: var(--helix-color-surface-inverse);
+  background-color: var(--helix-color-surface);
 }

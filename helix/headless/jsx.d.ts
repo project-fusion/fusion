@@ -9282,6 +9282,26 @@ that cannot work is worse than one that is not there. */
   extraControls?: HelixBaseVideo["extraControls"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   speeds?: HelixBaseVideo["speeds"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+It used to leave the moment the pointer did, which is not how a player
+behaves: a reader moving across the picture to reach a control watched it
+vanish under them. Zero turns the wait off and the bar goes immediately;
+a large number keeps it up for as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "idle-delay"?: HelixBaseVideo["idleDelay"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+It used to leave the moment the pointer did, which is not how a player
+behaves: a reader moving across the picture to reach a control watched it
+vanish under them. Zero turns the wait off and the bar goes immediately;
+a large number keeps it up for as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  idleDelay?: HelixBaseVideo["idleDelay"];
   /** What the play control is called while it would start the video. */
   "play-label"?: HelixBaseVideo["playLabel"];
   /** What the play control is called while it would start the video. */
@@ -9347,6 +9367,26 @@ that cannot work is worse than one that is not there. */
   "prop:extraControls"?: HelixBaseVideo["extraControls"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   "prop:speeds"?: HelixBaseVideo["speeds"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+It used to leave the moment the pointer did, which is not how a player
+behaves: a reader moving across the picture to reach a control watched it
+vanish under them. Zero turns the wait off and the bar goes immediately;
+a large number keeps it up for as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "attr:idle-delay"?: HelixBaseVideo["idleDelay"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+It used to leave the moment the pointer did, which is not how a player
+behaves: a reader moving across the picture to reach a control watched it
+vanish under them. Zero turns the wait off and the bar goes immediately;
+a large number keeps it up for as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "prop:idleDelay"?: HelixBaseVideo["idleDelay"];
   /** What the play control is called while it would start the video. */
   "attr:play-label"?: HelixBaseVideo["playLabel"];
   /** What the play control is called while it would start the video. */
@@ -17196,6 +17236,15 @@ export type CustomElements = {
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
+   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * It used to leave the moment the pointer did, which is not how a player
+   * behaves: a reader moving across the picture to reach a control watched it
+   * vanish under them. Zero turns the wait off and the bar goes immediately;
+   * a large number keeps it up for as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    *
@@ -25332,6 +25381,15 @@ export type CustomElementsSolidJs = {
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
+   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * It used to leave the moment the pointer did, which is not how a player
+   * behaves: a reader moving across the picture to reach a control watched it
+   * vanish under them. Zero turns the wait off and the bar goes immediately;
+   * a large number keeps it up for as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    *
