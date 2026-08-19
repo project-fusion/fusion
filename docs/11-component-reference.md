@@ -210,6 +210,7 @@ no shadow: the rule is the whole of it.
 | Property | Description |
 | --- | --- |
 | `--app-header-background` | Fill behind the banner. |
+| `--app-header-border-color` | The line under the bar. None by default. |
 | `--app-header-height` | Height of the banner. |
 | `--app-header-inset` | Inline padding of the banner. |
 | `--app-header-max-inline-size` | Width the content is centered in. |
@@ -3277,6 +3278,8 @@ from the field it came out of.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The options, and any groups of them. |
+| `start` | Before the chosen value, for an icon or a prefix. |
+| `end` | After it, for a count, a unit, or a clear button. |
 | `indicator` | The mark on the trigger saying this opens, usually a caret. |
 | `label` | Richer than a string. |
 | `hint` | Richer than a string. |

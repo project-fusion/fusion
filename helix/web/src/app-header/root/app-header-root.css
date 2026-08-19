@@ -4,18 +4,25 @@
    rendered inside it. Flat is both the quieter look and the one that does not
    surprise.
 
-   **And no line under it, in any appearance.** There was a hairline that faded
-   in once content ran underneath, which is the conventional answer to "the bar
-   is over something now" and answers a question the bar had already answered:
-   `flat` is opaque and `material` is blurred, so in both the content stops at
-   the bar because it cannot be seen through it. The line was a second edge
-   drawn on top of an edge that was already there, and it is the one thing on
-   the page that runs the full width of the window.
+   **No line under it by default, and never one that arrives on scroll.** There
+   was a hairline that faded in once content ran underneath, which is the
+   conventional answer to "the bar is over something now" and answers a question
+   the bar had already answered: `flat` is opaque and `material` is blurred, so
+   in both the content stops at the bar because it cannot be seen through it.
 
    `transparent` is the one appearance where scrolling genuinely changes
-   something, and it says so the honest way: it has no surface at the top of the
-   page and takes one when it needs to hide what is passing under it. That is
-   what `data-scrolled` is still for. */
+   something, and it says so the honest way: no surface at the top of the page,
+   and one when it needs to hide what is passing under it. That is what
+   `data-scrolled` is still for.
+
+   **But the line itself is a consumer's call, so the box stays.** A header over
+   prose needs nothing; a header sitting straight onto tool chrome, a toolbar
+   with its own rule and panes below it, merges into the bar underneath without
+   one. `--app-header-border-color` is that decision, transparent by default.
+
+   Declared and coloured rather than absent and added, so turning it on cannot
+   shift the page by a pixel: the border box is reserved either way, which is
+   the same reason the hover ring on a card is an outline. */
 :host {
   /* Dense by nature, and it says so once. A control put in here takes this
      without being told, so a row cannot end up with one member the wrong height
@@ -30,12 +37,15 @@
   --helix-size-tag: var(--helix-size-tag-sm);
 
   background-color: var(--app-header-background, var(--helix-color-background));
+  border-block-end: var(--helix-border-thin) solid var(--app-header-border-color, transparent);
   display: block;
   inline-size: 100%;
-  /* On the background, which is now the only thing a scroll changes. It was on
-     `border-color`, so with the line gone it animated a property nothing sets
-     and `transparent` took its surface in one frame. */
-  transition: background-color var(--helix-duration-normal) var(--helix-easing-standard);
+  /* The background as well as the border. It was `border-color` alone, which
+     with the scroll rule gone left `transparent` taking its surface in a single
+     frame: the one thing a scroll still changes was the one thing not fading. */
+  transition:
+    background-color var(--helix-duration-normal) var(--helix-easing-standard),
+    border-color var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 :host([appearance="material"]) {

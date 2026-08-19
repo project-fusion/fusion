@@ -31,6 +31,7 @@ import { styles } from './app-header-root.css.js'
  * @csspart content - The centered row inside the banner.
  *
  * @cssproperty --app-header-background - Fill behind the banner.
+ * @cssproperty --app-header-border-color - The line under the bar. None by default.
  * @cssproperty --app-header-height - Height of the banner.
  * @cssproperty --app-header-inset - Inline padding of the banner.
  * @cssproperty --app-header-max-inline-size - Width the content is centered in.

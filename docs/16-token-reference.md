@@ -39,7 +39,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 133 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 101 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 103 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 4 |
@@ -84,7 +84,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 159 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
-| `--helix-radii-full` | `9999px` | 42 |
+| `--helix-radii-full` | `9999px` | 43 |
 
 ## font
 
@@ -147,7 +147,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 140 |
+| `--helix-border-thin` | `1px` | 142 |
 | `--helix-border-thick` | `2px` | 43 |
 
 ## shadow
@@ -182,7 +182,7 @@ How long something takes.
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 265 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 89 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 91 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
 ## easing
@@ -191,7 +191,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 225 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 227 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 56 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
@@ -244,7 +244,7 @@ Position in the stack. Positional, never named after a component.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-layer-base` | `0` | 7 |
+| `--helix-layer-base` | `0` | 8 |
 | `--helix-layer-raised` | `10` | 23 |
 | `--helix-layer-sticky` | `100` | 2 |
 | `--helix-layer-overlay` | `1000` | 2 |
