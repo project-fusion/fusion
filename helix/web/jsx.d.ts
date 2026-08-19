@@ -15180,7 +15180,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
-   * - `--time-wheel-height`: How tall a spinner column is, in `spinner`. (default: `undefined`)
+   * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
+   * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22284,7 +22285,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
-   * - `--time-wheel-height`: How tall a spinner column is, in `spinner`. (default: `undefined`)
+   * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
+   * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23296,8 +23298,10 @@ export type CustomCssProperties = {
   "--textarea-background-color"?: string;
   /** How tall the list is before it scrolls. */
   "--time-list-height"?: string;
-  /** How tall a spinner column is, in `spinner`. */
+  /** How tall a spinner column is. Five rows by default. */
   "--time-wheel-height"?: string;
+  /** Height and least width of one row in a spinner. */
+  "--time-row-size"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
   /** Distance from the edges of the window. */

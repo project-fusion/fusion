@@ -59,7 +59,12 @@
    size to, because every column had offered to be nothing. Measured, `AM` came
    out as one letter and an ellipsis. */
 [part="column"] {
-  --listbox-max-block-size: var(--time-wheel-height, 11rem);
+  /* The row is stated once and read three times: by the row itself, by the block
+     padding that lets the first and last reach the middle, and by the height,
+     which is five of them. Written separately they drift, and the drift shows up
+     as a wheel resting a few pixels off centre. */
+  --_time-row: var(--time-row-size, var(--helix-size-control));
+  --listbox-max-block-size: var(--time-wheel-height, calc(var(--_time-row) * 5));
 
   flex: 1 1 auto;
   min-inline-size: max-content;
@@ -90,8 +95,13 @@
      column whose height is a published hook: at a fixed inset a short wheel is
      almost entirely faded and a tall one barely is. */
   mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
-  padding-block: calc((var(--time-wheel-height, 11rem) - var(--helix-size-control-sm)) / 2);
+  padding-block: calc((var(--listbox-max-block-size) - var(--_time-row)) / 2);
   scroll-snap-type: y mandatory;
+  /* No scrollbar. A wheel with a bar down its side is a list again, and there
+     are three of them: the fade already says there is more above and below.
+     `scrollbar-width` is the standard property, rather than a vendor
+     pseudo-element that would have to be reached through `::part`. */
+  scrollbar-width: none;
 }
 
 [part="column"] [part="option"] {
@@ -113,11 +123,15 @@
   text-align: center;
 }
 
-/* Room either side of a number, since a column sized to `max-content` is
-   otherwise exactly as wide as its widest row and the digits touch the rule
+/* Square, and roomy. A wheel's rows are read as positions rather than as lines
+   of text, so they want the height of a control rather than the height of a
+   sentence, and the same again across: a column sized to `max-content` is
+   otherwise exactly as wide as its widest row, and the digits touch the rule
    between two wheels. */
 [part="column"] [part="option"]::part(item) {
-  padding-inline: var(--helix-space-sm);
+  min-block-size: var(--_time-row);
+  min-inline-size: var(--_time-row);
+  padding-inline: var(--helix-space-md);
 }
 
 /* No tick. A listbox marks its answer because a reader has to find it among

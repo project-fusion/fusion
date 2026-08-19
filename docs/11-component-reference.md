@@ -4132,7 +4132,8 @@ card would be a card inside a card there.
 | Property | Description |
 | --- | --- |
 | `--time-list-height` | How tall the list is before it scrolls. |
-| `--time-wheel-height` | How tall a spinner column is, in `spinner`. |
+| `--time-wheel-height` | How tall a spinner column is. Five rows by default. |
+| `--time-row-size` | Height and least width of one row in a spinner. |
 
 ## Toast
 

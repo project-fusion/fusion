@@ -41632,8 +41632,12 @@
               "name": "--time-list-height"
             },
             {
-              "description": "How tall a spinner column is, in `spinner`.",
+              "description": "How tall a spinner column is. Five rows by default.",
               "name": "--time-wheel-height"
+            },
+            {
+              "description": "Height and least width of one row in a spinner.",
+              "name": "--time-row-size"
             }
           ],
           "members": [
