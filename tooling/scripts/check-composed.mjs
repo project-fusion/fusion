@@ -13,10 +13,10 @@
  * it. A consumer on the styled tier then gets the styled calendar, and one on
  * the headless tier brings a calendar of their own under that name.
  *
- * **It went wrong the first time it was used.** Input Date's headless tier
+ * **It went wrong the first time it was used.** Date Input's headless tier
  * imported the base calendar and rendered `helix-calendar`, and its styled tier
  * imported no calendar at all. Measured: importing that one family registered
- * `helix-input-date` and `helix-base-calendar`, and left `helix-calendar`
+ * `helix-date-input` and `helix-base-calendar`, and left `helix-calendar`
  * undefined. Every example still looked right, because the sandbox and the docs
  * site both import the whole barrel, which is exactly the condition under which
  * a missing import is invisible. It would have shipped that way to the first
@@ -31,7 +31,7 @@
  * headless class and almost never overrides `render`, so the tags are in the
  * tier below and the obligation is inherited with them. Checking only the file
  * the tag is written in is the version of this check that does not work: it was
- * written that way first, and it passed with the Input Date bug reintroduced,
+ * written that way first, and it passed with the Date Input bug reintroduced,
  * because the headless file did import a calendar. It was the styled tier that
  * imported none, and the styled tier has no `<helix-calendar>` in it to find.
  * So each styled file is held to what its counterpart one tier down renders,

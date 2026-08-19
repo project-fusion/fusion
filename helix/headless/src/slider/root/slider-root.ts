@@ -232,7 +232,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
        360 given 225 took the default max of 100, clamped to 100, and drew its
        handle at 100/360.
    *
-   * Found on Input Color's hue channel, where the handle sat at 28 per cent of a
+   * Found on Color Input's hue channel, where the handle sat at 28 per cent of a
    * track whose fill said 62.5. The two disagreed because they are computed from
    * different things: the fill is arithmetic on this element's property, and the
    * handle is the platform's reading of the input's own clamped value. Every

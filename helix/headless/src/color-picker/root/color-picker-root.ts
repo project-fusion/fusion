@@ -47,8 +47,8 @@ interface EyeDropperConstructor {
  * @summary Picks a colour, from a square and two ramps.
  *
  * @description
- * **The picker itself, with no field around it.** Input Color is this element in
- * a panel behind a text field, the same way Input Date is `helix-calendar` in a
+ * **The picker itself, with no field around it.** Color Input is this element in
+ * a panel behind a text field, the same way Date Input is `helix-calendar` in a
  * panel: a form wants a field, and a settings pane or a toolbar wants the picker
  * sitting flat on the page with nothing to open. Neither should be the other one
  * with parts hidden.
@@ -141,10 +141,10 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * can build a colour and cannot state one, and a reader who has a hex already
    * should not have to find it by dragging.
    *
-   * Input Color sets this, because its field is that input. Two editable fields
+   * Color Input sets this, because its field is that input. Two editable fields
    * for one value is the outcome worth avoiding: two places to type, and no
    * answer to which one is authoritative or which has the caret. The other way
-   * round was considered, Input Color dropping its own field and letting this be
+   * round was considered, Color Input dropping its own field and letting this be
    * the only one, and it is worse for a form: the value cannot be read or pasted
    * without opening a panel.
    */
@@ -224,7 +224,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * colour, so the square is given the last thing that was one. Typing `#00ff00`
    * a character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,
    * `#00ff00`: two of those are colours and the ones between are not, so without
-   * this the square walks red, blue, red, green. Input Color keeps the same
+   * this the square walks red, blue, red, green. Color Input keeps the same
    * guard for its own field, each local to the input it protects.
    */
   private settled = ''

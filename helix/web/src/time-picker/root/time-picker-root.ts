@@ -19,7 +19,7 @@ import { styles } from './time-picker-root.css.js'
  * have to be recomputed every time the density changed.
  *
  * No border and no fill of its own. Flat on a page it takes what it is given,
- * and in Input Time's panel the panel supplies both: a list that brought its own
+ * and in Time Input's panel the panel supplies both: a list that brought its own
  * card would be a card inside a card there.
  *
  * @since 0.1.0

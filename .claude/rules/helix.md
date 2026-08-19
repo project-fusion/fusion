@@ -75,7 +75,7 @@ for its listbox and Pagination for its select.
 **Both tiers, not just the one with the tag in it.** A styled component extends
 the headless class and almost never overrides `render`, so it inherits the
 template and the obligation with it, while having no `<helix-…>` of its own to
-remind anyone. Input Date shipped without the styled import for exactly that
+remind anyone. Date Input shipped without the styled import for exactly that
 reason, and every example still looked right, because the sandbox and the docs
 site import the whole barrel. That is the condition under which this failure is
 invisible: it appears only for the consumer who imports one component.

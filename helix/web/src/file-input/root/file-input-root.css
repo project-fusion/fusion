@@ -1,0 +1,339 @@
+/* The field is the drop target, so it is a box with room in it rather than a
+   line. A file control is not a text field: nothing is typed into it, its height
+   is not a line of text, and the thing a reader aims at is the whole area. */
+[part="field"] {
+  align-items: center;
+  position: relative;
+  background-color: var(--file-input-background-color, var(--helix-color-surface-sunken));
+  border: var(--helix-border-thin) dashed var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: center;
+  padding: var(--file-input-inset, var(--helix-space-md));
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Dashed, and that is the one piece of ornament here worth defending: a solid
+   border says "a box", and a dashed one is the convention for a box you may put
+   something into. It is the only affordance a drop target has before anything is
+   dragged, because a cursor cannot say it in advance. */
+
+/* The input is kept, not replaced. It has to be in the layout and reachable,
+   because it holds the label, the name, the validity and the focus, so it is
+   made invisible rather than `display: none`, which would take it out of the
+   tab order and out of the form.
+
+   Sized to the field and laid over it rather than pushed off-screen: a click
+   anywhere on the box then lands on the input itself, which is what opens the
+   picker without a script pretending to be a reader. */
+[part="control"] {
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+/* The field is what the input is measured against, not the host.
+ *
+ * Positioned on the host it covered the host: the label above the box and the
+ * hint below it were both under an invisible file input, so pressing either one
+ * opened a picker, and the box a reader actually aims at was not the box that
+ * answered. Measured, the control and the field were different sizes. */
+:host {
+  display: block;
+}
+
+/* The ring is drawn on the field, because the input it belongs to is invisible.
+   `:has()` is allowed here: what the rules forbid is `:has()` inside the
+   functional `:host()`, and this is an ordinary descendant selector in the
+   shadow root. */
+[part="field"]:has([part="control"]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Something is over it. The accent rather than a darker grey, because a drop is
+   a thing about to happen rather than a thing being pointed at, and the field
+   has to read as armed from across the page. */
+[part="field"][data-dropping] {
+  background-color: var(--helix-color-primary-subtle);
+  border-color: var(--helix-color-primary);
+  border-style: solid;
+}
+
+/* The trigger stacks whatever is slotted into it: a mark above, its label
+ * below.
+ *
+ * A drop target is a box rather than a line, so its affordance is a shape in the
+ * middle of one rather than a run of text sitting where a value would go. The
+ * default is still the plain label, because a component should not require a
+ * consumer to bring an icon before it reads correctly. */
+[part="trigger"] {
+  align-items: center;
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--helix-font-sans);
+  gap: var(--helix-space-2xs);
+  text-align: center;
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-medium);
+  /* Not `pointer`: the input above it already carries that, and a label with its
+     own cursor would flicker as the pointer crossed between them. */
+  pointer-events: none;
+}
+
+/* The chosen files. A list, because that is what it is, with the marker taken
+   off: the names are already a column and a bullet beside each is noise. */
+[part="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  list-style: none;
+  margin-block: var(--helix-space-xs) 0;
+  padding: var(--helix-space-none);
+}
+
+/* Each file is a card rather than a row.
+ *
+ * A name on a tinted bar is a list item, and what these are is a set of things
+ * that were added and can be taken back out: they carry two readings and a
+ * control, and a bar holding three things reads as a row of a table with no
+ * header. A bordered card on the page's own ground separates them from each
+ * other and from the drop field above, which is the one thing a tinted bar
+ * could not do, being the same tint as the field. */
+/* A card arrives rather than appearing.
+ *
+ * Three files chosen at once were three cards at full strength in one frame,
+ * under a field that had not changed, so the only thing telling a reader
+ * anything had happened was that the page was suddenly taller. A short scale and
+ * fade says "these are new" without asking anyone to wait for it.
+ *
+ * `@starting-style` is what makes it possible at all: a transition needs a value
+ * to come *from*, and an element inserted this frame has no previous value, so
+ * without it the card is simply at its resting style and nothing runs. Tree and
+ * Drawer use it for the same reason.
+ *
+ * **It sits after the resting rule**, which is the bug Drawer records: a
+ * starting style and an ordinary rule of the same specificity are separated by
+ * source order, so written first it loses and the entrance never begins.
+ *
+ * **On the block axis only, from the top edge.** A uniform scale is a card
+ * popping toward the reader, which is what a panel over a page does; this is a
+ * row joining a stack, and the stack is growing downward. Matching the motion to
+ * the axis the layout actually moved on makes it read as the list making room,
+ * which is the nearest thing to the height animation without one.
+ *
+ * `transform-origin` is what makes it the top rather than the middle: a new card
+ * is appended, so it unfolds from the edge it is attached to rather than
+ * expanding from its own centre into the gap.
+ *
+ * 0.9 rather than the 0.96 the panels use. That figure is right for a whole
+ * surface, where a tenth would be a lurch; on a forty-pixel row it is two pixels
+ * and reads as nothing at all.
+ *
+ * Height itself is still not animated, which is the other half of the
+ * abruptness: it needs `interpolate-size` or a grid row trick, and that is a
+ * separate decision. Nothing animates on the way out either, which is honest
+ * rather than ideal: an exit needs the element kept in the tree while it runs,
+ * and it leaves the array the moment it goes. */
+[part="file"] {
+  align-items: center;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  gap: var(--helix-space-sm);
+  opacity: 1;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+  scale: 1 1;
+  transform-origin: top;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+@starting-style {
+  [part="file"] {
+    opacity: 0;
+    scale: 1 0.9;
+  }
+}
+
+/* The name and its readings on one line where they fit, and stacked where they
+ * do not.
+ *
+ * A column always was two lines for every file, including `raw.bin` at one byte,
+ * which is a lot of card for very little. A row always cannot work either: a
+ * file name is often long, and the name is the thing being identified.
+ *
+ * So `wrap`, and the choice is made per file by how much room the name needs.
+ * The floor is what makes it work: `overflow-wrap: anywhere` on the name means
+ * its min-content width is one character, so without a floor it would shrink to
+ * a column of letters rather than ever pushing the tags down. Sixteen
+ * characters, in `ch`, which is the unit for "this many characters" and reads as
+ * the decision it is.
+ *
+ * `min-inline-size: 0` on the container for the other half of the same problem:
+ * a flex item's floor is its content, so a long unbroken name pushes the remove
+ * control off the end of the card unless this says otherwise. */
+[part="detail"] {
+  align-items: center;
+  column-gap: var(--helix-space-sm);
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+  row-gap: var(--helix-space-2xs);
+}
+
+[part="name"] {
+  min-inline-size: min(100%, 16ch);
+}
+
+/* The size and the kind, as two small tags under the name.
+ *
+ * They were one line of muted text with a middle dot between them, which reads
+ * as a sentence about the file. They are not a sentence, they are two readings
+ * of it, and a tag is what this system already uses for a short fact with an
+ * edge around it. Two of them also survive a narrow card: text wraps mid-reading
+ * and tags wrap between readings.
+ *
+ * `size-tag-sm` set here rather than a density on the host, because density is a
+ * decision about a region and these are small because they are secondary to the
+ * name above them, which is a decision about this card. The token crosses the
+ * boundary on its own, which is the whole reason the tag reads it. */
+[part="meta"] {
+  --helix-size-tag: var(--helix-size-tag-sm);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+}
+
+/* Tabular, so a column of sizes lines its digits up rather than shuffling as
+   files are added and removed. */
+[part="size"] {
+  font-variant-numeric: tabular-nums;
+}
+
+[part="name"] {
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  /* A file name is the one string here that is not the component's to shorten,
+     and the middle of it is where the meaning usually is. Wrapping beats an
+     ellipsis for that reason. */
+  overflow-wrap: anywhere;
+}
+
+/* A trash can rather than a cross, and from the icon set rather than drawn.
+ *
+ * It was a stencil in a mask here, on the argument that a file field should cost
+ * no icon dependency. The argument held until the mark was wrong: a cross says
+ * "dismiss this", which is what a tag's control does, and taking a file out of a
+ * set that is about to be uploaded is a delete. The set has a trash can and the
+ * component now uses it, the same way the colour picker uses its eyedropper.
+ *
+ * `danger` on hover only. A row of red bins is a list that looks like a warning,
+ * where the same mark in the muted foreground is a control that is available. */
+[part="remove"] {
+  all: unset;
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-lg);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="remove"]:hover {
+  color: var(--helix-color-danger);
+}
+
+[part="remove"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* `:host(:disabled)`, not `:host([disabled])`. The pseudo-class matches on this
+   element's own attribute *and* on an ancestor `<fieldset disabled>`, where the
+   attribute selector only ever sees the first. Same reason Input gives. */
+:host(:disabled) [part="field"] {
+  border-style: solid;
+  color: var(--helix-color-foreground-subtle);
+}
+
+:host(:disabled) [part="control"],
+:host(:disabled) [part="trigger"] {
+  cursor: not-allowed;
+}
+
+/* Hover only where it can be acted on, so a disabled field does not light up
+   under a pointer that cannot open anything. */
+:host(:not(:disabled)) [part="field"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="field"],
+  [part="file"],
+  [part="remove"] {
+    transition: none;
+  }
+
+  /* The card still has to arrive, so the starting style goes rather than the
+     card: without this it is inserted at 0.96 and stays there, which is a
+     shrunken card rather than a still one. */
+  [part="file"] {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+/* Muted, and larger than a line of text. The mark says "a place to put files"
+ * and the words say which files, so the mark carries the shape and the words
+ * carry the meaning: at the foreground's full weight the two competed.
+ *
+ * **A mark and its label are two slotted children, not one wrapper holding
+ * both.** `::slotted()` matches direct children and nothing deeper, so an icon
+ * inside a slotted `<span>` cannot be reached from here at all, and neither
+ * `::slotted(*) helix-icon` nor `slot helix-icon` reaches it either. Slotting
+ * them as siblings under the same name is what makes both this rule and the
+ * column above it work, and it is the arrangement the examples use. */
+::slotted(helix-icon[slot="trigger"]) {
+  --icon-size: var(--helix-size-icon-lg);
+
+  color: var(--helix-color-foreground-muted);
+}
+
+/* Wrong, and the field says so.
+ *
+ * The same four selectors Input carries, and for the reason it records at
+ * length: the focus rule owns the `outline` and nothing here was changing its
+ * colour, so a focused field with an error came out as a red border inside a
+ * blue ring. Hover is named for the same reason from the other side. The border
+ * and the ring are one edge, so when one turns they both do.
+ *
+ * This was missing on every field added after Input, which is what a sweep of
+ * all sixteen form controls turned up: `data-invalid` reached the host and only
+ * the message underneath answered it. */
+:host([data-invalid]) [part="field"],
+:host([data-invalid]) [part="field"]:hover,
+:host([data-invalid]:focus-within) [part="field"],
+:host([data-invalid]:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}

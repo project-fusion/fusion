@@ -74,7 +74,7 @@
  * The fill and the track colour compose the default and cover every slider that
  * reads as a proportion, which is nearly all of them. What they cannot express
  * is a track whose colour is the value rather than a measure of it: a hue ramp
- * has no filled half, and neither does an alpha bar. Input Color needs both, and
+ * has no filled half, and neither does an alpha bar. Color Input needs both, and
  * the alternative was for it to reach through `::part(control)` into
  * `::-webkit-slider-runnable-track` from outside, which is a consumer patching
  * around a gap here and would have needed the Firefox pseudo-element too.

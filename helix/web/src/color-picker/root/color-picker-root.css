@@ -1,7 +1,7 @@
 /* The inset the rows under the square take, and the picker's own bottom.
  *
  * Zero by default, because flat on a page this element is the content and
- * whatever holds it owns the margin. Input Color's panel sets it, so the square
+ * whatever holds it owns the margin. Color Input's panel sets it, so the square
  * runs edge to edge and only the rows beneath are brought in: a square inset on
  * all four sides leaves a band of overlay around it and reads as a picture of a
  * picker rather than as one.
@@ -268,7 +268,7 @@
  *
  * The text is what makes this element complete standing on a page. A square and
  * two ramps can build a colour and cannot state one, and a reader who already
- * has a hex should not have to find it by dragging. Input Color sets `no-value`
+ * has a hex should not have to find it by dragging. Color Input sets `no-value`
  * and the tools then take the row, since its own field is that input. */
 [part="footer"] {
   display: flex;

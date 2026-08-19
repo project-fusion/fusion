@@ -34,7 +34,7 @@ import { styles } from './color-picker-root.css.js'
  * reader is the difference between "pale blue" and "blue, half transparent".
  *
  * No padding and no surface of its own. Flat on a page it takes the space it is
- * given, and in Input Color's panel the panel supplies both: a picker that
+ * given, and in Color Input's panel the panel supplies both: a picker that
  * brought its own card would be a card inside a card there.
  *
  * @since 0.1.0

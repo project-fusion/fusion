@@ -18,7 +18,7 @@
 /* The listbox brings its own frame and this element does not want it.
  *
  * A bordered, filled, rounded box is right for a listbox standing on a page,
- * and inside Input Time's panel it is a card inside a card: two borders a
+ * and inside Time Input's panel it is a card inside a card: two borders a
  * couple of pixels apart, two radii that do not agree, and rows inset from the
  * edge the eye is following down. This element is bare for the same reason
  * `helix-color-picker` is, so whatever holds it supplies the surface.

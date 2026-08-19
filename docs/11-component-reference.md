@@ -953,6 +953,108 @@ line per answer rather than hunting along a row.
 | --- | --- |
 | `--checkbox-group-gap` | Space between the boxes. |
 
+## Color Input
+
+### Root — `helix-color-input`
+
+A colour, typed in any syntax or picked from a panel.
+
+Extends `HelixBaseColorInput`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control.
+
+**The trigger fills the trailing end rather than sitting in it as an icon.** A
+colour field has one thing to show and it is a colour, so the swatch takes the
+height of the control and reads as a block of it. It is the one field here
+whose trailing affordance is the value itself: Date Input's calendar mark
+stands for an action, and an action stretched to field height is a large icon
+and nothing more.
+
+**The panel has no padding, and clips instead.** The square runs to its edge
+and takes the panel's rounded corners from being clipped by it, rather than
+sitting inset with a band of overlay showing on all four sides. The picker
+pads its own lower rows.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseColorInput` | Whether the colour carries an alpha channel. |
+| `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseColorInput` | Whether the field is a text box with a swatch on it, or only the swatch. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColorInput` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColorInput` | Whether the reader may change the format from the panel. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseColorInput` | What the field says before a colour is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colours offered under the picker, as a comma-separated list. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a colour'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseColorInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a panel opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input carrying the value. Absent in `swatch`. |
+| `trigger` | The control that opens the panel. |
+| `preview` | The chip showing the colour, inside the trigger. |
+| `surface` | The floating panel. |
+| `picker` | The colour picker inside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--color-input-background-color` | Fill behind the field. |
+| `--color-input-swatch-size` | Edge length of the block in `appearance="swatch"`. |
+| `--color-input-swatch-radii` | Corner radius of that block. |
+| `--color-input-panel-size` | Width of the panel, and so of the square. |
+
 ## Color Picker
 
 ### Root — `helix-color-picker`
@@ -980,7 +1082,7 @@ background is just a different colour, and the one thing a preview owes a
 reader is the difference between "pale blue" and "blue, half transparent".
 
 No padding and no surface of its own. Flat on a page it takes the space it is
-given, and in Input Color's panel the panel supplies both: a picker that
+given, and in Color Input's panel the panel supplies both: a picker that
 brought its own card would be a card inside a card there.
 
 #### Properties
@@ -1051,6 +1153,108 @@ brought its own card would be a card inside a card there.
 | `--color-picker-swatch-size` | Edge length of one preset. |
 | `--color-picker-grid-ratio` | Aspect ratio of the square. |
 | `--color-picker-grid-radii` | Corner radius of the square. |
+
+## Date Input
+
+### Root — `helix-date-input`
+
+A date, typed or picked from a calendar.
+
+Extends `HelixBaseDateInput`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control. The trigger is a mark within that box rather than a button beside it:
+a second frame inside the first is two controls where a reader sees one.
+
+The calendar is the real `helix-calendar`, in a panel with no border of its
+own. A surface over the page is told apart by its shadow and by what it
+covers, and a line around it as well reads as a box drawn around something
+already separate.
+
+Height comes from the region, like every other control: `data-density` on
+whatever holds it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixBaseDateInput` | How a date is written in the field: `short` through `full`, or ISO. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseDateInput` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseDateInput` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseDateInput` | First column of the week in the calendar, `0` for Sunday through `6`. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseDateInput` | Language tag the calendar names its months and days in. |
+| `max` | `max` | `string` | `''` | `HelixBaseDateInput` | Latest date that can be chosen, as `YYYY-MM-DD`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseDateInput` | How many dates are shown as tags before the rest are counted, in `multiple`. |
+| `min` | `min` | `string` | `''` | `HelixBaseDateInput` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseDateInput` | How many dates can be held at once. |
+| `months` | `months` | `number` | `1` | `HelixBaseDateInput` | How many months the calendar shows, side by side. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixBaseDateInput` | What the field says before a date is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixBaseDateInput` | Accessible name for the control that opens the calendar. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseDateInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the date changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the calendar opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a calendar opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input. |
+| `date` | One held date, as a tag, in `multiple`. |
+| `rest` | How many dates are held beyond the ones shown. |
+| `trigger` | The control that opens the calendar. |
+| `surface` | The floating panel. |
+| `calendar` | The calendar inside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--date-input-background-color` | Fill behind the field. |
 
 ## Dialog
 
@@ -1371,6 +1575,99 @@ empty.
 | --- | --- |
 | `--empty-inset` | Space around the whole block. |
 
+## File Input
+
+### Root — `helix-file-input`
+
+A control for choosing files, by pointer or by dropping them on it.
+
+Extends `HelixBaseFileInput`.
+
+The field is a box rather than a line, because nothing is typed into it: its
+height is not a line of text, and what a reader aims at is the whole area. The
+border is dashed for the same reason a drop target usually is, which is the
+only affordance one has before anything is being dragged.
+
+The native input is kept and laid over the field at zero opacity rather than
+hidden, so a click anywhere on the box lands on the input itself and opens the
+picker. Hiding it with `display: none` would take it out of the tab order and
+out of the form, and a script clicking a hidden input is the same thing with
+more moving parts.
+
+The focus ring is drawn on the field, because the control it belongs to is
+invisible.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `accept` | `accept` | `string` | `''` | `HelixBaseFileInput` | Which files the picker offers, as a native `accept` list. |
+| `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixBaseFileInput` | Which camera or microphone a mobile picker should offer, if any. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `files` | - | `File[]` | - | `HelixBaseFileInput` | The files chosen, which is the element's own and never assigned. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseFileInput` | Language tag the sizes are written in. Absent uses the runtime's own. |
+| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseFileInput` | Whether more than one file can be chosen. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseFileInput` | What the control removing one file is called, per file. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixBaseFileInput` | What the trigger reads, where nothing is slotted into it. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `clear()` | `HelixBaseFileInput` | Takes every file back out. |
+| `focus()` | `HelixBaseFileInput` | Puts focus on the input, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `HelixBaseFileInput` | Empties it, which is what a form reset means for a file input. |
+| `removeAt()` | `HelixBaseFileInput` | Drops one file, by index. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the chosen files change, with their names. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | What the reader presses to open the picker. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box that is pressed and dropped on. |
+| `control` | The file input itself, which carries the label and validity. |
+| `trigger` | The label that opens the picker. |
+| `list` | The chosen files. |
+| `file` | One chosen file. |
+| `detail` | Its name and its reading, stacked. |
+| `name` | Its name. |
+| `meta` | The row holding its size and kind. |
+| `size` | How big it is. |
+| `kind` | What kind of file it is. |
+| `remove` | The control that takes it back out. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--file-input-background-color` | Fill behind the field. |
+| `--file-input-inset` | Padding inside the field. |
+
 ## Flex
 
 ### Root — `helix-flex`
@@ -1618,563 +1915,6 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | --- | --- |
 | `--input-size` | Height of the field. |
 | `--input-background-color` | Fill behind the text. |
-
-## Input Color
-
-### Root — `helix-input-color`
-
-A colour, typed in any syntax or picked from a panel.
-
-Extends `HelixBaseInputColor`.
-
-The frame is the field rather than the input, so the trigger sits inside the
-same box as the text and the focus ring is drawn once around the whole
-control.
-
-**The trigger fills the trailing end rather than sitting in it as an icon.** A
-colour field has one thing to show and it is a colour, so the swatch takes the
-height of the control and reads as a block of it. It is the one field here
-whose trailing affordance is the value itself: Input Date's calendar mark
-stands for an action, and an action stretched to field height is a large icon
-and nothing more.
-
-**The panel has no padding, and clips instead.** The square runs to its edge
-and takes the panel's rounded corners from being clipped by it, rather than
-sitting inset with a band of overlay showing on all four sides. The picker
-pads its own lower rows.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `alpha` | `alpha` | `boolean` | `false` | `HelixBaseInputColor` | Whether the colour carries an alpha channel. |
-| `appearance` | `appearance` | `'swatch' \| undefined` | - | `HelixBaseInputColor` | Whether the field is a text box with a swatch on it, or only the swatch. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseInputColor` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseInputColor` | Whether the reader may change the format from the panel. |
-| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'#000000'` | `HelixBaseInputColor` | What the field says before a colour is in it. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `swatches` | `swatches` | `string` | `''` | `HelixBaseInputColor` | Colours offered under the picker, as a comma-separated list. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a colour'` | `HelixBaseInputColor` | Accessible name for the control that opens the panel. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `focus()` | `HelixBaseInputColor` | Puts the caret in the field, the way a label pointing at one would. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the colour changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `trigger` | The mark on the field saying a panel opens. |
-| `hint` | Help under the field. |
-| `feedback` | What is wrong with it. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The box holding the text and the trigger. |
-| `control` | The text input carrying the value. Absent in `swatch`. |
-| `trigger` | The control that opens the panel. |
-| `preview` | The chip showing the colour, inside the trigger. |
-| `surface` | The floating panel. |
-| `picker` | The colour picker inside it. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--input-color-background-color` | Fill behind the field. |
-| `--input-color-swatch-size` | Edge length of the block in `appearance="swatch"`. |
-| `--input-color-swatch-radii` | Corner radius of that block. |
-| `--input-color-panel-size` | Width of the panel, and so of the square. |
-
-## Input Date
-
-### Root — `helix-input-date`
-
-A date, typed or picked from a calendar.
-
-Extends `HelixBaseInputDate`.
-
-The frame is the field rather than the input, so the trigger sits inside the
-same box as the text and the focus ring is drawn once around the whole
-control. The trigger is a mark within that box rather than a button beside it:
-a second frame inside the first is two controls where a reader sees one.
-
-The calendar is the real `helix-calendar`, in a panel with no border of its
-own. A surface over the page is told apart by its shadow and by what it
-covers, and a line around it as well reads as a box drawn around something
-already separate.
-
-Height comes from the region, like every other control: `data-density` on
-whatever holds it.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixBaseInputDate` | How a date is written in the field: `short` through `full`, or ISO. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseInputDate` | Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. |
-| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseInputDate` | Days of the week that cannot be chosen, `0` for Sunday through `6`. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseInputDate` | First column of the week in the calendar, `0` for Sunday through `6`. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseInputDate` | Language tag the calendar names its months and days in. |
-| `max` | `max` | `string` | `''` | `HelixBaseInputDate` | Latest date that can be chosen, as `YYYY-MM-DD`. |
-| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseInputDate` | How many dates are shown as tags before the rest are counted, in `multiple`. |
-| `min` | `min` | `string` | `''` | `HelixBaseInputDate` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
-| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseInputDate` | How many dates can be held at once. |
-| `months` | `months` | `number` | `1` | `HelixBaseInputDate` | How many months the calendar shows, side by side. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'YYYY-MM-DD'` | `HelixBaseInputDate` | What the field says before a date is in it. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a date'` | `HelixBaseInputDate` | Accessible name for the control that opens the calendar. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `focus()` | `HelixBaseInputDate` | Puts the caret in the field, the way a label pointing at one would. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the date changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the calendar opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `trigger` | The mark on the field saying a calendar opens. |
-| `hint` | Help under the field. |
-| `feedback` | What is wrong with it. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The box holding the text and the trigger. |
-| `control` | The text input. |
-| `date` | One held date, as a tag, in `multiple`. |
-| `rest` | How many dates are held beyond the ones shown. |
-| `trigger` | The control that opens the calendar. |
-| `surface` | The floating panel. |
-| `calendar` | The calendar inside it. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--input-date-background-color` | Fill behind the field. |
-
-## Input File
-
-### Root — `helix-input-file`
-
-A control for choosing files, by pointer or by dropping them on it.
-
-Extends `HelixBaseInputFile`.
-
-The field is a box rather than a line, because nothing is typed into it: its
-height is not a line of text, and what a reader aims at is the whole area. The
-border is dashed for the same reason a drop target usually is, which is the
-only affordance one has before anything is being dragged.
-
-The native input is kept and laid over the field at zero opacity rather than
-hidden, so a click anywhere on the box lands on the input itself and opens the
-picker. Hiding it with `display: none` would take it out of the tab order and
-out of the form, and a script clicking a hidden input is the same thing with
-more moving parts.
-
-The focus ring is drawn on the field, because the control it belongs to is
-invisible.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `accept` | `accept` | `string` | `''` | `HelixBaseInputFile` | Which files the picker offers, as a native `accept` list. |
-| `capture` | `capture` | `'environment' \| 'user' \| undefined` | - | `HelixBaseInputFile` | Which camera or microphone a mobile picker should offer, if any. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `files` | - | `File[]` | - | `HelixBaseInputFile` | The files chosen, which is the element's own and never assigned. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseInputFile` | Language tag the sizes are written in. Absent uses the runtime's own. |
-| `multiple` | `multiple` | `boolean` | `false` | `HelixBaseInputFile` | Whether more than one file can be chosen. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseInputFile` | What the control removing one file is called, per file. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose files'` | `HelixBaseInputFile` | What the trigger reads, where nothing is slotted into it. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `clear()` | `HelixBaseInputFile` | Takes every file back out. |
-| `focus()` | `HelixBaseInputFile` | Puts focus on the input, the way a label pointing at one would. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `HelixBaseInputFile` | Empties it, which is what a form reset means for a file input. |
-| `removeAt()` | `HelixBaseInputFile` | Drops one file, by index. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the chosen files change, with their names. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `trigger` | What the reader presses to open the picker. |
-| `hint` | Help under the field. |
-| `feedback` | What is wrong with it. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The box that is pressed and dropped on. |
-| `control` | The file input itself, which carries the label and validity. |
-| `trigger` | The label that opens the picker. |
-| `list` | The chosen files. |
-| `file` | One chosen file. |
-| `detail` | Its name and its reading, stacked. |
-| `name` | Its name. |
-| `meta` | The row holding its size and kind. |
-| `size` | How big it is. |
-| `kind` | What kind of file it is. |
-| `remove` | The control that takes it back out. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--input-file-background-color` | Fill behind the field. |
-| `--input-file-inset` | Padding inside the field. |
-
-## Input Number
-
-### Root — `helix-input-number`
-
-A number a reader types or steps to.
-
-Extends `HelixBaseInputNumber`.
-
-The frame an `Input` wears, because in a form this stands in a row with them.
-The difference is inside it: a button at each end of the box rather than
-beside it, so the whole reads as one field rather than a field with two
-controls after it.
-
-The number is centred and set in tabular figures, which is the one place this
-differs from every other field in the library. Digits are what changes under a
-repeated press, and proportional ones make the number shuffle while it counts.
-
-The steppers are out of the tab order. A keyboard reader already has four keys
-on the field itself, and two more tab stops per number is a form that takes
-three times as long to cross.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixBaseInputNumber` | Accessible name for the control that steps down. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `incrementLabel` | `increment-label` | `string` | `'Increase'` | `HelixBaseInputNumber` | Accessible name for the control that steps up. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `largeStep` | `large-step` | `number \| undefined` | - | `HelixBaseInputNumber` | How far `PageUp` and `PageDown` move. |
-| `max` | `max` | `number \| undefined` | - | `HelixBaseInputNumber` | Largest value the reader may reach. Absent has no ceiling. |
-| `min` | `min` | `number \| undefined` | - | `HelixBaseInputNumber` | Smallest value the reader may reach. Absent has no floor. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseInputNumber` | Shown while the field is empty. Not a label: it goes when typing starts. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInputNumber` | Whether the field refuses input while still submitting its value. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInputNumber` | Focus is delegated to the field, so the host is never the focus target. |
-| `step` | `step` | `number` | `1` | `HelixBaseInputNumber` | How far one step moves. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `focus()` | `HelixBaseInputNumber` | Puts the caret in the field, the way a label pointing at one would. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `select()` | `HelixBaseInputNumber` | Selects the number, so typing replaces it. |
-| `stepDown()` | `HelixBaseInputNumber` | One step down. |
-| `stepUp()` | `HelixBaseInputNumber` | One step up, or `PageUp`'s larger one. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
-| `change` | `Event` | Relayed from the field once the reader has finished. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `start` | Before the number, for a unit or an icon. |
-| `end` | After it. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The box holding everything. |
-| `control` | The field itself. |
-| `decrement` | The control that steps down. |
-| `increment` | The control that steps up. |
-
-## Input Pin
-
-### Root — `helix-input-pin`
-
-A short code, one character to a box.
-
-Extends `HelixBaseInputPin`.
-
-Square boxes at the control height with real space between them, which is the
-whole picture: a code is read as separate characters, and boxes shoulder to
-shoulder read as one field with lines drawn in it.
-
-The focus ring is on the box the reader is in rather than around the row. A
-code is entered one character at a time and the boxes exist to say which one
-is next, so a ring around all six would answer the question the component is
-for.
-
-Figures are tabular, so a 1 takes the room an 8 does and the row does not
-breathe as a code is typed into it.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixBaseInputPin` | Accessible name for one box, with `{index}` and `{length}` filled in. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `length` | `length` | `number` | `6` | `HelixBaseInputPin` | How many characters the code has. |
-| `mask` | `mask` | `boolean` | `false` | `HelixBaseInputPin` | Whether the characters are hidden, the way a password is. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInputPin` | Whether the boxes refuse input while still submitting their value. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInputPin` | Focus is delegated, so the host is never the focus target. |
-| `type` | `type` | `PinType` | `'numeric'` | `HelixBaseInputPin` | What a box accepts, which decides the keyboard a phone offers. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `clear()` | `HelixBaseInputPin` | Empties every box and returns to the first. |
-| `focus()` | `HelixBaseInputPin` | Puts the caret in the first empty box, which is where a reader resumes. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the code changes, and cancelable. |
-| `helix-complete` | `HelixCompleteEvent` | Fired when the last box is filled. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The row of boxes. |
-| `cell` | One box. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--pin-gap` | Space between one box and the next. |
-
-## Input Time
-
-### Root — `helix-input-time`
-
-A time, typed or picked from a list.
-
-Extends `HelixBaseInputTime`.
-
-The frame is the field rather than the input, so the trigger sits inside the
-same box as the text and the focus ring is drawn once around the whole
-control. The trigger is a mark within that box rather than a button beside it,
-the arrangement Input Date settled on.
-
-The panel is the field's width, which is the one place this differs from Input
-Date: a calendar is seven columns with a width of its own, and a list of times
-is a column of one line each, so it should be as wide as the control it
-belongs to. That is the same reasoning Select gives for its own list.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseInputTime` | Whether the panel is one list of times or a column each. |
-| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseInputTime` | Language tag the times are written in. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `'23:59'` | `HelixBaseInputTime` | Latest time that can be chosen, as `HH:mm`. |
-| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseInputTime` | How many times are shown as tags before the rest are counted, in `multiple`. |
-| `min` | `min` | `string` | `'00:00'` | `HelixBaseInputTime` | Earliest time that can be chosen, as `HH:mm`. |
-| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseInputTime` | How many times can be held at once. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
-| `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixBaseInputTime` | What the field says before a time is in it. |
-| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
-| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
-| `step` | `step` | `number` | `15` | `HelixBaseInputTime` | How far apart the offered times are, in minutes. |
-| `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseInputTime` | Whether the field writes the time out, or holds the value as it is. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseInputTime` | Accessible name for the control that opens the list. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `focus()` | `HelixBaseInputTime` | Puts the caret in the field, the way a label pointing at one would. |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the time changes. |
-| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
-| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| `trigger` | The mark on the field saying a list opens. |
-| `hint` | Help under the field. |
-| `feedback` | What is wrong with it. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `field` | The box holding the text and the trigger. |
-| `control` | The text input. |
-| `time` | One held time, as a tag, in `multiple`. |
-| `rest` | How many times are held beyond the ones shown. |
-| `trigger` | The control that opens the list. |
-| `surface` | The floating panel. |
-| `picker` | The list inside it. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--input-time-background-color` | Fill behind the field. |
 
 ## Kbd
 
@@ -2646,6 +2386,92 @@ says where the current page was as well as where it is.
 | `--navigation-indicator-color` | Fill of the traveling marker. |
 | `--navigation-gap` | Space between destinations. |
 
+## Number Input
+
+### Root — `helix-number-input`
+
+A number a reader types or steps to.
+
+Extends `HelixBaseNumberInput`.
+
+The frame an `Input` wears, because in a form this stands in a row with them.
+The difference is inside it: a button at each end of the box rather than
+beside it, so the whole reads as one field rather than a field with two
+controls after it.
+
+The number is centred and set in tabular figures, which is the one place this
+differs from every other field in the library. Digits are what changes under a
+repeated press, and proportional ones make the number shuffle while it counts.
+
+The steppers are out of the tab order. A keyboard reader already has four keys
+on the field itself, and two more tab stops per number is a form that takes
+three times as long to cross.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `decrementLabel` | `decrement-label` | `string` | `'Decrease'` | `HelixBaseNumberInput` | Accessible name for the control that steps down. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `incrementLabel` | `increment-label` | `string` | `'Increase'` | `HelixBaseNumberInput` | Accessible name for the control that steps up. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `largeStep` | `large-step` | `number \| undefined` | - | `HelixBaseNumberInput` | How far `PageUp` and `PageDown` move. |
+| `max` | `max` | `number \| undefined` | - | `HelixBaseNumberInput` | Largest value the reader may reach. Absent has no ceiling. |
+| `min` | `min` | `number \| undefined` | - | `HelixBaseNumberInput` | Smallest value the reader may reach. Absent has no floor. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseNumberInput` | Shown while the field is empty. Not a label: it goes when typing starts. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseNumberInput` | Whether the field refuses input while still submitting its value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
+| `step` | `step` | `number` | `1` | `HelixBaseNumberInput` | How far one step moves. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseNumberInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `select()` | `HelixBaseNumberInput` | Selects the number, so typing replaces it. |
+| `stepDown()` | `HelixBaseNumberInput` | One step down. |
+| `stepUp()` | `HelixBaseNumberInput` | One step up, or `PageUp`'s larger one. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
+| `change` | `Event` | Relayed from the field once the reader has finished. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `start` | Before the number, for a unit or an icon. |
+| `end` | After it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding everything. |
+| `control` | The field itself. |
+| `decrement` | The control that steps down. |
+| `increment` | The control that steps up. |
+
 ## Option
 
 ### Root — `helix-option`
@@ -2921,6 +2747,83 @@ a way to move through it.
 | `page` | `page` | `number` | `1` | `HelixBasePaginationSummary` | The page on show, one-based. |
 | `pageSize` | `page-size` | `number` | `0` | `HelixBasePaginationSummary` | How many items are on a page. |
 | `total` | `total` | `number` | `0` | `HelixBasePaginationSummary` | How many items there are across every page. |
+
+## Pin Input
+
+### Root — `helix-pin-input`
+
+A short code, one character to a box.
+
+Extends `HelixBasePinInput`.
+
+Square boxes at the control height with real space between them, which is the
+whole picture: a code is read as separate characters, and boxes shoulder to
+shoulder read as one field with lines drawn in it.
+
+The focus ring is on the box the reader is in rather than around the row. A
+code is entered one character at a time and the boxes exist to say which one
+is next, so a ring around all six would answer the question the component is
+for.
+
+Figures are tabular, so a 1 takes the room an 8 does and the row does not
+breathe as a code is typed into it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cellLabel` | `cell-label` | `string` | `'Character {index} of {length}'` | `HelixBasePinInput` | Accessible name for one box, with `{index}` and `{length}` filled in. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `length` | `length` | `number` | `6` | `HelixBasePinInput` | How many characters the code has. |
+| `mask` | `mask` | `boolean` | `false` | `HelixBasePinInput` | Whether the characters are hidden, the way a password is. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `readOnly` | `read-only` | `boolean` | `false` | `HelixBasePinInput` | Whether the boxes refuse input while still submitting their value. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBasePinInput` | Focus is delegated, so the host is never the focus target. |
+| `type` | `type` | `PinType` | `'numeric'` | `HelixBasePinInput` | What a box accepts, which decides the keyboard a phone offers. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `clear()` | `HelixBasePinInput` | Empties every box and returns to the first. |
+| `focus()` | `HelixBasePinInput` | Puts the caret in the first empty box, which is where a reader resumes. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired as the code changes, and cancelable. |
+| `helix-complete` | `HelixCompleteEvent` | Fired when the last box is filled. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The row of boxes. |
+| `cell` | One box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--pin-gap` | Space between one box and the next. |
 
 ## Popover
 
@@ -4085,6 +3988,103 @@ dragged wider than the form holding it is a field that breaks the layout.
 | --- | --- |
 | `--textarea-background-color` | Fill behind the text. |
 
+## Time Input
+
+### Root — `helix-time-input`
+
+A time, typed or picked from a list.
+
+Extends `HelixBaseTimeInput`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control. The trigger is a mark within that box rather than a button beside it,
+the arrangement Date Input settled on.
+
+The panel is the field's width, which is the one place this differs from Input
+Date: a calendar is seven columns with a width of its own, and a list of times
+is a column of one line each, so it should be as wide as the control it
+belongs to. That is the same reasoning Select gives for its own list.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseTimeInput` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixBaseTimeInput` | Latest time that can be chosen, as `HH:mm`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseTimeInput` | How many times are shown as tags before the rest are counted, in `multiple`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixBaseTimeInput` | Earliest time that can be chosen, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTimeInput` | How many times can be held at once. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixBaseTimeInput` | What the field says before a time is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `step` | `step` | `number` | `15` | `HelixBaseTimeInput` | How far apart the offered times are, in minutes. |
+| `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseTimeInput` | Whether the field writes the time out, or holds the value as it is. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseTimeInput` | Accessible name for the control that opens the list. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseTimeInput` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the time changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a list opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input. |
+| `time` | One held time, as a tag, in `multiple`. |
+| `rest` | How many times are held beyond the ones shown. |
+| `trigger` | The control that opens the list. |
+| `surface` | The floating panel. |
+| `picker` | The list inside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--time-input-background-color` | Fill behind the field. |
+
 ## Time Picker
 
 ### Root — `helix-time-picker`
@@ -4099,7 +4099,7 @@ rather than a count of rows: what a panel has is room, and a row count would
 have to be recomputed every time the density changed.
 
 No border and no fill of its own. Flat on a page it takes what it is given,
-and in Input Time's panel the panel supplies both: a list that brought its own
+and in Time Input's panel the panel supplies both: a list that brought its own
 card would be a card inside a card there.
 
 #### Properties

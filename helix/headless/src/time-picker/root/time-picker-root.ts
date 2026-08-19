@@ -84,7 +84,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * which a reader scrolls or types into; one minute is one thousand four hundred
  * and forty, which is a listbox in name only. So the list is for the times a
  * product actually offers, and arbitrary times are the field's job in Input
- * Time, the same division Input Date draws between typing a date and using the
+ * Time, the same division Date Input draws between typing a date and using the
  * calendar.
  *
  * **The value is `HH:mm` on a twenty-four hour clock, always.** That is what a

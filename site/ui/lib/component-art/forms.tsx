@@ -156,6 +156,51 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  'color-input': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
+      {/* The hex, drawn as one run rather than as seven marks: it is a single
+          code, and a field showing a word here would be the wrong picture. */}
+      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="64" x="64" y="76" />
+      {/* The chip. `artSolid`, because it is the one mark on this card standing
+          for a colour that was chosen rather than for furniture. */}
+      <rect className="artSolid" height="14" rx="3" width="14" x="240" y="73" />
+      {/* The panel: three tracks, each with its handle somewhere different, and
+          the top one moving. The pitch is 26, which is what puts the three in
+          the panel with the same gap above and below them. */}
+      <rect className="artSunken" height="90" rx="4" width="224" x="48" y="112" />
+      {[0, 1, 2].map((row) => (
+        <rect
+          className="artRule"
+          height="4"
+          key={row}
+          rx="2"
+          width="192"
+          x="64"
+          y={134 + row * 26}
+        />
+      ))}
+      {[
+        { at: 104, row: 1 },
+        { at: 176, row: 2 },
+      ].map(({ at, row }) => (
+        <g filter="url(#helixArtShadow)" key={row}>
+          <circle className="artOverlay" cx={at} cy={136 + row * 26} r="8" />
+        </g>
+      ))}
+      {/* `artTravel` rather than `artFill`: a handle moves along its track, and
+          the growing version of this drew a bar that got longer, which is what a
+          progress reading looks like and not what a channel does. */}
+      <g className="artMotion artTravel" style={{ '--art-to': '64px' } as CSSProperties}>
+        <g filter="url(#helixArtShadow)">
+          <circle className="artOverlay" cx="128" cy="136" r="8" />
+        </g>
+      </g>
+    </>
+  ),
+
   /** More than one of them is the answer, and only those carry a band. */
   /**
    * The field an `Input` draws, with a button welded to each end.
@@ -230,75 +275,7 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
-   * Square at the control height, and the glyph is all of it.
-   *
-   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
-   * icon: the card read as a hamburger button and the subject became what the
-   * button opens rather than what the button is. Three dots is the one mark in
-   * common use that means "this control's content is an icon, and the icon is
-   * not the point", and nothing else in the gallery uses it.
-   */
-  'icon-button': (
-    <>
-      <g className="artMotion artLift">
-        <g className="artLiftShadow" filter="url(#helixArtShadow)">
-          <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
-        </g>
-        <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
-        {[150, 160, 170].map((cx) => (
-          <circle className="artOnSolid" cx={cx} cy="100" key={cx} r="2" />
-        ))}
-      </g>
-    </>
-  ),
-
-  'input-color': (
-    <>
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
-      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
-      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
-      {/* The hex, drawn as one run rather than as seven marks: it is a single
-          code, and a field showing a word here would be the wrong picture. */}
-      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="64" x="64" y="76" />
-      {/* The chip. `artSolid`, because it is the one mark on this card standing
-          for a colour that was chosen rather than for furniture. */}
-      <rect className="artSolid" height="14" rx="3" width="14" x="240" y="73" />
-      {/* The panel: three tracks, each with its handle somewhere different, and
-          the top one moving. The pitch is 26, which is what puts the three in
-          the panel with the same gap above and below them. */}
-      <rect className="artSunken" height="90" rx="4" width="224" x="48" y="112" />
-      {[0, 1, 2].map((row) => (
-        <rect
-          className="artRule"
-          height="4"
-          key={row}
-          rx="2"
-          width="192"
-          x="64"
-          y={134 + row * 26}
-        />
-      ))}
-      {[
-        { at: 104, row: 1 },
-        { at: 176, row: 2 },
-      ].map(({ at, row }) => (
-        <g filter="url(#helixArtShadow)" key={row}>
-          <circle className="artOverlay" cx={at} cy={136 + row * 26} r="8" />
-        </g>
-      ))}
-      {/* `artTravel` rather than `artFill`: a handle moves along its track, and
-          the growing version of this drew a bar that got longer, which is what a
-          progress reading looks like and not what a channel does. */}
-      <g className="artMotion artTravel" style={{ '--art-to': '64px' } as CSSProperties}>
-        <g filter="url(#helixArtShadow)">
-          <circle className="artOverlay" cx="128" cy="136" r="8" />
-        </g>
-      </g>
-    </>
-  ),
-
-  'input-date': (
+  'date-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
       <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
@@ -341,7 +318,7 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  'input-file': (
+  'file-input': (
     <>
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="56" x="48" y="44" />
       <rect className="artSunken" height="56" rx="4" width="224" x="48" y="64" />
@@ -388,112 +365,25 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  'input-number': (
-    <>
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="48" x="48" y="52" />
-      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="72" />
-      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="72.5" />
-      {/* The rules, one unit and filled rather than stroked, so they never
-          half-render at the card's three-quarter scale. */}
-      <rect className="artRule" height="40" width="1" x="88" y="72" />
-      <rect className="artRule" height="40" width="1" x="232" y="72" />
-      {/* Minus and plus, at the icon step, drawn as filled bars for the same
-          reason the rules are. */}
-      <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="62" y="91" />
-      <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="246" y="91" />
-      <rect className="artInk" fillOpacity="0.55" height="12" rx="1" width="2" x="251" y="86" />
-      {/* Centred in what is left of the field, which is 89 to 232. */}
-      <rect
-        className="artSolid artMotion artFill"
-        height="8"
-        rx="4"
-        style={{ '--art-grow': 1.6 } as CSSProperties}
-        width="24"
-        x="140"
-        y="88"
-      />
-    </>
-  ),
-
   /**
-   * Boxes with real air between them, which is the whole silhouette.
+   * Square at the control height, and the glyph is all of it.
    *
-   * Four rather than six, because the card is 320 wide and six at the control
-   * step would leave no margin either side. What has to survive at thumbnail
-   * size is "separate boxes", not the count.
-   *
-   * Two are filled and two are not, so the row reads as a code part way in
-   * rather than as four empty fields, and the third carries the focus edge: a
-   * pin's ring is on the box the reader is in and never around the row, which is
-   * the one thing its stylesheet is most careful about.
-   *
-   * **The ring moves to the next box on hover**, which is what a pin actually
-   * does: a character lands and the focus steps along. The first version grew
-   * the character instead, with `--art-grow: 1`, which is `scaleX(1)` and is
-   * nothing at all. Same fault this file records against `Outline`'s
-   * `--art-to: 0`, and it survived because a still card looks correct. Caught by
-   * shooting the real gallery rather than a harness that approximates it.
-   *
-   * The four sides of the ring travel as a group, so they arrive together.
+   * The glyph was three stacked bars, which is not a glyph, it is *the* menu
+   * icon: the card read as a hamburger button and the subject became what the
+   * button opens rather than what the button is. Three dots is the one mark in
+   * common use that means "this control's content is an icon, and the icon is
+   * not the point", and nothing else in the gallery uses it.
    */
-  'input-pin': (
+  'icon-button': (
     <>
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="60" />
-      {[48, 100, 152, 204].map((x) => (
-        <rect className="artSunken" height="40" key={x} rx="4" width="40" x={x} y="80" />
-      ))}
-      {[48, 100, 204].map((x) => (
-        <rect className="artEdge" height="39" key={x} rx="4" width="39" x={x + 0.5} y="80.5" />
-      ))}
-      {/* The two already entered. A bar rather than a glyph, at the width a
-          single character takes in the vocabulary the rest of the gallery uses. */}
-      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="64" y="94" />
-      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="116" y="94" />
-      {/* The box the reader is in, ringed rather than filled, and stepping to the
-          next one on hover. 52 is the pitch: a 40 box and a 12 gap. */}
-      <g className="artSolid artMotion artTravel" style={{ '--art-to': '52px' } as CSSProperties}>
-        <rect height="40" rx="4" width="2" x="152" y="80" />
-        <rect height="40" rx="4" width="2" x="190" y="80" />
-        <rect height="2" rx="1" width="40" x="152" y="80" />
-        <rect height="2" rx="1" width="40" x="152" y="118" />
-      </g>
-    </>
-  ),
-
-  /**
-   * A field with a clock mark, and the column it opens.
-   *
-   * The same shape as Input Date's card, because they are the same control over
-   * a different set: a reader who recognises one should read the other without
-   * being told.
-   */
-  'input-time': (
-    <>
-      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
-      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
-      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
-      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="56" x="64" y="76" />
-      {/* The clock: a ring with two hands, at the size the calendar mark takes on
-          its own card. */}
-      <circle className="artRule" cx="247" cy="80" fill="none" r="7" strokeWidth="1.5" />
-      <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="247" y="76" />
-      <rect className="artInk" fillOpacity="0.55" height="1" width="4" x="247" y="79" />
-      {/* The list, and the row that is landed on. */}
-      <rect className="artSunken" height="72" rx="4" width="224" x="48" y="112" />
-      {[0, 1, 2].map((row) => (
-        <rect
-          className="artInk"
-          fillOpacity="0.28"
-          height="8"
-          key={row}
-          rx="4"
-          width="48"
-          x="64"
-          y={126 + row * 22}
-        />
-      ))}
-      <g className="artMotion artTravel" style={{ '--art-to': '22px' } as CSSProperties}>
-        <rect className="artSolid" height="16" rx="4" width="192" x="64" y="122" />
+      <g className="artMotion artLift">
+        <g className="artLiftShadow" filter="url(#helixArtShadow)">
+          <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        </g>
+        <rect className="artSolid" height="40" rx="4" width="40" x="140" y="80" />
+        {[150, 160, 170].map((cx) => (
+          <circle className="artOnSolid" cx={cx} cy="100" key={cx} r="2" />
+        ))}
       </g>
     </>
   ),
@@ -522,6 +412,33 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  'number-input': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="48" x="48" y="52" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="72" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="72.5" />
+      {/* The rules, one unit and filled rather than stroked, so they never
+          half-render at the card's three-quarter scale. */}
+      <rect className="artRule" height="40" width="1" x="88" y="72" />
+      <rect className="artRule" height="40" width="1" x="232" y="72" />
+      {/* Minus and plus, at the icon step, drawn as filled bars for the same
+          reason the rules are. */}
+      <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="62" y="91" />
+      <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="246" y="91" />
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="1" width="2" x="251" y="86" />
+      {/* Centred in what is left of the field, which is 89 to 232. */}
+      <rect
+        className="artSolid artMotion artFill"
+        height="8"
+        rx="4"
+        style={{ '--art-grow': 1.6 } as CSSProperties}
+        width="24"
+        x="140"
+        y="88"
+      />
+    </>
+  ),
+
   /** One choice, on its own. The count is the distinction from Listbox. */
   option: (
     <>
@@ -531,6 +448,51 @@ export const formsArt: Record<string, ReactNode> = {
         className="artSolid artMotion artMark"
         d="M224 100l4 4 9-10 1.4 1.4-10.4 11.4-5.4-5.4z"
       />
+    </>
+  ),
+
+  /**
+   * Boxes with real air between them, which is the whole silhouette.
+   *
+   * Four rather than six, because the card is 320 wide and six at the control
+   * step would leave no margin either side. What has to survive at thumbnail
+   * size is "separate boxes", not the count.
+   *
+   * Two are filled and two are not, so the row reads as a code part way in
+   * rather than as four empty fields, and the third carries the focus edge: a
+   * pin's ring is on the box the reader is in and never around the row, which is
+   * the one thing its stylesheet is most careful about.
+   *
+   * **The ring moves to the next box on hover**, which is what a pin actually
+   * does: a character lands and the focus steps along. The first version grew
+   * the character instead, with `--art-grow: 1`, which is `scaleX(1)` and is
+   * nothing at all. Same fault this file records against `Outline`'s
+   * `--art-to: 0`, and it survived because a still card looks correct. Caught by
+   * shooting the real gallery rather than a harness that approximates it.
+   *
+   * The four sides of the ring travel as a group, so they arrive together.
+   */
+  'pin-input': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="60" />
+      {[48, 100, 152, 204].map((x) => (
+        <rect className="artSunken" height="40" key={x} rx="4" width="40" x={x} y="80" />
+      ))}
+      {[48, 100, 204].map((x) => (
+        <rect className="artEdge" height="39" key={x} rx="4" width="39" x={x + 0.5} y="80.5" />
+      ))}
+      {/* The two already entered. A bar rather than a glyph, at the width a
+          single character takes in the vocabulary the rest of the gallery uses. */}
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="64" y="94" />
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="2" width="8" x="116" y="94" />
+      {/* The box the reader is in, ringed rather than filled, and stepping to the
+          next one on hover. 52 is the pitch: a 40 box and a 12 gap. */}
+      <g className="artSolid artMotion artTravel" style={{ '--art-to': '52px' } as CSSProperties}>
+        <rect height="40" rx="4" width="2" x="152" y="80" />
+        <rect height="40" rx="4" width="2" x="190" y="80" />
+        <rect height="2" rx="1" width="40" x="152" y="80" />
+        <rect height="2" rx="1" width="40" x="152" y="118" />
+      </g>
     </>
   ),
 
@@ -626,6 +588,44 @@ export const formsArt: Record<string, ReactNode> = {
       ))}
       <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="256" y="134" />
       <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="250" y="140" />
+    </>
+  ),
+
+  /**
+   * A field with a clock mark, and the column it opens.
+   *
+   * The same shape as Date Input's card, because they are the same control over
+   * a different set: a reader who recognises one should read the other without
+   * being told.
+   */
+  'time-input': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
+      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="56" x="64" y="76" />
+      {/* The clock: a ring with two hands, at the size the calendar mark takes on
+          its own card. */}
+      <circle className="artRule" cx="247" cy="80" fill="none" r="7" strokeWidth="1.5" />
+      <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="247" y="76" />
+      <rect className="artInk" fillOpacity="0.55" height="1" width="4" x="247" y="79" />
+      {/* The list, and the row that is landed on. */}
+      <rect className="artSunken" height="72" rx="4" width="224" x="48" y="112" />
+      {[0, 1, 2].map((row) => (
+        <rect
+          className="artInk"
+          fillOpacity="0.28"
+          height="8"
+          key={row}
+          rx="4"
+          width="48"
+          x="64"
+          y={126 + row * 22}
+        />
+      ))}
+      <g className="artMotion artTravel" style={{ '--art-to': '22px' } as CSSProperties}>
+        <rect className="artSolid" height="16" rx="4" width="192" x="64" y="122" />
+      </g>
     </>
   ),
 
