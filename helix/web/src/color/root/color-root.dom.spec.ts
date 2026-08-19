@@ -232,6 +232,39 @@ describe('color picker', () => {
     expect(sample.getAttribute('aria-label')).toBe('Copied')
   })
 
+  test('and a refused clipboard falls through to the older route', async () => {
+    /* The modern API is gated in more places than it looks: an insecure origin,
+       an unfocused document, and a Permissions Policy defaulting to `self`,
+       which a sandboxed iframe is not. `execCommand` rides the gesture instead
+       of asking for a permission, so it works where the other is refused, and a
+       control that silently does nothing is indistinguishable from a broken one. */
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: () => Promise.reject(new Error('NotAllowedError')) },
+    })
+    let copied: string | undefined
+    const original = document.execCommand
+    document.execCommand = ((command: string) => {
+      if (command === 'copy') {
+        copied = document.querySelector('textarea')?.value
+        return true
+      }
+      return false
+    }) as typeof document.execCommand
+
+    const host = await picker('default-value="#ff0000"')
+    const sample = part(host, 'sample') as HTMLButtonElement
+    sample.click()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    document.execCommand = original
+
+    expect(copied).toBe('#ff0000')
+    expect(sample.hasAttribute('data-copied')).toBe(true)
+    // And nothing is left behind in the document.
+    expect(document.querySelector('textarea')).toBeNull()
+  })
+
   test('and there is nothing to copy from an empty picker', async () => {
     const host = await picker()
     expect((part(host, 'sample') as HTMLButtonElement).disabled).toBe(true)

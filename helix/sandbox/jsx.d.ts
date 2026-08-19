@@ -630,6 +630,13 @@ export type CustomElements = {
    * consumer's document rather than something guessed at here.
    *
    * **The source is not trusted, and the frame is what makes that safe.**
+   * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
+   * policy defaults to `self` and this frame has an opaque origin, so it is not
+   * `self` and the default denies it. A component inside the preview that copies
+   * to the clipboard is otherwise a control that silently does nothing, which is
+   * how this was found. Nothing else is granted, and a copy still needs the
+   * reader's own gesture.
+   *
    * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
    * an opaque origin: script in an example cannot reach this page, its storage,
    * its cookies, or the editor the source was typed into. Without it they could,
@@ -1100,6 +1107,13 @@ export type CustomElementsSolidJs = {
    * consumer's document rather than something guessed at here.
    *
    * **The source is not trusted, and the frame is what makes that safe.**
+   * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
+   * policy defaults to `self` and this frame has an opaque origin, so it is not
+   * `self` and the default denies it. A component inside the preview that copies
+   * to the clipboard is otherwise a control that silently does nothing, which is
+   * how this was found. Nothing else is granted, and a copy still needs the
+   * reader's own gesture.
+   *
    * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
    * an opaque origin: script in an example cannot reach this page, its storage,
    * its cookies, or the editor the source was typed into. Without it they could,

@@ -37,6 +37,7 @@ import { styles } from './input-color-root.css.js'
  *
  * @cssproperty --input-color-background-color - Fill behind the field.
  * @cssproperty --input-color-swatch-size - Edge length of the block in `appearance="swatch"`.
+ * @cssproperty --input-color-swatch-radii - Corner radius of that block.
  * @cssproperty --input-color-panel-size - Width of the panel, and so of the square.
  */
 @customElement('helix-input-color')

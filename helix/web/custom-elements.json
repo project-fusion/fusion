@@ -8282,6 +8282,10 @@
               "name": "--color-sample-size"
             },
             {
+              "description": "Edge length of one preset.",
+              "name": "--color-swatch-size"
+            },
+            {
               "description": "Aspect ratio of the square.",
               "name": "--color-grid-ratio"
             },
@@ -13676,6 +13680,10 @@
             {
               "description": "Edge length of the block in `appearance=\"swatch\"`.",
               "name": "--input-color-swatch-size"
+            },
+            {
+              "description": "Corner radius of that block.",
+              "name": "--input-color-swatch-radii"
             },
             {
               "description": "Width of the panel, and so of the square.",

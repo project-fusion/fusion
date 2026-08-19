@@ -347,10 +347,13 @@
   padding-inline: var(--color-inset, var(--helix-space-none));
 }
 
+/* `icon-lg`, not `icon-md`. These are targets rather than marks: a preset is
+   pressed, and twenty pixels is under every pointer guideline there is. A hook,
+   since a row of sixteen wants smaller ones than a row of six. */
 [part="swatch"] {
-  block-size: var(--helix-size-icon-md);
+  block-size: var(--color-swatch-size, var(--helix-size-icon-lg));
   cursor: pointer;
-  inline-size: var(--helix-size-icon-md);
+  inline-size: var(--color-swatch-size, var(--helix-size-icon-lg));
   padding: var(--helix-space-none);
 }
 

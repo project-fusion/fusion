@@ -232,8 +232,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-spinner-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 14 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 58 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 12 |
-| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 7 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 16 |
+| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 49 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 94 |
 | `--helix-size-focus-offset` | `2px` | 78 |

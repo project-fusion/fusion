@@ -44,6 +44,7 @@ import { styles } from './color-root.css.js'
  *
  * @cssproperty --color-inset - Inset of the rows under the square, and the bottom.
  * @cssproperty --color-sample-size - Edge length of the chip that copies the value.
+ * @cssproperty --color-swatch-size - Edge length of one preset.
  * @cssproperty --color-grid-ratio - Aspect ratio of the square.
  * @cssproperty --color-grid-radii - Corner radius of the square.
  */

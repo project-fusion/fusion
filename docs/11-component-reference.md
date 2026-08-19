@@ -1046,6 +1046,7 @@ brought its own card would be a card inside a card there.
 | --- | --- |
 | `--color-inset` | Inset of the rows under the square, and the bottom. |
 | `--color-sample-size` | Edge length of the chip that copies the value. |
+| `--color-swatch-size` | Edge length of one preset. |
 | `--color-grid-ratio` | Aspect ratio of the square. |
 | `--color-grid-radii` | Corner radius of the square. |
 
@@ -1715,6 +1716,7 @@ pads its own lower rows.
 | --- | --- |
 | `--input-color-background-color` | Fill behind the field. |
 | `--input-color-swatch-size` | Edge length of the block in `appearance="swatch"`. |
+| `--input-color-swatch-radii` | Corner radius of that block. |
 | `--input-color-panel-size` | Width of the panel, and so of the square. |
 
 ## Input Date

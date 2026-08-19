@@ -211,12 +211,16 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* One edge and one corner, on the preview.
+ *
+ * The trigger carried a border and clipped the preview to it, which draws two
+ * curves rather than one: `overflow` clips to the padding box, so the inside of
+ * a border-radius is that radius less the border width, and at any size where a
+ * swatch is worth looking at the two read as a ring around a slightly wrongly
+ * rounded square. The preview is the only thing in this shape, so it takes both. */
 :host([appearance="swatch"]) [part="trigger"] {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
   block-size: var(--input-color-swatch-size, var(--helix-size-control));
   inline-size: var(--input-color-swatch-size, var(--helix-size-control));
-  overflow: hidden;
 }
 
 /* The ring goes on the trigger rather than around the field, since in this shape
@@ -226,5 +230,8 @@
 }
 
 :host([appearance="swatch"]) [part="preview"] {
+  block-size: 100%;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--input-color-swatch-radii, var(--helix-radii-sm));
   inline-size: 100%;
 }

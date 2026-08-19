@@ -9933,6 +9933,7 @@ export type CustomElements = {
    *
    * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
    * - `--color-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
+   * - `--color-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
    *
@@ -10768,6 +10769,7 @@ export type CustomElements = {
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
    * - `--input-color-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
+   * - `--input-color-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
@@ -16484,6 +16486,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--color-inset`: Inset of the rows under the square, and the bottom. (default: `undefined`)
    * - `--color-sample-size`: Edge length of the chip that copies the value. (default: `undefined`)
+   * - `--color-swatch-size`: Edge length of one preset. (default: `undefined`)
    * - `--color-grid-ratio`: Aspect ratio of the square. (default: `undefined`)
    * - `--color-grid-radii`: Corner radius of the square. (default: `undefined`)
    *
@@ -17353,6 +17356,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--input-color-background-color`: Fill behind the field. (default: `undefined`)
    * - `--input-color-swatch-size`: Edge length of the block in `appearance="swatch"`. (default: `undefined`)
+   * - `--input-color-swatch-radii`: Corner radius of that block. (default: `undefined`)
    * - `--input-color-panel-size`: Width of the panel, and so of the square. (default: `undefined`)
    *
    * ## CSS Parts
@@ -21766,6 +21770,8 @@ export type CustomCssProperties = {
   "--color-inset"?: string;
   /** Edge length of the chip that copies the value. */
   "--color-sample-size"?: string;
+  /** Edge length of one preset. */
+  "--color-swatch-size"?: string;
   /** Aspect ratio of the square. */
   "--color-grid-ratio"?: string;
   /** Corner radius of the square. */
@@ -21810,6 +21816,8 @@ export type CustomCssProperties = {
   "--input-color-background-color"?: string;
   /** Edge length of the block in `appearance="swatch"`. */
   "--input-color-swatch-size"?: string;
+  /** Corner radius of that block. */
+  "--input-color-swatch-radii"?: string;
   /** Width of the panel, and so of the square. */
   "--input-color-panel-size"?: string;
   /** Fill behind the field. */
