@@ -272,3 +272,79 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* A grip beside the line, for a splitter that has to be found rather than known.
+ *
+ * The line alone is right where a reader already knows the panes are resizable,
+ * which is most of a tool they use every day. It is wrong the first time: a
+ * hairline between two panels is a border until something says otherwise, and
+ * the only thing saying otherwise is a cursor that appears once the pointer is
+ * already on it.
+ *
+ * A short capsule at the middle of the run, beside the line rather than on it.
+ * On it, the grip has to be wider than the line and the line then bulges, which
+ * reads as a defect in the border; beside it, the two are separate marks and the
+ * line stays a line.
+ *
+ * Drawn on the separator's second pseudo-element, so it costs no markup and no
+ * part: `::before` is already the line. A pseudo-element hit-tests as its
+ * originating element, so the grip lights the divider by being pointed at
+ * without being a target of its own, which is also why it is `grip` and not
+ * `handle`: the corner is the thing here that is a box the reader grabs. */
+:host([appearance="grip"]) [part="separator"]::after {
+  background-color: var(--splitter-grip-color, var(--helix-color-foreground-subtle));
+  border-radius: var(--helix-radii-full);
+  content: "";
+  position: absolute;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Along the run, centred, and offset to the leading side of the line. */
+:host([appearance="grip"]:not([orientation="vertical"])) [part="separator"]::after {
+  block-size: var(--splitter-grip-length, 2rem);
+  inline-size: var(--helix-border-thick);
+  inset-block-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
+  inset-inline-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
+}
+
+:host([appearance="grip"][orientation="vertical"]) [part="separator"]::after {
+  block-size: var(--helix-border-thick);
+  inline-size: var(--splitter-grip-length, 2rem);
+  inset-block-start: calc(50% - var(--helix-border-thick) - var(--helix-space-2xs));
+  inset-inline-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
+}
+
+/* A pane shut to nothing loses its line, and the grip goes with it: the grip is
+   what says where the divider is, and left alone over a border drawn by
+   something else it is a floating capsule pointing at nothing.
+   Before the interest rules and not after, the same order the line's own flush
+   rule is in and for the same reason: the target is still eight pixels and still
+   answers, so hover, focus and a drag have to bring both back or a pane shut to
+   nothing can never be opened again. */
+:host([appearance="grip"]) [part="separator"][data-flush]::after {
+  background-color: transparent;
+}
+
+/* And it answers with the line rather than beside it, on the same two hooks the
+   line uses. The grip is not a second control with a state of its own: it marks
+   where this divider is, so a reader who darkens the line and sees a grip that
+   did not move is looking at two things where there is one.
+   Grey at rest and accent only while moving, for the reason the corner records:
+   hover is a question and a drag is an answer. A grip that were accent at rest
+   would also put a row of coloured pills down a workbench of nested splitters,
+   which is a lot of ink spent saying "this is a boundary" four times. */
+:host([appearance="grip"]) [part="separator"]:hover::after,
+:host([appearance="grip"]) [part="separator"]:focus-visible::after,
+:host([appearance="grip"]) [part="separator"][data-dragging]::after {
+  background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
+}
+
+:host([appearance="grip"]) [part="separator"][data-dragging]::after {
+  background-color: var(--splitter-drag-color, var(--helix-color-primary));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([appearance="grip"]) [part="separator"]::after {
+    transition: none;
+  }
+}

@@ -7151,6 +7151,22 @@ export type HelixSplitterHelixChangeElementEvent =
   HelixSplitterElementEvent<HelixChangeEvent>;
 
 export type HelixSplitterProps = {
+  /** Whether the divider carries a grip.
+
+- `line` is the divider alone, for a splitter the reader already knows is
+  one: an editor, a mail client, anything they open every day.
+- `grip` adds a short capsule beside the line, for the first encounter. A
+  hairline between two panels is a border until something says otherwise,
+  and at rest the only thing saying otherwise is a cursor that appears once
+  the pointer is already on it.
+
+`grip` rather than `handle`, which this component has already spent on the
+corner: that is a box the reader grabs, and this is a mark that says the
+line can be grabbed. The grip adds no hit area of its own.
+
+Both are writable, so a generated page can say which it means rather than
+relying on the absence of an attribute. */
+  appearance?: HelixSplitter["appearance"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -7220,6 +7236,22 @@ consumer's to set. */
 };
 
 export type HelixSplitterSolidJsProps = {
+  /** Whether the divider carries a grip.
+
+- `line` is the divider alone, for a splitter the reader already knows is
+  one: an editor, a mail client, anything they open every day.
+- `grip` adds a short capsule beside the line, for the first encounter. A
+  hairline between two panels is a border until something says otherwise,
+  and at rest the only thing saying otherwise is a cursor that appears once
+  the pointer is already on it.
+
+`grip` rather than `handle`, which this component has already spent on the
+corner: that is a box the reader grabs, and this is a mark that says the
+line can be grabbed. The grip adds no hit area of its own.
+
+Both are writable, so a generated page can say which it means rather than
+relying on the absence of an attribute. */
+  "prop:appearance"?: HelixSplitter["appearance"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -14403,6 +14435,21 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the divider carries a grip.
+   *
+   * - `line` is the divider alone, for a splitter the reader already knows is
+   *   one: an editor, a mail client, anything they open every day.
+   * - `grip` adds a short capsule beside the line, for the first encounter. A
+   *   hairline between two panels is a border until something says otherwise,
+   *   and at rest the only thing saying otherwise is a cursor that appears once
+   *   the pointer is already on it.
+   *
+   * `grip` rather than `handle`, which this component has already spent on the
+   * corner: that is a box the reader grabs, and this is a mark that says the
+   * line can be grabbed. The grip adds no hit area of its own.
+   *
+   * Both are writable, so a generated page can say which it means rather than
+   * relying on the absence of an attribute.
    * - `orientation`: Which way the panes are laid out.
    *
    * `horizontal` is side by side with an upright divider between them, and
@@ -14483,6 +14530,8 @@ export type CustomElements = {
    * - `--splitter-color`: The line between the panes. (default: `undefined`)
    * - `--splitter-corner`: How wide the handle at a crossing is. (default: `undefined`)
    * - `--splitter-drag-color`: The line while it is being moved. (default: `undefined`)
+   * - `--splitter-grip-color`: The grip beside the line, at rest. (default: `undefined`)
+   * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
    *
@@ -21545,6 +21594,21 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the divider carries a grip.
+   *
+   * - `line` is the divider alone, for a splitter the reader already knows is
+   *   one: an editor, a mail client, anything they open every day.
+   * - `grip` adds a short capsule beside the line, for the first encounter. A
+   *   hairline between two panels is a border until something says otherwise,
+   *   and at rest the only thing saying otherwise is a cursor that appears once
+   *   the pointer is already on it.
+   *
+   * `grip` rather than `handle`, which this component has already spent on the
+   * corner: that is a box the reader grabs, and this is a mark that says the
+   * line can be grabbed. The grip adds no hit area of its own.
+   *
+   * Both are writable, so a generated page can say which it means rather than
+   * relying on the absence of an attribute.
    * - `orientation`: Which way the panes are laid out.
    *
    * `horizontal` is side by side with an upright divider between them, and
@@ -21625,6 +21689,8 @@ export type CustomElementsSolidJs = {
    * - `--splitter-color`: The line between the panes. (default: `undefined`)
    * - `--splitter-corner`: How wide the handle at a crossing is. (default: `undefined`)
    * - `--splitter-drag-color`: The line while it is being moved. (default: `undefined`)
+   * - `--splitter-grip-color`: The grip beside the line, at rest. (default: `undefined`)
+   * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
    *
@@ -23582,6 +23648,10 @@ export type CustomCssProperties = {
   "--splitter-corner"?: string;
   /** The line while it is being moved. */
   "--splitter-drag-color"?: string;
+  /** The grip beside the line, at rest. */
+  "--splitter-grip-color"?: string;
+  /** How far the grip runs along the divider. */
+  "--splitter-grip-length"?: string;
   /** The target under the pointer. */
   "--splitter-hover-color"?: string;
   /** How wide the draggable box is. */

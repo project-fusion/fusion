@@ -3452,6 +3452,7 @@ gesture.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'grip' \| 'line' \| undefined` | - | - | Whether the divider carries a grip. |
 | `collapsed` | `collapsed` | `'end' \| 'start' \| undefined` | - | `HelixBaseSplitter` | Which pane is shut, if either. |
 | `collapsedSize` | `collapsed-size` | `number` | `0` | `HelixBaseSplitter` | How much of a shut pane is still shown, as a percentage. |
 | `cornerLabel` | `corner-label` | `string` | `'Resize both'` | `HelixBaseSplitter` | Accessible name for the handle where two dividers cross. |
@@ -3502,6 +3503,8 @@ gesture.
 | `--splitter-color` | The line between the panes. |
 | `--splitter-corner` | How wide the handle at a crossing is. |
 | `--splitter-drag-color` | The line while it is being moved. |
+| `--splitter-grip-color` | The grip beside the line, at rest. |
+| `--splitter-grip-length` | How far the grip runs along the divider. |
 | `--splitter-hover-color` | The target under the pointer. |
 | `--splitter-target` | How wide the draggable box is. |
 

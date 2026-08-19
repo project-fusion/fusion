@@ -35709,6 +35709,14 @@
               "name": "--splitter-drag-color"
             },
             {
+              "description": "The grip beside the line, at rest.",
+              "name": "--splitter-grip-color"
+            },
+            {
+              "description": "How far the grip runs along the divider.",
+              "name": "--splitter-grip-length"
+            },
+            {
               "description": "The target under the pointer.",
               "name": "--splitter-hover-color"
             },
@@ -35752,6 +35760,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'grip' | 'line' | undefined"
+              },
+              "description": "Whether the divider carries a grip.\n\n- `line` is the divider alone, for a splitter the reader already knows is\n  one: an editor, a mail client, anything they open every day.\n- `grip` adds a short capsule beside the line, for the first encounter. A\n  hairline between two panels is a border until something says otherwise,\n  and at rest the only thing saying otherwise is a cursor that appears once\n  the pointer is already on it.\n\n`grip` rather than `handle`, which this component has already spent on the\ncorner: that is a box the reader grabs, and this is a mark that says the\nline can be grabbed. The grip adds no hit area of its own.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
+              "attribute": "appearance",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "orientation",
@@ -36555,45 +36573,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseSplitter",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Two panes and a divider the reader can move.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/splitter",
-            "aliases": [
-              "SplitPane",
-              "Resizable",
-              "SplitView"
-            ],
-            "tier": "styled",
-            "group": "Splitter",
-            "part": "Root"
-          },
-          "tagName": "helix-splitter",
-          "customElement": true,
-          "slots": [
-            {
-              "description": "The pane before the divider.",
-              "name": "start",
-              "inheritedFrom": {
-                "name": "HelixBaseSplitter",
-                "module": "src/splitter/root/splitter-root.ts"
-              }
-            },
-            {
-              "description": "The pane after it.",
-              "name": "end",
-              "inheritedFrom": {
-                "name": "HelixBaseSplitter",
-                "module": "src/splitter/root/splitter-root.ts"
-              }
-            }
-          ],
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'grip' | 'line' | undefined"
+              },
+              "description": "Whether the divider carries a grip.\n\n- `line` is the divider alone, for a splitter the reader already knows is\n  one: an editor, a mail client, anything they open every day.\n- `grip` adds a short capsule beside the line, for the first encounter. A\n  hairline between two panels is a border until something says otherwise,\n  and at rest the only thing saying otherwise is a cursor that appears once\n  the pointer is already on it.\n\n`grip` rather than `handle`, which this component has already spent on the\ncorner: that is a box the reader grabs, and this is a mark that says the\nline can be grabbed. The grip adds no hit area of its own.\n\nBoth are writable, so a generated page can say which it means rather than\nrelying on the absence of an attribute.",
+              "fieldName": "appearance"
+            },
             {
               "name": "orientation",
               "type": {
@@ -36728,6 +36716,44 @@
               "default": "'Resize both'",
               "description": "Accessible name for the handle where two dividers cross.",
               "fieldName": "cornerLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseSplitter",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Two panes and a divider the reader can move.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/splitter",
+            "aliases": [
+              "SplitPane",
+              "Resizable",
+              "SplitView"
+            ],
+            "tier": "styled",
+            "group": "Splitter",
+            "part": "Root"
+          },
+          "tagName": "helix-splitter",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The pane before the divider.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseSplitter",
+                "module": "src/splitter/root/splitter-root.ts"
+              }
+            },
+            {
+              "description": "The pane after it.",
+              "name": "end",
               "inheritedFrom": {
                 "name": "HelixBaseSplitter",
                 "module": "src/splitter/root/splitter-root.ts"

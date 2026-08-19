@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseSplitter } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './splitter-root.css.js'
 
 /**
@@ -47,11 +48,33 @@ import { styles } from './splitter-root.css.js'
  * @cssproperty --splitter-color - The line between the panes.
  * @cssproperty --splitter-corner - How wide the handle at a crossing is.
  * @cssproperty --splitter-drag-color - The line while it is being moved.
+ * @cssproperty --splitter-grip-color - The grip beside the line, at rest.
+ * @cssproperty --splitter-grip-length - How far the grip runs along the divider.
  * @cssproperty --splitter-hover-color - The target under the pointer.
  * @cssproperty --splitter-target - How wide the draggable box is.
  */
 @customElement('helix-splitter')
 export class HelixSplitter extends HelixBaseSplitter {
+  /**
+   * Whether the divider carries a grip.
+   *
+   * - `line` is the divider alone, for a splitter the reader already knows is
+   *   one: an editor, a mail client, anything they open every day.
+   * - `grip` adds a short capsule beside the line, for the first encounter. A
+   *   hairline between two panels is a border until something says otherwise,
+   *   and at rest the only thing saying otherwise is a cursor that appears once
+   *   the pointer is already on it.
+   *
+   * `grip` rather than `handle`, which this component has already spent on the
+   * corner: that is a box the reader grabs, and this is a mark that says the
+   * line can be grabbed. The grip adds no hit area of its own.
+   *
+   * Both are writable, so a generated page can say which it means rather than
+   * relying on the absence of an attribute.
+   */
+  @property({ reflect: true })
+  appearance?: 'grip' | 'line'
+
   static override styles: CSSResultGroup = styles
 }
 
