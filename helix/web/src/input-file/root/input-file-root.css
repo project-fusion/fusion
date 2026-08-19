@@ -121,12 +121,25 @@
  * starting style and an ordinary rule of the same specificity are separated by
  * source order, so written first it loses and the entrance never begins.
  *
- * `scale` rather than a height. Height would stop the list jumping, which is the
- * other half of the abruptness, and it needs `interpolate-size` or a grid row
- * trick to animate at all: scale is what was asked for, costs no layout, and
- * leaves that as a separate decision. Nothing animates on the way out, either,
- * which is honest rather than ideal: an exit needs the element kept in the tree
- * while it runs, and it is removed from the array the moment it goes. */
+ * **On the block axis only, from the top edge.** A uniform scale is a card
+ * popping toward the reader, which is what a panel over a page does; this is a
+ * row joining a stack, and the stack is growing downward. Matching the motion to
+ * the axis the layout actually moved on makes it read as the list making room,
+ * which is the nearest thing to the height animation without one.
+ *
+ * `transform-origin` is what makes it the top rather than the middle: a new card
+ * is appended, so it unfolds from the edge it is attached to rather than
+ * expanding from its own centre into the gap.
+ *
+ * 0.9 rather than the 0.96 the panels use. That figure is right for a whole
+ * surface, where a tenth would be a lurch; on a forty-pixel row it is two pixels
+ * and reads as nothing at all.
+ *
+ * Height itself is still not animated, which is the other half of the
+ * abruptness: it needs `interpolate-size` or a grid row trick, and that is a
+ * separate decision. Nothing animates on the way out either, which is honest
+ * rather than ideal: an exit needs the element kept in the tree while it runs,
+ * and it leaves the array the moment it goes. */
 [part="file"] {
   align-items: center;
   background-color: var(--helix-color-surface);
@@ -137,7 +150,8 @@
   opacity: 1;
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
-  scale: 1;
+  scale: 1 1;
+  transform-origin: top;
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized);
@@ -146,7 +160,7 @@
 @starting-style {
   [part="file"] {
     opacity: 0;
-    scale: 0.96;
+    scale: 1 0.9;
   }
 }
 
@@ -285,7 +299,7 @@
      shrunken card rather than a still one. */
   [part="file"] {
     opacity: 1;
-    scale: 1;
+    scale: 1 1;
   }
 }
 
