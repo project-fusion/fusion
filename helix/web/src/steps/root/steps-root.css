@@ -1,34 +1,30 @@
 /* Everything about the arrangement is handed down as custom properties rather
    than read from this host's attribute, because a step cannot see it.
-   `orientation`, `labels` and `appearance` are on this element, and a slotted
-   step's own stylesheet can only match `:host(...)`, which is the step. The
-   selector that would answer it, `:host-context()`, is Chromium-only. Custom
-   properties inherit through the flat tree into slotted content, which is the
-   one portable channel.
+   `orientation` and `appearance` are on this element, and a slotted step's own
+   stylesheet can only match `:host(...)`, which is the step. The selector that
+   would answer it, `:host-context()`, is Chromium-only. Custom properties
+   inherit through the flat tree into slotted content, which is the one portable
+   channel.
 
    **The rule is two half lines per step, not one line between steps.** Each
    reaches from the mark to its own step's edge and half the gap beyond, so it
    meets the one coming the other way in the middle of the gap. That is what
    lets the rule read as continuous without any step knowing the size of its
-   neighbour, which is the thing a step cannot know and the reason the earlier
-   single line was either a stub or a line drawn through somebody's name.
+   neighbour, which is the thing a step cannot know.
 
-   The counter is declared here and read by each step, so `numeric` numbering is
-   resolved by the browser at layout: the third step says "3" in the server's
-   own markup and reordering renumbers with no script. */
+   **Each axis has one arrangement, and it is the one the rule can survive.** A
+   row puts names under the marks, because beside them there is a word in the
+   line's path and the rule would be struck through it. A column puts names
+   beside, because there is no width to save and a name under its mark would
+   sit where the line has to run. There was a `labels` property offering both
+   in both, and three of its four combinations were arrangements nobody should
+   pick. */
 :host {
   counter-reset: helix-step;
   display: flex;
   gap: var(--steps-gap, var(--helix-space-md));
 
   --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
-  /* The square the mark occupies, which is not always the glyph's own size.
-     Beside the name the mark shares a row with a dense button, and a twenty
-     pixel glyph aligned to the top of a thirty-two pixel control sits six
-     pixels above the first line of the name. Giving the mark the button's box
-     and centring the glyph in it puts the two middles together. Every line
-     offset is measured from this box rather than from the glyph, so the rule
-     meets the mark wherever the two differ. */
   --_steps-mark-box: var(--_steps-m);
   --_steps-columns: minmax(0, 1fr);
   --_steps-marker-column: 1;
@@ -36,8 +32,8 @@
   --_steps-body-column: 1;
   --_steps-body-row: 2;
   --_steps-body-align: center;
-  --_steps-content: none;
   --_steps-row-gap: var(--helix-space-xs);
+  --_steps-content: none;
 
   --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
   --_steps-lead-inline-size: calc(
@@ -49,7 +45,6 @@
   );
   --_steps-lead-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-block-size: var(--helix-border-thin);
-  --_steps-trail-display: block;
   --_steps-trail-inline-start: calc(50% + var(--_steps-mark-box) / 2);
   --_steps-trail-inline-size: calc(
     50% +
@@ -70,28 +65,13 @@
   min-inline-size: 0;
 }
 
-/* Name beside the mark, which puts the name in the trailing line's path. So
-   there is no trailing line: the leading one spans the gap alone and the rule
-   is a series of joins rather than a continuous rule. That is the honest
-   drawing of this arrangement, and it is why the names go underneath by
-   default. */
-:host([labels="beside"]) {
-  --_steps-mark-box: var(--helix-size-control-sm);
-  --_steps-columns: auto minmax(0, 1fr);
-  --_steps-marker-justify: start;
-  --_steps-body-column: 2;
-  --_steps-body-row: 1;
-  --_steps-body-align: start;
-  --_steps-row-gap: var(--helix-space-2xs);
-  --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) * -1);
-  --_steps-lead-inline-size: var(--steps-gap, var(--helix-space-md));
-  --_steps-trail-display: none;
-}
+/* Down the column the name sits beside the mark, and both halves run again:
+   above the mark to half the gap over it, and below it to half the gap under.
+   The trailing half is the step's own height less the mark, which is the one
+   measurement a step always has, and is why the halves belong to the step
+   rather than to the list.
 
-/* Down the column the name is always beside the mark, and both halves run
-   again: above the mark to half the gap over it, and below the mark to half the
-   gap under. The trailing half is the step's own height less the mark, which is
-   the one measurement a step always has. */
+   The mark takes the button's box here, because it shares a row with one. */
 :host([orientation="vertical"]) {
   flex-direction: column;
 
@@ -101,13 +81,13 @@
   --_steps-body-column: 2;
   --_steps-body-row: 1;
   --_steps-body-align: start;
+  --_steps-row-gap: var(--helix-space-2xs);
   --_steps-content: grid;
 
   --_steps-lead-inline-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-inline-size: var(--helix-border-thin);
   --_steps-lead-block-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
   --_steps-lead-block-size: calc(var(--steps-gap, var(--helix-space-md)) / 2);
-  --_steps-trail-display: block;
   --_steps-trail-inline-start: calc(var(--_steps-mark-box) / 2);
   --_steps-trail-inline-size: var(--helix-border-thin);
   --_steps-trail-block-start: var(--_steps-mark-box);
@@ -128,11 +108,19 @@
  *
  * No box, the same as the marks: a filled square behind a digit is a button
  * shape, and a row of them reads as a row of controls rather than as a rule
- * with marks on it. The state is the digit's own colour, which is the same
- * three colours the marks use, so the two appearances say the same thing in
- * the same palette and differ only in what is drawn. */
+ * with marks on it.
+ *
+ * And no colour on the digits. A green check is green because the check is
+ * already the shape for "done" and the hue only confirms it; a green 2 says
+ * nothing a reader can read, because a number carries no meaning of its own for
+ * a colour to agree with. It would be hue used as the whole signal, which is
+ * the one thing colour must not be. So the digits are ink, and the current step
+ * is a step darker rather than a different colour, which is the move the names
+ * make. The public hooks still win: a consumer who wants a green 2 gets one. */
 :host([appearance="numeric"]) {
   --_steps-mark: none;
   --_steps-count: counter(helix-step);
-  --_steps-marker-color: var(--helix-color-foreground-muted);
+  --_steps-marker-color: var(--helix-color-foreground-subtle);
+  --_steps-ink-complete: var(--helix-color-foreground-muted);
+  --_steps-ink-current: var(--helix-color-foreground);
 }

@@ -1064,6 +1064,63 @@ brought its own card would be a card inside a card there.
 | `--color-picker-grid-ratio` | Aspect ratio of the square. |
 | `--color-picker-grid-radii` | Corner radius of the square. |
 
+## Copy Button
+
+### Root — `helix-copy-button`
+
+A button that puts a string on the clipboard and says it did.
+
+Extends `HelixBaseCopyButton`.
+
+The styled tier adds one thing the base one cannot: the confirmation and the
+resting content share a grid cell, so the button is the size of the larger of
+them and does not resize mid-press. See the stylesheet for why that matters.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
+| `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+| `value` | `value` | `string` | `''` | `HelixBaseCopyButton` | What goes on the clipboard. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-copy` | `HelixCopyEvent` | Fired after the clipboard write succeeds. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The resting content, usually a copy icon. |
+| `copied` | What replaces it once the write succeeds. |
+| `start` | Content before the label, usually an icon. |
+| `end` | Content after the label. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `button` | The inner button. |
+
 ## Date Input
 
 ### Root — `helix-date-input`
@@ -3837,7 +3894,6 @@ second name for it here would be a second thing to keep in step.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
 | `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
-| `labels` | `labels` | `'beside' \| undefined` | - | `HelixBaseSteps` | Where a step's name sits against its marker. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
 
 #### Slots

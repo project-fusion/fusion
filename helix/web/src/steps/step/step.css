@@ -1,39 +1,23 @@
 /* A grid rather than a row, because a step has three things in it and only two
-   of them sit side by side: the marker and the name are a row, and what the
-   stage holds goes underneath both. As a flex row the content became a third
-   item beside the name, which is what it did before this was written down.
-   The tracks come from the list, which is the only thing that knows whether the
-   name is beside the marker or under it. */
+   of them sit side by side: the mark and the name are a row, and what the stage
+   holds goes underneath both. The tracks come from the list, which is the only
+   thing that knows which way the sequence runs. */
 :host {
   align-items: start;
-  column-gap: var(--helix-space-sm);
+  column-gap: var(--helix-space-2xs);
   counter-increment: helix-step;
   display: grid;
   flex: 0 0 auto;
-  grid-template-columns: var(--_steps-columns, auto minmax(0, 1fr));
+  grid-template-columns: var(--_steps-columns, minmax(0, 1fr));
   min-inline-size: 0;
   position: relative;
   row-gap: var(--_steps-row-gap, var(--helix-space-2xs));
 
-  --_step-marker: var(--steps-marker-size, var(--helix-size-control-sm));
-}
-
-[part="marker"] {
-  grid-column: var(--_steps-marker-column, 1);
-  grid-row: 1;
-  justify-self: var(--_steps-marker-justify, start);
-}
-
-[part="body"] {
-  grid-column: var(--_steps-body-column, 2);
-  grid-row: var(--_steps-body-row, 1);
-}
-
-/* Under both, in the name's own column, so the stage's content lines up with
-   the name rather than with the marker beside it. */
-[part="content"] {
-  grid-column: var(--_steps-body-column, 2);
-  grid-row: calc(var(--_steps-body-row, 1) + 1);
+  /* One inset, read twice: by the name, which is a button and takes it as its
+     own padding, and by the description under it, which has none of its own and
+     would otherwise start a dozen pixels to the left of the name above it.
+     Written once so the two cannot drift. */
+  --_step-inset: var(--helix-space-sm);
 }
 
 /* Two half lines, one either side of the mark. Each reaches from the mark to
@@ -59,7 +43,6 @@
 
 [part="trail"] {
   block-size: var(--_steps-trail-block-size, var(--helix-border-thin));
-  display: var(--_steps-trail-display, block);
   inline-size: var(--_steps-trail-inline-size, 0);
   inset-block-start: var(--_steps-trail-block-start, 50%);
   inset-inline-start: var(--_steps-trail-inline-start, 0);
@@ -76,26 +59,31 @@
  *
  * A ring drawn round a check is a second shape saying what the check already
  * says, and a row of them reads as a row of buttons rather than as a rule with
- * marks on it. The box comes back under `numeric`, where there is a digit that
- * genuinely needs one: a bare "3" beside a name is a number in a sentence. */
+ * marks on it. `numeric` puts a digit here instead, and it gets no box either.
+ *
+ * The square it occupies is not always the glyph's own size. Down a column the
+ * mark shares a row with a dense button, and a twenty pixel glyph aligned to
+ * the top of a thirty-two pixel control sits six pixels above the first line of
+ * the name; the box is the button's and the glyph is centred in it. Every line
+ * offset is measured from this box rather than from the glyph. */
 [part="marker"] {
   align-items: center;
+  grid-column: var(--_steps-marker-column, 1);
+  grid-row: 1;
+  justify-self: var(--_steps-marker-justify, center);
   block-size: var(--_steps-mark-box, var(--helix-size-icon));
   box-sizing: border-box;
   color: var(--_steps-marker-color, var(--helix-color-border));
+  display: inline-flex;
+  flex: 0 0 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
-  display: inline-flex;
-  flex: 0 0 auto;
   inline-size: var(--_steps-mark-box, var(--helix-size-icon));
   justify-content: center;
-  /* Over the halves, which run under it to its own edges. */
   position: relative;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
   z-index: 1;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* The slot is a flex item like the glyph inside it, so it needs the same
@@ -107,19 +95,11 @@
   justify-content: center;
 }
 
-/* The number is the slot's fallback, the same arrangement Breadcrumbs uses for
-   its separator: filling the slot replaces it and costs the consumer no way to
-   opt out. A complete step renders a check into that slot instead, so this only
-   draws where neither is there. */
 /* The counter, drawn only where the list asked for numbers. `content` takes a
    custom property whose value is the `counter()` call itself, which is how a
    step that cannot see `appearance` still knows whether to render a digit.
-
-   On the mark rather than on the slot inside it. The slot's fallback is now an
-   icon, so the slot always has a child and the `:not(:has(*))` this hung on
-   stopped matching the moment the mark became a state rather than a number:
-   every numeric step drew an empty box. Under `numeric` the glyph is
-   `display: none`, so the two can never both show. */
+   Under `numeric` the glyph is `display: none`, so the two can never both
+   show. */
 [part="marker"]::after {
   content: var(--_steps-count, none);
 }
@@ -132,50 +112,42 @@
 }
 
 slot[name="marker"]::slotted(*) {
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--_steps-m, var(--helix-size-icon));
 }
 
-/* Green for done, and it is the one place in this component that takes a hue
-   with meaning: a check is already the shape for "finished", so the colour is
-   confirming rather than carrying it, which is what `success` is for.
-
-   Current takes the accent, and it is the only other mark that is not grey. Two
-   states in colour and one out of it is what makes the sequence readable at a
-   glance: everything ahead of the reader is quiet. */
+/* A hue only where the shape already carries the meaning.
+ *
+ * Green on a check is confirming: the check is the shape for "finished", so the
+ * colour agrees with something a reader can already read. The accent on the
+ * target is the same bargain, and the two together let the sequence be read at
+ * a glance, everything ahead of the reader staying quiet.
+ *
+ * Under `numeric` both go back to ink, because a digit carries no meaning of
+ * its own for a colour to agree with: a green 2 would be hue used as the whole
+ * signal. The list hands the ink down, and the public hooks still win over it,
+ * so a consumer who wants a green 2 sets `--steps-complete-color` and gets one. */
 :host([complete]) [part="marker"] {
-  background-color: var(--_steps-marker-background-complete, transparent);
-  border-color: var(--_steps-marker-border-complete, transparent);
-  color: var(
-    --_steps-marker-color-complete,
-    var(--steps-complete-color, var(--helix-color-success))
-  );
+  color: var(--steps-complete-color, var(--_steps-ink-complete, var(--helix-color-success)));
 }
 
 :host([current]) [part="marker"] {
-  background-color: var(--_steps-marker-background-current, transparent);
-  border-color: var(--_steps-marker-border-current, transparent);
-  color: var(--_steps-marker-color-current, var(--steps-current-color, var(--helix-color-primary)));
+  color: var(--steps-current-color, var(--_steps-ink-current, var(--helix-color-primary)));
 }
 
 /* Complete wins where a step is both, because the check is the fact and the
    target is only where the reader happens to be standing. The name and the rule
    still say which one is open. */
 :host([complete][current]) [part="marker"] {
-  background-color: var(--_steps-marker-background-complete, transparent);
-  border-color: var(--_steps-marker-border-complete, transparent);
-  color: var(
-    --_steps-marker-color-complete,
-    var(--steps-complete-color, var(--helix-color-success))
-  );
+  color: var(--steps-complete-color, var(--_steps-ink-complete, var(--helix-color-success)));
 }
 
 [part="body"] {
-  align-items: var(--_steps-body-align, start);
+  align-items: var(--_steps-body-align, center);
+  grid-column: var(--_steps-body-column, 1);
+  grid-row: var(--_steps-body-row, 2);
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-2xs);
   min-inline-size: 0;
-  /* Over the connector, which runs under the row to the next marker. */
   position: relative;
   z-index: 1;
 }
@@ -185,27 +157,19 @@ slot[name="marker"]::slotted(*) {
  * What is left to say is only what a step needs that a button has no view on:
  * how tall it is, and that its text is the step's size rather than a control's.
  * The hover wash, the focus ring, the disabled treatment and the pressed state
- * all arrive with it. The rules this file used to carry for those are gone, and
- * so is the `all: unset` that made them necessary.
+ * all arrive with it, and so does `--button-background-color`, which is why
+ * there is no hover hook of this component's own.
  *
- * `--helix-size-control` down to the mark's own size, so the first line of the
- * name sits against the middle of the mark beside it. A control-height button
- * would put its text ten pixels below the mark and leave the rule meeting
- * nothing. Set on the button rather than as a density on the step, because it
- * is this one control being fitted to a mark and not a region being made
- * dense. */
+ * Dense, said in the properties density is made of rather than with a
+ * `data-density` attribute. That attribute is matched by a rule in the base
+ * layer, which is a document rule and cannot reach an element inside a shadow
+ * root: written here it would set nothing at all. The text stays at `sm` rather
+ * than following density down to `xs`, because this is a name a reader reads
+ * across a row and not a label on a control. */
 [part="label"] {
-  /* Dense, said in the properties density is made of rather than with a
-     `data-density` attribute. That attribute is matched by a rule in the base
-     layer, which is a document rule and cannot reach an element inside a shadow
-     root: written here it would set nothing at all.
-
-     The text stays at `sm` rather than following density down to `xs`, because
-     this is a name a reader is meant to read across a row and not a label on a
-     control. */
   --helix-size-control: var(--helix-size-control-sm);
-  --helix-space-control: var(--helix-space-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-space-control: var(--_step-inset);
   --helix-text-control: var(--helix-text-sm);
   --button-foreground-color: var(--helix-color-foreground-muted);
 
@@ -219,27 +183,38 @@ slot[name="marker"]::slotted(*) {
   --button-foreground-color: var(--helix-color-foreground);
 }
 
+/* The same inset the name takes as padding, so the two start on one line. The
+   name is a button and carries its own; the description is text and would
+   otherwise begin a dozen pixels to the left of the word above it. */
+[part="description"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  padding-inline: var(--_step-inset);
+}
+
 :host([disabled]) [part="marker"],
 :host([disabled]) [part="description"] {
   opacity: 0.5;
 }
 
-[part="description"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-}
-
-/* What the stage holds, open on the current step and only down a column.
+/* What the stage holds, open on the current step and only down a column. A row
+   has no room under a step for a form, and stretching one to fit would set
+   every step's height by the tallest.
  *
  * `grid-template-rows` from `0fr` to `1fr` rather than a height, because the
  * height is the content's and nothing here knows it: animating `max-height` to
  * a guess either clips the content or spends the difference easing nothing.
  * The inner element needs `min-block-size: 0` or a grid item refuses to go
  * below its own content and the row never closes. */
+/* Under both, in the name's own column, so a stage's content lines up with the
+   name rather than with the mark beside it. */
 [part="content"] {
   display: var(--_steps-content, none);
+  grid-column: var(--_steps-body-column, 1);
+  grid-row: calc(var(--_steps-body-row, 2) + 1);
   grid-template-rows: 0fr;
+  padding-inline: var(--_step-inset);
   transition: grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
@@ -255,14 +230,7 @@ slot[name="marker"]::slotted(*) {
 
 @media (prefers-reduced-motion: reduce) {
   [part="marker"],
-  [part="label"],
   [part="content"] {
-    transition: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="marker"] {
     transition: none;
   }
 }

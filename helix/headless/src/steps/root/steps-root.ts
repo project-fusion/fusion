@@ -50,9 +50,15 @@ export class HelixBaseSteps extends HelixElement {
   /**
    * Which way the steps run.
    *
-   * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape with room under a step
-   * for what the stage holds.
+   * Absent is a row, which is what a form header wants, with each name under
+   * its mark: beside them there is a word in the rule's path and the line would
+   * be struck through it. `vertical` stacks them, names beside their marks,
+   * which is the shape with room under a step for what the stage holds.
+   *
+   * Each axis has one arrangement rather than a second property offering both
+   * in both. Of those four combinations three are ones nobody should pick, and
+   * a property whose job is mostly to be left alone is a property that mostly
+   * catches people out.
    */
   @property({ reflect: true })
   orientation?: 'vertical'
@@ -71,22 +77,6 @@ export class HelixBaseSteps extends HelixElement {
    */
   @property({ reflect: true })
   appearance?: 'numeric'
-
-  /**
-   * Where a step's name sits against its marker.
-   *
-   * Absent is under the marker, which is the shape a row of stages wants: the
-   * rule runs unbroken between the marks and the names hang below it. `beside`
-   * puts the name next to its mark, for a column, where there is no width to
-   * save and a name under its mark would sit in the line's path.
-   *
-   * On the list rather than on each step, for the reason density is on a region
-   * rather than on each control: a row where one name is beside its marker and
-   * the next is under it is a row nobody meant, and said once it is unwritable
-   * rather than merely discouraged.
-   */
-  @property({ reflect: true })
-  labels?: 'beside'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
