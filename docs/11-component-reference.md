@@ -3479,6 +3479,72 @@ same quantity.
 | --- | --- |
 | `--stat-group-gap` | Space between figures. |
 
+## Steps
+
+### Root — `helix-steps`
+
+A sequence of stages, and where the reader is in it.
+
+Extends `HelixBaseSteps`.
+
+The numbering is a CSS counter rather than a property, so a step's position
+is drawn by the browser at layout and is right in the server's markup with no
+script involved. Reordering the steps renumbers them; nothing has to be told.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
+| `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The steps, which are `helix-step` elements. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--steps-gap` | Space between one step and the next. |
+| `--steps-marker-size` | Diameter of the numbered circle. |
+| `--steps-connector-color` | The line between steps not yet reached. |
+| `--steps-complete-color` | Fill on a finished step's marker. |
+| `--steps-current-color` | Fill on the current step's marker. |
+
+### Step — `helix-step`
+
+One stage in a sequence.
+
+Extends `HelixBaseStep`.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `complete` | `complete` | `boolean` | `false` | `HelixBaseStep` | Whether the reader has finished this stage. |
+| `current` | `current` | `boolean` | `false` | `HelixBaseStep` | Whether this is the stage the reader is in. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The step's name. |
+| `description` | A line under the name, for what the stage is for. |
+| `marker` | Replaces the number, or the check a complete step shows. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `marker` | The circle carrying the number or the check. |
+| `body` | The name and its description. |
+| `label` | The step's name. |
+| `description` | The line under it. |
+| `connector` | The line arriving from the step before this one. |
+
 ## Switch
 
 ### Root — `helix-switch`

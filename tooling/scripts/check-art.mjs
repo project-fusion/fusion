@@ -109,8 +109,28 @@ const WORDS = [
   'sixty-three',
   'sixty-four',
   'sixty-five',
+  'sixty-six',
+  'sixty-seven',
+  'sixty-eight',
+  'sixty-nine',
+  'seventy',
+  'seventy-one',
+  'seventy-two',
+  'seventy-three',
+  'seventy-four',
+  'seventy-five',
 ]
-const wordFor = (count) => WORDS[count - 49]
+const wordFor = (count) => {
+  const word = WORDS[count - 49]
+  if (word === undefined) {
+    throw new Error(
+      `check:art: ${count} families is past the end of WORDS. Add the words up to it: ` +
+        'the table exists so a number word in this prose is checkable rather than trusted, ' +
+        'and a count off the end silently compared every word against "undefined".',
+    )
+  }
+  return word
+}
 const said = wordFor(families.size)
 
 /* Folders that are *families*, which is the question the prose is answering:
@@ -127,7 +147,9 @@ const foldersSaid = wordFor(folders)
 
 for (const file of ['index.tsx', 'core.tsx']) {
   const text = readFileSync(join(ART, file), 'utf8')
-  for (const [, word] of text.matchAll(/\b(f(?:orty|ifty)-[a-z]+|sixty(?:-[a-z]+)?|fifty)\b/g)) {
+  for (const [, word] of text.matchAll(
+    /\b(f(?:orty|ifty)-[a-z]+|(?:sixty|seventy)(?:-[a-z]+)?|fifty)\b/g,
+  )) {
     if (word !== said && word !== foldersSaid) {
       problems.push(
         `${ART}/${file}: says "${word}" where the catalog has ${families.size} families ` +

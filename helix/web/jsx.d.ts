@@ -72,6 +72,8 @@ import type {
   HelixSplitter,
   HelixStat,
   HelixStatGroup,
+  HelixStep,
+  HelixSteps,
   HelixSwitch,
   HelixTable,
   HelixTableCell,
@@ -7110,6 +7112,58 @@ reports a hydration mismatch. The absent attribute is the column, which the
 stylesheet reads as the base case. The existing server spec caught this,
 being the one that asserts the host carries nothing nobody wrote. */
   "prop:direction"?: HelixStat["direction"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixStepsProps = {
+  /** Accessible name for the sequence.
+
+A list of stages is a landmark a reader arrives at out of order, so it
+needs a name of its own rather than borrowing the heading above it. */
+  label?: HelixSteps["label"];
+  /** Which way the steps run.
+
+Absent is a row, which is what a form header wants. `vertical` stacks them,
+for a sidebar or a narrow column, and is the shape that has room for each
+step's description. */
+  orientation?: HelixSteps["orientation"];
+};
+
+export type HelixStepsSolidJsProps = {
+  /** Accessible name for the sequence.
+
+A list of stages is a landmark a reader arrives at out of order, so it
+needs a name of its own rather than borrowing the heading above it. */
+  "prop:label"?: HelixSteps["label"];
+  /** Which way the steps run.
+
+Absent is a row, which is what a form header wants. `vertical` stacks them,
+for a sidebar or a narrow column, and is the shape that has room for each
+step's description. */
+  "prop:orientation"?: HelixSteps["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixStepProps = {
+  /** Whether the reader has finished this stage. */
+  complete?: HelixStep["complete"];
+  /** Whether this is the stage the reader is in. */
+  current?: HelixStep["current"];
+};
+
+export type HelixStepSolidJsProps = {
+  /** Whether the reader has finished this stage. */
+  "prop:complete"?: HelixStep["complete"];
+  /** Whether this is the stage the reader is in. */
+  "prop:current"?: HelixStep["current"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14593,6 +14647,73 @@ export type CustomElements = {
   "helix-stat": Partial<HelixStatProps & BaseProps<HelixStat> & BaseEvents>;
 
   /**
+   * The numbering is a CSS counter rather than a property, so a step's position
+   * is drawn by the browser at layout and is right in the server's markup with no
+   * script involved. Reordering the steps renumbers them; nothing has to be told.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the sequence.
+   *
+   * A list of stages is a landmark a reader arrives at out of order, so it
+   * needs a name of its own rather than borrowing the heading above it.
+   * - `orientation`: Which way the steps run.
+   *
+   * Absent is a row, which is what a form header wants. `vertical` stacks them,
+   * for a sidebar or a narrow column, and is the shape that has room for each
+   * step's description.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
+   * - `--steps-marker-size`: Diameter of the numbered circle. (default: `undefined`)
+   * - `--steps-connector-color`: The line between steps not yet reached. (default: `undefined`)
+   * - `--steps-complete-color`: Fill on a finished step's marker. (default: `undefined`)
+   * - `--steps-current-color`: Fill on the current step's marker. (default: `undefined`)
+   */
+  "helix-steps": Partial<HelixStepsProps & BaseProps<HelixSteps> & BaseEvents>;
+
+  /**
+   *
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `complete`: Whether the reader has finished this stage.
+   * - `current`: Whether this is the stage the reader is in.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The step's name.
+   * - `description`: A line under the name, for what the stage is for.
+   * - `marker`: Replaces the number, or the check a complete step shows.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `marker`: The circle carrying the number or the check.
+   * - `body`: The name and its description.
+   * - `label`: The step's name.
+   * - `description`: The line under it.
+   * - `connector`: The line arriving from the step before this one.
+   */
+  "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents>;
+
+  /**
    * A thumb travelling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
@@ -21815,6 +21936,80 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The numbering is a CSS counter rather than a property, so a step's position
+   * is drawn by the browser at layout and is right in the server's markup with no
+   * script involved. Reordering the steps renumbers them; nothing has to be told.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the sequence.
+   *
+   * A list of stages is a landmark a reader arrives at out of order, so it
+   * needs a name of its own rather than borrowing the heading above it.
+   * - `orientation`: Which way the steps run.
+   *
+   * Absent is a row, which is what a form header wants. `vertical` stacks them,
+   * for a sidebar or a narrow column, and is the shape that has room for each
+   * step's description.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The steps, which are `helix-step` elements.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
+   * - `--steps-marker-size`: Diameter of the numbered circle. (default: `undefined`)
+   * - `--steps-connector-color`: The line between steps not yet reached. (default: `undefined`)
+   * - `--steps-complete-color`: Fill on a finished step's marker. (default: `undefined`)
+   * - `--steps-current-color`: Fill on the current step's marker. (default: `undefined`)
+   */
+  "helix-steps": Partial<
+    HelixStepsProps &
+      HelixStepsSolidJsProps &
+      BaseProps<HelixSteps> &
+      BaseEvents
+  >;
+
+  /**
+   *
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `complete`: Whether the reader has finished this stage.
+   * - `current`: Whether this is the stage the reader is in.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The step's name.
+   * - `description`: A line under the name, for what the stage is for.
+   * - `marker`: Replaces the number, or the check a complete step shows.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `marker`: The circle carrying the number or the check.
+   * - `body`: The name and its description.
+   * - `label`: The step's name.
+   * - `description`: The line under it.
+   * - `connector`: The line arriving from the step before this one.
+   */
+  "helix-step": Partial<
+    HelixStepProps & HelixStepSolidJsProps & BaseProps<HelixStep> & BaseEvents
+  >;
+
+  /**
    * A thumb travelling in a groove, which is the one place in the library color
    * is used to say "on". A checkbox does not, because a tick is legible on its
    * own; a switch has no mark, so the fill is the whole of what distinguishes the
@@ -23924,6 +24119,16 @@ export type CustomCssProperties = {
   "--stat-group-gap"?: string;
   /** Size of the figure. */
   "--stat-value-size"?: string;
+  /** Space between one step and the next. */
+  "--steps-gap"?: string;
+  /** Diameter of the numbered circle. */
+  "--steps-marker-size"?: string;
+  /** The line between steps not yet reached. */
+  "--steps-connector-color"?: string;
+  /** Fill on a finished step's marker. */
+  "--steps-complete-color"?: string;
+  /** Fill on the current step's marker. */
+  "--steps-current-color"?: string;
   /** Height of the track. The width follows it. */
   "--switch-height"?: string;
   /** Length of the track, if not the derived one. */

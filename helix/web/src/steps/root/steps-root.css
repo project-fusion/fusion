@@ -1,0 +1,47 @@
+/* The counter is declared here and read by each step, which is what makes the
+   numbering free: the browser resolves it at layout, so the third step says "3"
+   in the server's own markup and reordering renumbers with no script.
+
+   The axis is handed down as custom properties rather than read from this
+   host's attribute, because a step cannot see it. `orientation` is on this
+   element, and a slotted step's own stylesheet can only match `:host(...)`,
+   which is the step. Custom properties inherit through the flat tree into
+   slotted content, so this is the one channel that reaches. */
+:host {
+  counter-reset: helix-step;
+  display: flex;
+  gap: var(--steps-gap, var(--helix-space-md));
+
+  --_steps-connector-inline: var(--steps-gap, var(--helix-space-md));
+  --_steps-connector-block: var(--helix-border-thin);
+  --_steps-connector-inset-block: 50%;
+  --_steps-connector-inset-inline: 100%;
+}
+
+/* A row hands each step an equal share, so the connectors between them are the
+   same length whatever the labels measure. Without it a long name stretches its
+   own step and the line before it shrinks to nothing. */
+:host(:not([orientation="vertical"])) ::slotted(*) {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+:host([orientation="vertical"]) {
+  flex-direction: column;
+
+  /* Above the marker rather than beside it, and at the marker's own middle so
+     the line meets the circle instead of the text next to it. Every value the
+     connector needs is handed over, because the step cannot ask which way the
+     list runs: `:host-context()` would answer it and is Chromium-only, so the
+     one portable channel is a property that inherits. */
+  --_steps-connector-inline: var(--helix-border-thin);
+  --_steps-connector-block: var(--steps-gap, var(--helix-space-md));
+  --_steps-connector-inset-block: auto;
+  --_steps-connector-inset-block-end: 100%;
+  --_steps-connector-inset-inline: auto;
+  --_steps-connector-inset-inline-start: calc(
+    var(--steps-marker-size, var(--helix-size-control-sm)) /
+    2
+  );
+  --_steps-connector-shift: -50% 0;
+}

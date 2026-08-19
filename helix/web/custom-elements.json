@@ -17838,6 +17838,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/steps/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/switch/index.js"
           }
         },
@@ -35710,6 +35718,525 @@
           "declaration": {
             "name": "HelixStat",
             "module": "src/stat/root/stat-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/steps/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/steps/root/steps-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/steps/step/step.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/steps/root/steps-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/steps/root/steps-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/steps/root/steps-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The numbering is a CSS counter rather than a property, so a step's position\nis drawn by the browser at layout and is right in the server's markup with no\nscript involved. Reordering the steps renumbers them; nothing has to be told.",
+          "name": "HelixSteps",
+          "cssProperties": [
+            {
+              "description": "Space between one step and the next.",
+              "name": "--steps-gap"
+            },
+            {
+              "description": "Diameter of the numbered circle.",
+              "name": "--steps-marker-size"
+            },
+            {
+              "description": "The line between steps not yet reached.",
+              "name": "--steps-connector-color"
+            },
+            {
+              "description": "Fill on a finished step's marker.",
+              "name": "--steps-complete-color"
+            },
+            {
+              "description": "Fill on the current step's marker.",
+              "name": "--steps-current-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Steps'",
+              "description": "Accessible name for the sequence.\n\nA list of stages is a landmark a reader arrives at out of order, so it\nneeds a name of its own rather than borrowing the heading above it.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | undefined"
+              },
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "attribute": "orientation",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseSteps",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A sequence of stages, and where the reader is in it.",
+          "helix": {
+            "category": "navigation",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/steps",
+            "aliases": [
+              "Stepper",
+              "Wizard",
+              "Progress steps"
+            ],
+            "tier": "styled",
+            "group": "Steps",
+            "part": "Root"
+          },
+          "tagName": "helix-steps",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The steps, which are `helix-step` elements.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Steps'",
+              "description": "Accessible name for the sequence.\n\nA list of stages is a landmark a reader arrives at out of order, so it\nneeds a name of its own rather than borrowing the heading above it.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | undefined"
+              },
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/steps/root/steps-root.ts",
+          "definitionPath": "src/steps/root/steps-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSteps",
+          "declaration": {
+            "name": "HelixSteps",
+            "module": "src/steps/root/steps-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-steps",
+          "declaration": {
+            "name": "HelixSteps",
+            "module": "src/steps/root/steps-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/steps/step/step.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/steps/step/step.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/steps/step/step.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HelixStep",
+          "members": [
+            {
+              "kind": "field",
+              "name": "complete",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader has finished this stage.",
+              "attribute": "complete",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the stage the reader is in.",
+              "attribute": "current",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseStep",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One stage in a sequence.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/steps",
+            "aliases": [
+              "Stage"
+            ],
+            "tier": "styled",
+            "group": "Steps",
+            "part": "Step"
+          },
+          "tagName": "helix-step",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The step's name.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "A line under the name, for what the stage is for.",
+              "name": "description",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "Replaces the number, or the check a complete step shows.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The circle carrying the number or the check.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The name and its description.",
+              "name": "body",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The step's name.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The line under it.",
+              "name": "description",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The line arriving from the step before this one.",
+              "name": "connector",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "complete",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader has finished this stage.",
+              "fieldName": "complete",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the stage the reader is in.",
+              "fieldName": "current",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            }
+          ],
+          "modulePath": "src/steps/step/step.ts",
+          "definitionPath": "src/steps/step/step.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixStep",
+          "declaration": {
+            "name": "HelixStep",
+            "module": "src/steps/step/step.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-step",
+          "declaration": {
+            "name": "HelixStep",
+            "module": "src/steps/step/step.ts"
           }
         }
       ]

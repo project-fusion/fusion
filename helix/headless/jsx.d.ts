@@ -59,6 +59,8 @@ import type {
   HelixBaseSplitter,
   HelixBaseStat,
   HelixBaseStatGroup,
+  HelixBaseStep,
+  HelixBaseSteps,
   HelixBaseSwitch,
   HelixBaseTable,
   HelixBaseTableCell,
@@ -6342,6 +6344,58 @@ reports a hydration mismatch. The absent attribute is the column, which the
 stylesheet reads as the base case. The existing server spec caught this,
 being the one that asserts the host carries nothing nobody wrote. */
   "prop:direction"?: HelixBaseStat["direction"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseStepsProps = {
+  /** Accessible name for the sequence.
+
+A list of stages is a landmark a reader arrives at out of order, so it
+needs a name of its own rather than borrowing the heading above it. */
+  label?: HelixBaseSteps["label"];
+  /** Which way the steps run.
+
+Absent is a row, which is what a form header wants. `vertical` stacks them,
+for a sidebar or a narrow column, and is the shape that has room for each
+step's description. */
+  orientation?: HelixBaseSteps["orientation"];
+};
+
+export type HelixBaseStepsSolidJsProps = {
+  /** Accessible name for the sequence.
+
+A list of stages is a landmark a reader arrives at out of order, so it
+needs a name of its own rather than borrowing the heading above it. */
+  "prop:label"?: HelixBaseSteps["label"];
+  /** Which way the steps run.
+
+Absent is a row, which is what a form header wants. `vertical` stacks them,
+for a sidebar or a narrow column, and is the shape that has room for each
+step's description. */
+  "prop:orientation"?: HelixBaseSteps["orientation"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseStepProps = {
+  /** Whether the reader has finished this stage. */
+  complete?: HelixBaseStep["complete"];
+  /** Whether this is the stage the reader is in. */
+  current?: HelixBaseStep["current"];
+};
+
+export type HelixBaseStepSolidJsProps = {
+  /** Whether the reader has finished this stage. */
+  "prop:complete"?: HelixBaseStep["complete"];
+  /** Whether this is the stage the reader is in. */
+  "prop:current"?: HelixBaseStep["current"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13738,6 +13792,101 @@ export type CustomElements = {
   >;
 
   /**
+   * **Each step states its own position, and nothing here coordinates them.** A
+   * step is `complete`, or `current`, or neither, and it says so on itself. The
+   * alternative is an `active` index on this element, which reads better in
+   * markup and cannot render on a server: this element would have to count its
+   * slotted children to know which one is third, and the server has no children
+   * to count. A stepper whose state appears only after hydration is a stepper
+   * that flashes every stage as unvisited on first paint.
+   *
+   * The consequence is that the numbering is not JavaScript either. It is a CSS
+   * counter in the tier above, which the browser resolves at layout with no
+   * script at all, so the third step reads "3" in the server's own markup.
+   *
+   * **The connector belongs to the step, not to the list.** Each one draws the
+   * line that arrives at it and hides it when it is first, the same arrangement
+   * Breadcrumbs uses for its separator and for the same reason: a line drawn
+   * between items needs either an index or a parent that counts, and drawing it
+   * on the item needs neither.
+   *
+   * `role="list"` on the host rather than an `<ol>` in the shadow root. The steps
+   * are the consumer's elements in the light DOM, so an `<ol>` here would be a
+   * list whose items are somewhere else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the sequence.
+   *
+   * A list of stages is a landmark a reader arrives at out of order, so it
+   * needs a name of its own rather than borrowing the heading above it.
+   * - `orientation`: Which way the steps run.
+   *
+   * Absent is a row, which is what a form header wants. `vertical` stacks them,
+   * for a sidebar or a narrow column, and is the shape that has room for each
+   * step's description.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The steps, which are `helix-step` elements.
+   */
+  "helix-base-steps": Partial<
+    HelixBaseStepsProps & BaseProps<HelixBaseSteps> & BaseEvents
+  >;
+
+  /**
+   * **The marker is a slot whose fallback is the number.** A step is numbered by
+   * a CSS counter in the styled tier, so the digit costs no script and is in the
+   * server's markup; a consumer who wants an icon there fills the slot instead.
+   * `complete` swaps the fallback for a check, because a finished stage has an
+   * answer and the number was only ever standing in for one.
+   *
+   * **`complete` and `current` are separate, and both can be false.** A stage
+   * that is neither is one the reader has not reached, which is the majority of
+   * any sequence and therefore the state that needs no attribute. They can also
+   * both be true: a reader who steps back into a finished stage is in it and has
+   * finished it, and a stepper that forgets the second is one that loses its
+   * checks the moment somebody reviews their answers.
+   *
+   * `aria-current="step"` is the whole of what position means to a screen reader,
+   * and it goes on the host through `ElementInternals` rather than as an
+   * attribute, which is the rule the whole library follows: an attribute written
+   * here is one a consumer's server markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `complete`: Whether the reader has finished this stage.
+   * - `current`: Whether this is the stage the reader is in.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The step's name.
+   * - `description`: A line under the name, for what the stage is for.
+   * - `marker`: Replaces the number, or the check a complete step shows.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `marker`: The circle carrying the number or the check.
+   * - `body`: The name and its description.
+   * - `label`: The step's name.
+   * - `description`: The line under it.
+   * - `connector`: The line arriving from the step before this one.
+   */
+  "helix-base-step": Partial<
+    HelixBaseStepProps & BaseProps<HelixBaseStep> & BaseEvents
+  >;
+
+  /**
    * **A switch is not a checkbox with a different shape.** A checkbox is an
    * answer to a question the form asks when it is submitted; a switch is a thing
    * happening now. That is why `role="switch"` exists and why a switch belongs
@@ -20957,6 +21106,107 @@ export type CustomElementsSolidJs = {
     HelixBaseStatProps &
       HelixBaseStatSolidJsProps &
       BaseProps<HelixBaseStat> &
+      BaseEvents
+  >;
+
+  /**
+   * **Each step states its own position, and nothing here coordinates them.** A
+   * step is `complete`, or `current`, or neither, and it says so on itself. The
+   * alternative is an `active` index on this element, which reads better in
+   * markup and cannot render on a server: this element would have to count its
+   * slotted children to know which one is third, and the server has no children
+   * to count. A stepper whose state appears only after hydration is a stepper
+   * that flashes every stage as unvisited on first paint.
+   *
+   * The consequence is that the numbering is not JavaScript either. It is a CSS
+   * counter in the tier above, which the browser resolves at layout with no
+   * script at all, so the third step reads "3" in the server's own markup.
+   *
+   * **The connector belongs to the step, not to the list.** Each one draws the
+   * line that arrives at it and hides it when it is first, the same arrangement
+   * Breadcrumbs uses for its separator and for the same reason: a line drawn
+   * between items needs either an index or a parent that counts, and drawing it
+   * on the item needs neither.
+   *
+   * `role="list"` on the host rather than an `<ol>` in the shadow root. The steps
+   * are the consumer's elements in the light DOM, so an `<ol>` here would be a
+   * list whose items are somewhere else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name for the sequence.
+   *
+   * A list of stages is a landmark a reader arrives at out of order, so it
+   * needs a name of its own rather than borrowing the heading above it.
+   * - `orientation`: Which way the steps run.
+   *
+   * Absent is a row, which is what a form header wants. `vertical` stacks them,
+   * for a sidebar or a narrow column, and is the shape that has room for each
+   * step's description.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The steps, which are `helix-step` elements.
+   */
+  "helix-base-steps": Partial<
+    HelixBaseStepsProps &
+      HelixBaseStepsSolidJsProps &
+      BaseProps<HelixBaseSteps> &
+      BaseEvents
+  >;
+
+  /**
+   * **The marker is a slot whose fallback is the number.** A step is numbered by
+   * a CSS counter in the styled tier, so the digit costs no script and is in the
+   * server's markup; a consumer who wants an icon there fills the slot instead.
+   * `complete` swaps the fallback for a check, because a finished stage has an
+   * answer and the number was only ever standing in for one.
+   *
+   * **`complete` and `current` are separate, and both can be false.** A stage
+   * that is neither is one the reader has not reached, which is the majority of
+   * any sequence and therefore the state that needs no attribute. They can also
+   * both be true: a reader who steps back into a finished stage is in it and has
+   * finished it, and a stepper that forgets the second is one that loses its
+   * checks the moment somebody reviews their answers.
+   *
+   * `aria-current="step"` is the whole of what position means to a screen reader,
+   * and it goes on the host through `ElementInternals` rather than as an
+   * attribute, which is the rule the whole library follows: an attribute written
+   * here is one a consumer's server markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `complete`: Whether the reader has finished this stage.
+   * - `current`: Whether this is the stage the reader is in.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The step's name.
+   * - `description`: A line under the name, for what the stage is for.
+   * - `marker`: Replaces the number, or the check a complete step shows.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `marker`: The circle carrying the number or the check.
+   * - `body`: The name and its description.
+   * - `label`: The step's name.
+   * - `description`: The line under it.
+   * - `connector`: The line arriving from the step before this one.
+   */
+  "helix-base-step": Partial<
+    HelixBaseStepProps &
+      HelixBaseStepSolidJsProps &
+      BaseProps<HelixBaseStep> &
       BaseEvents
   >;
 
