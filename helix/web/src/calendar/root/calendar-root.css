@@ -169,7 +169,9 @@
   color: var(--helix-color-foreground-subtle);
 }
 
-[part="cell"]:hover:not([aria-disabled]) [part="day"] {
+/* `:not([data-outside])` as well, since a filler day takes no click and a cell
+   that lights under the pointer is a cell offering one. */
+[part="cell"]:hover:not([aria-disabled], [data-outside]) [part="day"] {
   background-color: var(--helix-color-surface-sunken);
 }
 

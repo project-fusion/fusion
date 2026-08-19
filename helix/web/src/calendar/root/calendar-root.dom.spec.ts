@@ -385,3 +385,39 @@ describe('calendar as a form control', () => {
     expect(cal.month).toBe('2026-09')
   })
 })
+
+describe('a day from a neighbouring month is filler', () => {
+  const outside = (cal: Calendar): HTMLElement[] =>
+    days(cal).filter((one) => one.hasAttribute('data-outside'))
+
+  test('clicking one chooses nothing', async () => {
+    const cal = await calendar('default-month="2026-08"')
+    const filler = outside(cal)[0] as HTMLElement
+    expect(filler).toBeDefined()
+    filler.click()
+    await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(cal.value).toBe('')
+  })
+
+  test('and a range never draws its end twice, which is what months="2" showed', async () => {
+    /* September the 5th is a trailing cell in August's grid and a real cell in
+       September's. Both used to carry the terminus, so one answer was two dark
+       chips on the page. Asserted by counting, because the bug is the count. */
+    const cal = await calendar('default-month="2026-08" months="2" mode="range"')
+    ;(cal as unknown as { value: string }).value = '2026-08-19,2026-09-05'
+    await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
+
+    const marked = (name: string): number =>
+      days(cal).filter((one) => one.hasAttribute(name)).length
+    expect(marked('data-range-start')).toBe(1)
+    expect(marked('data-range-end')).toBe(1)
+
+    // And no filler cell carries any of the range's state.
+    for (const filler of outside(cal)) {
+      expect(filler.hasAttribute('data-range-start')).toBe(false)
+      expect(filler.hasAttribute('data-range-middle')).toBe(false)
+      expect(filler.hasAttribute('data-range-end')).toBe(false)
+      expect(filler.hasAttribute('aria-selected')).toBe(false)
+    }
+  })
+})

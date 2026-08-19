@@ -626,6 +626,18 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
               const iso = toIso(date)
               const disabled = this.barred(date)
               const selected = this.isSelected(iso)
+              /* A day from a neighbouring month is filler, so the grid is a
+                 rectangle, and nothing else. It takes no click and shows no
+                 selection.
+                 It used to take both, and at `months="2"` that put the same
+                 date on the page twice: September the 5th is a trailing cell in
+                 August's grid and a real cell in September's, so choosing the
+                 end of a range drew the dark terminus in both, and the band ran
+                 through August's last row and then again through September's
+                 first. Two cells cannot be the answer to one question. The band
+                 now stops at the last day the grid owns and picks up in the
+                 next, which is where those dates actually are. */
+              const outside = !sameMonth(date, month)
               // The cell is the column track and the day is the shape centered
               // in it. A range paints the track, so it runs continuously
               // between days and stops at the ends of a row on its own.
@@ -635,14 +647,16 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
                 aria-disabled=${disabled ? 'true' : nothing}
                 aria-label=${full.format(date)}
                 aria-current=${iso === today ? 'date' : nothing}
-                aria-selected=${selected ? 'true' : nothing}
-                data-outside=${sameMonth(date, month) ? nothing : ''}
-                data-range-end=${range && iso === range[1] ? '' : nothing}
-                data-range-middle=${range && iso > range[0] && iso < range[1] ? '' : nothing}
-                data-range-start=${range && iso === range[0] ? '' : nothing}
+                aria-selected=${!outside && selected ? 'true' : nothing}
+                data-outside=${outside ? '' : nothing}
+                data-range-end=${!outside && range && iso === range[1] ? '' : nothing}
+                data-range-middle=${
+                  !outside && range && iso > range[0] && iso < range[1] ? '' : nothing
+                }
+                data-range-start=${!outside && range && iso === range[0] ? '' : nothing}
                 data-today=${iso === today ? '' : nothing}
-                tabindex=${sameMonth(date, month) && iso === anchor ? '0' : '-1'}
-                @click=${() => this.select(date)}
+                tabindex=${!outside && iso === anchor ? '0' : '-1'}
+                @click=${outside ? nothing : () => this.select(date)}
                 ><span part="day">${date.getUTCDate()}</span></span
               >`
             })}
