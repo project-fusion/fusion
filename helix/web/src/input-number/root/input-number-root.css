@@ -17,6 +17,17 @@
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
   display: flex;
+  /* The field clips its own corners, which is what rounds the steppers.
+   *
+   * They stretch to the full height and fill on hover, and the fill had square
+   * corners inside a rounded field: a grey rectangle poking out past the curve
+   * at both ends. Clipping here rather than rounding each button, because the
+   * inside of a border-radius is that radius less the border width, and stating
+   * that arithmetic twice is two places to get it wrong when the token moves.
+   *
+   * The focus ring is unaffected: it is an `outline` on this element, and an
+   * outline is not clipped by the overflow of the box it is drawn on. */
+  overflow: hidden;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
