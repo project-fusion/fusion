@@ -27283,6 +27283,14 @@
               "name": "code"
             },
             {
+              "description": "Everything but the three corner squares.",
+              "name": "modules"
+            },
+            {
+              "description": "The three corner squares, which can take their own colour.",
+              "name": "finders"
+            },
+            {
               "description": "The box holding the centre mark.",
               "name": "logo"
             }
@@ -27313,6 +27321,16 @@
               "default": "''",
               "description": "What the image is called.\n\nFalling back to the value is deliberate: a code almost always holds a URL,\nand a URL is a better name than \"QR code\" for a reader who cannot see it.",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "QrStyle"
+              },
+              "default": "'square'",
+              "description": "How the modules are drawn.\n\n`square` is the default and the only one that joins runs of adjacent\nmodules into a single subpath, which is what keeps a thousand modules to a\nhandful of nodes. `rounded` and `dots` draw each module on its own, because\nthe corners are the thing being drawn and a joined run has none in the\nmiddle. That cost is paid only by a code that asks for them.\n\nA scanner reads contrast between cells, not their shape, so all three\nscan. `dots` sits a little under half a module so neighbours do not touch,\nwhich is what makes it read as dots rather than as a softened square code.",
+              "attribute": "shape"
             },
             {
               "kind": "field",
@@ -27441,6 +27459,15 @@
               "default": "''",
               "description": "What the image is called.\n\nFalling back to the value is deliberate: a code almost always holds a URL,\nand a URL is a better name than \"QR code\" for a reader who cannot see it.",
               "fieldName": "label"
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "QrStyle"
+              },
+              "default": "'square'",
+              "description": "How the modules are drawn.\n\n`square` is the default and the only one that joins runs of adjacent\nmodules into a single subpath, which is what keeps a thousand modules to a\nhandful of nodes. `rounded` and `dots` draw each module on its own, because\nthe corners are the thing being drawn and a joined run has none in the\nmiddle. That cost is paid only by a code that asks for them.\n\nA scanner reads contrast between cells, not their shape, so all three\nscan. `dots` sits a little under half a module so neighbours do not touch,\nwhich is what makes it read as dots rather than as a softened square code.",
+              "fieldName": "shape"
             },
             {
               "name": "correction",

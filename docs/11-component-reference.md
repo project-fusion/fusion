@@ -3270,6 +3270,7 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | --- | --- | --- | --- | --- | --- |
 | `correction` | `correction` | `QrCorrection \| undefined` | - | `HelixBaseQrCode` | How much of the code can be lost and still read. |
 | `label` | `label` | `string` | `''` | `HelixBaseQrCode` | What the image is called. |
+| `shape` | `shape` | `QrStyle` | `'square'` | `HelixBaseQrCode` | How the modules are drawn. |
 | `value` | `value` | `string` | `''` | `HelixBaseQrCode` | What the code encodes, which is usually a URL. |
 
 #### Slots
@@ -3283,6 +3284,8 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | Part | Description |
 | --- | --- |
 | `code` | The square itself. |
+| `modules` | Everything but the three corner squares. |
+| `finders` | The three corner squares, which can take their own colour. |
 | `logo` | The box holding the centre mark. |
 
 #### Custom properties
@@ -3291,6 +3294,7 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | --- | --- |
 | `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
 | `--qr-code-color` | The dark modules. Defaults to the page's ink. |
+| `--qr-code-finder-color` | The three corner squares. Defaults to the same ink as the modules. |
 | `--qr-code-background-color` | Behind them, including the quiet zone. |
 | `--qr-code-logo-size` | How much of the middle a mark may cover. Defaults to `22%`, which `H` correction carries comfortably. |
 | `--qr-code-logo-inset` | The quiet zone around that mark. |

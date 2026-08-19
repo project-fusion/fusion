@@ -25,10 +25,16 @@ import { fileURLToPath } from 'node:url'
  * lose those, so the inner markup is kept verbatim and the component renders
  * it.
  *
- * `fusion.svg` is skipped. It is a brand mark rather than an icon: it defines
- * gradients by id, and ids are document-global, so two of them on one page
- * would fight over the same names. The marketing site renders that mark
- * directly instead.
+ * `fusion.svg` is not skipped, and the reason it used to be was wrong. It
+ * defines gradients by id, and the note here said ids are document-global so
+ * two marks on one page would fight over the same names. Ids are scoped to
+ * their *tree*, and a shadow root is a tree: `helix-icon` renders into one, so
+ * two of them resolve their own gradients even with identical ids next door.
+ * Measured, with two copies in separate shadow roots and two more in the light
+ * DOM for comparison.
+ *
+ * Which leaves the light DOM as the case the old note was actually describing,
+ * and no component here renders an icon there.
  */
 
 // `fileURLToPath`, not `import.meta.dir`: the latter is Bun's and is undefined
@@ -76,7 +82,7 @@ const camel = (slug) => slug.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCa
 const entries = readFileSync(LIST, 'utf8')
   .split('\n')
   .map((line) => line.trim())
-  .filter((line) => line !== '' && !line.startsWith('#') && line !== 'fusion')
+  .filter((line) => line !== '' && !line.startsWith('#'))
   .sort()
   .map((slug) => {
     const source = sourceFor(slug)

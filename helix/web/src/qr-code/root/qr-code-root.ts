@@ -23,6 +23,8 @@ import { styles } from './qr-code-root.css.js'
  *
  * @cssproperty --qr-code-size - How wide the square is. Defaults to `12rem`.
  * @cssproperty --qr-code-color - The dark modules. Defaults to the page's ink.
+ * @cssproperty --qr-code-finder-color - The three corner squares. Defaults to
+ * the same ink as the modules.
  * @cssproperty --qr-code-background-color - Behind them, including the quiet zone.
  * @cssproperty --qr-code-logo-size - How much of the middle a mark may cover.
  * Defaults to `22%`, which `H` correction carries comfortably.

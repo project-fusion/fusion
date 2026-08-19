@@ -29,6 +29,15 @@
   inline-size: 100%;
 }
 
+/* The corner squares can take their own colour, and default to the code's.
+   Two paths rather than one so this is possible at all: a single path is one
+   fill, and the finders are the part of a code a brand most often wants to
+   tint. They stay square whatever the modules do, because they are what a
+   scanner locks onto first. */
+[part="finders"] {
+  fill: var(--qr-code-finder-color, currentColor);
+}
+
 /* The middle, for a mark that only reads at a high correction.
  *
  * Centred over the code rather than punched into it: the modules underneath are

@@ -1,0 +1,5 @@
+/* The corner squares carry the brand and the modules stay ink, which keeps the
+   contrast a scanner needs while still being recognisably ours. */
+helix-qr-code {
+  --qr-code-finder-color: oklch(0.45 0.16 265);
+}

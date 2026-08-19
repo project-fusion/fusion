@@ -6274,6 +6274,18 @@ export type HelixBaseQrCodeProps = {
 Falling back to the value is deliberate: a code almost always holds a URL,
 and a URL is a better name than "QR code" for a reader who cannot see it. */
   label?: HelixBaseQrCode["label"];
+  /** How the modules are drawn.
+
+`square` is the default and the only one that joins runs of adjacent
+modules into a single subpath, which is what keeps a thousand modules to a
+handful of nodes. `rounded` and `dots` draw each module on its own, because
+the corners are the thing being drawn and a joined run has none in the
+middle. That cost is paid only by a code that asks for them.
+
+A scanner reads contrast between cells, not their shape, so all three
+scan. `dots` sits a little under half a module so neighbours do not touch,
+which is what makes it read as dots rather than as a softened square code. */
+  shape?: HelixBaseQrCode["shape"];
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
@@ -6292,6 +6304,18 @@ export type HelixBaseQrCodeSolidJsProps = {
 Falling back to the value is deliberate: a code almost always holds a URL,
 and a URL is a better name than "QR code" for a reader who cannot see it. */
   "prop:label"?: HelixBaseQrCode["label"];
+  /** How the modules are drawn.
+
+`square` is the default and the only one that joins runs of adjacent
+modules into a single subpath, which is what keeps a thousand modules to a
+handful of nodes. `rounded` and `dots` draw each module on its own, because
+the corners are the thing being drawn and a joined run has none in the
+middle. That cost is paid only by a code that asks for them.
+
+A scanner reads contrast between cells, not their shape, so all three
+scan. `dots` sits a little under half a module so neighbours do not touch,
+which is what makes it read as dots rather than as a softened square code. */
+  "prop:shape"?: HelixBaseQrCode["shape"];
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
@@ -14823,6 +14847,17 @@ export type CustomElements = {
    *
    * Falling back to the value is deliberate: a code almost always holds a URL,
    * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `shape`: How the modules are drawn.
+   *
+   * `square` is the default and the only one that joins runs of adjacent
+   * modules into a single subpath, which is what keeps a thousand modules to a
+   * handful of nodes. `rounded` and `dots` draw each module on its own, because
+   * the corners are the thing being drawn and a joined run has none in the
+   * middle. That cost is paid only by a code that asks for them.
+   *
+   * A scanner reads contrast between cells, not their shape, so all three
+   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * which is what makes it read as dots rather than as a softened square code.
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
@@ -14842,6 +14877,8 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `code`: The square itself.
+   * - `modules`: Everything but the three corner squares.
+   * - `finders`: The three corner squares, which can take their own colour.
    * - `logo`: The box holding the centre mark.
    */
   "helix-base-qr-code": Partial<
@@ -23033,6 +23070,17 @@ export type CustomElementsSolidJs = {
    *
    * Falling back to the value is deliberate: a code almost always holds a URL,
    * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `shape`: How the modules are drawn.
+   *
+   * `square` is the default and the only one that joins runs of adjacent
+   * modules into a single subpath, which is what keeps a thousand modules to a
+   * handful of nodes. `rounded` and `dots` draw each module on its own, because
+   * the corners are the thing being drawn and a joined run has none in the
+   * middle. That cost is paid only by a code that asks for them.
+   *
+   * A scanner reads contrast between cells, not their shape, so all three
+   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * which is what makes it read as dots rather than as a softened square code.
    * - `correction`: How much of the code can be lost and still read.
    *
    * `M` by default, which is the level almost every code in the world uses and
@@ -23052,6 +23100,8 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `code`: The square itself.
+   * - `modules`: Everything but the three corner squares.
+   * - `finders`: The three corner squares, which can take their own colour.
    * - `logo`: The box holding the centre mark.
    */
   "helix-base-qr-code": Partial<

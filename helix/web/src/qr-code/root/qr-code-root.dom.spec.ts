@@ -49,13 +49,30 @@ const expected = (value: string, ecc: 'H' | 'L' | 'M' | 'Q'): Set<string> => {
 
 const svgOf = (host: Code): SVGElement => part(host, 'code') as unknown as SVGElement
 
+/**
+ * Every cell either path fills, which is what "the code" means now.
+ *
+ * The drawing is two paths, the modules and the three corner squares, so that
+ * the finders can take a colour of their own: one path is one fill. Anything
+ * asking whether the picture matches the encoder has to put them back together.
+ */
+const allCells = (host: Code): Set<string> => {
+  const found = new Set<string>()
+  for (const path of svgOf(host).querySelectorAll('path')) {
+    for (const cell of cellsOf(path.getAttribute('d') ?? '')) {
+      found.add(cell)
+    }
+  }
+  return found
+}
+
 describe('qr code', () => {
   test('the path is the matrix, module for module', async () => {
     /* Runs are joined, so this cannot be checked by counting nodes. Expanding
        the path back into cells is the only comparison that proves the drawing
        and the encoding agree. */
     const host = await code('<helix-qr-code value="https://helix.fusion.dev"></helix-qr-code>')
-    const drawn = cellsOf(svgOf(host).querySelector('path')?.getAttribute('d') ?? '')
+    const drawn = allCells(host)
     expect(drawn).toEqual(expected('https://helix.fusion.dev', 'M'))
     expect(drawn.size).toBeGreaterThan(100)
   })
@@ -94,9 +111,74 @@ describe('qr code', () => {
 
   test('correction is `M` unless asked otherwise', async () => {
     const host = await code('<helix-qr-code correction="L" value="hello"></helix-qr-code>')
-    const drawn = cellsOf(svgOf(host).querySelector('path')?.getAttribute('d') ?? '')
+    const drawn = allCells(host)
     expect(drawn).toEqual(expected('hello', 'L'))
     expect(drawn).not.toEqual(expected('hello', 'M'))
+  })
+
+  test('every shape covers exactly the modules the encoder set', async () => {
+    /* A scanner reads contrast between cells, not their shape, so what matters
+       is coverage rather than geometry. `dots` and `rounded` draw one shape per
+       module, so their subpath starts *are* the modules; `square` joins runs, so
+       its starts are fewer and only have to be a subset. The finders are drawn
+       square in every case and are checked separately. */
+    const value = 'https://helix.fusion.dev'
+    const { data, size } = encode(value, { border: 0, ecc: 'M' })
+    const finder = (x: number, y: number): boolean =>
+      (x < 8 && y < 8) || (size - 1 - x < 8 && y < 8) || (x < 8 && size - 1 - y < 8)
+    const body = new Set<string>()
+    for (const [y, row] of data.entries()) {
+      for (const [x, on] of row.entries()) {
+        if (on && !finder(x, y)) {
+          body.add(`${x},${y}`)
+        }
+      }
+    }
+
+    for (const shape of ['dots', 'rounded']) {
+      const host = await code(`<helix-qr-code shape="${shape}" value="${value}"></helix-qr-code>`)
+      const d = svgOf(host).querySelector('[part="modules"]')?.getAttribute('d') ?? ''
+      const drawn = new Set(
+        [...d.matchAll(/M([\d.]+) ([\d.]+)/g)].map(
+          ([, x, y]) => `${Math.floor(Number(x))},${Math.floor(Number(y))}`,
+        ),
+      )
+      expect(drawn).toEqual(body)
+    }
+
+    const square = await code(`<helix-qr-code value="${value}"></helix-qr-code>`)
+    const d = svgOf(square).querySelector('[part="modules"]')?.getAttribute('d') ?? ''
+    const starts = [...d.matchAll(/M(\d+) (\d+)/g)].map(([, x, y]) => `${x},${y}`)
+    expect(starts.length).toBeLessThan(body.size)
+    expect(starts.every((cell) => body.has(cell))).toBe(true)
+  })
+
+  test('the corner squares are their own path, and stay square', async () => {
+    /* They are what a scanner locks onto first, so rounding them trades
+       reliability for decoration. Separating them is also what lets them take
+       a colour of their own: one path is one fill. */
+    const host = await code('<helix-qr-code shape="dots" value="hello"></helix-qr-code>')
+    const finders = svgOf(host).querySelector('[part="finders"]')?.getAttribute('d') ?? ''
+    expect(finders).not.toBe('')
+    // A run-joined square path uses `h`; an arc-drawn one uses `a`.
+    expect(finders).toContain('h')
+    expect(finders).not.toContain('a')
+  })
+
+  test('the finders are in the three corners the specification puts them', async () => {
+    const host = await code('<helix-qr-code value="hello"></helix-qr-code>')
+    const size = encode('hello', { border: 0, ecc: 'M' }).size
+    const starts = [
+      ...(svgOf(host).querySelector('[part="finders"]')?.getAttribute('d') ?? '').matchAll(
+        /M(\d+) (\d+)/g,
+      ),
+    ].map(([, x, y]) => ({ x: Number(x), y: Number(y) }))
+    const corner = (one: { x: number; y: number }): boolean =>
+      (one.x < 8 && one.y < 8) ||
+      (one.x >= size - 8 && one.y < 8) ||
+      (one.x < 8 && one.y >= size - 8)
+    expect(starts.length).toBeGreaterThan(0)
+    expect(starts.every(corner)).toBe(true)
   })
 
   test('nothing is drawn for nothing, rather than an empty square', async () => {
@@ -143,13 +225,13 @@ if (hasLayout()) {
          makes it unscannable. A consumer who filled the slot has said what they
          want without having to know that. */
       const host = await code(withLogo)
-      const drawn = cellsOf(svgOf(host).querySelector('path')?.getAttribute('d') ?? '')
+      const drawn = allCells(host)
       expect(drawn).toEqual(expected('hello', 'H'))
     })
 
     test('and an explicit correction still wins, because it was asked for', async () => {
       const host = await code(withLogo.replace('value=', 'correction="L" value='))
-      const drawn = cellsOf(svgOf(host).querySelector('path')?.getAttribute('d') ?? '')
+      const drawn = allCells(host)
       expect(drawn).toEqual(expected('hello', 'L'))
     })
 

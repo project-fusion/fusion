@@ -6,27 +6,87 @@ import { encode } from 'uqr'
 /** How much of the code can be lost and still read. */
 export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
 
+/** How the modules are drawn. */
+export type QrStyle = 'dots' | 'rounded' | 'square'
+
+/** Whether a module is one of the three finder squares, or their separators. */
+const isFinder = (x: number, y: number, size: number): boolean => {
+  const near = (a: number, b: number): boolean => a < 8 && b < 8
+  return near(x, y) || near(size - 1 - x, y) || near(x, size - 1 - y)
+}
+
 /**
  * The dark modules of a matrix, as one path.
  *
  * One `<path>` rather than a rect per module. A modest code is 33 by 33, so a
  * rect apiece is a thousand elements the browser lays out and the accessibility
- * tree walks, and every one of them is a one-unit square. The path is the same
- * picture in a single node, and runs of adjacent modules are joined into one
- * subpath so a row of eight costs one `h8` rather than eight squares.
+ * tree walks, and every one of them is a one-unit square.
+ *
+ * **`square` joins runs and the other styles cannot.** A row of eight square
+ * modules is one `h8`, which is what keeps the node count down; a row of eight
+ * *rounded* ones is eight shapes, because the corners are what is being drawn
+ * and a joined run has no corners in the middle of it. So the cost of the other
+ * styles is real and is paid only by the codes that ask for them.
+ *
+ * `only` splits the drawing in two without walking the matrix twice: the finder
+ * squares are structural, at three known corners, so a caller can ask for them
+ * alone and get a second path to paint differently.
  */
-const pathFor = (matrix: readonly (readonly boolean[])[]): string => {
+const pathFor = (
+  matrix: readonly (readonly boolean[])[],
+  style: QrStyle,
+  only: 'all' | 'body' | 'finders' = 'all',
+): string => {
+  const size = matrix.length
+  const wanted = (x: number, y: number): boolean => {
+    if (!matrix[y]?.[x]) {
+      return false
+    }
+    if (only === 'all') {
+      return true
+    }
+    return only === 'finders' ? isFinder(x, y, size) : !isFinder(x, y, size)
+  }
+
   const parts: string[] = []
-  for (const [y, row] of matrix.entries()) {
-    let run = 0
-    for (let x = 0; x <= row.length; x += 1) {
-      if (row[x]) {
-        run += 1
+  if (style === 'square') {
+    for (let y = 0; y < size; y += 1) {
+      let run = 0
+      for (let x = 0; x <= size; x += 1) {
+        if (wanted(x, y)) {
+          run += 1
+          continue
+        }
+        if (run > 0) {
+          parts.push(`M${x - run} ${y}h${run}v1h-${run}z`)
+          run = 0
+        }
+      }
+    }
+    return parts.join('')
+  }
+
+  /* A circle for `dots` and a squircle for `rounded`, both drawn as arcs on a
+     one-unit square. The radius is a little under half so neighbouring dots do
+     not touch, which is what makes a dotted code read as dots rather than as a
+     square one with soft edges. */
+  const r = style === 'dots' ? 0.45 : 0.28
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      if (!wanted(x, y)) {
         continue
       }
-      if (run > 0) {
-        parts.push(`M${x - run} ${y}h${run}v1h-${run}z`)
-        run = 0
+      if (style === 'dots') {
+        parts.push(
+          `M${x + 0.5 - r} ${y + 0.5}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0z`,
+        )
+      } else {
+        parts.push(
+          `M${x + r} ${y}h${1 - r * 2}a${r} ${r} 0 0 1 ${r} ${r}` +
+            `v${1 - r * 2}a${r} ${r} 0 0 1 ${-r} ${r}` +
+            `h${-(1 - r * 2)}a${r} ${r} 0 0 1 ${-r} ${-r}` +
+            `v${-(1 - r * 2)}a${r} ${r} 0 0 1 ${r} ${-r}z`,
+        )
       }
     }
   }
@@ -68,6 +128,8 @@ const pathFor = (matrix: readonly (readonly boolean[])[]): string => {
  * @slot logo - A mark for the centre, which only reads at a high correction.
  *
  * @csspart code - The square itself.
+ * @csspart modules - Everything but the three corner squares.
+ * @csspart finders - The three corner squares, which can take their own colour.
  * @csspart logo - The box holding the centre mark.
  */
 @customElement('helix-base-qr-code')
@@ -84,6 +146,22 @@ export class HelixBaseQrCode extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * How the modules are drawn.
+   *
+   * `square` is the default and the only one that joins runs of adjacent
+   * modules into a single subpath, which is what keeps a thousand modules to a
+   * handful of nodes. `rounded` and `dots` draw each module on its own, because
+   * the corners are the thing being drawn and a joined run has none in the
+   * middle. That cost is paid only by a code that asks for them.
+   *
+   * A scanner reads contrast between cells, not their shape, so all three
+   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * which is what makes it read as dots rather than as a softened square code.
+   */
+  @property()
+  shape: QrStyle = 'square'
 
   /**
    * How much of the code can be lost and still read.
@@ -120,6 +198,13 @@ export class HelixBaseQrCode extends HelixElement {
        was given. */
     const quiet = 4
     const box = size + quiet * 2
+    /* The three corner squares as their own path, so they can take their own
+       colour. Their positions are structural rather than guessed: seven by
+       seven at each of three corners, plus the separator ring, which is what
+       `isFinder` describes. Drawn square whatever the body's style is, because
+       they are what a scanner locks onto first and rounding them costs
+       reliability for decoration. */
+    const finders = pathFor(result.data, 'square', 'finders')
     return svg`<svg
       part="code"
       viewBox="0 0 ${box} ${box}"
@@ -128,7 +213,18 @@ export class HelixBaseQrCode extends HelixElement {
       aria-label=${this.label || this.value}
       shape-rendering="crispEdges"
     >
-      <path d=${pathFor(result.data)} transform="translate(${quiet} ${quiet})" fill="currentColor" />
+      <path
+        part="modules"
+        d=${pathFor(result.data, this.shape, 'body')}
+        transform="translate(${quiet} ${quiet})"
+        fill="currentColor"
+      />
+      <path
+        part="finders"
+        d=${finders}
+        transform="translate(${quiet} ${quiet})"
+        fill="currentColor"
+      />
     </svg>`
   }
 
