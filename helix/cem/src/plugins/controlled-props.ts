@@ -91,6 +91,22 @@ export interface ControlledPropsOptions {
  *
  * Reaches typed JSX only, so the runtime audit stays for everyone else.
  *
+ * **And it reaches only the four mixins, which is not every controlled
+ * property.** Eight more are implemented directly in a component and pass their
+ * own `label` to `requestControlledChange`: pagination's `page` and its size
+ * `value`, toast's `open`, listbox's `filter`, splitter's `position` and
+ * `collapsed`, carousel's `index`, date picker's `month`. Every one of them is
+ * controlled in exactly the sense this guards against, and none is guarded,
+ * because `inheritedFrom` is the only signal in the manifest and they inherit
+ * from nothing.
+ *
+ * The fix is to stop inferring it. An `@controlled helix-change` tag on the
+ * property, read into the manifest and checked against the
+ * `requestControlledChange` calls the way `check:events` checks `@event`, would
+ * cover all twelve and could not drift. Deliberately not done here: it is a
+ * manifest change plus a check plus twelve declarations, and it should not ride
+ * along inside the plugin that consumes it.
+ *
  * Runs after the generator, so list it after `jsxTypesPlugin`.
  */
 export const controlledProps = ({
