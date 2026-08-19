@@ -39569,9 +39569,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'toggle' | 'underline' | undefined"
+                "text": "'segmented' | 'underline' | undefined"
               },
-              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `toggle` puts the pill in a framed, sunken track, which reads\nas one control rather than as a row.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `segmented` puts the pill in a framed, sunken track, which\nreads as one control rather than as a row.\n\n`segmented` and not `toggle`, which is what this was called. An appearance\nvalue that is another component's name says \"it looks like that one\", which\na reader can only act on if they already know what that one looks like, and\nevery other appearance in the library describes itself: `outlined`,\n`spaced`, `underline`, `plain`. This component's own comments called it\nsegmented in both places it explained itself, which is the name that was\ndoing the work.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
@@ -39812,9 +39812,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'toggle' | 'underline' | undefined"
+                "text": "'segmented' | 'underline' | undefined"
               },
-              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `toggle` puts the pill in a framed, sunken track, which reads\nas one control rather than as a row.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
+              "description": "How the row reads.\n\nUnset is a raised pill on the selected tab with nothing behind the row,\nwhich is what a set sitting inside other chrome wants. `underline` is a\nrule under the row and a thicker one under the selected tab, for a set that\nheads a page. `segmented` puts the pill in a framed, sunken track, which\nreads as one control rather than as a row.\n\n`segmented` and not `toggle`, which is what this was called. An appearance\nvalue that is another component's name says \"it looks like that one\", which\na reader can only act on if they already know what that one looks like, and\nevery other appearance in the library describes itself: `outlined`,\n`spaced`, `underline`, `plain`. This component's own comments called it\nsegmented in both places it explained itself, which is the name that was\ndoing the work.\n\nReflected and left unset by default, so the host carries nothing a\nconsumer's server markup does not already have.",
               "fieldName": "appearance",
               "inheritedFrom": {
                 "name": "HelixBaseTabs",
@@ -41930,6 +41930,10 @@
             {
               "description": "Wash behind the times inside a range.",
               "name": "--time-picker-range-color"
+            },
+            {
+              "description": "Fill on the chosen row of a wheel.",
+              "name": "--time-picker-selected-color"
             }
           ],
           "members": [
@@ -42397,6 +42401,21 @@
               "type": {
                 "text": "reveal() => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "revealWhenSettled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Reveals once the wheels have rendered themselves.\n\n`updated` is this element's own moment, and each wheel is a `helix-listbox`\nthat was created during this very render: its first update has been\nscheduled and has not run, so it has no rows and no height and `reveal`\nmeasures zero and gives up. Measured on a standalone picker, every column\nsat at `scrollTop: 0` with the answer nine rows down, which reads as a wheel\nshowing the wrong time rather than as one that failed to scroll.\n\nIt survived because the case that was tested was the panel, and whatever\nopens a panel calls `reveal` again afterwards for the separate reason the\nmethod documents. Flat on a page there is no panel and no second call.\n\nSafe to run on every update: the listbox stops as soon as the chosen row is\nwithin a pixel of centre, so a call with nothing to do costs two rect reads\nand changes nothing. It cannot fight a reader mid-scroll either, since\nscrolling a wheel changes no property and so schedules no update.",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"

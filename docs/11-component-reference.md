@@ -3785,7 +3785,7 @@ a movement instead of two separate fills.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `appearance` | `appearance` | `'toggle' \| 'underline' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
+| `appearance` | `appearance` | `'segmented' \| 'underline' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
 | `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
@@ -4155,6 +4155,7 @@ card would be a card inside a card there.
 | `--time-picker-wheel-height` | How tall a wheel is. Five rows by default. |
 | `--time-picker-row-size` | Height and least width of one row in a wheel. |
 | `--time-picker-range-color` | Wash behind the times inside a range. |
+| `--time-picker-selected-color` | Fill on the chosen row of a wheel. |
 
 ## Toast
 

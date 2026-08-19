@@ -7715,8 +7715,16 @@ how markup says where to start. */
 Unset is a raised pill on the selected tab with nothing behind the row,
 which is what a set sitting inside other chrome wants. `underline` is a
 rule under the row and a thicker one under the selected tab, for a set that
-heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-as one control rather than as a row.
+heads a page. `segmented` puts the pill in a framed, sunken track, which
+reads as one control rather than as a row.
+
+`segmented` and not `toggle`, which is what this was called. An appearance
+value that is another component's name says "it looks like that one", which
+a reader can only act on if they already know what that one looks like, and
+every other appearance in the library describes itself: `outlined`,
+`spaced`, `underline`, `plain`. This component's own comments called it
+segmented in both places it explained itself, which is the name that was
+doing the work.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
@@ -7762,8 +7770,16 @@ how markup says where to start. */
 Unset is a raised pill on the selected tab with nothing behind the row,
 which is what a set sitting inside other chrome wants. `underline` is a
 rule under the row and a thicker one under the selected tab, for a set that
-heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-as one control rather than as a row.
+heads a page. `segmented` puts the pill in a framed, sunken track, which
+reads as one control rather than as a row.
+
+`segmented` and not `toggle`, which is what this was called. An appearance
+value that is another component's name says "it looks like that one", which
+a reader can only act on if they already know what that one looks like, and
+every other appearance in the library describes itself: `outlined`,
+`spaced`, `underline`, `plain`. This component's own comments called it
+segmented in both places it explained itself, which is the name that was
+doing the work.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
@@ -15009,8 +15025,16 @@ export type CustomElements = {
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underline` is a
    * rule under the row and a thicker one under the selected tab, for a set that
-   * heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-   * as one control rather than as a row.
+   * heads a page. `segmented` puts the pill in a framed, sunken track, which
+   * reads as one control rather than as a row.
+   *
+   * `segmented` and not `toggle`, which is what this was called. An appearance
+   * value that is another component's name says "it looks like that one", which
+   * a reader can only act on if they already know what that one looks like, and
+   * every other appearance in the library describes itself: `outlined`,
+   * `spaced`, `underline`, `plain`. This component's own comments called it
+   * segmented in both places it explained itself, which is the name that was
+   * doing the work.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
@@ -15524,6 +15548,7 @@ export type CustomElements = {
    * - `--time-picker-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
    * - `--time-picker-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-picker-range-color`: Wash behind the times inside a range. (default: `undefined`)
+   * - `--time-picker-selected-color`: Fill on the chosen row of a wheel. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22208,8 +22233,16 @@ export type CustomElementsSolidJs = {
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underline` is a
    * rule under the row and a thicker one under the selected tab, for a set that
-   * heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-   * as one control rather than as a row.
+   * heads a page. `segmented` puts the pill in a framed, sunken track, which
+   * reads as one control rather than as a row.
+   *
+   * `segmented` and not `toggle`, which is what this was called. An appearance
+   * value that is another component's name says "it looks like that one", which
+   * a reader can only act on if they already know what that one looks like, and
+   * every other appearance in the library describes itself: `outlined`,
+   * `spaced`, `underline`, `plain`. This component's own comments called it
+   * segmented in both places it explained itself, which is the name that was
+   * doing the work.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
@@ -22735,6 +22768,7 @@ export type CustomElementsSolidJs = {
    * - `--time-picker-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
    * - `--time-picker-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-picker-range-color`: Wash behind the times inside a range. (default: `undefined`)
+   * - `--time-picker-selected-color`: Fill on the chosen row of a wheel. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23763,6 +23797,8 @@ export type CustomCssProperties = {
   "--time-picker-row-size"?: string;
   /** Wash behind the times inside a range. */
   "--time-picker-range-color"?: string;
+  /** Fill on the chosen row of a wheel. */
+  "--time-picker-selected-color"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
   /** Distance from the edges of the window. */

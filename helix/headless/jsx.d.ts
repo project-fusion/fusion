@@ -6959,8 +6959,16 @@ export type HelixBaseTabsProps = {
 Unset is a raised pill on the selected tab with nothing behind the row,
 which is what a set sitting inside other chrome wants. `underline` is a
 rule under the row and a thicker one under the selected tab, for a set that
-heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-as one control rather than as a row.
+heads a page. `segmented` puts the pill in a framed, sunken track, which
+reads as one control rather than as a row.
+
+`segmented` and not `toggle`, which is what this was called. An appearance
+value that is another component's name says "it looks like that one", which
+a reader can only act on if they already know what that one looks like, and
+every other appearance in the library describes itself: `outlined`,
+`spaced`, `underline`, `plain`. This component's own comments called it
+segmented in both places it explained itself, which is the name that was
+doing the work.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
@@ -7006,8 +7014,16 @@ export type HelixBaseTabsSolidJsProps = {
 Unset is a raised pill on the selected tab with nothing behind the row,
 which is what a set sitting inside other chrome wants. `underline` is a
 rule under the row and a thicker one under the selected tab, for a set that
-heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-as one control rather than as a row.
+heads a page. `segmented` puts the pill in a framed, sunken track, which
+reads as one control rather than as a row.
+
+`segmented` and not `toggle`, which is what this was called. An appearance
+value that is another component's name says "it looks like that one", which
+a reader can only act on if they already know what that one looks like, and
+every other appearance in the library describes itself: `outlined`,
+`spaced`, `underline`, `plain`. This component's own comments called it
+segmented in both places it explained itself, which is the name that was
+doing the work.
 
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
@@ -14206,8 +14222,16 @@ export type CustomElements = {
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underline` is a
    * rule under the row and a thicker one under the selected tab, for a set that
-   * heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-   * as one control rather than as a row.
+   * heads a page. `segmented` puts the pill in a framed, sunken track, which
+   * reads as one control rather than as a row.
+   *
+   * `segmented` and not `toggle`, which is what this was called. An appearance
+   * value that is another component's name says "it looks like that one", which
+   * a reader can only act on if they already know what that one looks like, and
+   * every other appearance in the library describes itself: `outlined`,
+   * `spaced`, `underline`, `plain`. This component's own comments called it
+   * segmented in both places it explained itself, which is the name that was
+   * doing the work.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
@@ -21419,8 +21443,16 @@ export type CustomElementsSolidJs = {
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underline` is a
    * rule under the row and a thicker one under the selected tab, for a set that
-   * heads a page. `toggle` puts the pill in a framed, sunken track, which reads
-   * as one control rather than as a row.
+   * heads a page. `segmented` puts the pill in a framed, sunken track, which
+   * reads as one control rather than as a row.
+   *
+   * `segmented` and not `toggle`, which is what this was called. An appearance
+   * value that is another component's name says "it looks like that one", which
+   * a reader can only act on if they already know what that one looks like, and
+   * every other appearance in the library describes itself: `outlined`,
+   * `spaced`, `underline`, `plain`. This component's own comments called it
+   * segmented in both places it explained itself, which is the name that was
+   * doing the work.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.

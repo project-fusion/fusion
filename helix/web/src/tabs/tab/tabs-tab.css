@@ -13,8 +13,12 @@
   background-color: var(--_tab-surface, transparent);
   /* The height a control is. A tab was as tall as its own text plus whatever
      padding the appearance asked for, which came out at 31px next to a 40px
-     button and made a toolbar look assembled from parts. */
-  block-size: var(--helix-size-control);
+     button and made a toolbar look assembled from parts.
+
+     Through a variable, because an appearance that puts a frame around the row
+     has to hand the tab a share of the frame rather than the whole control
+     height. `segmented` does exactly that. */
+  block-size: var(--_tab-height, var(--helix-size-control));
   border: none;
   /* Transparent always. The mark that says which tab is current is one
      element in the strip that travels, not a border that blinks off here and
