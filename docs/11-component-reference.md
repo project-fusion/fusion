@@ -5502,6 +5502,7 @@ to do next.
 | `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
 | `video` | The video itself. |
 | `poster` | What covers it before it plays. |
+| `cue` | The caption on screen now, drawn by this element. |
 | `controls` | The bar along the bottom. |
 | `play` | Play and pause. |
 | `scrubber` | Where it is, and where to go. |

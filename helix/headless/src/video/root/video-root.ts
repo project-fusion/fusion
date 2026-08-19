@@ -76,6 +76,7 @@ const clock = (seconds: number): string => {
  * target the keys are bound to.
  * @csspart video - The video itself.
  * @csspart poster - What covers it before it plays.
+ * @csspart cue - The caption on screen now, drawn by this element.
  * @csspart controls - The bar along the bottom.
  * @csspart play - Play and pause.
  * @csspart scrubber - Where it is, and where to go.
@@ -161,6 +162,10 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private hasCaptions = false
 
+  /** The words of the cue on screen now, or nothing between cues. */
+  @state()
+  private cue = ''
+
   /** The sources and caption tracks to copy into the video, as the consumer wrote them. */
   @state()
   private media: { attrs: Record<string, string>; tag: 'source' | 'track' }[] = []
@@ -229,6 +234,21 @@ export class HelixBaseVideo extends HelixElement {
       return
     }
     this.duration = video.duration
+    /* The video's own shape, handed to CSS as a number.
+     *
+     * `aspect-ratio: auto` cannot be used for this, and that is the whole
+     * reason this exists: `auto` takes the element's intrinsic ratio, and a
+     * `<video>` carrying a poster reports the *poster's*. A three-by-two still
+     * over a sixteen-by-nine clip made the box three-by-two, so the poster
+     * filled it and the video letterboxed inside, standing fifty pixels
+     * shorter the moment it started. Measured at 488 by 325 where the video
+     * wanted 488 by 275.
+     *
+     * Set once the metadata is in, which is the first moment the real ratio is
+     * knowable at all. Until then the stylesheet's own default holds. */
+    if (video.videoWidth > 0 && video.videoHeight > 0) {
+      this.style.setProperty('--_video-ratio', `${video.videoWidth} / ${video.videoHeight}`)
+    }
     /* Read once the video has its tracks, not from the slot. A `<track>` is
        only a caption once the platform has parsed it, and a consumer can add
        one later. */
@@ -236,7 +256,17 @@ export class HelixBaseVideo extends HelixElement {
     /* And what the first one is doing, which is not always nothing: a
        `<track default>` starts showing without anyone pressing anything, so a
        button that began at "off" reported the opposite of what was on screen. */
-    this.captioned = video.textTracks[0]?.mode === 'showing'
+    const track = video.textTracks[0]
+    if (track) {
+      /* A `<track default>` arrives `showing`, which is the browser drawing it.
+         Moved to `hidden` so the cues keep coming and we draw them instead. */
+      if (track.mode === 'showing') {
+        track.mode = 'hidden'
+      }
+      this.captioned = track.mode === 'hidden'
+      track.addEventListener('cuechange', this.handleCue)
+      this.handleCue()
+    }
   }
 
   private readonly handleTime = (): void => {
@@ -265,15 +295,39 @@ export class HelixBaseVideo extends HelixElement {
     this.silent = video.muted
   }
 
+  /**
+   * Draws the active cue ourselves, so it can be put where we want it.
+   *
+   * The browser renders cues inside the video's own box and there is no
+   * standard way to inset that box: a caption lands under the control bar and
+   * stays there. `::cue` styles the text and not the region, and the property
+   * that moves the region is a `-webkit-` internal that two of the three
+   * engines do not have.
+   *
+   * So the track is set to `hidden` rather than `showing`, which is the mode
+   * that keeps the cues coming without drawing them, and what it reports is
+   * rendered into a part of our own. That also makes captions styleable, which
+   * `::cue` only half allows.
+   */
+  private readonly handleCue = (): void => {
+    const track = this.video?.textTracks[0]
+    const active = track?.activeCues?.[0]
+    this.cue = active instanceof VTTCue ? active.text : ''
+  }
+
   /** Turns the first caption track on or off, which is what the button means. */
   private toggleCaptions(): void {
     const track = this.video?.textTracks[0]
     if (!track) {
       return
     }
-    const next = track.mode !== 'showing'
-    track.mode = next ? 'showing' : 'disabled'
+    const next = track.mode === 'disabled'
+    /* `hidden`, never `showing`. Hidden is the mode where a track still fires
+       `cuechange` and still fills `activeCues`, and the browser draws nothing:
+       exactly what is wanted when something else is doing the drawing. */
+    track.mode = next ? 'hidden' : 'disabled'
     this.captioned = next
+    this.cue = ''
   }
 
   private async toggleFullscreen(): Promise<void> {
@@ -386,12 +440,7 @@ export class HelixBaseVideo extends HelixElement {
     if (changed.has('media')) {
       const video = this.video
       video?.load()
-      const track = video?.textTracks[0]
       this.hasCaptions = (video?.textTracks.length ?? 0) > 0
-      /* Read, not assumed. A `<track default>` starts showing without anyone
-         pressing anything, so a button that began at "off" was reporting the
-         opposite of what the reader could see on the picture. */
-      this.captioned = track?.mode === 'showing'
     }
   }
 
@@ -532,6 +581,7 @@ export class HelixBaseVideo extends HelixElement {
            No backticks in here: this comment is inside a template literal, and
            the first one ends it. -->
       <span aria-hidden="true" hidden><slot @slotchange=${this.handleMedia}></slot></span>
+      ${this.cue === '' ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
       <slot name="poster" part="poster"></slot>
       ${this.controls ? nothing : this.renderBar()}
     </div>`

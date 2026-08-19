@@ -35,7 +35,13 @@
  * frame, is fitted the same way, so the two cannot disagree even where a
  * consumer's ratio and their file's do. */
 [part="video"] {
-  aspect-ratio: var(--video-aspect-ratio, auto 16 / 9);
+  /* The video's ratio once it is known, and sixteen by nine until then. Not
+     `auto`: that takes the element's intrinsic ratio, and a video carrying a
+     poster reports the poster's, so the box took the still's shape and the
+     clip letterboxed inside it. The element writes `--_video-ratio` from
+     `videoWidth` and `videoHeight`, which is the only source that is always
+     the video. */
+  aspect-ratio: var(--video-aspect-ratio, var(--_video-ratio, 16 / 9));
   /* Dark, and not a token that turns over with the theme. `surface-inverse` is
      near-white in dark mode, so the well behind an unloaded video came out white
      on a black page and the bar's light ink vanished into it. A video sits in a
@@ -319,6 +325,50 @@
    promise the `poster` attribute makes: `inset: 0` against the stage, and
    `object-fit` on whatever they put in it, so an image of any ratio is fitted
    into the video's box rather than setting its own. */
+/* The caption, above the bar and clear of it.
+ *
+ * Which is the reason the element draws it at all: a browser renders cues
+ * inside the video's own box, with no standard way to inset that box, so a
+ * caption sits under the controls and stays there. The offset follows the bar,
+ * so the line lifts while the bar is up and settles when it has gone.
+ *
+ * Its own ground, because a caption is light text over a picture that could be
+ * anything. Centred and held to a measure rather than run edge to edge: a
+ * subtitle as wide as the video is a line nobody tracks back from. */
+[part="cue"] {
+  background-color: var(--helix-color-overlay);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-media);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  inline-size: max-content;
+  inset-block-end: calc(var(--helix-size-icon-lg) + var(--helix-space-lg));
+  inset-inline-start: 50%;
+  margin: var(--helix-space-none);
+  max-inline-size: min(80%, 36rem);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: absolute;
+  text-align: center;
+  text-wrap: balance;
+  transition: inset-block-end var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: -50% 0;
+}
+
+/* Down where the bar has gone, so a caption is not left floating in the middle
+   of nothing while a video plays unattended. */
+:host([data-playing]:not(:hover):not(:focus-within)) [part="cue"] {
+  inset-block-end: var(--helix-space-lg);
+}
+
+/* On a solid bar the groove is cut into it rather than laid on top, which is
+   what a bar with a ground of its own wants. The transparent one has no bar to
+   cut into, so its track stays a wash of the ink. */
+:host([appearance="solid"]) [part="scrubber"],
+:host([appearance="solid"]) [part="volume"] {
+  background-color: color-mix(in oklab, var(--helix-color-surface-media) 55%, currentColor 18%);
+  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--helix-color-surface-media) 70%, transparent);
+}
+
 [part="poster"] {
   display: block;
   inset: 0;
@@ -334,6 +384,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part="controls"],
+  [part="cue"],
   [part="stage"]::before,
   [part="volume"] {
     transition: none;

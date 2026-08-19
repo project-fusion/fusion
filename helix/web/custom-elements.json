@@ -56780,6 +56780,20 @@
             },
             {
               "kind": "field",
+              "name": "cue",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The words of the cue on screen now, or nothing between cues.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "media",
               "type": {
                 "text": "{ attrs: Record<string, string>; tag: 'source' | 'track' }[]"
@@ -56894,6 +56908,17 @@
               "name": "handleVolume",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleCue",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Draws the active cue ourselves, so it can be put where we want it.\n\nThe browser renders cues inside the video's own box and there is no\nstandard way to inset that box: a caption lands under the control bar and\nstays there. `::cue` styles the text and not the region, and the property\nthat moves the region is a `-webkit-` internal that two of the three\nengines do not have.\n\nSo the track is set to `hidden` rather than `showing`, which is the mode\nthat keeps the cues coming without drawing them, and what it reports is\nrendered into a part of our own. That also makes captions styleable, which\n`::cue` only half allows.",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -57246,6 +57271,14 @@
             {
               "description": "What covers it before it plays.",
               "name": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The caption on screen now, drawn by this element.",
+              "name": "cue",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"

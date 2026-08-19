@@ -265,31 +265,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -498,31 +473,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -785,31 +735,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -1049,31 +974,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -1254,31 +1154,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -1519,31 +1394,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -1793,31 +1643,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -2026,31 +1851,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -2209,31 +2009,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -2404,31 +2179,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -2579,31 +2329,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -3005,31 +2730,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -3262,31 +2962,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -3451,31 +3126,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -3885,31 +3535,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -4491,31 +4116,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -5400,31 +5000,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -5776,31 +5351,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -5968,31 +5518,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -7021,31 +6546,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -8158,31 +7658,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -9454,31 +8929,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -10129,31 +9579,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -10775,31 +10200,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -12063,31 +11463,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -13231,31 +12606,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -13839,31 +13189,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -14116,31 +13441,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -14517,31 +13817,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -14875,31 +14150,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -15348,31 +14598,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -15612,31 +14837,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -16435,31 +15635,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -17158,31 +16333,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -17322,31 +16472,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -18832,31 +17957,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -19229,31 +18329,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -19425,31 +18500,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -19593,31 +18643,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -20797,31 +19822,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -21214,31 +20214,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -21536,31 +20511,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -22212,31 +21162,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -22733,31 +21658,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -23059,31 +21959,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -24044,31 +22919,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -24425,31 +23275,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -24690,31 +23515,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -25120,31 +23920,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -25814,31 +24589,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -26284,31 +25034,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -26550,31 +25275,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -27511,31 +26211,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -28093,31 +26768,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -28434,31 +27084,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -28744,31 +27369,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -28954,31 +27554,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -29733,31 +28308,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -30114,31 +28664,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -31156,31 +29681,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -31545,31 +30045,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -32390,31 +30865,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -33309,31 +31759,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -33581,31 +32006,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -33782,31 +32182,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -34166,31 +32541,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -34493,31 +32843,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -35322,31 +33647,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -35629,31 +33929,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -35823,31 +34098,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -36240,31 +34490,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -36459,31 +34684,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -36674,31 +34874,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -37103,31 +35278,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -37398,31 +35548,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -37674,31 +35799,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -38559,31 +36659,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -39916,31 +37991,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -41059,31 +39109,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -41647,31 +39672,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -41886,31 +39886,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -42673,31 +40648,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -43056,31 +41006,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -43368,31 +41293,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -43960,31 +41860,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -44568,31 +42443,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
@@ -45212,31 +43062,6 @@
             },
             {
               "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
-              }
-            },
-            {
-              "kind": "method",
               "name": "relayNativeEvent",
               "privacy": "protected",
               "return": {
@@ -45475,6 +43300,10 @@
               "name": "poster"
             },
             {
+              "description": "The caption on screen now, drawn by this element.",
+              "name": "cue"
+            },
+            {
               "description": "The bar along the bottom.",
               "name": "controls"
             },
@@ -45699,6 +43528,16 @@
             },
             {
               "kind": "field",
+              "name": "cue",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The words of the cue on screen now, or nothing between cues."
+            },
+            {
+              "kind": "field",
               "name": "media",
               "type": {
                 "text": "{ attrs: Record<string, string>; tag: 'source' | 'track' }[]"
@@ -45783,6 +43622,13 @@
               "readonly": true
             },
             {
+              "kind": "field",
+              "name": "handleCue",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Draws the active cue ourselves, so it can be put where we want it.\n\nThe browser renders cues inside the video's own box and there is no\nstandard way to inset that box: a caption lands under the control bar and\nstays there. `::cue` styles the text and not the region, and the property\nthat moves the region is a `-webkit-` internal that two of the three\nengines do not have.\n\nSo the track is set to `hidden` rather than `showing`, which is the mode\nthat keeps the cues coming without drawing them, and what it reports is\nrendered into a part of our own. That also makes captions styleable, which\n`::cue` only half allows."
+            },
+            {
               "kind": "method",
               "name": "toggleCaptions",
               "privacy": "private",
@@ -45838,31 +43684,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "dispatchEvent",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ],
-              "description": "Announces an event, having first bound whatever React is holding for it.\n\nEvery event this library sends passes through here, the concrete classes in\n`events.ts` and the relayed native ones alike, and `requestControlledChange`\ndispatches through the host as well. One override therefore covers all\nninety-seven of them, which is the reason it is here rather than at each\ndispatch. See `bindReactHandler`.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              },
-              "type": {
-                "text": "dispatchEvent(event: Event) => boolean"
               }
             },
             {
