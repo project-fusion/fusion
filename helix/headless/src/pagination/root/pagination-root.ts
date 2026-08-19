@@ -508,7 +508,7 @@ export class HelixBasePagination extends HelixElement {
 
     /* Feature-tested rather than assumed, the same way `hostAria` tests element
        references: an engine without `CustomStateSet` gets a control that renders
-       its one page instead of disappearing, which is the behaviour this had
+       its one page instead of disappearing, which is the behavior this had
        before and is not broken. */
     if ('states' in this.internals) {
       this.internals.states[this.count <= 1 ? 'add' : 'delete']('empty')

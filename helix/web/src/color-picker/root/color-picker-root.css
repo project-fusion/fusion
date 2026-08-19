@@ -18,7 +18,7 @@
  * A checkerboard behind the color rather than a solid, so a color carrying
  * alpha reads as partly transparent instead of as a slightly different color.
  * Two gradients rather than an image, because a data URI would be a second thing
- * to theme and this one only ever needs two greys. */
+ * to theme and this one only ever needs two grays. */
 [part="sample"],
 [part="swatch"] {
   background-image:
@@ -311,7 +311,7 @@
    own, so the error goes where an error goes on every other field in the
    library rather than onto the square, which is a picture of a color space and
    not an answer. Hover and focus named as well, so the border cannot be taken
-   back to grey by the pointer or to blue by the caret: one edge, one color,
+   back to gray by the pointer or to blue by the caret: one edge, one color,
    the arrangement Input records. */
 :host([invalid]) [part="value"],
 :host([invalid]) [part="value"]:hover,

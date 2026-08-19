@@ -56,7 +56,7 @@
  *
  * `*-placement` says which edge, and this says where along it. The two together
  * are the nine positions a consumer asks for in words: bottom left, bottom
- * centre, top right, and so on.
+ * center, top right, and so on.
  *
  * **One property, read by whichever axis the edge implies.** On a block edge the
  * run is a row and its position along that edge is `justify-self`; on an inline
@@ -69,7 +69,7 @@
  * The defaults are stated here as the value of that property rather than as a
  * `justify-self`, so an edge rule can change the default and the attribute still
  * beats it: a block edge splits the row, dots to the start and arrows to the
- * end, and an inline edge centres both because a column beside the slides has
+ * end, and an inline edge centers both because a column beside the slides has
  * nothing to split with.
  *
  * **Both on the same edge with the same alignment will overlap**, because they
@@ -99,7 +99,7 @@
 /* Beside the slides, where a run of dots becomes a column and the arrows stack.
    `align-self` splits the column the way `justify-self` splits the row, so the
    two swap roles here: the position along the edge moves onto the block axis
-   and the inline one is centred in the gutter. */
+   and the inline one is centered in the gutter. */
 :host([indicator-placement="inline-start"]) [part="indicators"],
 :host([indicator-placement="inline-end"]) [part="indicators"] {
   align-self: var(--_carousel-indicators-along);
@@ -116,7 +116,7 @@
   padding-block-start: var(--helix-space-none);
 }
 
-/* A column beside the slides has nothing to split the edge with, so both centre
+/* A column beside the slides has nothing to split the edge with, so both center
    there rather than keeping the row's start-and-end pairing. Before the
    attribute rules below, so the attribute wins at equal specificity. */
 :host([indicator-placement="inline-start"]) [part="indicators"],
@@ -337,9 +337,9 @@
    *
    * Color ran over `fast` and size over `normal`, 120ms against 200ms, so the
    * two halves of one change finished 80ms apart: the arriving dot was fully
-   * blue while still four fifths grown, and the leaving one fully grey while
+   * blue while still four fifths grown, and the leaving one fully gray while
    * still a fifth wide. Measured across the handoff, the middle of every move
-   * was a fat grey stub beside a short blue one, and the color arriving ahead
+   * was a fat gray stub beside a short blue one, and the color arriving ahead
    * of the shape is what read as a jump rather than as a glide. Stated once so
    * they cannot drift apart again.
    *

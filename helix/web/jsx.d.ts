@@ -870,7 +870,7 @@ export type HelixButtonProps = {
   becoming loud: for actions that are available rather than suggested.
   Cancel, dismiss, the contents of a toolbar.
 - `danger` says the action is destructive before the confirmation does. The
-  shape of the control is what a reader recognises at a glance, where a red
+  shape of the control is what a reader recognizes at a glance, where a red
   word inside a neutral button is something they have to read first.
 
 This is also where emphasis comes from, rather than size: a filled primary
@@ -986,7 +986,7 @@ export type HelixButtonSolidJsProps = {
   becoming loud: for actions that are available rather than suggested.
   Cancel, dismiss, the contents of a toolbar.
 - `danger` says the action is destructive before the confirmation does. The
-  shape of the control is what a reader recognises at a glance, where a red
+  shape of the control is what a reader recognizes at a glance, where a red
   word inside a neutral button is something they have to read first.
 
 This is also where emphasis comes from, rather than size: a filled primary
@@ -1199,7 +1199,7 @@ rather than by a rule about the pair, so moving one leaves the other alone. */
 
 The second half of the answer to "where do they go". `indicatorPlacement`
 says which edge and this says where along it, so the pair spells out the
-nine positions a consumer asks for in words: bottom left, bottom centre,
+nine positions a consumer asks for in words: bottom left, bottom center,
 top right, and so on. One attribute with nine values was the alternative
 and it multiplies rather than composing, since every value has to name both
 facts and a consumer changing one has to rewrite the other.
@@ -1214,7 +1214,7 @@ Arabic on a horizontal run, and the top on a vertical one.
 
 Unset splits the row, dots to the start and arrows to the end, which is
 what keeps two items in one grid cell from landing on each other. Beside the
-slides, and over them, both centre instead, because a column there has
+slides, and over them, both center instead, because a column there has
 nothing to split the edge with. Putting both groups on the same edge with
 the same alignment does overlap them, and always did: that is what the two
 different defaults exist to avoid. */
@@ -1223,7 +1223,7 @@ different defaults exist to avoid. */
 
 The second half of the answer to "where do they go". `indicatorPlacement`
 says which edge and this says where along it, so the pair spells out the
-nine positions a consumer asks for in words: bottom left, bottom centre,
+nine positions a consumer asks for in words: bottom left, bottom center,
 top right, and so on. One attribute with nine values was the alternative
 and it multiplies rather than composing, since every value has to name both
 facts and a consumer changing one has to rewrite the other.
@@ -1238,7 +1238,7 @@ Arabic on a horizontal run, and the top on a vertical one.
 
 Unset splits the row, dots to the start and arrows to the end, which is
 what keeps two items in one grid cell from landing on each other. Beside the
-slides, and over them, both centre instead, because a column there has
+slides, and over them, both center instead, because a column there has
 nothing to split the edge with. Putting both groups on the same edge with
 the same alignment does overlap them, and always did: that is what the two
 different defaults exist to avoid. */
@@ -1287,14 +1287,14 @@ a carousel's chrome can go. */
 
 `overlay` answers it too, and the edge there is the whole slide: the bar is
 stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centred unless asked otherwise, which is
+it rather than moving the bar. Centered unless asked otherwise, which is
 where an arrow over a photograph belongs. */
   "controls-align"?: HelixCarousel["controlsAlign"];
   /** Where along that side the arrows sit. See `indicatorAlign`.
 
 `overlay` answers it too, and the edge there is the whole slide: the bar is
 stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centred unless asked otherwise, which is
+it rather than moving the bar. Centered unless asked otherwise, which is
 where an arrow over a photograph belongs. */
   controlsAlign?: HelixCarousel["controlsAlign"];
   /** How many slides are shown across the track at once. Absent shows one.
@@ -1329,7 +1329,7 @@ state turns up, this is what it is extracted from. */
   index?: HelixCarousel["index"];
   /** Which way the track runs.
 
-Behaviour rather than presentation, which is why it is here: the scroll
+Behavior rather than presentation, which is why it is here: the scroll
 position and the nearest-slide arithmetic are both single-axis, and a
 styled-tier attribute cannot change which one they read. Two sites branch
 on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -1396,7 +1396,7 @@ rather than by a rule about the pair, so moving one leaves the other alone. */
 
 The second half of the answer to "where do they go". `indicatorPlacement`
 says which edge and this says where along it, so the pair spells out the
-nine positions a consumer asks for in words: bottom left, bottom centre,
+nine positions a consumer asks for in words: bottom left, bottom center,
 top right, and so on. One attribute with nine values was the alternative
 and it multiplies rather than composing, since every value has to name both
 facts and a consumer changing one has to rewrite the other.
@@ -1411,7 +1411,7 @@ Arabic on a horizontal run, and the top on a vertical one.
 
 Unset splits the row, dots to the start and arrows to the end, which is
 what keeps two items in one grid cell from landing on each other. Beside the
-slides, and over them, both centre instead, because a column there has
+slides, and over them, both center instead, because a column there has
 nothing to split the edge with. Putting both groups on the same edge with
 the same alignment does overlap them, and always did: that is what the two
 different defaults exist to avoid. */
@@ -1420,7 +1420,7 @@ different defaults exist to avoid. */
 
 The second half of the answer to "where do they go". `indicatorPlacement`
 says which edge and this says where along it, so the pair spells out the
-nine positions a consumer asks for in words: bottom left, bottom centre,
+nine positions a consumer asks for in words: bottom left, bottom center,
 top right, and so on. One attribute with nine values was the alternative
 and it multiplies rather than composing, since every value has to name both
 facts and a consumer changing one has to rewrite the other.
@@ -1435,7 +1435,7 @@ Arabic on a horizontal run, and the top on a vertical one.
 
 Unset splits the row, dots to the start and arrows to the end, which is
 what keeps two items in one grid cell from landing on each other. Beside the
-slides, and over them, both centre instead, because a column there has
+slides, and over them, both center instead, because a column there has
 nothing to split the edge with. Putting both groups on the same edge with
 the same alignment does overlap them, and always did: that is what the two
 different defaults exist to avoid. */
@@ -1484,14 +1484,14 @@ a carousel's chrome can go. */
 
 `overlay` answers it too, and the edge there is the whole slide: the bar is
 stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centred unless asked otherwise, which is
+it rather than moving the bar. Centered unless asked otherwise, which is
 where an arrow over a photograph belongs. */
   "attr:controls-align"?: HelixCarousel["controlsAlign"];
   /** Where along that side the arrows sit. See `indicatorAlign`.
 
 `overlay` answers it too, and the edge there is the whole slide: the bar is
 stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centred unless asked otherwise, which is
+it rather than moving the bar. Centered unless asked otherwise, which is
 where an arrow over a photograph belongs. */
   "prop:controlsAlign"?: HelixCarousel["controlsAlign"];
   /** How many slides are shown across the track at once. Absent shows one.
@@ -1526,7 +1526,7 @@ state turns up, this is what it is extracted from. */
   "prop:index"?: HelixCarousel["index"];
   /** Which way the track runs.
 
-Behaviour rather than presentation, which is why it is here: the scroll
+Behavior rather than presentation, which is why it is here: the scroll
 position and the nearest-slide arithmetic are both single-axis, and a
 styled-tier attribute cannot change which one they read. Two sites branch
 on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -3049,7 +3049,7 @@ export type HelixDialogHelixCloseElementEvent =
 export type HelixDialogProps = {
   /** How wide the panel is allowed to be. */
   size?: HelixDialog["size"];
-  /** Whether the panel's contents run from the start or centre on it. */
+  /** Whether the panel's contents run from the start or center on it. */
   align?: HelixDialog["align"];
   /** Whether the element is open.
 
@@ -3088,7 +3088,7 @@ refusing to be closed, and a dialog with no way out at all is a trap.
 
 Escape *and* a press on the backdrop, which it now genuinely means. The
 sentence said both for a long time while nothing listened for a backdrop
-press, so it promised a behaviour a consumer would have written their
+press, so it promised a behavior a consumer would have written their
 markup around; the fix then was to narrow the sentence, and the fix now is
 to build the half that was missing.
 
@@ -3113,7 +3113,7 @@ instead. */
 export type HelixDialogSolidJsProps = {
   /** How wide the panel is allowed to be. */
   "prop:size"?: HelixDialog["size"];
-  /** Whether the panel's contents run from the start or centre on it. */
+  /** Whether the panel's contents run from the start or center on it. */
   "prop:align"?: HelixDialog["align"];
   /** Whether the element is open.
 
@@ -3152,7 +3152,7 @@ refusing to be closed, and a dialog with no way out at all is a trap.
 
 Escape *and* a press on the backdrop, which it now genuinely means. The
 sentence said both for a long time while nothing listened for a backdrop
-press, so it promised a behaviour a consumer would have written their
+press, so it promised a behavior a consumer would have written their
 markup around; the fix then was to narrow the sentence, and the fix now is
 to build the half that was missing.
 
@@ -8304,7 +8304,7 @@ carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
-behaviour and a reader who has met one has met both. The alternative, a
+behavior and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
@@ -8443,7 +8443,7 @@ carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
-behaviour and a reader who has met one has met both. The alternative, a
+behavior and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
@@ -9927,7 +9927,7 @@ export type CustomElements = {
    *   becoming loud: for actions that are available rather than suggested.
    *   Cancel, dismiss, the contents of a toolbar.
    * - `danger` says the action is destructive before the confirmation does. The
-   *   shape of the control is what a reader recognises at a glance, where a red
+   *   shape of the control is what a reader recognizes at a glance, where a red
    *   word inside a neutral button is something they have to read first.
    *
    * This is also where emphasis comes from, rather than size: a filled primary
@@ -10061,7 +10061,7 @@ export type CustomElements = {
 
   /**
    * Tinted from the severity's status color with `color-mix`, and marked with a
-   * bar on the inline start so the severity survives being read in greyscale or
+   * bar on the inline start so the severity survives being read in grayscale or
    * by anyone who does not distinguish the hues.
    *
    * There is no `appearance` here. `severity` carries the meaning and lives on
@@ -10185,7 +10185,7 @@ export type CustomElements = {
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
    * says which edge and this says where along it, so the pair spells out the
-   * nine positions a consumer asks for in words: bottom left, bottom centre,
+   * nine positions a consumer asks for in words: bottom left, bottom center,
    * top right, and so on. One attribute with nine values was the alternative
    * and it multiplies rather than composing, since every value has to name both
    * facts and a consumer changing one has to rewrite the other.
@@ -10200,7 +10200,7 @@ export type CustomElements = {
    *
    * Unset splits the row, dots to the start and arrows to the end, which is
    * what keeps two items in one grid cell from landing on each other. Beside the
-   * slides, and over them, both centre instead, because a column there has
+   * slides, and over them, both center instead, because a column there has
    * nothing to split the edge with. Putting both groups on the same edge with
    * the same alignment does overlap them, and always did: that is what the two
    * different defaults exist to avoid.
@@ -10227,7 +10227,7 @@ export type CustomElements = {
    *
    * `overlay` answers it too, and the edge there is the whole slide: the bar is
    * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centred unless asked otherwise, which is
+   * it rather than moving the bar. Centered unless asked otherwise, which is
    * where an arrow over a photograph belongs.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
@@ -10251,7 +10251,7 @@ export type CustomElements = {
    * state turns up, this is what it is extracted from.
    * - `orientation`: Which way the track runs.
    *
-   * Behaviour rather than presentation, which is why it is here: the scroll
+   * Behavior rather than presentation, which is why it is here: the scroll
    * position and the nearest-slide arithmetic are both single-axis, and a
    * styled-tier attribute cannot change which one they read. Two sites branch
    * on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -11302,7 +11302,7 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `size`: How wide the panel is allowed to be.
-   * - `align`: Whether the panel's contents run from the start or centre on it.
+   * - `align`: Whether the panel's contents run from the start or center on it.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -11335,7 +11335,7 @@ export type CustomElements = {
    *
    * Escape *and* a press on the backdrop, which it now genuinely means. The
    * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behaviour a consumer would have written their
+   * press, so it promised a behavior a consumer would have written their
    * markup around; the fix then was to narrow the sentence, and the fix now is
    * to build the half that was missing.
    *
@@ -12892,7 +12892,7 @@ export type CustomElements = {
    * beside it, so the whole reads as one field rather than a field with two
    * controls after it.
    *
-   * The number is centred and set in tabular figures, which is the one place this
+   * The number is centered and set in tabular figures, which is the one place this
    * differs from every other field in the library. Digits are what changes under a
    * repeated press, and proportional ones make the number shuffle while it counts.
    *
@@ -13203,7 +13203,7 @@ export type CustomElements = {
    * The current page is a raised chip rather than a brand fill, which is the
    * treatment `Tabs` gives its selected tab. Brand on a page number claims more
    * than the state deserves: it is not a choice the reader made about anything,
-   * it is where they happen to be standing, and a row of grey numbers with one
+   * it is where they happen to be standing, and a row of gray numbers with one
    * blue one reads as the blue one being an action.
    *
    * Selected on `aria-current` rather than on a second attribute saying the same
@@ -15544,7 +15544,7 @@ export type CustomElements = {
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
-   * behaviour and a reader who has met one has met both. The alternative, a
+   * behavior and a reader who has met one has met both. The alternative, a
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
@@ -15648,7 +15648,7 @@ export type CustomElements = {
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to centre
+   * `display: none`, so every box measures zero and there is nothing to center
    * against: measured, the hour wheel stayed 288 pixels off its answer because
    * the only call happened before anything had a size. Whatever shows the panel
    * calls this again afterwards. The guard below makes the early call harmless
@@ -16997,7 +16997,7 @@ export type CustomElementsSolidJs = {
    *   becoming loud: for actions that are available rather than suggested.
    *   Cancel, dismiss, the contents of a toolbar.
    * - `danger` says the action is destructive before the confirmation does. The
-   *   shape of the control is what a reader recognises at a glance, where a red
+   *   shape of the control is what a reader recognizes at a glance, where a red
    *   word inside a neutral button is something they have to read first.
    *
    * This is also where emphasis comes from, rather than size: a filled primary
@@ -17134,7 +17134,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * Tinted from the severity's status color with `color-mix`, and marked with a
-   * bar on the inline start so the severity survives being read in greyscale or
+   * bar on the inline start so the severity survives being read in grayscale or
    * by anyone who does not distinguish the hues.
    *
    * There is no `appearance` here. `severity` carries the meaning and lives on
@@ -17263,7 +17263,7 @@ export type CustomElementsSolidJs = {
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
    * says which edge and this says where along it, so the pair spells out the
-   * nine positions a consumer asks for in words: bottom left, bottom centre,
+   * nine positions a consumer asks for in words: bottom left, bottom center,
    * top right, and so on. One attribute with nine values was the alternative
    * and it multiplies rather than composing, since every value has to name both
    * facts and a consumer changing one has to rewrite the other.
@@ -17278,7 +17278,7 @@ export type CustomElementsSolidJs = {
    *
    * Unset splits the row, dots to the start and arrows to the end, which is
    * what keeps two items in one grid cell from landing on each other. Beside the
-   * slides, and over them, both centre instead, because a column there has
+   * slides, and over them, both center instead, because a column there has
    * nothing to split the edge with. Putting both groups on the same edge with
    * the same alignment does overlap them, and always did: that is what the two
    * different defaults exist to avoid.
@@ -17305,7 +17305,7 @@ export type CustomElementsSolidJs = {
    *
    * `overlay` answers it too, and the edge there is the whole slide: the bar is
    * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centred unless asked otherwise, which is
+   * it rather than moving the bar. Centered unless asked otherwise, which is
    * where an arrow over a photograph belongs.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
@@ -17329,7 +17329,7 @@ export type CustomElementsSolidJs = {
    * state turns up, this is what it is extracted from.
    * - `orientation`: Which way the track runs.
    *
-   * Behaviour rather than presentation, which is why it is here: the scroll
+   * Behavior rather than presentation, which is why it is here: the scroll
    * position and the nearest-slide arithmetic are both single-axis, and a
    * styled-tier attribute cannot change which one they read. Two sites branch
    * on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -18401,7 +18401,7 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `size`: How wide the panel is allowed to be.
-   * - `align`: Whether the panel's contents run from the start or centre on it.
+   * - `align`: Whether the panel's contents run from the start or center on it.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -18434,7 +18434,7 @@ export type CustomElementsSolidJs = {
    *
    * Escape *and* a press on the backdrop, which it now genuinely means. The
    * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behaviour a consumer would have written their
+   * press, so it promised a behavior a consumer would have written their
    * markup around; the fix then was to narrow the sentence, and the fix now is
    * to build the half that was missing.
    *
@@ -20054,7 +20054,7 @@ export type CustomElementsSolidJs = {
    * beside it, so the whole reads as one field rather than a field with two
    * controls after it.
    *
-   * The number is centred and set in tabular figures, which is the one place this
+   * The number is centered and set in tabular figures, which is the one place this
    * differs from every other field in the library. Digits are what changes under a
    * repeated press, and proportional ones make the number shuffle while it counts.
    *
@@ -20377,7 +20377,7 @@ export type CustomElementsSolidJs = {
    * The current page is a raised chip rather than a brand fill, which is the
    * treatment `Tabs` gives its selected tab. Brand on a page number claims more
    * than the state deserves: it is not a choice the reader made about anything,
-   * it is where they happen to be standing, and a row of grey numbers with one
+   * it is where they happen to be standing, and a row of gray numbers with one
    * blue one reads as the blue one being an action.
    *
    * Selected on `aria-current` rather than on a second attribute saying the same
@@ -22801,7 +22801,7 @@ export type CustomElementsSolidJs = {
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
-   * behaviour and a reader who has met one has met both. The alternative, a
+   * behavior and a reader who has met one has met both. The alternative, a
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
@@ -22905,7 +22905,7 @@ export type CustomElementsSolidJs = {
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to centre
+   * `display: none`, so every box measures zero and there is nothing to center
    * against: measured, the hour wheel stayed 288 pixels off its answer because
    * the only call happened before anything had a size. Whatever shows the panel
    * calls this again afterwards. The guard below makes the early call harmless

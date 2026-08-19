@@ -197,7 +197,7 @@ describe('time holds more than one', () => {
   })
 
   test('and a third pick starts over from that third one', async () => {
-    /* The calendar's behaviour, so a reader who has met one has met both.
+    /* The calendar's behavior, so a reader who has met one has met both.
        Working out which is newest by difference rather than by position, since
        a toggle removes as easily as it adds. */
     const host = await many('default-value="09:00,17:00" mode="range"')
@@ -240,7 +240,7 @@ describe('time is off', () => {
     /* `disabled` reached the value at submit time and nothing else: rows still
        took a click and the keyboard still moved through them. Both halves are
        asserted, because either alone leaves the other broken. Told, so the list
-       greys and leaves the tab order; refused, so no path writes a value. */
+       grays and leaves the tab order; refused, so no path writes a value. */
     const host = await picker('default-value="09:00" disabled')
     const list = part(host, 'list') as HTMLElement
     expect(list.hasAttribute('disabled')).toBe(true)

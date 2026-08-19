@@ -77,7 +77,7 @@
 
 /* The three bands. Color is the obvious half and the ticks below are the other:
    a reading that only says "poor" in red says nothing to a reader who cannot see
-   red, and says nothing at all in a screenshot printed in grey. */
+   red, and says nothing at all in a screenshot printed in gray. */
 [part="indicator"][data-band="good"] {
   background-color: var(--meter-color, var(--helix-color-success));
 }
@@ -125,7 +125,7 @@
   inset-block-start: 0;
   inset-inline-start: var(--_meter-at, 0%);
   position: absolute;
-  /* Centred on the threshold rather than starting at it, so the mark says where
+  /* Centered on the threshold rather than starting at it, so the mark says where
      the band begins rather than where it begins plus two pixels. */
   translate: -50%;
   z-index: var(--helix-layer-raised);
@@ -161,7 +161,7 @@
   --_meter-stroke: var(--meter-ring-width, var(--helix-size-progress));
 
   /* The bar's own track rule paints a fill and a full radius, and here this is
-     an `<svg>`: left alone it is a grey disc behind the drawing, which reads as
+     an `<svg>`: left alone it is a gray disc behind the drawing, which reads as
      a filled circle with an arc on its edge. The groove is a stroked circle
      inside the drawing, not a background behind it. */
   background-color: transparent;
@@ -187,7 +187,7 @@
    properties and a consumer changing the thickness moves the circles that carry
    it without the component recalculating anything.
 
-   `r` in per cent resolves against the diagonal normalised by root two, which
+   `r` in per cent resolves against the diagonal normalized by root two, which
    for the square this always is comes out as the side. */
 :host([shape="arc"]) [part="groove"],
 :host([shape="arc"]) [part="indicator"],

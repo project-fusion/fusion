@@ -130,7 +130,7 @@ describe('color picker', () => {
   test('a hue survives a trip through a color that has none', async () => {
     // The reason the model is the state rather than a reading of the value.
     // Black is brightness 0, whose hue and saturation are both undefined, so
-    // re-deriving from the hex turns a green dragged down into a grey coming up.
+    // re-deriving from the hex turns a green dragged down into a gray coming up.
     const host = await picker('default-value="#00ff00"')
     await axis(host, 'brightness', 0)
     expect(host.value).toBe('#000000')

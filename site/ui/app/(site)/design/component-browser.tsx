@@ -33,7 +33,7 @@ const ALL = 'all'
  * percentage is what lets the field cover the whole hero at any width, and the
  * snap is what keeps a shine on a dot rather than near one: the lattice is a
  * tile of `--site-lattice-pitch` positioned `center`, so dots sit at the
- * section's centre and at whole multiples of the pitch out from it. Fixed
+ * section's center and at whole multiples of the pitch out from it. Fixed
  * offsets in pitches would hold that alignment and cluster in the middle of a
  * wide viewport, which is what these used to do.
  *
@@ -319,7 +319,7 @@ export function ComponentBrowser({
            * spacing it already had.
            *
            * The tag is over the name rather than beside it. Alongside, it read
-           * as part of the title and pushed it off centre. */}
+           * as part of the title and pushed it off center. */}
           <helix-flex align="center" data-density="sm" direction="column" gap="sm">
             {/* Two marks, not one. The eyebrow was asked to name the vertical,
                 and it was already carrying the stage, which is the one label on

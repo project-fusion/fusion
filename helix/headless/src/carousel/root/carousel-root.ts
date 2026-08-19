@@ -81,7 +81,7 @@ export class HelixBaseCarousel extends HelixElement {
   /**
    * Which way the track runs.
    *
-   * Behaviour rather than presentation, which is why it is here: the scroll
+   * Behavior rather than presentation, which is why it is here: the scroll
    * position and the nearest-slide arithmetic are both single-axis, and a
    * styled-tier attribute cannot change which one they read. Two sites branch
    * on it, `scrollTo` and the drag settle, and nothing else in the component

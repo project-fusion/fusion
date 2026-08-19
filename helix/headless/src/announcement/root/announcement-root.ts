@@ -110,7 +110,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
 
            It was `helix-base-icon-button`, which is the headless tier and
            therefore ships no CSS at all, so the `<button>` inside it kept the
-           browser's own border and grey fill and the dismiss control read as a
+           browser's own border and gray fill and the dismiss control read as a
            form button dropped into a message bar. The styled tier could not
            reach it: `[part="dismiss"]` selects the host and stops at its shadow
            boundary, and its rules were already written for a plain button,

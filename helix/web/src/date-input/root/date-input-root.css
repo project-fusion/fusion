@@ -41,7 +41,7 @@
 }
 
 /* Named with `:hover` as well, or a focused field under the pointer takes the
-   hover border back and reads as a grey edge inside a blue ring. Being focused
+   hover border back and reads as a gray edge inside a blue ring. Being focused
    outranks being pointed at, so it has to say so. Input records the same. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {

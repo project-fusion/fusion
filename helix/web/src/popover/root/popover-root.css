@@ -126,7 +126,7 @@
 }
 
 /* Out of the near edge, and out of the arrow where there is one:
-   `--_floating-arrow-x` and `--_floating-arrow-y` are the pointer's centre, which
+   `--_floating-arrow-x` and `--_floating-arrow-y` are the pointer's center, which
    is the only thing that knows where it landed once `shift` has slid the panel
    along to keep it on screen. With no arrow the fallback is the middle of that
    edge, which is the best guess available. */

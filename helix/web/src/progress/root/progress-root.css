@@ -222,7 +222,7 @@
   --_ring-stroke: var(--progress-ring-width, var(--helix-size-progress));
 
   /* The bar's own track rule paints this, and here it is an `<svg>`: the fill
-     and the full radius it gives a bar came out as a solid grey disc behind the
+     and the full radius it gives a bar came out as a solid gray disc behind the
      ring, which read as a filled circle with an arc on its edge. The groove is a
      stroked circle inside the drawing, not a background behind it. */
   background-color: transparent;
@@ -237,7 +237,7 @@
    properties and a consumer changing the thickness moves the circle that carries
    it without the component recalculating anything.
 
-   `r` in per cent resolves against the diagonal normalised by root two, which
+   `r` in per cent resolves against the diagonal normalized by root two, which
    for the square this always is comes out as the side. */
 :host([shape="ring"]) [part="groove"],
 :host([shape="ring"]) [part="indicator"] {

@@ -23,16 +23,16 @@
   /* The intent inputs. `@helix-io/theme` derives everything below from
      these, guaranteeing contrast by construction rather than by audit. */
   --_helix-seed-brand: oklch(0.58 0.19 258);
-  /* Zero, and the ramp is grey.
+  /* Zero, and the ramp is gray.
      
-     The idea was that a grey with a trace of the brand in it belongs to the
-     palette in a way a dead grey does not, and the trace kept being visible: at
+     The idea was that a gray with a trace of the brand in it belongs to the
+     palette in a way a dead gray does not, and the trace kept being visible: at
      0.008 the dark backgrounds read navy, and halving it to 0.004 moved the
      complaint from "too blue" to "still blue" rather than answering it. Chroma
      in OKLCH is perceptually even but *saturation* is chroma against lightness,
      so a fixed figure is a rising tint as the surface darkens, and a dark
      interface is mostly large flat surfaces. The brand carries the hue; the
-     greys hold everything else up. */
+     grays hold everything else up. */
   --_helix-seed-neutral-chroma: 0;
   --_helix-seed-neutral-hue: 258;
 
@@ -62,7 +62,7 @@
      and it was accelerating through the range they need: .015 from white to 50,
      .025 to 100, then .05 to 200. That last step is twice the one before it and
      it is the one `surface-sunken` sits on, so every control filled with it came
-     out as a grey slab on a white page. Reported on the checkbox, the input, the
+     out as a gray slab on a white page. Reported on the checkbox, the input, the
      textarea, the segmented control and a selected tab, which is five symptoms
      of one number.
  

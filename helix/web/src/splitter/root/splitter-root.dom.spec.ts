@@ -172,7 +172,7 @@ const grab = async (host: Splitter, handle: HTMLElement, type: string): Promise<
 describe('splitter crossings', () => {
   test('the outer one draws the corner, and the nested one does not', async () => {
     // It has to be the outer: the crossing is on a pane's edge, and a pane is
-    // `overflow: auto`, so a handle centred there is cut in half by the pane it
+    // `overflow: auto`, so a handle centered there is cut in half by the pane it
     // belongs to.
     const [host, within] = await nested()
     expect(corner(host)).not.toBeNull()

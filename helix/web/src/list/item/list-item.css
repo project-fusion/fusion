@@ -18,11 +18,11 @@
 /* `span 2`, not `1 / -1`. The row has a column template and no row template, so
    `-1` is the last *explicit* row line, of which there are none: the span
    collapsed to row one and a leading icon beside a two-line row sat against the
-   label rather than centred on both. The exact fault `Card` hit and wrote up.
+   label rather than centered on both. The exact fault `Card` hit and wrote up.
 
    Two is the most this row ever has, a label and its supporting line, and a
    second implicit track is zero tall when there is only one, so the same rule
-   centres correctly either way. */
+   centers correctly either way. */
 /* The leading mark carries its own trailing gap, so a row without one costs
    nothing for it. A `column-gap` on the grid is drawn beside a zero-width
    column just the same: measured on an ordered list, the text sat 28px in

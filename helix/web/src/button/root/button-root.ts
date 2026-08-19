@@ -49,7 +49,7 @@ export class HelixButton extends HelixBaseButton {
    *   becoming loud: for actions that are available rather than suggested.
    *   Cancel, dismiss, the contents of a toolbar.
    * - `danger` says the action is destructive before the confirmation does. The
-   *   shape of the control is what a reader recognises at a glance, where a red
+   *   shape of the control is what a reader recognizes at a glance, where a red
    *   word inside a neutral button is something they have to read first.
    *
    * This is also where emphasis comes from, rather than size: a filled primary

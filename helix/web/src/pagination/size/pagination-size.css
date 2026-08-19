@@ -33,7 +33,7 @@
 }
 
 /* The stacked sheet gives a label four pixels of padding under its text, so it
-   sits a step clear of the control below it. In a row centred on its items that
+   sits a step clear of the control below it. In a row centered on its items that
    padding makes the label's box taller than its ink and the words read as
    sitting high beside the control. `field-inline.css` exists for exactly this
    and cannot be composed from out here, so the one declaration it would have

@@ -952,7 +952,7 @@ state turns up, this is what it is extracted from. */
   index?: HelixBaseCarousel["index"];
   /** Which way the track runs.
 
-Behaviour rather than presentation, which is why it is here: the scroll
+Behavior rather than presentation, which is why it is here: the scroll
 position and the nearest-slide arithmetic are both single-axis, and a
 styled-tier attribute cannot change which one they read. Two sites branch
 on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -997,7 +997,7 @@ state turns up, this is what it is extracted from. */
   "prop:index"?: HelixBaseCarousel["index"];
   /** Which way the track runs.
 
-Behaviour rather than presentation, which is why it is here: the scroll
+Behavior rather than presentation, which is why it is here: the scroll
 position and the nearest-slide arithmetic are both single-axis, and a
 styled-tier attribute cannot change which one they read. Two sites branch
 on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -2510,7 +2510,7 @@ refusing to be closed, and a dialog with no way out at all is a trap.
 
 Escape *and* a press on the backdrop, which it now genuinely means. The
 sentence said both for a long time while nothing listened for a backdrop
-press, so it promised a behaviour a consumer would have written their
+press, so it promised a behavior a consumer would have written their
 markup around; the fix then was to narrow the sentence, and the fix now is
 to build the half that was missing.
 
@@ -2570,7 +2570,7 @@ refusing to be closed, and a dialog with no way out at all is a trap.
 
 Escape *and* a press on the backdrop, which it now genuinely means. The
 sentence said both for a long time while nothing listened for a backdrop
-press, so it promised a behaviour a consumer would have written their
+press, so it promised a behavior a consumer would have written their
 markup around; the fix then was to narrow the sentence, and the fix now is
 to build the half that was missing.
 
@@ -7464,7 +7464,7 @@ carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
-behaviour and a reader who has met one has met both. The alternative, a
+behavior and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
@@ -7603,7 +7603,7 @@ carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
-behaviour and a reader who has met one has met both. The alternative, a
+behavior and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
@@ -9266,7 +9266,7 @@ export type CustomElements = {
    * state turns up, this is what it is extracted from.
    * - `orientation`: Which way the track runs.
    *
-   * Behaviour rather than presentation, which is why it is here: the scroll
+   * Behavior rather than presentation, which is why it is here: the scroll
    * position and the nearest-slide arithmetic are both single-axis, and a
    * styled-tier attribute cannot change which one they read. Two sites branch
    * on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -9744,7 +9744,7 @@ export type CustomElements = {
    * **The working model is HSB, and the value is derived from it.** The reverse
    * loses colors: black is `brightness: 0`, whose hue and saturation are both
    * undefined, so a reader who drags to the bottom of the square and back would
-   * get grey where they had red. Holding the model means a color survives a trip
+   * get gray where they had red. Holding the model means a color survives a trip
    * through one that has no hue. A value arriving from outside is read into the
    * model once, which is the only moment the conversion runs in that direction.
    *
@@ -10328,7 +10328,7 @@ export type CustomElements = {
    *
    * Escape *and* a press on the backdrop, which it now genuinely means. The
    * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behaviour a consumer would have written their
+   * press, so it promised a behavior a consumer would have written their
    * markup around; the fix then was to narrow the sentence, and the fix now is
    * to build the half that was missing.
    *
@@ -13499,7 +13499,7 @@ export type CustomElements = {
    * Built the other way round first, because a splitter already knows where its
    * own divider begins and needs no measurement of the other, and that version was
    * clipped: the crossing lies on the boundary between a pane and the divider
-   * beside it, a handle centred there reaches back over the boundary, and a pane
+   * beside it, a handle centered there reaches back over the boundary, and a pane
    * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
    * is the one element that already straddles the seam, so the corner belongs in
    * it.
@@ -14651,7 +14651,7 @@ export type CustomElements = {
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
-   * behaviour and a reader who has met one has met both. The alternative, a
+   * behavior and a reader who has met one has met both. The alternative, a
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
@@ -14751,7 +14751,7 @@ export type CustomElements = {
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to centre
+   * `display: none`, so every box measures zero and there is nothing to center
    * against: measured, the hour wheel stayed 288 pixels off its answer because
    * the only call happened before anything had a size. Whatever shows the panel
    * calls this again afterwards. The guard below makes the early call harmless
@@ -16358,7 +16358,7 @@ export type CustomElementsSolidJs = {
    * state turns up, this is what it is extracted from.
    * - `orientation`: Which way the track runs.
    *
-   * Behaviour rather than presentation, which is why it is here: the scroll
+   * Behavior rather than presentation, which is why it is here: the scroll
    * position and the nearest-slide arithmetic are both single-axis, and a
    * styled-tier attribute cannot change which one they read. Two sites branch
    * on it, `scrollTo` and the drag settle, and nothing else in the component
@@ -16848,7 +16848,7 @@ export type CustomElementsSolidJs = {
    * **The working model is HSB, and the value is derived from it.** The reverse
    * loses colors: black is `brightness: 0`, whose hue and saturation are both
    * undefined, so a reader who drags to the bottom of the square and back would
-   * get grey where they had red. Holding the model means a color survives a trip
+   * get gray where they had red. Holding the model means a color survives a trip
    * through one that has no hue. A value arriving from outside is read into the
    * model once, which is the only moment the conversion runs in that direction.
    *
@@ -17441,7 +17441,7 @@ export type CustomElementsSolidJs = {
    *
    * Escape *and* a press on the backdrop, which it now genuinely means. The
    * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behaviour a consumer would have written their
+   * press, so it promised a behavior a consumer would have written their
    * markup around; the fix then was to narrow the sentence, and the fix now is
    * to build the half that was missing.
    *
@@ -20713,7 +20713,7 @@ export type CustomElementsSolidJs = {
    * Built the other way round first, because a splitter already knows where its
    * own divider begins and needs no measurement of the other, and that version was
    * clipped: the crossing lies on the boundary between a pane and the divider
-   * beside it, a handle centred there reaches back over the boundary, and a pane
+   * beside it, a handle centered there reaches back over the boundary, and a pane
    * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
    * is the one element that already straddles the seam, so the corner belongs in
    * it.
@@ -21907,7 +21907,7 @@ export type CustomElementsSolidJs = {
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
-   * behaviour and a reader who has met one has met both. The alternative, a
+   * behavior and a reader who has met one has met both. The alternative, a
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
@@ -22007,7 +22007,7 @@ export type CustomElementsSolidJs = {
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to centre
+   * `display: none`, so every box measures zero and there is nothing to center
    * against: measured, the hour wheel stayed 288 pixels off its answer because
    * the only call happened before anything had a size. Whatever shows the panel
    * calls this again afterwards. The guard below makes the early call harmless

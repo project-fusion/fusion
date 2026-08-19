@@ -45,7 +45,7 @@
 }
 
 /* Named with `:hover` as well, or a focused field under the pointer takes the
-   hover border back and reads as a grey edge inside a blue ring. Being focused
+   hover border back and reads as a gray edge inside a blue ring. Being focused
    outranks being pointed at, so it has to say so. Input records the same. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
@@ -110,7 +110,7 @@
 /* The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out, for the reason Popover, Menu and Select all record:
  * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
- * declaration leaves three pixels of medium grey rather than none at all.
+ * declaration leaves three pixels of medium gray rather than none at all.
  *
  * Its own width, not the field's. A picker is not a longer text field, and a
  * square stretched to a 600 pixel field is a square no longer.

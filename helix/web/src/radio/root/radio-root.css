@@ -188,12 +188,12 @@
   outline: none;
 }
 
-/* The circle sits on the first line of the label rather than centred against a
+/* The circle sits on the first line of the label rather than centered against a
  * block of text, which is where a native control sits beside a paragraph.
  *
  * Half the difference between the line and the circle, derived rather than
- * picked. It was `space-2xs`, a flat 4px, and it put the circle's centre 6.5px
- * below the centre of the text it sits beside: measured on a one-line card,
+ * picked. It was `space-2xs`, a flat 4px, and it put the circle's center 6.5px
+ * below the center of the text it sits beside: measured on a one-line card,
  * where a nudge chosen for a paragraph is simply wrong. The line is the font
  * size times its line height, and the circle is taller than that, so the offset
  * comes out negative and lifts it slightly rather than dropping it. */

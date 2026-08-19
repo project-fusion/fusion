@@ -219,7 +219,7 @@ export class FloatingController implements ReactiveController {
           insetBlockStart: point.y === undefined ? '' : `${point.y}px`,
           insetInlineStart: point.x === undefined ? '' : `${point.x}px`,
         })
-        /* Where the pointer ended up, as the centre of it, published for
+        /* Where the pointer ended up, as the center of it, published for
            anything that has to grow out of the thing it points at.
          *
          * A panel scaling in wants its `transform-origin` on its own arrow, and

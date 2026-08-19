@@ -2,7 +2,7 @@
   --_avatar-size: var(--avatar-size, var(--helix-size-avatar));
 
   align-items: center;
-  /* Grey, not a brand tint. An avatar with no picture is a placeholder for a
+  /* Gray, not a brand tint. An avatar with no picture is a placeholder for a
      person, and `primary-subtle` made every one of them look like it meant
      something. `surface-raised` rather than `sunken`, because sunken is
      `neutral-950` in dark mode and an avatar on a `neutral-1000` page all but

@@ -69,7 +69,7 @@
    picking a hero that is actually dark is what makes that legible here.
 
    No `color-scheme` on the band itself, which was the first attempt and turned
-   it light grey: `--helix-color-surface-inverse` is a `light-dark()` pair, so
+   it light gray: `--helix-color-surface-inverse` is a `light-dark()` pair, so
    declaring a dark scheme on the element flipped the very token being used to
    make it dark. The header carries `data-color-mode="dark"` instead, which is
    the half that needed telling. */

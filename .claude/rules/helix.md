@@ -465,7 +465,7 @@ and the rest can be bare verbs, and the linter carries the measured list.
 **The same probe is what ended the PascalCase scheme.** Its argument was that
 React strips `on` from a prop and listens for the remainder verbatim, so
 `OpenChange` would be `onOpenChange`. Measured, React reserves *every* prop
-matching `on[A-Z]` for its own system and drops what it does not recognise,
+matching `on[A-Z]` for its own system and drops what it does not recognize,
 whether or not the element declares the property, so `onOpenChange` in raw JSX
 never reached the element and never had. A callback prop is a feature of the
 generated wrappers; the DOM event is the universal channel, and it needs a name

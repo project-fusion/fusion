@@ -102,14 +102,14 @@
   );
 }
 
-/* Centred, and the dismiss is out of flow so it stays centred.
+/* Centered, and the dismiss is out of flow so it stays centered.
  *
  * A band across the whole page has no left edge to read from: the text starts
  * wherever the viewport happens to be wide, which at 1400px is a sentence
- * marooned against the corner. Centred it sits where the eye already is.
+ * marooned against the corner. Centered it sits where the eye already is.
  *
  * The control is absolutely positioned rather than a flex sibling, because a
- * sibling with width would push the centre off by half its own size, and the
+ * sibling with width would push the center off by half its own size, and the
  * text would shift as soon as a message became dismissible. */
 [part="content"] {
   flex: 1 1 auto;
@@ -120,7 +120,7 @@
 /* The gap sits on what is slotted rather than on this region, because the
    region always holds a `<slot>` element and is therefore never `:empty`
    however little is assigned. With the gap on the row, a band with no actions
-   still reserved it, and the centred message came out 8px left of centre. */
+   still reserved it, and the centered message came out 8px left of center. */
 [part="actions"] slot::slotted(*) {
   margin-inline-start: var(--helix-space-md);
 }
@@ -153,7 +153,7 @@
   flex: 0 0 auto;
   place-content: center;
   place-items: center;
-  /* Out of flow, so the centred message is centred on the band and not on
+  /* Out of flow, so the centered message is centered on the band and not on
      whatever is left after the control. */
   position: absolute;
   inset-inline-end: var(--announcement-inset, var(--helix-space-lg));

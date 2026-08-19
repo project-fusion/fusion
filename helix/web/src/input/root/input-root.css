@@ -70,7 +70,7 @@
 
 /* Named with `:hover` as well, which is the whole reason this reads right.
    Hover is a more specific selector than focus here, four to three, so a
-   focused field under the pointer took the hover border back: a grey edge
+   focused field under the pointer took the hover border back: a gray edge
    inside a blue ring, which is the two-ring look this was meant to end. Being
    focused outranks being pointed at, so it has to say so. */
 :host(:focus-within) [part="field"],
@@ -96,7 +96,7 @@
    Being wrong outranks being pointed at and outranks being focused, so it has
    to say so twice over, for the same reason the focus rule names `:hover`.
    Unnamed, this was (0,3,0) against hover's (0,4,0), so running a pointer over
-   a field with an error in it put the grey border back.
+   a field with an error in it put the gray border back.
 
    Focus was worse than that, and visibly. The focus rule owns the `outline`,
    and nothing here was changing its color, so a focused field with an error

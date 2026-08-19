@@ -116,7 +116,7 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             'documented-category',
             path,
             declaration.name,
-            'Missing or unrecognised @category in the class JSDoc.',
+            'Missing or unrecognized @category in the class JSDoc.',
           )
         }
 

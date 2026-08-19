@@ -16,7 +16,7 @@
  *
  * **What is written is the comma form.** Both are valid and the space-separated
  * one is newer, which was the reason it was chosen first; the commas are what a
- * reader recognises, what most code around them holds, and what pastes into
+ * reader recognizes, what most code around them holds, and what pastes into
  * anything without a second thought. A syntax a value is handed *out* in is not
  * the place to be early. `rgba` and `hsla` come with them, since a comma form
  * with a fourth argument is spelled that way.

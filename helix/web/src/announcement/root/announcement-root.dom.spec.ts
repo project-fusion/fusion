@@ -49,7 +49,7 @@ describe('announcement', () => {
     /* The name is on the control that is actually focused, which is now the
        control itself: this was a `helix-base-icon-button` wrapping a button,
        and the wrapper shipped no styles, so what rendered was the browser's own
-       bordered grey button inside a message bar. A plain `<button>` is what
+       bordered gray button inside a message bar. A plain `<button>` is what
        every other in-shadow control in the library renders.
 
        Asserting the tag as well as the name, because the two failure modes are

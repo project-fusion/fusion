@@ -346,7 +346,7 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
        computed against whatever layout is current when this is called, and
        inside a panel that has just been revealed it is a frame behind: measured,
        one call landed a whole row short, 672 where 704 was wanted, and calling
-       it again from a settled layout put it exactly on centre. Reading a rect
+       it again from a settled layout put it exactly on center. Reading a rect
        forces layout, so the second pass sees the result of the first and
        corrects the remainder. It stops as soon as there is nothing left to
        correct, so the usual case is one pass and a cheap check. */

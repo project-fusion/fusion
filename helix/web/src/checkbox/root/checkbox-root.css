@@ -178,7 +178,7 @@
 /* Wrong, and the reader knows it: the box's own edge, not a ring around it.
  *
  * It was a ring, offset outside the box, and the picture was a red square with
- * a rounded grey box sitting inside it. A ring is right where a component has
+ * a rounded gray box sitting inside it. A ring is right where a component has
  * no edge of its own to color, which was true while the browser drew this one
  * and stopped being true the moment we did.
  *
@@ -284,7 +284,7 @@
 
 /* On the label's first line, half the difference between the line and the box.
    Derived rather than picked, for the reason `Radio` records: a flat `space-2xs`
-   put the box's centre 6.5px below the centre of the text beside it, measured on
+   put the box's center 6.5px below the center of the text beside it, measured on
    a one-line card, because 4px was chosen for a paragraph. */
 :host([appearance="card"]) [part="box"] {
   margin-block-start: calc(

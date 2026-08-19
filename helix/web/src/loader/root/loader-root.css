@@ -58,7 +58,7 @@
    Further than the ring goes, and it has to be: the ring's swell is spread over
    a whole circle at the edge of the picture, where a couple of hundredths of
    opacity is plenty, and the mark is a small shape in the middle with nothing
-   around it to be read against. At the ring's numbers the centre was moving and
+   around it to be read against. At the ring's numbers the center was moving and
    nobody could see it. */
 [part="mark"] {
   animation: helix-loader-breathe-mark 2.4s ease-in-out infinite;

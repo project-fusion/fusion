@@ -9,7 +9,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * - **Squares are checkboxes, circles are radios.** Nothing else in the set may
  *   use a small square with a mark cut out of it.
  * - **A tick, a knob or a raised segment is a real surface token**, not a
- *   lighter grey: `surface-overlay` for a thing sitting on top, `background` for
+ *   lighter gray: `surface-overlay` for a thing sitting on top, `background` for
  *   the page coming back through. That is what makes them read as cut out.
  * - **Count carries meaning.** One row is Option, rows on selection bands are
  *   Listbox, rows with squares are Checkbox Group.
@@ -175,12 +175,12 @@ export const formsArt: Record<string, ReactNode> = {
    *
    * The two ends are the whole silhouette. Without them this is `Input`
    * exactly, same sunken box at the same width, and a card that has to be read
-   * rather than recognised has already failed at thumbnail size. The rules
+   * rather than recognized has already failed at thumbnail size. The rules
    * between them and the number are what say the buttons are part of the field
    * and not two buttons after it, which is the one thing this component's
    * stylesheet is most careful about.
    *
-   * The value is centred rather than left-aligned, which is the other thing that
+   * The value is centered rather than left-aligned, which is the other thing that
    * tells it from `Input` at a glance and is true of the component.
    *
    * It counts on hover, and the first version did not: `--art-to: 0px` with a
@@ -342,7 +342,7 @@ export const formsArt: Record<string, ReactNode> = {
           y="119"
         />
       ))}
-      {/* The trigger, centred in the box the way the label is, and static.
+      {/* The trigger, centered in the box the way the label is, and static.
           It carried `artFill` and so the one thing this card animated was a
           label growing forty percent wider, which is not a thing a file input
           does to anything. `artFill` is for a value filling a track. */}
@@ -426,7 +426,7 @@ export const formsArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="62" y="91" />
       <rect className="artInk" fillOpacity="0.55" height="2" rx="1" width="12" x="246" y="91" />
       <rect className="artInk" fillOpacity="0.55" height="12" rx="1" width="2" x="251" y="86" />
-      {/* Centred in what is left of the field, which is 89 to 232. */}
+      {/* Centered in what is left of the field, which is 89 to 232. */}
       <rect
         className="artSolid artMotion artFill"
         height="8"
@@ -595,7 +595,7 @@ export const formsArt: Record<string, ReactNode> = {
    * A field with a clock mark, and the column it opens.
    *
    * The same shape as Date Input's card, because they are the same control over
-   * a different set: a reader who recognises one should read the other without
+   * a different set: a reader who recognizes one should read the other without
    * being told.
    */
   'time-input': (

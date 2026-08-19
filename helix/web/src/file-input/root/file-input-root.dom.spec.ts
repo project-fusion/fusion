@@ -115,7 +115,7 @@ describe('input file', () => {
   })
 
   test('and a file the browser cannot name falls back to its extension', async () => {
-    // `type` is empty for anything unrecognised, and the extension is what the
+    // `type` is empty for anything unrecognized, and the extension is what the
     // name already shows: a poor label and a better one than nothing.
     const host = await field()
     control(host).files = (() => {

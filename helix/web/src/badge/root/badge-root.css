@@ -48,10 +48,10 @@
    * **And it was the wrong sign, so the pullback pushed out.** A negative inset
    * moves the mark away from the corner, which is the opposite of what the
    * paragraph above asks for and what a reader sees: measured on an avatar, a
-   * button and an icon button, the mark's centre landed 4px *outside* the
+   * button and an icon button, the mark's center landed 4px *outside* the
    * corner in both axes, and on a 32px circle that is well clear of the shape,
    * so the badge floated beside the avatar rather than sitting on it. Positive
-   * now: the centre sits 4px inside the corner, which on that circle is within
+   * now: the center sits 4px inside the corner, which on that circle is within
    * a pixel of where its edge crosses the diagonal. */
   inset-block-start: var(--badge-offset, calc(var(--_badge-size) / 4));
   inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / 4));

@@ -300,7 +300,7 @@ if (hasLayout()) {
 
          Both faults it covers are specificity. `[data-invalid]` unnamed by
          hover is (0,3,0) against hover's (0,4,0), so pointing at a field with
-         an error in it put the grey border back. And the focus rule owns the
+         an error in it put the gray border back. And the focus rule owns the
          `outline`, so a focused error came out red inside blue, which is the
          double-struck look the focus rule exists to prevent arriving by another
          route. The two are one edge, so they have to agree. */

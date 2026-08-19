@@ -69,12 +69,12 @@
 
 /* It grows out of the edge that faces the trigger, so a tooltip above one
    expands upward from its own bottom edge and one to the left expands leftward
-   from its right. A centre origin was tried and reads as the bubble inflating in
+   from its right. A center origin was tried and reads as the bubble inflating in
    place, which says nothing about what it belongs to.
 
    **The midpoint of that edge, now that there is no arrow.** These read
    `--_floating-arrow-x` and `--_floating-arrow-y`, which the floating controller
-   writes as the centre of the pointer it has just placed, because the pointer was
+   writes as the center of the pointer it has just placed, because the pointer was
    the only thing that knew where along the edge the tooltip actually attached:
    `top-start` puts it near one end and `shift` slides it anywhere. With the arrow
    removed the controller is passed no pointer and writes neither property, so

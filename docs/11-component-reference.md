@@ -570,7 +570,7 @@ Sets a passage apart as information, a warning, or an error.
 Extends `HelixBaseCallout`.
 
 Tinted from the severity's status color with `color-mix`, and marked with a
-bar on the inline start so the severity survives being read in greyscale or
+bar on the inline start so the severity survives being read in grayscale or
 by anyone who does not distinguish the hues.
 
 There is no `appearance` here. `severity` carries the meaning and lives on
@@ -1273,7 +1273,7 @@ dialog rather than being a div somebody positioned.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `align` | `align` | `'center' \| 'start' \| undefined` | - | - | Whether the panel's contents run from the start or centre on it. |
+| `align` | `align` | `'center' \| 'start' \| undefined` | - | - | Whether the panel's contents run from the start or center on it. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseDialog` | Accessible name for the dialog. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
@@ -2399,7 +2399,7 @@ The difference is inside it: a button at each end of the box rather than
 beside it, so the whole reads as one field rather than a field with two
 controls after it.
 
-The number is centred and set in tabular figures, which is the one place this
+The number is centered and set in tabular figures, which is the one place this
 differs from every other field in the library. Digits are what changes under a
 repeated press, and proportional ones make the number shuffle while it counts.
 
@@ -2625,7 +2625,7 @@ as it does.
 The current page is a raised chip rather than a brand fill, which is the
 treatment `Tabs` gives its selected tab. Brand on a page number claims more
 than the state deserves: it is not a choice the reader made about anything,
-it is where they happen to be standing, and a row of grey numbers with one
+it is where they happen to be standing, and a row of gray numbers with one
 blue one reads as the blue one being an action.
 
 Selected on `aria-current` rather than on a second attribute saying the same

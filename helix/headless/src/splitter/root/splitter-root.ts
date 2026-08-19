@@ -28,7 +28,7 @@ import { property, state } from 'lit/decorators.js'
  * Built the other way round first, because a splitter already knows where its
  * own divider begins and needs no measurement of the other, and that version was
  * clipped: the crossing lies on the boundary between a pane and the divider
- * beside it, a handle centred there reaches back over the boundary, and a pane
+ * beside it, a handle centered there reaches back over the boundary, and a pane
  * is `overflow: auto`. Exactly half the corner was cut off. The outer separator
  * is the one element that already straddles the seam, so the corner belongs in
  * it.

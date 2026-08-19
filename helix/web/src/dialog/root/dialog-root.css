@@ -230,7 +230,7 @@
  * inside a resizing frame it tracks it exactly, 900 to 704, 600 to 564, 420 to
  * 384, 360 to 324. So the panel was already responsive; what it was not was
  * *different*. Every size is identical below about 406px, and what a reader gets
- * there is a slightly narrower centred card, which is the desktop shape shrunk
+ * there is a slightly narrower centered card, which is the desktop shape shrunk
  * rather than the shape a phone wants.
  *
  * That is what earns the query. The rule this file has followed is that `min()`
@@ -248,7 +248,7 @@
  * simply not a question below it, where there is one answer. */
 @media (width < 30rem) {
   [part="dialog"] {
-    /* Pinned rather than centred. A `<dialog>` is `position: fixed` with
+    /* Pinned rather than centered. A `<dialog>` is `position: fixed` with
        `inset: 0` and `margin: auto` from the UA, so taking the block-end margin
        to zero is the whole of what moves it down. */
     margin-block-end: var(--helix-space-none);
@@ -265,7 +265,7 @@
     border-start-end-radius: var(--helix-radii-sm);
     border-end-start-radius: var(--helix-radii-none);
     border-end-end-radius: var(--helix-radii-none);
-    /* Up from the edge it is pinned to. A centred panel rises by a hair because
+    /* Up from the edge it is pinned to. A centered panel rises by a hair because
        it is arriving in place; a sheet travels its own height, because where it
        came from is the thing being said. */
     translate: 0 100%;
@@ -342,7 +342,7 @@
   inline-size: var(--dialog-icon-size, calc(var(--helix-size-icon-lg) * 2));
 }
 
-/* Centred, and it has to be on the panel rather than on each region.
+/* Centered, and it has to be on the panel rather than on each region.
  *
  * The dialog's own content is a bare slot, so what a consumer writes there is
  * usually a text node, and `::slotted()` matches elements only: a rule per
@@ -359,9 +359,9 @@
   justify-content: center;
 }
 
-/* A block box is not centred by `text-align`, so the mark is placed rather than
+/* A block box is not centered by `text-align`, so the mark is placed rather than
    aligned. `fit-content`, or a block at the panel's full width has nothing to
-   centre. */
+   center. */
 :host([align="center"]) ::slotted([slot="icon"]) {
   margin-inline: auto;
 }

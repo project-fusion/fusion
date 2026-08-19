@@ -95,7 +95,7 @@ export interface CommandOptions {
  * for "the target decides what this means", and the target deciding is exactly
  * what this is.
  *
- * Unrecognised commands are left alone rather than swallowed, so a host that
+ * Unrecognized commands are left alone rather than swallowed, so a host that
  * answers `--show` does not quietly absorb a `--print` meant for something
  * else.
  */

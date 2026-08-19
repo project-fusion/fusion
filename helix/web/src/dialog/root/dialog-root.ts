@@ -19,7 +19,7 @@ import { styles } from './dialog-root.css.js'
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog
  *
- * @property align - Whether the panel's contents run from the start or centre on it.
+ * @property align - Whether the panel's contents run from the start or center on it.
  * @property size - How wide the panel is allowed to be.
  *
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
@@ -60,7 +60,7 @@ export class HelixDialog extends HelixBaseDialog {
    * Which way the panel's contents read.
    *
    * One property for the whole panel rather than one per region. The regions are
-   * never mixed in practice: a dialog that asks a short question centres its
+   * never mixed in practice: a dialog that asks a short question centers its
    * mark, its title, its sentence and its buttons together, and a dialog holding
    * a form runs all four from the start. Three properties would be three ways to
    * write the same two arrangements, and a fourth way to get one of them wrong.

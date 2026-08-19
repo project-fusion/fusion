@@ -70,7 +70,7 @@ export const toolingArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="72" x="64" y="100" />
       <rect className="artRule" height="120" width="1" x="160" y="40" />
       <rect className="artPage" height="120" width="111" x="161" y="40" />
-      {/* Centred in the preview pane, not flush to its right edge. The pane
+      {/* Centered in the preview pane, not flush to its right edge. The pane
           runs 161 to 272, so a control 80 wide sits at 176: it was at 192,
           which put it hard against the frame and read as clipped rather than
           as rendered. */}

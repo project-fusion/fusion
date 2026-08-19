@@ -77,7 +77,7 @@ export class HelixBaseDialog extends MixinControllerOpen(HelixElement) {
    *
    * Escape *and* a press on the backdrop, which it now genuinely means. The
    * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behaviour a consumer would have written their
+   * press, so it promised a behavior a consumer would have written their
    * markup around; the fix then was to narrow the sentence, and the fix now is
    * to build the half that was missing.
    *

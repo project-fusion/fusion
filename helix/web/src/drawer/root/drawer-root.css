@@ -92,7 +92,7 @@
    * A `<dialog>` arrives with `margin: auto`, a 3px `solid` border, `padding:
    * 1em`, `width: fit-content` and `max-width/height: calc(100% - 6px - 2em)`.
    * Every one of those fights an edge-anchored panel: with `inset: 0` the auto
-   * margin centres it, so the drawer came out as a bordered box floating in the
+   * margin centers it, so the drawer came out as a bordered box floating in the
    * middle of the viewport at 320x564 where it should have been flush to the
    * right edge at full height. Measured, and visible in a screenshot, which is
    * the only reason it was caught: `:modal` was true and the panel had escaped

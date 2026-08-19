@@ -48,7 +48,7 @@ export const registerDom = (): void => {
  * point of a custom state is that it reaches a stylesheet and never the DOM, so
  * there is no attribute a spec could read instead. Feature-tested by its users
  * (`'states' in internals`), so leaving it out did not break anything; it made
- * the behaviour untestable outside a browser, which is how it went in.
+ * the behavior untestable outside a browser, which is how it went in.
  *
  * `setValidity` is modelled too, for the same reason `setFormValue` is: a
  * control reads its own verdict back to decide whether to show a message, so a

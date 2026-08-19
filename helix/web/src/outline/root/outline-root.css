@@ -72,7 +72,7 @@
  * wanted one.
  *
  * The width lives in a custom property because two declarations depend on it:
- * the size and the inset that keeps it centred in the rail. Both are ordinary
+ * the size and the inset that keeps it centered in the rail. Both are ordinary
  * transitionable properties, so changing the variable animates them together
  * and the mark grows about its own middle rather than off one edge.
  *

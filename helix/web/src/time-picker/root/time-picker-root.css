@@ -47,7 +47,7 @@
  * a row stops being a row on the panel. */
 :host([mode="range"]) [part="option"][selected]::part(item) {
   /* `foreground-muted` rather than `foreground`, which was tried first and is a
-     slab of near-black in a list of grey rows: measured at 21:1 against its own
+     slab of near-black in a list of gray rows: measured at 21:1 against its own
      label, where the muted step is 6.01, comfortably past AA and leaving black
      to the text that is actually text. `foreground-on-accent` for the label,
      since that is the token for words on a filled control and this is one. */
@@ -120,7 +120,7 @@
 
 /* Shorter than the single list, which is a different job: a list is read down
    and a dial is read around its middle, so it wants enough rows to show the
-   neighbours and not so many that the centre stops being a centre. */
+   neighbours and not so many that the center stops being a center. */
 /* Each column is at least as wide as its own widest row, and they share what is
    left equally. `flex-basis: 0` with a zero floor was the first version and it
    collapsed them: inside a panel sized to its content there is no content to
@@ -130,7 +130,7 @@
   /* The row is stated once and read three times: by the row itself, by the block
      padding that lets the first and last reach the middle, and by the height,
      which is five of them. Written separately they drift, and the drift shows up
-     as a wheel resting a few pixels off centre. */
+     as a wheel resting a few pixels off center. */
   --_time-row: var(--time-picker-row-size, var(--helix-size-control));
   --listbox-max-block-size: var(--time-picker-wheel-height, calc(var(--_time-row) * 5));
 
@@ -143,7 +143,7 @@
  * `scroll-snap-type` is what makes a row come to rest in the middle rather than
  * wherever the finger left it, and the block padding is what lets the first and
  * last rows get there at all: without it a column can scroll its first row to
- * the top and no further, so midnight can never be the thing in the centre. Half
+ * the top and no further, so midnight can never be the thing in the center. Half
  * the column less half a row, which is the arithmetic for "one row's worth of
  * middle".
  *
@@ -172,13 +172,13 @@
   scroll-snap-align: center;
 }
 
-/* Centred, because a column of numbers read against its own edge is a list and
+/* Centered, because a column of numbers read against its own edge is a list and
  * read against its middle is a dial.
  *
  * Both the row and the words. `justify-content` on the row alone did nothing
- * visible, measured: it centres the row's children, and the label is a flex item
+ * visible, measured: it centers the row's children, and the label is a flex item
  * that fills the row, so the text went on sitting against its own start edge
- * inside a label that was already centred by being the whole width. */
+ * inside a label that was already centered by being the whole width. */
 [part="column"] [part="option"]::part(item) {
   justify-content: center;
 }
@@ -257,7 +257,7 @@
 }
 
 /* And the answer is the calendar's solid mark: `foreground-muted` rather than
-   `foreground`, which is a slab of near-black among grey numbers, and
+   `foreground`, which is a slab of near-black among gray numbers, and
    `foreground-on-accent` for the digits, which is the token for words on a
    filled control. The list appearance already reads this way for its range
    termini, so all three surfaces now say "chosen" with one mark. */
@@ -275,7 +275,7 @@
 /* No tick. A listbox marks its answer because a reader has to find it among
    options that are otherwise alike; a dial has exactly one value per column and
    it is the one in the middle, so a mark beside it says what the position
-   already said and pushes the number off centre doing it. */
+   already said and pushes the number off center doing it. */
 [part="column"] [part="option"]::part(item)::after {
   content: none;
 }

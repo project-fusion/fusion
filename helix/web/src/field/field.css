@@ -34,7 +34,7 @@
  * `medium` rather than regular. A placeholder is not filler, it is the one piece
  * of instruction a field carries before anything is typed, and at
  * `foreground-subtle` the color has already taken most of its weight away.
- * Regular on top of that reads as greyed-out rather than as guidance. Matching
+ * Regular on top of that reads as grayed-out rather than as guidance. Matching
  * the label, which is the other short instruction in the same control. */
 ::placeholder {
   color: var(--helix-color-foreground-subtle);

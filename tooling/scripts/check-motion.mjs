@@ -105,7 +105,7 @@ const rules = (css) => {
 
 const REDUCE = /@media[^{]*prefers-reduced-motion:\s*reduce/
 
-/** One selector per comma, normalised so the two sides compare. */
+/** One selector per comma, normalized so the two sides compare. */
 const parts = (selector) =>
   selector
     .split(',')
@@ -130,7 +130,7 @@ for (const tier of TIERS) {
   for (const sheet of sheets(tier)) {
     const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     const parsed = rules(css)
-    /* What the sheet has already answered for. Compared as normalised selector
+    /* What the sheet has already answered for. Compared as normalized selector
        text: a reduce rule has to name the same selector, which also means it
        carries the same specificity and therefore actually wins. Naming a looser
        one silently loses, which is the trap that made the per-file check

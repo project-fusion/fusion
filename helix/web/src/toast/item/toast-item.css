@@ -81,7 +81,7 @@
    * wrong for the same reason: an action is a thing to do about the message, so
    * it belongs under the words rather than beside them or under the icon. And
    * inline, the action was the tallest thing on the line, so a one-line toast
-   * had its text and its mark centred against a 32px control instead of sitting
+   * had its text and its mark centered against a 32px control instead of sitting
    * on their own line.
    *
    * Column one is `auto`, so with no mark it is zero wide and the message

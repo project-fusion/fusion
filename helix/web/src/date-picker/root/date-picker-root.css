@@ -49,7 +49,7 @@
  * carries a back arrow while only the last carries a forward one, so a run of
  * three put the first heading against its arrow, the second hard left and the
  * third against the other arrow. Measured across `months="3"`: three headings,
- * three different positions, none of them centred.
+ * three different positions, none of them centered.
  *
  * A grid places the heading in the middle column whether the arrows exist or
  * not, so every month in a row reads at the same height and the same offset,
@@ -221,9 +221,9 @@
 
 /* The ends of a range, and a single date, are the solid mark. The days between
    them carry only the band. */
-/* Greys rather than the accent, the same call Time's range takes.
+/* Grays rather than the accent, the same call Time's range takes.
    `foreground-muted` and not `foreground`, which is a slab of near-black in a
-   grid of grey squares: measured at 21:1 against its own label where the muted
+   grid of gray squares: measured at 21:1 against its own label where the muted
    step is 6.01, past AA with room and leaving black to the text. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
   background-color: var(--date-picker-selected-color, var(--helix-color-foreground-muted));

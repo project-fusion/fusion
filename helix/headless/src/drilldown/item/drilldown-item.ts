@@ -96,7 +96,7 @@ export class HelixBaseDrilldownItem extends HelixElement {
      *
      * It was a `<div role="button">` with a click handler and nothing else, so
      * the row could not be activated from the keyboard at all: Enter and Space
-     * are behaviour the platform gives a real button and gives nothing else,
+     * are behavior the platform gives a real button and gives nothing else,
      * and neither was handled here. Same argument `Button` makes for rendering
      * one rather than reproducing it.
      *

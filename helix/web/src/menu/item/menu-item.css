@@ -73,7 +73,7 @@
  * in the row's own ink.
  *
  * The color only has to be legible, not comparative: an unchecked row renders
- * an empty `<span part="mark">` as a spacer rather than a grey tick, so the
+ * an empty `<span part="mark">` as a spacer rather than a gray tick, so the
  * mark's *presence* is the whole of the state. `foreground-subtle` stays on the
  * rule above because the other thing wearing this part is the submenu caret,
  * which should be quiet. */

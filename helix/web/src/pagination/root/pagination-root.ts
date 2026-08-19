@@ -20,7 +20,7 @@ import { styles } from './pagination-root.css.js'
  * The current page is a raised chip rather than a brand fill, which is the
  * treatment `Tabs` gives its selected tab. Brand on a page number claims more
  * than the state deserves: it is not a choice the reader made about anything,
- * it is where they happen to be standing, and a row of grey numbers with one
+ * it is where they happen to be standing, and a row of gray numbers with one
  * blue one reads as the blue one being an action.
  *
  * Selected on `aria-current` rather than on a second attribute saying the same

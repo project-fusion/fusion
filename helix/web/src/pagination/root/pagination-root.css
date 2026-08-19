@@ -83,7 +83,7 @@
  * Same treatment `Tabs` gives its selected tab, `surface-raised` under
  * `shadow-sm`, and for the same reason. Brand on a page number claims more than
  * the state deserves: it is not a choice the reader made about anything, it is
- * where they happen to be standing, and a row of grey numbers with one blue one
+ * where they happen to be standing, and a row of gray numbers with one blue one
  * reads as the blue one being an action. Lifting it says the same thing in the
  * register the rest of the library uses for it.
  *
@@ -93,7 +93,7 @@
  *
  * **The border is what actually distinguishes it, and that is a measurement.**
  * The first pass carried `surface-raised` under `shadow-sm` and nothing else,
- * and the two greys in play are `oklch(0.97 0 258)` for raised against
+ * and the two grays in play are `oklch(0.97 0 258)` for raised against
  * `oklch(0.96 0 258)` for the sunken fill a hovered page takes: one per cent of
  * lightness apart, so the page you are on and the page under the pointer were
  * the same chip. A shadow at this size cannot carry a distinction that fine.
@@ -161,7 +161,7 @@
 /* The gap is a control, so it takes the control box above and needs only what
    makes it quieter than a page: it is a way through rather than a destination.
 
-   Nothing about its position is stated here. It was centred by hand once, on
+   Nothing about its position is stated here. It was centered by hand once, on
    the theory that an ellipsis needed pushing onto the baseline, and measured at
    1.5px *below* the digits for it: the glyph is already drawn at its baseline,
    so aligning the em boxes is the whole of the job and the shared box does that

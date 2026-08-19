@@ -61,7 +61,7 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * Fifty-six pixels tall, which is `--helix-size-header`, spanning the page.
    *
-   * The bar and nothing else. A page under it, twice: first as an empty grey
+   * The bar and nothing else. A page under it, twice: first as an empty gray
    * field, then with content, on the reasoning that what makes fifty-six pixels
    * read as *header* is something beginning where it ends. That is true of a
    * page and it is not true of a card. What the card has to say is "a bar of
@@ -164,7 +164,7 @@ export const overlaysArt: Record<string, ReactNode> = {
    * of the frame was a page, dimmed almost to flat, with the actual dialog
    * small in the middle of it. Drawer keeps the page because Drawer is
    * *attached* to an edge and has no silhouette without one. A dialog is
-   * centred and floating, and floating is a shadow, which needs nothing behind
+   * centered and floating, and floating is a shadow, which needs nothing behind
    * it to read.
    */
   dialog: (

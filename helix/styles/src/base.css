@@ -418,7 +418,7 @@ helix-text[tone="danger"] {
    * in both modes: giving the middle tier an edge separates the three by *kind*,
    * nothing against a line against a fill, where six points of a wash separates
    * them only by degree. Tried the other way too, a resting wash on tertiary,
-   * and it is worse: two near-identical grey boxes where there had been one.
+   * and it is worse: two near-identical gray boxes where there had been one.
    *
    * The property was already here as `transparent`, which is what makes this
    * cost no layout at all, and `primary`, `danger` and `tertiary` each speak to
@@ -948,10 +948,10 @@ helix-toggle[disabled]::part(item) {
   }
 }
 
-/* Hover goes to the brand, not to a darker grey.
+/* Hover goes to the brand, not to a darker gray.
  *
  * It was `border-strong`, which is a hairline moving from 0.91 to 0.71: a
- * twenty point jump that still says nothing except "slightly more". Grey
+ * twenty point jump that still says nothing except "slightly more". Gray
  * darkening is the cheapest possible interaction signal and it reads as the
  * card getting heavier rather than as the card being pointed at. The brand
  * already means "this one, now" everywhere else in the library.

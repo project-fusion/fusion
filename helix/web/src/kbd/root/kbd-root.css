@@ -3,7 +3,7 @@
   font: inherit;
   /* Lifted a tenth of an em, which is what puts the key on the line.
    *
-   * The box is `1.5em` and the label inside it is `0.75em`, centred. Aligning
+   * The box is `1.5em` and the label inside it is `0.75em`, centered. Aligning
    * that label's baseline with the prose baseline, which is what `baseline`
    * does, therefore leaves the box hanging about a descender below the line's
    * middle: measured against the middle of a run of text, 1.25px low at 12px,
@@ -13,7 +13,7 @@
    * aligns on half the x-height, where the box wants half the line, so it left
    * the key 1.07px low at 12px and 1.7px at 20px. Lifting by a tenth of an em
    * scales with the box, because the box is em-sized: measured at 12, 14, 16
-   * and 20px it lands within 0.35px of centre at every one. */
+   * and 20px it lands within 0.35px of center at every one. */
   vertical-align: 0.1em;
 
   /* Relative to the surrounding text rather than on the type scale, because a

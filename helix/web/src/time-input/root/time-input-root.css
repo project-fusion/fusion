@@ -43,7 +43,7 @@
 }
 
 /* Named with `:hover` as well, or a focused field under the pointer takes the
-   hover border back and reads as a grey edge inside a blue ring. */
+   hover border back and reads as a gray edge inside a blue ring. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
   border-color: var(--helix-color-primary);
@@ -85,7 +85,7 @@
 /* The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out, for the reason Popover, Menu and Select all record:
  * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
- * declaration leaves three pixels of medium grey rather than none at all.
+ * declaration leaves three pixels of medium gray rather than none at all.
  *
  * The field's width, unlike Date Input's. A calendar is seven columns with a
  * width of its own and a list of times is a column of single lines, so this one

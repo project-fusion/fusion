@@ -55,7 +55,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Something is over it. The accent rather than a darker grey, because a drop is
+/* Something is over it. The accent rather than a darker gray, because a drop is
    a thing about to happen rather than a thing being pointed at, and the field
    has to read as armed from across the page. */
 [part="field"][data-dropping] {
@@ -129,7 +129,7 @@
  *
  * `transform-origin` is what makes it the top rather than the middle: a new card
  * is appended, so it unfolds from the edge it is attached to rather than
- * expanding from its own centre into the gap.
+ * expanding from its own center into the gap.
  *
  * 0.9 rather than the 0.96 the panels use. That figure is right for a whole
  * surface, where a tenth would be a lurch; on a forty-pixel row it is two pixels

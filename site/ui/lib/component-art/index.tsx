@@ -98,10 +98,10 @@ export function ComponentArt({ slug }: { slug: string }) {
         >
           <feDropShadow dx="0" dy="4" stdDeviation="5" />
         </filter>
-        {/* Offset to the cell centre rather than its corner. On the corner the
+        {/* Offset to the cell center rather than its corner. On the corner the
             dots land on 48, 64, 80 — the same coordinates the drawings start
             and end on — so every panel edge would have a dot sitting half under
-            it. At the centre they fall in the gaps and read as the field the
+            it. At the center they fall in the gaps and read as the field the
             geometry was measured against. */}
         {/* Radius 1, not 0.75. The card renders at about three quarters of the
             viewBox, so a 0.75 dot lands near a single device pixel and most of

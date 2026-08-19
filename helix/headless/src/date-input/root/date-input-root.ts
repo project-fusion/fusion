@@ -507,7 +507,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
    * the browser moves focus off the removed cell to the body, and the caret is
    * then put back here with `relatedTarget` pointing at the body, which is
    * outside this element and reads as an arrival. Every step is ordinary browser
-   * behaviour and none of it can be exercised here: `focus()` dispatches no
+   * behavior and none of it can be exercised here: `focus()` dispatches no
    * event in an unfocused document, which is what both the test runtime and the
    * available browser pane are. A spec was written for it and passed with the
    * guard removed, so it was covering nothing and has been taken out rather than

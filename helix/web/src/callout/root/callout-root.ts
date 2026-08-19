@@ -8,7 +8,7 @@ import { styles } from './callout-root.css.js'
  *
  * @description
  * Tinted from the severity's status color with `color-mix`, and marked with a
- * bar on the inline start so the severity survives being read in greyscale or
+ * bar on the inline start so the severity survives being read in grayscale or
  * by anyone who does not distinguish the hues.
  *
  * There is no `appearance` here. `severity` carries the meaning and lives on

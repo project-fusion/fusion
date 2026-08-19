@@ -36,7 +36,7 @@
      lists do. Five tokens appeared in the OS block and in neither explicit one,
      so choosing a mode by hand left `surface-sunken`, `overlay`,
      `foreground-subtle` and both material tokens at the other mode's values:
-     a segmented control kept its light grey track on a dark page. */
+     a segmented control kept its light gray track on a dark page. */
   color-scheme: light dark;
 
   /* Which mode is in force, and its opposite, as values something can read.
@@ -96,7 +96,7 @@
 
      How deep is the part that took a second pass. It sat on neutral-200 at
      0.91, which is the step where the ramp starts opening up, and everything
-     filled with it came out as a grey slab on a white page: the checkbox, the
+     filled with it came out as a gray slab on a white page: the checkbox, the
      input, the textarea, the segmented control's track, a selected tab. Five
      reports, one number. Each was patched at the component for a day, which is
      five edits saying the same thing and the clue that none of them was the
@@ -141,7 +141,7 @@
   /* Text and icons, by prominence. */
   /* The ends of the ramp, matching the page. An icon takes `currentColor` and
      inherits, so this is what a bare one is: black on white and white on black,
-     rather than the dark grey and off-white a step in from each. Everything
+     rather than the dark gray and off-white a step in from each. Everything
      that wants to be quieter asks for `-muted` or `-subtle` by name. */
   --helix-color-foreground: light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0));
   --helix-color-foreground-muted: light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400));
@@ -168,7 +168,7 @@
    * about which one to reach for.
    *
    * `border-strong` was a hairline moving from 0.91 to 0.71 on hover: a twenty
-   * point jump in grey that communicates "slightly more" and nothing else. It
+   * point jump in gray that communicates "slightly more" and nothing else. It
    * read as the control getting heavier rather than as the control being
    * pointed at, and it was the library's only reason to own a second neutral
    * line color.
@@ -176,7 +176,7 @@
    * So: one resting hairline, and interaction is the brand, said as `primary`
    * at the seventeen sites that used to say one of the other two. An author now
    * answers one question, is this at rest or is it being interacted with,
-   * rather than picking among three greys that differ by feel.
+   * rather than picking among three grays that differ by feel.
    *
    * `--helix-material-border` further down is not a fourth. It is drawn over a
    * translucent pane rather than an opaque surface, so it is a `color-mix` with

@@ -230,7 +230,7 @@ if (hasLayout()) {
 
     test('an invalid box is wrong at its own edge, not ringed outside it', async () => {
       /* It was a ring, offset outside the box, and the picture was a red square
-         with a rounded grey box sitting inside it: a box inside a box rather
+         with a rounded gray box sitting inside it: a box inside a box rather
          than a box that is wrong. A ring is right where a component has no edge
          of its own to color, which stopped being true when this stopped
          letting the browser paint it. */

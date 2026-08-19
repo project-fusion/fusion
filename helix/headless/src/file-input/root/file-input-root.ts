@@ -45,7 +45,7 @@ const size = (bytes: number, locale?: string): string => {
  *
  * The subtype of the MIME type, so `image/png` reads `PNG`, which is the word a
  * reader already has for it. A browser leaves `type` empty for anything it does
- * not recognise, so the extension is the fallback: it is what the name already
+ * not recognize, so the extension is the fallback: it is what the name already
  * shows, which makes it a poor label and a better one than nothing.
  */
 const kind = (file: File): string => {

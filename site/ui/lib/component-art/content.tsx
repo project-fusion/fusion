@@ -11,7 +11,7 @@ import type { CSSProperties, ReactNode } from 'react'
  *
  * **Every drawing here is the fewest marks that still say which component it
  * is.** A second body line teaches nothing the first did not, and a card that
- * has to be read rather than recognised has already failed at thumbnail size.
+ * has to be read rather than recognized has already failed at thumbnail size.
  * Where a count carries meaning it stays: Divider needs something either side of
  * the rule, Quote needs to wrap. Where it was only filling space it is gone.
  *
@@ -19,7 +19,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * marks would be under two pixels each.
  *
  * **Most of this group declares no archetype, and still moves.** Avatar,
- * Blockquote, Flex, Grid, Icon, Quote, Stat and Text have no runtime behaviour
+ * Blockquote, Flex, Grid, Icon, Quote, Stat and Text have no runtime behavior
  * to replay: a type scale is not climbed one line at a time. Each of them briefly carried an
  * `artRow` anyway, and a stagger that means nothing is worse than no stagger,
  * because it teaches a reader that the stagger means nothing.
@@ -94,10 +94,10 @@ export const contentArt: Record<string, ReactNode> = {
    */
   divider: (
     <>
-      {/* Centred, all three. They were flush left at 48 while the rule ran 48 to
-          272, so the one element already centred was the only one that looked
+      {/* Centered, all three. They were flush left at 48 while the rule ran 48 to
+          272, so the one element already centered was the only one that looked
           wrong: two lines hanging left under a rule reaching further right than
-          either of them. Each is centred on 160 now, and the only ragged thing
+          either of them. Each is centered on 160 now, and the only ragged thing
           left is the line lengths, which is what a line length is for. */}
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="160" x="80" y="84" />
       {/* The rule draws itself out, from the middle, and 224 is where it ends
@@ -223,7 +223,7 @@ export const contentArt: Record<string, ReactNode> = {
   /**
    * Marks around a ring, at `loader-lg`. Marks rather than an arc, because
    * that is what the component draws, and because an arc would need a stroke.
-   * It rotates about its own bounding-box centre.
+   * It rotates about its own bounding-box center.
    */
   loader: (
     <g className="artSpin">
@@ -260,7 +260,7 @@ export const contentArt: Record<string, ReactNode> = {
    * Same track at the same height, because the two stand beside each other in a
    * panel and the component is deliberately the same shape. The ticks are the
    * entire silhouette: without them this card is `progress` exactly, and a card
-   * that has to be read rather than recognised has already failed at thumbnail
+   * that has to be read rather than recognized has already failed at thumbnail
    * size.
    *
    * The bands are color in the component and cannot be here, since the gallery

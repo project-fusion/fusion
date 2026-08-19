@@ -51,7 +51,7 @@
    * near-black at 11% on white all but vanishes, while near-white at 11% on
    * black is already a visible field. `light-dark()` takes colors only, so the
    * strength lives in the color rather than in an opacity, and `color-mix`
-   * keeps it derived from the foreground token rather than hardcoded to a grey. */
+   * keeps it derived from the foreground token rather than hardcoded to a gray. */
   --site-lattice: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 20%, transparent),
     color-mix(in oklab, var(--helix-color-foreground) 11%, transparent)
@@ -397,8 +397,8 @@ helix-drawer {
  *
  * It replaces the shared `VerticalPage` header on this route only. The other
  * three verticals keep the left-aligned title, because they are pages of prose
- * and this is the front of a gallery: the search is the reason to centre it,
- * and a centred column with nothing to type into is just a wide heading. */
+ * and this is the front of a gallery: the search is the reason to center it,
+ * and a centered column with nothing to type into is just a wide heading. */
 .designHero {
   align-items: center;
   background-color: var(--helix-color-background);
@@ -470,7 +470,7 @@ helix-drawer {
  *
  * Drawn on top of the lattice rather than replacing a dot in it, because a
  * background is one image and cannot have two dozen of its tiles animated
- * separately. The grey dot stays underneath and the primary one is the same
+ * separately. The gray dot stays underneath and the primary one is the same
  * size at rest, so what a reader sees is a dot changing color rather than a
  * second mark arriving next to one. */
 .designHeroField {
@@ -511,7 +511,7 @@ helix-drawer {
   /* A percentage of the section, snapped to the nearest lattice dot. The
      percentage is what carries the field across the whole hero at any width;
      the snap is what keeps every shine on a dot instead of near one. Rounding
-     is against the offset from the centre, not from the edge, because
+     is against the offset from the center, not from the edge, because
      `background-position: center` is what anchors the lattice. */
   inset-block-start: calc(50% + round(var(--shine-y) * 1% - 50%, var(--site-lattice-pitch)));
   inset-inline-start: calc(50% + round(var(--shine-x) * 1% - 50%, var(--site-lattice-pitch)));
@@ -566,9 +566,9 @@ helix-drawer {
  * arithmetic rather than as a round number, so the two stay equal if the button
  * size ever moves.
  *
- * `text-align: start` because the hero centres its column and `text-align`
+ * `text-align: start` because the hero centers its column and `text-align`
  * inherits straight through the shadow boundary into the field: the placeholder
- * and anything typed came out centred, which is not how a search box behaves
+ * and anything typed came out centered, which is not how a search box behaves
  * anywhere. Centring is a property of the layout here, not of the control. */
 .designSearch {
   inline-size: 100%;
@@ -750,7 +750,7 @@ helix-drawer {
 /* The palette, and every value in it is a semantic token.
  *
  * The drawings used to be one fill at a ramp of alphas, which was legible but
- * said nothing: a panel and a page and a scrim were the same grey at different
+ * said nothing: a panel and a page and a scrim were the same gray at different
  * strengths. Naming the real token instead means each shape is *the thing it
  * depicts* — a floating panel is `surface-overlay`, a dimmed page is `overlay`,
  * a tooltip is `surface-inverse` and flips with the mode on its own. It also
@@ -853,7 +853,7 @@ helix-drawer {
  * was chosen in dark, checked in dark, and left light mode with no lattice at
  * all. `light-dark()` takes colors only, so the strength has to live in the
  * color rather than in `fill-opacity`, and `color-mix` keeps it derived from
- * the foreground token rather than hardcoded to a grey. */
+ * the foreground token rather than hardcoded to a gray. */
 .artGridDot {
   fill: var(--site-lattice);
 }
@@ -947,7 +947,7 @@ helix-drawer {
   --art-curve: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* A centre pivot, stated, because SVG does not give you one.
+/* A center pivot, stated, because SVG does not give you one.
  *
  * `transform-box: fill-box` says *which* box the percentages resolve against.
  * It does not set the origin, and SVG's UA stylesheet computes
@@ -979,7 +979,7 @@ helix-drawer {
  * So the honest split is by whether the *component* does anything at runtime. A
  * key press, a badge's mark, a header's nav: real, and they keep their own
  * motion. Avatar, Blockquote, Divider, Flex, Grid, Icon, Quote, Stat and Text
- * have no runtime behaviour at all, and they get this instead.
+ * have no runtime behavior at all, and they get this instead.
  *
  * Selected rather than opted into. `:has()` asks the drawing whether it already
  * carries an archetype, so a card cannot end up with both and a new family
@@ -1399,7 +1399,7 @@ helix-drawer {
  * outer tree on the host, which the cascade lets win in both scroll states. */
 /* The mark takes the brand.
  *
- * Its gradients were declared against `--logo-color-*` with grey literals as
+ * Its gradients were declared against `--logo-color-*` with gray literals as
  * fallbacks, exactly so a theme could retint it without the SVG being touched.
  * `primary` is the brand blue and follows the color mode on its own.
  *
@@ -1636,7 +1636,7 @@ helix-sandbox [slot="panel"]::part(panels) {
   /* Full strength, black on a white page and white on a black one.
      The lockup sits inside `<a data-link="quiet">`, which paints navigation in
      the muted foreground so that a column of rows does not shout, and the
-     wordmark was inheriting it: measured at oklch(0.5), a mid grey, in both
+     wordmark was inheriting it: measured at oklch(0.5), a mid gray, in both
      modes. Right for a nav row and wrong for the brand's own name, which is
      the one piece of text on the page that is a thing rather than a label. */
   color: var(--helix-color-foreground);
@@ -1754,7 +1754,7 @@ helix-drawer helix-tree {
  * spending a word on something every card in the list would say.
  *
  * Square rather than a pill: the inline inset a tag gives its text is there to
- * keep letters off the edge, and a single centred glyph does not need it on
+ * keep letters off the edge, and a single centered glyph does not need it on
  * both sides of nothing. */
 .statusMark {
   --tag-radii: var(--helix-radii-sm);

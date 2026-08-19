@@ -53,7 +53,7 @@ export class HelixCarousel extends HelixBaseCarousel {
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
    * says which edge and this says where along it, so the pair spells out the
-   * nine positions a consumer asks for in words: bottom left, bottom centre,
+   * nine positions a consumer asks for in words: bottom left, bottom center,
    * top right, and so on. One attribute with nine values was the alternative
    * and it multiplies rather than composing, since every value has to name both
    * facts and a consumer changing one has to rewrite the other.
@@ -68,7 +68,7 @@ export class HelixCarousel extends HelixBaseCarousel {
    *
    * Unset splits the row, dots to the start and arrows to the end, which is
    * what keeps two items in one grid cell from landing on each other. Beside the
-   * slides, and over them, both centre instead, because a column there has
+   * slides, and over them, both center instead, because a column there has
    * nothing to split the edge with. Putting both groups on the same edge with
    * the same alignment does overlap them, and always did: that is what the two
    * different defaults exist to avoid.
@@ -105,7 +105,7 @@ export class HelixCarousel extends HelixBaseCarousel {
    *
    * `overlay` answers it too, and the edge there is the whole slide: the bar is
    * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centred unless asked otherwise, which is
+   * it rather than moving the bar. Centered unless asked otherwise, which is
    * where an arrow over a photograph belongs.
    */
   @property({ attribute: 'controls-align', reflect: true })

@@ -49,7 +49,7 @@
  * width and jumping sideways.
  *
  * All three are the same mistake: the box was doing the drawing. Now the box is
- * only the target, centred on the seam and costing the layout nothing, and the
+ * only the target, centered on the seam and costing the layout nothing, and the
  * line is drawn inside it.
  *
  * `margin-inline` pulls back exactly half the width on each side, so the element
@@ -82,7 +82,7 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* The line, centred in the target rather than drawn on its edge, so the two are
+/* The line, centered in the target rather than drawn on its edge, so the two are
    concentric and thickening one does not move the other. */
 [part="separator"]::before {
   background-color: var(--splitter-color, var(--helix-color-border));
@@ -123,7 +123,7 @@
  * pixel of the same color and the overlap is a single pixel nobody sees. It
  * stops being invisible the moment one of them is hovered. A hovered divider is
  * two pixels and dark, and the light one crossing it starts exactly at its
- * centre, so it repaints the right half of the dark stroke and leaves a notch
+ * center, so it repaints the right half of the dark stroke and leaves a notch
  * in it. Reported from a screenshot, and it is only ever the hovered state.
  *
  * One step of the layer is enough, because a hovered inner divider is later
@@ -208,7 +208,7 @@
 /* The corner, where a nested splitter's divider crosses this one.
  *
  * **Drawn by the outer splitter, and it has to be.** The crossing sits on the
- * boundary between a pane and the divider beside it, so a handle centred on it
+ * boundary between a pane and the divider beside it, so a handle centered on it
  * straddles that boundary, and a pane is `overflow: auto` and clips whatever
  * reaches out of it. Built on the nested splitter first, and measured: exactly
  * the half that reached back over the seam was cut off.
@@ -219,7 +219,7 @@
  * children. The whole context still sat at `raised`, tied with the nested
  * splitter's separator, and a tie goes to document order: the nested one is
  * later, so it took the pointer along the eight pixels where the two dividers
- * overlap. Hit-tested at the crossing before the move, the centre and the whole
+ * overlap. Hit-tested at the crossing before the move, the center and the whole
  * inline-forward edge of the corner resolved to the nested splitter. Positioned
  * against the host instead, the corner's layer is read in the host's context and
  * beats every separator in the nest.
@@ -231,7 +231,7 @@
  *
  * Sixteen pixels against the divider's eight: it is the target for two dividers
  * rather than one, and the reader is aiming at a point instead of a line. It is
- * centred on the crossing with logical margins rather than `translate`, which is
+ * centered on the crossing with logical margins rather than `translate`, which is
  * physical and would push the inline half the wrong way in a right-to-left
  * document. Margins on an absolutely positioned box offset it from its inset and
  * do flip. */
@@ -314,7 +314,7 @@
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Along the run, centred, and offset to the leading side of the line. */
+/* Along the run, centered, and offset to the leading side of the line. */
 :host([appearance="grip"]:not([orientation="vertical"])) [part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
   inline-size: var(--helix-border-thick);

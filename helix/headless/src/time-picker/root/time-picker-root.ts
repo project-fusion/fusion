@@ -172,7 +172,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
-   * behaviour and a reader who has met one has met both. The alternative, a
+   * behavior and a reader who has met one has met both. The alternative, a
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
@@ -287,7 +287,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     /* `disabled` meant nothing here beyond dropping the value at submit time,
        the same gap the calendar had: times still took a click, the keyboard
        still moved through the list, and nothing said the control was off. The
-       listbox is told as well, which is what greys it and takes it out of the
+       listbox is told as well, which is what grays it and takes it out of the
        tab order, and this refuses at the source so every path in is covered by
        one check.
        `isDisabled` rather than `disabled`, which is only the half a consumer
@@ -394,7 +394,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to centre
+   * `display: none`, so every box measures zero and there is nothing to center
    * against: measured, the hour wheel stayed 288 pixels off its answer because
    * the only call happened before anything had a size. Whatever shows the panel
    * calls this again afterwards. The guard below makes the early call harmless
@@ -426,7 +426,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * method documents. Flat on a page there is no panel and no second call.
    *
    * Safe to run on every update: the listbox stops as soon as the chosen row is
-   * within a pixel of centre, so a call with nothing to do costs two rect reads
+   * within a pixel of center, so a call with nothing to do costs two rect reads
    * and changes nothing. It cannot fight a reader mid-scroll either, since
    * scrolling a wheel changes no property and so schedules no update.
    */

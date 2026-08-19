@@ -338,8 +338,8 @@ describe('carousel indicators', () => {
 
 describe('carousel chrome placement', () => {
   /* Where a run lands, read against the row it is placed in rather than against
-     the host. The host spans three grid rows, so a run centred in its own row
-     is well above the host's centre, and measuring against the host called every
+     the host. The host spans three grid rows, so a run centered in its own row
+     is well above the host's center, and measuring against the host called every
      inline case "start" on the first pass. happy-dom lays nothing out, so this
      asserts the properties the layout is made of instead. */
   const along = (host: HTMLElement, name: string): string =>

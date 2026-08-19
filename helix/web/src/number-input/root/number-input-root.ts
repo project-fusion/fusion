@@ -14,7 +14,7 @@ import { styles } from './number-input-root.css.js'
  * beside it, so the whole reads as one field rather than a field with two
  * controls after it.
  *
- * The number is centred and set in tabular figures, which is the one place this
+ * The number is centered and set in tabular figures, which is the one place this
  * differs from every other field in the library. Digits are what changes under a
  * repeated press, and proportional ones make the number shuffle while it counts.
  *

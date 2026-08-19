@@ -12,7 +12,7 @@
   box-sizing: border-box;
   /* Content, so full foreground. It was `foreground-muted`, which is the color
      for chrome around something a reader is looking at, and a table's cells are
-     the thing they are looking at: a whole table set in grey reads as disabled
+     the thing they are looking at: a whole table set in gray reads as disabled
      or as a footnote. The rules and the column headings are what recede. */
   color: var(--helix-color-foreground);
   display: flex;
@@ -31,7 +31,7 @@
    Column headings are the ones that recede, and they are `helix-table-column`
    now rather than a cell wearing an attribute. Before columns existed this
    selector had to serve both, so it took the quieter of the two treatments and
-   every row header in every table was small grey text. */
+   every row header in every table was small gray text. */
 :host([header]) {
   font-weight: var(--helix-weight-medium);
 }

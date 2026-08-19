@@ -65,7 +65,7 @@ interface EyeDropperConstructor {
  * **The working model is HSB, and the value is derived from it.** The reverse
  * loses colors: black is `brightness: 0`, whose hue and saturation are both
  * undefined, so a reader who drags to the bottom of the square and back would
- * get grey where they had red. Holding the model means a color survives a trip
+ * get gray where they had red. Holding the model means a color survives a trip
  * through one that has no hue. A value arriving from outside is read into the
  * model once, which is the only moment the conversion runs in that direction.
  *
@@ -188,7 +188,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    *
    * The one bit that keeps the model from being overwritten by the value it just
    * produced. Without it, dragging to the bottom of the square writes black,
-   * which reads back as hue 0 and saturation 0, and the next drag starts grey.
+   * which reads back as hue 0 and saturation 0, and the next drag starts gray.
    */
   private owned = false
 
