@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-radii-lg`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-duration-instant`.
+Currently unread anywhere: `--helix-radii-lg`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`, `--helix-duration-instant`.
 
 ## color
 
@@ -38,7 +38,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 30 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 135 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 133 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 101 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
@@ -147,7 +147,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 140 |
+| `--helix-border-thin` | `1px` | 138 |
 | `--helix-border-thick` | `2px` | 45 |
 
 ## shadow
@@ -172,7 +172,7 @@ Blur and translucency, for a surface that lets the page through.
 | `--helix-material-blur-lg` | `32px` | 0 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 2 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
-| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 2 |
+| `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 0 |
 
 ## duration
 

@@ -1,8 +1,21 @@
-/* Flat by default: an ordinary surface and a hairline, no translucency and no
-   blur. Material is opt-in through `appearance="material"`, because a filter
-   makes the header a containing block for `position: fixed` descendants, which
-   traps any overlay rendered inside it. Flat is both the quieter look and the
-   one that does not surprise. */
+/* Flat by default: an ordinary surface, no translucency and no blur. Material is
+   opt-in through `appearance="material"`, because a filter makes the header a
+   containing block for `position: fixed` descendants, which traps any overlay
+   rendered inside it. Flat is both the quieter look and the one that does not
+   surprise.
+
+   **And no line under it, in any appearance.** There was a hairline that faded
+   in once content ran underneath, which is the conventional answer to "the bar
+   is over something now" and answers a question the bar had already answered:
+   `flat` is opaque and `material` is blurred, so in both the content stops at
+   the bar because it cannot be seen through it. The line was a second edge
+   drawn on top of an edge that was already there, and it is the one thing on
+   the page that runs the full width of the window.
+
+   `transparent` is the one appearance where scrolling genuinely changes
+   something, and it says so the honest way: it has no surface at the top of the
+   page and takes one when it needs to hide what is passing under it. That is
+   what `data-scrolled` is still for. */
 :host {
   /* Dense by nature, and it says so once. A control put in here takes this
      without being told, so a row cannot end up with one member the wrong height
@@ -17,10 +30,12 @@
   --helix-size-tag: var(--helix-size-tag-sm);
 
   background-color: var(--app-header-background, var(--helix-color-background));
-  border-block-end: var(--helix-border-thin) solid transparent;
   display: block;
   inline-size: 100%;
-  transition: border-color var(--helix-duration-normal) var(--helix-easing-standard);
+  /* On the background, which is now the only thing a scroll changes. It was on
+     `border-color`, so with the line gone it animated a property nothing sets
+     and `transparent` took its surface in one frame. */
+  transition: background-color var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 :host([appearance="material"]) {
@@ -50,10 +65,6 @@
 
 :host([appearance="transparent"][data-scrolled]) {
   background-color: var(--app-header-background, var(--helix-color-background));
-}
-
-:host([data-scrolled]) {
-  border-block-end-color: var(--helix-color-border);
 }
 
 :host([sticky]) {
@@ -102,13 +113,6 @@
    tracks stop being equal, so nothing is holding the middle any more. */
 :host([nav-align="start"]) [part="row"] {
   grid-template-columns: auto 1fr auto;
-}
-
-/* Flat against the hero, lifted once content runs underneath. `data-scrolled`
-   is absent in the server's markup, which matches a fresh load at the top, so
-   the bar does not start lifted and settle. */
-:host([appearance="material"][data-scrolled]) {
-  border-block-end-color: var(--helix-material-border);
 }
 
 /* Brand and actions are bare slots, so an omitted one generates no flex item
