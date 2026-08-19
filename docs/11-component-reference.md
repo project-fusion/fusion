@@ -2077,6 +2077,98 @@ breathe as a code is typed into it.
 | --- | --- |
 | `--pin-gap` | Space between one box and the next. |
 
+## Input Time
+
+### Root — `helix-input-time`
+
+A time, typed or picked from a list.
+
+Extends `HelixBaseInputTime`.
+
+The frame is the field rather than the input, so the trigger sits inside the
+same box as the text and the focus ring is drawn once around the whole
+control. The trigger is a mark within that box rather than a button beside it,
+the arrangement Input Date settled on.
+
+The panel is the field's width, which is the one place this differs from Input
+Date: a calendar is seven columns with a width of its own, and a list of times
+is a column of one line each, so it should be as wide as the control it
+belongs to. That is the same reasoning Select gives for its own list.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseInputTime` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixBaseInputTime` | Latest time that can be chosen, as `HH:mm`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixBaseInputTime` | Earliest time that can be chosen, as `HH:mm`. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `'HH:mm'` | `HelixBaseInputTime` | What the field says before a time is in it. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `step` | `step` | `number` | `15` | `HelixBaseInputTime` | How far apart the offered times are, in minutes. |
+| `timeStyle` | `time-style` | `'iso' \| 'local'` | `'local'` | `HelixBaseInputTime` | Whether the field writes the time out, or holds the value as it is. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a time'` | `HelixBaseInputTime` | Accessible name for the control that opens the list. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseInputTime` | Puts the caret in the field, the way a label pointing at one would. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the time changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the list opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | The mark on the field saying a list opens. |
+| `hint` | Help under the field. |
+| `feedback` | What is wrong with it. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box holding the text and the trigger. |
+| `control` | The text input. |
+| `trigger` | The control that opens the list. |
+| `surface` | The floating panel. |
+| `picker` | The list inside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--input-time-background-color` | Fill behind the field. |
+
 ## Kbd
 
 ### Root — `helix-kbd`
@@ -3967,6 +4059,73 @@ dragged wider than the form holding it is a field that breaks the layout.
 | Property | Description |
 | --- | --- |
 | `--textarea-background-color` | Fill behind the text. |
+
+## Time
+
+### Root — `helix-time`
+
+Picks a time, from a list of them.
+
+Extends `HelixBaseTime`.
+
+A bounded list on a surface of its own, because ninety-six rows is taller than
+anywhere it will be put. `--time-list-height` is the bound and it is a height
+rather than a count of rows: what a panel has is room, and a row count would
+have to be recomputed every time the density changed.
+
+No border and no fill of its own. Flat on a page it takes what it is given,
+and in Input Time's panel the panel supplies both: a list that brought its own
+card would be a card inside a card there.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `'Time'` | `HelixBaseTime` | Accessible name for the list, which has no visible one of its own. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseTime` | Language tag the times are written in. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `'23:59'` | `HelixBaseTime` | Latest time offered, as `HH:mm`. |
+| `min` | `min` | `string` | `'00:00'` | `HelixBaseTime` | Earliest time offered, as `HH:mm`. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `step` | `step` | `number` | `15` | `HelixBaseTime` | How far apart the offered times are, in minutes. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseTime` | Puts the keyboard on the list, which is the only control here. |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the time changes. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `list` | The listbox holding the times. |
+| `items` | The scrolling column inside it, forwarded from the listbox. |
+| `empty` | What it says when nothing matches, forwarded from the listbox. |
+| `option` | One time in it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--time-list-height` | How tall the list is before it scrolls. |
 
 ## Toast
 

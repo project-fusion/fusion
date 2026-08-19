@@ -33,6 +33,7 @@ import type {
   HelixBaseInputFile,
   HelixBaseInputNumber,
   HelixBaseInputPin,
+  HelixBaseInputTime,
   HelixBaseKbd,
   HelixBaseList,
   HelixBaseListItem,
@@ -69,6 +70,7 @@ import type {
   HelixBaseTabsTab,
   HelixBaseTag,
   HelixBaseTextarea,
+  HelixBaseTime,
   HelixBaseToast,
   HelixBaseToastItem,
   HelixBaseToggle,
@@ -87,7 +89,11 @@ import type {
   HelixNavigateEvent,
   HelixOpenEvent,
   HelixSelectEvent,
+  fromMinutes,
   initialsOf,
+  isTime,
+  toMinutes,
+  writeTime,
 } from '@helix-io/headless';
 
 /**
@@ -3627,6 +3633,289 @@ fire at all. */
   textContent?: string | number;
 };
 
+/** `HelixBaseInputTime` component event */
+export type HelixBaseInputTimeElementEvent<E = Event> = TypedEvent<
+  HelixBaseInputTime,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseInputTimeHelixChangeElementEvent =
+  HelixBaseInputTimeElementEvent<HelixChangeEvent>;
+/** `helix-open` event type */
+export type HelixBaseInputTimeHelixOpenElementEvent =
+  HelixBaseInputTimeElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseInputTimeHelixCloseElementEvent =
+  HelixBaseInputTimeElementEvent<HelixCloseEvent>;
+
+export type HelixBaseInputTimeProps = {
+  /** How far apart the offered times are, in minutes. */
+  step?: HelixBaseInputTime["step"];
+  /** Earliest time that can be chosen, as `HH:mm`. */
+  min?: HelixBaseInputTime["min"];
+  /** Latest time that can be chosen, as `HH:mm`. */
+  max?: HelixBaseInputTime["max"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "time-style"?: HelixBaseInputTime["timeStyle"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  timeStyle?: HelixBaseInputTime["timeStyle"];
+  /** Language tag the times are written in. Absent uses the runtime's own. */
+  locale?: HelixBaseInputTime["locale"];
+  /** What the field says before a time is in it. */
+  placeholder?: HelixBaseInputTime["placeholder"];
+  /** Accessible name for the control that opens the list. */
+  "trigger-label"?: HelixBaseInputTime["triggerLabel"];
+  /** Accessible name for the control that opens the list. */
+  triggerLabel?: HelixBaseInputTime["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseInputTime["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseInputTime["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseInputTime["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseInputTime["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseInputTime["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixBaseInputTime["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseInputTime["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseInputTime["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseInputTime["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseInputTime["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseInputTime["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseInputTime["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixBaseInputTime["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixBaseInputTime["onValueChange"];
+
+  /** Fired when the time changes. */
+  "onhelix-change"?: (e: HelixBaseInputTimeHelixChangeElementEvent) => void;
+  /** Fired when the list opens. */
+  "onhelix-open"?: (e: HelixBaseInputTimeHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixBaseInputTimeHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseInputTimeSolidJsProps = {
+  /** How far apart the offered times are, in minutes. */
+  "prop:step"?: HelixBaseInputTime["step"];
+  /** Earliest time that can be chosen, as `HH:mm`. */
+  "prop:min"?: HelixBaseInputTime["min"];
+  /** Latest time that can be chosen, as `HH:mm`. */
+  "prop:max"?: HelixBaseInputTime["max"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "attr:time-style"?: HelixBaseInputTime["timeStyle"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "prop:timeStyle"?: HelixBaseInputTime["timeStyle"];
+  /** Language tag the times are written in. Absent uses the runtime's own. */
+  "prop:locale"?: HelixBaseInputTime["locale"];
+  /** What the field says before a time is in it. */
+  "prop:placeholder"?: HelixBaseInputTime["placeholder"];
+  /** Accessible name for the control that opens the list. */
+  "attr:trigger-label"?: HelixBaseInputTime["triggerLabel"];
+  /** Accessible name for the control that opens the list. */
+  "prop:triggerLabel"?: HelixBaseInputTime["triggerLabel"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseInputTime["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseInputTime["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseInputTime["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseInputTime["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseInputTime["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixBaseInputTime["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixBaseInputTime["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixBaseInputTime["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixBaseInputTime["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixBaseInputTime["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseInputTime["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseInputTime["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixBaseInputTime["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixBaseInputTime["onValueChange"];
+  /** Fired when the time changes. */
+  "on:helix-change"?: (e: HelixBaseInputTimeHelixChangeElementEvent) => void;
+  /** Fired when the list opens. */
+  "on:helix-open"?: (e: HelixBaseInputTimeHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixBaseInputTimeHelixCloseElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseInput` component event */
 export type HelixBaseInputElementEvent<E = Event> = TypedEvent<
   HelixBaseInput,
@@ -6923,6 +7212,160 @@ fire at all. */
   "on:helix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   "on:change"?: (e: HelixBaseTextareaElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseTime` component event */
+export type HelixBaseTimeElementEvent<E = Event> = TypedEvent<HelixBaseTime, E>;
+/** `helix-change` event type */
+export type HelixBaseTimeHelixChangeElementEvent =
+  HelixBaseTimeElementEvent<HelixChangeEvent>;
+
+export type HelixBaseTimeProps = {
+  /** How far apart the offered times are, in minutes.
+
+Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+reader scrolls rather than hunts, and few enough that the list is a list.
+Anything under five is a thousand rows and wants a field instead. */
+  step?: HelixBaseTime["step"];
+  /** Earliest time offered, as `HH:mm`. */
+  min?: HelixBaseTime["min"];
+  /** Latest time offered, as `HH:mm`. */
+  max?: HelixBaseTime["max"];
+  /** Language tag the times are written in. Absent uses the runtime's own. */
+  locale?: HelixBaseTime["locale"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  label?: HelixBaseTime["label"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseTime["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseTime["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixBaseTime["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseTime["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseTime["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixBaseTime["onValueChange"];
+
+  /** Fired when the time changes. */
+  "onhelix-change"?: (e: HelixBaseTimeHelixChangeElementEvent) => void;
+};
+
+export type HelixBaseTimeSolidJsProps = {
+  /** How far apart the offered times are, in minutes.
+
+Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+reader scrolls rather than hunts, and few enough that the list is a list.
+Anything under five is a thousand rows and wants a field instead. */
+  "prop:step"?: HelixBaseTime["step"];
+  /** Earliest time offered, as `HH:mm`. */
+  "prop:min"?: HelixBaseTime["min"];
+  /** Latest time offered, as `HH:mm`. */
+  "prop:max"?: HelixBaseTime["max"];
+  /** Language tag the times are written in. Absent uses the runtime's own. */
+  "prop:locale"?: HelixBaseTime["locale"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "prop:label"?: HelixBaseTime["label"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixBaseTime["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixBaseTime["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixBaseTime["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixBaseTime["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixBaseTime["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixBaseTime["onValueChange"];
+  /** Fired when the time changes. */
+  "on:helix-change"?: (e: HelixBaseTimeHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -10570,6 +11013,192 @@ export type CustomElements = {
   >;
 
   /**
+   * **The list is `helix-time`, not a second one written here.** It is worth
+   * having on its own, flat in a settings pane with nothing to open, and this
+   * element is the field, the overlay and the form. Exactly the arrangement Input
+   * Date has with `helix-calendar` and Input Color with `helix-color`.
+   *
+   * **Typed as well as picked, and that is the division the list depends on.** A
+   * list at a step offers the times a product actually has, and the field is how a
+   * reader says `09:07`. Neither is a worse version of the other: without the
+   * field a step is a cage, and without the list every common time is typed out.
+   *
+   * **The value is `HH:mm` on a twenty-four hour clock, always**, because that is
+   * what a form submits, what `min` and `max` compare against, and what sorts as a
+   * string. What the field *shows* is the reader's own convention while it is
+   * idle, and the value itself once the caret is in it: the same separation Input
+   * Date draws, and for the same reason, which is that `2:30 PM` cannot be typed
+   * back and `Intl` has no parser to make it so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `step`: How far apart the offered times are, in minutes.
+   * - `min`: Earliest time that can be chosen, as `HH:mm`.
+   * - `max`: Latest time that can be chosen, as `HH:mm`.
+   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
+   *
+   * `local` is the reader's own convention from `Intl`, which is what a time is
+   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+   * swaps to the value while the caret is in it either way, so the rendering is
+   * never something this element would refuse to read back.
+   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `placeholder`: What the field says before a time is in it.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the time changes.
+   * - `helix-open`: Fired when the list opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a list opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input.
+   * - `trigger`: The control that opens the list.
+   * - `surface`: The floating panel.
+   * - `picker`: The list inside it.
+   */
+  "helix-base-input-time": Partial<
+    HelixBaseInputTimeProps & BaseProps<HelixBaseInputTime> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
    * password manager, and the on-screen keyboard a phone chooses all come from the
    * platform. `delegatesFocus` puts focus on it, and it serializes into the
@@ -13544,6 +14173,133 @@ export type CustomElements = {
    */
   "helix-base-textarea": Partial<
     HelixBaseTextareaProps & BaseProps<HelixBaseTextarea> & BaseEvents
+  >;
+
+  /**
+   * **A list rather than three spinners**, and the reason is what a list already
+   * is. `helix-listbox` brings the keyboard, the typeahead, the scroll into view
+   * and the announcement of a set of options, and a time at a step is a set of
+   * options. Three little spinners for hours, minutes and a meridiem are three
+   * controls to build, three to test, and a tab stop each for something a reader
+   * answers once.
+   *
+   * **A step is what makes it a list at all.** Fifteen minutes is ninety-six rows,
+   * which a reader scrolls or types into; one minute is one thousand four hundred
+   * and forty, which is a listbox in name only. So the list is for the times a
+   * product actually offers, and arbitrary times are the field's job in Input
+   * Time, the same division Input Date draws between typing a date and using the
+   * calendar.
+   *
+   * **The value is `HH:mm` on a twenty-four hour clock, always.** That is what a
+   * form submits and what `min` and `max` compare against, and it sorts as a
+   * string, which is the whole reason the shape is that one. What each row *says*
+   * is the reader's own convention, from `Intl`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `step`: How far apart the offered times are, in minutes.
+   *
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
+   * - `min`: Earliest time offered, as `HH:mm`.
+   * - `max`: Latest time offered, as `HH:mm`.
+   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the time changes.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the list, which is the only control here.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `list`: The listbox holding the times.
+   * - `items`: The scrolling column inside it, forwarded from the listbox.
+   * - `empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `option`: One time in it.
+   */
+  "helix-base-time": Partial<
+    HelixBaseTimeProps & BaseProps<HelixBaseTime> & BaseEvents
   >;
 
   /**
@@ -17234,6 +17990,195 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * **The list is `helix-time`, not a second one written here.** It is worth
+   * having on its own, flat in a settings pane with nothing to open, and this
+   * element is the field, the overlay and the form. Exactly the arrangement Input
+   * Date has with `helix-calendar` and Input Color with `helix-color`.
+   *
+   * **Typed as well as picked, and that is the division the list depends on.** A
+   * list at a step offers the times a product actually has, and the field is how a
+   * reader says `09:07`. Neither is a worse version of the other: without the
+   * field a step is a cage, and without the list every common time is typed out.
+   *
+   * **The value is `HH:mm` on a twenty-four hour clock, always**, because that is
+   * what a form submits, what `min` and `max` compare against, and what sorts as a
+   * string. What the field *shows* is the reader's own convention while it is
+   * idle, and the value itself once the caret is in it: the same separation Input
+   * Date draws, and for the same reason, which is that `2:30 PM` cannot be typed
+   * back and `Intl` has no parser to make it so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `step`: How far apart the offered times are, in minutes.
+   * - `min`: Earliest time that can be chosen, as `HH:mm`.
+   * - `max`: Latest time that can be chosen, as `HH:mm`.
+   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
+   *
+   * `local` is the reader's own convention from `Intl`, which is what a time is
+   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+   * swaps to the value while the caret is in it either way, so the rendering is
+   * never something this element would refuse to read back.
+   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `placeholder`: What the field says before a time is in it.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the time changes.
+   * - `helix-open`: Fired when the list opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: The mark on the field saying a list opens.
+   * - `hint`: Help under the field.
+   * - `feedback`: What is wrong with it.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the caret in the field, the way a label pointing at one would.
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box holding the text and the trigger.
+   * - `control`: The text input.
+   * - `trigger`: The control that opens the list.
+   * - `surface`: The floating panel.
+   * - `picker`: The list inside it.
+   */
+  "helix-base-input-time": Partial<
+    HelixBaseInputTimeProps &
+      HelixBaseInputTimeSolidJsProps &
+      BaseProps<HelixBaseInputTime> &
+      BaseEvents
+  >;
+
+  /**
    * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
    * password manager, and the on-screen keyboard a phone chooses all come from the
    * platform. `delegatesFocus` puts focus on it, and it serializes into the
@@ -20314,6 +21259,136 @@ export type CustomElementsSolidJs = {
     HelixBaseTextareaProps &
       HelixBaseTextareaSolidJsProps &
       BaseProps<HelixBaseTextarea> &
+      BaseEvents
+  >;
+
+  /**
+   * **A list rather than three spinners**, and the reason is what a list already
+   * is. `helix-listbox` brings the keyboard, the typeahead, the scroll into view
+   * and the announcement of a set of options, and a time at a step is a set of
+   * options. Three little spinners for hours, minutes and a meridiem are three
+   * controls to build, three to test, and a tab stop each for something a reader
+   * answers once.
+   *
+   * **A step is what makes it a list at all.** Fifteen minutes is ninety-six rows,
+   * which a reader scrolls or types into; one minute is one thousand four hundred
+   * and forty, which is a listbox in name only. So the list is for the times a
+   * product actually offers, and arbitrary times are the field's job in Input
+   * Time, the same division Input Date draws between typing a date and using the
+   * calendar.
+   *
+   * **The value is `HH:mm` on a twenty-four hour clock, always.** That is what a
+   * form submits and what `min` and `max` compare against, and it sorts as a
+   * string, which is the whole reason the shape is that one. What each row *says*
+   * is the reader's own convention, from `Intl`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `step`: How far apart the offered times are, in minutes.
+   *
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
+   * - `min`: Earliest time offered, as `HH:mm`.
+   * - `max`: Latest time offered, as `HH:mm`.
+   * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
+   * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the time changes.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the list, which is the only control here.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `list`: The listbox holding the times.
+   * - `items`: The scrolling column inside it, forwarded from the listbox.
+   * - `empty`: What it says when nothing matches, forwarded from the listbox.
+   * - `option`: One time in it.
+   */
+  "helix-base-time": Partial<
+    HelixBaseTimeProps &
+      HelixBaseTimeSolidJsProps &
+      BaseProps<HelixBaseTime> &
       BaseEvents
   >;
 

@@ -460,6 +460,44 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A field with a clock mark, and the column it opens.
+   *
+   * The same shape as Input Date's card, because they are the same control over
+   * a different set: a reader who recognises one should read the other without
+   * being told.
+   */
+  'input-time': (
+    <>
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="40" x="48" y="40" />
+      <rect className="artSunken" height="40" rx="4" width="224" x="48" y="60" />
+      <rect className="artEdge" height="39" rx="4" width="223" x="48.5" y="60.5" />
+      <rect className="artInk" fillOpacity="0.4" height="8" rx="4" width="56" x="64" y="76" />
+      {/* The clock: a ring with two hands, at the size the calendar mark takes on
+          its own card. */}
+      <circle className="artRule" cx="247" cy="80" fill="none" r="7" strokeWidth="1.5" />
+      <rect className="artInk" fillOpacity="0.55" height="4" width="1" x="247" y="76" />
+      <rect className="artInk" fillOpacity="0.55" height="1" width="4" x="247" y="79" />
+      {/* The list, and the row that is landed on. */}
+      <rect className="artSunken" height="72" rx="4" width="224" x="48" y="112" />
+      {[0, 1, 2].map((row) => (
+        <rect
+          className="artInk"
+          fillOpacity="0.28"
+          height="8"
+          key={row}
+          rx="4"
+          width="48"
+          x="64"
+          y={126 + row * 22}
+        />
+      ))}
+      <g className="artMotion artTravel" style={{ '--art-to': '22px' } as CSSProperties}>
+        <rect className="artSolid" height="16" rx="4" width="192" x="64" y="122" />
+      </g>
+    </>
+  ),
+
   listbox: (
     <>
       {[
@@ -588,6 +626,38 @@ export const formsArt: Record<string, ReactNode> = {
       ))}
       <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="256" y="134" />
       <rect className="artInk" fillOpacity="0.28" height="4" rx="1" width="4" x="250" y="140" />
+    </>
+  ),
+
+  /**
+   * A column of times with one of them taken.
+   *
+   * Rows rather than a clock face. A clock is what the component is *about* and
+   * not what it looks like, and the rule this gallery keeps is that a card draws
+   * the shape a reader will meet: a node graph is not a Tree, and a dial is not a
+   * list of quarter hours.
+   */
+  time: (
+    <>
+      <rect className="artSunken" height="140" rx="4" width="180" x="70" y="42" />
+      {[0, 1, 2, 3].map((row) => (
+        <rect
+          className="artInk"
+          fillOpacity="0.28"
+          height="8"
+          key={row}
+          rx="4"
+          width="52"
+          x="86"
+          y={62 + row * 32}
+        />
+      ))}
+      {/* The one that is taken, and it travels: a list is scrolled past and
+          landed on, which is a move rather than a swell. Thirty two is the row
+          pitch, so it lands on a row rather than between two. */}
+      <g className="artMotion artTravel" style={{ '--art-to': '32px' } as CSSProperties}>
+        <rect className="artSolid" height="20" rx="4" width="148" x="86" y="86" />
+      </g>
     </>
   ),
 

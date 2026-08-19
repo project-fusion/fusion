@@ -22,6 +22,7 @@ chart-line
 check
 check-circle
 check-circle-fill
+clock
 cloud
 compass
 copy

@@ -356,7 +356,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
        mid-answer. */
     if (this.mode === undefined) {
       this.requestOpen(false)
-      this.updateComplete.then(() => this.control?.focus())
+      this.updateComplete.then(() => this.returnFocus())
     }
   }
 
@@ -419,7 +419,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
     if (event.key === 'Escape' && this.open) {
       event.stopPropagation()
       this.requestOpen(false)
-      this.control?.focus()
+      this.returnFocus()
     }
   }
 
@@ -473,6 +473,38 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    * pressing the trigger from opening the panel on focus and then shutting it
    * again on the click.
    */
+  /**
+   * Puts the caret back in the field without the field reopening the calendar.
+   *
+   * Focus opens the calendar, so handing focus back after a pick reopens the
+   * thing that was just answered. `relatedTarget` was the guard and it is not
+   * enough on its own: it catches a hand-off from the trigger, and it does not
+   * catch this, because the cell that had focus is gone by the time the caret
+   * moves and the document has fallen back to something outside this element.
+   *
+   * **Reasoned rather than measured, and worth saying which.** In a focused
+   * document: the reader presses a day, the cell has focus, the panel is hidden,
+   * the browser moves focus off the removed cell to the body, and the caret is
+   * then put back here with `relatedTarget` pointing at the body, which is
+   * outside this element and reads as an arrival. Every step is ordinary browser
+   * behaviour and none of it can be exercised here: `focus()` dispatches no
+   * event in an unfocused document, which is what both the test runtime and the
+   * available browser pane are. A spec was written for it and passed with the
+   * guard removed, so it was covering nothing and has been taken out rather than
+   * left to look like proof.
+   *
+   * A flag rather than a better guess, because this element is the one moving
+   * the focus and is the only thing that can know so. Cleared synchronously,
+   * since `focus()` dispatches before it returns.
+   */
+  private returning = false
+
+  private returnFocus(): void {
+    this.returning = true
+    this.control?.focus()
+    this.returning = false
+  }
+
   private readonly handleBlur = (): void => {
     this.editing = false
   }
@@ -480,7 +512,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   private readonly handleFocus = (event: FocusEvent): void => {
     this.editing = true
     const from = event.relatedTarget
-    if (this.open || this.isDisabled) {
+    if (this.open || this.isDisabled || this.returning) {
       return
     }
     if (from instanceof Node && this.renderRoot?.contains?.(from)) {
