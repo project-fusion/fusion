@@ -93,7 +93,9 @@
   /* Over the halves, which run under it to its own edges. */
   position: relative;
   z-index: 1;
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* The slot is a flex item like the glyph inside it, so it needs the same
@@ -201,7 +203,9 @@ slot[name="marker"]::slotted(*) {
   font-weight: var(--helix-weight-medium);
   min-block-size: var(--_step-marker);
   text-align: start;
-  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="label"]:focus-visible {
@@ -214,10 +218,6 @@ slot[name="marker"]::slotted(*) {
    been through; the ones ahead recede. */
 :host([complete]) [part="label"],
 :host([current]) [part="label"] {
-  color: var(--helix-color-foreground);
-}
-
-:host(:not([disabled])) [part="label"]:hover {
   color: var(--helix-color-foreground);
 }
 
@@ -273,19 +273,23 @@ slot[name="marker"]::slotted(*) {
   }
 }
 
-/* The step answers the pointer, not just the name inside it.
+/* The wash is the button's, and the button is the name.
  *
- * The name is what is pressable, but the thing a reader is pointing at is the
- * stage: mark, name and description together. So the wash goes on the host.
+ * On the host first, on the reasoning that a reader points at the stage rather
+ * than at three words of it. Wrong, and visibly: a block behind the mark, the
+ * name and the description says the whole step is the control, which is the
+ * one thing this component is careful not to say. What is pressable and what
+ * lights up have to be the same shape.
  *
- * `box-shadow` with a spread rather than padding, because padding would move
- * the mark and every line offset is measured from it: the halves start at the
- * mark's edge and reach half a gap past the step's own, and all of that is
- * arithmetic on a box that padding would quietly change. A spread paints
- * outside the box and costs the layout nothing. */
-:host(:not([disabled]):hover) {
+ * `box-shadow` with a spread rather than padding. Padding would indent the name
+ * from the description under it, and in a column it would grow the step, which
+ * every line offset here is measured against: the trailing half is the step's
+ * own height less the mark. A spread paints outside the box and costs the
+ * layout nothing. */
+:host(:not([disabled])) [part="label"]:hover {
   background-color: var(--steps-hover-color, var(--helix-color-surface-sunken));
   border-radius: var(--helix-radii-sm);
   box-shadow: 0 0 0 var(--helix-space-2xs)
     var(--steps-hover-color, var(--helix-color-surface-sunken));
+  color: var(--helix-color-foreground);
 }
