@@ -56,7 +56,6 @@
  * hides part of the video, and over a dark one disappears. */
 [part="controls"] {
   align-items: center;
-  background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
   /* Light, for the same reason and against the same ground: the bar is painted
      over a dark gradient of its own, so its ink is chosen to sit on that rather
      than on the page. `foreground-inverse` turns over with the theme and put
@@ -67,9 +66,44 @@
   inset-block-end: 0;
   inset-inline: 0;
   opacity: 1;
-  padding: var(--helix-space-lg) var(--helix-space-sm) var(--helix-space-xs);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
   position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The shading reaches higher than the bar does.
+ *
+ * It is what makes light controls legible over a bright frame, and it needs
+ * room above them to fade out in. That room was padding: the bar stood
+ * fifty-six pixels tall to carry twenty-four pixels of gradient, so a third of
+ * it was shadow with nothing in it. Drawn separately, the shading is as tall as
+ * it needs to be and the bar is as tall as its controls.
+ *
+ * On the stage's `::before` rather than the bar's, and with no `z-index` at
+ * all. A pseudo-element is its originating element's first child, so it paints
+ * under everything after it in the tree, and the bar comes after it: tree order
+ * does the stacking a negative `z-index` would have done by force. There is no
+ * `--helix-layer-*` for "behind", correctly, because nothing should need one. */
+[part="stage"]::before {
+  background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
+  block-size: calc(var(--helix-size-icon-lg) + var(--helix-space-2xl));
+  content: "";
+  inset-block-end: 0;
+  inset-inline: 0;
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* And it goes with the bar it is there for. */
+:host([data-playing]:not(:hover):not(:focus-within)) [part="stage"]::before {
+  opacity: 0;
+}
+
+/* Nothing to shade where the browser draws its own bar. */
+:host([controls]) [part="stage"]::before {
+  content: none;
 }
 
 /* Gone while it is playing and nobody is near it. Focus counts as being near
@@ -126,10 +160,23 @@
 /* Both ranges are real inputs, stripped rather than replaced: the keyboard, the
    touch target and the screen reader announcement are the platform's, and only
    the paint is ours. */
+/* Both ranges carry their own fill, painted from the same number the thumb sits
+   at rather than from a second element kept in step with it.
+ 
+   The volume had none, and that is what read as a hole in the bar. Every
+   control is eight pixels from the next, measured, so there was no gap to
+   close: sixty-four pixels of empty groove between the speaker and the
+   fullscreen button simply looks like nothing is there. Filled, it reads as a
+   level, which is what it is. */
 [part="scrubber"],
 [part="volume"] {
   appearance: none;
-  background-color: color-mix(in oklab, currentColor 30%, transparent);
+  background-color: color-mix(in oklab, currentColor 28%, transparent);
+  background-image: linear-gradient(
+    to right,
+    var(--_video-fill) calc(var(--_video-at, 0) * 100%),
+    transparent calc(var(--_video-at, 0) * 100%)
+  );
   block-size: 4px;
   border-radius: var(--helix-radii-full);
   cursor: pointer;
@@ -137,20 +184,29 @@
 }
 
 [part="scrubber"] {
-  /* The played part, painted from the same number the thumb sits at rather than
-     from a second element that would have to be kept in step with it. */
-  background-image: linear-gradient(
-    to right,
-    var(--video-accent-color, var(--helix-color-primary)) calc(var(--_video-progress, 0) * 100%),
-    transparent calc(var(--_video-progress, 0) * 100%)
-  );
+  --_video-at: var(--_video-progress, 0);
+  --_video-fill: var(--video-accent-color, var(--helix-color-primary));
+
   flex: 1 1 auto;
   min-inline-size: 0;
 }
 
+/* The level is drawn in the reader's own ink rather than the accent. Two bright
+   bars on one row compete, and only one of them is about what is being
+   watched. */
 [part="volume"] {
+  --_video-at: var(--_video-level, 1);
+  --_video-fill: currentColor;
+
   flex: 0 0 auto;
-  inline-size: 4rem;
+  inline-size: 3.5rem;
+}
+
+/* The speaker and its level are one control, so they sit closer to each other
+   than to anything else. Six things evenly spaced is a row with no grouping in
+   it to read. */
+[part="mute"] + [part="volume"] {
+  margin-inline-start: calc(var(--helix-space-xs) * -1 + var(--helix-space-2xs));
 }
 
 [part="scrubber"]::-webkit-slider-thumb,
@@ -190,7 +246,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="controls"] {
+  [part="controls"],
+  [part="stage"]::before {
     transition: none;
   }
 }

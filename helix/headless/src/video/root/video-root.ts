@@ -376,6 +376,7 @@ export class HelixBaseVideo extends HelixElement {
         .value=${String(this.silent ? 0 : this.loudness)}
         aria-label="Volume"
         aria-valuetext=${`${Math.round((this.silent ? 0 : this.loudness) * 100)} percent`}
+        style=${`--_video-level: ${this.silent ? 0 : this.loudness}`}
         @input=${(event: Event) => {
           const video = this.video
           if (video) {

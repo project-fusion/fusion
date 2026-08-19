@@ -66,13 +66,13 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 186 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 220 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 187 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 222 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 189 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 193 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 96 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 62 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 60 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 20 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 32 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 34 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 6 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
@@ -183,7 +183,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 289 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 291 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 93 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
@@ -193,7 +193,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 245 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 247 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 60 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
@@ -234,7 +234,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 16 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 80 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 30 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 32 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 63 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 126 |
