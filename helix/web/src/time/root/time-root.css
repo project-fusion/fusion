@@ -14,3 +14,72 @@
 
   display: block;
 }
+
+/* The listbox brings its own frame and this element does not want it.
+ *
+ * A bordered, filled, rounded box is right for a listbox standing on a page,
+ * and inside Input Time's panel it is a card inside a card: two borders a
+ * couple of pixels apart, two radii that do not agree, and rows inset from the
+ * edge the eye is following down. This element is bare for the same reason
+ * `helix-color` is, so whatever holds it supplies the surface.
+ *
+ * `::part` reaches it because the listbox is a direct child of this shadow root,
+ * which is one boundary. The block padding goes with the frame: it existed to
+ * hold the first and last rows clear of rounded corners there are no longer any
+ * of. */
+[part="list"]::part(items) {
+  background-color: transparent;
+  border: none;
+  border-radius: var(--helix-radii-none);
+  padding-block: var(--helix-space-none);
+}
+
+/* Three columns, each scrolling on its own.
+ *
+ * The shape of a spinner without pretending to be a wheel: a wheel is a picture
+ * of a control rather than a control, and the thing under it is three lists,
+ * which is what these are. Equal widths, so the hour column does not sit narrow
+ * beside a meridiem that says AM.
+ *
+ * A separator between rather than a border around each: three bordered boxes in
+ * a panel is three cards, and what a reader is looking at is one control with
+ * three parts. */
+[part="columns"] {
+  display: flex;
+}
+
+[part="column"] {
+  --listbox-max-block-size: var(--time-list-height, 16rem);
+
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+[part="column"] + [part="column"] {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+/* The same frame removal the single list gets, and for the same reason: whatever
+   holds this supplies the surface. */
+[part="column"]::part(items) {
+  background-color: transparent;
+  border: none;
+  border-radius: var(--helix-radii-none);
+  padding-block: var(--helix-space-none);
+}
+
+/* Centred, because a column of numbers read against its own edge is a list and
+ * read against its middle is a dial. This is the one place the spinner borrows
+ * the look rather than the mechanism.
+ *
+ * Both the row and the words. `justify-content` on the row alone did nothing
+ * visible, measured: it centres the row's children, and the label is a flex item
+ * that fills the row, so the text went on sitting against its own start edge
+ * inside a label that was already centred by being the whole width. */
+[part="column"] [part="option"]::part(item) {
+  justify-content: center;
+}
+
+[part="column"] [part="option"]::part(label) {
+  text-align: center;
+}

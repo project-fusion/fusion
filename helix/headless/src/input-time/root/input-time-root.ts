@@ -60,6 +60,17 @@ import { isTime, toMinutes, writeTime } from '../../time/root/time-root.js'
 export class HelixBaseInputTime extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /**
+   * Whether the panel is one list of times or a column each.
+   *
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   */
+  @property({ reflect: true })
+  appearance: 'list' | 'spinner' = 'list'
+
   /** How far apart the offered times are, in minutes. */
   @property({ type: Number })
   step = 15
@@ -309,6 +320,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-time
           part="picker"
+          appearance=${this.appearance}
           label=${this.label || 'Time'}
           locale=${this.locale || nothing}
           max=${this.max}

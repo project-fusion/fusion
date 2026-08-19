@@ -2099,6 +2099,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'list' \| 'spinner'` | `'list'` | `HelixBaseInputTime` | Whether the panel is one list of times or a column each. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -4081,6 +4082,7 @@ card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'list' \| 'spinner'` | `'list'` | `HelixBaseTime` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -4116,7 +4118,9 @@ card would be a card inside a card there.
 
 | Part | Description |
 | --- | --- |
-| `list` | The listbox holding the times. |
+| `list` | The listbox holding the times, in `list`. |
+| `columns` | The row of columns, in `spinner`. |
+| `column` | One of them. |
 | `items` | The scrolling column inside it, forwarded from the listbox. |
 | `empty` | What it says when nothing matches, forwarded from the listbox. |
 | `option` | One time in it. |

@@ -4,7 +4,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
 } from '@helix-io/core'
-import { html, type TemplateResult } from 'lit'
+import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
    custom element registers on import. The public tags rather than the base ones:
@@ -59,6 +59,17 @@ export const writeTime = (value: string, locale?: string): string => {
 }
 
 /**
+ * Whether the reader's locale writes times on a twelve hour clock.
+ *
+ * Asked of `Intl` rather than derived from a list of locales, because it is
+ * exactly the question `resolvedOptions` answers and the list is long and
+ * changes. `en-US` is true, `en-GB`, `fr-FR` and `ja-JP` are false, measured.
+ */
+const isTwelveHour = (locale?: string): boolean =>
+  new Intl.DateTimeFormat(locale || undefined, { timeStyle: 'short' }).resolvedOptions().hour12 ===
+  true
+
+/**
  * @summary Picks a time, from a list of them.
  *
  * @description
@@ -88,7 +99,9 @@ export const writeTime = (value: string, locale?: string): string => {
  *
  * @event {HelixChangeEvent} helix-change - Fired when the time changes.
  *
- * @csspart list - The listbox holding the times.
+ * @csspart list - The listbox holding the times, in `list`.
+ * @csspart columns - The row of columns, in `spinner`.
+ * @csspart column - One of them.
  * @csspart items - The scrolling column inside it, forwarded from the listbox.
  * @csspart empty - What it says when nothing matches, forwarded from the listbox.
  * @csspart option - One time in it.
@@ -122,6 +135,28 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
   label = 'Time'
 
   /**
+   * Whether the times are one list or a column each.
+   *
+   * `list` is the default and offers whole times, which is what a product with
+   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * minute and, where the locale uses one, a meridiem: three short columns
+   * instead of ninety-six rows, and the only way to reach `23:45` without
+   * scrolling most of a day.
+   *
+   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * list of half hours from nine to five is seventeen rows and every one of them
+   * is a time the product has; the same thing as columns is an hour column and a
+   * minute column, and nothing in either says the two are only valid together.
+   * The bounds are still enforced, so a reader can be refused after the fact,
+   * which is worse than not being offered it.
+   *
+   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * and the range is a whole day.
+   */
+  @property({ reflect: true })
+  appearance: 'list' | 'spinner' = 'list'
+
+  /**
    * Every time on offer, as minutes since midnight.
    *
    * Built from `min` upward rather than from midnight, so a list that starts at
@@ -146,12 +181,121 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     this.requestValue((event as HelixChangeEvent).detail.value)
   }
 
+  /** The three readings a spinner shows, from the value or from `min`. */
+  private get parts(): { hour: number; meridiem: 'AM' | 'PM'; minute: number } {
+    const at = toMinutes(this.value) ?? toMinutes(this.min) ?? 0
+    const hour = Math.floor(at / 60)
+    return { hour, meridiem: hour < 12 ? 'AM' : 'PM', minute: at % 60 }
+  }
+
+  /** Puts a changed column back together into a whole time. */
+  private readonly moveColumn = (part: 'hour' | 'meridiem' | 'minute', to: string): void => {
+    const { hour, meridiem, minute } = this.parts
+    let next = hour * 60 + minute
+    if (part === 'minute') {
+      next = hour * 60 + Number(to)
+    } else if (part === 'hour') {
+      /* On a twelve hour clock the column says 1 to 12 and the meridiem says
+         which half, so the two have to be recombined rather than read straight:
+         12 AM is midnight and 12 PM is noon, which is the one pair that does not
+         follow the pattern. */
+      const shown = Number(to)
+      const whole = isTwelveHour(this.locale) ? (shown % 12) + (meridiem === 'PM' ? 12 : 0) : shown
+      next = whole * 60 + minute
+    } else {
+      const half = hour % 12
+      next = (half + (to === 'PM' ? 12 : 0)) * 60 + minute
+    }
+    this.requestValue(fromMinutes(next))
+  }
+
+  /** Every whole hour that has at least one offered time in it. */
+  private get hours(): number[] {
+    const found = new Set(this.times.map((at) => Math.floor(at / 60)))
+    return [...found]
+  }
+
+  /** Every minute offered within the hour currently shown. */
+  private get minutes(): number[] {
+    const hour = this.parts.hour
+    return this.times.filter((at) => Math.floor(at / 60) === hour).map((at) => at % 60)
+  }
+
   /** Puts the keyboard on the list, which is the only control here. */
   override focus(options?: FocusOptions): void {
     this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
   }
 
+  /** One column of a spinner, which is a listbox like the whole list is. */
+  private renderColumn(
+    part: 'hour' | 'meridiem' | 'minute',
+    label: string,
+    values: string[],
+    written: (one: string) => string,
+    value: string,
+  ): TemplateResult {
+    return html`<helix-listbox
+      part="column"
+      data-column=${part}
+      exportparts="items"
+      aria-label=${label}
+      .value=${value}
+      @helix-change=${(event: Event) => {
+        event.stopPropagation()
+        this.moveColumn(part, (event as HelixChangeEvent).detail.value)
+      }}
+    >
+      ${values.map(
+        (one) => html`<helix-option part="option" value=${one}>${written(one)}</helix-option>`,
+      )}
+    </helix-listbox>`
+  }
+
+  private renderSpinner(): TemplateResult {
+    const twelve = isTwelveHour(this.locale)
+    const { hour, meridiem, minute } = this.parts
+    const shownHour = twelve ? String(hour % 12 === 0 ? 12 : hour % 12) : String(hour)
+    /* The hour column reads 1 to 12 on a twelve hour clock, so the whole hours
+       on offer are mapped into that half and de-duplicated: 13:00 and 01:00 are
+       both "1", and offering it twice is offering a choice that is not one. */
+    const hours = twelve
+      ? [...new Set(this.hours.map((one) => (one % 12 === 0 ? 12 : one % 12)))].sort(
+          (a, b) => a - b,
+        )
+      : this.hours
+    return html`<div part="columns">
+      ${this.renderColumn(
+        'hour',
+        'Hour',
+        hours.map(String),
+        (one) => (twelve ? one : one.padStart(2, '0')),
+        shownHour,
+      )}
+      ${this.renderColumn(
+        'minute',
+        'Minute',
+        this.minutes.map(String),
+        (one) => one.padStart(2, '0'),
+        String(minute),
+      )}
+      ${
+        twelve
+          ? this.renderColumn(
+              'meridiem',
+              'Before or after noon',
+              ['AM', 'PM'],
+              (one) => one,
+              meridiem,
+            )
+          : nothing
+      }
+    </div>`
+  }
+
   protected override render(): TemplateResult {
+    if (this.appearance === 'spinner') {
+      return this.renderSpinner()
+    }
     return html`<helix-listbox
       part="list"
       exportparts="items, empty"

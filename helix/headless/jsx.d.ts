@@ -3649,6 +3649,13 @@ export type HelixBaseInputTimeHelixCloseElementEvent =
   HelixBaseInputTimeElementEvent<HelixCloseEvent>;
 
 export type HelixBaseInputTimeProps = {
+  /** Whether the panel is one list of times or a column each.
+
+`list` offers whole times, which is what a product with slots or opening
+hours has. `spinner` splits them into an hour, a minute and a meridiem where
+the locale uses one, which is the only way to reach `23:45` without
+scrolling most of a day. `helix-time` carries the longer note on the trade. */
+  appearance?: HelixBaseInputTime["appearance"];
   /** How far apart the offered times are, in minutes. */
   step?: HelixBaseInputTime["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
@@ -3781,6 +3788,13 @@ fire at all. */
 };
 
 export type HelixBaseInputTimeSolidJsProps = {
+  /** Whether the panel is one list of times or a column each.
+
+`list` offers whole times, which is what a product with slots or opening
+hours has. `spinner` splits them into an hour, a minute and a meridiem where
+the locale uses one, which is the only way to reach `23:45` without
+scrolling most of a day. `helix-time` carries the longer note on the trade. */
+  "prop:appearance"?: HelixBaseInputTime["appearance"];
   /** How far apart the offered times are, in minutes. */
   "prop:step"?: HelixBaseInputTime["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
@@ -7240,6 +7254,24 @@ Anything under five is a thousand rows and wants a field instead. */
   locale?: HelixBaseTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   label?: HelixBaseTime["label"];
+  /** Whether the times are one list or a column each.
+
+`list` is the default and offers whole times, which is what a product with
+opening hours or slots actually has. `spinner` splits them into an hour, a
+minute and, where the locale uses one, a meridiem: three short columns
+instead of ninety-six rows, and the only way to reach `23:45` without
+scrolling most of a day.
+
+The trade is that a spinner cannot say which *combinations* are on offer. A
+list of half hours from nine to five is seventeen rows and every one of them
+is a time the product has; the same thing as columns is an hour column and a
+minute column, and nothing in either says the two are only valid together.
+The bounds are still enforced, so a reader can be refused after the fact,
+which is worse than not being offered it.
+
+So: `list` where the set is the point, `spinner` where any time is allowed
+and the range is a whole day. */
+  appearance?: HelixBaseTime["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseTime["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7312,6 +7344,24 @@ Anything under five is a thousand rows and wants a field instead. */
   "prop:locale"?: HelixBaseTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   "prop:label"?: HelixBaseTime["label"];
+  /** Whether the times are one list or a column each.
+
+`list` is the default and offers whole times, which is what a product with
+opening hours or slots actually has. `spinner` splits them into an hour, a
+minute and, where the locale uses one, a meridiem: three short columns
+instead of ninety-six rows, and the only way to reach `23:45` without
+scrolling most of a day.
+
+The trade is that a spinner cannot say which *combinations* are on offer. A
+list of half hours from nine to five is seventeen rows and every one of them
+is a time the product has; the same thing as columns is an hour column and a
+minute column, and nothing in either says the two are only valid together.
+The bounds are still enforced, so a reader can be refused after the fact,
+which is worse than not being offered it.
+
+So: `list` where the set is the point, `spinner` where any time is allowed
+and the range is a whole day. */
+  "prop:appearance"?: HelixBaseTime["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseTime["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -11034,6 +11084,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the panel is one list of times or a column each.
+   *
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `helix-time` carries the longer note on the trade.
    * - `step`: How far apart the offered times are, in minutes.
    * - `min`: Earliest time that can be chosen, as `HH:mm`.
    * - `max`: Latest time that can be chosen, as `HH:mm`.
@@ -14208,6 +14264,23 @@ export type CustomElements = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `appearance`: Whether the times are one list or a column each.
+   *
+   * `list` is the default and offers whole times, which is what a product with
+   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * minute and, where the locale uses one, a meridiem: three short columns
+   * instead of ninety-six rows, and the only way to reach `23:45` without
+   * scrolling most of a day.
+   *
+   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * list of half hours from nine to five is seventeen rows and every one of them
+   * is a time the product has; the same thing as columns is an hour column and a
+   * minute column, and nothing in either says the two are only valid together.
+   * The bounds are still enforced, so a reader can be refused after the fact,
+   * which is worse than not being offered it.
+   *
+   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * and the range is a whole day.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -14293,7 +14366,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The listbox holding the times.
+   * - `list`: The listbox holding the times, in `list`.
+   * - `columns`: The row of columns, in `spinner`.
+   * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it.
@@ -18011,6 +18086,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the panel is one list of times or a column each.
+   *
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `helix-time` carries the longer note on the trade.
    * - `step`: How far apart the offered times are, in minutes.
    * - `min`: Earliest time that can be chosen, as `HH:mm`.
    * - `max`: Latest time that can be chosen, as `HH:mm`.
@@ -21295,6 +21376,23 @@ export type CustomElementsSolidJs = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `appearance`: Whether the times are one list or a column each.
+   *
+   * `list` is the default and offers whole times, which is what a product with
+   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * minute and, where the locale uses one, a meridiem: three short columns
+   * instead of ninety-six rows, and the only way to reach `23:45` without
+   * scrolling most of a day.
+   *
+   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * list of half hours from nine to five is seventeen rows and every one of them
+   * is a time the product has; the same thing as columns is an hour column and a
+   * minute column, and nothing in either says the two are only valid together.
+   * The bounds are still enforced, so a reader can be refused after the fact,
+   * which is worse than not being offered it.
+   *
+   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * and the range is a whole day.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -21380,7 +21478,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The listbox holding the times.
+   * - `list`: The listbox holding the times, in `list`.
+   * - `columns`: The row of columns, in `spinner`.
+   * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
    * - `option`: One time in it.

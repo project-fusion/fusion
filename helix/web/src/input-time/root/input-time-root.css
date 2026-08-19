@@ -95,7 +95,13 @@
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: max-content;
-  padding: var(--helix-space-2xs);
+  /* No padding, and it clips instead. The rows run the panel's full width and
+     take its rounded corners from being clipped by it, rather than sitting inset
+     with a band of overlay down both sides: a row is a band across the list, and
+     a band that stops short of the edge is a pill. Input Color's panel does the
+     same for its square. */
+  overflow: hidden;
+  padding: var(--helix-space-none);
   position: absolute;
 }
 

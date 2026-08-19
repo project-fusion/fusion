@@ -20951,6 +20951,21 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'list' | 'spinner'"
+              },
+              "default": "'list'",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInputTime",
+                "module": "src/input-time/root/input-time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "step",
               "type": {
                 "text": "number"
@@ -21564,6 +21579,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'list' | 'spinner'"
+              },
+              "default": "'list'",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "HelixBaseInputTime",
+                "module": "src/input-time/root/input-time-root.ts"
               }
             },
             {
@@ -41808,6 +41836,21 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'list' | 'spinner'"
+              },
+              "default": "'list'",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `spinner` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a spinner cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `spinner` where any time is allowed\nand the range is a whole day.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "times",
               "type": {
                 "text": "number[]"
@@ -41824,6 +41867,59 @@
               "kind": "field",
               "name": "handleChange",
               "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "parts",
+              "type": {
+                "text": "{ hour: number; meridiem: 'AM' | 'PM'; minute: number }"
+              },
+              "privacy": "private",
+              "description": "The three readings a spinner shows, from the value or from `min`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "moveColumn",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Puts a changed column back together into a whole time.",
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hours",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private",
+              "description": "Every whole hour that has at least one offered time in it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "minutes",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private",
+              "description": "Every minute offered within the hour currently shown.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseTime",
@@ -41850,6 +41946,67 @@
               "description": "Puts the keyboard on the list, which is the only control here.",
               "type": {
                 "text": "focus(options?: FocusOptions) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "part",
+                  "type": {
+                    "text": "'hour' | 'meridiem' | 'minute'"
+                  }
+                },
+                {
+                  "name": "label",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "values",
+                  "type": {
+                    "text": "string[]"
+                  }
+                },
+                {
+                  "name": "written",
+                  "type": {
+                    "text": "(one: string) => string"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One column of a spinner, which is a listbox like the whole list is.",
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderSpinner",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
               },
               "inheritedFrom": {
                 "name": "HelixBaseTime",
@@ -42160,6 +42317,19 @@
               }
             },
             {
+              "name": "appearance",
+              "type": {
+                "text": "'list' | 'spinner'"
+              },
+              "default": "'list'",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `spinner` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a spinner cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `spinner` where any time is allowed\nand the range is a whole day.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -42188,8 +42358,24 @@
           ],
           "cssParts": [
             {
-              "description": "The listbox holding the times.",
+              "description": "The listbox holding the times, in `list`.",
               "name": "list",
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "description": "The row of columns, in `spinner`.",
+              "name": "columns",
+              "inheritedFrom": {
+                "name": "HelixBaseTime",
+                "module": "src/time/root/time-root.ts"
+              }
+            },
+            {
+              "description": "One of them.",
+              "name": "column",
               "inheritedFrom": {
                 "name": "HelixBaseTime",
                 "module": "src/time/root/time-root.ts"
