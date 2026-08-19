@@ -34,12 +34,50 @@
   padding-block: var(--helix-space-none);
 }
 
+/* The two ends of a range are the answer, so they are filled rather than
+ * washed.
+ *
+ * Only in a range, where "chosen" means one of two ends and the difference
+ * between an end and the times between them is the whole reading. A single
+ * selection keeps the listbox's own treatment, which is a row being pointed at
+ * rather than a terminus.
+ *
+ * The label colour goes with the fill. A foreground picked to sit on a surface
+ * does not sit on the accent, and this is the one place in this component where
+ * a row stops being a row on the panel. */
+:host([mode="range"]) [part="option"][selected]::part(item) {
+  background-color: var(--helix-color-primary);
+  color: var(--helix-color-foreground-on-accent);
+}
+
 /* The times inside a range, which are part of the answer without having been
-   chosen. A wash rather than the full selected fill, so the two ends stay the
-   things that were picked: the calendar draws its own range the same way, and a
-   reader who has seen one reads this without being told. */
+   chosen. A wash rather than the fill, so the two ends stay the things that were
+   picked: the calendar draws its own range the same way, and a reader who has
+   seen one reads this without being told. */
 [part="option"][data-between]::part(item) {
   background-color: var(--time-range-color, var(--helix-color-primary-subtle));
+}
+
+/* A dot where a terminus has its tick.
+ *
+ * The ends of a range are marked and the times between them were not marked at
+ * all, so a row inside the range read as a row that happened to be tinted. A
+ * mark in the same slot says it is part of the answer, and a dot rather than a
+ * tick says it was not chosen: a tick on every row between nine and five is
+ * seventeen claims that somebody pressed them.
+ *
+ * The same box the tick occupies, so nothing shifts between a terminus and its
+ * neighbour, with the dot drawn as a radius inside it. */
+[part="option"][data-between]::part(item)::after {
+  content: "";
+  background-color: currentColor;
+  block-size: var(--helix-size-icon-sm);
+  border-radius: var(--helix-radii-full);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-sm);
+  margin-inline-start: auto;
+  opacity: 0.4;
+  scale: 0.3;
 }
 
 /* Three columns, each scrolling on its own, read as a dial rather than a list.

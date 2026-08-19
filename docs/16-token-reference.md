@@ -35,11 +35,11 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 202 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 112 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 76 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 25 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 27 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 133 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 101 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 103 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 1 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 10 |
@@ -84,7 +84,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 142 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 4 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
-| `--helix-radii-full` | `9999px` | 48 |
+| `--helix-radii-full` | `9999px` | 50 |
 
 ## font
 
@@ -234,7 +234,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 60 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 22 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
-| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 47 |
+| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 51 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 98 |
 | `--helix-size-focus-offset` | `2px` | 80 |
 
