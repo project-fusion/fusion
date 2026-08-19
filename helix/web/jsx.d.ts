@@ -48,6 +48,7 @@ import type {
   HelixList,
   HelixListItem,
   HelixListbox,
+  HelixLoader,
   HelixMenu,
   HelixMenuItem,
   HelixMeter,
@@ -69,7 +70,6 @@ import type {
   HelixSelectEvent,
   HelixSkeleton,
   HelixSlider,
-  HelixSpinner,
   HelixSplitter,
   HelixStat,
   HelixStatGroup,
@@ -5106,6 +5106,25 @@ fire at all. */
   textContent?: string | number;
 };
 
+export type HelixLoaderProps = {
+  /** Diameter relative to the surrounding text. */
+  size?: HelixLoader["size"];
+  /** Accessible name, announced while the work is outstanding. */
+  label?: HelixLoader["label"];
+};
+
+export type HelixLoaderSolidJsProps = {
+  /** Diameter relative to the surrounding text. */
+  "prop:size"?: HelixLoader["size"];
+  /** Accessible name, announced while the work is outstanding. */
+  "prop:label"?: HelixLoader["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixMenuItem` component event */
 export type HelixMenuItemElementEvent<E = Event> = TypedEvent<HelixMenuItem, E>;
 /** `helix-select` event type */
@@ -6177,7 +6196,7 @@ how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
 nothing. `value` and `max` are ignored while it is set.
 
-Not `Spinner`, which is the other thing this could be. A spinner says the
+Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   indeterminate?: HelixProgress["indeterminate"];
@@ -6189,7 +6208,7 @@ place in the layout when the answer arrives and it becomes determinate. */
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
-spinner has, because a gradient has hard radial edges and no notion of a
+loader has, because a gradient has hard radial edges and no notion of a
 cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
@@ -6249,7 +6268,7 @@ how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
 nothing. `value` and `max` are ignored while it is set.
 
-Not `Spinner`, which is the other thing this could be. A spinner says the
+Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   "prop:indeterminate"?: HelixProgress["indeterminate"];
@@ -6261,7 +6280,7 @@ place in the layout when the answer arrives and it becomes determinate. */
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
-spinner has, because a gradient has hard radial edges and no notion of a
+loader has, because a gradient has hard radial edges and no notion of a
 cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
@@ -7121,25 +7140,6 @@ fire at all. */
   "on:helix-change"?: (e: HelixSliderHelixChangeElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixSliderElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixSpinnerProps = {
-  /** Diameter relative to the surrounding text. */
-  size?: HelixSpinner["size"];
-  /** Accessible name, announced while the work is outstanding. */
-  label?: HelixSpinner["label"];
-};
-
-export type HelixSpinnerSolidJsProps = {
-  /** Diameter relative to the surrounding text. */
-  "prop:size"?: HelixSpinner["size"];
-  /** Accessible name, announced while the work is outstanding. */
-  "prop:label"?: HelixSpinner["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -12874,7 +12874,7 @@ export type CustomElements = {
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
    * already manages that: centring is what a caller wants when the list is being
-   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
    * A delta from the two boxes rather than `offsetTop`. An option is a slotted
@@ -12905,6 +12905,46 @@ export type CustomElements = {
    */
   "helix-listbox": Partial<
     HelixListboxProps & BaseProps<HelixListbox> & BaseEvents
+  >;
+
+  /**
+   * Sized in `em`, so it matches whatever text it sits beside without being told.
+   * The color is `currentColor` for the same reason: a loader inside a primary
+   * button is on the accent, and one in body copy is not, and neither should have
+   * to say so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Diameter relative to the surrounding text.
+   * - `label`: Accessible name, announced while the work is outstanding.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--loader-size`: Diameter. Defaults to 1.5em. (default: `undefined`)
+   * - `--loader-color`: Color of the moving arc. (default: `undefined`)
+   * - `--loader-track-color`: Color of the circle behind it. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `track`: The full circle behind the indicator.
+   * - `indicator`: The arc that turns.
+   */
+  "helix-loader": Partial<
+    HelixLoaderProps & BaseProps<HelixLoader> & BaseEvents
   >;
 
   /**
@@ -13758,7 +13798,7 @@ export type CustomElements = {
    * a screen reader is told that rather than being read a number that means
    * nothing. `value` and `max` are ignored while it is set.
    *
-   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
@@ -13768,7 +13808,7 @@ export type CustomElements = {
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
-   * spinner has, because a gradient has hard radial edges and no notion of a
+   * loader has, because a gradient has hard radial edges and no notion of a
    * cap. `Skeleton.shape` is the same word for the same kind of decision.
    *
    * The value, the ARIA and the form participation are untouched by it. What
@@ -14439,46 +14479,6 @@ export type CustomElements = {
    */
   "helix-slider": Partial<
     HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
-  >;
-
-  /**
-   * Sized in `em`, so it matches whatever text it sits beside without being told.
-   * The color is `currentColor` for the same reason: a spinner inside a primary
-   * button is on the accent, and one in body copy is not, and neither should have
-   * to say so.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `size`: Diameter relative to the surrounding text.
-   * - `label`: Accessible name, announced while the work is outstanding.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--spinner-size`: Diameter. Defaults to 1.5em. (default: `undefined`)
-   * - `--spinner-color`: Color of the moving arc. (default: `undefined`)
-   * - `--spinner-track-color`: Color of the circle behind it. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
-   * - `indicator`: The arc that turns.
-   */
-  "helix-spinner": Partial<
-    HelixSpinnerProps & BaseProps<HelixSpinner> & BaseEvents
   >;
 
   /**
@@ -19994,7 +19994,7 @@ export type CustomElementsSolidJs = {
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
    * already manages that: centring is what a caller wants when the list is being
-   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
    * A delta from the two boxes rather than `offsetTop`. An option is a slotted
@@ -20027,6 +20027,49 @@ export type CustomElementsSolidJs = {
     HelixListboxProps &
       HelixListboxSolidJsProps &
       BaseProps<HelixListbox> &
+      BaseEvents
+  >;
+
+  /**
+   * Sized in `em`, so it matches whatever text it sits beside without being told.
+   * The color is `currentColor` for the same reason: a loader inside a primary
+   * button is on the accent, and one in body copy is not, and neither should have
+   * to say so.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `size`: Diameter relative to the surrounding text.
+   * - `label`: Accessible name, announced while the work is outstanding.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--loader-size`: Diameter. Defaults to 1.5em. (default: `undefined`)
+   * - `--loader-color`: Color of the moving arc. (default: `undefined`)
+   * - `--loader-track-color`: Color of the circle behind it. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `track`: The full circle behind the indicator.
+   * - `indicator`: The arc that turns.
+   */
+  "helix-loader": Partial<
+    HelixLoaderProps &
+      HelixLoaderSolidJsProps &
+      BaseProps<HelixLoader> &
       BaseEvents
   >;
 
@@ -20915,7 +20958,7 @@ export type CustomElementsSolidJs = {
    * a screen reader is told that rather than being read a number that means
    * nothing. `value` and `max` are ignored while it is set.
    *
-   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
@@ -20925,7 +20968,7 @@ export type CustomElementsSolidJs = {
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
-   * spinner has, because a gradient has hard radial edges and no notion of a
+   * loader has, because a gradient has hard radial edges and no notion of a
    * cap. `Skeleton.shape` is the same word for the same kind of decision.
    *
    * The value, the ARIA and the form participation are untouched by it. What
@@ -21620,49 +21663,6 @@ export type CustomElementsSolidJs = {
     HelixSliderProps &
       HelixSliderSolidJsProps &
       BaseProps<HelixSlider> &
-      BaseEvents
-  >;
-
-  /**
-   * Sized in `em`, so it matches whatever text it sits beside without being told.
-   * The color is `currentColor` for the same reason: a spinner inside a primary
-   * button is on the accent, and one in body copy is not, and neither should have
-   * to say so.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `size`: Diameter relative to the surrounding text.
-   * - `label`: Accessible name, announced while the work is outstanding.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--spinner-size`: Diameter. Defaults to 1.5em. (default: `undefined`)
-   * - `--spinner-color`: Color of the moving arc. (default: `undefined`)
-   * - `--spinner-track-color`: Color of the circle behind it. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
-   * - `indicator`: The arc that turns.
-   */
-  "helix-spinner": Partial<
-    HelixSpinnerProps &
-      HelixSpinnerSolidJsProps &
-      BaseProps<HelixSpinner> &
       BaseEvents
   >;
 
@@ -23681,6 +23681,12 @@ export type CustomCssProperties = {
   "--list-marker-gutter"?: string;
   /** How tall it gets before it scrolls. */
   "--listbox-max-block-size"?: string;
+  /** Diameter. Defaults to 1.5em. */
+  "--loader-size"?: string;
+  /** Color of the moving arc. */
+  "--loader-color"?: string;
+  /** Color of the circle behind it. */
+  "--loader-track-color"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
   /** Tallest the surface grows before it scrolls. */
@@ -23767,12 +23773,6 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose colour is the value. */
   "--slider-track-image"?: string;
-  /** Diameter. Defaults to 1.5em. */
-  "--spinner-size"?: string;
-  /** Color of the moving arc. */
-  "--spinner-color"?: string;
-  /** Color of the circle behind it. */
-  "--spinner-track-color"?: string;
   /** The line between the panes. */
   "--splitter-color"?: string;
   /** How wide the handle at a crossing is. */

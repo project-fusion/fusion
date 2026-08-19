@@ -15,7 +15,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * Where a count carries meaning it stays: Divider needs something either side of
  * the rule, Quote needs to wrap. Where it was only filling space it is gone.
  *
- * Spinner is drawn at `spinner-lg` rather than `md`, because at `md` its eight
+ * Loader is drawn at `loader-lg` rather than `md`, because at `md` its eight
  * marks would be under two pixels each.
  *
  * **Most of this group declares no archetype, and still moves.** Avatar,
@@ -30,7 +30,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * nothing at runtime" is to write no motion at all, which is also the way to
  * say nothing, and the two cannot drift apart.
  *
- * Callout, Divider, Empty, List, Progress, Skeleton, Spinner and Splitter do
+ * Callout, Divider, Empty, List, Loader, Progress, Skeleton and Splitter do
  * have something of their own. Divider is the one that moved off the baseline
  * after the fact: it has a single dimension worth animating, and the baseline
  * was scaling the whole drawing instead of the rule that is its subject.
@@ -221,6 +221,35 @@ export const contentArt: Record<string, ReactNode> = {
   ),
 
   /**
+   * Marks around a ring, at `loader-lg`. Marks rather than an arc, because
+   * that is what the component draws, and because an arc would need a stroke.
+   * It rotates about its own bounding-box centre.
+   */
+  loader: (
+    <g className="artSpin">
+      {[
+        { cx: 160, cy: 85, o: 0.55 },
+        { cx: 170.6, cy: 89.4, o: 0.46 },
+        { cx: 175, cy: 100, o: 0.38 },
+        { cx: 170.6, cy: 110.6, o: 0.3 },
+        { cx: 160, cy: 115, o: 0.24 },
+        { cx: 149.4, cy: 110.6, o: 0.18 },
+        { cx: 145, cy: 100, o: 0.14 },
+        { cx: 149.4, cy: 89.4, o: 0.1 },
+      ].map((mark) => (
+        <circle
+          className="artInk"
+          cx={mark.cx}
+          cy={mark.cy}
+          fillOpacity={mark.o}
+          key={`${mark.cx}-${mark.cy}`}
+          r="2.5"
+        />
+      ))}
+    </g>
+  ),
+
+  /**
    * A track and how far along it something is, at the eight pixel progress
    * height. Two shapes, and the second is the point: `progress` is `slider`
    * with the thumb taken off. One reports, the other takes a value.
@@ -285,35 +314,6 @@ export const contentArt: Record<string, ReactNode> = {
       <rect className="artInk" fillOpacity="0.12" height="8" rx="4" width="128" x="128" y="90" />
       <rect className="artInk" fillOpacity="0.12" height="8" rx="4" width="140" x="48" y="112" />
     </>
-  ),
-
-  /**
-   * Marks around a ring, at `spinner-lg`. Marks rather than an arc, because
-   * that is what the component draws, and because an arc would need a stroke.
-   * It rotates about its own bounding-box centre.
-   */
-  spinner: (
-    <g className="artSpin">
-      {[
-        { cx: 160, cy: 85, o: 0.55 },
-        { cx: 170.6, cy: 89.4, o: 0.46 },
-        { cx: 175, cy: 100, o: 0.38 },
-        { cx: 170.6, cy: 110.6, o: 0.3 },
-        { cx: 160, cy: 115, o: 0.24 },
-        { cx: 149.4, cy: 110.6, o: 0.18 },
-        { cx: 145, cy: 100, o: 0.14 },
-        { cx: 149.4, cy: 89.4, o: 0.1 },
-      ].map((mark) => (
-        <circle
-          className="artInk"
-          cx={mark.cx}
-          cy={mark.cy}
-          fillOpacity={mark.o}
-          key={`${mark.cx}-${mark.cy}`}
-          r="2.5"
-        />
-      ))}
-    </g>
   ),
 
   /**

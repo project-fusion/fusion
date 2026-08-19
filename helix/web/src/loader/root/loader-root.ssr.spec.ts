@@ -5,12 +5,12 @@ import '../index.js'
 
 describe('spinner server output', () => {
   test('renders its circles on the server', () => {
-    const markup = ssr(html`<helix-spinner></helix-spinner>`)
+    const markup = ssr(html`<helix-loader></helix-loader>`)
     expect(hasPart(markup, 'track')).toBe(true)
     expect(hasPart(markup, 'indicator')).toBe(true)
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(hostAttributes(ssr(html`<helix-spinner></helix-spinner>`), 'helix-spinner')).toEqual([])
+    expect(hostAttributes(ssr(html`<helix-loader></helix-loader>`), 'helix-loader')).toEqual([])
   })
 })

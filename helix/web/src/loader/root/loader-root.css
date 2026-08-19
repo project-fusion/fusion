@@ -2,39 +2,39 @@
   color: inherit;
   /* An inline grid rather than an inline flex, and one cell: both children take
      `grid-area: 1 / 1`, so a mark is centered over the circles with no offsets
-     to keep in step with the size. Still inline, so a spinner beside text sits
+     to keep in step with the size. Still inline, so a loader beside text sits
      on the line the way it did. */
   display: inline-grid;
   flex-shrink: 0;
   place-items: center;
   vertical-align: middle;
 
-  /* Tokens, so a spinner is the same size wherever it is placed. Set
-     `--spinner-size: 1em` for one that should match the text beside it, which
+  /* Tokens, so a loader is the same size wherever it is placed. Set
+     `--loader-size: 1em` for one that should match the text beside it, which
      is the case inside a button. */
-  --_spinner-size: var(--helix-size-spinner-md);
+  --_loader-size: var(--helix-size-loader-md);
 }
 
 :host([size="sm"]) {
-  --_spinner-size: var(--helix-size-spinner-sm);
+  --_loader-size: var(--helix-size-loader-sm);
 }
 
 :host([size="lg"]) {
-  --_spinner-size: var(--helix-size-spinner-lg);
+  --_loader-size: var(--helix-size-loader-lg);
 }
 
 [part="svg"] {
-  animation: helix-spinner-turn 0.8s linear infinite;
+  animation: helix-loader-turn 0.8s linear infinite;
   grid-area: 1 / 1;
-  block-size: var(--spinner-size, var(--_spinner-size));
-  inline-size: var(--spinner-size, var(--_spinner-size));
+  block-size: var(--loader-size, var(--_loader-size));
+  inline-size: var(--loader-size, var(--_loader-size));
 }
 
 /* The ring breathes while the indicator turns.
  *
  * The turn alone is one thing moving at one rate, and at the small sizes this
  * is usually drawn it reads as a mechanism rather than as work happening. A
- * slow swell underneath it gives the middle of the spinner something to do
+ * slow swell underneath it gives the middle of the loader something to do
  * between the passes of the arc, and it is deliberately out of step with the
  * turn: 2.4s against 0.8s, so the two never line up and the pair never settles
  * into a single beat.
@@ -44,14 +44,14 @@
  * of the 0.18 it held: shallow enough that a still frame looks unchanged and
  * only the movement is new. */
 [part="track"] {
-  animation: helix-spinner-breathe 2.4s ease-in-out infinite;
+  animation: helix-loader-breathe 2.4s ease-in-out infinite;
   opacity: 0.18;
-  stroke: var(--spinner-track-color, currentColor);
+  stroke: var(--loader-track-color, currentColor);
   stroke-width: 2;
 }
 
 /* And whatever is slotted into the middle breathes with it, in step, so a
-   spinner carrying a count or a glyph is one thing rather than a still mark
+   loader carrying a count or a glyph is one thing rather than a still mark
    inside a moving ring. Nothing is slotted in the common case and this animates
    an empty box, which costs nothing.
 
@@ -61,10 +61,10 @@
    around it to be read against. At the ring's numbers the centre was moving and
    nobody could see it. */
 [part="mark"] {
-  animation: helix-spinner-breathe-mark 2.4s ease-in-out infinite;
+  animation: helix-loader-breathe-mark 2.4s ease-in-out infinite;
 }
 
-@keyframes helix-spinner-breathe {
+@keyframes helix-loader-breathe {
   0%,
   100% {
     opacity: 0.12;
@@ -75,7 +75,7 @@
   }
 }
 
-@keyframes helix-spinner-breathe-mark {
+@keyframes helix-loader-breathe-mark {
   0%,
   100% {
     opacity: 0.45;
@@ -91,20 +91,20 @@
 /* A gap in the dash is what makes the rotation visible. A full circle turning
    looks like nothing at all. */
 [part="indicator"] {
-  stroke: var(--spinner-color, currentColor);
+  stroke: var(--loader-color, currentColor);
   stroke-dasharray: 50, 100;
   stroke-linecap: round;
   stroke-width: 2;
 }
 
-@keyframes helix-spinner-turn {
+@keyframes helix-loader-turn {
   to {
     transform: rotate(1turn);
   }
 }
 
 /* Reduced motion still needs the work to read as outstanding, so the turn slows
-   to a crawl rather than stopping: a frozen spinner reads as broken rather than
+   to a crawl rather than stopping: a frozen loader reads as broken rather than
    as busy. Scaled from a token instead of a raw duration, and it has to be
    declared here at all because the base layer's blanket rule is a document rule
    and does not reach into a shadow root. */
@@ -124,20 +124,20 @@
   }
 }
 
-/* The center. Sized against the spinner rather than stated, so a mark stays in
-   proportion at every size the spinner comes in: `size` survives on this
+/* The center. Sized against the loader rather than stated, so a mark stays in
+   proportion at every size the loader comes in: `size` survives on this
    component precisely because it is a picture, and a fixed mark inside a
    picture that scales is a mark that is wrong at two of the three sizes.
 
    `display: contents` when empty is not available here, because the grid needs
-   a cell either way. It carries no fill and no inset, so an unslotted spinner
+   a cell either way. It carries no fill and no inset, so an unslotted loader
    paints nothing extra. */
 [part="mark"] {
-  /* Derived from the spinner's own size rather than as a percentage. A
+  /* Derived from the loader's own size rather than as a percentage. A
      percentage here resolves against the grid cell, which is sized by whatever
      is in it, so the mark measured itself against itself and came out 136px
-     inside a 40px spinner. Measured, before this was a `calc`. */
-  --_mark-size: calc(var(--spinner-size, var(--_spinner-size)) * 0.4);
+     inside a 40px loader. Measured, before this was a `calc`. */
+  --_mark-size: calc(var(--loader-size, var(--_loader-size)) * 0.4);
   --icon-size: var(--_mark-size);
 
   align-items: center;

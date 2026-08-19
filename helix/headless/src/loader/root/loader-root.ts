@@ -10,11 +10,11 @@ import { property } from 'lit/decorators.js'
  * moving part read as a proportion of a whole rather than as a shape drifting
  * on its own, and it costs one element.
  *
- * **The center is a slot and is empty by default.** A spinner with a mark in
- * the middle is a brand's spinner, and this library does not know whose. The
- * slot is the capability; the logo is the application's, put in once wherever
- * the app wraps it. Nothing is rendered when nothing is slotted, so an
- * unbranded spinner is still two circles and no extra box.
+ * **The center is a slot and is empty by default.** A loader with a mark in the
+ * middle is a brand's loader, and this library does not know whose. The slot is
+ * the capability; the logo is the application's, put in once wherever the app
+ * wraps it. Nothing is rendered when nothing is slotted, so an unbranded loader
+ * is still two circles and no extra box.
  *
  * What is slotted does not turn. Only the arc moves, because a mark rotating
  * with it stops reading as a mark and becomes part of the animation, and a
@@ -28,8 +28,8 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases Loader, Busy, Activity
- * @documentation https://helix.fusion.dev/components/spinner
+ * @aliases Spinner, Busy, Activity
+ * @documentation https://helix.fusion.dev/components/loader
  *
  * @slot - A mark to sit still at the center, usually a logo. Empty by default.
  *
@@ -38,8 +38,8 @@ import { property } from 'lit/decorators.js'
  * @csspart track - The full circle behind the indicator.
  * @csspart indicator - The arc that turns.
  */
-@customElement('helix-base-spinner')
-export class HelixBaseSpinner extends HelixElement {
+@customElement('helix-base-loader')
+export class HelixBaseLoader extends HelixElement {
   /** Accessible name, announced while the work is outstanding. */
   @property()
   label = 'Loading'
@@ -61,6 +61,6 @@ export class HelixBaseSpinner extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-spinner': HelixBaseSpinner
+    'helix-base-loader': HelixBaseLoader
   }
 }

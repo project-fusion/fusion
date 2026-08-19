@@ -479,9 +479,9 @@
      eight and tag by four, and a spinner is read beside those. `lg` is what
      moved, since the small end is a spinner inside a control and is fixed by
      what it sits in. */
-  --helix-size-spinner-md: calc(1.5rem * var(--_helix-seed-density));
-  --helix-size-spinner-sm: calc(1rem * var(--_helix-seed-density));
-  --helix-size-spinner-lg: calc(2rem * var(--_helix-seed-density));
+  --helix-size-loader-md: calc(1.5rem * var(--_helix-seed-density));
+  --helix-size-loader-sm: calc(1rem * var(--_helix-seed-density));
+  --helix-size-loader-lg: calc(2rem * var(--_helix-seed-density));
   --helix-size-header: calc(3.5rem * var(--_helix-seed-density));
   /* The current step, which density moves, and the scale it moves along. An
      icon is chrome: in a dense row it has to come down with the rest of it, or

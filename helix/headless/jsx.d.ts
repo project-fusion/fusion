@@ -38,6 +38,7 @@ import type {
   HelixBaseList,
   HelixBaseListItem,
   HelixBaseListbox,
+  HelixBaseLoader,
   HelixBaseMenu,
   HelixBaseMenuItem,
   HelixBaseMeter,
@@ -56,7 +57,6 @@ import type {
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
-  HelixBaseSpinner,
   HelixBaseSplitter,
   HelixBaseStat,
   HelixBaseStatGroup,
@@ -4484,6 +4484,21 @@ fire at all. */
   textContent?: string | number;
 };
 
+export type HelixBaseLoaderProps = {
+  /** Accessible name, announced while the work is outstanding. */
+  label?: HelixBaseLoader["label"];
+};
+
+export type HelixBaseLoaderSolidJsProps = {
+  /** Accessible name, announced while the work is outstanding. */
+  "prop:label"?: HelixBaseLoader["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseMenuItem` component event */
 export type HelixBaseMenuItemElementEvent<E = Event> = TypedEvent<
   HelixBaseMenuItem,
@@ -5560,7 +5575,7 @@ how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
 nothing. `value` and `max` are ignored while it is set.
 
-Not `Spinner`, which is the other thing this could be. A spinner says the
+Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   indeterminate?: HelixBaseProgress["indeterminate"];
@@ -5572,7 +5587,7 @@ place in the layout when the answer arrives and it becomes determinate. */
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
-spinner has, because a gradient has hard radial edges and no notion of a
+loader has, because a gradient has hard radial edges and no notion of a
 cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
@@ -5632,7 +5647,7 @@ how the platform says "running, and nobody knows how far", and a reader on
 a screen reader is told that rather than being read a number that means
 nothing. `value` and `max` are ignored while it is set.
 
-Not `Spinner`, which is the other thing this could be. A spinner says the
+Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   "prop:indeterminate"?: HelixBaseProgress["indeterminate"];
@@ -5644,7 +5659,7 @@ place in the layout when the answer arrives and it becomes determinate. */
 own. A bar is two boxes and a ring is an SVG with two circles in it, and no
 stylesheet turns one into the other: the styled tier tried, with a conic
 gradient and a mask, and the thing it could not do was the round end the
-spinner has, because a gradient has hard radial edges and no notion of a
+loader has, because a gradient has hard radial edges and no notion of a
 cap. `Skeleton.shape` is the same word for the same kind of decision.
 
 The value, the ARIA and the form participation are untouched by it. What
@@ -6417,21 +6432,6 @@ fire at all. */
   "on:helix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixBaseSliderElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseSpinnerProps = {
-  /** Accessible name, announced while the work is outstanding. */
-  label?: HelixBaseSpinner["label"];
-};
-
-export type HelixBaseSpinnerSolidJsProps = {
-  /** Accessible name, announced while the work is outstanding. */
-  "prop:label"?: HelixBaseSpinner["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11910,7 +11910,7 @@ export type CustomElements = {
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
    * already manages that: centring is what a caller wants when the list is being
-   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
    * A delta from the two boxes rather than `offsetTop`. An option is a slotted
@@ -11951,6 +11951,52 @@ export type CustomElements = {
    */
   "helix-base-listbox": Partial<
     HelixBaseListboxProps & BaseProps<HelixBaseListbox> & BaseEvents
+  >;
+
+  /**
+   * Two concentric circles rather than one arc: the track is what makes the
+   * moving part read as a proportion of a whole rather than as a shape drifting
+   * on its own, and it costs one element.
+   *
+   * **The center is a slot and is empty by default.** A loader with a mark in the
+   * middle is a brand's loader, and this library does not know whose. The slot is
+   * the capability; the logo is the application's, put in once wherever the app
+   * wraps it. Nothing is rendered when nothing is slotted, so an unbranded loader
+   * is still two circles and no extra box.
+   *
+   * What is slotted does not turn. Only the arc moves, because a mark rotating
+   * with it stops reading as a mark and becomes part of the animation, and a
+   * wordmark upside down twice a second is worse than no wordmark.
+   *
+   * The semantics are on the host through `ElementInternals`, not on an inner
+   * span. A `role` written into the shadow root announces correctly but leaves
+   * the host itself anonymous to anything walking the light DOM, and a `role`
+   * written onto the host as an attribute is one a React consumer's server markup
+   * never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name, announced while the work is outstanding.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `track`: The full circle behind the indicator.
+   * - `indicator`: The arc that turns.
+   */
+  "helix-base-loader": Partial<
+    HelixBaseLoaderProps & BaseProps<HelixBaseLoader> & BaseEvents
   >;
 
   /**
@@ -12904,7 +12950,7 @@ export type CustomElements = {
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
-   * known yet. `Spinner` is still the right answer where the wait is short or has
+   * known yet. `Loader` is still the right answer where the wait is short or has
    * no place of its own on the page; a bar earns its width where the work is the
    * subject of the region it sits in.
    *
@@ -12941,7 +12987,7 @@ export type CustomElements = {
    * a screen reader is told that rather than being read a number that means
    * nothing. `value` and `max` are ignored while it is set.
    *
-   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
@@ -12951,7 +12997,7 @@ export type CustomElements = {
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
-   * spinner has, because a gradient has hard radial edges and no notion of a
+   * loader has, because a gradient has hard radial edges and no notion of a
    * cap. `Skeleton.shape` is the same word for the same kind of decision.
    *
    * The value, the ARIA and the form participation are untouched by it. What
@@ -13586,52 +13632,6 @@ export type CustomElements = {
    */
   "helix-base-slider": Partial<
     HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
-  >;
-
-  /**
-   * Two concentric circles rather than one arc: the track is what makes the
-   * moving part read as a proportion of a whole rather than as a shape drifting
-   * on its own, and it costs one element.
-   *
-   * **The center is a slot and is empty by default.** A spinner with a mark in
-   * the middle is a brand's spinner, and this library does not know whose. The
-   * slot is the capability; the logo is the application's, put in once wherever
-   * the app wraps it. Nothing is rendered when nothing is slotted, so an
-   * unbranded spinner is still two circles and no extra box.
-   *
-   * What is slotted does not turn. Only the arc moves, because a mark rotating
-   * with it stops reading as a mark and becomes part of the animation, and a
-   * wordmark upside down twice a second is worse than no wordmark.
-   *
-   * The semantics are on the host through `ElementInternals`, not on an inner
-   * span. A `role` written into the shadow root announces correctly but leaves
-   * the host itself anonymous to anything walking the light DOM, and a `role`
-   * written onto the host as an attribute is one a React consumer's server markup
-   * never had.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name, announced while the work is outstanding.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
-   * - `indicator`: The arc that turns.
-   */
-  "helix-base-spinner": Partial<
-    HelixBaseSpinnerProps & BaseProps<HelixBaseSpinner> & BaseEvents
   >;
 
   /**
@@ -19053,7 +19053,7 @@ export type CustomElementsSolidJs = {
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
    * already manages that: centring is what a caller wants when the list is being
-   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * read as a dial rather than scanned as a list, which is what Time Picker's wheels
    * does with three of these.
    *
    * A delta from the two boxes rather than `offsetTop`. An option is a slotted
@@ -19096,6 +19096,55 @@ export type CustomElementsSolidJs = {
     HelixBaseListboxProps &
       HelixBaseListboxSolidJsProps &
       BaseProps<HelixBaseListbox> &
+      BaseEvents
+  >;
+
+  /**
+   * Two concentric circles rather than one arc: the track is what makes the
+   * moving part read as a proportion of a whole rather than as a shape drifting
+   * on its own, and it costs one element.
+   *
+   * **The center is a slot and is empty by default.** A loader with a mark in the
+   * middle is a brand's loader, and this library does not know whose. The slot is
+   * the capability; the logo is the application's, put in once wherever the app
+   * wraps it. Nothing is rendered when nothing is slotted, so an unbranded loader
+   * is still two circles and no extra box.
+   *
+   * What is slotted does not turn. Only the arc moves, because a mark rotating
+   * with it stops reading as a mark and becomes part of the animation, and a
+   * wordmark upside down twice a second is worse than no wordmark.
+   *
+   * The semantics are on the host through `ElementInternals`, not on an inner
+   * span. A `role` written into the shadow root announces correctly but leaves
+   * the host itself anonymous to anything walking the light DOM, and a `role`
+   * written onto the host as an attribute is one a React consumer's server markup
+   * never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Accessible name, announced while the work is outstanding.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `svg`: The rotating circle pair.
+   * - `mark`: The region holding what was slotted at the center.
+   * - `track`: The full circle behind the indicator.
+   * - `indicator`: The arc that turns.
+   */
+  "helix-base-loader": Partial<
+    HelixBaseLoaderProps &
+      HelixBaseLoaderSolidJsProps &
+      BaseProps<HelixBaseLoader> &
       BaseEvents
   >;
 
@@ -20079,7 +20128,7 @@ export type CustomElementsSolidJs = {
 
   /**
    * Determinate by default, and `indeterminate` for a task whose total is not
-   * known yet. `Spinner` is still the right answer where the wait is short or has
+   * known yet. `Loader` is still the right answer where the wait is short or has
    * no place of its own on the page; a bar earns its width where the work is the
    * subject of the region it sits in.
    *
@@ -20116,7 +20165,7 @@ export type CustomElementsSolidJs = {
    * a screen reader is told that rather than being read a number that means
    * nothing. `value` and `max` are ignored while it is set.
    *
-   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    * - `max`: The total the work is measured against.
@@ -20126,7 +20175,7 @@ export type CustomElementsSolidJs = {
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
-   * spinner has, because a gradient has hard radial edges and no notion of a
+   * loader has, because a gradient has hard radial edges and no notion of a
    * cap. `Skeleton.shape` is the same word for the same kind of decision.
    *
    * The value, the ARIA and the form participation are untouched by it. What
@@ -20781,55 +20830,6 @@ export type CustomElementsSolidJs = {
     HelixBaseSliderProps &
       HelixBaseSliderSolidJsProps &
       BaseProps<HelixBaseSlider> &
-      BaseEvents
-  >;
-
-  /**
-   * Two concentric circles rather than one arc: the track is what makes the
-   * moving part read as a proportion of a whole rather than as a shape drifting
-   * on its own, and it costs one element.
-   *
-   * **The center is a slot and is empty by default.** A spinner with a mark in
-   * the middle is a brand's spinner, and this library does not know whose. The
-   * slot is the capability; the logo is the application's, put in once wherever
-   * the app wraps it. Nothing is rendered when nothing is slotted, so an
-   * unbranded spinner is still two circles and no extra box.
-   *
-   * What is slotted does not turn. Only the arc moves, because a mark rotating
-   * with it stops reading as a mark and becomes part of the animation, and a
-   * wordmark upside down twice a second is worse than no wordmark.
-   *
-   * The semantics are on the host through `ElementInternals`, not on an inner
-   * span. A `role` written into the shadow root announces correctly but leaves
-   * the host itself anonymous to anything walking the light DOM, and a `role`
-   * written onto the host as an attribute is one a React consumer's server markup
-   * never had.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `label`: Accessible name, announced while the work is outstanding.
-   *
-   * ## Slots
-   *
-   * Areas where markup can be added to the component.
-   *
-   * - `(default)`: A mark to sit still at the center, usually a logo. Empty by default.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `svg`: The rotating circle pair.
-   * - `mark`: The region holding what was slotted at the center.
-   * - `track`: The full circle behind the indicator.
-   * - `indicator`: The arc that turns.
-   */
-  "helix-base-spinner": Partial<
-    HelixBaseSpinnerProps &
-      HelixBaseSpinnerSolidJsProps &
-      BaseProps<HelixBaseSpinner> &
       BaseEvents
   >;
 

@@ -7,7 +7,7 @@ import { property } from 'lit/decorators.js'
  *
  * @description
  * Determinate by default, and `indeterminate` for a task whose total is not
- * known yet. `Spinner` is still the right answer where the wait is short or has
+ * known yet. `Loader` is still the right answer where the wait is short or has
  * no place of its own on the page; a bar earns its width where the work is the
  * subject of the region it sits in.
  *
@@ -56,7 +56,7 @@ export class HelixBaseProgress extends HelixElement {
    * a screen reader is told that rather than being read a number that means
    * nothing. `value` and `max` are ignored while it is set.
    *
-   * Not `Spinner`, which is the other thing this could be. A spinner says the
+   * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
    */
@@ -74,7 +74,7 @@ export class HelixBaseProgress extends HelixElement {
    * own. A bar is two boxes and a ring is an SVG with two circles in it, and no
    * stylesheet turns one into the other: the styled tier tried, with a conic
    * gradient and a mask, and the thing it could not do was the round end the
-   * spinner has, because a gradient has hard radial edges and no notion of a
+   * loader has, because a gradient has hard radial edges and no notion of a
    * cap. `Skeleton.shape` is the same word for the same kind of decision.
    *
    * The value, the ARIA and the form participation are untouched by it. What

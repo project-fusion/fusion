@@ -24,7 +24,7 @@ import { styles } from './input-number-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @aliases NumberField, NumberInput, Spinner, Stepper
+ * @aliases NumberField, NumberInput, Stepper
  * @documentation https://helix.fusion.dev/components/input-number
  *
  * @slot start - Before the number, for a unit or an icon.

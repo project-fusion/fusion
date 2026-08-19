@@ -80,8 +80,8 @@ describe('time', () => {
   })
 })
 
-describe('time as a spinner', () => {
-  const spinner = async (attrs = ''): Promise<Time> => {
+describe('time as wheels', () => {
+  const wheels = async (attrs = ''): Promise<Time> => {
     const host = (await mount(
       `<helix-time-picker appearance="wheels" ${attrs}></helix-time-picker>`,
     )) as Time
@@ -98,7 +98,7 @@ describe('time as a spinner', () => {
     )
 
   test('a whole day is an hour column and a minute column, not ninety-six rows', async () => {
-    const host = await spinner('locale="en-GB"')
+    const host = await wheels('locale="en-GB"')
     expect(host.shadowRoot?.querySelector('[part="list"]')).toBeNull()
     expect(values(host, 'hour')).toHaveLength(24)
     expect(values(host, 'minute')).toEqual(['0', '15', '30', '45'])
@@ -107,21 +107,21 @@ describe('time as a spinner', () => {
   test('a meridiem column only where the locale writes one', async () => {
     // Asked of `Intl` rather than derived from a list of locales, because that
     // is exactly the question `resolvedOptions` answers.
-    expect(column(await spinner('locale="en-GB"'), 'meridiem')).toBeNull()
-    expect(values(await spinner('locale="en-US"'), 'meridiem')).toEqual(['AM', 'PM'])
+    expect(column(await wheels('locale="en-GB"'), 'meridiem')).toBeNull()
+    expect(values(await wheels('locale="en-US"'), 'meridiem')).toEqual(['AM', 'PM'])
   })
 
   test('the hour column reads one to twelve on a twelve hour clock, once each', async () => {
     // 13:00 and 01:00 are both "1", and offering it twice is offering a choice
     // that is not one.
-    const host = await spinner('locale="en-US"')
+    const host = await wheels('locale="en-US"')
     expect(values(host, 'hour')).toHaveLength(12)
     expect(values(host, 'hour')).toContain('12')
     expect(values(host, 'hour')).toContain('1')
   })
 
   test('the columns recombine into one value', async () => {
-    const host = await spinner('default-value="09:15" locale="en-GB"')
+    const host = await wheels('default-value="09:15" locale="en-GB"')
     column(host, 'minute').dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
@@ -136,7 +136,7 @@ describe('time as a spinner', () => {
   test('and midnight and noon are the pair that does not follow the pattern', async () => {
     /* On a twelve hour clock 12 AM is midnight and 12 PM is noon, so the hour
        has to be recombined with the meridiem rather than read straight. */
-    const host = await spinner('default-value="00:30" locale="en-US"')
+    const host = await wheels('default-value="00:30" locale="en-US"')
     column(host, 'meridiem').dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
@@ -147,7 +147,7 @@ describe('time as a spinner', () => {
     await host.updateComplete
     expect(host.value).toBe('12:30')
 
-    const noon = await spinner('default-value="12:30" locale="en-US"')
+    const noon = await wheels('default-value="12:30" locale="en-US"')
     column(noon, 'meridiem').dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
@@ -160,7 +160,7 @@ describe('time as a spinner', () => {
   })
 
   test('the minute column offers what the step offers within that hour', async () => {
-    const host = await spinner('default-value="09:00" max="17:00" min="09:00" step="20"')
+    const host = await wheels('default-value="09:00" max="17:00" min="09:00" step="20"')
     expect(values(host, 'minute')).toEqual(['0', '20', '40'])
   })
 })

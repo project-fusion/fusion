@@ -2364,6 +2364,49 @@ list moves under the reader rather than the reader moving to find it.
 | --- | --- |
 | `--listbox-max-block-size` | How tall it gets before it scrolls. |
 
+## Loader
+
+### Root — `helix-loader`
+
+Says that something indeterminate is in progress.
+
+Extends `HelixBaseLoader`.
+
+Sized in `em`, so it matches whatever text it sits beside without being told.
+The color is `currentColor` for the same reason: a loader inside a primary
+button is on the accent, and one in body copy is not, and neither should have
+to say so.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Loading'` | `HelixBaseLoader` | Accessible name, announced while the work is outstanding. |
+| `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | A mark to sit still at the center, usually a logo. Empty by default. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `svg` | The rotating circle pair. |
+| `mark` | The region holding what was slotted at the center. |
+| `track` | The full circle behind the indicator. |
+| `indicator` | The arc that turns. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--loader-size` | Diameter. Defaults to 1.5em. |
+| `--loader-color` | Color of the moving arc. |
+| `--loader-track-color` | Color of the circle behind it. |
+
 ## Menu
 
 ### Root — `helix-menu`
@@ -3369,49 +3412,6 @@ the thumb being dragged.
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose colour is the value. |
-
-## Spinner
-
-### Root — `helix-spinner`
-
-Says that something indeterminate is in progress.
-
-Extends `HelixBaseSpinner`.
-
-Sized in `em`, so it matches whatever text it sits beside without being told.
-The color is `currentColor` for the same reason: a spinner inside a primary
-button is on the accent, and one in body copy is not, and neither should have
-to say so.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `label` | `label` | `string` | `'Loading'` | `HelixBaseSpinner` | Accessible name, announced while the work is outstanding. |
-| `size` | `size` | `'sm' \| 'md' \| 'lg' \| undefined` | - | - | Diameter relative to the surrounding text. |
-
-#### Slots
-
-| Slot | Description |
-| --- | --- |
-| *(default)* | A mark to sit still at the center, usually a logo. Empty by default. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `svg` | The rotating circle pair. |
-| `mark` | The region holding what was slotted at the center. |
-| `track` | The full circle behind the indicator. |
-| `indicator` | The arc that turns. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--spinner-size` | Diameter. Defaults to 1.5em. |
-| `--spinner-color` | Color of the moving arc. |
-| `--spinner-track-color` | Color of the circle behind it. |
 
 ## Splitter
 

@@ -10131,6 +10131,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/loader/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/menu/index.js"
           }
         },
@@ -10228,14 +10236,6 @@
           "declaration": {
             "name": "*",
             "module": "src/slider/index.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/spinner/index.js"
           }
         },
         {
@@ -15074,7 +15074,6 @@
             "aliases": [
               "NumberField",
               "NumberInput",
-              "Spinner",
               "Stepper"
             ],
             "tier": "headless",
@@ -19342,7 +19341,7 @@
                   "text": "void"
                 }
               },
-              "description": "Brings the chosen option to rest in the middle of the list.\n\nA method rather than something this does on its own, because a listbox\nopening on its answer usually wants it merely *visible* and the browser\nalready manages that: centring is what a caller wants when the list is being\nread as a dial rather than scanned as a list, which is what Time's spinner\ndoes with three of these.\n\nA delta from the two boxes rather than `offsetTop`. An option is a slotted\nlight DOM child, so its `offsetParent` is whatever is positioned above it,\nwhich is not this list and is not guaranteed to be anything: measuring both\nrects and moving by the difference needs no such assumption.",
+              "description": "Brings the chosen option to rest in the middle of the list.\n\nA method rather than something this does on its own, because a listbox\nopening on its answer usually wants it merely *visible* and the browser\nalready manages that: centring is what a caller wants when the list is being\nread as a dial rather than scanned as a list, which is what Time Picker's wheels\ndoes with three of these.\n\nA delta from the two boxes rather than `offsetTop`. An option is a slotted\nlight DOM child, so its `offsetParent` is whatever is positioned above it,\nwhich is not this list and is not guaranteed to be anything: measuring both\nrects and moving by the difference needs no such assumption.",
               "type": {
                 "text": "reveal() => void"
               }
@@ -20240,6 +20239,188 @@
           "declaration": {
             "name": "HelixBaseListbox",
             "module": "src/listbox/root/listbox-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/loader/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/loader/root/loader-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/loader/root/loader-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\n**The center is a slot and is empty by default.** A loader with a mark in the\nmiddle is a brand's loader, and this library does not know whose. The slot is\nthe capability; the logo is the application's, put in once wherever the app\nwraps it. Nothing is rendered when nothing is slotted, so an unbranded loader\nis still two circles and no extra box.\n\nWhat is slotted does not turn. Only the arc moves, because a mark rotating\nwith it stops reading as a mark and becomes part of the animation, and a\nwordmark upside down twice a second is worse than no wordmark.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
+          "name": "HelixBaseLoader",
+          "cssParts": [
+            {
+              "description": "The rotating circle pair.",
+              "name": "svg"
+            },
+            {
+              "description": "The region holding what was slotted at the center.",
+              "name": "mark"
+            },
+            {
+              "description": "The full circle behind the indicator.",
+              "name": "track"
+            },
+            {
+              "description": "The arc that turns.",
+              "name": "indicator"
+            }
+          ],
+          "slots": [
+            {
+              "description": "A mark to sit still at the center, usually a logo. Empty by default.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "Accessible name, announced while the work is outstanding.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "Accessible name, announced while the work is outstanding.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Says that something indeterminate is in progress.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/loader",
+            "aliases": [
+              "Spinner",
+              "Busy",
+              "Activity"
+            ],
+            "tier": "headless",
+            "group": "BaseLoader",
+            "part": "Root"
+          },
+          "tagName": "helix-base-loader",
+          "customElement": true,
+          "modulePath": "src/loader/root/loader-root.ts",
+          "definitionPath": "src/loader/root/loader-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseLoader",
+          "declaration": {
+            "name": "HelixBaseLoader",
+            "module": "src/loader/root/loader-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-loader",
+          "declaration": {
+            "name": "HelixBaseLoader",
+            "module": "src/loader/root/loader-root.ts"
           }
         }
       ]
@@ -24484,7 +24665,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Determinate by default, and `indeterminate` for a task whose total is not\nknown yet. `Spinner` is still the right answer where the wait is short or has\nno place of its own on the page; a bar earns its width where the work is the\nsubject of the region it sits in.\n\nA bar that fills at a made-up rate would be a bar that lies, so the\nindeterminate one does not fill: it runs a segment across the track, which\nsays work is happening and claims no proportion at all. `aria-valuenow` is\nomitted with it, which is the platform's own signal for the same thing.\n\n**The fill is a percentage of the track, written as a custom property.** It\nis derived from `value` and `max` rather than measured, so it renders on a\nserver with no layout and needs nothing after upgrade. That is what keeps it\nout of the class of geometry this library writes only on the client.\n\n**`value` is clamped, and out-of-range input is not an error.** A count that\nruns past its own total is ordinary in real applications, and a bar that\noverflows its track or reports `aria-valuenow` above `aria-valuemax` is worse\nthan one that reads as finished.\n\nSemantics are on the host through `ElementInternals`, the same as everywhere\nelse: a `role` in the shadow root announces correctly and leaves the host\nanonymous to anything walking the light DOM, and a `role` written onto the\nhost as an attribute is one a server's markup never had.",
+          "description": "Determinate by default, and `indeterminate` for a task whose total is not\nknown yet. `Loader` is still the right answer where the wait is short or has\nno place of its own on the page; a bar earns its width where the work is the\nsubject of the region it sits in.\n\nA bar that fills at a made-up rate would be a bar that lies, so the\nindeterminate one does not fill: it runs a segment across the track, which\nsays work is happening and claims no proportion at all. `aria-valuenow` is\nomitted with it, which is the platform's own signal for the same thing.\n\n**The fill is a percentage of the track, written as a custom property.** It\nis derived from `value` and `max` rather than measured, so it renders on a\nserver with no layout and needs nothing after upgrade. That is what keeps it\nout of the class of geometry this library writes only on the client.\n\n**`value` is clamped, and out-of-range input is not an error.** A count that\nruns past its own total is ordinary in real applications, and a bar that\noverflows its track or reports `aria-valuenow` above `aria-valuemax` is worse\nthan one that reads as finished.\n\nSemantics are on the host through `ElementInternals`, the same as everywhere\nelse: a `role` in the shadow root announces correctly and leaves the host\nanonymous to anything walking the light DOM, and a `role` written onto the\nhost as an attribute is one a server's markup never had.",
           "name": "HelixBaseProgress",
           "cssParts": [
             {
@@ -24522,7 +24703,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Spinner`, which is the other thing this could be. A spinner says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
+              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Loader`, which is the other thing this could be. A loader says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
               "attribute": "indeterminate",
               "reflects": true
             },
@@ -24542,7 +24723,7 @@
               "type": {
                 "text": "'ring' | undefined"
               },
-              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nloader has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
               "attribute": "shape",
               "reflects": true
             },
@@ -24672,7 +24853,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Spinner`, which is the other thing this could be. A spinner says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
+              "description": "Whether the work has a knowable end.\n\nOn the headless tier rather than as an `appearance`, because it is\nsemantics before it is a picture: a progressbar with no `aria-valuenow` is\nhow the platform says \"running, and nobody knows how far\", and a reader on\na screen reader is told that rather than being read a number that means\nnothing. `value` and `max` are ignored while it is set.\n\nNot `Loader`, which is the other thing this could be. A loader says the\npage is busy; a bar says a named piece of work is running, and keeps its\nplace in the layout when the answer arrives and it becomes determinate.",
               "fieldName": "indeterminate"
             },
             {
@@ -24689,7 +24870,7 @@
               "type": {
                 "text": "'ring' | undefined"
               },
-              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nspinner has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
+              "description": "Whether the value is drawn as a bar or as a ring.\n\n**On this tier because it changes the markup**, which is the base tier's to\nown. A bar is two boxes and a ring is an SVG with two circles in it, and no\nstylesheet turns one into the other: the styled tier tried, with a conic\ngradient and a mask, and the thing it could not do was the round end the\nloader has, because a gradient has hard radial edges and no notion of a\ncap. `Skeleton.shape` is the same word for the same kind of decision.\n\nThe value, the ARIA and the form participation are untouched by it. What\nchanges is only which shape carries the fraction.",
               "fieldName": "shape"
             },
             {
@@ -28340,188 +28521,6 @@
           "declaration": {
             "name": "HelixBaseSlider",
             "module": "src/slider/root/slider-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/spinner/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/spinner/root/spinner-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/spinner/root/spinner-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Two concentric circles rather than one arc: the track is what makes the\nmoving part read as a proportion of a whole rather than as a shape drifting\non its own, and it costs one element.\n\n**The center is a slot and is empty by default.** A spinner with a mark in\nthe middle is a brand's spinner, and this library does not know whose. The\nslot is the capability; the logo is the application's, put in once wherever\nthe app wraps it. Nothing is rendered when nothing is slotted, so an\nunbranded spinner is still two circles and no extra box.\n\nWhat is slotted does not turn. Only the arc moves, because a mark rotating\nwith it stops reading as a mark and becomes part of the animation, and a\nwordmark upside down twice a second is worse than no wordmark.\n\nThe semantics are on the host through `ElementInternals`, not on an inner\nspan. A `role` written into the shadow root announces correctly but leaves\nthe host itself anonymous to anything walking the light DOM, and a `role`\nwritten onto the host as an attribute is one a React consumer's server markup\nnever had.",
-          "name": "HelixBaseSpinner",
-          "cssParts": [
-            {
-              "description": "The rotating circle pair.",
-              "name": "svg"
-            },
-            {
-              "description": "The region holding what was slotted at the center.",
-              "name": "mark"
-            },
-            {
-              "description": "The full circle behind the indicator.",
-              "name": "track"
-            },
-            {
-              "description": "The arc that turns.",
-              "name": "indicator"
-            }
-          ],
-          "slots": [
-            {
-              "description": "A mark to sit still at the center, usually a logo. Empty by default.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Loading'",
-              "description": "Accessible name, announced while the work is outstanding.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Loading'",
-              "description": "Accessible name, announced while the work is outstanding.",
-              "fieldName": "label"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "Says that something indeterminate is in progress.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/spinner",
-            "aliases": [
-              "Loader",
-              "Busy",
-              "Activity"
-            ],
-            "tier": "headless",
-            "group": "BaseSpinner",
-            "part": "Root"
-          },
-          "tagName": "helix-base-spinner",
-          "customElement": true,
-          "modulePath": "src/spinner/root/spinner-root.ts",
-          "definitionPath": "src/spinner/root/spinner-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseSpinner",
-          "declaration": {
-            "name": "HelixBaseSpinner",
-            "module": "src/spinner/root/spinner-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-spinner",
-          "declaration": {
-            "name": "HelixBaseSpinner",
-            "module": "src/spinner/root/spinner-root.ts"
           }
         }
       ]
