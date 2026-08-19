@@ -729,7 +729,21 @@
             ],
             "tier": "styled",
             "group": "Accordion",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "outlined"
+              },
+              {
+                "slug": "plain"
+              },
+              {
+                "slug": "single"
+              }
+            ]
           },
           "tagName": "helix-accordion",
           "customElement": true,
@@ -983,7 +997,18 @@
             ],
             "tier": "styled",
             "group": "Announcement",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "tones"
+              },
+              {
+                "slug": "with-actions"
+              }
+            ]
           },
           "tagName": "helix-announcement",
           "customElement": true,
@@ -1413,7 +1438,24 @@
             ],
             "tier": "styled",
             "group": "AppHeader",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "flat"
+              },
+              {
+                "slug": "material"
+              },
+              {
+                "slug": "sticky"
+              },
+              {
+                "slug": "transparent"
+              }
+            ]
           },
           "tagName": "helix-app-header",
           "customElement": true,
@@ -1995,7 +2037,18 @@
             ],
             "tier": "styled",
             "group": "Avatar",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "broken-image"
+              },
+              {
+                "slug": "group"
+              }
+            ]
           },
           "tagName": "helix-avatar",
           "customElement": true,
@@ -2320,7 +2373,21 @@
             ],
             "tier": "styled",
             "group": "Badge",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "appearances"
+              },
+              {
+                "slug": "capped"
+              },
+              {
+                "slug": "dot"
+              }
+            ]
           },
           "tagName": "helix-badge",
           "customElement": true,
@@ -2533,7 +2600,12 @@
             ],
             "tier": "styled",
             "group": "Blockquote",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-blockquote",
           "customElement": true,
@@ -2983,7 +3055,12 @@
             ],
             "tier": "styled",
             "group": "Breadcrumbs",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-breadcrumbs",
           "customElement": true,
@@ -3203,7 +3280,18 @@
             ],
             "tier": "styled",
             "group": "ButtonGroup",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "spaced"
+              },
+              {
+                "slug": "with-icons"
+              }
+            ]
           },
           "tagName": "helix-button-group",
           "customElement": true,
@@ -3806,7 +3894,39 @@
             "documentation": "https://helix.fusion.dev/components/button",
             "tier": "styled",
             "group": "Button",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "as-link"
+              },
+              {
+                "slug": "danger"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "fill"
+              },
+              {
+                "slug": "primary"
+              },
+              {
+                "slug": "secondary"
+              },
+              {
+                "slug": "tertiary"
+              },
+              {
+                "slug": "width"
+              },
+              {
+                "slug": "with-icon"
+              }
+            ]
           },
           "tagName": "helix-button",
           "customElement": true,
@@ -4033,7 +4153,15 @@
             ],
             "tier": "styled",
             "group": "Callout",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "severities"
+              }
+            ]
           },
           "tagName": "helix-callout",
           "customElement": true,
@@ -4322,7 +4450,27 @@
             ],
             "tier": "styled",
             "group": "Card",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "elevated"
+              },
+              {
+                "slug": "horizontal"
+              },
+              {
+                "slug": "linked"
+              },
+              {
+                "slug": "outlined"
+              },
+              {
+                "slug": "plain"
+              }
+            ]
           },
           "tagName": "helix-card",
           "customElement": true,
@@ -5002,7 +5150,30 @@
             ],
             "tier": "styled",
             "group": "Carousel",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "hero"
+              },
+              {
+                "slug": "indicator-placement"
+              },
+              {
+                "slug": "placement-align"
+              },
+              {
+                "slug": "rotating"
+              },
+              {
+                "slug": "several-across"
+              },
+              {
+                "slug": "vertical"
+              }
+            ]
           },
           "tagName": "helix-carousel",
           "customElement": true,
@@ -5731,7 +5902,24 @@
             ],
             "tier": "styled",
             "group": "CheckboxGroup",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "horizontal"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-checkbox-group",
           "customElement": true,
@@ -6790,7 +6978,24 @@
             ],
             "tier": "styled",
             "group": "Checkbox",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "cards"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-checkbox",
           "customElement": true,
@@ -7978,7 +8183,27 @@
             ],
             "tier": "styled",
             "group": "ColorInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "alpha"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "swatch"
+              },
+              {
+                "slug": "swatches"
+              }
+            ]
           },
           "tagName": "helix-color-input",
           "customElement": true,
@@ -9105,7 +9330,27 @@
             ],
             "tier": "styled",
             "group": "ColorPicker",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "bare"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "swatches"
+              },
+              {
+                "slug": "syntaxes"
+              }
+            ]
           },
           "tagName": "helix-color-picker",
           "customElement": true,
@@ -10662,7 +10907,33 @@
             ],
             "tier": "styled",
             "group": "DateInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "bounded"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "formatted"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "months"
+              },
+              {
+                "slug": "multiple"
+              },
+              {
+                "slug": "range"
+              }
+            ]
           },
           "tagName": "helix-date-input",
           "customElement": true,
@@ -12074,7 +12345,30 @@
             ],
             "tier": "styled",
             "group": "DatePicker",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "bounded"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "multiple"
+              },
+              {
+                "slug": "range"
+              },
+              {
+                "slug": "restricted"
+              }
+            ]
           },
           "tagName": "helix-date-picker",
           "customElement": true,
@@ -12943,7 +13237,24 @@
             ],
             "tier": "styled",
             "group": "Dialog",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "centered"
+              },
+              {
+                "slug": "full"
+              },
+              {
+                "slug": "large"
+              },
+              {
+                "slug": "small"
+              }
+            ]
           },
           "tagName": "helix-dialog",
           "customElement": true,
@@ -13262,7 +13573,18 @@
             ],
             "tier": "styled",
             "group": "Divider",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "inset"
+              },
+              {
+                "slug": "with-content"
+              }
+            ]
           },
           "tagName": "helix-divider",
           "customElement": true,
@@ -13769,7 +14091,15 @@
             ],
             "tier": "styled",
             "group": "Drawer",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "placements"
+              }
+            ]
           },
           "tagName": "helix-drawer",
           "customElement": true,
@@ -14554,7 +14884,12 @@
             ],
             "tier": "styled",
             "group": "Drilldown",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-drilldown",
           "customElement": true,
@@ -14852,7 +15187,15 @@
             ],
             "tier": "styled",
             "group": "Empty",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "outlined"
+              }
+            ]
           },
           "tagName": "helix-empty",
           "customElement": true,
@@ -15779,7 +16122,21 @@
             ],
             "tier": "styled",
             "group": "FileInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "single"
+              }
+            ]
           },
           "tagName": "helix-file-input",
           "customElement": true,
@@ -16346,7 +16703,15 @@
             ],
             "tier": "styled",
             "group": "Flex",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "column"
+              }
+            ]
           },
           "tagName": "helix-flex",
           "customElement": true,
@@ -16595,7 +16960,15 @@
             ],
             "tier": "styled",
             "group": "Grid",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "fixed-columns"
+              }
+            ]
           },
           "tagName": "helix-grid",
           "customElement": true,
@@ -17164,7 +17537,15 @@
             ],
             "tier": "styled",
             "group": "IconButton",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "appearances"
+              }
+            ]
           },
           "tagName": "helix-icon-button",
           "customElement": true,
@@ -17365,7 +17746,15 @@
             ],
             "tier": "styled",
             "group": "Icon",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "sizes"
+              }
+            ]
           },
           "tagName": "helix-icon",
           "customElement": true,
@@ -18799,7 +19188,24 @@
             ],
             "tier": "styled",
             "group": "Input",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "read-only"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-input",
           "customElement": true,
@@ -19210,7 +19616,12 @@
             ],
             "tier": "styled",
             "group": "Kbd",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-kbd",
           "customElement": true,
@@ -19676,7 +20087,18 @@
             ],
             "tier": "styled",
             "group": "List",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "kinds"
+              },
+              {
+                "slug": "linked"
+              }
+            ]
           },
           "tagName": "helix-list",
           "customElement": true,
@@ -20779,7 +21201,27 @@
             ],
             "tier": "styled",
             "group": "Listbox",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "filtered"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "multiple"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-listbox",
           "customElement": true,
@@ -21316,7 +21758,21 @@
             ],
             "tier": "styled",
             "group": "Loader",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "pulse"
+              },
+              {
+                "slug": "sizes"
+              },
+              {
+                "slug": "with-icon"
+              }
+            ]
           },
           "tagName": "helix-loader",
           "customElement": true,
@@ -22349,7 +22805,12 @@
             ],
             "tier": "styled",
             "group": "Menu",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-menu",
           "customElement": true,
@@ -23030,7 +23491,27 @@
             ],
             "tier": "styled",
             "group": "Meter",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "band"
+              },
+              {
+                "slug": "bands"
+              },
+              {
+                "slug": "beyond"
+              },
+              {
+                "slug": "counted"
+              },
+              {
+                "slug": "round"
+              }
+            ]
           },
           "tagName": "helix-meter",
           "customElement": true,
@@ -23416,7 +23897,12 @@
             ],
             "tier": "styled",
             "group": "Navigation",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-navigation",
           "customElement": true,
@@ -24535,7 +25021,24 @@
             ],
             "tier": "styled",
             "group": "NumberInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "bounded"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "units"
+              }
+            ]
           },
           "tagName": "helix-number-input",
           "customElement": true,
@@ -25237,7 +25740,15 @@
             ],
             "tier": "styled",
             "group": "Option",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "grouped"
+              }
+            ]
           },
           "tagName": "helix-option",
           "customElement": true,
@@ -25804,7 +26315,15 @@
             ],
             "tier": "styled",
             "group": "Outline",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "smooth"
+              }
+            ]
           },
           "tagName": "helix-outline",
           "customElement": true,
@@ -26741,7 +27260,24 @@
             ],
             "tier": "styled",
             "group": "Pagination",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "compact"
+              },
+              {
+                "slug": "footer"
+              },
+              {
+                "slug": "links"
+              },
+              {
+                "slug": "window"
+              }
+            ]
           },
           "tagName": "helix-pagination",
           "customElement": true,
@@ -28735,7 +29271,24 @@
             ],
             "tier": "styled",
             "group": "PinInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "lengths"
+              },
+              {
+                "slug": "masked"
+              }
+            ]
           },
           "tagName": "helix-pin-input",
           "customElement": true,
@@ -29445,7 +29998,18 @@
             ],
             "tier": "styled",
             "group": "Popover",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "commanded"
+              },
+              {
+                "slug": "plain"
+              }
+            ]
           },
           "tagName": "helix-popover",
           "customElement": true,
@@ -29799,7 +30363,21 @@
             ],
             "tier": "styled",
             "group": "Progress",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "counted"
+              },
+              {
+                "slug": "indeterminate"
+              },
+              {
+                "slug": "ring"
+              }
+            ]
           },
           "tagName": "helix-progress",
           "customElement": true,
@@ -30102,7 +30680,12 @@
             ],
             "tier": "styled",
             "group": "Quote",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-quote",
           "customElement": true,
@@ -31436,7 +32019,27 @@
             ],
             "tier": "styled",
             "group": "Radio",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "cards"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "horizontal"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-radio",
           "customElement": true,
@@ -32434,7 +33037,24 @@
             ],
             "tier": "styled",
             "group": "Select",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "multiple"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-select",
           "customElement": true,
@@ -32967,7 +33587,12 @@
             ],
             "tier": "styled",
             "group": "Skeleton",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-skeleton",
           "customElement": true,
@@ -33857,7 +34482,24 @@
             ],
             "tier": "styled",
             "group": "Slider",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "markers"
+              },
+              {
+                "slug": "stepped"
+              }
+            ]
           },
           "tagName": "helix-slider",
           "customElement": true,
@@ -35230,7 +35872,30 @@
             ],
             "tier": "styled",
             "group": "Splitter",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "collapsed"
+              },
+              {
+                "slug": "columns"
+              },
+              {
+                "slug": "grip"
+              },
+              {
+                "slug": "nested"
+              },
+              {
+                "slug": "vertical"
+              },
+              {
+                "slug": "workbench"
+              }
+            ]
           },
           "tagName": "helix-splitter",
           "customElement": true,
@@ -35655,7 +36320,15 @@
             ],
             "tier": "styled",
             "group": "Stat",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "directions"
+              }
+            ]
           },
           "tagName": "helix-stat",
           "customElement": true,
@@ -35779,8 +36452,12 @@
               "name": "--steps-gap"
             },
             {
-              "description": "Diameter of the numbered circle.",
+              "description": "Size of the numbered marker.",
               "name": "--steps-marker-size"
+            },
+            {
+              "description": "Corner radius of that marker.",
+              "name": "--steps-marker-radii"
             },
             {
               "description": "The line between steps not yet reached.",
@@ -35816,8 +36493,22 @@
               "type": {
                 "text": "'vertical' | undefined"
               },
-              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape with room under a step\nfor what the stage holds.",
               "attribute": "orientation",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "'below' | undefined"
+              },
+              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "attribute": "labels",
               "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseSteps",
@@ -35911,7 +36602,18 @@
             ],
             "tier": "styled",
             "group": "Steps",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "below"
+              },
+              {
+                "slug": "vertical"
+              }
+            ]
           },
           "tagName": "helix-steps",
           "customElement": true,
@@ -35944,8 +36646,20 @@
               "type": {
                 "text": "'vertical' | undefined"
               },
-              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape with room under a step\nfor what the stage holds.",
               "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "name": "labels",
+              "type": {
+                "text": "'below' | undefined"
+              },
+              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "fieldName": "labels",
               "inheritedFrom": {
                 "name": "HelixBaseSteps",
                 "module": "src/steps/root/steps-root.ts"
@@ -36029,6 +36743,52 @@
               "description": "Whether this is the stage the reader is in.",
               "attribute": "current",
               "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may go to this stage.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this stage is called when it announces itself.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the step, unless it is refusing.",
+              "type": {
+                "text": "select() => void"
+              },
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -36146,11 +36906,19 @@
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
               }
+            },
+            {
+              "description": "What the stage holds, shown while it is the current one.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
             }
           ],
           "cssParts": [
             {
-              "description": "The circle carrying the number or the check.",
+              "description": "The shape carrying the number or the check.",
               "name": "marker",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
@@ -36166,7 +36934,7 @@
               }
             },
             {
-              "description": "The step's name.",
+              "description": "The step's name, which is the button.",
               "name": "label",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
@@ -36182,8 +36950,16 @@
               }
             },
             {
-              "description": "The line arriving from the step before this one.",
+              "description": "The line running on to the next step.",
               "name": "connector",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "What the stage holds, while it is open.",
+              "name": "content",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -36212,6 +36988,46 @@
               "default": "false",
               "description": "Whether this is the stage the reader is in.",
               "fieldName": "current",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may go to this stage.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this stage is called when it announces itself.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the step is pressed.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -36998,7 +37814,21 @@
             ],
             "tier": "styled",
             "group": "Switch",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-switch",
           "customElement": true,
@@ -37896,7 +38726,12 @@
             "documentation": "https://helix.fusion.dev/components/table",
             "tier": "styled",
             "group": "Table",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-table",
           "customElement": true,
@@ -38795,7 +39630,18 @@
             "documentation": "https://helix.fusion.dev/components/tabs",
             "tier": "styled",
             "group": "Tabs",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "segmented"
+              },
+              {
+                "slug": "underlined"
+              }
+            ]
           },
           "tagName": "helix-tabs",
           "customElement": true,
@@ -39523,7 +40369,21 @@
             ],
             "tier": "styled",
             "group": "Tag",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "appearances"
+              },
+              {
+                "slug": "dismissible"
+              },
+              {
+                "slug": "prefix"
+              }
+            ]
           },
           "tagName": "helix-tag",
           "customElement": true,
@@ -39752,7 +40612,18 @@
             ],
             "tier": "styled",
             "group": "Text",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "appearances"
+              },
+              {
+                "slug": "tones"
+              }
+            ]
           },
           "tagName": "helix-text",
           "customElement": true,
@@ -40638,7 +41509,27 @@
             ],
             "tier": "styled",
             "group": "Textarea",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "auto-grow"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "read-only"
+              },
+              {
+                "slug": "required"
+              }
+            ]
           },
           "tagName": "helix-textarea",
           "customElement": true,
@@ -42115,7 +43006,33 @@
             ],
             "tier": "styled",
             "group": "TimeInput",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "bounded"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "iso"
+              },
+              {
+                "slug": "multiple"
+              },
+              {
+                "slug": "range"
+              },
+              {
+                "slug": "wheels"
+              }
+            ]
           },
           "tagName": "helix-time-input",
           "customElement": true,
@@ -43391,7 +44308,30 @@
             ],
             "tier": "styled",
             "group": "TimePicker",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "business"
+              },
+              {
+                "slug": "disable-times"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "range"
+              },
+              {
+                "slug": "wheels"
+              }
+            ]
           },
           "tagName": "helix-time-picker",
           "customElement": true,
@@ -44386,7 +45326,24 @@
             ],
             "tier": "styled",
             "group": "Toast",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "arriving"
+              },
+              {
+                "slug": "auto-dismiss"
+              },
+              {
+                "slug": "page-mode"
+              },
+              {
+                "slug": "severities"
+              }
+            ]
           },
           "tagName": "helix-toast",
           "customElement": true,
@@ -45671,7 +46628,27 @@
             ],
             "tier": "styled",
             "group": "Toggle",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "disabled"
+              },
+              {
+                "slug": "filled"
+              },
+              {
+                "slug": "invalid"
+              },
+              {
+                "slug": "plain"
+              },
+              {
+                "slug": "states"
+              }
+            ]
           },
           "tagName": "helix-toggle",
           "customElement": true,
@@ -46050,7 +47027,12 @@
             ],
             "tier": "styled",
             "group": "Toolbar",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ]
           },
           "tagName": "helix-toolbar",
           "customElement": true,
@@ -46754,7 +47736,21 @@
             ],
             "tier": "styled",
             "group": "Tooltip",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "described"
+              },
+              {
+                "slug": "placements"
+              },
+              {
+                "slug": "rich-content"
+              }
+            ]
           },
           "tagName": "helix-tooltip",
           "customElement": true,
@@ -48035,7 +49031,15 @@
             ],
             "tier": "styled",
             "group": "Tree",
-            "part": "Root"
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "with-icons"
+              }
+            ]
           },
           "tagName": "helix-tree",
           "customElement": true,

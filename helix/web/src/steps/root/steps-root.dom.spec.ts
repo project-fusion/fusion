@@ -73,3 +73,57 @@ describe('steps', () => {
     }
   })
 })
+
+describe('a step is pressable, and only its name is', () => {
+  const one = async (attrs = ''): Promise<HTMLElement> => {
+    const host = (await mount(
+      `<helix-steps><helix-step ${attrs}>Payment</helix-step></helix-steps>`,
+    )) as Steps
+    await host.updateComplete
+    const step = host.querySelector('helix-step') as HTMLElement
+    await (step as unknown as Steps).updateComplete
+    return step
+  }
+
+  test('the button is the name, not the marker beside it', async () => {
+    /* The marker is `aria-hidden` decoration, so wrapping it would add hit area
+       and no meaning: the accessible name is the text either way. */
+    const step = await one('value="pay"')
+    const label = part(step, 'label') as HTMLElement
+    expect(label.tagName).toBe('BUTTON')
+    expect(step.shadowRoot?.querySelector('[part="marker"]')?.tagName).toBe('SPAN')
+  })
+
+  test('pressing it announces the step by name', async () => {
+    const step = await one('value="pay"')
+    const said: string[] = []
+    step.addEventListener('helix-select', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    ;(part(step, 'label') as HTMLElement).click()
+    expect(said).toEqual(['pay'])
+  })
+
+  test('and a refused step announces nothing', async () => {
+    // Which steps a reader may jump to is the consumer's to know: a wizard that
+    // lets you skip to the end and one that does not are both real.
+    const step = await one('disabled value="pay"')
+    const said: string[] = []
+    step.addEventListener('helix-select', () => said.push('x'))
+    ;(part(step, 'label') as HTMLElement).click()
+    expect(said).toEqual([])
+  })
+
+  test('what the stage holds is in the markup either way, and opens on current', async () => {
+    /* `current` is what opens it, so the state saying where the reader is also
+       shows them the stage: one attribute, and it renders open on the server
+       rather than after hydration. */
+    const shut = await one('value="pay"')
+    const open = await one('current value="pay"')
+    for (const step of [shut, open]) {
+      expect(step.shadowRoot?.querySelector('[part="content"]')).not.toBeNull()
+    }
+    expect(shut.hasAttribute('current')).toBe(false)
+    expect(open.hasAttribute('current')).toBe(true)
+  })
+})

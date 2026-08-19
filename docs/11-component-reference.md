@@ -3496,6 +3496,7 @@ script involved. Reordering the steps renumbers them; nothing has to be told.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
+| `labels` | `labels` | `'below' \| undefined` | - | `HelixBaseSteps` | Where a step's name sits against its marker. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
 
 #### Slots
@@ -3509,7 +3510,8 @@ script involved. Reordering the steps renumbers them; nothing has to be told.
 | Property | Description |
 | --- | --- |
 | `--steps-gap` | Space between one step and the next. |
-| `--steps-marker-size` | Diameter of the numbered circle. |
+| `--steps-marker-size` | Size of the numbered marker. |
+| `--steps-marker-radii` | Corner radius of that marker. |
 | `--steps-connector-color` | The line between steps not yet reached. |
 | `--steps-complete-color` | Fill on a finished step's marker. |
 | `--steps-current-color` | Fill on the current step's marker. |
@@ -3526,6 +3528,20 @@ Extends `HelixBaseStep`.
 | --- | --- | --- | --- | --- | --- |
 | `complete` | `complete` | `boolean` | `false` | `HelixBaseStep` | Whether the reader has finished this stage. |
 | `current` | `current` | `boolean` | `false` | `HelixBaseStep` | Whether this is the stage the reader is in. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseStep` | Whether the reader may go to this stage. |
+| `value` | `value` | `string` | `''` | `HelixBaseStep` | What this stage is called when it announces itself. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `select()` | `HelixBaseStep` | Announces the step, unless it is refusing. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the step is pressed. |
 
 #### Slots
 
@@ -3534,16 +3550,18 @@ Extends `HelixBaseStep`.
 | *(default)* | The step's name. |
 | `description` | A line under the name, for what the stage is for. |
 | `marker` | Replaces the number, or the check a complete step shows. |
+| `content` | What the stage holds, shown while it is the current one. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
-| `marker` | The circle carrying the number or the check. |
+| `marker` | The shape carrying the number or the check. |
 | `body` | The name and its description. |
-| `label` | The step's name. |
+| `label` | The step's name, which is the button. |
 | `description` | The line under it. |
-| `connector` | The line arriving from the step before this one. |
+| `connector` | The line running on to the next step. |
+| `content` | What the stage holds, while it is open. |
 
 ## Switch
 

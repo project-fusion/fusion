@@ -18,7 +18,8 @@ import { styles } from './steps-root.css.js'
  * @documentation https://helix.fusion.dev/components/steps
  *
  * @cssproperty --steps-gap - Space between one step and the next.
- * @cssproperty --steps-marker-size - Diameter of the numbered circle.
+ * @cssproperty --steps-marker-size - Size of the numbered marker.
+ * @cssproperty --steps-marker-radii - Corner radius of that marker.
  * @cssproperty --steps-connector-color - The line between steps not yet reached.
  * @cssproperty --steps-complete-color - Fill on a finished step's marker.
  * @cssproperty --steps-current-color - Fill on the current step's marker.

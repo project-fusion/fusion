@@ -28403,8 +28403,18 @@
               "type": {
                 "text": "'vertical' | undefined"
               },
-              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape with room under a step\nfor what the stage holds.",
               "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "'below' | undefined"
+              },
+              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "attribute": "labels",
               "reflects": true
             },
             {
@@ -28492,8 +28502,16 @@
               "type": {
                 "text": "'vertical' | undefined"
               },
-              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape that has room for each\nstep's description.",
+              "description": "Which way the steps run.\n\nAbsent is a row, which is what a form header wants. `vertical` stacks them,\nfor a sidebar or a narrow column, and is the shape with room under a step\nfor what the stage holds.",
               "fieldName": "orientation"
+            },
+            {
+              "name": "labels",
+              "type": {
+                "text": "'below' | undefined"
+              },
+              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "fieldName": "labels"
             }
           ],
           "superclass": {
@@ -28546,11 +28564,11 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The marker is a slot whose fallback is the number.** A step is numbered by\na CSS counter in the styled tier, so the digit costs no script and is in the\nserver's markup; a consumer who wants an icon there fills the slot instead.\n`complete` swaps the fallback for a check, because a finished stage has an\nanswer and the number was only ever standing in for one.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n`aria-current=\"step\"` is the whole of what position means to a screen reader,\nand it goes on the host through `ElementInternals` rather than as an\nattribute, which is the rule the whole library follows: an attribute written\nhere is one a consumer's server markup never had.",
+          "description": "**The name is a button, and only the name.** A stepper is something a reader\ngoes back through, and the thing they reach for is the name of the stage. The\nmarker is `aria-hidden` decoration, so wrapping it in the button would add\nhit area and no meaning: the accessible name would be the text either way,\nand what is pressable would stop being the same shape as what is readable.\n\nIt says nothing about where a reader may go. Every step is pressable and\nannounces itself with `helix-select`; refusing the ones ahead is `disabled`,\nwhich the consumer sets because only the consumer knows whether a form can be\nskipped. A component that guessed would be wrong on the first wizard that\nlets you jump to the end.\n\n**The marker is a slot whose fallback is the number.** A step is numbered by\na CSS counter in the styled tier, so the digit costs no script and is in the\nserver's markup; a consumer who wants an icon there fills the slot instead.\n`complete` swaps the fallback for a check, because a finished stage has an\nanswer and the number was only ever standing in for one.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n**The `content` slot opens on the current step, and only down a column.** A\nrow has no room under a step to put a form in, and stretching one to fit\nwould set every step's height by the tallest. `current` is what opens it, so\nthe state that says where the reader is is also the state that shows them the\nstage: one attribute, no second flag to keep in step with it, and it renders\nopen on the server rather than after hydration.",
           "name": "HelixBaseStep",
           "cssParts": [
             {
-              "description": "The circle carrying the number or the check.",
+              "description": "The shape carrying the number or the check.",
               "name": "marker"
             },
             {
@@ -28558,7 +28576,7 @@
               "name": "body"
             },
             {
-              "description": "The step's name.",
+              "description": "The step's name, which is the button.",
               "name": "label"
             },
             {
@@ -28566,8 +28584,12 @@
               "name": "description"
             },
             {
-              "description": "The line arriving from the step before this one.",
+              "description": "The line running on to the next step.",
               "name": "connector"
+            },
+            {
+              "description": "What the stage holds, while it is open.",
+              "name": "content"
             }
           ],
           "slots": [
@@ -28582,6 +28604,10 @@
             {
               "description": "Replaces the number, or the check a complete step shows.",
               "name": "marker"
+            },
+            {
+              "description": "What the stage holds, shown while it is the current one.",
+              "name": "content"
             }
           ],
           "members": [
@@ -28606,6 +28632,40 @@
               "description": "Whether this is the stage the reader is in.",
               "attribute": "current",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may go to this stage.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this stage is called when it announces itself.",
+              "attribute": "value"
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Announces the step, unless it is refusing.",
+              "type": {
+                "text": "select() => void"
+              }
             },
             {
               "kind": "field",
@@ -28677,6 +28737,16 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the step is pressed.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select"
+            }
+          ],
           "attributes": [
             {
               "name": "complete",
@@ -28695,6 +28765,24 @@
               "default": "false",
               "description": "Whether this is the stage the reader is in.",
               "fieldName": "current"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the reader may go to this stage.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this stage is called when it announces itself.",
+              "fieldName": "value"
             }
           ],
           "superclass": {

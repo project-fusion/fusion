@@ -51,11 +51,26 @@ export class HelixBaseSteps extends HelixElement {
    * Which way the steps run.
    *
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape that has room for each
-   * step's description.
+   * for a sidebar or a narrow column, and is the shape with room under a step
+   * for what the stage holds.
    */
   @property({ reflect: true })
   orientation?: 'vertical'
+
+  /**
+   * Where a step's name sits against its marker.
+   *
+   * Absent is beside it. `below` puts it under, which is the shape a row of
+   * four or five stages wants: names beside markers in a row spend the width on
+   * text and leave the connectors as stubs between them.
+   *
+   * On the list rather than on each step, for the reason density is on a region
+   * rather than on each control: a row where one name is beside its marker and
+   * the next is under it is a row nobody meant, and said once it is unwritable
+   * rather than merely discouraged.
+   */
+  @property({ reflect: true })
+  labels?: 'below'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

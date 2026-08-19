@@ -1,17 +1,26 @@
 <helix-steps
-  label="Checkout"
+  label="Label"
   orientation="vertical"
 >
-  <helix-step complete>
-    Details
-    <span slot="description">Name and address</span>
+  <helix-step
+    complete
+    value="one"
+  >
+    Step One
+    <span slot="description">Lorem ipsum dolor sit amet</span>
+    <helix-text slot="content">Consectetur adipiscing elit.</helix-text>
   </helix-step>
-  <helix-step current>
-    Payment
-    <span slot="description">Card or bank transfer</span>
+  <helix-step
+    current
+    value="two"
+  >
+    Step Two
+    <span slot="description">Sed do eiusmod tempor</span>
+    <helix-text slot="content">Incididunt ut labore et dolore magna aliqua.</helix-text>
   </helix-step>
-  <helix-step>
-    Review
-    <span slot="description">Check before ordering</span>
+  <helix-step value="three">
+    Step Three
+    <span slot="description">Ut enim ad minim veniam</span>
+    <helix-text slot="content">Quis nostrud exercitation ullamco.</helix-text>
   </helix-step>
 </helix-steps>

@@ -2,46 +2,85 @@
    numbering free: the browser resolves it at layout, so the third step says "3"
    in the server's own markup and reordering renumbers with no script.
 
-   The axis is handed down as custom properties rather than read from this
-   host's attribute, because a step cannot see it. `orientation` is on this
-   element, and a slotted step's own stylesheet can only match `:host(...)`,
-   which is the step. Custom properties inherit through the flat tree into
-   slotted content, so this is the one channel that reaches. */
+   Everything about the arrangement is handed down as custom properties rather
+   than read from this host's attribute, because a step cannot see it.
+   `orientation` and `labels` are on this element, and a slotted step's own
+   stylesheet can only match `:host(...)`, which is the step. The selector that
+   would answer it, `:host-context()`, is Chromium-only. Custom properties
+   inherit through the flat tree into slotted content, which is the one portable
+   channel.
+
+   **How far the connector runs is a question about the name, not the axis.**
+   With the name beside its marker there is a word between one marker and the
+   next, so a line reaching the whole way is a line struck through the text: it
+   spans the gap and stops. With the name underneath, the space between markers
+   is empty and the line runs the whole way, which is the look a row of stages
+   is usually drawn with. Both were tried and the first was drawn through
+   "Details" before the rule was written down. */
 :host {
   counter-reset: helix-step;
   display: flex;
   gap: var(--steps-gap, var(--helix-space-md));
 
-  --_steps-connector-inline: var(--steps-gap, var(--helix-space-md));
-  --_steps-connector-block: var(--helix-border-thin);
-  --_steps-connector-inset-block: 50%;
-  --_steps-connector-inset-inline: 100%;
+  --_steps-columns: auto minmax(0, 1fr);
+  --_steps-marker-column: 1;
+  --_steps-body-column: 2;
+  --_steps-body-row: 1;
+  --_steps-body-align: start;
+  --_steps-marker-justify: start;
+  --_steps-conn-inline-start: 100%;
+  --_steps-conn-inline-size: var(--steps-gap, var(--helix-space-md));
+  --_steps-conn-block-start: calc(var(--steps-marker-size, var(--helix-size-control-sm)) / 2);
+  --_steps-conn-block-size: var(--helix-border-thin);
+  --_steps-content: none;
 }
 
-/* A row hands each step an equal share, so the connectors between them are the
-   same length whatever the labels measure. Without it a long name stretches its
-   own step and the line before it shrinks to nothing. */
+/* A row hands each step an equal share, so the connector between one marker and
+   the next is the same length whatever the names measure. Without it a long
+   name stretches its own step and the line beside it shrinks to nothing. */
 :host(:not([orientation="vertical"])) ::slotted(*) {
   flex: 1 1 0;
   min-inline-size: 0;
 }
 
+/* Name under the marker, marker centred over it, and the line free to run the
+   whole way because nothing is in its path. It starts at the middle of one
+   marker and has to reach the middle of the next, which sits exactly one step
+   plus one gap further along, so its length is the step's own size plus the
+   gap whatever the names turn out to be. */
+:host([labels="below"]) {
+  --_steps-columns: minmax(0, 1fr);
+  --_steps-marker-column: 1;
+  --_steps-body-column: 1;
+  --_steps-body-row: 2;
+  --_steps-body-align: center;
+  /* Over the middle of its own name, which is also where the line starts. */
+  --_steps-marker-justify: center;
+  --_steps-conn-inline-start: 50%;
+  --_steps-conn-inline-size: calc(100% + var(--steps-gap, var(--helix-space-md)));
+}
+
+/* Down the column, and the same arithmetic on the other axis: marker middle to
+   marker middle is the step's own height plus the gap. Which is why the
+   connector belongs to the step it leaves rather than the step it reaches. A
+   step knows its own height; it cannot know the height of the one above, and
+   down a column those differ by whatever each stage holds. */
 :host([orientation="vertical"]) {
   flex-direction: column;
 
-  /* Above the marker rather than beside it, and at the marker's own middle so
-     the line meets the circle instead of the text next to it. Every value the
-     connector needs is handed over, because the step cannot ask which way the
-     list runs: `:host-context()` would answer it and is Chromium-only, so the
-     one portable channel is a property that inherits. */
-  --_steps-connector-inline: var(--helix-border-thin);
-  --_steps-connector-block: var(--steps-gap, var(--helix-space-md));
-  --_steps-connector-inset-block: auto;
-  --_steps-connector-inset-block-end: 100%;
-  --_steps-connector-inset-inline: auto;
-  --_steps-connector-inset-inline-start: calc(
-    var(--steps-marker-size, var(--helix-size-control-sm)) /
-    2
-  );
-  --_steps-connector-shift: -50% 0;
+  --_steps-conn-inline-start: calc(var(--steps-marker-size, var(--helix-size-control-sm)) / 2);
+  --_steps-conn-inline-size: var(--helix-border-thin);
+  --_steps-conn-block-size: calc(100% + var(--steps-gap, var(--helix-space-md)));
+  --_steps-content: grid;
+}
+
+/* A name under its marker is a row's answer to a row's problem. Down a column
+   there is no width to save, and the line would have to run through the name to
+   reach the marker below it. */
+:host([orientation="vertical"][labels="below"]) {
+  --_steps-columns: auto minmax(0, 1fr);
+  --_steps-body-column: 2;
+  --_steps-body-row: 1;
+  --_steps-body-align: start;
+  --_steps-marker-justify: start;
 }

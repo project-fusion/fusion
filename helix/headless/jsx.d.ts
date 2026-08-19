@@ -6360,9 +6360,20 @@ needs a name of its own rather than borrowing the heading above it. */
   /** Which way the steps run.
 
 Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape that has room for each
-step's description. */
+for a sidebar or a narrow column, and is the shape with room under a step
+for what the stage holds. */
   orientation?: HelixBaseSteps["orientation"];
+  /** Where a step's name sits against its marker.
+
+Absent is beside it. `below` puts it under, which is the shape a row of
+four or five stages wants: names beside markers in a row spend the width on
+text and leave the connectors as stubs between them.
+
+On the list rather than on each step, for the reason density is on a region
+rather than on each control: a row where one name is beside its marker and
+the next is under it is a row nobody meant, and said once it is unwritable
+rather than merely discouraged. */
+  labels?: HelixBaseSteps["labels"];
 };
 
 export type HelixBaseStepsSolidJsProps = {
@@ -6374,9 +6385,20 @@ needs a name of its own rather than borrowing the heading above it. */
   /** Which way the steps run.
 
 Absent is a row, which is what a form header wants. `vertical` stacks them,
-for a sidebar or a narrow column, and is the shape that has room for each
-step's description. */
+for a sidebar or a narrow column, and is the shape with room under a step
+for what the stage holds. */
   "prop:orientation"?: HelixBaseSteps["orientation"];
+  /** Where a step's name sits against its marker.
+
+Absent is beside it. `below` puts it under, which is the shape a row of
+four or five stages wants: names beside markers in a row spend the width on
+text and leave the connectors as stubs between them.
+
+On the list rather than on each step, for the reason density is on a region
+rather than on each control: a row where one name is beside its marker and
+the next is under it is a row nobody meant, and said once it is unwritable
+rather than merely discouraged. */
+  "prop:labels"?: HelixBaseSteps["labels"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6384,11 +6406,24 @@ step's description. */
   textContent?: string | number;
 };
 
+/** `HelixBaseStep` component event */
+export type HelixBaseStepElementEvent<E = Event> = TypedEvent<HelixBaseStep, E>;
+/** `helix-select` event type */
+export type HelixBaseStepHelixSelectElementEvent =
+  HelixBaseStepElementEvent<HelixSelectEvent>;
+
 export type HelixBaseStepProps = {
   /** Whether the reader has finished this stage. */
   complete?: HelixBaseStep["complete"];
   /** Whether this is the stage the reader is in. */
   current?: HelixBaseStep["current"];
+  /** Whether the reader may go to this stage. */
+  disabled?: HelixBaseStep["disabled"];
+  /** What this stage is called when it announces itself. */
+  value?: HelixBaseStep["value"];
+
+  /** Fired when the step is pressed. */
+  "onhelix-select"?: (e: HelixBaseStepHelixSelectElementEvent) => void;
 };
 
 export type HelixBaseStepSolidJsProps = {
@@ -6396,6 +6431,12 @@ export type HelixBaseStepSolidJsProps = {
   "prop:complete"?: HelixBaseStep["complete"];
   /** Whether this is the stage the reader is in. */
   "prop:current"?: HelixBaseStep["current"];
+  /** Whether the reader may go to this stage. */
+  "prop:disabled"?: HelixBaseStep["disabled"];
+  /** What this stage is called when it announces itself. */
+  "prop:value"?: HelixBaseStep["value"];
+  /** Fired when the step is pressed. */
+  "on:helix-select"?: (e: HelixBaseStepHelixSelectElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13825,8 +13866,18 @@ export type CustomElements = {
    * - `orientation`: Which way the steps run.
    *
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape that has room for each
-   * step's description.
+   * for a sidebar or a narrow column, and is the shape with room under a step
+   * for what the stage holds.
+   * - `labels`: Where a step's name sits against its marker.
+   *
+   * Absent is beside it. `below` puts it under, which is the shape a row of
+   * four or five stages wants: names beside markers in a row spend the width on
+   * text and leave the connectors as stubs between them.
+   *
+   * On the list rather than on each step, for the reason density is on a region
+   * rather than on each control: a row where one name is beside its marker and
+   * the next is under it is a row nobody meant, and said once it is unwritable
+   * rather than merely discouraged.
    *
    * ## Slots
    *
@@ -13839,6 +13890,18 @@ export type CustomElements = {
   >;
 
   /**
+   * **The name is a button, and only the name.** A stepper is something a reader
+   * goes back through, and the thing they reach for is the name of the stage. The
+   * marker is `aria-hidden` decoration, so wrapping it in the button would add
+   * hit area and no meaning: the accessible name would be the text either way,
+   * and what is pressable would stop being the same shape as what is readable.
+   *
+   * It says nothing about where a reader may go. Every step is pressable and
+   * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
+   * which the consumer sets because only the consumer knows whether a form can be
+   * skipped. A component that guessed would be wrong on the first wizard that
+   * lets you jump to the end.
+   *
    * **The marker is a slot whose fallback is the number.** A step is numbered by
    * a CSS counter in the styled tier, so the digit costs no script and is in the
    * server's markup; a consumer who wants an icon there fills the slot instead.
@@ -13852,10 +13915,12 @@ export type CustomElements = {
    * finished it, and a stepper that forgets the second is one that loses its
    * checks the moment somebody reviews their answers.
    *
-   * `aria-current="step"` is the whole of what position means to a screen reader,
-   * and it goes on the host through `ElementInternals` rather than as an
-   * attribute, which is the rule the whole library follows: an attribute written
-   * here is one a consumer's server markup never had.
+   * **The `content` slot opens on the current step, and only down a column.** A
+   * row has no room under a step to put a form in, and stretching one to fit
+   * would set every step's height by the tallest. `current` is what opens it, so
+   * the state that says where the reader is is also the state that shows them the
+   * stage: one attribute, no second flag to keep in step with it, and it renders
+   * open on the server rather than after hydration.
    *
    * ## Attributes & Properties
    *
@@ -13863,6 +13928,14 @@ export type CustomElements = {
    *
    * - `complete`: Whether the reader has finished this stage.
    * - `current`: Whether this is the stage the reader is in.
+   * - `disabled`: Whether the reader may go to this stage.
+   * - `value`: What this stage is called when it announces itself.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the step is pressed.
    *
    * ## Slots
    *
@@ -13871,16 +13944,24 @@ export type CustomElements = {
    * - `(default)`: The step's name.
    * - `description`: A line under the name, for what the stage is for.
    * - `marker`: Replaces the number, or the check a complete step shows.
+   * - `content`: What the stage holds, shown while it is the current one.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Announces the step, unless it is refusing.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marker`: The circle carrying the number or the check.
+   * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name.
+   * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line arriving from the step before this one.
+   * - `connector`: The line running on to the next step.
+   * - `content`: What the stage holds, while it is open.
    */
   "helix-base-step": Partial<
     HelixBaseStepProps & BaseProps<HelixBaseStep> & BaseEvents
@@ -21143,8 +21224,18 @@ export type CustomElementsSolidJs = {
    * - `orientation`: Which way the steps run.
    *
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
-   * for a sidebar or a narrow column, and is the shape that has room for each
-   * step's description.
+   * for a sidebar or a narrow column, and is the shape with room under a step
+   * for what the stage holds.
+   * - `labels`: Where a step's name sits against its marker.
+   *
+   * Absent is beside it. `below` puts it under, which is the shape a row of
+   * four or five stages wants: names beside markers in a row spend the width on
+   * text and leave the connectors as stubs between them.
+   *
+   * On the list rather than on each step, for the reason density is on a region
+   * rather than on each control: a row where one name is beside its marker and
+   * the next is under it is a row nobody meant, and said once it is unwritable
+   * rather than merely discouraged.
    *
    * ## Slots
    *
@@ -21160,6 +21251,18 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * **The name is a button, and only the name.** A stepper is something a reader
+   * goes back through, and the thing they reach for is the name of the stage. The
+   * marker is `aria-hidden` decoration, so wrapping it in the button would add
+   * hit area and no meaning: the accessible name would be the text either way,
+   * and what is pressable would stop being the same shape as what is readable.
+   *
+   * It says nothing about where a reader may go. Every step is pressable and
+   * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
+   * which the consumer sets because only the consumer knows whether a form can be
+   * skipped. A component that guessed would be wrong on the first wizard that
+   * lets you jump to the end.
+   *
    * **The marker is a slot whose fallback is the number.** A step is numbered by
    * a CSS counter in the styled tier, so the digit costs no script and is in the
    * server's markup; a consumer who wants an icon there fills the slot instead.
@@ -21173,10 +21276,12 @@ export type CustomElementsSolidJs = {
    * finished it, and a stepper that forgets the second is one that loses its
    * checks the moment somebody reviews their answers.
    *
-   * `aria-current="step"` is the whole of what position means to a screen reader,
-   * and it goes on the host through `ElementInternals` rather than as an
-   * attribute, which is the rule the whole library follows: an attribute written
-   * here is one a consumer's server markup never had.
+   * **The `content` slot opens on the current step, and only down a column.** A
+   * row has no room under a step to put a form in, and stretching one to fit
+   * would set every step's height by the tallest. `current` is what opens it, so
+   * the state that says where the reader is is also the state that shows them the
+   * stage: one attribute, no second flag to keep in step with it, and it renders
+   * open on the server rather than after hydration.
    *
    * ## Attributes & Properties
    *
@@ -21184,6 +21289,14 @@ export type CustomElementsSolidJs = {
    *
    * - `complete`: Whether the reader has finished this stage.
    * - `current`: Whether this is the stage the reader is in.
+   * - `disabled`: Whether the reader may go to this stage.
+   * - `value`: What this stage is called when it announces itself.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the step is pressed.
    *
    * ## Slots
    *
@@ -21192,16 +21305,24 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The step's name.
    * - `description`: A line under the name, for what the stage is for.
    * - `marker`: Replaces the number, or the check a complete step shows.
+   * - `content`: What the stage holds, shown while it is the current one.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `select() => void`: Announces the step, unless it is refusing.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marker`: The circle carrying the number or the check.
+   * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name.
+   * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line arriving from the step before this one.
+   * - `connector`: The line running on to the next step.
+   * - `content`: What the stage holds, while it is open.
    */
   "helix-base-step": Partial<
     HelixBaseStepProps &

@@ -1,53 +1,76 @@
-/* Always a row: the marker beside the name, whichever way the sequence runs.
-   The two axes differ in where the connector goes, not in how a step is put
-   together, and a step that also reshaped itself would be two layouts to keep
-   in step for no reading it improves. */
+/* A grid rather than a row, because a step has three things in it and only two
+   of them sit side by side: the marker and the name are a row, and what the
+   stage holds goes underneath both. As a flex row the content became a third
+   item beside the name, which is what it did before this was written down.
+   The tracks come from the list, which is the only thing that knows whether the
+   name is beside the marker or under it. */
 :host {
-  align-items: center;
+  align-items: start;
+  column-gap: var(--helix-space-sm);
   counter-increment: helix-step;
-  display: flex;
+  display: grid;
   flex: 0 0 auto;
-  gap: var(--helix-space-sm);
+  grid-template-columns: var(--_steps-columns, auto minmax(0, 1fr));
   min-inline-size: 0;
   position: relative;
+  row-gap: var(--helix-space-2xs);
 
   --_step-marker: var(--steps-marker-size, var(--helix-size-control-sm));
 }
 
-/* The line arriving from the step before, drawn on the step rather than between
-   them: a line between items needs an index or a parent that counts, and this
-   needs neither. Hidden on the first, where there is nothing to arrive from.
-   `:host(:first-child)` works where `:host(:has(...))` does not, because a
-   structural pseudo-class is allowed inside the functional form.
-
-   It spans the gap exactly, and the gap is the same custom property the list
-   lays itself out with, so the line meets the step on either side of it however
-   the spacing is set. */
-[part="connector"] {
-  background-color: var(--steps-connector-color, var(--helix-color-border));
-  block-size: var(--_steps-connector-block, var(--helix-border-thin));
-  inline-size: var(--_steps-connector-inline, var(--helix-space-md));
-  inset-block-end: var(--_steps-connector-inset-block-end, auto);
-  inset-block-start: var(--_steps-connector-inset-block, 50%);
-  inset-inline-end: var(--_steps-connector-inset-inline, 100%);
-  inset-inline-start: var(--_steps-connector-inset-inline-start, auto);
-  position: absolute;
-  translate: var(--_steps-connector-shift, 0 -50%);
+[part="marker"] {
+  grid-column: var(--_steps-marker-column, 1);
+  grid-row: 1;
+  justify-self: var(--_steps-marker-justify, start);
 }
 
-:host(:first-child) [part="connector"] {
+[part="body"] {
+  grid-column: var(--_steps-body-column, 2);
+  grid-row: var(--_steps-body-row, 1);
+}
+
+/* Under both, in the name's own column, so the stage's content lines up with
+   the name rather than with the marker beside it. */
+[part="content"] {
+  grid-column: var(--_steps-body-column, 2);
+  grid-row: calc(var(--_steps-body-row, 1) + 1);
+}
+
+/* The line running on to the next step, drawn by the step it leaves rather than
+   the one it reaches, and hidden on the last where there is nothing to reach.
+   `:host(:last-child)` works where `:host(:has(...))` does not, because a
+   structural pseudo-class is allowed inside the functional form, and it needs
+   no index and no parent counting its children.
+
+   Under the markers rather than over them, so a line that runs to the middle of
+   the next circle is covered by it and no seam shows where the two meet. */
+[part="connector"] {
+  background-color: var(--steps-connector-color, var(--helix-color-border));
+  block-size: var(--_steps-conn-block-size, var(--helix-border-thin));
+  inline-size: var(--_steps-conn-inline-size, 100%);
+  inset-block-start: var(--_steps-conn-block-start, 50%);
+  inset-inline-start: var(--_steps-conn-inline-start, 50%);
+  position: absolute;
+  z-index: 0;
+}
+
+:host(:last-child) [part="connector"] {
   display: none;
 }
 
-/* The circle, and the number inside it. `content` from the counter rather than
-   a rendered digit, so nothing writes it and nothing can get it out of step
-   with the order the steps are actually in. */
+/* The shape, and the number inside it. `content` from the counter rather than a
+   rendered digit, so nothing writes it and nothing can get it out of step with
+   the order the steps are actually in.
+
+   Four pixels rather than a circle: `sm` is the house radius and every other
+   small mark in the library takes it, and a row of circles beside a page of
+   rounded rectangles reads as a different set of parts. */
 [part="marker"] {
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
   block-size: var(--_step-marker);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--steps-marker-radii, var(--helix-radii-sm));
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
@@ -57,15 +80,18 @@
   font-weight: var(--helix-weight-semibold);
   inline-size: var(--_step-marker);
   justify-content: center;
+  /* Over the connector, which runs under it to the next marker's middle. */
+  position: relative;
+  z-index: 1;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The slot is a flex item like the glyph inside it, so it needs the same floor:
-   without one the check was handed the row's leftover width and drew as a wide
-   flat tick. */
+/* The slot is a flex item like the glyph inside it, so it needs the same
+   centring: without it the check was handed the row's leftover width and drew
+   as a wide flat tick. */
 [part="marker"] slot {
   align-items: center;
   display: inline-flex;
@@ -115,17 +141,46 @@ slot[name="marker"]::slotted(*) {
 }
 
 [part="body"] {
+  align-items: var(--_steps-body-align, start);
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
   min-inline-size: 0;
+  /* Over the connector, which runs under the row to the next marker. */
+  position: relative;
+  z-index: 1;
 }
 
+/* The name, which is the button.
+ *
+ * `all: unset` takes `box-sizing` with it, back to `content-box`, and the
+ * `border-box` every shadow root is given comes from a rule this one outranks,
+ * so it is restored in the same place. Four components were missing that and
+ * overflowed their own boxes by exactly their padding.
+ *
+ * A floor of the marker's height so the first line of the name sits against the
+ * middle of the marker beside it, whatever a description underneath adds. The
+ * step aligns to `flex-start`, which is what keeps the marker's centre a known
+ * distance from the top for the connector to meet. */
 [part="label"] {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
+  min-block-size: var(--_step-marker);
+  text-align: start;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="label"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
 /* The stage the reader is in reads at full strength, and so does one they have
@@ -135,14 +190,52 @@ slot[name="marker"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
+:host(:not([disabled])) [part="label"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+:host([disabled]) [part="label"] {
+  cursor: not-allowed;
+}
+
+:host([disabled]) [part="marker"],
+:host([disabled]) [part="description"] {
+  opacity: 0.5;
+}
+
 [part="description"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
 }
 
+/* What the stage holds, open on the current step and only down a column.
+ *
+ * `grid-template-rows` from `0fr` to `1fr` rather than a height, because the
+ * height is the content's and nothing here knows it: animating `max-height` to
+ * a guess either clips the content or spends the difference easing nothing.
+ * The inner element needs `min-block-size: 0` or a grid item refuses to go
+ * below its own content and the row never closes. */
+[part="content"] {
+  display: var(--_steps-content, none);
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host([current]) [part="content"] {
+  grid-template-rows: 1fr;
+}
+
+[part="content"] > slot {
+  display: block;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  [part="marker"] {
+  [part="marker"],
+  [part="label"],
+  [part="content"] {
     transition: none;
   }
 }
