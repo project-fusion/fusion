@@ -2,6 +2,12 @@ import { customElement, HelixElement } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../icon/index.js'
+/* Side-effect, and the public tag rather than the base one: a consumer on the
+   styled tier gets the styled menu, and one on the headless tier brings their
+   own under that name. Both tiers import it, because this tier writes the tag
+   and the styled tier inherits the template without having one of its own to
+   remind anyone. */
+import '../../menu/index.js'
 
 /**
  * Seconds as a clock, with an hour only when there is one.
@@ -122,6 +128,9 @@ let owner: HTMLElement | undefined
  * @csspart remote - Play on another device, where one is available.
  * @csspart speed - Playback speed, where it was asked for.
  * @csspart pip - Picture in picture, where it was asked for and exists.
+ * @csspart download - Saves the file, where it was asked for.
+ * @csspart overflow - The menu holding the controls kept off the bar.
+ * @csspart more - The button that opens it.
  * @csspart fullscreen - The whole screen, and back.
  *
  * @event {Event} play - Relayed, because it does not cross a shadow boundary.
@@ -179,9 +188,38 @@ export class HelixBaseVideo extends HelixElement {
    * `pip` is offered only where the platform has it, checked rather than
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
+   *
+   * The names are `speed`, `pip`, `remote` and `download`.
+   *
+   * **`download` is named and never assumed.** Offering the file is a decision
+   * about the content rather than about the player, and plenty of consumers
+   * decline it deliberately. It is also the one control whose success is not
+   * ours to promise: the attribute is ignored cross-origin, so a file served
+   * from somewhere else opens rather than saves, which is the browser's rule
+   * and not something a player can work around.
    */
   @property({ attribute: 'extra-controls' })
   extraControls = ''
+
+  /**
+   * Controls that go behind one button instead of onto the bar, named the same
+   * way.
+   *
+   * **Named rather than measured, and the reason is that a width cannot answer
+   * this.** A media query asks about the window, and the bar's problem is its
+   * own width: a video in a 320px sidebar on a desktop is cramped and a
+   * full-bleed hero on a phone is not. A container query asks the right
+   * question and still cannot answer it, because how many controls there are is
+   * the consumer's, so the threshold is not a width but a width per control,
+   * which is a guess. And a control that moves between the bar and a hidden
+   * menu as the layout shifts is a control the reader has to find twice.
+   *
+   * So the consumer says where the fold is, which they can, having already
+   * named the controls in order. A name in both lists is drawn once, on the
+   * bar: two of the same control is worse than either placement.
+   */
+  @property({ attribute: 'overflow-controls' })
+  overflowControls = ''
 
   /** The speeds offered, slowest first, as multipliers of normal. */
   @property({ attribute: 'speeds' })
@@ -269,23 +307,49 @@ export class HelixBaseVideo extends HelixElement {
   /** Cancels the availability watch, since it outlives a single render. */
   private remoteWatch: number | undefined
 
+  /** Whether this platform can do a named control at all. */
+  private offers(one: string): boolean {
+    if (one === 'pip') {
+      return typeof document !== 'undefined' && document.pictureInPictureEnabled
+    }
+    /* Availability, not support. A device that can play this has to exist for
+       the button to mean anything: an AirPlay control with nothing to send to
+       is a control that opens an empty list, which is worse than no control.
+       `watchAvailability` is what answers that, and it answers late, so this
+       reads a flag the watch keeps rather than asking. */
+    if (one === 'remote') {
+      return this.remoteAvailable
+    }
+    /* A download needs something to download. `src` and not a slotted
+       `<source>`: the element chose one of those and which one is the
+       browser's business, so offering a specific file would be a guess about a
+       decision already made. */
+    if (one === 'download') {
+      return this.src !== ''
+    }
+    return one === 'speed'
+  }
+
   /** The extras asked for, in order, and only the ones this platform can do. */
   private get extras(): string[] {
-    const asked = this.extraControls.split(/\s+/).filter(Boolean)
-    return asked.filter((one) => {
-      if (one === 'pip') {
-        return typeof document !== 'undefined' && document.pictureInPictureEnabled
-      }
-      /* Availability, not support. A device that can play this has to exist for
-         the button to mean anything: an AirPlay control with nothing to send to
-         is a control that opens an empty list, which is worse than no control.
-         `watchAvailability` is what answers that, and it answers late, so this
-         reads a flag the watch keeps rather than asking. */
-      if (one === 'remote') {
-        return this.remoteAvailable
-      }
-      return one === 'speed'
-    })
+    return this.extraControls
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((one) => this.offers(one))
+  }
+
+  /**
+   * The controls asked for behind the overflow button, in order.
+   *
+   * A name in both lists is on the bar and not here. Drawing it twice is worse
+   * than either placement, and the bar is the one a reader can see.
+   */
+  private get overflow(): string[] {
+    const onBar = new Set(this.extras)
+    return this.overflowControls
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((one) => !onBar.has(one) && this.offers(one))
   }
 
   /** The sources and caption tracks to copy into the video, as the consumer wrote them. */
@@ -751,6 +815,92 @@ export class HelixBaseVideo extends HelixElement {
     }
   }
 
+  /**
+   * One named control, as a button on the bar.
+   *
+   * A method rather than four branches inlined, because the same four names are
+   * asked for twice now, once for the bar and once for the menu behind it, and
+   * two lists that have to stay in step is how a control ends up offered in one
+   * place and not the other.
+   */
+  private renderExtra(one: string): TemplateResult {
+    if (one === 'remote') {
+      return html`<button
+        part="remote"
+        type="button"
+        aria-label="Play on another device"
+        aria-pressed=${this.remoteConnected ? 'true' : 'false'}
+        @click=${() => void this.promptRemote()}
+      >
+        <helix-icon name="airplay"></helix-icon>
+      </button>`
+    }
+    if (one === 'speed') {
+      return html`<button
+        part="speed"
+        type="button"
+        aria-label="Playback speed"
+        @click=${() => this.cycleSpeed()}
+      >
+        ${this.rate}x
+      </button>`
+    }
+    if (one === 'download') {
+      /* A real anchor, because saving a file is the browser's job and there is
+         no scripted version of it worth having. `download` asks for a save
+         rather than a navigation, and is ignored cross-origin, which the
+         property's own note records as the browser's rule rather than a gap
+         here. */
+      return html`<a
+        part="download"
+        download
+        href=${this.src}
+        aria-label="Download"
+      >
+        <helix-icon name="download"></helix-icon>
+      </a>`
+    }
+    return html`<button
+      part="pip"
+      type="button"
+      aria-label="Picture in picture"
+      @click=${() => void this.togglePip()}
+    >
+      <helix-icon name="picture-in-picture"></helix-icon>
+    </button>`
+  }
+
+  /**
+   * The same control as a row in the overflow menu.
+   *
+   * The label is words rather than a mark, which is the difference between a
+   * bar and a menu: a row has the width for a name and a reader scanning one is
+   * reading rather than recognising. `download` is a linked row, which is what
+   * `Menu.Item`'s `href` is for.
+   */
+  private renderOverflowItem(one: string): TemplateResult {
+    if (one === 'remote') {
+      return html`<helix-menu-item
+        value="remote"
+        @helix-select=${() => void this.promptRemote()}
+        >Play on another device</helix-menu-item
+      >`
+    }
+    if (one === 'speed') {
+      return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}
+        >Playback speed: ${this.rate}x</helix-menu-item
+      >`
+    }
+    if (one === 'download') {
+      return html`<helix-menu-item download href=${this.src} value="download"
+        >Download</helix-menu-item
+      >`
+    }
+    return html`<helix-menu-item value="pip" @helix-select=${() => void this.togglePip()}
+      >Picture in picture</helix-menu-item
+    >`
+  }
+
   private renderBar(): TemplateResult {
     const done = this.duration > 0 ? this.position / this.duration : 0
     return html`<div part="controls">
@@ -822,35 +972,17 @@ export class HelixBaseVideo extends HelixElement {
             </button>`
           : nothing
       }
-      ${this.extras.map((one) =>
-        one === 'remote'
-          ? html`<button
-              part="remote"
-              type="button"
-              aria-label="Play on another device"
-              aria-pressed=${this.remoteConnected ? 'true' : 'false'}
-              @click=${() => void this.promptRemote()}
-            >
-              <helix-icon name="airplay"></helix-icon>
-            </button>`
-          : one === 'speed'
-            ? html`<button
-              part="speed"
-              type="button"
-              aria-label="Playback speed"
-              @click=${() => this.cycleSpeed()}
-            >
-              ${this.rate}x
-            </button>`
-            : html`<button
-              part="pip"
-              type="button"
-              aria-label="Picture in picture"
-              @click=${() => void this.togglePip()}
-            >
-              <helix-icon name="picture-in-picture"></helix-icon>
-            </button>`,
-      )}
+      ${this.extras.map((one) => this.renderExtra(one))}
+      ${
+        this.overflow.length === 0
+          ? nothing
+          : html`<helix-menu part="overflow" label="More controls">
+              <button part="more" slot="trigger" type="button" aria-label="More controls">
+                <helix-icon name="dots-three-vertical"></helix-icon>
+              </button>
+              ${this.overflow.map((one) => this.renderOverflowItem(one))}
+            </helix-menu>`
+      }
       <button
         part="fullscreen"
         type="button"

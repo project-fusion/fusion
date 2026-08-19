@@ -4,6 +4,11 @@
 
 [part="item"] {
   align-items: center;
+  /* The row is an `<a>` where `href` is set, and the UA underlines those. A
+     menu row is a row whether or not it navigates, so the underline goes: what
+     says it is pressable is the whole band lighting up, which it already does.
+     Said here rather than in the base layer, which cannot reach a shadow root. */
+  text-decoration: none;
   /* No corner: a row that reaches both edges of the surface has no outside
      corner to round, and rounding it draws a notch against the surface's own. */
   border-radius: var(--helix-radii-none);

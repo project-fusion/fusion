@@ -33,7 +33,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
  *
- * @csspart item - The row.
+ * @csspart item - The row, which is an `<a>` where `href` is set.
  * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
  * a page. One column, because a row is never both.
  */
@@ -64,6 +64,47 @@ export class HelixBaseMenuItem extends HelixElement {
   /** Whether the row can be chosen. */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * Where the row goes, which makes it a real link.
+   *
+   * **The row itself becomes an `<a>`, and the role goes with it.** A
+   * `menuitem` cannot contain a link: measured in Chromium, an anchor inside
+   * one is exposed as a child and the row loses its accessible name entirely.
+   * So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
+   * roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+   * changes the markup rather than only adding an attribute.
+   *
+   * **`Option` cannot have this and the reason is worth knowing**, since a
+   * command palette is the obvious place to want it. A listbox has to keep
+   * focus somewhere else, in the text field for a combobox, so it says which
+   * option is current with `aria-activedescendant`. That reference can only
+   * point at the option's host, measured: assigning
+   * `ariaActiveDescendantElement` an element inside a sibling shadow root reads
+   * back `null`. So `role="option"` is pinned to the host, and an anchor under
+   * it hits the naming failure above. A menu has no such constraint because
+   * focus really moves to the row.
+   */
+  @property()
+  href = ''
+
+  /** Where the link opens, for the rows that should leave the page. */
+  @property()
+  target = ''
+
+  /** The relationship, which `target="_blank"` should always set. */
+  @property()
+  rel = ''
+
+  /**
+   * Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
+   */
+  @property({ type: Boolean })
+  download = false
 
   /**
    * Whether this row is on the page currently showing.
@@ -179,12 +220,32 @@ export class HelixBaseMenuItem extends HelixElement {
    *
    * It is not a `<button>`: a button inside a menu is announced as a button,
    * and the roles a menu needs are not roles a button can take.
+   *
+   * **A linked row hands Enter back to the browser.** An anchor answers Enter
+   * itself, by firing a click and following the link, so preventing the default
+   * here would mean re-issuing that navigation by hand and losing whatever the
+   * browser does around it. `Tree.Item` records the same trap from the other
+   * side: its tree prevents every key it handles, which is exactly what was
+   * swallowing Enter on its rows.
+   *
+   * Space is different, and that is the platform rather than a choice: an
+   * anchor ignores it. So the row presses itself, and the click that comes back
+   * both announces and navigates.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      this.handleClick()
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return
     }
+    const link = this.renderRoot.querySelector<HTMLAnchorElement>('a[part="item"]')
+    if (link && event.key === 'Enter') {
+      return
+    }
+    event.preventDefault()
+    if (link) {
+      link.click()
+      return
+    }
+    this.handleClick()
   }
 
   protected override render(): TemplateResult | typeof nothing {
@@ -202,17 +263,18 @@ export class HelixBaseMenuItem extends HelixElement {
       return nothing
     }
     const submenu = this.hasSubmenu
-    return html`<div
-        part="item"
-        role=${this.checkable || this.checked ? 'menuitemcheckbox' : 'menuitem'}
-        aria-checked=${this.checkable || this.checked ? (this.checked ? 'true' : 'false') : nothing}
-        aria-disabled=${this.disabled ? 'true' : nothing}
-        aria-haspopup=${submenu ? 'menu' : nothing}
-        tabindex=${this.disabled ? nothing : '-1'}
-        @click=${this.handleClick}
-        @keydown=${this.handleKeydown}
-      >
-        <slot></slot>
+    /* One row, two tags. Everything about it is the same but the element, which
+       is what an `href` changes: the anchor carries the role and the tab stop
+       rather than sitting inside something that does, for the reason the
+       property's own note records. `Tree.Item` writes its two the same way.
+
+       A disabled row renders no `href`. A disabled anchor is not a thing the
+       platform has, and `aria-disabled` alone still navigates. */
+    const linked = this.href !== '' && !this.disabled
+    const role = this.checkable || this.checked ? 'menuitemcheckbox' : 'menuitem'
+    const checkedState =
+      this.checkable || this.checked ? (this.checked ? 'true' : 'false') : nothing
+    const inside = html`<slot></slot>
         ${
           // One trailing column, and a row is never both: a way into a page has
           // nothing to tick, and a choice opens nothing. The tick sits after the
@@ -247,8 +309,33 @@ export class HelixBaseMenuItem extends HelixElement {
                   ${unsafeSVG(check.content)}
                 </svg>`
               : html`<span part="mark" aria-hidden="true"></span>`
-        }
-      </div>
+        }`
+    return html`${
+      linked
+        ? html`<a
+            part="item"
+            href=${this.href}
+            target=${this.target || nothing}
+            rel=${this.rel || nothing}
+            ?download=${this.download}
+            role=${role}
+            aria-checked=${checkedState}
+            aria-haspopup=${submenu ? 'menu' : nothing}
+            tabindex="-1"
+            @click=${this.handleClick}
+            @keydown=${this.handleKeydown}
+          >${inside}</a>`
+        : html`<div
+            part="item"
+            role=${role}
+            aria-checked=${checkedState}
+            aria-disabled=${this.disabled ? 'true' : nothing}
+            aria-haspopup=${submenu ? 'menu' : nothing}
+            tabindex=${this.disabled ? nothing : '-1'}
+            @click=${this.handleClick}
+            @keydown=${this.handleKeydown}
+          >${inside}</div>`
+    }
       <slot name="submenu" @slotchange=${this.readSubmenu}></slot>`
   }
 }

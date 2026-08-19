@@ -23,6 +23,65 @@ const menu = async (rows = '<helix-menu-item value="copy">Copy</helix-menu-item>
     `<helix-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-menu>`,
   )) as Menu
 
+describe('a menu row that navigates', () => {
+  const row = async (attrs: string) => {
+    const host = await menu(`<helix-menu-item ${attrs}>Docs</helix-menu-item>`)
+    host.open = true
+    await host.updateComplete
+    const item = host.querySelector('helix-menu-item') as Item & {
+      renderRoot: ShadowRoot
+      updateComplete: Promise<boolean>
+    }
+    await item.updateComplete
+    return item.renderRoot.querySelector('[part="item"]') as HTMLElement
+  }
+
+  test('the anchor is the row, carrying the role and the tab stop', async () => {
+    /* Not an anchor inside the row. A `menuitem` cannot contain a link:
+       measured in Chromium, the row loses its accessible name entirely and the
+       link is exposed as a child of it. `Tree.Item` makes the same move for
+       `treeitem`, and `Option` cannot, because a listbox has to say which option
+       is current with `aria-activedescendant` and that reference reaches only
+       the option's host. */
+    const linked = await row('href="/docs" value="docs"')
+    expect(linked.localName).toBe('a')
+    expect(linked.getAttribute('role')).toBe('menuitem')
+    expect(linked.getAttribute('tabindex')).toBe('-1')
+    expect(linked.querySelector('a')).toBeNull()
+  })
+
+  test('and a row with no href is still a div', async () => {
+    const plain = await row('value="copy"')
+    expect(plain.localName).toBe('div')
+    expect(plain.getAttribute('role')).toBe('menuitem')
+  })
+
+  test('a disabled row renders no href, since a disabled anchor is not a thing', async () => {
+    // `aria-disabled` alone would announce it as unavailable and navigate anyway.
+    const off = await row('disabled href="/docs" value="docs"')
+    expect(off.localName).toBe('div')
+    expect(off.hasAttribute('href')).toBe(false)
+  })
+
+  test('Enter goes back to the browser, and Space presses the row', async () => {
+    /* An anchor answers Enter itself, so preventing it would mean re-issuing
+       the navigation by hand. It ignores Space, so that one is ours. */
+    const linked = await row('href="/docs" value="docs"')
+    const press = (key: string) => {
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
+      linked.dispatchEvent(event)
+      return event.defaultPrevented
+    }
+    expect(press('Enter')).toBe(false)
+    expect(press(' ')).toBe(true)
+
+    const plain = await row('value="copy"')
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' })
+    plain.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+  })
+})
+
 describe('menu', () => {
   test('the menu role is on the surface, not on the host', async () => {
     // The host holds the trigger as well as the panel, so it is not the menu:

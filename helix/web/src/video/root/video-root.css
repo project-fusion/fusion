@@ -165,12 +165,18 @@
   opacity: 0;
 }
 
+/* `download` and `more` join the list. The first is an `<a>` and the second the
+   trigger of a menu, and neither is a reason for a control on this bar to be a
+   different size or a different shape from the ones beside it. `all: unset`
+   takes the anchor's underline with everything else. */
 [part="play"],
 [part="mute"],
 [part="captions"],
 [part="speed"],
 [part="pip"],
 [part="remote"],
+[part="download"],
+[part="more"],
 [part="fullscreen"] {
   all: unset;
   --icon-size: var(--helix-size-icon-sm);
@@ -193,6 +199,8 @@
 [part="speed"]:focus-visible,
 [part="pip"]:focus-visible,
 [part="remote"]:focus-visible,
+[part="download"]:focus-visible,
+[part="more"]:focus-visible,
 [part="fullscreen"]:focus-visible,
 [part="scrubber"]:focus-visible,
 [part="volume"]:focus-visible {
@@ -420,6 +428,20 @@
  * created the overlap. */
 :host([appearance="solid"]) [part="sound"] {
   --_video-level-gap: calc(var(--helix-space-xs) * 2);
+}
+
+/* The menu is a control on the bar like any other, so it takes no width of its
+   own: what a reader sees is the trigger inside it. Its panel is in the top
+   layer and is the menu's business, not this bar's.
+
+   `color-scheme` is the one thing that has to be said. The bar declares a dark
+   region on the host, which is right for controls drawn over a picture, and the
+   panel is not over the picture: it is a surface of the page, opened from a
+   video that happens to be on it. Left dark it came out as a dark menu on a
+   light page. */
+[part="overflow"] {
+  color-scheme: normal;
+  display: contents;
 }
 
 /* The caption, above the bar and clear of it.

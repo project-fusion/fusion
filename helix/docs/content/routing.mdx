@@ -162,7 +162,45 @@ is not broken.
 |---|---|
 | `Button` | Renders an `<a>` styled as a button. |
 | `Tree.Item` | Changes the ARIA shape, as above. A linked branch navigates from its row and opens from its chevron. |
+| `Menu.Item` | The row becomes the anchor and carries `menuitem`. Takes `target`, `rel` and `download`. |
 
 Anything else that should navigate is a gap. Slot a link into it, and press the
 row rather than the words: `Tree.Item` follows a slotted anchor from anywhere in
 the row and from the keyboard, which covers the case without an `href`.
+
+## `Option` cannot take one, and a command palette is where that shows
+
+The obvious place to want a link in a list is a command palette, whose entries
+are usually half commands and half destinations. It is the one place this
+library cannot offer an `href`, and the reason is worth writing down so nobody
+spends an afternoon rediscovering it.
+
+**A listbox cannot move focus to its options.** A combobox keeps focus in its
+text field while the arrows walk the list, so the pattern it is obliged to use
+is `aria-activedescendant`: focus stays put and an attribute says which option
+is current. A menu is the opposite, and that is what makes `Menu.Item` easy:
+focus really moves to the row, so the row can be an anchor with `menuitem` on
+it.
+
+**That reference reaches the option's host and nothing inside it.** IDREFs do
+not cross shadow boundaries at all, so `Listbox` uses the element-reference
+form. Measured in Chromium: assigning `ariaActiveDescendantElement` an element
+inside a *sibling* shadow root reads back `null`, while assigning the option's
+host reads back the host. So `role="option"` is pinned to the host, since the
+host is the only element the listbox can point at.
+
+**And a `role="option"` with an anchor inside it is broken.** Measured in the
+same browser, the accessibility tree for `<div role="option"><a href>Open
+settings</a></div>` inside a listbox is an option with *no accessible name*, and
+the link exposed as a child of it. The sibling option with plain text is named
+correctly. So the manoeuvre that works for `treeitem` and `menuitem`, moving the
+role onto the anchor, is exactly the one thing that cannot be done here.
+
+Two constraints pointing opposite ways, and no arrangement satisfies both.
+
+**So a palette routes through its event.** Listen for `helix-select` on
+`helix-command` and call the router. That is what a palette is for, entries being
+commands and "go to Settings" being a command that navigates, and it is what
+every palette a reader has used already does. What it costs is the gestures only
+a real anchor has: middle-click, a modified click, and the destination in the
+status bar.

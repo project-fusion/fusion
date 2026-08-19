@@ -3,6 +3,7 @@ import { HelixBaseVideo } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../icon/index.js'
+import '../../menu/index.js'
 import { styles } from './video-root.css.js'
 
 /**

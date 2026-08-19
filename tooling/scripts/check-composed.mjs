@@ -38,9 +38,16 @@
  * matched by the path they share.
  *
  * **What counts as importing it.** A side-effect `import '…/index.js'` whose path
- * ends in the family's folder. The family is the tag with the tier prefix taken
- * off, so `helix-base-date-picker` and `helix-date-picker` both resolve to `calendar`
- * and one rule covers both tiers.
+ * ends in the family's folder.
+ *
+ * **Which family a tag belongs to is read from where it is declared, not from
+ * its name.** Taking the tier prefix off the tag and calling the rest the family
+ * is right for a root and wrong for a part: `helix-menu-item` is declared in
+ * `menu/item/`, so the name says `menu-item` and the folder to import is `menu`.
+ * That went unexercised until `Video` rendered rows into a menu, and it reported
+ * a component that had done exactly the right thing. Every tag in the repo
+ * declares itself with `@customElement`, and the file it does that in is three
+ * segments deep, so the folder is not a guess.
  *
  * A component rendering its own family is exempt, since a part rendering a
  * sibling part is one folder importing itself.
@@ -71,8 +78,16 @@ const sources = (dir) => {
 const withoutComments = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
-/** The family a tag belongs to, with the tier prefix taken off. */
-const familyOf = (tag) => tag.replace(/^helix-(base-)?/, '')
+/**
+ * The family folder a tag is declared in.
+ *
+ * Built from `@customElement` rather than from the tag's own text, for the
+ * reason the note above records. The fallback is the old guess, which is right
+ * for every root and is all there is to say about a tag this repo does not
+ * declare.
+ */
+const declaredIn = new Map()
+const familyOf = (tag) => declaredIn.get(tag) ?? tag.replace(/^helix-(base-)?/, '')
 
 /** What a file side-effect imports, by family folder. */
 const imports = (code) => {
@@ -95,7 +110,11 @@ const problems = []
 const read = new Map()
 for (const tier of TIERS) {
   for (const path of sources(tier)) {
-    read.set(path, withoutComments(readFileSync(path, 'utf8')))
+    const code = withoutComments(readFileSync(path, 'utf8'))
+    read.set(path, code)
+    for (const match of code.matchAll(/@customElement\('(helix-[a-z-]+)'\)/g)) {
+      declaredIn.set(match[1], path.split('/').at(-3))
+    }
   }
 }
 
