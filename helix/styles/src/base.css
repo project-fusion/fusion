@@ -930,9 +930,13 @@ helix-toggle[disabled]::part(item) {
    * what. An outline takes no space at any width, so keeping it there and
    * colouring it costs nothing and gives the transition something to move.
    *
-   * `border-thick` rather than a literal 2, which is what every other rule in
-   * this file that draws a line of this weight names. */
-  outline: var(--helix-border-thick) solid transparent;
+   * `border-thin`, so the ring is two pixels in total rather than three: the
+   * card's own one, plus one outside it. Thick was making the widest ring in
+   * the library out of the quietest signal in it, and it is the only ring here
+   * that adds its border to its outline rather than standing alone. Named
+   * rather than written as a literal, which is what every other rule in this
+   * file that draws a line of this weight does. */
+  outline: var(--helix-border-thin) solid transparent;
   outline-offset: 0;
   text-decoration: none;
   transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -952,11 +956,11 @@ helix-toggle[disabled]::part(item) {
  * card getting heavier rather than as the card being pointed at. The brand
  * already means "this one, now" everywhere else in the library.
  *
- * Three pixels, made of the card's own one plus two outside it. `outline` is
- * the second one because it does not participate in layout, so a card cannot
- * shift by two pixels when a pointer crosses it. `outline-offset: 0` puts it
- * flush against the border, so the two read as one 3px ring rather than as a
- * ring with a gap in it.
+ * Two pixels, made of the card's own one plus one outside it. `outline` is the
+ * second one because it does not participate in layout, so a card cannot shift
+ * when a pointer crosses it. `outline-offset: 0` puts it flush against the
+ * border, so the two read as one 2px ring rather than as a ring with a gap in
+ * it.
  *
  * And the ring is the whole signal. There was a `shadow-md` here too, which
  * put three things on one hover: a coloured ring, a cast shadow, and whatever
