@@ -307,6 +307,19 @@
   outline-offset: 0;
 }
 
+/* Wrong, and the field says so. The one picker of the three with a box of its
+   own, so the error goes where an error goes on every other field in the
+   library rather than onto the square, which is a picture of a colour space and
+   not an answer. Hover and focus named as well, so the border cannot be taken
+   back to grey by the pointer or to blue by the caret: one edge, one colour,
+   the arrangement Input records. */
+:host([invalid]) [part="value"],
+:host([invalid]) [part="value"]:hover,
+:host([invalid]) [part="value"]:focus-visible {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
 /* The tools keep their own width beside the text, and take the row when there is
    no text: `flex: 1 1 0` on each button splits whatever the row has left, which
    is everything when the value is withheld and nothing it does not need when it

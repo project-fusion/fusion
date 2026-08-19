@@ -4,7 +4,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
 } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
    custom element registers on import. The public tags rather than the base ones:
@@ -108,6 +108,19 @@ const isTwelveHour = (locale?: string): boolean =>
  */
 @customElement('helix-base-time-picker')
 export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) {
+  /**
+   * Whether the current selection fails validation.
+   *
+   * A flag rather than a message, which is the split Calendar already drew and
+   * these two now follow. A flat picker has no room of its own for a sentence:
+   * the field that wraps one owns the label, the hint and the feedback, and a
+   * second message inside the panel would be the same error said twice. What is
+   * left for the picker is the one thing the field cannot draw from outside, the
+   * mark on the answer itself.
+   */
+  @property({ reflect: true, type: Boolean })
+  invalid = false
+
   /**
    * How far apart the offered times are, in minutes.
    *
@@ -426,7 +439,16 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     this.reveal()
   }
 
-  protected override updated(changed: import('lit').PropertyValues): void {
+  /* `ariaInvalid` on the host through `ElementInternals`, the same route
+     Calendar takes and for the reason the whole library records: a `role` or a
+     state written onto the host as an attribute is one a React consumer's
+     server markup never had. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.internals.ariaInvalid = this.invalid ? 'true' : null
+  }
+
+  protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.reveal()
     void this.revealWhenSettled()
@@ -489,7 +511,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
           (a, b) => a - b,
         )
       : this.hours
-    return html`<div part="columns">
+    return html`<div part="columns" data-unset=${this.value === '' ? '' : nothing}>
       ${this.renderColumn(
         'hour',
         'Hour',
@@ -532,6 +554,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
       part="list"
       exportparts="items, empty"
       aria-label=${this.label}
+      data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}
       ?multiple=${this.mode !== undefined}
       .value=${this.value}

@@ -279,3 +279,30 @@
 [part="column"] [part="option"]::part(item)::after {
   content: none;
 }
+/* Wrong, and the mark says so.
+ *
+ * A ring on the answer rather than a border round the surface. A flat picker is
+ * a grid or a column with no frame to turn red, and framing one to carry an
+ * error would draw a box that exists for nothing else. The field that wraps a
+ * picker already owns the message; what only the picker can do is point at the
+ * thing that is wrong, and that is the mark on the chosen value.
+ *
+ * On the same box the focus ring uses, so the two are one edge rather than two
+ * concentric ones. Input records the longer version of this: a red border inside
+ * a blue ring is the double-struck look the focus rule exists to prevent,
+ * arriving by another route. */
+:host([invalid]) [part="option"][selected]::part(item),
+:host([invalid]) [part="column"] [part="option"][selected]::part(label) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* And with nothing chosen, the surface, for the reason Calendar records at
+   length: `required` and unanswered is the commonest invalid a picker has, and
+   there is no row to ring. */
+:host([invalid]) [part="list"][data-unset],
+:host([invalid]) [part="columns"][data-unset] {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
+  outline-offset: var(--helix-size-focus-offset);
+}

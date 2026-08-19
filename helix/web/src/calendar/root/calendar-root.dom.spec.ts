@@ -421,3 +421,30 @@ describe('a day from a neighbouring month is filler', () => {
     }
   })
 })
+
+describe('an invalid calendar says so where it can be heard', () => {
+  const internals = (host: HTMLElement): ElementInternals =>
+    (host as unknown as { internals: ElementInternals }).internals
+
+  test('through internals, not an attribute the consumer never wrote', async () => {
+    const cal = await calendar('default-month="2026-08" invalid')
+    await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(internals(cal).ariaInvalid).toBe('true')
+  })
+
+  test('and the grid says when there is no day to mark', async () => {
+    /* `required` and unanswered is the commonest way a picker is invalid, and
+       there is no chosen day to ring. The tier below writes the state because
+       `:host(:not(:has(...)))` is invalid CSS and would be dropped at parse
+       time, so the styled tier cannot ask this question itself. */
+    const empty = await calendar('default-month="2026-08"')
+    await (empty as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(empty.shadowRoot?.querySelector('[part="grid"]')?.hasAttribute('data-unset')).toBe(true)
+
+    const chosen = await calendar('default-month="2026-08" default-value="2026-08-14"')
+    await (chosen as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(chosen.shadowRoot?.querySelector('[part="grid"]')?.hasAttribute('data-unset')).toBe(
+      false,
+    )
+  })
+})

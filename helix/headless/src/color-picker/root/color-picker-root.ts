@@ -5,7 +5,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
 } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* Side-effect import, because this renders `<helix-slider>` in its own shadow
    root and a custom element registers on import. The public tag rather than the
@@ -101,6 +101,19 @@ interface EyeDropperConstructor {
  */
 @customElement('helix-base-color-picker')
 export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement) {
+  /**
+   * Whether the current selection fails validation.
+   *
+   * A flag rather than a message, which is the split Calendar already drew and
+   * these two now follow. A flat picker has no room of its own for a sentence:
+   * the field that wraps one owns the label, the hint and the feedback, and a
+   * second message inside the panel would be the same error said twice. What is
+   * left for the picker is the one thing the field cannot draw from outside, the
+   * mark on the answer itself.
+   */
+  @property({ reflect: true, type: Boolean })
+  invalid = false
+
   /**
    * Whether the colour carries an alpha channel.
    *
@@ -368,6 +381,15 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
         this.move({ [channel]: Number((event as HelixChangeEvent).detail.value) })
       }}
     ></helix-slider>`
+  }
+
+  /* `ariaInvalid` on the host through `ElementInternals`, the same route
+     Calendar takes and for the reason the whole library records: a `role` or a
+     state written onto the host as an attribute is one a React consumer's
+     server markup never had. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.internals.ariaInvalid = this.invalid ? 'true' : null
   }
 
   protected override render(): TemplateResult {

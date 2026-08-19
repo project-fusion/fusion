@@ -614,7 +614,12 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
             : nothing
         }
       </div>
-      <div part="grid" role="grid" aria-label=${heading.format(month)}>
+      <div
+        part="grid"
+        role="grid"
+        aria-label=${heading.format(month)}
+        data-unset=${this.value === '' ? '' : nothing}
+      >
         <div part="week" role="row">
           ${weeks[0]?.map(
             (date) => html`<span part="weekday" role="columnheader">${weekday.format(date)}</span>`,
