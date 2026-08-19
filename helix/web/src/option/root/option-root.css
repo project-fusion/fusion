@@ -41,7 +41,11 @@
   /* The trigger's inset, which the comment claimed and the number did not: the
      trigger insets by `xs` and this by `sm`, so the chosen answer shifted
      sideways between the closed control and the row it came from. */
-  padding-inline: var(--helix-space-xs);
+  /* Through a hook, because the heading above a group reads the same one and
+     the comment below records what happens when two stylesheets each name the
+     inset themselves. A panel that wants its rows on some other column, as the
+     command palette does, now moves both by saying one thing. */
+  padding-inline: var(--option-inset, var(--helix-space-xs));
   /* A picker, not prose. Its three sibling chooseable rows all say this;
      without it, dragging across a list selects the labels. */
   user-select: none;

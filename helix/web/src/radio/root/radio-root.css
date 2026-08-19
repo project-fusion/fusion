@@ -43,7 +43,7 @@
      you put a mark in should be. Both hold in dark, where the page is black. */
   background-color: var(--radio-background-color, var(--helix-color-background));
   block-size: var(--_radio-size);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-thin) solid var(--radio-border-color, var(--helix-color-border));
   /* The one thing that makes this a radio and not a checkbox. */
   border-radius: var(--helix-radii-full);
   display: grid;
@@ -59,14 +59,17 @@
    code won. A circle that turns brand-blue on hover is the loudest thing in a
    form, and it says "recommended" about whichever option a pointer happens to
    be over. */
+/* Through the hook, so a container saying "these are wrong" is not undone by a
+   pointer passing over one of them. The fallback is what this rule has always
+   been; the hook is only ever set by something that has a reason to. */
 :host(:not([disabled])) [part="item"]:hover [part="box"] {
-  border-color: var(--helix-color-foreground-muted);
+  border-color: var(--radio-border-color, var(--helix-color-foreground-muted));
 }
 
 /* The edge firms up and takes no color, which is the checkbox's rule: color
    is reserved for state, and being chosen is an answer rather than a state. */
 :host([selected]) [part="box"] {
-  border-color: var(--helix-color-foreground);
+  border-color: var(--radio-border-color, var(--helix-color-foreground));
 }
 
 /* A dot rather than a mask, because a circle is a border radius and needs no

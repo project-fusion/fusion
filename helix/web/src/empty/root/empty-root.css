@@ -7,14 +7,6 @@
   text-align: center;
 }
 
-:host([appearance="outlined"]) {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  /* The house radius, for the reason `Card` records. The inventory taken after
-     that sweep found this and `Callout` as the only two in-flow containers left
-     on `md`. */
-  border-radius: var(--helix-radii-sm);
-}
-
 slot[name="icon"]::slotted(*) {
   /* The `lg` step, not a raw rem. It was the only hard-coded icon size in
      component CSS and the only icon in the library that did not move with

@@ -461,7 +461,7 @@ describe('input date can cap its tags', () => {
       'default-value="2026-08-04,2026-08-11,2026-08-18,2026-08-25" max-tags="2"',
     )
     expect(host.shadowRoot?.querySelectorAll('[part="date"]')).toHaveLength(2)
-    expect(part(host, 'rest')?.textContent?.trim()).toBe('2 more')
+    expect(part(host, 'rest')?.textContent?.trim()).toBe('+2')
   })
 
   test('and counts nothing when the cap is not reached', async () => {
@@ -492,7 +492,7 @@ describe('input date keeps the tag row readable', () => {
 
   test('the placeholder goes once anything is held', async () => {
     /* It exists to say what goes in an empty field. Beside two tags and a count
-       it reads as a fourth item: "August 4, August 11, 2 more, YYYY-MM-DD" is
+       it reads as a fourth item: "August 4, August 11, +2, YYYY-MM-DD" is
        four things where a reader sees one sentence. */
     const empty = await many('')
     expect(part(empty, 'control')?.getAttribute('placeholder')).toBe('YYYY-MM-DD')
@@ -507,7 +507,7 @@ describe('input date keeps the tag row readable', () => {
     const nodes = [...(part(host, 'field')?.children ?? [])]
     const at = (name: string) => nodes.findIndex((one) => one.getAttribute('part') === name)
     expect(at('control')).toBeLessThan(at('rest'))
-    expect(part(host, 'rest')?.textContent?.trim()).toBe('1 more')
+    expect(part(host, 'rest')?.textContent?.trim()).toBe('+1')
   })
 
   test('a single-date field keeps its placeholder, since nothing is held as a tag', async () => {

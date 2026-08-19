@@ -18,6 +18,27 @@ helix-dialog::part(dialog) {
   padding: var(--helix-space-none);
 }
 
+/* One text column down the whole panel.
+ *
+ * The search row is this panel's heading rather than a control inside it, so
+ * what a reader sees at the top is the word "Search commands", and every row
+ * under it should start where that word does. It did not: the field's text
+ * begins after the magnifier and the gap behind it, and the rows began at their
+ * own inset, so the panel had two left edges twenty-four pixels apart and
+ * nothing lined up with the thing at the top.
+ *
+ * Derived rather than typed, from the three lengths that actually put the word
+ * there: the row's inset, the mark, and the space after it. A number would be
+ * right until one of the three moved.
+ *
+ * It leaves the mark's column free under the field, which is where an option
+ * with an icon puts its own, so a palette with icons lines up on both columns
+ * rather than one. */
+:host {
+  --_command-inset: var(--helix-space-sm);
+  --option-inset: calc(var(--_command-inset) + var(--helix-size-icon-sm) + var(--helix-space-2xs));
+}
+
 /* The list fills the panel, which is already the surface: a second border and a
    second fill inside one would draw the shape twice. This one is in this
    element's own shadow root, so it is selected the ordinary way. */
@@ -46,7 +67,7 @@ helix-listbox::part(items) {
    one rule under it holding the results apart. */
 helix-listbox::part(search) {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  padding: var(--helix-space-sm);
+  padding: var(--_command-inset);
 }
 
 helix-listbox::part(search-field) {
@@ -62,7 +83,10 @@ helix-listbox::part(search-field) {
   display: flex;
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-sm);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  /* On the column, not on the panel's own inset. It is the last line of the
+     same panel, and left at the inset it started under the magnifier, which is
+     a third left edge on a panel that is meant to have one. */
+  padding: var(--helix-space-xs) var(--option-inset);
 }
 
 [part="footer"][hidden] {

@@ -8188,6 +8188,13 @@
             },
             {
               "kind": "field",
+              "name": "handleFieldClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Anywhere in the field opens the list, and puts the caret where typing goes.\n\nOn the field rather than on the `<input>`, which is where it was. The caret\nis a sibling of the input and so is the tag strip, so pressing the one part\nof the control that visibly says \"this opens\" did nothing at all, and a\nreader who wanted the list had to find the text box. Anything drawn inside\nthe field is the field.\n\nA tag is the exception, because a tag is its own control: its dismiss\nremoves a choice, and opening the list on the way past would leave the\nreader looking at a panel they did not ask for. Read from the composed\npath, since the press lands on a button inside the tag's shadow root and\nthe event has retargeted by the time it arrives here.\n\nIt only ever opens. Closing is Escape, a choice, or leaving, which is what\nthe input already did and what a text field wants: a control that closed\nwhen you clicked into the middle of your own typing would be unusable."
+            },
+            {
+              "kind": "field",
               "name": "handleDismiss",
               "privacy": "private",
               "readonly": true,

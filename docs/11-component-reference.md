@@ -800,6 +800,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 | `--checkbox-size` | Width and height of the box. |
 | `--checkbox-checked-color` | Fill of a ticked box. |
 | `--checkbox-background-color` | Fill of an unticked box. |
+| `--checkbox-border-color` | Edge of the box, in every state. |
 | `--checkbox-mark-color` | Ink the tick is drawn in. |
 | `--checkbox-card-padding` | Inset of the card appearance. |
 | `--checkbox-card-background-color` | Fill behind a card-shaped choice. |
@@ -1836,7 +1837,6 @@ empty.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'outlined' \| undefined` | - | - | Whether the state sits on a surface of its own. |
 | `noAnnounce` | `no-announce` | `boolean` | `false` | `HelixBaseEmpty` | Whether the state is announced when it appears. |
 
 #### Slots
@@ -2813,6 +2813,7 @@ picked from what they are looking at.
 
 | Property | Description |
 | --- | --- |
+| `--option-inset` | Space before the label, shared with a group heading. |
 | `--option-active-color` | Wash behind the option the keyboard is on. |
 | `--option-radii` | Corner radius of the row. A listbox and a select flatten it. |
 
@@ -3377,6 +3378,7 @@ and being chosen is an answer rather than a state.
 | `--radio-size` | Diameter of the circle. |
 | `--radio-mark-color` | Color of the dot. |
 | `--radio-background-color` | Fill of an unselected circle. |
+| `--radio-border-color` | Edge of the circle, in every state. |
 | `--radio-card-padding` | Inset of the card appearance. |
 | `--radio-card-background-color` | Fill behind a card-shaped choice. |
 | `--radio-card-border-color` | Edge around one. |

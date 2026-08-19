@@ -6080,6 +6080,10 @@
               "name": "--checkbox-background-color"
             },
             {
+              "description": "Edge of the box, in every state.",
+              "name": "--checkbox-border-color"
+            },
+            {
               "description": "Ink the tick is drawn in.",
               "name": "--checkbox-mark-color"
             },
@@ -11021,6 +11025,17 @@
               "privacy": "private",
               "readonly": true,
               "description": "Takes what the list announced and stops it there.\n\nThe listbox says `helix-change` under its own name, and a consumer\nlistening on this element would otherwise hear two changes for one choice,\none of them naming a control they did not put on the page.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFieldClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Anywhere in the field opens the list, and puts the caret where typing goes.\n\nOn the field rather than on the `<input>`, which is where it was. The caret\nis a sibling of the input and so is the tag strip, so pressing the one part\nof the control that visibly says \"this opens\" did nothing at all, and a\nreader who wanted the list had to find the text box. Anything drawn inside\nthe field is the field.\n\nA tag is the exception, because a tag is its own control: its dismiss\nremoves a choice, and opening the list on the way past would leave the\nreader looking at a panel they did not ask for. Read from the composed\npath, since the press lands on a button inside the tag's shadow root and\nthe event has retargeted by the time it arrives here.\n\nIt only ever opens. Closing is Escape, a choice, or leaving, which is what\nthe input already did and what a text field wants: a control that closed\nwhen you clicked into the middle of your own typing would be unusable.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -18541,16 +18556,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | undefined"
-              },
-              "description": "Whether the state sits on a surface of its own.",
-              "attribute": "appearance",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "noAnnounce",
               "type": {
                 "text": "boolean"
@@ -18634,29 +18639,6 @@
               }
             }
           ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'outlined' | undefined"
-              },
-              "description": "Whether the state sits on a surface of its own.",
-              "fieldName": "appearance"
-            },
-            {
-              "name": "no-announce",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
-              "fieldName": "noAnnounce",
-              "inheritedFrom": {
-                "name": "HelixBaseEmpty",
-                "module": "src/empty/root/empty-root.ts"
-              }
-            }
-          ],
           "superclass": {
             "name": "HelixBaseEmpty",
             "package": "@helix-io/headless"
@@ -18678,9 +18660,6 @@
             "examples": [
               {
                 "slug": "default"
-              },
-              {
-                "slug": "outlined"
               }
             ],
             "source": "helix/web/src/empty"
@@ -18715,6 +18694,21 @@
             {
               "description": "The way out.",
               "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseEmpty",
+                "module": "src/empty/root/empty-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "no-announce",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the state is announced when it appears.\n\nOn by default: an empty view almost always replaces something that was\nloading. Turn it off for one that was on the page from the start, which\nhas nothing to announce because nothing changed.",
+              "fieldName": "noAnnounce",
               "inheritedFrom": {
                 "name": "HelixBaseEmpty",
                 "module": "src/empty/root/empty-root.ts"
@@ -29603,6 +29597,10 @@
           "name": "HelixOption",
           "cssProperties": [
             {
+              "description": "Space before the label, shared with a group heading.",
+              "name": "--option-inset"
+            },
+            {
               "description": "Wash behind the option the keyboard is on.",
               "name": "--option-active-color"
             },
@@ -36173,6 +36171,10 @@
             {
               "description": "Fill of an unselected circle.",
               "name": "--radio-background-color"
+            },
+            {
+              "description": "Edge of the circle, in every state.",
+              "name": "--radio-border-color"
             },
             {
               "description": "Inset of the card appearance.",

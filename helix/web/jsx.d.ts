@@ -14807,6 +14807,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
    * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
@@ -23089,6 +23090,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
    * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
@@ -27371,6 +27373,8 @@ export type CustomCssProperties = {
   "--navigation-indicator-color"?: string;
   /** Space between destinations. */
   "--navigation-gap"?: string;
+  /** Space before the label, shared with a group heading. */
+  "--option-inset"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */

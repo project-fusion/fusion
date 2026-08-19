@@ -84,7 +84,7 @@
      you put a mark in should be. Both hold in dark, where the page is black. */
   background-color: var(--checkbox-background-color, var(--helix-color-background));
   block-size: var(--_checkbox-size);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-thin) solid var(--checkbox-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   cursor: inherit;
   inline-size: var(--_checkbox-size);
@@ -100,8 +100,11 @@
    code disagreed and the code won, and a box that turns brand-blue under a
    pointer says "recommended" about whichever one it happens to be over. Same
    correction `Radio` took. */
+/* Through the hook, so a container saying "these are wrong" is not undone by a
+   pointer passing over one of them. The fallback is what this rule has always
+   been; the hook is only ever set by something that has a reason to. */
 :host(:not(:disabled)) [part="field"]:hover [part="control"] {
-  border-color: var(--helix-color-foreground-muted);
+  border-color: var(--checkbox-border-color, var(--helix-color-foreground-muted));
 }
 
 /* No color, which is the same rule the segmented control's thumb follows:
@@ -115,7 +118,10 @@
    because it means "some", not "neither". */
 :host([data-checked]) [part="control"],
 :host([indeterminate]) [part="control"] {
-  border-color: var(--checkbox-checked-color, var(--helix-color-foreground));
+  border-color: var(
+    --checkbox-border-color,
+    var(--checkbox-checked-color, var(--helix-color-foreground))
+  );
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours.
@@ -263,10 +269,22 @@
   border-color: var(--helix-color-foreground-muted);
 }
 
-/* Lifted rather than colored, which is the rule the tick already follows. */
+/* Chosen, and it looks exactly like a chosen radio card.
+ *
+ * The two appearances sit in the same forms and often on the same page, and a
+ * set of one kind beside a set of the other has to read as the same control
+ * answering a different question. This had the lift and the primary edge and
+ * not the ring, so a chosen checkbox card was a quieter thing than a chosen
+ * radio card for no reason anybody could name from looking at it.
+ *
+ * See the radio's note for why the ring is drawn rather than the border
+ * widened: three pixels is a 1px border with two more laid outside it by
+ * `box-shadow`, so nothing about the card's box moves when it is chosen and a
+ * column of them does not jump as the answer changes. */
 :host([appearance="card"][data-checked]) [part="field"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
 }
 
 /* The ring goes on the card, because the card is the target. It cannot go on

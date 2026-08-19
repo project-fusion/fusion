@@ -141,8 +141,8 @@ export {
 export type { ConventionLintOptions }
 export {
   composition,
-  conventionLint,
   controlledProps,
+  conventionLint,
   declaredEvents,
   examples,
   helixTier,

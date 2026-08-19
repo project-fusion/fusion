@@ -80,6 +80,11 @@
    nothing under it moves when the message arrives. */
 [part="feedback"] {
   color: var(--helix-color-danger);
+  /* A step up from the hint it replaces. The two occupy one line and swap, so
+     weight is the only thing left to separate them: color already carries the
+     danger, and at `text-xs` a red line in the same weight as every other note
+     on the form reads as another note. */
+  font-weight: var(--helix-weight-medium);
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`.

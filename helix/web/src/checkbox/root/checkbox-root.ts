@@ -26,6 +26,7 @@ import { styles } from './checkbox-root.css.js'
  * @cssproperty --checkbox-size - Width and height of the box.
  * @cssproperty --checkbox-checked-color - Fill of a ticked box.
  * @cssproperty --checkbox-background-color - Fill of an unticked box.
+ * @cssproperty --checkbox-border-color - Edge of the box, in every state.
  * @cssproperty --checkbox-mark-color - Ink the tick is drawn in.
  * @cssproperty --checkbox-card-padding - Inset of the card appearance.
  * @cssproperty --checkbox-card-background-color - Fill behind a card-shaped choice.

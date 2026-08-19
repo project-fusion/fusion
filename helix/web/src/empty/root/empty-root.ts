@@ -1,7 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseEmpty } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './empty-root.css.js'
 
 /**
@@ -22,10 +21,6 @@ import { styles } from './empty-root.css.js'
  */
 @customElement('helix-empty')
 export class HelixEmpty extends HelixBaseEmpty {
-  /** Whether the state sits on a surface of its own. */
-  @property({ reflect: true })
-  appearance?: 'outlined'
-
   static override styles: CSSResultGroup = styles
 }
 

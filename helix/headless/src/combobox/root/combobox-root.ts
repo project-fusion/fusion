@@ -490,6 +490,42 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     }
   }
 
+  /**
+   * Anywhere in the field opens the list, and puts the caret where typing goes.
+   *
+   * On the field rather than on the `<input>`, which is where it was. The caret
+   * is a sibling of the input and so is the tag strip, so pressing the one part
+   * of the control that visibly says "this opens" did nothing at all, and a
+   * reader who wanted the list had to find the text box. Anything drawn inside
+   * the field is the field.
+   *
+   * A tag is the exception, because a tag is its own control: its dismiss
+   * removes a choice, and opening the list on the way past would leave the
+   * reader looking at a panel they did not ask for. Read from the composed
+   * path, since the press lands on a button inside the tag's shadow root and
+   * the event has retargeted by the time it arrives here.
+   *
+   * It only ever opens. Closing is Escape, a choice, or leaving, which is what
+   * the input already did and what a text field wants: a control that closed
+   * when you clicked into the middle of your own typing would be unusable.
+   */
+  private readonly handleFieldClick = (event: MouseEvent): void => {
+    if (this.isDisabled) {
+      return
+    }
+    if (
+      event
+        .composedPath()
+        .some((node) => node instanceof HTMLElement && node.localName === 'helix-tag')
+    ) {
+      return
+    }
+    this.renderRoot.querySelector<HTMLElement>('[part="control"]')?.focus()
+    if (!this.open) {
+      this.requestOpen(true)
+    }
+  }
+
   /** One tag asking to be taken out of the set. */
   private readonly handleDismiss = (event: Event): void => {
     event.stopPropagation()
@@ -546,7 +582,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
 
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
-      <div part="field">
+      <div part="field" @click=${this.handleFieldClick}>
         <slot name="start"></slot>
         ${
           this.multiple && this.chosen.length > 0
@@ -581,7 +617,6 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
-          @click=${() => !this.isDisabled && !this.open && this.requestOpen(true)}
         />
         <slot name="end"></slot>
         <slot name="indicator">
