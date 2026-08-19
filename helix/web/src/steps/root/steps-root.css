@@ -22,6 +22,14 @@
   gap: var(--steps-gap, var(--helix-space-md));
 
   --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
+  /* The square the mark occupies, which is not always the glyph's own size.
+     Beside the name the mark shares a row with a dense button, and a twenty
+     pixel glyph aligned to the top of a thirty-two pixel control sits six
+     pixels above the first line of the name. Giving the mark the button's box
+     and centring the glyph in it puts the two middles together. Every line
+     offset is measured from this box rather than from the glyph, so the rule
+     meets the mark wherever the two differ. */
+  --_steps-mark-box: var(--_steps-m);
   --_steps-columns: minmax(0, 1fr);
   --_steps-marker-column: 1;
   --_steps-marker-justify: center;
@@ -29,27 +37,28 @@
   --_steps-body-row: 2;
   --_steps-body-align: center;
   --_steps-content: none;
+  --_steps-row-gap: var(--helix-space-xs);
 
   --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
   --_steps-lead-inline-size: calc(
     50% +
     var(--steps-gap, var(--helix-space-md)) /
     2 -
-    var(--_steps-m) /
+    var(--_steps-mark-box) /
     2
   );
-  --_steps-lead-block-start: calc(var(--_steps-m) / 2);
+  --_steps-lead-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-block-size: var(--helix-border-thin);
   --_steps-trail-display: block;
-  --_steps-trail-inline-start: calc(50% + var(--_steps-m) / 2);
+  --_steps-trail-inline-start: calc(50% + var(--_steps-mark-box) / 2);
   --_steps-trail-inline-size: calc(
     50% +
     var(--steps-gap, var(--helix-space-md)) /
     2 -
-    var(--_steps-m) /
+    var(--_steps-mark-box) /
     2
   );
-  --_steps-trail-block-start: calc(var(--_steps-m) / 2);
+  --_steps-trail-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-trail-block-size: var(--helix-border-thin);
 }
 
@@ -67,11 +76,13 @@
    drawing of this arrangement, and it is why the names go underneath by
    default. */
 :host([labels="beside"]) {
+  --_steps-mark-box: var(--helix-size-control-sm);
   --_steps-columns: auto minmax(0, 1fr);
   --_steps-marker-justify: start;
   --_steps-body-column: 2;
   --_steps-body-row: 1;
   --_steps-body-align: start;
+  --_steps-row-gap: var(--helix-space-2xs);
   --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) * -1);
   --_steps-lead-inline-size: var(--steps-gap, var(--helix-space-md));
   --_steps-trail-display: none;
@@ -84,6 +95,7 @@
 :host([orientation="vertical"]) {
   flex-direction: column;
 
+  --_steps-mark-box: var(--helix-size-control-sm);
   --_steps-columns: auto minmax(0, 1fr);
   --_steps-marker-justify: start;
   --_steps-body-column: 2;
@@ -91,17 +103,17 @@
   --_steps-body-align: start;
   --_steps-content: grid;
 
-  --_steps-lead-inline-start: calc(var(--_steps-m) / 2);
+  --_steps-lead-inline-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-inline-size: var(--helix-border-thin);
   --_steps-lead-block-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
   --_steps-lead-block-size: calc(var(--steps-gap, var(--helix-space-md)) / 2);
   --_steps-trail-display: block;
-  --_steps-trail-inline-start: calc(var(--_steps-m) / 2);
+  --_steps-trail-inline-start: calc(var(--_steps-mark-box) / 2);
   --_steps-trail-inline-size: var(--helix-border-thin);
-  --_steps-trail-block-start: var(--_steps-m);
+  --_steps-trail-block-start: var(--_steps-mark-box);
   --_steps-trail-block-size: calc(
     100% -
-    var(--_steps-m) +
+    var(--_steps-mark-box) +
     var(--steps-gap, var(--helix-space-md)) /
     2
   );

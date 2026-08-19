@@ -13,7 +13,7 @@
   grid-template-columns: var(--_steps-columns, auto minmax(0, 1fr));
   min-inline-size: 0;
   position: relative;
-  row-gap: var(--helix-space-2xs);
+  row-gap: var(--_steps-row-gap, var(--helix-space-2xs));
 
   --_step-marker: var(--steps-marker-size, var(--helix-size-control-sm));
 }
@@ -80,7 +80,7 @@
  * genuinely needs one: a bare "3" beside a name is a number in a sentence. */
 [part="marker"] {
   align-items: center;
-  block-size: var(--_steps-m, var(--helix-size-icon));
+  block-size: var(--_steps-mark-box, var(--helix-size-icon));
   box-sizing: border-box;
   color: var(--_steps-marker-color, var(--helix-color-border));
   font-family: var(--helix-font-sans);
@@ -88,7 +88,7 @@
   font-weight: var(--helix-weight-semibold);
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--_steps-m, var(--helix-size-icon));
+  inline-size: var(--_steps-mark-box, var(--helix-size-icon));
   justify-content: center;
   /* Over the halves, which run under it to its own edges. */
   position: relative;
@@ -125,10 +125,10 @@
 }
 
 [part="marker"] svg {
-  block-size: 100%;
+  block-size: var(--_steps-m, var(--helix-size-icon));
   display: var(--_steps-mark, inline);
   flex: 0 0 auto;
-  inline-size: 100%;
+  inline-size: var(--_steps-m, var(--helix-size-icon));
 }
 
 slot[name="marker"]::slotted(*) {
@@ -180,49 +180,43 @@ slot[name="marker"]::slotted(*) {
   z-index: 1;
 }
 
-/* The name, which is the button.
+/* The name, which is a `helix-button` rather than a `<button>` reset here.
  *
- * `all: unset` takes `box-sizing` with it, back to `content-box`, and the
- * `border-box` every shadow root is given comes from a rule this one outranks,
- * so it is restored in the same place. Four components were missing that and
- * overflowed their own boxes by exactly their padding.
+ * What is left to say is only what a step needs that a button has no view on:
+ * how tall it is, and that its text is the step's size rather than a control's.
+ * The hover wash, the focus ring, the disabled treatment and the pressed state
+ * all arrive with it. The rules this file used to carry for those are gone, and
+ * so is the `all: unset` that made them necessary.
  *
- * A floor of the marker's height so the first line of the name sits against the
- * middle of the marker beside it, whatever a description underneath adds. The
- * step aligns to `flex-start`, which is what keeps the marker's centre a known
- * distance from the top for the connector to meet. */
+ * `--helix-size-control` down to the mark's own size, so the first line of the
+ * name sits against the middle of the mark beside it. A control-height button
+ * would put its text ten pixels below the mark and leave the rule meeting
+ * nothing. Set on the button rather than as a density on the step, because it
+ * is this one control being fitted to a mark and not a region being made
+ * dense. */
 [part="label"] {
-  all: unset;
-  align-items: center;
-  box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
-  min-block-size: var(--_step-marker);
-  text-align: start;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
-}
+  /* Dense, said in the properties density is made of rather than with a
+     `data-density` attribute. That attribute is matched by a rule in the base
+     layer, which is a document rule and cannot reach an element inside a shadow
+     root: written here it would set nothing at all.
 
-[part="label"]:focus-visible {
-  border-radius: var(--helix-radii-sm);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+     The text stays at `sm` rather than following density down to `xs`, because
+     this is a name a reader is meant to read across a row and not a label on a
+     control. */
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-space-control: var(--helix-space-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-text-control: var(--helix-text-sm);
+  --button-foreground-color: var(--helix-color-foreground-muted);
+
+  max-inline-size: 100%;
 }
 
 /* The stage the reader is in reads at full strength, and so does one they have
    been through; the ones ahead recede. */
 :host([complete]) [part="label"],
 :host([current]) [part="label"] {
-  color: var(--helix-color-foreground);
-}
-
-:host([disabled]) [part="label"] {
-  cursor: not-allowed;
+  --button-foreground-color: var(--helix-color-foreground);
 }
 
 :host([disabled]) [part="marker"],
@@ -271,25 +265,4 @@ slot[name="marker"]::slotted(*) {
   [part="marker"] {
     transition: none;
   }
-}
-
-/* The wash is the button's, and the button is the name.
- *
- * On the host first, on the reasoning that a reader points at the stage rather
- * than at three words of it. Wrong, and visibly: a block behind the mark, the
- * name and the description says the whole step is the control, which is the
- * one thing this component is careful not to say. What is pressable and what
- * lights up have to be the same shape.
- *
- * `box-shadow` with a spread rather than padding. Padding would indent the name
- * from the description under it, and in a column it would grow the step, which
- * every line offset here is measured against: the trailing half is the step's
- * own height less the mark. A spread paints outside the box and costs the
- * layout nothing. */
-:host(:not([disabled])) [part="label"]:hover {
-  background-color: var(--steps-hover-color, var(--helix-color-surface-sunken));
-  border-radius: var(--helix-radii-sm);
-  box-shadow: 0 0 0 var(--helix-space-2xs)
-    var(--steps-hover-color, var(--helix-color-surface-sunken));
-  color: var(--helix-color-foreground);
 }

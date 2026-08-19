@@ -108,12 +108,16 @@ describe('a step is pressable, and only its name is', () => {
     return step
   }
 
-  test('the button is the name, not the marker beside it', async () => {
-    /* The marker is `aria-hidden` decoration, so wrapping it would add hit area
-       and no meaning: the accessible name is the text either way. */
+  test('the button is the name, and it is the library’s own button', async () => {
+    /* `helix-button` rather than a `<button>` reset here: the hover wash, the
+       focus ring and the disabled treatment are decisions it already carries,
+       and a second copy of them is a second copy to keep in step.
+       The marker is `aria-hidden` decoration and stays outside it, so wrapping
+       it would add hit area and no meaning. */
     const step = await one('value="pay"')
     const label = part(step, 'label') as HTMLElement
-    expect(label.tagName).toBe('BUTTON')
+    expect(label.tagName).toBe('HELIX-BUTTON')
+    expect(label.getAttribute('appearance')).toBe('tertiary')
     expect(step.shadowRoot?.querySelector('[part="marker"]')?.tagName).toBe('SPAN')
   })
 

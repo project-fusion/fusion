@@ -3115,6 +3115,341 @@ group keeps its question above the row rather than beside the first choice.
 | --- | --- |
 | `--radio-group-gap` | Space between the choices. |
 
+## Sandbox
+
+### Root — `helix-sandbox`
+
+Pairs an editable source pane with a live preview.
+
+Extends `HelixElement`.
+
+Coordination is by event, the same way the accordion does it: a source pane
+dispatches `SourceChange`, which bubbles, and the sandbox hands the value to
+whatever preview is slotted into it. Neither child knows the other exists, so
+either can be replaced or used alone.
+
+The event carries the pane's `name`, which is what lets one sandbox hold
+several panes without the root identifying senders by reference. `html` is
+the preview's markup and `css` is its stylesheet. A pane named anything else
+is showing something rather than driving it, and is ignored: the sandbox has
+a pane rendering the example as JSX, and guessing would have put the text of
+a React component into the preview.
+
+**The dividers are two nested `helix-splitter`s, not a grid this element
+drags itself.** It had its own: a five row grid, a stylesheet written to on
+every pointer move, three pointer handlers, a keyboard handler reading which
+axes each divider was allowed to move, and a corner placed by hand into the
+cell where two tracks met. All of it is the splitter's now, including the
+corner, which arrives on its own wherever a nested splitter crosses the one it
+is in.
+
+The panes are the inner splitter and the panel is the outer one, which is the
+order that makes the panel span the full width: the outer divider runs edge to
+edge and the inner stops at it.
+
+**Both are controlled from here, so `split` and `panel-size` stay the truth.**
+A splitter that owned its own position would leave this element reporting one
+arrangement and showing another, and a consumer restoring a saved layout
+writes to these two properties. Each splitter announces where it wants to go
+and this answers, which is the same contract a form control has with a
+framework.
+
+**The panel is in pixels here and a percentage in the splitter, and the
+conversion belongs here.** A terminal wants a number of lines rather than a
+share of the window, so its height should not change when the window does. A
+splitter has no business knowing that, so it stays percentage-pure and this
+element, which does know what is in the panel, holds the box and converts.
+That is also what keeps a stored `panelSize` from a previous visit meaning
+what it meant when it was written.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cornerLabel` | `corner-label` | `string` | `'Resize panes and panel'` | - | Accessible name for the divider that moves both at once. |
+| `lead` | `lead` | `'source' \| 'preview'` | `'source'` | - | Which pane comes first, before the divider. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | - | Whether the panes sit side by side or stacked. |
+| `panelCollapsedSize` | `panel-collapsed-size` | `number` | `0` | - | What the panel's height becomes when it is closed. |
+| `panelLabel` | `panel-label` | `string` | `'Resize panel'` | - | Accessible name for the panel's divider. |
+| `panelSize` | `panel-size` | `number` | `160` | - | Height of the panel, in pixels. |
+| `separatorLabel` | `separator-label` | `string` | `'Resize source pane'` | - | Accessible name for the divider. |
+| `split` | `split` | `number` | `50` | - | Percentage of the sandbox given to the source pane. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when a divider is let go, with the new arrangement. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `source` | The editable source pane. First unless `lead` says otherwise. |
+| `preview` | The live preview. Second unless `lead` says otherwise. |
+| `toolbar` | A bar across the top, spanning both panes. |
+| `panel` | A panel under both panes, usually a terminal. |
+| `status` | A status bar, spanning both panes at the bottom. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `body` | The splitter holding the panes above the panel. |
+| `corner` | The handle where the two dividers cross. |
+| `pane` | Either pane. |
+| `panel` | The box holding whatever was slotted as the panel. |
+| `panes` | The splitter holding the source and preview panes. |
+| `separator` | Either divider. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--sandbox-min-block-size` | Minimum height of the sandbox. |
+| `--sandbox-separator-color` | Color of the divider. |
+
+### Preview — `helix-sandbox-preview`
+
+Renders sandbox source in a frame of its own.
+
+Extends `HelixElement`.
+
+A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
+provides. That document imports whatever the examples need, listens for a
+render message, and writes the markup into itself.
+
+**A frame rather than the page.** Rendering into the page meant an example
+was styled by whatever surrounded it, which flatters the preview and lies
+about it: an example that restyles `helix-card` restyled the sandbox too, a
+script in an example ran against the real document, and a stray
+`position: fixed` escaped the pane. It also left nothing to capture console
+output from, and the terminal has to come from somewhere.
+
+The cost is that the frame starts empty. Styles and element definitions do
+not cross into it, because a document has its own stylesheets and a window
+has its own custom element registry, so `src` has to load them. That is the
+consumer's document rather than something guessed at here.
+
+**The source is not trusted, and the frame is what makes that safe.**
+`allow="clipboard-write *"` is granted explicitly, and the star matters: the
+policy defaults to `self` and this frame has an opaque origin, so it is not
+`self` and the default denies it. A component inside the preview that copies
+to the clipboard is otherwise a control that silently does nothing, which is
+how this was found. Nothing else is granted, and a copy still needs the
+reader's own gesture.
+
+`sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
+an opaque origin: script in an example cannot reach this page, its storage,
+its cookies, or the editor the source was typed into. Without it they could,
+measured, through an `onerror` handler on an image that fails to load, which
+`innerHTML` does not strip the way it refuses a `<script>` tag.
+
+That is what lets a sandbox hold markup a reader pasted from somewhere, or
+one day arrived in a shared link, rather than only what its owner typed.
+
+`allow-forms` is granted because examples have forms in them and a submit
+that silently does nothing is a worse lie than one that navigates a frame
+nobody is looking at. Top-level navigation, popups and modals are not.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `direction` | `direction` | `'rtl' \| undefined` | - | - | Writing direction inside the frame. |
+| `label` | `label` | `string` | `'Preview'` | - | Accessible name for the frame. |
+| `layout` | `layout` | `'padded' \| 'centered' \| 'fullscreen' \| undefined` | - | - | How the example is placed in the frame. |
+| `source` | `source` | `string` | `''` | - | Markup to render. |
+| `src` | `src` | `string` | `''` | - | Document the frame loads, which brings the styles and the elements. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `reload()` | - | Loads the frame's document again, and re-sends the example to it. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-console` | `HelixConsoleEvent` | Relayed from the frame, one per console call. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `frame` | The iframe. |
+
+### Source — `helix-sandbox-source`
+
+Editable source for a sandbox preview.
+
+Extends `HelixElement`.
+
+A real `<textarea>`, not a contenteditable div with a syntax highlighter over
+it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
+reader support all come from the platform, and every one of them is
+expensive to rebuild and easy to get subtly wrong.
+
+Tab inserts two spaces rather than leaving the field, because a code pane
+that cannot indent is not one. Escape then Tab still moves focus out, which
+is the documented escape hatch for exactly this trade.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `fieldLabel` | `field-label` | `string` | `'Example source'` | - | Accessible name for the editable region. |
+| `name` | `name` | `string` | `'html'` | - | Which source this pane holds, echoed in every `SourceChange`. |
+| `tabIndents` | `tab-indents` | `boolean` | `true` | - | Whether Tab indents rather than moving focus. |
+| `value` | `value` | `string` | `''` | - | The source being edited. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the source is edited. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `source` | The editable region. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--sandbox-source-background` | Fill behind the source. |
+| `--sandbox-source-min-block-size` | Minimum height of the pane. |
+
+### Status Bar — `helix-sandbox-status-bar`
+
+Reports where the cursor is and what is being edited.
+
+Extends `HelixElement`.
+
+Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
+on every keystroke and every arrow press, the sandbox hears it and writes the
+position here. Nothing about that reaches the consumer's framework, which is
+the point. A caret position routed through React state would re-render the
+workbench on every cursor move, to update two numbers.
+
+**Not a live region.** The readout changes on every keystroke, so announcing
+it would talk over the reader continuously while they type. It is text they
+can navigate to, which is what a status bar is in every editor that has one.
+
+A readout with nothing to say is not rendered at all rather than rendered
+empty, or the bar keeps a gap where a value is not.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `column` | `column` | `number \| undefined` | - | - | One-based column of the cursor. Absent shows no readout. |
+| `language` | `language` | `string \| undefined` | - | - | The language being edited, as a name or one the editor knows. |
+| `line` | `line` | `number \| undefined` | - | - | One-based line of the cursor. Absent shows no readout. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | Items at the start of the bar. |
+| `end` | Items after the readouts, at the end of the bar. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `caret` | The line and column readout. |
+| `language` | The language readout. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--status-bar-color` | Color of the bar's text. |
+
+### Terminal — `helix-sandbox-terminal`
+
+Shows what the previewed example wrote to the console.
+
+Extends `HelixElement`.
+
+Fed by the sandbox, which hears `helix-console` from the preview and hands it
+here. The preview is a separate document, so what arrives has already crossed
+`postMessage`: text, not values.
+
+**Repeats collapse.** An example with a render loop can write the same
+warning hundreds of times, and two hundred identical lines say nothing that
+one line and a count does not. Only consecutive repeats collapse, so the
+order of what happened survives.
+
+A `role="log"` rather than a live region by hand. It is the semantic for an
+append-only stream, and it means a reader is told about new output without
+the whole panel being re-announced each time.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `emptyLabel` | `empty-label` | `string` | `'Nothing written to the console yet.'` | - | What to show before anything has been written. |
+| `label` | `label` | `string` | `'Console output'` | - | Accessible name for the log. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `clear()` | - | Empties the log. |
+| `write()` | - | Adds a line, collapsing it into the one above when they are identical. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `log` | The scrolling region. |
+| `entry` | One line. |
+| `level` | The level a line came in at. |
+| `message` | The text of a line. |
+| `count` | How many times a repeated line arrived. |
+| `empty` | Shown while nothing has been written. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--terminal-size` | Height of the scrolling region. |
+
+### Toolbar — `helix-sandbox-toolbar`
+
+The bar across the top of a sandbox.
+
+Extends `HelixElement`.
+
+Spans the source pane and the preview together, so what it holds is about the
+sandbox rather than about one side of it. The files go at the start and the
+menus at the end, which is the arrangement every editor has settled on.
+
+**Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
+for the whole group, and it is for a set of controls of the same kind. This
+holds a tab list, which owns its own arrow-key behavior and would lose it.
+Use `helix-toolbar` where the contents really are a row of buttons.
+
+Both slots are bare, so an unfilled one generates no box and costs no gap.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | Items at the start, usually the files. |
+| `end` | Items at the end, usually menus. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--toolbar-gap` | Space between items. |
+
 ## Select
 
 ### Root — `helix-select`
@@ -3491,6 +3826,11 @@ The numbering is a CSS counter rather than a property, so a step's position
 is drawn by the browser at layout and is right in the server's markup with no
 script involved. Reordering the steps renumbers them; nothing has to be told.
 
+A step's name is a `helix-button`, so what it looks like under the pointer,
+with focus, and when refused are Button's decisions and Button's hooks. There
+is no `--steps-hover-color`: `--button-background-color` is that hook, and a
+second name for it here would be a second thing to keep in step.
+
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
@@ -3513,7 +3853,6 @@ script involved. Reordering the steps renumbers them; nothing has to be told.
 | `--steps-gap` | Space between one step and the next. |
 | `--steps-marker-size` | Size of the mark, glyph or digit. |
 | `--steps-connector-color` | The rule running through the steps. |
-| `--steps-hover-color` | Wash behind a step under the pointer. |
 | `--steps-complete-color` | The mark on a finished step. |
 | `--steps-current-color` | The mark on the current step. |
 
@@ -3559,7 +3898,7 @@ Extends `HelixBaseStep`.
 | --- | --- |
 | `marker` | The shape carrying the number or the check. |
 | `body` | The name and its description. |
-| `label` | The step's name, which is the button. |
+| `label` | The step's name, which is a `helix-button`. |
 | `description` | The line under it. |
 | `lead` | The half line arriving from the step before. |
 | `trail` | The half line running on to the next. |

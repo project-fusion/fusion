@@ -3,6 +3,11 @@ import { checkCircleFill, circle, record } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+/* Side-effect import, because this renders `<helix-button>` and a custom element
+   registers on import. The public tag rather than the base one: a consumer on the
+   styled tier gets the styled button, and one on the headless tier brings a button
+   of their own under that name. `check:composed` enforces it, in both tiers. */
+import '../../button/index.js'
 
 /**
  * @summary One stage in a sequence.
@@ -13,6 +18,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * marker is `aria-hidden` decoration, so wrapping it in the button would add
  * hit area and no meaning: the accessible name would be the text either way,
  * and what is pressable would stop being the same shape as what is readable.
+ *
+ * It is `helix-button`, not a `<button>` this element resets and dresses. The
+ * hover wash, the focus ring, the disabled treatment and the way the label sits
+ * against an icon are all decisions the button already carries, and a second
+ * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+ * shape: transparent until it is pointed at.
  *
  * It says nothing about where a reader may go. Every step is pressable and
  * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
@@ -62,7 +73,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart marker - The shape carrying the number or the check.
  * @csspart body - The name and its description.
- * @csspart label - The step's name, which is the button.
+ * @csspart label - The step's name, which is a `helix-button`.
  * @csspart description - The line under it.
  * @csspart lead - The half line arriving from the step before.
  * @csspart trail - The half line running on to the next.
@@ -133,9 +144,14 @@ export class HelixBaseStep extends HelixElement {
         <slot name="marker">${this.mark}</slot>
       </span>
       <span part="body">
-        <button part="label" type="button" ?disabled=${this.disabled} @click=${this.select}>
+        <helix-button
+          part="label"
+          appearance="tertiary"
+          ?disabled=${this.disabled}
+          @click=${this.select}
+        >
           <slot></slot>
-        </button>
+        </helix-button>
         <span part="description"><slot name="description"></slot></span>
       </span>
       <div part="content"><slot name="content"></slot></div>`
