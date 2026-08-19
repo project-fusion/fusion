@@ -8178,6 +8178,28 @@ Anything under five is a thousand rows and wants a field instead. */
   min?: HelixTime["min"];
   /** Latest time offered, as `HH:mm`. */
   max?: HelixTime["max"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "disable-times"?: HelixTime["disableTimes"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  disableTimes?: HelixTime["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
   locale?: HelixTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -8286,6 +8308,28 @@ Anything under five is a thousand rows and wants a field instead. */
   "prop:min"?: HelixTime["min"];
   /** Latest time offered, as `HH:mm`. */
   "prop:max"?: HelixTime["max"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "attr:disable-times"?: HelixTime["disableTimes"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "prop:disableTimes"?: HelixTime["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
   "prop:locale"?: HelixTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -14530,7 +14574,7 @@ export type CustomElements = {
    * - `--splitter-color`: The line between the panes. (default: `undefined`)
    * - `--splitter-corner`: How wide the handle at a crossing is. (default: `undefined`)
    * - `--splitter-drag-color`: The line while it is being moved. (default: `undefined`)
-   * - `--splitter-grip-color`: The grip beside the line, at rest. (default: `undefined`)
+   * - `--splitter-grip-color`: The grip beside the line, once it is shown. (default: `undefined`)
    * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
@@ -15332,6 +15376,16 @@ export type CustomElements = {
    * Anything under five is a thousand rows and wants a field instead.
    * - `min`: Earliest time offered, as `HH:mm`.
    * - `max`: Latest time offered, as `HH:mm`.
+   * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
+   *
+   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * shape of problem: `min` and `max` take away a span, and what a booking
+   * usually has to take away is a scatter. A morning with 09:30 and 11:00
+   * already gone is not two bounds.
+   *
+   * A time not on the step is simply never offered, so it is not an error to
+   * name one, and naming every time in the list is how the empty state is
+   * reached honestly rather than by handing over an empty range.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.
@@ -21689,7 +21743,7 @@ export type CustomElementsSolidJs = {
    * - `--splitter-color`: The line between the panes. (default: `undefined`)
    * - `--splitter-corner`: How wide the handle at a crossing is. (default: `undefined`)
    * - `--splitter-drag-color`: The line while it is being moved. (default: `undefined`)
-   * - `--splitter-grip-color`: The grip beside the line, at rest. (default: `undefined`)
+   * - `--splitter-grip-color`: The grip beside the line, once it is shown. (default: `undefined`)
    * - `--splitter-grip-length`: How far the grip runs along the divider. (default: `undefined`)
    * - `--splitter-hover-color`: The target under the pointer. (default: `undefined`)
    * - `--splitter-target`: How wide the draggable box is. (default: `undefined`)
@@ -22531,6 +22585,16 @@ export type CustomElementsSolidJs = {
    * Anything under five is a thousand rows and wants a field instead.
    * - `min`: Earliest time offered, as `HH:mm`.
    * - `max`: Latest time offered, as `HH:mm`.
+   * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
+   *
+   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * shape of problem: `min` and `max` take away a span, and what a booking
+   * usually has to take away is a scatter. A morning with 09:30 and 11:00
+   * already gone is not two bounds.
+   *
+   * A time not on the step is simply never offered, so it is not an error to
+   * name one, and naming every time in the list is how the empty state is
+   * reached honestly rather than by handing over an empty range.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.
@@ -23648,7 +23712,7 @@ export type CustomCssProperties = {
   "--splitter-corner"?: string;
   /** The line while it is being moved. */
   "--splitter-drag-color"?: string;
-  /** The grip beside the line, at rest. */
+  /** The grip beside the line, once it is shown. */
   "--splitter-grip-color"?: string;
   /** How far the grip runs along the divider. */
   "--splitter-grip-length"?: string;

@@ -33596,6 +33596,16 @@
             },
             {
               "kind": "field",
+              "name": "disableTimes",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
+              "attribute": "disable-times"
+            },
+            {
+              "kind": "field",
               "name": "locale",
               "type": {
                 "text": "string"
@@ -33644,6 +33654,70 @@
               "privacy": "private",
               "description": "Every time on offer, as minutes since midnight.\n\nBuilt from `min` upward rather than from midnight, so a list that starts at\n`09:00` steps from nine rather than offering `09:15` because that is where\nthe quarter hours from midnight happen to land. A step that does not divide\nthe hour is a real thing to want, twenty minutes being the obvious one, and\nthis is the reading that makes it behave.",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "barred",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Whether a time is barred by name.\n\n`barred`, not `disabled`, for the reason Calendar records: this is a form\ncontrol and `HelixFormElement.disabled` is a boolean about the whole of it,\nso a method and a flag cannot share the name.\n\nOnly the named list. `min` and `max` are not consulted here because they\nnever produce a row to bar: `times` builds the list between them, so a time\noutside the bounds is absent rather than present and refused."
+            },
+            {
+              "kind": "method",
+              "name": "wholeHourBarred",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "shown",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "half",
+                  "optional": true,
+                  "type": {
+                    "text": "'AM' | 'PM'"
+                  }
+                }
+              ],
+              "description": "Whether every offered time in an hour is barred.\n\n`shown` is the meridiem the wheel is on, so `1` means 01:00 under AM and\n13:00 under PM. Absent is a 24 hour clock, where the number is the hour."
+            },
+            {
+              "kind": "method",
+              "name": "halfBarred",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "half",
+                  "type": {
+                    "text": "'AM' | 'PM'"
+                  }
+                }
+              ],
+              "description": "Whether every offered time in a half of the clock is barred."
             },
             {
               "kind": "field",
@@ -33792,9 +33866,16 @@
                   "type": {
                     "text": "string"
                   }
+                },
+                {
+                  "name": "barred",
+                  "default": "() => false",
+                  "type": {
+                    "text": "(one: string) => boolean"
+                  }
                 }
               ],
-              "description": "One wheel, which is a listbox like the whole list is."
+              "description": "One wheel.\n\n`barred` is passed per column rather than read from `disableTimes` here,\nbecause a column holds a third of a time and only the caller knows the\nother two thirds. What that means differs by column and the difference is\nnot a detail: a minute is barred when *this* hour plus it is, and an hour is\nbarred only when every minute in it is, since one free minute is a reason to\nopen the wheel rather than to close it."
             },
             {
               "kind": "method",
@@ -34184,6 +34265,15 @@
               "default": "'23:59'",
               "description": "Latest time offered, as `HH:mm`.",
               "fieldName": "max"
+            },
+            {
+              "name": "disable-times",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
+              "fieldName": "disableTimes"
             },
             {
               "name": "locale",

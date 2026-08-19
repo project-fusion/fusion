@@ -126,6 +126,21 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
   @property()
   max = '23:59'
 
+  /**
+   * Times that cannot be chosen, comma separated, as `HH:mm`.
+   *
+   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * shape of problem: `min` and `max` take away a span, and what a booking
+   * usually has to take away is a scatter. A morning with 09:30 and 11:00
+   * already gone is not two bounds.
+   *
+   * A time not on the step is simply never offered, so it is not an error to
+   * name one, and naming every time in the list is how the empty state is
+   * reached honestly rather than by handing over an empty range.
+   */
+  @property({ attribute: 'disable-times' })
+  disableTimes = ''
+
   /** Language tag the times are written in. Absent uses the runtime's own. */
   @property()
   locale = ''
@@ -198,6 +213,43 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     return found
   }
 
+  /**
+   * Whether a time is barred by name.
+   *
+   * `barred`, not `disabled`, for the reason Calendar records: this is a form
+   * control and `HelixFormElement.disabled` is a boolean about the whole of it,
+   * so a method and a flag cannot share the name.
+   *
+   * Only the named list. `min` and `max` are not consulted here because they
+   * never produce a row to bar: `times` builds the list between them, so a time
+   * outside the bounds is absent rather than present and refused.
+   */
+  private barred(at: string): boolean {
+    return this.disableTimes
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+      .includes(at)
+  }
+
+  /**
+   * Whether every offered time in an hour is barred.
+   *
+   * `shown` is the meridiem the wheel is on, so `1` means 01:00 under AM and
+   * 13:00 under PM. Absent is a 24 hour clock, where the number is the hour.
+   */
+  private wholeHourBarred(shown: number, half?: 'AM' | 'PM'): boolean {
+    const whole = half === undefined ? shown : (shown % 12) + (half === 'PM' ? 12 : 0)
+    const within = this.times.filter((at) => Math.floor(at / 60) === whole)
+    return within.length > 0 && within.every((at) => this.barred(fromMinutes(at)))
+  }
+
+  /** Whether every offered time in a half of the clock is barred. */
+  private halfBarred(half: 'AM' | 'PM'): boolean {
+    const within = this.times.filter((at) => (half === 'PM') === at >= 720)
+    return within.length > 0 && within.every((at) => this.barred(fromMinutes(at)))
+  }
+
   /** The times held, which is a list whether or not a mode is set. */
   private get held(): string[] {
     return this.value
@@ -230,6 +282,13 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
       return
     }
     const announced = (event as HelixChangeEvent).detail.value
+    /* The listbox already skips a disabled option, so this is the second lock
+       rather than the first: it covers a value arriving from a consumer's own
+       dispatch, and it is what makes the refusal a fact about the component
+       rather than about the listbox it happens to render. */
+    if (announced.split(',').some((one) => this.barred(one.trim()))) {
+      return
+    }
     if (this.mode !== 'range') {
       this.requestValue(announced)
       return
@@ -284,7 +343,16 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
       const half = hour % 12
       next = (half + (to === 'PM' ? 12 : 0)) * 60 + minute
     }
-    this.requestValue(fromMinutes(next))
+    /* The wheels build a value from three columns and never reach
+       `handleChange`, so the refusal has to be repeated here. Disabling the
+       options is not enough on its own: a reader on 09:00 who moves the hour to
+       10 lands on 10:00, and 10:00 can be barred while nothing in the hour
+       column was. */
+    const whole = fromMinutes(next)
+    if (this.barred(whole)) {
+      return
+    }
+    this.requestValue(whole)
   }
 
   /** Every whole hour that has at least one offered time in it. */
@@ -340,12 +408,23 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
   }
 
   /** One wheel, which is a listbox like the whole list is. */
+  /**
+   * One wheel.
+   *
+   * `barred` is passed per column rather than read from `disableTimes` here,
+   * because a column holds a third of a time and only the caller knows the
+   * other two thirds. What that means differs by column and the difference is
+   * not a detail: a minute is barred when *this* hour plus it is, and an hour is
+   * barred only when every minute in it is, since one free minute is a reason to
+   * open the wheel rather than to close it.
+   */
   private renderColumn(
     part: 'hour' | 'meridiem' | 'minute',
     label: string,
     values: string[],
     written: (one: string) => string,
     value: string,
+    barred: (one: string) => boolean = () => false,
   ): TemplateResult {
     return html`<helix-listbox
       part="column"
@@ -360,7 +439,10 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
       }}
     >
       ${values.map(
-        (one) => html`<helix-option part="option" value=${one}>${written(one)}</helix-option>`,
+        (one) =>
+          html`<helix-option part="option" value=${one} ?disabled=${barred(one)}
+            >${written(one)}</helix-option
+          >`,
       )}
     </helix-listbox>`
   }
@@ -384,6 +466,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
         hours.map(String),
         (one) => (twelve ? one : one.padStart(2, '0')),
         shownHour,
+        (one) => this.wholeHourBarred(Number(one), twelve ? meridiem : undefined),
       )}
       ${this.renderColumn(
         'minute',
@@ -391,6 +474,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
         this.minutes.map(String),
         (one) => one.padStart(2, '0'),
         String(minute),
+        (one) => this.barred(fromMinutes(hour * 60 + Number(one))),
       )}
       ${
         twelve
@@ -400,6 +484,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
               ['AM', 'PM'],
               (one) => one,
               meridiem,
+              (one) => this.halfBarred(one as 'AM' | 'PM'),
             )
           : nothing
       }
@@ -427,6 +512,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
         return html`<helix-option
           part="option"
           value=${at}
+          ?disabled=${this.barred(at)}
           data-between=${this.between(at) ? '' : nothing}
           >${writeTime(at, this.locale)}</helix-option
         >`

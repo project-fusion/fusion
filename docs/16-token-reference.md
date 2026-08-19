@@ -34,7 +34,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 3 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 214 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 116 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 78 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 76 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 27 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
@@ -147,7 +147,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 138 |
+| `--helix-border-thin` | `1px` | 136 |
 | `--helix-border-thick` | `2px` | 45 |
 
 ## shadow
@@ -181,7 +181,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 0 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 260 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 262 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 89 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 12 |
 
@@ -191,7 +191,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 220 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 222 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 56 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 25 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |

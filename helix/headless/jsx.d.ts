@@ -7368,6 +7368,28 @@ Anything under five is a thousand rows and wants a field instead. */
   min?: HelixBaseTime["min"];
   /** Latest time offered, as `HH:mm`. */
   max?: HelixBaseTime["max"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "disable-times"?: HelixBaseTime["disableTimes"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  disableTimes?: HelixBaseTime["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
   locale?: HelixBaseTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -7476,6 +7498,28 @@ Anything under five is a thousand rows and wants a field instead. */
   "prop:min"?: HelixBaseTime["min"];
   /** Latest time offered, as `HH:mm`. */
   "prop:max"?: HelixBaseTime["max"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "attr:disable-times"?: HelixBaseTime["disableTimes"];
+  /** Times that cannot be chosen, comma separated, as `HH:mm`.
+
+The counterpart to Calendar's `disable-dates`, and it exists for the same
+shape of problem: `min` and `max` take away a span, and what a booking
+usually has to take away is a scatter. A morning with 09:30 and 11:00
+already gone is not two bounds.
+
+A time not on the step is simply never offered, so it is not an error to
+name one, and naming every time in the list is how the empty state is
+reached honestly rather than by handing over an empty range. */
+  "prop:disableTimes"?: HelixBaseTime["disableTimes"];
   /** Language tag the times are written in. Absent uses the runtime's own. */
   "prop:locale"?: HelixBaseTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -14485,6 +14529,16 @@ export type CustomElements = {
    * Anything under five is a thousand rows and wants a field instead.
    * - `min`: Earliest time offered, as `HH:mm`.
    * - `max`: Latest time offered, as `HH:mm`.
+   * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
+   *
+   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * shape of problem: `min` and `max` take away a span, and what a booking
+   * usually has to take away is a scatter. A morning with 09:30 and 11:00
+   * already gone is not two bounds.
+   *
+   * A time not on the step is simply never offered, so it is not an error to
+   * name one, and naming every time in the list is how the empty state is
+   * reached honestly rather than by handing over an empty range.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.
@@ -21700,6 +21754,16 @@ export type CustomElementsSolidJs = {
    * Anything under five is a thousand rows and wants a field instead.
    * - `min`: Earliest time offered, as `HH:mm`.
    * - `max`: Latest time offered, as `HH:mm`.
+   * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
+   *
+   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * shape of problem: `min` and `max` take away a span, and what a booking
+   * usually has to take away is a scatter. A morning with 09:30 and 11:00
+   * already gone is not two bounds.
+   *
+   * A time not on the step is simply never offered, so it is not an error to
+   * name one, and naming every time in the list is how the empty state is
+   * reached honestly rather than by handing over an empty range.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `mode`: How many times can be held at once.

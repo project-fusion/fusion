@@ -272,3 +272,72 @@ describe('time is off', () => {
     expect(host.value).toBe('09:00')
   })
 })
+
+describe('times can be taken out of the list by name', () => {
+  const picker = async (attrs = ''): Promise<Time> => {
+    const host = (await mount(`<helix-time ${attrs}></helix-time>`)) as Time
+    await host.updateComplete
+    return host
+  }
+
+  const barred = (host: Time): string[] =>
+    [...(host.shadowRoot?.querySelectorAll('[part="option"][disabled]') ?? [])].map(
+      (one) => one.getAttribute('value') ?? '',
+    )
+
+  test('a named time is offered and refused, rather than absent', async () => {
+    /* Absent is what `min` and `max` do, and it is the wrong answer for a
+       booking: a reader looking for 09:30 has to see that it exists and is
+       taken, or they conclude the list is wrong. */
+    const host = await picker('disable-times="09:30,11:00" max="12:00" min="09:00"')
+    expect(barred(host)).toEqual(['09:30', '11:00'])
+    // Still in the list, which is the half that says "taken" rather than "no".
+    const shown = [...(host.shadowRoot?.querySelectorAll('[part="option"]') ?? [])].map((one) =>
+      one.getAttribute('value'),
+    )
+    expect(shown).toContain('09:30')
+  })
+
+  test('and a barred time is refused even when something announces it directly', async () => {
+    const host = await picker('default-value="09:00" disable-times="09:30" max="12:00" min="09:00"')
+    part(host, 'list')?.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value: '09:30' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+
+  test('the wheels refuse it too, which they reach by their own path', async () => {
+    /* `moveColumn` rebuilds the value from three columns, so a reader on 09:00
+       moving the hour to 10 lands on 10:00 without any option in the hour
+       column having been disabled. */
+    const host = await picker(
+      'appearance="wheels" default-value="09:00" disable-times="10:00" max="12:00" min="09:00" step="60"',
+    )
+    const hour = host.shadowRoot?.querySelector('[data-column="hour"]') as HTMLElement
+    hour.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value: '10' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+
+  test('an hour is only closed when every time in it is', async () => {
+    // One free minute is a reason to open the wheel, not to close it.
+    const host = await picker(
+      'appearance="wheels" disable-times="10:00,10:15,10:30,10:45,11:00" max="11:59" min="10:00"',
+    )
+    const shut = [...(host.shadowRoot?.querySelectorAll('[data-column="hour"] [disabled]') ?? [])]
+      .map((one) => one.getAttribute('value'))
+      .sort()
+    expect(shut).toEqual(['10'])
+  })
+})

@@ -3503,7 +3503,7 @@ gesture.
 | `--splitter-color` | The line between the panes. |
 | `--splitter-corner` | How wide the handle at a crossing is. |
 | `--splitter-drag-color` | The line while it is being moved. |
-| `--splitter-grip-color` | The grip beside the line, at rest. |
+| `--splitter-grip-color` | The grip beside the line, once it is shown. |
 | `--splitter-grip-length` | How far the grip runs along the divider. |
 | `--splitter-hover-color` | The target under the pointer. |
 | `--splitter-target` | How wide the draggable box is. |
@@ -4104,6 +4104,7 @@ card would be a card inside a card there.
 | `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTime` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTime` | Times that cannot be chosen, comma separated, as `HH:mm`. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
