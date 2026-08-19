@@ -1308,6 +1308,9 @@ helix-drawer {
      maintained by hand: it is one number used twice. */
   --docs-rail: 15rem;
 
+  /* Where the columns begin, which is also where the rails stick. */
+  --docs-top: calc(var(--helix-size-header) + var(--helix-space-2xl));
+
   align-items: start;
   display: grid;
   gap: var(--helix-space-2xl);
@@ -1593,13 +1596,22 @@ helix-code-block .tok-operator {
   color: var(--helix-color-syntax-callable);
 }
 
-/* Sticky under the header, and no taller than what is left of the viewport, so
-   a long list scrolls inside the rail instead of pushing the page. */
+/* Sticky where they already are, so nothing moves when the page does.
+ *
+ * The offset was `header + space-md`, a guess, while the rails actually rest at
+ * `header + the shell's own top padding`. Measured: resting at 105 and sticking
+ * at 72, so the first scroll of the page yanked both rails up 33px and they
+ * never returned. A sticky offset that does not match the resting position is
+ * a jump on the first pixel of scroll.
+ *
+ * `--docs-top` is that one number, used by the padding and by the offset, so
+ * the two cannot drift apart again. No taller than what is left of the viewport
+ * either, so a long list scrolls inside the rail instead of pushing the page. */
 .docsNav,
 .docsRail {
   block-size: fit-content;
-  inset-block-start: calc(var(--helix-size-header) + var(--helix-space-md));
-  max-block-size: calc(100vh - var(--helix-size-header) - var(--helix-space-xl));
+  inset-block-start: var(--docs-top);
+  max-block-size: calc(100vh - var(--docs-top) - var(--helix-space-lg));
   overflow-y: auto;
   position: sticky;
 }

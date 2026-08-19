@@ -557,7 +557,8 @@
             ],
             "tier": "headless",
             "group": "BaseAccordion",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/accordion"
           },
           "tagName": "helix-base-accordion",
           "customElement": true,
@@ -857,7 +858,8 @@
             ],
             "tier": "headless",
             "group": "BaseAnnouncement",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/announcement"
           },
           "tagName": "helix-base-announcement",
           "customElement": true,
@@ -1053,7 +1055,8 @@
             ],
             "tier": "headless",
             "group": "BaseAppHeader",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/app-header"
           },
           "tagName": "helix-base-app-header",
           "customElement": true,
@@ -1503,7 +1506,8 @@
             ],
             "tier": "headless",
             "group": "BaseAvatar",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/avatar"
           },
           "tagName": "helix-base-avatar",
           "customElement": true,
@@ -1738,7 +1742,8 @@
             ],
             "tier": "headless",
             "group": "BaseBadge",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/badge"
           },
           "tagName": "helix-base-badge",
           "customElement": true,
@@ -1928,7 +1933,8 @@
             ],
             "tier": "headless",
             "group": "BaseBlockquote",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/blockquote"
           },
           "tagName": "helix-base-blockquote",
           "customElement": true,
@@ -2243,7 +2249,8 @@
             ],
             "tier": "headless",
             "group": "BaseBreadcrumbs",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/breadcrumbs"
           },
           "tagName": "helix-base-breadcrumbs",
           "customElement": true,
@@ -2407,7 +2414,8 @@
             ],
             "tier": "headless",
             "group": "BaseButtonGroup",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/button-group"
           },
           "tagName": "helix-base-button-group",
           "customElement": true,
@@ -2852,7 +2860,8 @@
             "documentation": "https://helix.fusion.dev/components/button",
             "tier": "headless",
             "group": "BaseButton",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/button"
           },
           "tagName": "helix-base-button",
           "customElement": true,
@@ -3035,7 +3044,8 @@
             ],
             "tier": "headless",
             "group": "BaseCallout",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/callout"
           },
           "tagName": "helix-base-callout",
           "customElement": true,
@@ -3190,7 +3200,8 @@
             ],
             "tier": "headless",
             "group": "BaseCard",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/card"
           },
           "tagName": "helix-base-card",
           "customElement": true,
@@ -3672,7 +3683,8 @@
             ],
             "tier": "headless",
             "group": "BaseCarousel",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/carousel"
           },
           "tagName": "helix-base-carousel",
           "customElement": true,
@@ -4275,7 +4287,8 @@
             ],
             "tier": "headless",
             "group": "BaseCheckboxGroup",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/checkbox-group"
           },
           "tagName": "helix-base-checkbox-group",
           "customElement": true,
@@ -5208,7 +5221,8 @@
             ],
             "tier": "headless",
             "group": "BaseCheckbox",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/checkbox"
           },
           "tagName": "helix-base-checkbox",
           "customElement": true,
@@ -5428,7 +5442,8 @@
             ],
             "tier": "headless",
             "group": "BaseCodeBlock",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/code-block"
           },
           "tagName": "helix-base-code-block",
           "customElement": true,
@@ -5577,7 +5592,8 @@
             ],
             "tier": "headless",
             "group": "BaseCode",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/code"
           },
           "tagName": "helix-base-code",
           "customElement": true,
@@ -6837,7 +6853,8 @@
             ],
             "tier": "headless",
             "group": "BaseColorInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/color-input"
           },
           "tagName": "helix-base-color-input",
           "customElement": true,
@@ -7856,7 +7873,8 @@
             ],
             "tier": "headless",
             "group": "BaseColorPicker",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/color-picker"
           },
           "tagName": "helix-base-color-picker",
           "customElement": true,
@@ -9211,7 +9229,8 @@
             ],
             "tier": "headless",
             "group": "BaseCombobox",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/combobox"
           },
           "tagName": "helix-base-combobox",
           "customElement": true,
@@ -9847,7 +9866,8 @@
             ],
             "tier": "headless",
             "group": "BaseCopyButton",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/copy-button"
           },
           "tagName": "helix-base-copy-button",
           "customElement": true,
@@ -11275,7 +11295,8 @@
             ],
             "tier": "headless",
             "group": "BaseDateInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/date-input"
           },
           "tagName": "helix-base-date-input",
           "customElement": true,
@@ -12341,7 +12362,8 @@
             ],
             "tier": "headless",
             "group": "BaseDatePicker",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/date-picker"
           },
           "tagName": "helix-base-date-picker",
           "customElement": true,
@@ -12791,7 +12813,8 @@
             ],
             "tier": "headless",
             "group": "BaseDialog",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/dialog"
           },
           "tagName": "helix-base-dialog",
           "customElement": true,
@@ -12995,7 +13018,8 @@
             ],
             "tier": "headless",
             "group": "BaseDivider",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/divider"
           },
           "tagName": "helix-base-divider",
           "customElement": true,
@@ -13426,7 +13450,8 @@
             ],
             "tier": "headless",
             "group": "BaseDrawer",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/drawer"
           },
           "tagName": "helix-base-drawer",
           "customElement": true,
@@ -14028,7 +14053,8 @@
             ],
             "tier": "headless",
             "group": "BaseDrilldown",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/drilldown"
           },
           "tagName": "helix-base-drilldown",
           "customElement": true,
@@ -14206,7 +14232,8 @@
             ],
             "tier": "headless",
             "group": "BaseEmpty",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/empty"
           },
           "tagName": "helix-base-empty",
           "customElement": true,
@@ -15138,7 +15165,8 @@
             ],
             "tier": "headless",
             "group": "BaseFileInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/file-input"
           },
           "tagName": "helix-base-file-input",
           "customElement": true,
@@ -15240,7 +15268,8 @@
             ],
             "tier": "headless",
             "group": "BaseIconButton",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/icon-button"
           },
           "tagName": "helix-base-icon-button",
           "customElement": true,
@@ -15846,7 +15875,8 @@
             ],
             "tier": "headless",
             "group": "BaseIcon",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/icon"
           },
           "tagName": "helix-base-icon",
           "customElement": true,
@@ -17504,7 +17534,8 @@
             ],
             "tier": "headless",
             "group": "BaseInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/input"
           },
           "tagName": "helix-base-input",
           "customElement": true,
@@ -17654,7 +17685,8 @@
             ],
             "tier": "headless",
             "group": "BaseKbd",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/kbd"
           },
           "tagName": "helix-base-kbd",
           "customElement": true,
@@ -17990,7 +18022,8 @@
             ],
             "tier": "headless",
             "group": "BaseList",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/list"
           },
           "tagName": "helix-base-list",
           "customElement": true,
@@ -19210,7 +19243,8 @@
             ],
             "tier": "headless",
             "group": "BaseListbox",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/listbox"
           },
           "tagName": "helix-base-listbox",
           "customElement": true,
@@ -19393,7 +19427,8 @@
             ],
             "tier": "headless",
             "group": "BaseLoader",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/loader"
           },
           "tagName": "helix-base-loader",
           "customElement": true,
@@ -20293,7 +20328,8 @@
             ],
             "tier": "headless",
             "group": "BaseMenu",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/menu"
           },
           "tagName": "helix-base-menu",
           "customElement": true,
@@ -20747,7 +20783,8 @@
             ],
             "tier": "headless",
             "group": "BaseMeter",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/meter"
           },
           "tagName": "helix-base-meter",
           "customElement": true,
@@ -20966,7 +21003,8 @@
             ],
             "tier": "headless",
             "group": "BaseNavigation",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/navigation"
           },
           "tagName": "helix-base-navigation",
           "customElement": true,
@@ -22112,7 +22150,8 @@
             ],
             "tier": "headless",
             "group": "BaseNumberInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/number-input"
           },
           "tagName": "helix-base-number-input",
           "customElement": true,
@@ -22556,7 +22595,8 @@
             ],
             "tier": "headless",
             "group": "BaseOption",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/option"
           },
           "tagName": "helix-base-option",
           "customElement": true,
@@ -22942,7 +22982,8 @@
             ],
             "tier": "headless",
             "group": "BaseOutline",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/outline"
           },
           "tagName": "helix-base-outline",
           "customElement": true,
@@ -23758,7 +23799,8 @@
             ],
             "tier": "headless",
             "group": "BasePagination",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/pagination"
           },
           "tagName": "helix-base-pagination",
           "customElement": true,
@@ -25378,7 +25420,8 @@
             ],
             "tier": "headless",
             "group": "BasePinInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/pin-input"
           },
           "tagName": "helix-base-pin-input",
           "customElement": true,
@@ -25832,7 +25875,8 @@
             ],
             "tier": "headless",
             "group": "BasePopover",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/popover"
           },
           "tagName": "helix-base-popover",
           "customElement": true,
@@ -26132,7 +26176,8 @@
             ],
             "tier": "headless",
             "group": "BaseProgress",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/progress"
           },
           "tagName": "helix-base-progress",
           "customElement": true,
@@ -26302,7 +26347,8 @@
             ],
             "tier": "headless",
             "group": "BaseQuote",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/quote"
           },
           "tagName": "helix-base-quote",
           "customElement": true,
@@ -27439,7 +27485,8 @@
             ],
             "tier": "headless",
             "group": "BaseRadio",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/radio"
           },
           "tagName": "helix-base-radio",
           "customElement": true,
@@ -28578,7 +28625,8 @@
             ],
             "tier": "headless",
             "group": "BaseSelect",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/select"
           },
           "tagName": "helix-base-select",
           "customElement": true,
@@ -28722,7 +28770,8 @@
             ],
             "tier": "headless",
             "group": "BaseSkeleton",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/skeleton"
           },
           "tagName": "helix-base-skeleton",
           "customElement": true,
@@ -29727,7 +29776,8 @@
             ],
             "tier": "headless",
             "group": "BaseSlider",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/slider"
           },
           "tagName": "helix-base-slider",
           "customElement": true,
@@ -30537,7 +30587,8 @@
             ],
             "tier": "headless",
             "group": "BaseSplitter",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/splitter"
           },
           "tagName": "helix-base-splitter",
           "customElement": true,
@@ -30866,7 +30917,8 @@
             ],
             "tier": "headless",
             "group": "BaseStat",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/stat"
           },
           "tagName": "helix-base-stat",
           "customElement": true,
@@ -31278,7 +31330,8 @@
             ],
             "tier": "headless",
             "group": "BaseSteps",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/steps"
           },
           "tagName": "helix-base-steps",
           "customElement": true,
@@ -32456,7 +32509,8 @@
             ],
             "tier": "headless",
             "group": "BaseSwitch",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/switch"
           },
           "tagName": "helix-base-switch",
           "customElement": true,
@@ -33046,7 +33100,8 @@
             ],
             "tier": "headless",
             "group": "BaseTable",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/table"
           },
           "tagName": "helix-base-table",
           "customElement": true,
@@ -33845,7 +33900,8 @@
             ],
             "tier": "headless",
             "group": "BaseTabs",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/tabs"
           },
           "tagName": "helix-base-tabs",
           "customElement": true,
@@ -34309,7 +34365,8 @@
             ],
             "tier": "headless",
             "group": "BaseTag",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/tag"
           },
           "tagName": "helix-base-tag",
           "customElement": true,
@@ -35336,7 +35393,8 @@
             ],
             "tier": "headless",
             "group": "BaseTextarea",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/textarea"
           },
           "tagName": "helix-base-textarea",
           "customElement": true,
@@ -36737,7 +36795,8 @@
             ],
             "tier": "headless",
             "group": "BaseTimeInput",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/time-input"
           },
           "tagName": "helix-base-time-input",
           "customElement": true,
@@ -37744,7 +37803,8 @@
             ],
             "tier": "headless",
             "group": "BaseTimePicker",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/time-picker"
           },
           "tagName": "helix-base-time-picker",
           "customElement": true,
@@ -38396,7 +38456,8 @@
             ],
             "tier": "headless",
             "group": "BaseToast",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/toast"
           },
           "tagName": "helix-base-toast",
           "customElement": true,
@@ -39530,7 +39591,8 @@
             ],
             "tier": "headless",
             "group": "BaseToggle",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/toggle"
           },
           "tagName": "helix-base-toggle",
           "customElement": true,
@@ -39799,7 +39861,8 @@
             ],
             "tier": "headless",
             "group": "BaseToolbar",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/toolbar"
           },
           "tagName": "helix-base-toolbar",
           "customElement": true,
@@ -40460,7 +40523,8 @@
             ],
             "tier": "headless",
             "group": "BaseTooltip",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/tooltip"
           },
           "tagName": "helix-base-tooltip",
           "customElement": true,
@@ -41393,7 +41457,8 @@
             ],
             "tier": "headless",
             "group": "BaseTree",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/headless/src/tree"
           },
           "tagName": "helix-base-tree",
           "customElement": true,

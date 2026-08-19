@@ -11,8 +11,8 @@
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-end-end-radius: var(--helix-radii-none);
   border-end-start-radius: var(--helix-radii-none);
-  border-start-end-radius: var(--helix-radii-md);
-  border-start-start-radius: var(--helix-radii-md);
+  border-start-end-radius: var(--helix-radii-sm);
+  border-start-start-radius: var(--helix-radii-sm);
   display: flex;
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-sm);
@@ -51,7 +51,7 @@
      step is the difference between black and not-quite. */
   background-color: var(--helix-color-background);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   margin: var(--helix-space-none);
   overflow-x: auto;
   padding-block: var(--helix-space-sm);

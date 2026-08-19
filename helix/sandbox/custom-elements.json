@@ -318,7 +318,8 @@
             ],
             "tier": "styled",
             "group": "Editor",
-            "part": "Root"
+            "part": "Root",
+            "source": "helix/sandbox/src/editor"
           },
           "tagName": "helix-sandbox-editor",
           "customElement": true,

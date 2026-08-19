@@ -311,6 +311,7 @@ describe('createHelixCemConfig', () => {
       'helix-metadata',
       // After composition, which is what decides a declaration is the root.
       'helix-examples',
+      'helix-source',
       'helix-declared-events',
       'helix-react-events',
       'helix-convention-lint',

@@ -13,6 +13,7 @@ import {
   getFamilies,
   type PropertyDoc,
 } from '../../../../../lib/catalog'
+import { sourceUrl } from '../../../../../lib/source'
 import { ComponentPreview } from './preview'
 
 /**
@@ -304,6 +305,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
      heading. `@summary` is the sentence that says what the component is. */
   const prose = family.summary
   const headline = family.examples[0]
+  const source = sourceUrl(family.source)
 
   return (
     <div className="docsShell">
@@ -338,11 +340,14 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             <helix-flex align="center" class="docsTitle" gap="md" justify="between">
               <helix-text as="h1">{family.label}</helix-text>
               <helix-flex align="center" data-density="sm" gap="xs">
-                {/* Unwired on purpose, pending a decision about where source is
-                    read from: nothing is published and there is no public repo
-                    URL to point at, and a button linking to a page that does not
-                    exist is worse than one that visibly does nothing yet. */}
-                <helix-button appearance="secondary">View Source</helix-button>
+                {/* An anchor, because it leaves the site. The URL is composed
+                    here rather than stored: the manifest holds the path and the
+                    ref is this site's to choose, which is what lets a versioned
+                    reference point at the source it documents instead of at
+                    whatever `main` holds when it is read. */}
+                <a data-button="secondary" href={source} rel="noreferrer" target="_blank">
+                  View Source
+                </a>
                 <helix-menu label="Document actions">
                   {/* `dots-three-vertical` did not exist in the icon set and
                       `dots-three` was never a name: the trigger rendered an

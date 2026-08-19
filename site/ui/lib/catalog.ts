@@ -78,6 +78,8 @@ export interface Family {
   label: string
   since: string
   slug: string
+  /** The family's source directory, relative to the repository root. */
+  source: string
   status: string
   summary: string
 }
@@ -106,6 +108,7 @@ interface RawDeclaration {
     documentation?: string
     examples?: { description?: string; slug?: string }[]
     part?: string
+    source?: string
     since?: string
     status?: string
   }
@@ -320,6 +323,7 @@ const build = (): Family[] => {
         label: startCase(slug),
         since: root.helix?.since ?? '',
         slug,
+        source: root.helix?.source ?? '',
         status: root.helix?.status ?? '',
         summary: root.summary ?? '',
       }

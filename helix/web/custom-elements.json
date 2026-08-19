@@ -743,7 +743,8 @@
               {
                 "slug": "single"
               }
-            ]
+            ],
+            "source": "helix/web/src/accordion"
           },
           "tagName": "helix-accordion",
           "customElement": true,
@@ -1008,7 +1009,8 @@
               {
                 "slug": "with-actions"
               }
-            ]
+            ],
+            "source": "helix/web/src/announcement"
           },
           "tagName": "helix-announcement",
           "customElement": true,
@@ -1455,7 +1457,8 @@
               {
                 "slug": "transparent"
               }
-            ]
+            ],
+            "source": "helix/web/src/app-header"
           },
           "tagName": "helix-app-header",
           "customElement": true,
@@ -2048,7 +2051,8 @@
               {
                 "slug": "group"
               }
-            ]
+            ],
+            "source": "helix/web/src/avatar"
           },
           "tagName": "helix-avatar",
           "customElement": true,
@@ -2387,7 +2391,8 @@
               {
                 "slug": "dot"
               }
-            ]
+            ],
+            "source": "helix/web/src/badge"
           },
           "tagName": "helix-badge",
           "customElement": true,
@@ -2605,7 +2610,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/blockquote"
           },
           "tagName": "helix-blockquote",
           "customElement": true,
@@ -3060,7 +3066,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/breadcrumbs"
           },
           "tagName": "helix-breadcrumbs",
           "customElement": true,
@@ -3291,7 +3298,8 @@
               {
                 "slug": "with-icons"
               }
-            ]
+            ],
+            "source": "helix/web/src/button-group"
           },
           "tagName": "helix-button-group",
           "customElement": true,
@@ -3926,7 +3934,8 @@
               {
                 "slug": "with-icon"
               }
-            ]
+            ],
+            "source": "helix/web/src/button"
           },
           "tagName": "helix-button",
           "customElement": true,
@@ -4161,7 +4170,8 @@
               {
                 "slug": "severities"
               }
-            ]
+            ],
+            "source": "helix/web/src/callout"
           },
           "tagName": "helix-callout",
           "customElement": true,
@@ -4470,7 +4480,8 @@
               {
                 "slug": "plain"
               }
-            ]
+            ],
+            "source": "helix/web/src/card"
           },
           "tagName": "helix-card",
           "customElement": true,
@@ -5173,7 +5184,8 @@
               {
                 "slug": "vertical"
               }
-            ]
+            ],
+            "source": "helix/web/src/carousel"
           },
           "tagName": "helix-carousel",
           "customElement": true,
@@ -5919,7 +5931,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/checkbox-group"
           },
           "tagName": "helix-checkbox-group",
           "customElement": true,
@@ -6995,7 +7008,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/checkbox"
           },
           "tagName": "helix-checkbox",
           "customElement": true,
@@ -7278,7 +7292,8 @@
                 "description": "A block with no name and nothing to copy, which draws no header.",
                 "slug": "bare"
               }
-            ]
+            ],
+            "source": "helix/web/src/code-block"
           },
           "tagName": "helix-code-block",
           "customElement": true,
@@ -7531,7 +7546,8 @@
                 "description": "A fragment of code inside a line of prose.",
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/code"
           },
           "tagName": "helix-code",
           "customElement": true,
@@ -8681,7 +8697,8 @@
               {
                 "slug": "swatches"
               }
-            ]
+            ],
+            "source": "helix/web/src/color-input"
           },
           "tagName": "helix-color-input",
           "customElement": true,
@@ -9828,7 +9845,8 @@
               {
                 "slug": "syntaxes"
               }
-            ]
+            ],
+            "source": "helix/web/src/color-picker"
           },
           "tagName": "helix-color-picker",
           "customElement": true,
@@ -11332,7 +11350,8 @@
               {
                 "slug": "suggest"
               }
-            ]
+            ],
+            "source": "helix/web/src/combobox"
           },
           "tagName": "helix-combobox",
           "customElement": true,
@@ -12266,7 +12285,8 @@
                 "description": "A button that copies a string and confirms it for a moment.",
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/copy-button"
           },
           "tagName": "helix-copy-button",
           "customElement": true,
@@ -13729,7 +13749,8 @@
               {
                 "slug": "range"
               }
-            ]
+            ],
+            "source": "helix/web/src/date-input"
           },
           "tagName": "helix-date-input",
           "customElement": true,
@@ -15164,7 +15185,8 @@
               {
                 "slug": "restricted"
               }
-            ]
+            ],
+            "source": "helix/web/src/date-picker"
           },
           "tagName": "helix-date-picker",
           "customElement": true,
@@ -16050,7 +16072,8 @@
               {
                 "slug": "small"
               }
-            ]
+            ],
+            "source": "helix/web/src/dialog"
           },
           "tagName": "helix-dialog",
           "customElement": true,
@@ -16380,7 +16403,8 @@
               {
                 "slug": "with-content"
               }
-            ]
+            ],
+            "source": "helix/web/src/divider"
           },
           "tagName": "helix-divider",
           "customElement": true,
@@ -16895,7 +16919,8 @@
               {
                 "slug": "placements"
               }
-            ]
+            ],
+            "source": "helix/web/src/drawer"
           },
           "tagName": "helix-drawer",
           "customElement": true,
@@ -17685,7 +17710,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/drilldown"
           },
           "tagName": "helix-drilldown",
           "customElement": true,
@@ -17991,7 +18017,8 @@
               {
                 "slug": "outlined"
               }
-            ]
+            ],
+            "source": "helix/web/src/empty"
           },
           "tagName": "helix-empty",
           "customElement": true,
@@ -18932,7 +18959,8 @@
               {
                 "slug": "single"
               }
-            ]
+            ],
+            "source": "helix/web/src/file-input"
           },
           "tagName": "helix-file-input",
           "customElement": true,
@@ -19507,7 +19535,8 @@
               {
                 "slug": "column"
               }
-            ]
+            ],
+            "source": "helix/web/src/flex"
           },
           "tagName": "helix-flex",
           "customElement": true,
@@ -19764,7 +19793,8 @@
               {
                 "slug": "fixed-columns"
               }
-            ]
+            ],
+            "source": "helix/web/src/grid"
           },
           "tagName": "helix-grid",
           "customElement": true,
@@ -20341,7 +20371,8 @@
               {
                 "slug": "appearances"
               }
-            ]
+            ],
+            "source": "helix/web/src/icon-button"
           },
           "tagName": "helix-icon-button",
           "customElement": true,
@@ -20550,7 +20581,8 @@
               {
                 "slug": "sizes"
               }
-            ]
+            ],
+            "source": "helix/web/src/icon"
           },
           "tagName": "helix-icon",
           "customElement": true,
@@ -22156,7 +22188,8 @@
               {
                 "slug": "reveal"
               }
-            ]
+            ],
+            "source": "helix/web/src/input"
           },
           "tagName": "helix-input",
           "customElement": true,
@@ -22640,7 +22673,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/kbd"
           },
           "tagName": "helix-kbd",
           "customElement": true,
@@ -23117,7 +23151,8 @@
               {
                 "slug": "linked"
               }
-            ]
+            ],
+            "source": "helix/web/src/list"
           },
           "tagName": "helix-list",
           "customElement": true,
@@ -24279,7 +24314,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/listbox"
           },
           "tagName": "helix-listbox",
           "customElement": true,
@@ -24830,7 +24866,8 @@
               {
                 "slug": "with-icon"
               }
-            ]
+            ],
+            "source": "helix/web/src/loader"
           },
           "tagName": "helix-loader",
           "customElement": true,
@@ -25868,7 +25905,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/menu"
           },
           "tagName": "helix-menu",
           "customElement": true,
@@ -26569,7 +26607,8 @@
               {
                 "slug": "round"
               }
-            ]
+            ],
+            "source": "helix/web/src/meter"
           },
           "tagName": "helix-meter",
           "customElement": true,
@@ -26960,7 +26999,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/navigation"
           },
           "tagName": "helix-navigation",
           "customElement": true,
@@ -28096,7 +28136,8 @@
               {
                 "slug": "units"
               }
-            ]
+            ],
+            "source": "helix/web/src/number-input"
           },
           "tagName": "helix-number-input",
           "customElement": true,
@@ -28806,7 +28847,8 @@
               {
                 "slug": "grouped"
               }
-            ]
+            ],
+            "source": "helix/web/src/option"
           },
           "tagName": "helix-option",
           "customElement": true,
@@ -29381,7 +29423,8 @@
               {
                 "slug": "smooth"
               }
-            ]
+            ],
+            "source": "helix/web/src/outline"
           },
           "tagName": "helix-outline",
           "customElement": true,
@@ -30335,7 +30378,8 @@
               {
                 "slug": "window"
               }
-            ]
+            ],
+            "source": "helix/web/src/pagination"
           },
           "tagName": "helix-pagination",
           "customElement": true,
@@ -32346,7 +32390,8 @@
               {
                 "slug": "masked"
               }
-            ]
+            ],
+            "source": "helix/web/src/pin-input"
           },
           "tagName": "helix-pin-input",
           "customElement": true,
@@ -33067,7 +33112,8 @@
               {
                 "slug": "plain"
               }
-            ]
+            ],
+            "source": "helix/web/src/popover"
           },
           "tagName": "helix-popover",
           "customElement": true,
@@ -33435,7 +33481,8 @@
               {
                 "slug": "ring"
               }
-            ]
+            ],
+            "source": "helix/web/src/progress"
           },
           "tagName": "helix-progress",
           "customElement": true,
@@ -33743,7 +33790,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/quote"
           },
           "tagName": "helix-quote",
           "customElement": true,
@@ -35097,7 +35145,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/radio"
           },
           "tagName": "helix-radio",
           "customElement": true,
@@ -36124,7 +36173,8 @@
                 "description": "Source beside a preview, with a toolbar over both and a status bar under them.",
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/sandbox"
           },
           "tagName": "helix-sandbox",
           "customElement": true,
@@ -38012,7 +38062,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/select"
           },
           "tagName": "helix-select",
           "customElement": true,
@@ -38550,7 +38601,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/skeleton"
           },
           "tagName": "helix-skeleton",
           "customElement": true,
@@ -39457,7 +39509,8 @@
               {
                 "slug": "stepped"
               }
-            ]
+            ],
+            "source": "helix/web/src/slider"
           },
           "tagName": "helix-slider",
           "customElement": true,
@@ -40853,7 +40906,8 @@
               {
                 "slug": "workbench"
               }
-            ]
+            ],
+            "source": "helix/web/src/splitter"
           },
           "tagName": "helix-splitter",
           "customElement": true,
@@ -41286,7 +41340,8 @@
               {
                 "slug": "directions"
               }
-            ]
+            ],
+            "source": "helix/web/src/stat"
           },
           "tagName": "helix-stat",
           "customElement": true,
@@ -41751,7 +41806,8 @@
               {
                 "slug": "vertical"
               }
-            ]
+            ],
+            "source": "helix/web/src/steps"
           },
           "tagName": "helix-steps",
           "customElement": true,
@@ -43027,7 +43083,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/switch"
           },
           "tagName": "helix-switch",
           "customElement": true,
@@ -43930,7 +43987,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/table"
           },
           "tagName": "helix-table",
           "customElement": true,
@@ -44840,7 +44898,8 @@
               {
                 "slug": "underlined"
               }
-            ]
+            ],
+            "source": "helix/web/src/tabs"
           },
           "tagName": "helix-tabs",
           "customElement": true,
@@ -45582,7 +45641,8 @@
               {
                 "slug": "prefix"
               }
-            ]
+            ],
+            "source": "helix/web/src/tag"
           },
           "tagName": "helix-tag",
           "customElement": true,
@@ -45822,7 +45882,8 @@
               {
                 "slug": "tones"
               }
-            ]
+            ],
+            "source": "helix/web/src/text"
           },
           "tagName": "helix-text",
           "customElement": true,
@@ -46728,7 +46789,8 @@
               {
                 "slug": "required"
               }
-            ]
+            ],
+            "source": "helix/web/src/textarea"
           },
           "tagName": "helix-textarea",
           "customElement": true,
@@ -48231,7 +48293,8 @@
               {
                 "slug": "wheels"
               }
-            ]
+            ],
+            "source": "helix/web/src/time-input"
           },
           "tagName": "helix-time-input",
           "customElement": true,
@@ -49530,7 +49593,8 @@
               {
                 "slug": "wheels"
               }
-            ]
+            ],
+            "source": "helix/web/src/time-picker"
           },
           "tagName": "helix-time-picker",
           "customElement": true,
@@ -50542,7 +50606,8 @@
               {
                 "slug": "severities"
               }
-            ]
+            ],
+            "source": "helix/web/src/toast"
           },
           "tagName": "helix-toast",
           "customElement": true,
@@ -51847,7 +51912,8 @@
               {
                 "slug": "states"
               }
-            ]
+            ],
+            "source": "helix/web/src/toggle"
           },
           "tagName": "helix-toggle",
           "customElement": true,
@@ -52231,7 +52297,8 @@
               {
                 "slug": "default"
               }
-            ]
+            ],
+            "source": "helix/web/src/toolbar"
           },
           "tagName": "helix-toolbar",
           "customElement": true,
@@ -52949,7 +53016,8 @@
               {
                 "slug": "rich-content"
               }
-            ]
+            ],
+            "source": "helix/web/src/tooltip"
           },
           "tagName": "helix-tooltip",
           "customElement": true,
@@ -54318,7 +54386,8 @@
               {
                 "slug": "with-icons"
               }
-            ]
+            ],
+            "source": "helix/web/src/tree"
           },
           "tagName": "helix-tree",
           "customElement": true,

@@ -80,6 +80,15 @@ export interface HelixMetadata {
   since?: string
 
   /**
+   * Where the family's source directory lives, relative to the repository root.
+   *
+   * A path and not a URL. Documentation will be versioned, so the ref belongs
+   * to whoever renders the link: bake one in here and an archived version of
+   * the docs points at today's source. Only on the root declaration.
+   */
+  source?: string
+
+  /**
    * Stability contract. `experimental` may change without a major version;
    * `stable` is bound by semver; `deprecated` names its replacement.
    */

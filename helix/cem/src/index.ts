@@ -9,6 +9,7 @@ import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
+import { source } from './plugins/source.js'
 import { stableOrder } from './plugins/stable-order.js'
 import type { HelixMetadata, Plugin } from './types.js'
 
@@ -59,9 +60,11 @@ export const createHelixCemConfig = ({
     helixTier(tier),
     composition(),
     metadata(),
-    // After `composition`, which is what decides a declaration is the family's
-    // root, and examples hang off the root rather than off every part.
+    // Both after `composition`, which is what decides a declaration is the
+    // family's root: examples and a source path hang off the root rather than
+    // off every part.
     examples(),
+    source(),
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
     reactEvents(),
@@ -141,4 +144,5 @@ export {
   jsxImports,
   metadata,
   reactEvents,
+  source,
 }
