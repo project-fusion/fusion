@@ -266,6 +266,11 @@
  * on. */
 [part="sound"] {
   --_video-level-size: 4.5rem;
+  /* How far the level stands off the bar, in one place, because the ground
+     behind it has to follow: written separately they drifted, and on the solid
+     appearance the pill ended up sixteen pixels above the track it belongs to,
+     all of the gap above the thumb and none below it. */
+  --_video-level-lift: calc(100% + var(--helix-space-2xs));
 
   align-items: center;
   display: flex;
@@ -290,7 +295,7 @@
      `block-size` is the thin one. Written the other way round the slider came
      out seventy-two by four, lying down as before. */
   block-size: 4px;
-  bottom: calc(100% + var(--helix-space-2xs));
+  bottom: var(--_video-level-lift);
   /* One number for the track's length, read by the ground behind it too. */
   direction: rtl;
   inline-size: var(--_video-level-size);
@@ -329,7 +334,9 @@
   border-radius: var(--helix-radii-full);
   content: "";
   block-size: calc(var(--_video-level-size) + var(--helix-space-xs) * 2);
-  bottom: calc(100% + var(--helix-space-2xs) - var(--helix-space-xs));
+  /* One pad lower than the track, which is what centres a ground that is one
+     pad taller at each end. */
+  bottom: calc(var(--_video-level-lift) - var(--helix-space-xs));
   inline-size: var(--helix-size-icon-lg);
   left: 50%;
   position: absolute;
@@ -366,10 +373,8 @@
  * edge and nobody notices. Given a bar with a ground, four pixels of the slider
  * sat on it. Lifted by the bar's own top padding, which is the number that
  * created the overlap. */
-:host([appearance="solid"]) [part="volume"],
-:host([appearance="solid"]) [part="sound"]:hover::before,
-:host([appearance="solid"]) [part="sound"]:focus-within::before {
-  bottom: calc(100% + var(--helix-space-xs) * 2);
+:host([appearance="solid"]) [part="sound"] {
+  --_video-level-lift: calc(100% + var(--helix-space-xs) * 2);
 }
 
 /* The caption, above the bar and clear of it.

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { FusionLogo } from '../fusion-logo'
 import { SiteNav } from '../site-nav'
 
 /**
@@ -26,7 +25,12 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <footer className="siteFooter">
         <helix-flex align="center" class="shell" gap="md" justify="between" wrap>
           <helix-flex align="center" gap="xs">
-            <FusionLogo size="1.25rem" />
+            <helix-icon
+              className="fusionLogo"
+              label="Fusion"
+              name="fusion"
+              style={{ '--icon-size': '1.25rem' }}
+            />
             <helix-text appearance="caption" tone="muted">
               Fusion Development Group
             </helix-text>
