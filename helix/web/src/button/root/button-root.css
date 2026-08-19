@@ -89,12 +89,13 @@
    * step away from whatever it sits on in either mode, which a fixed neutral
    * cannot be, and the same button drops onto a page, a card and a panel.
    *
-   * The line is there because a footer row asked for it. Secondary and tertiary
-   * were separated by six points of the same wash and nothing else, so with all
-   * three appearances side by side the row read as one solid button and two
-   * ghosts of slightly different faintness. Giving the middle tier an edge
-   * separates the three by kind, nothing against a line against a fill, where
-   * six points of a wash separates them only by degree. */
+   * The line is there because a footer row asked for it. Written before the two
+   * axes existed, the resting fill and the transparent one were six points of
+   * the same wash apart and nothing else, so with all of them side by side the
+   * row read as one solid button and two ghosts of slightly different
+   * faintness. Giving the outlined one an edge separates them by kind, nothing
+   * against a line against a fill, where six points of a wash separates them
+   * only by degree. */
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 6%, transparent)

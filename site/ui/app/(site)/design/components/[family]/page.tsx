@@ -335,8 +335,8 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                       empty 40px square, present in the DOM and invisible on the
                       page. Icons are a line in `helix/icons/icons.txt`, which
                       resolves from Phosphor at build time. */}
-                  {/* `secondary`, the same as View Source beside it. The two
-                      are one row of controls and were two appearances. */}
+                  {/* `outlined`, the same as View Source beside it. The two are
+                      one row of controls and were two appearances. */}
                   <helix-icon-button appearance="outlined" label="More" slot="trigger">
                     <helix-icon name="dots-three-vertical"></helix-icon>
                   </helix-icon-button>

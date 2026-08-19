@@ -119,7 +119,7 @@ const OPEN = /<([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g
  * way that only shows up between an attribute and one that extends it:
  * `localeCompare` gives punctuation almost no weight, so `data-button-fill` and
  * `data-button` compared as `databuttonfillstandard` against
- * `databuttontertiary` and the longer name won on the `f`. The same fault put
+ * `databuttonghost` and the longer name won on the `f`. The same fault put
  * `value-text` ahead of `value`. Biome's own HTML formatter sorts on the name
  * and disagreed with both, which is how they were found: two formatters in one
  * `check` have to agree or they take turns undoing each other.

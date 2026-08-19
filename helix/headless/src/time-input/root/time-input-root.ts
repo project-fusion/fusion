@@ -449,6 +449,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
               )
             : nothing
         }
+        ${this.restCount > 0 ? html`<span part="rest">${`+${this.restCount}`}</span>` : nothing}
         <input
           part="control"
           id="control"
@@ -467,7 +468,6 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
         />
-        ${this.restCount > 0 ? html`<span part="rest">${`+${this.restCount}`}</span>` : nothing}
         <button
           part="trigger"
           type="button"

@@ -137,7 +137,22 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   }
 }
 
-/** Detail carried by `helix-change`. */
+/**
+ * Detail carried by `helix-change`.
+ *
+ * **`value` is a string, and the things that are not strings are the rule
+ * rather than the exception to it.** Pagination's page, its page size, the
+ * splitter's position and the carousel's index all announce through `String()`.
+ * That is deliberate: an HTML value is a string, a consumer parses one back
+ * with `Number()`, and nothing is lost on the way.
+ *
+ * A boolean is the case where it *is* lost, because `"false"` is truthy, so a
+ * consumer who forgets to compare against the word gets the opposite answer and
+ * no error. That is why checkedness has `helix-toggle` and its own boolean, and
+ * it is the line to hold: **stringify a value, never a fact.** A new control
+ * whose state is a boolean wants an event with a typed detail, not a `String()`
+ * call here.
+ */
 export interface ChangeDetail {
   /**
    * Which value changed, so one listener can serve several fields.

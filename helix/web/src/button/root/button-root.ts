@@ -92,9 +92,9 @@ export class HelixButton extends HelixBaseButton {
    *   a card, and on a phone where a control is a target before it is a label.
    *
    * Width and not weight. `appearance` says how much a button matters and this
-   * says how much room it takes, and the two are independent: a `tertiary
-   * standard` Cancel beside a `primary standard` Save is exactly the pairing
-   * a dialog wants.
+   * says how much room it takes, and the three are independent: a `ghost
+   * standard` Cancel beside a `solid primary standard` Save is exactly the
+   * pairing a dialog wants.
    *
    * **A consumer's own anchor takes it as `data-button-fill`**, the way it
    * takes the appearance as `data-button`:

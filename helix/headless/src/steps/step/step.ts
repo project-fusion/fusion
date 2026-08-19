@@ -22,7 +22,7 @@ import '../../button/index.js'
  * It is `helix-button`, not a `<button>` this element resets and dresses. The
  * hover wash, the focus ring, the disabled treatment and the way the label sits
  * against an icon are all decisions the button already carries, and a second
- * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+ * copy of them here is a second copy to keep in step. `ghost` is the quiet
  * shape: transparent until it is pointed at.
  *
  * It says nothing about where a reader may go. Every step is pressable and

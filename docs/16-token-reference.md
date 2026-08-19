@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 9 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 240 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 138 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 95 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 97 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 31 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 6 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
@@ -66,7 +66,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 190 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 228 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 224 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 195 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 191 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 96 |
@@ -94,7 +94,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 122 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 124 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 27 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 9 |
 
@@ -104,7 +104,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 77 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 79 |
 | `--helix-text-sm` | `var(--_helix-size-14)` | 95 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 38 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 18 |
@@ -120,7 +120,7 @@ The three weights.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-weight-regular` | `400` | 16 |
-| `--helix-weight-medium` | `500` | 106 |
+| `--helix-weight-medium` | `500` | 108 |
 | `--helix-weight-semibold` | `600` | 47 |
 
 ## leading

@@ -35,7 +35,7 @@
   user-select: none;
 }
 
-/* Relative to the menu's own surface. See the note on the tertiary button in
+/* Relative to the menu's own surface. See the note on the ghost button in
    the base layer: an absolute sunken value darkened the row past the panel it
    sat on. */
 [part="item"]:hover {

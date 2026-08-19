@@ -85,6 +85,23 @@
   max-inline-size: 100%;
 }
 
+/* Beside the tags it counts, not at the far end of the row.
+ *
+ * It is a fact about the set, and a summary separated from what it summarises
+ * by a text field is one the reader has to work out. Pushed right it also sits
+ * against the caret and reads as chrome, and the distance between the tags and
+ * their own count then changes as the field is typed into, which is the clearest
+ * sign it is in the wrong place. */
+[part="rest"] {
+  align-self: center;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  white-space: nowrap;
+}
+
 /* The text field keeps a usable width once tags share the line with it, and
    wraps to its own line rather than shrinking to nothing when they fill it. */
 [part="field"]:has([part="tags"]) [part="control"] {

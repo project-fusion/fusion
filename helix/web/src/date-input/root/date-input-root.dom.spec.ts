@@ -500,13 +500,17 @@ describe('input date keeps the tag row readable', () => {
     expect(part(held, 'control')?.hasAttribute('placeholder')).toBe(false)
   })
 
-  test('and the count sits after the field, not between the tags and it', async () => {
-    // At the end it is a note about the row, and the caret sits directly after
-    // the last tag where typing continues the list.
+  test('and the count sits with the tags it counts, before the field', async () => {
+    /* It sat after the field, on the reasoning that at the end it is a note
+       about the row. Rendered against the combobox it is not: pushed right the
+       count lands against the trigger with the whole width of the field between
+       it and the tags, so it reads as part of the trigger rather than as a fact
+       about the set. The caret still follows the set, the set now being the tags
+       and their count. */
     const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" max-tags="2"')
     const nodes = [...(part(host, 'field')?.children ?? [])]
     const at = (name: string) => nodes.findIndex((one) => one.getAttribute('part') === name)
-    expect(at('control')).toBeLessThan(at('rest'))
+    expect(at('rest')).toBeLessThan(at('control'))
     expect(part(host, 'rest')?.textContent?.trim()).toBe('+1')
   })
 

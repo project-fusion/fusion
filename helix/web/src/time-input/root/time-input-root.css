@@ -205,12 +205,19 @@
 [part="rest"] {
   color: var(--helix-color-foreground-subtle);
   flex: none;
-  margin-inline-start: auto;
-  /* Clear of the control beside it. `margin-inline-start: auto` pushes this to
-     the end of the row, where the only thing between it and the trigger was the
-     field's own 4px gap: at that distance the count and the calendar read as one
-     mark. */
-  margin-inline-end: var(--helix-space-2xs);
+  align-self: center;
+  /* Beside the tags it counts, not at the far end of the row.
+   *
+   * It sat there, pushed by `margin-inline-start: auto`, on the reasoning that
+   * at the end it is a note about the row and the caret then follows the last
+   * tag directly. Rendered against the combobox, which counts beside its chips:
+   * pushed right the count lands against the trigger with the whole width of the
+   * field between it and the tags, so it reads as part of the trigger cluster
+   * and what it counts has to be worked out. Beside them it reads as "and two
+   * more of these" with nothing to work out.
+   *
+   * The caret still follows the set. The set is now the tags and their count,
+   * which is the thing the caret should follow. */
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

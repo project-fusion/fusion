@@ -123,6 +123,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart control - The text field itself.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  * @csspart tag - One chosen option.
+ * @csspart rest - The count of choices held beyond `max-tags`.
  * @csspart create - The row offering to add what was typed.
  * @csspart indicator - The caret.
  * @csspart surface - The floating panel.
@@ -186,6 +187,23 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   /** What a tag's remove control is called, since the mark has no name. */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove'
+
+  /**
+   * How many tags to draw before the rest become a count. `multiple` only.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * choices would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
+   * on, where a row that silently stops is a field that appears to have lost
+   * what was put in it. Date Input and Time Input carry the same property and
+   * the same reasoning.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
 
   /** Accessible name for the list, which has no visible one of its own. */
   @property({ attribute: 'list-label' })
@@ -338,6 +356,17 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     if (!this.multiple) {
       this.close()
     }
+  }
+
+  /** The choices that get a tag, which is all of them until `maxTags` says not. */
+  private get shown(): { text: string; value: string }[] {
+    const held = this.chosen
+    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+  }
+
+  /** How many are held beyond the ones shown. */
+  private get restCount(): number {
+    return Math.max(0, this.chosen.length - this.shown.length)
   }
 
   /** What a single-choice field shows at rest, which the tags replace. */
@@ -587,7 +616,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
         ${
           this.multiple && this.chosen.length > 0
             ? html`<span part="tags">
-                ${this.chosen.map(
+                ${this.shown.map(
                   (option) => html`<helix-tag
                     part="tag"
                     data-value=${option.value}
@@ -597,6 +626,11 @@ export class HelixBaseCombobox extends MixinControllerOpen(
                     >${option.text}</helix-tag
                   >`,
                 )}
+                ${
+                  this.restCount > 0
+                    ? html`<span part="rest">${`+${this.restCount}`}</span>`
+                    : nothing
+                }
               </span>`
             : nothing
         }
