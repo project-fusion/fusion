@@ -84,6 +84,36 @@ export const contentArt: Record<string, ReactNode> = {
       </g>
     </>
   ),
+  /* Two lines and a caret. A block of code drawn as real glyphs would be
+     unreadable at this size and would be a different language per card. */
+  code: (
+    <>
+      <g className="artMotion artLift">
+        <path
+          className="artOn"
+          d="M150 92l-10 8 10 8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+        <rect className="artLine" height="3" rx="1.5" width="34" x="158" y="98" />
+      </g>
+    </>
+  ),
+
+  'code-block': (
+    <>
+      <rect className="artLine" fill="none" height="72" rx="5" width="112" x="104" y="64" />
+      <path className="artEdge" d="M104 84h112" />
+      <g className="artMotion artLift">
+        <rect className="artSolid" height="3" rx="1.5" width="30" x="118" y="98" />
+        <rect className="artLine" height="3" rx="1.5" width="52" x="118" y="110" />
+        <rect className="artLine" height="3" rx="1.5" width="38" x="118" y="122" />
+      </g>
+      <circle className="artOn artFade" cx="204" cy="74" r="3" />
+    </>
+  ),
 
   /**
    * One rule, and the two groups it makes.

@@ -17,6 +17,8 @@ import type {
   HelixBaseCarousel,
   HelixBaseCheckbox,
   HelixBaseCheckboxGroup,
+  HelixBaseCode,
+  HelixBaseCodeBlock,
   HelixBaseColorInput,
   HelixBaseColorPicker,
   HelixBaseCombobox,
@@ -1249,6 +1251,66 @@ instead. */
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixBaseCheckboxElementEvent) => void;
 
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseCodeBlockProps = {
+  /** What to call this block, usually a file name or a language. */
+  label?: HelixBaseCodeBlock["label"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "no-copy"?: HelixBaseCodeBlock["noCopy"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  noCopy?: HelixBaseCodeBlock["noCopy"];
+};
+
+export type HelixBaseCodeBlockSolidJsProps = {
+  /** What to call this block, usually a file name or a language. */
+  "prop:label"?: HelixBaseCodeBlock["label"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "bool:no-copy"?: HelixBaseCodeBlock["noCopy"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "prop:noCopy"?: HelixBaseCodeBlock["noCopy"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseCodeProps = {};
+
+export type HelixBaseCodeSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -10192,6 +10254,89 @@ export type CustomElements = {
   >;
 
   /**
+   * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
+   * by a block of code: `pre` keeps the whitespace, `code` says what the
+   * whitespace is for, and losing either one loses something no styling puts
+   * back. Indentation in a `div` is a paragraph with odd spacing.
+   *
+   * **It scrolls rather than wraps.** A wrapped line of code is a lie about where
+   * the line ends, and in a language where a line break can be significant it is
+   * a lie that costs someone an afternoon. The box takes its own scrollbar.
+   *
+   * **The copy button is here because the alternative is selecting it by hand.**
+   * Every consumer would otherwise put one there, slightly differently, and the
+   * one that forgot would be the one with the longest snippet. It is on unless
+   * `no-copy` says otherwise, and takes its text from the slot rather than from a
+   * property, so there is no second copy of the code to keep in step.
+   *
+   * A `Code` for a fragment inside a sentence. Separate families, because one
+   * flows with prose and the other is a figure.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: What to call this block, usually a file name or a language.
+   * - `no-copy`/`noCopy`: Whether to leave the copy button off.
+   *
+   * Negative, which is not a style choice. A boolean attribute is true whenever
+   * it is *present*, so a `copyable` defaulting to true could never be turned
+   * off from markup: `copyable="false"` is the string "false", which is
+   * present, which is true. Measured, and it is why this is named the other way
+   * round. The platform already writes booleans like this for the same reason,
+   * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `block`: The scrolling `<pre>`.
+   * - `code`: The `<code>` inside it.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `copy`: The copy button.
+   * - `label`: The file name or language, where one is given.
+   */
+  "helix-base-code-block": Partial<
+    HelixBaseCodeBlockProps & BaseProps<HelixBaseCodeBlock> & BaseEvents
+  >;
+
+  /**
+   * **A real `<code>`, because the element is the meaning.** A styled span reads
+   * as code and is not: a screen reader announces nothing about it, a translation
+   * tool will happily translate it, and a search that understands documents
+   * cannot tell it from emphasis. The tag is the whole point, which is also why
+   * this component is so small.
+   *
+   * **Inline, and only inline.** A block of code is `CodeBlock`, a separate
+   * family rather than a variant here. The two differ in more than presentation:
+   * one flows with a sentence and must never scroll, the other is a figure with
+   * its own box, its own overflow and something to copy. Namespacing them
+   * together would say `CodeBlock` is part of `Code`, and it is not.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The `<code>` element.
+   */
+  "helix-base-code": Partial<
+    HelixBaseCodeProps & BaseProps<HelixBaseCode> & BaseEvents
+  >;
+
+  /**
    * **The picker is `helix-color-picker`, not a second one written here.** It owns the
    * square, the ramps, the eyedropper and the syntax toggle, and it is worth
    * having on its own: a settings pane wants a picker flat on the page with
@@ -17859,6 +18004,95 @@ export type CustomElementsSolidJs = {
     HelixBaseCheckboxProps &
       HelixBaseCheckboxSolidJsProps &
       BaseProps<HelixBaseCheckbox> &
+      BaseEvents
+  >;
+
+  /**
+   * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
+   * by a block of code: `pre` keeps the whitespace, `code` says what the
+   * whitespace is for, and losing either one loses something no styling puts
+   * back. Indentation in a `div` is a paragraph with odd spacing.
+   *
+   * **It scrolls rather than wraps.** A wrapped line of code is a lie about where
+   * the line ends, and in a language where a line break can be significant it is
+   * a lie that costs someone an afternoon. The box takes its own scrollbar.
+   *
+   * **The copy button is here because the alternative is selecting it by hand.**
+   * Every consumer would otherwise put one there, slightly differently, and the
+   * one that forgot would be the one with the longest snippet. It is on unless
+   * `no-copy` says otherwise, and takes its text from the slot rather than from a
+   * property, so there is no second copy of the code to keep in step.
+   *
+   * A `Code` for a fragment inside a sentence. Separate families, because one
+   * flows with prose and the other is a figure.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: What to call this block, usually a file name or a language.
+   * - `no-copy`/`noCopy`: Whether to leave the copy button off.
+   *
+   * Negative, which is not a style choice. A boolean attribute is true whenever
+   * it is *present*, so a `copyable` defaulting to true could never be turned
+   * off from markup: `copyable="false"` is the string "false", which is
+   * present, which is true. Measured, and it is why this is named the other way
+   * round. The platform already writes booleans like this for the same reason,
+   * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `block`: The scrolling `<pre>`.
+   * - `code`: The `<code>` inside it.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `copy`: The copy button.
+   * - `label`: The file name or language, where one is given.
+   */
+  "helix-base-code-block": Partial<
+    HelixBaseCodeBlockProps &
+      HelixBaseCodeBlockSolidJsProps &
+      BaseProps<HelixBaseCodeBlock> &
+      BaseEvents
+  >;
+
+  /**
+   * **A real `<code>`, because the element is the meaning.** A styled span reads
+   * as code and is not: a screen reader announces nothing about it, a translation
+   * tool will happily translate it, and a search that understands documents
+   * cannot tell it from emphasis. The tag is the whole point, which is also why
+   * this component is so small.
+   *
+   * **Inline, and only inline.** A block of code is `CodeBlock`, a separate
+   * family rather than a variant here. The two differ in more than presentation:
+   * one flows with a sentence and must never scroll, the other is a figure with
+   * its own box, its own overflow and something to copy. Namespacing them
+   * together would say `CodeBlock` is part of `Code`, and it is not.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The `<code>` element.
+   */
+  "helix-base-code": Partial<
+    HelixBaseCodeProps &
+      HelixBaseCodeSolidJsProps &
+      BaseProps<HelixBaseCode> &
       BaseEvents
   >;
 

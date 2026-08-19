@@ -29,6 +29,7 @@ cloud
 compass
 copy
 cube
+dots-three-vertical
 download
 envelope
 eye

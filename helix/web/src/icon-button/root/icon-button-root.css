@@ -65,9 +65,19 @@
    waiting to be hovered, which is what a control standing beside a field wants:
    the field paints itself and a transparent button next to it reads as a box
    with something floating after it, not as one piece of chrome. */
+/* The same wash `Button` uses, not a fixed neutral.
+ *
+ * This was `surface`, which is opaque, while the text button beside it fills
+ * with 6% of the foreground. Measured side by side at `secondary`: two
+ * different background colours, same border, same radius, so a row holding one
+ * of each read as two kinds of control. The base layer already argues the case
+ * for the wash, that a percentage of the foreground is a step away from
+ * whatever it sits on in either mode where a fixed neutral is not, and it
+ * applies here for the same reason. */
 :host([appearance="secondary"]) [part="button"] {
-  background-color: var(--helix-color-surface);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   border-color: var(--helix-color-border);
+  color: var(--helix-color-foreground);
 }
 
 /* Named again for hover, which the bare `[part="button"]:hover` above cannot
@@ -75,7 +85,7 @@
    the fill won in every state and a neutral button was the one variant that did
    not answer the pointer at all. */
 :host([appearance="secondary"]) [part="button"]:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
 }
 
 :host([appearance="danger"]) [part="button"] {

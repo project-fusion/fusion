@@ -146,7 +146,22 @@ helix-card > [slot="media"] {
    So the line stays where it is and gains weight and color. The one pixel of
    thickness snaps and is imperceptible; the color is what a reader sees. It is
    listed in the transition anyway, in case it becomes animatable. */
-:where([data-prose] a) {
+/* Prose, and anything that says it is a link.
+ *
+ * `[data-link]` joins the same rule rather than repeating it, which is the
+ * helper-beside-the-recipe pattern used for `data-button`: one decision written
+ * for two surfaces. It was missing, and the gap was invisible because the
+ * *variants* existed. `data-link="subtle"` and `"quiet"` are documented as
+ * departures from this rule, so a plain `data-link` outside `[data-prose]`
+ * selected nothing at all and an anchor in a table came out as the browser's
+ * default underlined blue. Found on the docs site's Examples table.
+ *
+ * Two specificities on purpose. The prose half stays inside `:where()` so a
+ * consumer's own class beats it; the attribute half is 0-1-0 so it beats the
+ * bare-element reset while still losing to a class. The variants below are the
+ * same weight and follow in source order, which is what lets them win. */
+:where([data-prose] a),
+[data-link] {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
@@ -171,7 +186,8 @@ helix-card > [slot="media"] {
     text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:where([data-prose] a):hover {
+:where([data-prose] a):hover,
+[data-link]:hover {
   color: var(--helix-color-primary-hover);
   text-decoration-color: currentColor;
   text-decoration-thickness: 2px;

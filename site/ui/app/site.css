@@ -1337,6 +1337,20 @@ helix-drawer {
   }
 }
 
+/* Air between one top-level section and the next.
+ *
+ * They were `gap="2xl"` on the column, the same distance the API Reference puts
+ * between two elements inside itself, so the page had one rhythm and no
+ * hierarchy: Usage sat as far from Preview as Root sat from Group. A section
+ * break should be the largest space on the page. */
+.docsMain > helix-flex > [id] {
+  scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
+}
+
+.docsMain > helix-flex {
+  gap: var(--helix-space-3xl);
+}
+
 .docsMain {
   margin-inline: auto;
   /* The measure, in the unit that means it. `54rem` was a guess that happened
@@ -1382,7 +1396,9 @@ helix-drawer {
 .docsPreview {
   block-size: 32rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  /* 4px. `sm` is the seed halved, which is what that number is here, so the
+     corner follows the theme's radius rather than pinning it. */
+  border-radius: var(--helix-radii-sm);
   overflow: hidden;
 }
 
@@ -1391,6 +1407,24 @@ helix-drawer {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
+}
+
+/* The editor is bounded and scrolls inside itself.
+ *
+ * It does not overflow today, because the sandbox is a fixed 32rem and the
+ * splitter divides that: measured at 153px of editor in a 194px pane. The cap
+ * is for the examples that are longer than the pane, where an uncapped editor
+ * grows the row it is in and the preview above it gets squeezed by however long
+ * the source happens to be. A reference page should not change shape per
+ * component.
+ *
+ * `min-block-size: 0` beside it because this is a grid item: a grid track's
+ * default minimum is its content, so a max on its own is quietly ignored the
+ * moment the content is taller than the cap. */
+.docsPreviewSource helix-sandbox-editor {
+  max-block-size: 100%;
+  min-block-size: 0;
+  overflow: auto;
 }
 
 /* The bar between the preview and the editor. It sits inside the source region
@@ -1417,8 +1451,44 @@ helix-drawer {
 
 /* Pushed to the far end, so the tabs stay a group and the action is plainly not
    one of them. */
+/* The two actions sit together at the far end, so the tabs stay a group and
+   what can be done to the file is plainly not one of them. */
 .docsPreviewCopy {
   margin-inline-start: auto;
+}
+
+/* An anchor that is an icon button.
+ *
+ * `data-button` is the base layer's helper for a link that looks like a button,
+ * and there is no icon-only counterpart to it: `helix-icon-button` is an
+ * element and does not take an `href`, so a link to the sandbox cannot be one.
+ * What is written here is the icon button's own box, `--helix-size-control`
+ * square with the padding taken back off, so the two controls at this end of
+ * the bar are the same size and shape.
+ *
+ * **This belongs in `helix/styles` rather than here.** A `data-icon-button`
+ * beside `data-button` is one decision for two surfaces, which is the pattern
+ * the base layer already uses; this is that decision made in one consumer
+ * because the page needed it today. It is worth doing properly the next time an
+ * anchor has to be an icon button, which will not be long: the sandbox toolbar
+ * and the docs title row both want one. */
+.docsPreviewOpen {
+  aspect-ratio: 1;
+  /* The same token the icon button beside it reads, so `data-density` moves
+     both together rather than shrinking one and leaving the other. */
+  background-color: transparent;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: inline-grid;
+  inline-size: var(--helix-size-control);
+  padding: var(--helix-space-none);
+  place-items: center;
+  text-decoration: none;
+}
+
+.docsPreviewOpen:hover {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
 }
 
 .docsPreviewTab[aria-pressed="true"] {
@@ -1426,15 +1496,101 @@ helix-drawer {
   color: var(--helix-color-foreground);
 }
 
-.docsCode {
-  background-color: var(--helix-color-surface-raised);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-sm);
-  margin: 0;
-  overflow-x: auto;
-  padding: var(--helix-space-sm) var(--helix-space-md);
+/* A property's name, in the library's identifier colour rather than the brand's.
+ *
+ * It was `tone="primary"`, which is the colour of a link and of a filled
+ * button: the first column of six tables was shouting in the one colour the
+ * page uses for things a reader can act on, and none of them were. */
+.apiName {
+  color: var(--helix-color-syntax-name);
+}
+
+/* And the type beside it, coloured by what each part of it is. The tokens are
+   the library's own, so a type on this page is the colour the same word takes
+   in the sandbox's editor. */
+/* A type wraps rather than scrolls.
+ *
+ * Scrolling kept every row one line tall, and hid the end of any type longer
+ * than its column behind a gesture: a reader cannot see that
+ * `HelixBaseAccordionItem[]` is an array without dragging it. A wrapped type is
+ * longer to look at and entirely visible, which is what a reference is for.
+ *
+ * `break-word` rather than `anywhere`, so a break is taken only when a single
+ * token genuinely cannot fit. `anywhere` would split short unions mid-literal
+ * while there was still room to put them on the next line whole. */
+.apiType {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  overflow-wrap: break-word;
+}
+
+/* A literal value is green. That is `syntax-tag` rather than `syntax-string`,
+   which is navy in this GitHub-derived set: the token names describe an
+   editor's grammar, and what is wanted here is the colour.
+ *
+ * Held back toward the text around it. At full strength a union of six literals
+ * is six bright green words in a table cell, which is louder than the prose
+ * beside it and louder than the type actually matters. */
+.apiType [data-token="literal"] {
+  color: color-mix(
+    in oklab,
+    var(--helix-color-syntax-tag) 72%,
+    var(--helix-color-foreground-muted)
+  );
+}
+
+/* An absence, not an identifier. */
+/* Lezer's token classes, painted from the library's syntax tokens.
+ *
+ * The classes are the highlighter's and are stable; the palette is ours. These
+ * are light-DOM spans slotted into a code block, so a document rule reaches
+ * them directly and no `::part()` is needed. */
+helix-code-block .tok-keyword {
+  color: var(--helix-color-syntax-keyword);
+}
+
+helix-code-block .tok-string {
+  color: var(--helix-color-syntax-tag);
+}
+
+helix-code-block .tok-typeName,
+helix-code-block .tok-tagName {
+  color: var(--helix-color-syntax-callable);
+}
+
+helix-code-block .tok-propertyName,
+helix-code-block .tok-attributeName {
+  color: var(--helix-color-syntax-name);
+}
+
+helix-code-block .tok-comment {
+  color: var(--helix-color-syntax-comment);
+}
+
+helix-code-block .tok-number,
+helix-code-block .tok-bool {
+  color: var(--helix-color-syntax-constant);
+}
+
+helix-code-block .tok-punctuation,
+helix-code-block .tok-operator {
+  color: var(--helix-color-foreground-subtle);
+}
+
+.apiUnnamed {
+  color: var(--helix-color-foreground-subtle);
+  font-style: italic;
+}
+
+/* And every built-in is one colour, `string` alongside `boolean`. They are the
+   same kind of word, and separating them made a union of literals read as a
+   list of primitives. */
+.apiType [data-token="builtin"] {
+  color: var(--helix-color-syntax-keyword);
+}
+
+.apiType [data-token="custom"] {
+  color: var(--helix-color-syntax-callable);
 }
 
 /* Sticky under the header, and no taller than what is left of the viewport, so

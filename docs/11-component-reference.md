@@ -863,6 +863,71 @@ line per answer rather than hunting along a row.
 | --- | --- |
 | `--checkbox-group-gap` | Space between the boxes. |
 
+## Code
+
+### Root — `helix-code`
+
+A fragment of code inside a line of prose.
+
+Extends `HelixBaseCode`.
+
+A step down the scale, because a monospace face reads larger than the prose
+around it at the same nominal size. `--code-size` overrides it.
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The code. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `code` | The `<code>` element. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--code-size` | The fragment's size. Defaults to `text-sm`. |
+
+## Code Block
+
+### Root — `helix-code-block`
+
+A block of code, with somewhere to put its name and a way to take it.
+
+Extends `HelixBaseCodeBlock`.
+
+The header sits above the code rather than floating on it. Overlaid, which is
+the usual build, the copy button covers the first line, which is the one line
+of a snippet a reader is most likely to be reading.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `''` | `HelixBaseCodeBlock` | What to call this block, usually a file name or a language. |
+| `noCopy` | `no-copy` | `boolean` | `false` | `HelixBaseCodeBlock` | Whether to leave the copy button off. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The code. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `block` | The scrolling `<pre>`. |
+| `code` | The `<code>` inside it. |
+| `frame` | The code and the copy button beside it. |
+| `header` | The bar carrying the name, where there is one. |
+| `copy` | The copy button. |
+| `label` | The file name or language, where one is given. |
+
 ## Color Input
 
 ### Root — `helix-color-input`

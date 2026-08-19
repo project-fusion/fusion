@@ -242,3 +242,15 @@ slot[name="start"]::slotted(*) {
     transition: none;
   }
 }
+
+/* The chevron obeys the tree's placement.
+ *
+ * `order` moves the paint and not the DOM, which is correct here and would not
+ * be for anything focusable: the toggle is `aria-hidden` and the row itself is
+ * the control, so reading order is untouched. `margin-inline-start: auto` is
+ * what actually pushes it to the far end; without it `order` alone only puts it
+ * after the label, hard against the text. */
+[part="toggle"] {
+  margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));
+  order: var(--tree-chevron-order, 0);
+}

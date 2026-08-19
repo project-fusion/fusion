@@ -20,6 +20,8 @@ import type {
   HelixCheckbox,
   HelixCheckboxGroup,
   HelixCloseEvent,
+  HelixCode,
+  HelixCodeBlock,
   HelixColorInput,
   HelixColorPicker,
   HelixCombobox,
@@ -1810,6 +1812,66 @@ instead. */
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixCheckboxElementEvent) => void;
 
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixCodeBlockProps = {
+  /** What to call this block, usually a file name or a language. */
+  label?: HelixCodeBlock["label"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "no-copy"?: HelixCodeBlock["noCopy"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  noCopy?: HelixCodeBlock["noCopy"];
+};
+
+export type HelixCodeBlockSolidJsProps = {
+  /** What to call this block, usually a file name or a language. */
+  "prop:label"?: HelixCodeBlock["label"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "bool:no-copy"?: HelixCodeBlock["noCopy"];
+  /** Whether to leave the copy button off.
+
+Negative, which is not a style choice. A boolean attribute is true whenever
+it is *present*, so a `copyable` defaulting to true could never be turned
+off from markup: `copyable="false"` is the string "false", which is
+present, which is true. Measured, and it is why this is named the other way
+round. The platform already writes booleans like this for the same reason,
+`novalidate` and `nomodule` and `noreferrer` among them. */
+  "prop:noCopy"?: HelixCodeBlock["noCopy"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixCodeProps = {};
+
+export type HelixCodeSolidJsProps = {
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -11548,6 +11610,70 @@ export type CustomElements = {
   >;
 
   /**
+   * The header sits above the code rather than floating on it. Overlaid, which is
+   * the usual build, the copy button covers the first line, which is the one line
+   * of a snippet a reader is most likely to be reading.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: What to call this block, usually a file name or a language.
+   * - `no-copy`/`noCopy`: Whether to leave the copy button off.
+   *
+   * Negative, which is not a style choice. A boolean attribute is true whenever
+   * it is *present*, so a `copyable` defaulting to true could never be turned
+   * off from markup: `copyable="false"` is the string "false", which is
+   * present, which is true. Measured, and it is why this is named the other way
+   * round. The platform already writes booleans like this for the same reason,
+   * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `block`: The scrolling `<pre>`.
+   * - `code`: The `<code>` inside it.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `copy`: The copy button.
+   * - `label`: The file name or language, where one is given.
+   */
+  "helix-code-block": Partial<
+    HelixCodeBlockProps & BaseProps<HelixCodeBlock> & BaseEvents
+  >;
+
+  /**
+   * A step down the scale, because a monospace face reads larger than the prose
+   * around it at the same nominal size. `--code-size` overrides it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--code-size`: The fragment's size. Defaults to `text-sm`. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The `<code>` element.
+   */
+  "helix-code": Partial<HelixCodeProps & BaseProps<HelixCode> & BaseEvents>;
+
+  /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
    * control.
@@ -19490,6 +19616,75 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The header sits above the code rather than floating on it. Overlaid, which is
+   * the usual build, the copy button covers the first line, which is the one line
+   * of a snippet a reader is most likely to be reading.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: What to call this block, usually a file name or a language.
+   * - `no-copy`/`noCopy`: Whether to leave the copy button off.
+   *
+   * Negative, which is not a style choice. A boolean attribute is true whenever
+   * it is *present*, so a `copyable` defaulting to true could never be turned
+   * off from markup: `copyable="false"` is the string "false", which is
+   * present, which is true. Measured, and it is why this is named the other way
+   * round. The platform already writes booleans like this for the same reason,
+   * `novalidate` and `nomodule` and `noreferrer` among them.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `block`: The scrolling `<pre>`.
+   * - `code`: The `<code>` inside it.
+   * - `frame`: The code and the copy button beside it.
+   * - `header`: The bar carrying the name, where there is one.
+   * - `copy`: The copy button.
+   * - `label`: The file name or language, where one is given.
+   */
+  "helix-code-block": Partial<
+    HelixCodeBlockProps &
+      HelixCodeBlockSolidJsProps &
+      BaseProps<HelixCodeBlock> &
+      BaseEvents
+  >;
+
+  /**
+   * A step down the scale, because a monospace face reads larger than the prose
+   * around it at the same nominal size. `--code-size` overrides it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The code.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--code-size`: The fragment's size. Defaults to `text-sm`. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The `<code>` element.
+   */
+  "helix-code": Partial<
+    HelixCodeProps & HelixCodeSolidJsProps & BaseProps<HelixCode> & BaseEvents
+  >;
+
+  /**
    * The frame is the field rather than the input, so the trigger sits inside the
    * same box as the text and the focus ring is drawn once around the whole
    * control.
@@ -26482,6 +26677,8 @@ export type CustomCssProperties = {
   "--checkbox-card-background-color"?: string;
   /** Edge around one. */
   "--checkbox-card-border-color"?: string;
+  /** The fragment's size. Defaults to `text-sm`. */
+  "--code-size"?: string;
   /** Fill behind the field. */
   "--color-input-background-color"?: string;
   /** Edge length of the block in `appearance="swatch"`. */

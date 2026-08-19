@@ -5237,6 +5237,375 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/code-block/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/code-block/root/code-block-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/code-block/root/code-block-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**`<pre><code>` and nothing cleverer.** The pair is what the platform means\nby a block of code: `pre` keeps the whitespace, `code` says what the\nwhitespace is for, and losing either one loses something no styling puts\nback. Indentation in a `div` is a paragraph with odd spacing.\n\n**It scrolls rather than wraps.** A wrapped line of code is a lie about where\nthe line ends, and in a language where a line break can be significant it is\na lie that costs someone an afternoon. The box takes its own scrollbar.\n\n**The copy button is here because the alternative is selecting it by hand.**\nEvery consumer would otherwise put one there, slightly differently, and the\none that forgot would be the one with the longest snippet. It is on unless\n`no-copy` says otherwise, and takes its text from the slot rather than from a\nproperty, so there is no second copy of the code to keep in step.\n\nA `Code` for a fragment inside a sentence. Separate families, because one\nflows with prose and the other is a figure.",
+          "name": "HelixBaseCodeBlock",
+          "cssParts": [
+            {
+              "description": "The scrolling `<pre>`.",
+              "name": "block"
+            },
+            {
+              "description": "The `<code>` inside it.",
+              "name": "code"
+            },
+            {
+              "description": "The code and the copy button beside it.",
+              "name": "frame"
+            },
+            {
+              "description": "The bar carrying the name, where there is one.",
+              "name": "header"
+            },
+            {
+              "description": "The copy button.",
+              "name": "copy"
+            },
+            {
+              "description": "The file name or language, where one is given.",
+              "name": "label"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The code.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to call this block, usually a file name or a language.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "noCopy",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to leave the copy button off.\n\nNegative, which is not a style choice. A boolean attribute is true whenever\nit is *present*, so a `copyable` defaulting to true could never be turned\noff from markup: `copyable=\"false\"` is the string \"false\", which is\npresent, which is true. Measured, and it is why this is named the other way\nround. The platform already writes booleans like this for the same reason,\n`novalidate` and `nomodule` and `noreferrer` among them.",
+              "attribute": "no-copy"
+            },
+            {
+              "kind": "field",
+              "name": "text",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The code as text, read from the slot rather than stored.\n\nClient only, and it has to be: the server has no children to read. The\ncopy button is a client-side affordance anyway, so nothing is lost, and\ntaking the text from a property instead would be a second copy of the code\nthat goes stale the moment the slot changes.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What to call this block, usually a file name or a language.",
+              "fieldName": "label"
+            },
+            {
+              "name": "no-copy",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to leave the copy button off.\n\nNegative, which is not a style choice. A boolean attribute is true whenever\nit is *present*, so a `copyable` defaulting to true could never be turned\noff from markup: `copyable=\"false\"` is the string \"false\", which is\npresent, which is true. Measured, and it is why this is named the other way\nround. The platform already writes booleans like this for the same reason,\n`novalidate` and `nomodule` and `noreferrer` among them.",
+              "fieldName": "noCopy"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A block of code, with somewhere to put its name and a way to take it.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/code-block",
+            "aliases": [
+              "Code block",
+              "Snippet",
+              "Pre"
+            ],
+            "tier": "headless",
+            "group": "BaseCodeBlock",
+            "part": "Root"
+          },
+          "tagName": "helix-base-code-block",
+          "customElement": true,
+          "modulePath": "src/code-block/root/code-block-root.ts",
+          "definitionPath": "src/code-block/root/code-block-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseCodeBlock",
+          "declaration": {
+            "name": "HelixBaseCodeBlock",
+            "module": "src/code-block/root/code-block-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-code-block",
+          "declaration": {
+            "name": "HelixBaseCodeBlock",
+            "module": "src/code-block/root/code-block-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/code/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/code/root/code-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/code/root/code-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**A real `<code>`, because the element is the meaning.** A styled span reads\nas code and is not: a screen reader announces nothing about it, a translation\ntool will happily translate it, and a search that understands documents\ncannot tell it from emphasis. The tag is the whole point, which is also why\nthis component is so small.\n\n**Inline, and only inline.** A block of code is `CodeBlock`, a separate\nfamily rather than a variant here. The two differ in more than presentation:\none flows with a sentence and must never scroll, the other is a figure with\nits own box, its own overflow and something to copy. Namespacing them\ntogether would say `CodeBlock` is part of `Code`, and it is not.",
+          "name": "HelixBaseCode",
+          "cssParts": [
+            {
+              "description": "The `<code>` element.",
+              "name": "code"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The code.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A fragment of code inside a line of prose.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/code",
+            "aliases": [
+              "Inline code",
+              "Kbd"
+            ],
+            "tier": "headless",
+            "group": "BaseCode",
+            "part": "Root"
+          },
+          "tagName": "helix-base-code",
+          "customElement": true,
+          "modulePath": "src/code/root/code-root.ts",
+          "definitionPath": "src/code/root/code-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseCode",
+          "declaration": {
+            "name": "HelixBaseCode",
+            "module": "src/code/root/code-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-code",
+          "declaration": {
+            "name": "HelixBaseCode",
+            "module": "src/code/root/code-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/color-input/index.ts",
       "declarations": [],
       "exports": [
@@ -15498,6 +15867,22 @@
           "declaration": {
             "name": "*",
             "module": "src/checkbox-group/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/code/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/code-block/index.js"
           }
         },
         {

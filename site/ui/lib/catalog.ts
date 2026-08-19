@@ -49,6 +49,8 @@ export interface Element {
   events: EventDoc[]
   label: string
   methods: ApiMember[]
+  /** Role within the family. `Root` for its primary element. */
+  part: string
   properties: PropertyDoc[]
   slots: ApiMember[]
   summary: string
@@ -103,6 +105,7 @@ interface RawDeclaration {
     category?: string
     documentation?: string
     examples?: { description?: string; slug?: string }[]
+    part?: string
     since?: string
     status?: string
   }
@@ -295,6 +298,11 @@ const build = (): Family[] => {
             })),
             label: displayName(entry.tagName as string),
             methods: methods(entry.members),
+            /* From the manifest, not by stripping the family name off the
+               label. The composition plugin already derives this from the
+               folder, and "Avatar Group" minus "Avatar" is a string operation
+               that happens to work until a part's name contains the family's. */
+            part: entry.helix?.part ?? '',
             properties: properties(entry.members),
             slots: members(entry.slots),
             summary: entry.summary ?? '',

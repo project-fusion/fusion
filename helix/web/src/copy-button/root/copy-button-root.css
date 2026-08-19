@@ -22,3 +22,23 @@
 [part="button"][data-copied] {
   color: var(--helix-color-success);
 }
+
+/* The fallback icons need sizing here, and this is the whole reason why.
+ *
+ * `::slotted()` matches assigned nodes and never fallback content, so
+ * `IconButton`'s rule for a slotted icon cannot reach an icon the component
+ * draws itself. Measured: both glyphs rendered, both took the right colour, and
+ * both came out 0x0, so the button was a correctly sized box containing
+ * nothing. Fallback content belongs to this shadow tree and is styled from
+ * inside it, which is what these two rules are.
+ *
+ * `--helix-size-icon-sm`, the same token the slotted path resolves to, so an
+ * icon a consumer passes and one the component supplies are the same size. */
+slot > svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+slot[hidden] {
+  display: none;
+}

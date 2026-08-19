@@ -40,6 +40,7 @@ const KEYS = new Set([
  * @documentation https://helix.fusion.dev/components/tree
  *
  * @slot - The tree's items.
+
  *
  * @csspart tree - The tree container.
  *

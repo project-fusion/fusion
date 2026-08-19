@@ -136,7 +136,19 @@ export class HelixBaseOutline extends HelixElement {
     return this.links.flatMap((link) => {
       const id = decodeURIComponent(link.getAttribute('href')?.slice(1) ?? '')
       const target = id ? root.getElementById?.(id) : null
-      return target ? [{ link, target }] : []
+      /* A section that is not rendered is not one that can be read.
+       *
+       * `display: none` reports a zero rect, and zero is above the reading line,
+       * so an unrendered section counts as passed on every measurement and the
+       * marker lands on the last one of them. Found on a reference page that
+       * shows one API tier at a time and hides the other: the rail marked a
+       * heading the reader could not see, and no scrolling could move it,
+       * because the hidden sections always won the comparison.
+       *
+       * `getClientRects()` rather than a size check, because it is empty for
+       * exactly the case in question and non-empty for a section that is merely
+       * scrolled out of view, which is very much readable. */
+      return target && target.getClientRects().length > 0 ? [{ link, target }] : []
     })
   }
 

@@ -1,3 +1,7 @@
+/* Server only, which is what makes this free. The highlighter is a Lezer parse
+   and a tree walk, so it runs during the build and the page ships coloured
+   markup with no client JavaScript spent on it. `helix/web` never sees it. */
+import { highlight } from '@helix-io/sandbox/highlight'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { startCase } from '@/lib/naming'
@@ -44,20 +48,98 @@ const SECTIONS = [
 ] as const
 
 /**
- * A first column sized to its content, and a description that takes the rest.
+ * The description column, one width for every table on the page.
  *
- * Named rather than repeated per table so the six tables in a section line up
- * with each other. A reader comparing a slot to a part is comparing two tables,
- * and columns that disagree by a few rem read as two unrelated shapes.
+ * Fixed here and flexible everywhere else, which is the way round that makes
+ * the page line up. Sizing the *first* column instead leaves the description
+ * taking whatever is left, so a table with a Type column and one without end up
+ * with their prose starting and ending in different places, and the six tables
+ * in a section read as six unrelated shapes. Pinning the prose means a reader
+ * scanning down the page is scanning one column.
  */
-const NARROW = '14rem'
+const DESCRIPTION = '26rem'
 
 const first = (text: string): string => text.split('\n\n')[0] ?? ''
 
 function Code({ children }: { children: string }) {
   return (
-    <helix-text appearance="code" tone="primary">
+    <helix-text appearance="code" class="apiName">
       {children}
+    </helix-text>
+  )
+}
+
+/**
+ * Colours a type annotation by what each part of it is.
+ *
+ * Split rather than highlighted: a type is not a program, and running a real
+ * tokenizer over `'primary' | 'neutral'` would be a parser shipped to colour
+ * six words. The split keeps quoted literals whole and then treats every run of
+ * identifier characters as one token, which is all the structure a type
+ * annotation has.
+ *
+ * The palette is the library's own `syntax-*` tokens, so a type here is the
+ * colour the same word would be in the sandbox's editor. That is the reason
+ * strings are not green: this set is GitHub-derived, where a string is navy and
+ * green is the tag colour. Recolouring them would make the reference page
+ * disagree with the editor two panes away, which is worse than either choice.
+ */
+/**
+ * The built-in types, which are one colour between them.
+ *
+ * `string` belongs here and not with the literals. It is the same kind of word
+ * as `boolean`: a name the language supplies, sitting where a type goes.
+ * `"primary"` is a different kind of thing entirely, a value standing in for a
+ * type, and colouring the two alike made a union of literals read as though it
+ * were a list of primitives.
+ */
+const BUILTIN = new Set([
+  'any',
+  'boolean',
+  'false',
+  'never',
+  'null',
+  'number',
+  'string',
+  'true',
+  'undefined',
+  'unknown',
+  'void',
+])
+
+const kindOf = (token: string): string => {
+  if (token.startsWith('"')) {
+    return 'literal'
+  }
+  if (BUILTIN.has(token)) {
+    return 'builtin'
+  }
+  return /^[A-Z]/.test(token) ? 'custom' : 'plain'
+}
+
+function TypeText({ children }: { children: string }) {
+  /* Double quotes, because that is what the rest of the library writes. The
+     manifest records a literal exactly as the source spelled it, and the source
+     is TypeScript where single quotes are the house style; a reader copying
+     `"primary"` out of this table is putting it into HTML or JSX, where it is
+     the wrong quote. Swapped on the way out rather than in the manifest, which
+     should keep saying what the source says. */
+  const parts = children
+    .replace(/'([^']*)'/g, '"$1"')
+    .split(/("[^"]*"|[A-Za-z_$][\w$]*)/g)
+    .filter(Boolean)
+  return (
+    <helix-text appearance="code" class="apiType">
+      {parts.map((part, index) =>
+        /^("|[A-Za-z_$])/.test(part) ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
+          <span data-token={kindOf(part)} key={index}>
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      )}
     </helix-text>
   )
 }
@@ -77,22 +159,18 @@ function MemberTable({
   }
   return (
     <helix-table label={label}>
-      <helix-table-column width={NARROW}>{label}</helix-table-column>
-      {typed && <helix-table-column width="16rem">Type</helix-table-column>}
-      <helix-table-column>Description</helix-table-column>
+      <helix-table-column>{label}</helix-table-column>
+      {typed && <helix-table-column>Type</helix-table-column>}
+      <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
       {rows.map((row) => (
         <helix-table-row key={row.name}>
           <helix-table-cell header>
-            <Code>{row.name || '(default)'}</Code>
+            {/* The unnamed slot has no name, and printing `(default)` in the
+                identifier colour dressed an absence up as one. */}
+            {row.name ? <Code>{row.name}</Code> : <span className="apiUnnamed">(default)</span>}
           </helix-table-cell>
           {typed && (
-            <helix-table-cell>
-              {row.type && (
-                <helix-text appearance="code" tone="subtle">
-                  {row.type}
-                </helix-text>
-              )}
-            </helix-table-cell>
+            <helix-table-cell>{row.type && <TypeText>{row.type}</TypeText>}</helix-table-cell>
           )}
           <helix-table-cell>
             <helix-text appearance="caption" tone="muted">
@@ -112,27 +190,19 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   }
   return (
     <helix-table label="Properties">
-      <helix-table-column width={NARROW}>Prop</helix-table-column>
-      <helix-table-column width="14rem">Type</helix-table-column>
-      <helix-table-column width="8rem">Default</helix-table-column>
-      <helix-table-column>Description</helix-table-column>
+      <helix-table-column>Prop</helix-table-column>
+      <helix-table-column>Type</helix-table-column>
+      <helix-table-column>Default</helix-table-column>
+      <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
       {rows.map((row) => (
         <helix-table-row key={row.name}>
           <helix-table-cell header>
             <Code>{row.name}</Code>
           </helix-table-cell>
           <helix-table-cell>
-            <helix-text appearance="code" tone="subtle">
-              {row.type}
-            </helix-text>
+            <TypeText>{row.type}</TypeText>
           </helix-table-cell>
-          <helix-table-cell>
-            {row.default && (
-              <helix-text appearance="code" tone="subtle">
-                {row.default}
-              </helix-text>
-            )}
-          </helix-table-cell>
+          <helix-table-cell>{row.default && <TypeText>{row.default}</TypeText>}</helix-table-cell>
           <helix-table-cell>
             <helix-text appearance="caption" tone="muted">
               {first(row.description)}
@@ -147,19 +217,26 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
 /** One element's whole surface, six tables deep. */
 function ElementApi({ element }: { element: Element }) {
   return (
-    <helix-flex data-tier={element.tier} direction="column" gap="lg" id={element.tagName}>
-      <helix-flex direction="column" gap="2xs">
-        <helix-text appearance="subheading" as="h3">
-          {element.label}
-        </helix-text>
-        <helix-text appearance="code" tone="subtle">
-          &lt;{element.tagName}&gt;
-        </helix-text>
+    <helix-flex data-tier={element.tier} direction="column" gap="md" id={element.tagName}>
+      {/* The part, not the family and the part: every heading under Avatar's
+          API Reference began with the word Avatar, which the page has already
+          said twice above.
+
+          And the tag beside the heading rather than under it. `Root` and
+          `helix-accordion` are one fact stated twice, a role and the name it
+          answers to, and stacked they read as a heading followed by a first
+          line of content. On the same line the name is plainly a label on the
+          heading, and the section starts at its prose instead. */}
+      <helix-flex align="center" data-density="sm" gap="sm" wrap>
+        <helix-text as="h3">{element.part || element.label}</helix-text>
+        <helix-tag>
+          <helix-text appearance="code">{element.tagName}</helix-text>
+        </helix-tag>
       </helix-flex>
 
-      {element.description && (
+      {element.summary && (
         <helix-text appearance="caption" as="p" class="description" tone="muted">
-          {first(element.description)}
+          {element.summary}
         </helix-text>
       )}
 
@@ -188,11 +265,11 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
   const families = getFamilies()
   const root = family.elements.find((entry) => entry.tagName === `helix-${family.slug}`)
-  /* The long prose, not the one-liner. `@summary` is what the card in the
-     gallery shows and it is a sentence; `@description` is the reasoning, and a
-     reference page is where that belongs. */
-  const prose = root?.description || family.summary
-  const described = family.examples.some((example) => example.description !== '')
+  /* The one-liner, not the reasoning. `@description` is an essay: it argues
+     with itself, cites measurements and names components that are not this one,
+     which is right in a source file and wrong as the first thing under a
+     heading. `@summary` is the sentence that says what the component is. */
+  const prose = family.summary
   const headline = family.examples[0]
 
   return (
@@ -201,7 +278,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
         {/* A branch, not a flat list. Components is one entry among the guides
             that will sit beside it rather than the whole of the navigation,
             which is what a flat tree of sixty-six families quietly asserted. */}
-        <helix-tree active={family.slug} label="Documentation">
+        <helix-tree active={family.slug} chevron-placement="end" label="Documentation">
           {/* `default-open`, not `open`. `open` is the controlled half of
               `MixinControllerOpen`, and setting it declares the consumer owns
               the state: the branch would freeze open and a reader could not
@@ -226,19 +303,25 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                 that is about the *document* rather than about the component, so
                 the one button worth a word of its own keeps it. */}
             <helix-flex align="center" class="docsTitle" gap="md" justify="between">
-              <helix-text appearance="heading" as="h1">
-                {family.label}
-              </helix-text>
+              <helix-text as="h1">{family.label}</helix-text>
               <helix-flex align="center" data-density="sm" gap="xs">
                 {/* Unwired on purpose, pending a decision about where source is
                     read from: nothing is published and there is no public repo
                     URL to point at, and a button linking to a page that does not
                     exist is worse than one that visibly does nothing yet. */}
-                <helix-button appearance="tertiary">View Source</helix-button>
+                <helix-button appearance="secondary">View Source</helix-button>
                 <helix-menu label="Document actions">
-                  <helix-icon-button appearance="tertiary" label="More" slot="trigger">
-                    <helix-icon name="dots-three"></helix-icon>
+                  {/* `dots-three-vertical` did not exist in the icon set and
+                      `dots-three` was never a name: the trigger rendered an
+                      empty 40px square, present in the DOM and invisible on the
+                      page. Icons are a line in `helix/icons/icons.txt`, which
+                      resolves from Phosphor at build time. */}
+                  {/* `secondary`, the same as View Source beside it. The two
+                      are one row of controls and were two appearances. */}
+                  <helix-icon-button appearance="secondary" label="More" slot="trigger">
+                    <helix-icon name="dots-three-vertical"></helix-icon>
                   </helix-icon-button>
+                  <helix-menu-item value="view-sandbox">View in Sandbox</helix-menu-item>
                   <helix-menu-item value="view-markdown">View Markdown</helix-menu-item>
                   <helix-menu-item value="copy-markdown">Copy Markdown</helix-menu-item>
                   <helix-menu-item value="open-cursor">Open in Cursor</helix-menu-item>
@@ -259,48 +342,52 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               {family.status && <helix-tag>{startCase(family.status)}</helix-tag>}
               {family.since && <helix-tag>Since {family.since}</helix-tag>}
               {family.category && <helix-tag>{startCase(family.category)}</helix-tag>}
-              {family.aliases.length > 0 && (
-                <helix-text appearance="label" tone="subtle">
-                  Also known as {family.aliases.join(', ')}
-                </helix-text>
-              )}
             </helix-flex>
           </helix-flex>
 
           <helix-flex direction="column" gap="md" id="usage">
-            <helix-text appearance="title" as="h2">
-              Usage
-            </helix-text>
-            {/* The import and the markup, and deliberately no CDN script tag:
-                every package here is `private: true` and nothing is published,
-                so a `<script src>` line would be the one instruction on this
-                page that cannot be followed. */}
-            <helix-flex direction="column" gap="sm">
-              {family.elements.some((entry) => entry.tier === 'styled') && (
-                <pre className="docsCode" data-tier="styled">
-                  <code>{`import '@helix-io/web/${family.slug}'`}</code>
-                </pre>
-              )}
-              {family.elements.some((entry) => entry.tier === 'headless') && (
-                <pre className="docsCode" data-tier="headless">
-                  <code>{`import '@helix-io/headless/${family.slug}'`}</code>
-                </pre>
-              )}
-              <pre className="docsCode">
-                <code>{`<helix-${family.slug}></helix-${family.slug}>`}</code>
-              </pre>
-            </helix-flex>
+            <helix-text as="h2">Usage</helix-text>
+            {/* The import, and only the import. There was a second block
+                holding `<helix-accordion></helix-accordion>`, which is the tag
+                the heading two lines above already says: a line of code that
+                teaches nothing is still a line of code a reader has to read.
+                And deliberately no CDN script tag: every package here is
+                `private: true` and nothing is published, so a `<script src>`
+                would be the one instruction on this page that cannot be
+                followed. */}
+            {family.elements.some((entry) => entry.tier === 'styled') && (
+              <helix-code-block data-tier="styled">
+                <span
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
+                  dangerouslySetInnerHTML={{
+                    __html: highlight(`import '@helix-io/web/${family.slug}'`, 'js'),
+                  }}
+                />
+              </helix-code-block>
+            )}
+            {family.elements.some((entry) => entry.tier === 'headless') && (
+              <helix-code-block data-tier="headless">
+                <span
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
+                  dangerouslySetInnerHTML={{
+                    __html: highlight(`import '@helix-io/headless/${family.slug}'`, 'js'),
+                  }}
+                />
+              </helix-code-block>
+            )}
           </helix-flex>
 
           <helix-flex direction="column" gap="md" id="preview">
-            <helix-text appearance="title" as="h2">
-              Preview
-            </helix-text>
+            <helix-text as="h2">Preview</helix-text>
             {/* The family's headline example, which is `default.html` and is
                 first in the list by construction. A family with no examples
                 shows nothing rather than an empty frame. */}
             {headline ? (
-              <ComponentPreview css={headline.css} html={headline.html} />
+              <ComponentPreview
+                css={headline.css}
+                html={headline.html}
+                sandboxHref={`/design/sandbox?e=${family.slug}.${headline.slug}`}
+              />
             ) : (
               <helix-empty>
                 <helix-text appearance="caption" tone="muted">
@@ -310,10 +397,16 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             )}
           </helix-flex>
 
-          <helix-flex direction="column" gap="xl" id="api">
-            <helix-text appearance="title" as="h2">
-              API Reference
-            </helix-text>
+          {/* Wide between one element and the next, tight inside each. The two
+              were `xl` and `lg`, near enough that a heading sat about as far
+              from the table under it as from the whole section above it, so the
+              page had no seam between one element's API and another's.
+              `2xl` because that is the top of `Flex`'s scale: the token
+              `space-3xl` exists but the component does not offer it, which is
+              the component being right about how far apart two things in one
+              flow should ever be. */}
+          <helix-flex direction="column" gap="2xl" id="api">
+            <helix-text as="h2">API Reference</helix-text>
             {family.elements.map((element) => (
               <ElementApi element={element} key={element.tagName} />
             ))}
@@ -321,30 +414,32 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
           {family.examples.length > 0 && (
             <helix-flex direction="column" gap="md" id="examples">
-              <helix-text appearance="title" as="h2">
-                Examples
-              </helix-text>
+              <helix-text as="h2">Examples</helix-text>
               <helix-table label="Examples">
-                <helix-table-column width={NARROW}>Name</helix-table-column>
-                {/* The column appears when there is something to put in it.
-                    None of the 247 examples carries an `@summary` yet, and a
-                    column of empty cells reads as data that failed to load
-                    rather than as prose nobody has written. */}
-                {described && <helix-table-column>Description</helix-table-column>}
+                <helix-table-column>Name</helix-table-column>
+                <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
                 {family.examples.map((example) => (
                   <helix-table-row key={example.slug}>
                     <helix-table-cell header>
-                      <Link href={`/design/sandbox?e=${family.slug}.${example.slug}`}>
+                      {/* `quiet`: a column where every row is a link does not
+                          need every row underlined and blue. The variant carries
+                          the muted colour, drops the rule, and moves to full
+                          foreground on hover. */}
+                      <Link
+                        data-link="quiet"
+                        href={`/design/sandbox?e=${family.slug}.${example.slug}`}
+                      >
                         {example.label}
                       </Link>
                     </helix-table-cell>
-                    {described && (
-                      <helix-table-cell>
-                        <helix-text appearance="caption" tone="muted">
-                          {example.description}
-                        </helix-text>
-                      </helix-table-cell>
-                    )}
+                    {/* A dash where nobody has written one yet. An empty cell
+                        reads as data that failed to load; a dash reads as a
+                        blank someone still has to fill. */}
+                    <helix-table-cell>
+                      <helix-text appearance="caption" tone="muted">
+                        {example.description || '-'}
+                      </helix-text>
+                    </helix-table-cell>
                   </helix-table-row>
                 ))}
               </helix-table>
@@ -358,6 +453,12 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
             headings actually are and writes `aria-current` onto these anchors.
             The list it replaced marked nothing at all, so the rail said where
             you could go and never where you were. */}
+        {/* A visible heading, not only the accessible one. `label` names the
+            navigation for a screen reader and paints nothing, so the rail was
+            a column of links with no word saying what they were. */}
+        <helix-text appearance="label" class="docsRailTitle" tone="subtle">
+          On this page
+        </helix-text>
         <helix-outline label="On this page">
           {SECTIONS.map((section) => (
             <a href={`#${section.id}`} key={section.id} suppressHydrationWarning>
@@ -372,7 +473,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               key={element.tagName}
               suppressHydrationWarning
             >
-              {element.label}
+              {element.part || element.label}
             </a>
           ))}
           {family.examples.length > 0 && (

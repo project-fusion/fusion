@@ -162,7 +162,12 @@
 ::slotted(a) {
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
+  /* One step down from the prose it sits beside. A contents list is a margin
+     note about the page rather than part of it: at `sm` the rail read as a
+     second column of content competing with the first, and the eye kept being
+     offered a choice it had already made. `xs` is small enough to be reference
+     and large enough to be a target. */
+  font-size: var(--helix-text-xs);
   /* A step up from body weight even at rest. A contents page is scanned rather
      than read, and at `regular` against `foreground-muted` the whole column sat
      back far enough that the current item was doing all the work of saying

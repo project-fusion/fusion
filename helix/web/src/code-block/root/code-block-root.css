@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+/* The name, over the code rather than floating on it. Only drawn when there is
+   a name: a bar holding nothing was what made every one-line snippet look like
+   it had an empty strip above it. */
+[part="header"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-end-end-radius: var(--helix-radii-none);
+  border-end-start-radius: var(--helix-radii-none);
+  border-start-end-radius: var(--helix-radii-md);
+  border-start-start-radius: var(--helix-radii-md);
+  display: flex;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+}
+
+/* The positioning context for the copy button, which sits inside the code box.
+   Beside it, the button was outside the border and the two read as a code block
+   with a stray control next to it. Inside, it is one object. */
+[part="frame"] {
+  position: relative;
+}
+
+[part="copy"] {
+  inset-block-start: var(--helix-space-2xs);
+  inset-inline-end: var(--helix-space-2xs);
+  position: absolute;
+}
+
+/* Scrolls, never wraps. A wrapped line of code is a lie about where the line
+   ends, and in a language where a break is significant it is an expensive one.
+ *
+ * The end padding is the button's own width plus a gap, so the code is held
+ * clear of it rather than running underneath. An absolutely positioned control
+ * covers whatever is under it, and the first line of a snippet is the line most
+ * likely to be read. */
+[part="block"] {
+  /* The page's own ground, not a sunken panel. `surface-sunken` is a step away
+     from the background, so a block of code read as a well cut into the page
+     when what it is is the page with a line around it. On a dark theme that
+     step is the difference between black and not-quite. */
+  background-color: var(--helix-color-background);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  margin: var(--helix-space-none);
+  overflow-x: auto;
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--helix-space-md) calc(var(--helix-size-control) + var(--helix-space-sm));
+}
+
+/* Only under a header does the block give up its top edge, so the two boxes
+   read as one. A block with no name keeps all four sides. */
+[part="header"] + [part="frame"] [part="block"] {
+  border-block-start-width: var(--helix-space-none);
+  border-start-end-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
+[part="code"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+}

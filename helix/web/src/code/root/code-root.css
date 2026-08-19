@@ -1,0 +1,24 @@
+:host {
+  display: inline;
+}
+
+/* Sized against the text around it rather than the scale.
+ *
+ * A monospace face at the same nominal size reads larger than the prose it sits
+ * in, because its x-height and its stems are heavier, so it is set a step down
+ * the scale. See the note on `--code-size` below. */
+[part="code"] {
+  background-color: var(--helix-color-surface-raised);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-syntax-name);
+  font-family: var(--helix-font-mono);
+  /* A hook defaulting to a semantic token, which `check:tokens` is right to
+     insist on. The first draft was `0.9em` so the fragment tracked whatever
+     text it sat in, and a ratio is genuinely the better default for something
+     that appears in headings, captions and body alike. It is not available:
+     a raw value is a raw value inside a fallback too. So the scale decides, and
+     `--code-size` is how a consumer puts the ratio back. */
+  font-size: var(--code-size, var(--helix-text-sm));
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--helix-space-2xs);
+}

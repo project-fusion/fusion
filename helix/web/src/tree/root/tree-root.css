@@ -29,3 +29,20 @@
   --_tree-chevron-order: 2;
   --_tree-reserve: 0;
 }
+
+/* The placement, handed down as a number the item can use for `order`.
+ *
+ * A custom property rather than each item asking its parent: it crosses the
+ * light DOM and then the item's shadow boundary by itself, so a tree of any
+ * depth is covered by one declaration and nothing has to re-render when it
+ * changes. */
+:host([chevron-placement="end"]) {
+  /* Past the `end` slot, which already sits at `order: 1` with an auto margin
+     of its own. Sharing that order put the two side by side and, more to the
+     point, put *two* auto margins on one line: free space is split between
+     every auto margin, so the chevron came to rest halfway along the row with
+     70px of nothing after it. One auto margin does the pushing, and the chevron
+     rides behind it at the far end. */
+  --tree-chevron-order: 2;
+  --tree-chevron-gap: var(--helix-space-none);
+}
