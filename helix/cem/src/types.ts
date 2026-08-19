@@ -24,6 +24,16 @@ export interface Documented {
 }
 
 export interface HelixMember extends Documented {
+  /** Helix's own fields, namespaced the way the declaration's are. */
+  helix?: {
+    /**
+     * Events that answer this property, where it is controlled.
+     *
+     * Set from `@controlled` by `helix-controlled`. Present only on a property
+     * a consumer can take ownership of by declaring it.
+     */
+    controlled?: string[]
+  }
   kind?: string
   privacy?: string
 }

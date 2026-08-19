@@ -1,6 +1,7 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { composition } from './plugins/composition.js'
+import { controlled } from './plugins/controlled.js'
 import { controlledProps } from './plugins/controlled-props.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
@@ -68,6 +69,7 @@ export const createHelixCemConfig = ({
     source(),
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
+    controlled(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
     // Before the JSX generator, which walks modules in order, so both the

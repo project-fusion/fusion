@@ -37,4 +37,12 @@ const seeded = <helix-input default-value="Ada" label="Name" />
 // change is answered by a real anchor rather than by a handler.
 const routed = <helix-tree active="components" label="Docs" />
 
-void [unanswered, overlay, answered, imperative, seeded, routed]
+// Controlled without a controller mixin anywhere in sight. `page` is declared on
+// the component itself, which is how a third of the controlled surface went
+// unguarded while every check passed.
+// @expect TS2322
+const paged = <helix-pagination page={3} pages={10} />
+
+const pagedAnswered = <helix-pagination onhelix-navigate={() => {}} page={3} pages={10} />
+
+void [unanswered, overlay, answered, imperative, seeded, routed, paged, pagedAnswered]

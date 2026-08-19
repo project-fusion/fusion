@@ -93,6 +93,8 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      *
      * The same shape as the other three mixins, which is the point of them
      * being four of a kind rather than four of three kinds.
+     *
+     * @controlled helix-change
      */
     @property()
     get value(): string {

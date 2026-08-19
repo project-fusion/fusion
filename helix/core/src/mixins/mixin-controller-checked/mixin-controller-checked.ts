@@ -83,6 +83,8 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      *
      * Not reflected: the attribute is the consumer's input and stays as they
      * wrote it, and `data-checked` carries the resolved state for stylesheets.
+     *
+     * @controlled helix-change
      */
     @property({ type: Boolean })
     get checked(): boolean {

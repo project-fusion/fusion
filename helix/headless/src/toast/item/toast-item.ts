@@ -113,6 +113,8 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
    * only one starting state that makes sense: a message that has been rendered
    * is showing. An attribute whose only legal value is the default is an
    * attribute nobody can use.
+   *
+   * @controlled helix-dismiss
    */
   @property({ type: Boolean })
   get open(): boolean {

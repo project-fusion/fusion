@@ -141,6 +141,8 @@ export class HelixBaseSplitter extends HelixElement {
    * Reading gives where it is; writing declares it the consumer's, and
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
+   *
+   * @controlled helix-change
    */
   @property({ type: Number })
   get position(): number {
@@ -180,6 +182,8 @@ export class HelixBaseSplitter extends HelixElement {
    *
    * It overrides `min` and `max`, which is the point of it. Those keep a sliver
    * of a pane during a drag; this is the thing that says the sliver can go.
+   *
+   * @controlled helix-change
    */
   @property()
   get collapsed(): 'end' | 'start' | undefined {

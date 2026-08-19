@@ -66,6 +66,8 @@ export class HelixBaseCarousel extends HelixElement {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
+   *
+   * @controlled helix-select
    */
   @property({ type: Number })
   get index(): number {

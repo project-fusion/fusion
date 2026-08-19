@@ -134,6 +134,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -3292,7 +3298,12 @@
                 "text": "number"
               },
               "description": "The slide in view, counted from zero.\n\nReading gives the real slide, in either mode. Writing sets it, the way a\nscript assigning to a native control does. Which mode the carousel is in is\nread once, at the first update, from whether anything had declared an\n`index` by then: declared, and the consumer owns it and the carousel only\nannounces where it would have gone; not declared, and the carousel owns it\nand `default-index` says where it starts.\n\nThe same contract the four mixins carry, written out here rather than\nextracted, because a slide is addressed by position and every one of those\nmixins is keyed by a name. One consumer is not a mixin: if a second numeric\nstate turns up, this is what it is extracted from.",
-              "attribute": "index"
+              "attribute": "index",
+              "helix": {
+                "controlled": [
+                  "helix-select"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -4441,6 +4452,11 @@
               },
               "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
               "attribute": "checked",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -5872,6 +5888,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -5996,6 +6018,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -7345,6 +7372,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -8219,6 +8251,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -8343,6 +8381,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -9364,6 +9407,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -10714,6 +10763,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -10838,6 +10893,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -11854,7 +11914,12 @@
                 "text": "string"
               },
               "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
-              "attribute": "month"
+              "attribute": "month",
+              "helix": {
+                "controlled": [
+                  "helix-navigate"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -12218,6 +12283,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -12922,6 +12992,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -13537,6 +13613,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -17280,6 +17362,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -18669,7 +18756,12 @@
                 "text": "string"
               },
               "description": "What the list is narrowed to, if anything.\n\nFiltering hides rather than removes, so nothing about the value changes and\nthe list is still the consumer's own elements in their own order. Reading\ngives what is being filtered on; writing declares it theirs, and\n`default-filter` seeds one the list owns.",
-              "attribute": "filter"
+              "attribute": "filter",
+              "helix": {
+                "controlled": [
+                  "helix-filter"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -19132,6 +19224,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -20843,6 +20940,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -22203,6 +22306,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -23967,7 +24075,12 @@
                 "text": "number"
               },
               "description": "The page on show, one-based.\n\nAn accessor pair, the same shape as the calendar's `month`. Reading gives\nthe page on show; writing declares it the consumer's, and `default-page`\nseeds one the element owns.\n\n**Clamped on the way out, because \"the page on show\" is what it says it\ngives.** It returned whatever had been written, so `default-page=\"99\"` on a\nten-page result rendered page 10, marked page 10 with `aria-current`, and\nreported 99. A consumer syncing their query from this read a page that does\nnot exist while the control in front of them said otherwise. Not a\nfar-fetched value: it is a bookmarked link after the result shrank.\n\nRounded here too, so `2.7` reads as the 2 it renders.",
-              "attribute": "page"
+              "attribute": "page",
+              "helix": {
+                "controlled": [
+                  "helix-navigate"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -24699,7 +24812,12 @@
                 "text": "number"
               },
               "description": "The size in force.\n\nReading gives the real one; writing declares it the consumer's, and\n`default-value` seeds one this element owns. Same accessor pair as\n`Pagination.page` and the calendar's `month`.",
-              "attribute": "value"
+              "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -25482,6 +25600,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -26410,6 +26533,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -27580,6 +27709,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -28803,6 +28937,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -28927,6 +29067,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -30102,6 +30247,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -30958,7 +31108,12 @@
                 "text": "number"
               },
               "description": "Where the divider sits, as a percentage of the whole.\n\nReading gives where it is; writing declares it the consumer's, and\n`default-position` seeds one this element owns. The same accessor pair\n`Pagination.page` and the calendar's `month` carry.",
-              "attribute": "position"
+              "attribute": "position",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -30977,7 +31132,12 @@
                 "text": "'end' | 'start' | undefined"
               },
               "description": "Which pane is shut, if either.\n\nThe same accessor pair as `position`, and deliberately a second state\nrather than a reading of the first. A pane shut by dragging the divider to\nthe edge and a pane shut on purpose look identical in geometry and are not\nthe same thing: only the second knows where to go back to. Kept apart, the\nopen position is simply the one collapsing never overwrote, so restoring\nneeds no memory of its own.\n\nIt overrides `min` and `max`, which is the point of it. Those keep a sliver\nof a pane during a drag; this is the thing that says the sliver can go.",
-              "attribute": "collapsed"
+              "attribute": "collapsed",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -32139,6 +32299,11 @@
               },
               "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
               "attribute": "active",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -32823,6 +32988,11 @@
               },
               "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
               "attribute": "checked",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -34850,6 +35020,11 @@
               },
               "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
               "attribute": "active",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
@@ -35844,6 +36019,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -37022,6 +37202,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -37146,6 +37332,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -38501,6 +38692,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -39160,7 +39356,12 @@
                 "text": "boolean"
               },
               "description": "Whether the message is still showing.\n\nThe same decide-once contract every other stateful thing here carries, and\nit was the one exception: this waited to be told in every case, so\n`duration` did nothing at all without consumer script and the dismiss\ncontrol looked broken to anyone who pressed it. `Dialog` closes itself,\n`Accordion` closes itself, and there was no reason a message should not.\n\nDeclared by the markup and it is the consumer's: the item announces and\nwaits. Not declared and it is the item's: it goes when it is asked to, and\nthe consumer still hears `helix-dismiss` and takes it out of their own\nlist. Read once, at the first update.\n\n**No `default-open`, unlike the four mixins.** A `default-` seed exists so\nmarkup can choose a starting state without claiming ownership, and there is\nonly one starting state that makes sense: a message that has been rendered\nis showing. An attribute whose only legal value is the default is an\nattribute nobody can use.",
-              "attribute": "open"
+              "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-dismiss"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -39777,6 +39978,11 @@
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
               "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -41364,6 +41570,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -41934,6 +42146,12 @@
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
               "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -42530,6 +42748,11 @@
               },
               "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
               "attribute": "active",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              },
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"

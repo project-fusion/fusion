@@ -317,6 +317,8 @@ describe('createHelixCemConfig', () => {
       'helix-examples',
       'helix-source',
       'helix-declared-events',
+      // Before the JSX generator, which reads the annotation it writes.
+      'helix-controlled',
       'helix-react-events',
       'helix-convention-lint',
       'helix-stable-order',

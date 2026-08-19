@@ -220,6 +220,8 @@ export class HelixBasePagination extends HelixElement {
    * far-fetched value: it is a bookmarked link after the result shrank.
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
+   *
+   * @controlled helix-navigate
    */
   @property({ type: Number })
   get page(): number {

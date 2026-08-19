@@ -2834,7 +2834,12 @@
               "type": {
                 "text": "string"
               },
-              "description": "Which item is current, by its `value`.\n\nReading gives the real one, in either mode. Writing hands ownership to the\nconsumer: from then on the set announces changes and applies none of them."
+              "description": "Which item is current, by its `value`.\n\nReading gives the real one, in either mode. Writing hands ownership to the\nconsumer: from then on the set announces changes and applies none of them.",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -2896,7 +2901,12 @@
                 "text": "string"
               },
               "description": "Which item is current, by its `value`.\n\nCalled `active`, which is what this mixin is named for and what it was\nnot: it declared `value`, so the one mixin whose whole subject is which\nitem is active had no such property, and `active` meant something else\nentirely elsewhere in the library. It still does, and only there now:\n`option.active` is the option the keyboard is on, which is a different\nquestion from which one is chosen.\n\nAn accessor pair, the same shape as the other three. Reading gives the\nreal item; writing hands ownership to the consumer, so `<helix-tabs\nactive=\"one\">` is a set that stays on that tab and `default-active` is\nhow markup says where to start.",
-              "attribute": "active"
+              "attribute": "active",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -3038,7 +3048,12 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the control is checked.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them."
+              "description": "Whether the control is checked.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them.",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -3101,7 +3116,12 @@
                 "text": "boolean"
               },
               "description": "Whether the control is checked.\n\nOne property rather than two. Reading gives the real state whichever\nmode the control is in; writing hands ownership to the consumer, which\nis what the attribute in `<helix-checkbox checked>` does as well. The\nsame shape all four of these mixins have, for the reason given on\n`MixinControllerOpen.open`.\n\nNot reflected: the attribute is the consumer's input and stays as they\nwrote it, and `data-checked` carries the resolved state for stylesheets.",
-              "attribute": "checked"
+              "attribute": "checked",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -3270,7 +3290,13 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether the element is open.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the element announces changes and applies none\nof them, and waits to be told."
+              "description": "Whether the element is open.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the element announces changes and applies none\nof them, and waits to be told.",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              }
             },
             {
               "kind": "method",
@@ -3315,7 +3341,13 @@
                 "text": "boolean"
               },
               "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
-              "attribute": "open"
+              "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              }
             },
             {
               "kind": "field",
@@ -3456,7 +3488,12 @@
               "type": {
                 "text": "string"
               },
-              "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told."
+              "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told.",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "method",
@@ -3529,7 +3566,12 @@
                 "text": "string"
               },
               "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
-              "attribute": "value"
+              "attribute": "value",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
             },
             {
               "kind": "field",

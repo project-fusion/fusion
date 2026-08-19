@@ -80,6 +80,8 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
      * cloned, serialised for hydration, or diffed by a framework, it would come
      * back controlled and stop responding. `data-open` carries the resolved
      * state for stylesheets, which is what it has always been for.
+     *
+     * @controlled helix-open helix-close
      */
     @property({ type: Boolean })
     get open(): boolean {

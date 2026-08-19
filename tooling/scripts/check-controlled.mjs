@@ -27,10 +27,22 @@
  * one direction at a time and were satisfied by *any* error on the line: a
  * misspelled tag name would have kept them green. This asserts the code.
  *
+ * **It also holds `@controlled` against the calls it describes**, which is the
+ * half that decides whether any of the above covers anything. A property is
+ * controlled because it settles itself through `requestControlledChange`, and
+ * the tag is the only thing that says so to the manifest. Tagged and never
+ * called is a constraint on a property that does not announce; called and never
+ * tagged is a property nothing guards, which is exactly how eight of them
+ * escaped when the answer was inferred from `inheritedFrom` instead.
+ *
+ * Both live in one script because they are one claim: this is the controlled
+ * surface, and this is what declaring it costs a consumer.
+ *
  * Run with `bun run check:controlled` (also part of `bun run verify`).
  */
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { extname, join } from 'node:path'
 
 const FIXTURE = 'tooling/fixtures/controlled-props.tsx'
 const PROJECT = 'tooling/fixtures/tsconfig.json'
@@ -118,7 +130,81 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
+/* Second half: every controlled property says so, and every property that says
+   so is one. */
+const TIERS = ['helix/core/src', 'helix/headless/src', 'helix/web/src']
+
+const walk = (dir, found = []) => {
+  for (const entry of readdirSync(dir)) {
+    const path = join(dir, entry)
+    if (statSync(path).isDirectory()) {
+      walk(path, found)
+    } else {
+      found.push(path)
+    }
+  }
+  return found
+}
+
+const isSource = (path) =>
+  extname(path) === '.ts' && !path.endsWith('.css.ts') && !path.includes('.spec.')
+
+const declarations = []
+
+for (const tier of TIERS) {
+  for (const path of walk(tier).filter(isSource)) {
+    const source = readFileSync(path, 'utf8')
+    /* The label a settled property is announced under, which is the property's
+       own name in all twelve. Read from the call rather than from the property,
+       because the call is what makes it controlled. */
+    const called = new Set([...source.matchAll(/^\s*label: '([\w-]+)',$/gm)].map((m) => m[1]))
+    /* The property the tag sits above, which is the next declaration after the
+       comment closes and whatever decorators follow it. */
+    const tagged = new Set(
+      [
+        ...source.matchAll(
+          /\* @controlled [\w\s-]+\n(?:[\s\S]{0,400}?)\n\s+(?:get )?([A-Za-z]\w*)[(:=]/g,
+        ),
+      ].map((match) => match[1]),
+    )
+    if (called.size > 0 || tagged.size > 0) {
+      declarations.push({ called, path, tagged })
+    }
+  }
+}
+
+for (const { called, path, tagged } of declarations) {
+  for (const name of called) {
+    if (!tagged.has(name)) {
+      problems.push(
+        `${path}: \`${name}\` settles itself through requestControlledChange and carries no ` +
+          '`@controlled` tag, so nothing downstream knows it is controlled: not the manifest, ' +
+          'not the reference, and not the JSX types that would have refused it without a handler.',
+      )
+    }
+  }
+  for (const name of tagged) {
+    if (!called.has(name)) {
+      problems.push(
+        `${path}: \`${name}\` is tagged \`@controlled\` and never announces through ` +
+          'requestControlledChange, so the types ask a consumer for a handler that nothing calls.',
+      )
+    }
+  }
+}
+
+if (problems.length > 0) {
+  console.error(`Controlled state is not declared where it is used (${problems.length}):\n`)
+  for (const problem of problems) {
+    console.error(`  ${problem}\n`)
+  }
+  process.exit(1)
+}
+
+const tagCount = declarations.reduce((count, one) => count + one.tagged.size, 0)
+
 console.log(
-  `controlled: ${expected.size} rejected without an answer, ` +
+  `controlled: ${tagCount} declared properties, every one announced; ` +
+    `${expected.size} rejected in JSX without an answer, ` +
     `${lines.filter((line) => line.startsWith('const ')).length - expected.size} allowed with one`,
 )

@@ -10224,7 +10224,7 @@ export type CustomElements = {
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
-  >;
+  > & HelixBaseCarouselControlled;
 
   /**
    * The host is the group, so `role="group"` sits on it through internals and
@@ -13830,7 +13830,7 @@ export type CustomElements = {
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
-  >;
+  > & HelixBasePaginationControlled;
 
   /**
    * Its own element beside `Pagination` rather than a slot inside it, for the
@@ -15127,7 +15127,7 @@ export type CustomElements = {
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
-  >;
+  > & HelixBaseSplitterControlled;
 
   /**
    * A group rather than a list, because the figures are read together and their
@@ -16541,7 +16541,7 @@ export type CustomElements = {
    */
   "helix-base-toast-item": Partial<
     HelixBaseToastItemProps & BaseProps<HelixBaseToastItem> & BaseEvents
-  >;
+  > & HelixBaseToastItemControlled;
 
   /**
    * **The region is why this is one family rather than two.** A live region has
@@ -25544,6 +25544,24 @@ type HelixBaseAccordionItemControlled =
   );
 
 /**
+ * helix-base-carousel: a controlled `index` announces and waits, so the handler comes with it.
+ */
+type HelixBaseCarouselControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-select`. */
+        index: HelixBaseCarousel["index"];
+        "onhelix-select": (event: HelixBaseCarouselHelixSelectElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        index: HelixBaseCarousel["index"];
+        ref: import('react').Ref<HelixBaseCarousel>;
+      }
+    | { index?: undefined }
+  );
+
+/**
  * helix-base-checkbox: a controlled `checked` announces and waits, so the handler comes with it.
  */
 type HelixBaseCheckboxControlled =
@@ -25695,9 +25713,22 @@ type HelixBaseDateInputControlled =
   );
 
 /**
- * helix-base-date-picker: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-base-date-picker: a controlled `month` or `value` announces and waits, so the handler comes with it.
  */
 type HelixBaseDatePickerControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        month: HelixBaseDatePicker["month"];
+        "onhelix-navigate": (event: HelixBaseDatePickerHelixNavigateElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        month: HelixBaseDatePicker["month"];
+        ref: import('react').Ref<HelixBaseDatePicker>;
+      }
+    | { month?: undefined }
+  ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
@@ -25769,9 +25800,22 @@ type HelixBaseInputControlled =
   );
 
 /**
- * helix-base-listbox: a controlled `value` announces and waits, so the handler comes with it.
+ * helix-base-listbox: a controlled `filter` or `value` announces and waits, so the handler comes with it.
  */
 type HelixBaseListboxControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-filter`. */
+        filter: HelixBaseListbox["filter"];
+        "onhelix-filter": (event: HelixBaseListboxHelixFilterElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        filter: HelixBaseListbox["filter"];
+        ref: import('react').Ref<HelixBaseListbox>;
+      }
+    | { filter?: undefined }
+  ) &
   (
     | {
         /** Declared, so the consumer owns it and answers `helix-change`. */
@@ -25821,6 +25865,24 @@ type HelixBaseNumberInputControlled =
         ref: import('react').Ref<HelixBaseNumberInput>;
       }
     | { value?: undefined }
+  );
+
+/**
+ * helix-base-pagination: a controlled `page` announces and waits, so the handler comes with it.
+ */
+type HelixBasePaginationControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-navigate`. */
+        page: HelixBasePagination["page"];
+        "onhelix-navigate": (event: HelixBasePaginationHelixNavigateElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        page: HelixBasePagination["page"];
+        ref: import('react').Ref<HelixBasePagination>;
+      }
+    | { page?: undefined }
   );
 
 /**
@@ -25929,6 +25991,37 @@ type HelixBaseSliderControlled =
   );
 
 /**
+ * helix-base-splitter: a controlled `position` or `collapsed` announces and waits, so the handler comes with it.
+ */
+type HelixBaseSplitterControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        position: HelixBaseSplitter["position"];
+        "onhelix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        position: HelixBaseSplitter["position"];
+        ref: import('react').Ref<HelixBaseSplitter>;
+      }
+    | { position?: undefined }
+  ) &
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        collapsed: HelixBaseSplitter["collapsed"];
+        "onhelix-change": (event: HelixBaseSplitterHelixChangeElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        collapsed: HelixBaseSplitter["collapsed"];
+        ref: import('react').Ref<HelixBaseSplitter>;
+      }
+    | { collapsed?: undefined }
+  );
+
+/**
  * helix-base-switch: a controlled `checked` announces and waits, so the handler comes with it.
  */
 type HelixBaseSwitchControlled =
@@ -26012,6 +26105,24 @@ type HelixBaseTimePickerControlled =
         ref: import('react').Ref<HelixBaseTimePicker>;
       }
     | { value?: undefined }
+  );
+
+/**
+ * helix-base-toast-item: a controlled `open` announces and waits, so the handler comes with it.
+ */
+type HelixBaseToastItemControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-dismiss`. */
+        open: HelixBaseToastItem["open"];
+        "onhelix-dismiss": (event: HelixBaseToastItemHelixDismissElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        open: HelixBaseToastItem["open"];
+        ref: import('react').Ref<HelixBaseToastItem>;
+      }
+    | { open?: undefined }
   );
 
 /**

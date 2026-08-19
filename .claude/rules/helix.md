@@ -541,6 +541,32 @@ class in `helix/core/src/events/events.ts` that carries its own name and augment
 `HTMLElementEventMap`. There is no generic `emit(name, detail)` helper: a
 dispatch through one cannot be named by the analyzer.
 
+**A controlled property declares itself with `@controlled`**, naming the events
+that answer it:
+
+```ts
+/** Whether the control is checked. @controlled helix-change */
+```
+
+Declaring `value` on a Helix control is a claim of ownership, so the element
+announces and applies nothing until it is told. Which properties work that way
+was inferred from `inheritedFrom` for exactly one commit, on the reasoning that
+they all come from a controller mixin. Eight do not: pagination's `page` and its
+size `value`, toast's `open`, listbox's `filter`, splitter's `position` and
+`collapsed`, carousel's `index`, date picker's `month` are implemented in the
+component and inherit from nothing. A third of the surface went unguarded and
+every check reported success.
+
+Nothing in the source says it either, short of a guess: `requestControlledChange`
+is called from a private method three hundred lines from the property it
+settles. So the property says so, `check:controlled` holds the tag and the call
+together in both directions, and the generated JSX types refuse the property
+without a handler.
+
+`@controlled` on the property, not the class, so it survives inheritance: a
+component's `checked` is a copy of the mixin's member, and a list kept beside
+the members would need merging by hand at every tier.
+
 Every `@property` gets a one-line description.
 
 **A camelCase property needs an explicit `attribute`.** Lit lowercases a

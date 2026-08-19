@@ -163,6 +163,8 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
    * this when the reader paged, so a consumer holding it was overwritten and
    * never told. Reading gives the month on show; writing declares it theirs,
    * and `default-month` seeds one the calendar owns.
+   *
+   * @controlled helix-navigate
    */
   @property()
   get month(): string {

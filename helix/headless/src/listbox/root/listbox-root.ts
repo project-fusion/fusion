@@ -181,6 +181,8 @@ export class HelixBaseListbox extends MixinCollection(
    * the list is still the consumer's own elements in their own order. Reading
    * gives what is being filtered on; writing declares it theirs, and
    * `default-filter` seeds one the list owns.
+   *
+   * @controlled helix-filter
    */
   @property()
   get filter(): string {

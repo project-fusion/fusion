@@ -82,6 +82,8 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * real item; writing hands ownership to the consumer, so `<helix-tabs
      * active="one">` is a set that stays on that tab and `default-active` is
      * how markup says where to start.
+     *
+     * @controlled helix-change
      */
     @property()
     get active(): string {

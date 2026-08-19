@@ -3,31 +3,16 @@ import { join } from 'node:path'
 import type { Plugin } from '../types.js'
 
 /**
- * The controlled properties, and the events that answer each one.
+ * Properties that are controlled and still take no handler in JSX.
  *
- * Keyed by the mixin that grafts the property on, because that is what the
- * manifest records in `inheritedFrom` and it cannot be confused with a
- * component's own property of the same name.
- *
- * **`active` is deliberately not here**, though it is controlled the same way.
- * It names which child is current, and that is routinely owned by something
- * outside the element: our own documentation nav derives it from the route and
- * moves it with real anchors, so the tree's change is answered by a navigation
- * rather than by a handler. Requiring one there buys a no-op that pushes the
- * same route twice. The runtime audit still covers it.
- *
- * `open` names two, and both are required where the component declares both. A
- * controlled overlay that hears one direction and not the other is half wired:
- * a dialog answering `helix-close` and not `helix-open` cannot be opened by its
- * own trigger, and one answering `helix-open` and not `helix-close` cannot be
- * dismissed with Escape. The event split is deliberate (see `events.ts`), so
- * the requirement follows it.
+ * `active` names which child is current, and that is routinely owned by
+ * something outside the element: our own documentation nav derives it from the
+ * route and moves it with real anchors, so the tree's change is answered by a
+ * navigation. Requiring a handler there buys a no-op that pushes the same route
+ * twice. It is still `@controlled`, because it is, and the runtime audit still
+ * covers it. This list is only about what the compiler insists on.
  */
-const CONTROLLED: Record<string, { events: string[]; property: string }> = {
-  MixinControllerChecked: { events: ['helix-change'], property: 'checked' },
-  MixinControllerOpen: { events: ['helix-open', 'helix-close'], property: 'open' },
-  MixinControllerValue: { events: ['helix-change'], property: 'value' },
-}
+const EXEMPT = new Set(['active'])
 
 /** `helix-change` becomes `HelixChange`, which is how the generator names its event types. */
 const pascal = (name: string): string =>
@@ -91,21 +76,15 @@ export interface ControlledPropsOptions {
  *
  * Reaches typed JSX only, so the runtime audit stays for everyone else.
  *
- * **And it reaches only the four mixins, which is not every controlled
- * property.** Eight more are implemented directly in a component and pass their
- * own `label` to `requestControlledChange`: pagination's `page` and its size
- * `value`, toast's `open`, listbox's `filter`, splitter's `position` and
- * `collapsed`, carousel's `index`, date picker's `month`. Every one of them is
- * controlled in exactly the sense this guards against, and none is guarded,
- * because `inheritedFrom` is the only signal in the manifest and they inherit
- * from nothing.
- *
- * The fix is to stop inferring it. An `@controlled helix-change` tag on the
- * property, read into the manifest and checked against the
- * `requestControlledChange` calls the way `check:events` checks `@event`, would
- * cover all twelve and could not drift. Deliberately not done here: it is a
- * manifest change plus a check plus twelve declarations, and it should not ride
- * along inside the plugin that consumes it.
+ * **Which properties are controlled is read, not inferred.** The first version
+ * worked it out from `inheritedFrom`, on the reasoning that a controlled
+ * property comes from one of the four controller mixins. Eight did not:
+ * pagination's `page` and its size `value`, toast's `open`, listbox's `filter`,
+ * splitter's `position` and `collapsed`, carousel's `index`, date picker's
+ * `month` are each implemented in the component. They inherit from nothing, so
+ * a third of the controlled surface went unguarded while every check in the
+ * repository reported success. `@controlled` on the property is the signal now,
+ * and `check:controlled` holds it against the `requestControlledChange` calls.
  *
  * Runs after the generator, so list it after `jsxTypesPlugin`.
  */
@@ -131,7 +110,7 @@ export const controlledProps = ({
       modules?: {
         declarations?: {
           events?: { name: string }[]
-          members?: { inheritedFrom?: { name?: string }; name?: string }[]
+          members?: { helix?: { controlled?: string[] }; name?: string }[]
           tagName?: string
         }[]
       }[]
@@ -145,13 +124,16 @@ export const controlledProps = ({
         const declared = new Set((declaration.events ?? []).map((event) => event.name))
         const found: Controlled[] = []
         for (const member of declaration.members ?? []) {
-          const entry = CONTROLLED[member.inheritedFrom?.name ?? '']
-          if (!entry || member.name !== entry.property) {
+          const answers = member.helix?.controlled
+          if (!answers || !member.name || EXEMPT.has(member.name)) {
             continue
           }
-          const events = entry.events.filter((event) => declared.has(event))
+          /* Only the events this component actually declares. A property can
+             name two, and a component that sends one of them should ask for
+             one handler rather than for a handler that never fires. */
+          const events = answers.filter((event) => declared.has(event))
           if (events.length > 0) {
-            found.push({ events, property: entry.property })
+            found.push({ events, property: member.name })
           }
         }
         if (found.length > 0) {

@@ -86,6 +86,8 @@ export class HelixBasePaginationSize extends HelixElement {
    * Reading gives the real one; writing declares it the consumer's, and
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
+   *
+   * @controlled helix-change
    */
   @property({ type: Number })
   get value(): number {
