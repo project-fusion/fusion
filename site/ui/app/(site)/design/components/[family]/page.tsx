@@ -8,6 +8,7 @@ import { startCase } from '@/lib/naming'
 import {
   type ApiMember,
   type Element,
+  type Example,
   findFamily,
   getFamilies,
   type PropertyDoc,
@@ -60,6 +61,38 @@ const SECTIONS = [
 const DESCRIPTION = '26rem'
 
 const first = (text: string): string => text.split('\n\n')[0] ?? ''
+
+/**
+ * Rows in alphabetical order, by the column a reader scans.
+ *
+ * The manifest emits members in source order, which is the order the component
+ * author found convenient and carries no meaning for anyone reading the table.
+ * Alphabetical is the order a reader can search without reading: looking for
+ * `disabled` in a list of thirty properties is a scan when the list is sorted
+ * and a full read when it is not.
+ *
+ * `localeCompare` rather than `<`, so the unnamed slot and any name with a
+ * dash in it sort where a person would expect rather than where their code
+ * points fall.
+ */
+const byName = <T extends { name: string }>(rows: T[]): T[] =>
+  [...rows].sort((a, b) => a.name.localeCompare(b.name))
+
+/**
+ * Examples alphabetically, with the headline held at the top.
+ *
+ * `default.html` is the family's canonical example rather than one of its
+ * variants, which is why it reads as "Preview" and why both the plugin and the
+ * catalog already put it first. Sorting the column flat would file it under P
+ * among the variants it is meant to introduce, so the pin survives the sort and
+ * everything after it is alphabetical.
+ */
+const byExample = (rows: Example[]): Example[] =>
+  [...rows].sort((a, b) =>
+    a.slug === 'default' || b.slug === 'default'
+      ? Number(b.slug === 'default') - Number(a.slug === 'default')
+      : a.label.localeCompare(b.label),
+  )
 
 function Code({ children }: { children: string }) {
   return (
@@ -162,7 +195,7 @@ function MemberTable({
       <helix-table-column>{label}</helix-table-column>
       {typed && <helix-table-column>Type</helix-table-column>}
       <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-      {rows.map((row) => (
+      {byName(rows).map((row) => (
         <helix-table-row key={row.name}>
           <helix-table-cell header>
             {/* The unnamed slot has no name, and printing `(default)` in the
@@ -194,7 +227,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
       <helix-table-column>Type</helix-table-column>
       <helix-table-column>Default</helix-table-column>
       <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-      {rows.map((row) => (
+      {byName(rows).map((row) => (
         <helix-table-row key={row.name}>
           <helix-table-cell header>
             <Code>{row.name}</Code>
@@ -418,7 +451,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               <helix-table label="Examples">
                 <helix-table-column>Name</helix-table-column>
                 <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-                {family.examples.map((example) => (
+                {byExample(family.examples).map((example) => (
                   <helix-table-row key={example.slug}>
                     <helix-table-cell header>
                       {/* `quiet`: a column where every row is a link does not

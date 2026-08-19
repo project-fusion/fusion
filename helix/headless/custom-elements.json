@@ -7999,6 +7999,16 @@
             },
             {
               "kind": "field",
+              "name": "suggest",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field finishes the word as it is typed.\n\n`suggest` rather than `autocomplete`, which is a real HTML attribute this\nelement already sets on the input it renders, and two things of one name\nmeaning different things on the same control is a question a consumer\nshould not have to ask.",
+              "attribute": "suggest"
+            },
+            {
+              "kind": "field",
               "name": "createLabel",
               "type": {
                 "text": "string"
@@ -8046,6 +8056,16 @@
               "privacy": "private",
               "default": "''",
               "description": "What the reader has typed, which narrows the list and is not the value.\n\nState rather than a property, because it is a keystroke rather than API: a\nconsumer sets `value` to say what is chosen, and nothing outside needs to\nsay what is half-typed."
+            },
+            {
+              "kind": "field",
+              "name": "suggestion",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The completed words, where the field is finishing one, and empty otherwise.\n\nHeld apart from `typed` rather than replacing it, because they are needed\nfor different things at the same moment: this one is what the input shows,\n`typed` is what the list is filtered by, and the selection between them is\nwhat the reader is offered."
             },
             {
               "kind": "field",
@@ -8158,6 +8178,25 @@
               "name": "handleInput",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "completionFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "typed",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The words of the first option the typing begins, or nothing.\n\nCase-insensitively matched and returned in the option's own case, so a\nreader typing \"ru\" is offered \"Rust\" rather than \"rust\": the completion is\na name from the list, and correcting the reader's capitals to match it is\nthe whole point of showing it."
             },
             {
               "kind": "field",
@@ -8968,6 +9007,15 @@
               "fieldName": "creatable"
             },
             {
+              "name": "suggest",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field finishes the word as it is typed.\n\n`suggest` rather than `autocomplete`, which is a real HTML attribute this\nelement already sets on the input it renders, and two things of one name\nmeaning different things on the same control is a question a consumer\nshould not have to ask.",
+              "fieldName": "suggest"
+            },
+            {
               "name": "create-label",
               "type": {
                 "text": "string"
@@ -9155,7 +9203,7 @@
             "category": "forms",
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/combobox\n\n**With `multiple`, the chosen options are tags in the field.** A field that\nsays \"Rust, Ruby, Go\" is a sentence the reader has to parse to find out what\nis in it, and offers nothing to press to take one out: Select does that today\nand it is the weakest part of it. A tag apiece is one object per answer, each\nwith its own remove control, which is what the reader already believes they\nare looking at.\n\nThe panel stays open while more than one can be chosen, because a control\nthat shut after each pick is one the reader has to reopen to keep using. The\nfilter clears on each choice instead, so the next pick starts from the whole\nlist rather than from the last search.\n\n**`creatable` announces, and does not write.** The options are the consumer's\nlight DOM and nothing here puts an element into it: a component that grew the\nconsumer's markup would be a component their framework re-renders over. What\nthis does is offer a row saying what would be added, take the value when the\nreader presses it, and say so with `helix-create`. A consumer who has to\nvalidate first refuses the event and adds nothing.\n\nWhich leaves a value naming no option, and that is what the words fall back\nto: for anything chosen the field shows the option's text if there is one and\nthe value itself otherwise. No copy is stored, so a consumer who then adds a\nreal option with that value has its words take over on the next render.",
+            "documentation": "https://helix.fusion.dev/components/combobox\n\n**With `multiple`, the chosen options are tags in the field.** A field that\nsays \"Rust, Ruby, Go\" is a sentence the reader has to parse to find out what\nis in it, and offers nothing to press to take one out: Select does that today\nand it is the weakest part of it. A tag apiece is one object per answer, each\nwith its own remove control, which is what the reader already believes they\nare looking at.\n\nThe panel stays open while more than one can be chosen, because a control\nthat shut after each pick is one the reader has to reopen to keep using. The\nfilter clears on each choice instead, so the next pick starts from the whole\nlist rather than from the last search.\n\n**`creatable` announces, and does not write.** The options are the consumer's\nlight DOM and nothing here puts an element into it: a component that grew the\nconsumer's markup would be a component their framework re-renders over. What\nthis does is offer a row saying what would be added, take the value when the\nreader presses it, and say so with `helix-create`. A consumer who has to\nvalidate first refuses the event and adds nothing.\n\nWhich leaves a value naming no option, and that is what the words fall back\nto: for anything chosen the field shows the option's text if there is one and\nthe value itself otherwise. No copy is stored, so a consumer who then adds a\nreal option with that value has its words take over on the next render.\n\n**`suggest` finishes the word, and only ever forwards.** The field completes\nto the first option the typing begins, with the part the reader did not type\nselected, so the next character replaces it and Delete removes it. Applied on\ninsertion alone: completing after a deletion would put back what the reader\njust took out, and a field that cannot be shortened is a field that cannot be\ncorrected. Measured as the difference between `insertText` and the several\n`delete*` input types, which is what the platform already says about which\nhappened.\n\nThe filter stays what was typed rather than what was completed. Filtering on\nthe completion would narrow the list to the one option it came from, so a\nreader typing \"ru\" would be shown \"Rust\" alone and never learn Ruby was\nthere.",
             "aliases": [
               "Autocomplete",
               "Typeahead",

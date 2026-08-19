@@ -10770,6 +10770,20 @@
             },
             {
               "kind": "field",
+              "name": "suggest",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field finishes the word as it is typed.\n\n`suggest` rather than `autocomplete`, which is a real HTML attribute this\nelement already sets on the input it renders, and two things of one name\nmeaning different things on the same control is a question a consumer\nshould not have to ask.",
+              "attribute": "suggest",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "createLabel",
               "type": {
                 "text": "string"
@@ -10833,6 +10847,20 @@
               "privacy": "private",
               "default": "''",
               "description": "What the reader has typed, which narrows the list and is not the value.\n\nState rather than a property, because it is a keystroke rather than API: a\nconsumer sets `value` to say what is chosen, and nothing outside needs to\nsay what is half-typed.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "suggestion",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The completed words, where the field is finishing one, and empty otherwise.\n\nHeld apart from `typed` rather than replacing it, because they are needed\nfor different things at the same moment: this one is what the input shows,\n`typed` is what the list is filtered by, and the selection between them is\nwhat the reader is offered.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -10989,6 +11017,29 @@
               "name": "handleInput",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "completionFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "typed",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The words of the first option the typing begins, or nothing.\n\nCase-insensitively matched and returned in the option's own case, so a\nreader typing \"ru\" is offered \"Rust\" rather than \"rust\": the completion is\na name from the list, and correcting the reader's capitals to match it is\nthe whole point of showing it.",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -11419,6 +11470,19 @@
               "default": "false",
               "description": "Whether the reader may answer with something the list does not hold.\n\nThe row appears while what is typed matches no option's words exactly, so\nit is offered next to near misses too: a reader typing \"Ruby on Rails\" with\n\"Ruby\" in the list wants the one they are typing, not the one they are\nhalfway through.",
               "fieldName": "creatable",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "name": "suggest",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field finishes the word as it is typed.\n\n`suggest` rather than `autocomplete`, which is a real HTML attribute this\nelement already sets on the input it renders, and two things of one name\nmeaning different things on the same control is a question a consumer\nshould not have to ask.",
+              "fieldName": "suggest",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"

@@ -2505,6 +2505,13 @@ it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
   creatable?: HelixCombobox["creatable"];
+  /** Whether the field finishes the word as it is typed.
+
+`suggest` rather than `autocomplete`, which is a real HTML attribute this
+element already sets on the input it renders, and two things of one name
+meaning different things on the same control is a question a consumer
+should not have to ask. */
+  suggest?: HelixCombobox["suggest"];
   /** What the create row says, before the words it would add. */
   "create-label"?: HelixCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
@@ -2645,6 +2652,13 @@ it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
   "prop:creatable"?: HelixCombobox["creatable"];
+  /** Whether the field finishes the word as it is typed.
+
+`suggest` rather than `autocomplete`, which is a real HTML attribute this
+element already sets on the input it renders, and two things of one name
+meaning different things on the same control is a question a consumer
+should not have to ask. */
+  "prop:suggest"?: HelixCombobox["suggest"];
   /** What the create row says, before the words it would add. */
   "attr:create-label"?: HelixCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
@@ -12146,6 +12160,12 @@ export type CustomElements = {
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
    * "Ruby" in the list wants the one they are typing, not the one they are
    * halfway through.
+   * - `suggest`: Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
@@ -20174,6 +20194,12 @@ export type CustomElementsSolidJs = {
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
    * "Ruby" in the list wants the one they are typing, not the one they are
    * halfway through.
+   * - `suggest`: Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.

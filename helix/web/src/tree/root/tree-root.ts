@@ -28,6 +28,8 @@ import { styles } from './tree-root.css.js'
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
+ * @cssproperty --tree-chevron-order - Set from `chevron-placement`; read by each item.
+ * @cssproperty --tree-chevron-gap - Set from `chevron-placement`; the space before the chevron.
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixBaseTree {
