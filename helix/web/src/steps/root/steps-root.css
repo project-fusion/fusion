@@ -1,86 +1,135 @@
-/* The counter is declared here and read by each step, which is what makes the
-   numbering free: the browser resolves it at layout, so the third step says "3"
-   in the server's own markup and reordering renumbers with no script.
-
-   Everything about the arrangement is handed down as custom properties rather
+/* Everything about the arrangement is handed down as custom properties rather
    than read from this host's attribute, because a step cannot see it.
-   `orientation` and `labels` are on this element, and a slotted step's own
-   stylesheet can only match `:host(...)`, which is the step. The selector that
-   would answer it, `:host-context()`, is Chromium-only. Custom properties
-   inherit through the flat tree into slotted content, which is the one portable
-   channel.
+   `orientation`, `labels` and `appearance` are on this element, and a slotted
+   step's own stylesheet can only match `:host(...)`, which is the step. The
+   selector that would answer it, `:host-context()`, is Chromium-only. Custom
+   properties inherit through the flat tree into slotted content, which is the
+   one portable channel.
 
-   **How far the connector runs is a question about the name, not the axis.**
-   With the name beside its marker there is a word between one marker and the
-   next, so a line reaching the whole way is a line struck through the text: it
-   spans the gap and stops. With the name underneath, the space between markers
-   is empty and the line runs the whole way, which is the look a row of stages
-   is usually drawn with. Both were tried and the first was drawn through
-   "Details" before the rule was written down. */
+   **The rule is two half lines per step, not one line between steps.** Each
+   reaches from the mark to its own step's edge and half the gap beyond, so it
+   meets the one coming the other way in the middle of the gap. That is what
+   lets the rule read as continuous without any step knowing the size of its
+   neighbour, which is the thing a step cannot know and the reason the earlier
+   single line was either a stub or a line drawn through somebody's name.
+
+   The counter is declared here and read by each step, so `numeric` numbering is
+   resolved by the browser at layout: the third step says "3" in the server's
+   own markup and reordering renumbers with no script. */
 :host {
   counter-reset: helix-step;
   display: flex;
   gap: var(--steps-gap, var(--helix-space-md));
 
-  --_steps-columns: auto minmax(0, 1fr);
+  --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
+  --_steps-columns: minmax(0, 1fr);
   --_steps-marker-column: 1;
-  --_steps-body-column: 2;
-  --_steps-body-row: 1;
-  --_steps-body-align: start;
-  --_steps-marker-justify: start;
-  --_steps-conn-inline-start: 100%;
-  --_steps-conn-inline-size: var(--steps-gap, var(--helix-space-md));
-  --_steps-conn-block-start: calc(var(--steps-marker-size, var(--helix-size-control-sm)) / 2);
-  --_steps-conn-block-size: var(--helix-border-thin);
+  --_steps-marker-justify: center;
+  --_steps-body-column: 1;
+  --_steps-body-row: 2;
+  --_steps-body-align: center;
   --_steps-content: none;
+
+  --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
+  --_steps-lead-inline-size: calc(
+    50% +
+    var(--steps-gap, var(--helix-space-md)) /
+    2 -
+    var(--_steps-m) /
+    2
+  );
+  --_steps-lead-block-start: calc(var(--_steps-m) / 2);
+  --_steps-lead-block-size: var(--helix-border-thin);
+  --_steps-trail-display: block;
+  --_steps-trail-inline-start: calc(50% + var(--_steps-m) / 2);
+  --_steps-trail-inline-size: calc(
+    50% +
+    var(--steps-gap, var(--helix-space-md)) /
+    2 -
+    var(--_steps-m) /
+    2
+  );
+  --_steps-trail-block-start: calc(var(--_steps-m) / 2);
+  --_steps-trail-block-size: var(--helix-border-thin);
 }
 
-/* A row hands each step an equal share, so the connector between one marker and
-   the next is the same length whatever the names measure. Without it a long
-   name stretches its own step and the line beside it shrinks to nothing. */
+/* A row hands each step an equal share, so the marks sit at even intervals
+   whatever the names measure. Without it a long name stretches its own step and
+   the marks bunch. */
 :host(:not([orientation="vertical"])) ::slotted(*) {
   flex: 1 1 0;
   min-inline-size: 0;
 }
 
-/* Name under the marker, marker centred over it, and the line free to run the
-   whole way because nothing is in its path. It starts at the middle of one
-   marker and has to reach the middle of the next, which sits exactly one step
-   plus one gap further along, so its length is the step's own size plus the
-   gap whatever the names turn out to be. */
-:host([labels="below"]) {
-  --_steps-columns: minmax(0, 1fr);
-  --_steps-marker-column: 1;
-  --_steps-body-column: 1;
-  --_steps-body-row: 2;
-  --_steps-body-align: center;
-  /* Over the middle of its own name, which is also where the line starts. */
-  --_steps-marker-justify: center;
-  --_steps-conn-inline-start: 50%;
-  --_steps-conn-inline-size: calc(100% + var(--steps-gap, var(--helix-space-md)));
-}
-
-/* Down the column, and the same arithmetic on the other axis: marker middle to
-   marker middle is the step's own height plus the gap. Which is why the
-   connector belongs to the step it leaves rather than the step it reaches. A
-   step knows its own height; it cannot know the height of the one above, and
-   down a column those differ by whatever each stage holds. */
-:host([orientation="vertical"]) {
-  flex-direction: column;
-
-  --_steps-conn-inline-start: calc(var(--steps-marker-size, var(--helix-size-control-sm)) / 2);
-  --_steps-conn-inline-size: var(--helix-border-thin);
-  --_steps-conn-block-size: calc(100% + var(--steps-gap, var(--helix-space-md)));
-  --_steps-content: grid;
-}
-
-/* A name under its marker is a row's answer to a row's problem. Down a column
-   there is no width to save, and the line would have to run through the name to
-   reach the marker below it. */
-:host([orientation="vertical"][labels="below"]) {
+/* Name beside the mark, which puts the name in the trailing line's path. So
+   there is no trailing line: the leading one spans the gap alone and the rule
+   is a series of joins rather than a continuous rule. That is the honest
+   drawing of this arrangement, and it is why the names go underneath by
+   default. */
+:host([labels="beside"]) {
   --_steps-columns: auto minmax(0, 1fr);
+  --_steps-marker-justify: start;
   --_steps-body-column: 2;
   --_steps-body-row: 1;
   --_steps-body-align: start;
+  --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) * -1);
+  --_steps-lead-inline-size: var(--steps-gap, var(--helix-space-md));
+  --_steps-trail-display: none;
+}
+
+/* Down the column the name is always beside the mark, and both halves run
+   again: above the mark to half the gap over it, and below the mark to half the
+   gap under. The trailing half is the step's own height less the mark, which is
+   the one measurement a step always has. */
+:host([orientation="vertical"]) {
+  flex-direction: column;
+
+  --_steps-columns: auto minmax(0, 1fr);
   --_steps-marker-justify: start;
+  --_steps-body-column: 2;
+  --_steps-body-row: 1;
+  --_steps-body-align: start;
+  --_steps-content: grid;
+
+  --_steps-lead-inline-start: calc(var(--_steps-m) / 2);
+  --_steps-lead-inline-size: var(--helix-border-thin);
+  --_steps-lead-block-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
+  --_steps-lead-block-size: calc(var(--steps-gap, var(--helix-space-md)) / 2);
+  --_steps-trail-display: block;
+  --_steps-trail-inline-start: calc(var(--_steps-m) / 2);
+  --_steps-trail-inline-size: var(--helix-border-thin);
+  --_steps-trail-block-start: var(--_steps-m);
+  --_steps-trail-block-size: calc(
+    100% -
+    var(--_steps-m) +
+    var(--steps-gap, var(--helix-space-md)) /
+    2
+  );
+}
+
+/* Numbers, where the order is the point rather than the state.
+ *
+ * The digit is a CSS counter, so nothing writes it and nothing can get it out
+ * of step with the order the steps are actually in. `content` takes it through
+ * a custom property, which is how a step that cannot see this attribute still
+ * knows whether to draw one.
+ *
+ * The box comes back here and only here. A bare numeral beside a name is a
+ * number in a sentence; a check needs no ring, because the check is already the
+ * shape. And the state moves from the glyph to the fill, since a digit cannot
+ * change what it is the way a mark can. */
+:host([appearance="numeric"]) {
+  --_steps-m: var(--steps-marker-size, var(--helix-size-control-sm));
+  --_steps-mark: none;
+  --_steps-count: counter(helix-step);
+  --_steps-marker-background: var(--helix-color-surface-sunken);
+  --_steps-marker-border: var(--helix-color-border);
+  --_steps-marker-radii: var(--helix-radii-sm);
+  --_steps-marker-color: var(--helix-color-foreground-muted);
+  --_steps-marker-background-complete: var(--steps-complete-color, var(--helix-color-success));
+  --_steps-marker-border-complete: var(--steps-complete-color, var(--helix-color-success));
+  --_steps-marker-color-complete: var(--helix-color-foreground-on-accent);
+  --_steps-marker-background-current: var(--steps-current-color, var(--helix-color-primary));
+  --_steps-marker-border-current: var(--steps-current-color, var(--helix-color-primary));
+  --_steps-marker-color-current: var(--helix-color-foreground-on-accent);
 }

@@ -6363,11 +6363,23 @@ Absent is a row, which is what a form header wants. `vertical` stacks them,
 for a sidebar or a narrow column, and is the shape with room under a step
 for what the stage holds. */
   orientation?: HelixBaseSteps["orientation"];
+  /** What each step is marked with.
+
+Absent is the state itself: a check where a stage is done, a target where
+the reader is, an empty ring ahead of them. Three marks that need no
+legend, which a number does: "3" says where a stage sits in the order and
+nothing about whether it is finished.
+
+`numeric` is the older convention and is still the right one where the
+order is the point, a form that says "step 3 of 5" beside it, or a sequence
+a reader is told to come back to by number. */
+  appearance?: HelixBaseSteps["appearance"];
   /** Where a step's name sits against its marker.
 
-Absent is beside it. `below` puts it under, which is the shape a row of
-four or five stages wants: names beside markers in a row spend the width on
-text and leave the connectors as stubs between them.
+Absent is under the marker, which is the shape a row of stages wants: the
+rule runs unbroken between the marks and the names hang below it. `beside`
+puts the name next to its mark, for a column, where there is no width to
+save and a name under its mark would sit in the line's path.
 
 On the list rather than on each step, for the reason density is on a region
 rather than on each control: a row where one name is beside its marker and
@@ -6388,11 +6400,23 @@ Absent is a row, which is what a form header wants. `vertical` stacks them,
 for a sidebar or a narrow column, and is the shape with room under a step
 for what the stage holds. */
   "prop:orientation"?: HelixBaseSteps["orientation"];
+  /** What each step is marked with.
+
+Absent is the state itself: a check where a stage is done, a target where
+the reader is, an empty ring ahead of them. Three marks that need no
+legend, which a number does: "3" says where a stage sits in the order and
+nothing about whether it is finished.
+
+`numeric` is the older convention and is still the right one where the
+order is the point, a form that says "step 3 of 5" beside it, or a sequence
+a reader is told to come back to by number. */
+  "prop:appearance"?: HelixBaseSteps["appearance"];
   /** Where a step's name sits against its marker.
 
-Absent is beside it. `below` puts it under, which is the shape a row of
-four or five stages wants: names beside markers in a row spend the width on
-text and leave the connectors as stubs between them.
+Absent is under the marker, which is the shape a row of stages wants: the
+rule runs unbroken between the marks and the names hang below it. `beside`
+puts the name next to its mark, for a column, where there is no width to
+save and a name under its mark would sit in the line's path.
 
 On the list rather than on each step, for the reason density is on a region
 rather than on each control: a row where one name is beside its marker and
@@ -13868,11 +13892,22 @@ export type CustomElements = {
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
    * for a sidebar or a narrow column, and is the shape with room under a step
    * for what the stage holds.
+   * - `appearance`: What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
    * - `labels`: Where a step's name sits against its marker.
    *
-   * Absent is beside it. `below` puts it under, which is the shape a row of
-   * four or five stages wants: names beside markers in a row spend the width on
-   * text and leave the connectors as stubs between them.
+   * Absent is under the marker, which is the shape a row of stages wants: the
+   * rule runs unbroken between the marks and the names hang below it. `beside`
+   * puts the name next to its mark, for a column, where there is no width to
+   * save and a name under its mark would sit in the line's path.
    *
    * On the list rather than on each step, for the reason density is on a region
    * rather than on each control: a row where one name is beside its marker and
@@ -13902,11 +13937,21 @@ export type CustomElements = {
    * skipped. A component that guessed would be wrong on the first wizard that
    * lets you jump to the end.
    *
-   * **The marker is a slot whose fallback is the number.** A step is numbered by
-   * a CSS counter in the styled tier, so the digit costs no script and is in the
-   * server's markup; a consumer who wants an icon there fills the slot instead.
-   * `complete` swaps the fallback for a check, because a finished stage has an
-   * answer and the number was only ever standing in for one.
+   * **The marker is a slot whose fallback is the state.** A finished stage shows
+   * a check, the current one a target, and one not yet reached an empty ring:
+   * three marks that say what a reader wants to know without a legend. A consumer
+   * who wants their own fills the slot instead.
+   *
+   * The step renders exactly one of the three, chosen from its own two booleans.
+   * Rendering all three and hiding two in CSS would work and is worse: the
+   * accessibility tree would carry marks that are not there, and the markup would
+   * say three things about a stage that is one.
+   *
+   * Numbering is a separate question and belongs to the tier above. `numeric`
+   * hides the mark and shows a CSS counter, which the browser resolves at layout,
+   * so the digit costs no script and is right in the server's markup however the
+   * steps are ordered. Nothing here knows which appearance is in use, and does
+   * not need to.
    *
    * **`complete` and `current` are separate, and both can be false.** A stage
    * that is neither is one the reader has not reached, which is the majority of
@@ -13960,7 +14005,8 @@ export type CustomElements = {
    * - `body`: The name and its description.
    * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line running on to the next step.
+   * - `lead`: The half line arriving from the step before.
+   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
    */
   "helix-base-step": Partial<
@@ -21226,11 +21272,22 @@ export type CustomElementsSolidJs = {
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
    * for a sidebar or a narrow column, and is the shape with room under a step
    * for what the stage holds.
+   * - `appearance`: What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
    * - `labels`: Where a step's name sits against its marker.
    *
-   * Absent is beside it. `below` puts it under, which is the shape a row of
-   * four or five stages wants: names beside markers in a row spend the width on
-   * text and leave the connectors as stubs between them.
+   * Absent is under the marker, which is the shape a row of stages wants: the
+   * rule runs unbroken between the marks and the names hang below it. `beside`
+   * puts the name next to its mark, for a column, where there is no width to
+   * save and a name under its mark would sit in the line's path.
    *
    * On the list rather than on each step, for the reason density is on a region
    * rather than on each control: a row where one name is beside its marker and
@@ -21263,11 +21320,21 @@ export type CustomElementsSolidJs = {
    * skipped. A component that guessed would be wrong on the first wizard that
    * lets you jump to the end.
    *
-   * **The marker is a slot whose fallback is the number.** A step is numbered by
-   * a CSS counter in the styled tier, so the digit costs no script and is in the
-   * server's markup; a consumer who wants an icon there fills the slot instead.
-   * `complete` swaps the fallback for a check, because a finished stage has an
-   * answer and the number was only ever standing in for one.
+   * **The marker is a slot whose fallback is the state.** A finished stage shows
+   * a check, the current one a target, and one not yet reached an empty ring:
+   * three marks that say what a reader wants to know without a legend. A consumer
+   * who wants their own fills the slot instead.
+   *
+   * The step renders exactly one of the three, chosen from its own two booleans.
+   * Rendering all three and hiding two in CSS would work and is worse: the
+   * accessibility tree would carry marks that are not there, and the markup would
+   * say three things about a stage that is one.
+   *
+   * Numbering is a separate question and belongs to the tier above. `numeric`
+   * hides the mark and shows a CSS counter, which the browser resolves at layout,
+   * so the digit costs no script and is right in the server's markup however the
+   * steps are ordered. Nothing here knows which appearance is in use, and does
+   * not need to.
    *
    * **`complete` and `current` are separate, and both can be false.** A stage
    * that is neither is one the reader has not reached, which is the majority of
@@ -21321,7 +21388,8 @@ export type CustomElementsSolidJs = {
    * - `body`: The name and its description.
    * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line running on to the next step.
+   * - `lead`: The half line arriving from the step before.
+   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
    */
   "helix-base-step": Partial<

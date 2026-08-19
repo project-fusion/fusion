@@ -4,6 +4,7 @@
 # time, regular weight first and then fill, so adding an icon is adding a line
 # rather than finding and pasting an SVG. A name the package does not have is
 # read from raw/, which is where marks that are not Phosphor live.
+
 arrow-left
 arrow-right
 arrow-square-out
@@ -22,6 +23,7 @@ chart-line
 check
 check-circle
 check-circle-fill
+circle
 clock
 cloud
 compass
@@ -59,6 +61,7 @@ push-pin
 push-pin-slash
 react
 receipt
+record
 share-network
 shield-check
 sidebar-simple

@@ -7131,11 +7131,23 @@ Absent is a row, which is what a form header wants. `vertical` stacks them,
 for a sidebar or a narrow column, and is the shape with room under a step
 for what the stage holds. */
   orientation?: HelixSteps["orientation"];
+  /** What each step is marked with.
+
+Absent is the state itself: a check where a stage is done, a target where
+the reader is, an empty ring ahead of them. Three marks that need no
+legend, which a number does: "3" says where a stage sits in the order and
+nothing about whether it is finished.
+
+`numeric` is the older convention and is still the right one where the
+order is the point, a form that says "step 3 of 5" beside it, or a sequence
+a reader is told to come back to by number. */
+  appearance?: HelixSteps["appearance"];
   /** Where a step's name sits against its marker.
 
-Absent is beside it. `below` puts it under, which is the shape a row of
-four or five stages wants: names beside markers in a row spend the width on
-text and leave the connectors as stubs between them.
+Absent is under the marker, which is the shape a row of stages wants: the
+rule runs unbroken between the marks and the names hang below it. `beside`
+puts the name next to its mark, for a column, where there is no width to
+save and a name under its mark would sit in the line's path.
 
 On the list rather than on each step, for the reason density is on a region
 rather than on each control: a row where one name is beside its marker and
@@ -7156,11 +7168,23 @@ Absent is a row, which is what a form header wants. `vertical` stacks them,
 for a sidebar or a narrow column, and is the shape with room under a step
 for what the stage holds. */
   "prop:orientation"?: HelixSteps["orientation"];
+  /** What each step is marked with.
+
+Absent is the state itself: a check where a stage is done, a target where
+the reader is, an empty ring ahead of them. Three marks that need no
+legend, which a number does: "3" says where a stage sits in the order and
+nothing about whether it is finished.
+
+`numeric` is the older convention and is still the right one where the
+order is the point, a form that says "step 3 of 5" beside it, or a sequence
+a reader is told to come back to by number. */
+  "prop:appearance"?: HelixSteps["appearance"];
   /** Where a step's name sits against its marker.
 
-Absent is beside it. `below` puts it under, which is the shape a row of
-four or five stages wants: names beside markers in a row spend the width on
-text and leave the connectors as stubs between them.
+Absent is under the marker, which is the shape a row of stages wants: the
+rule runs unbroken between the marks and the names hang below it. `beside`
+puts the name next to its mark, for a column, where there is no width to
+save and a name under its mark would sit in the line's path.
 
 On the list rather than on each step, for the reason density is on a region
 rather than on each control: a row where one name is beside its marker and
@@ -14705,11 +14729,22 @@ export type CustomElements = {
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
    * for a sidebar or a narrow column, and is the shape with room under a step
    * for what the stage holds.
+   * - `appearance`: What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
    * - `labels`: Where a step's name sits against its marker.
    *
-   * Absent is beside it. `below` puts it under, which is the shape a row of
-   * four or five stages wants: names beside markers in a row spend the width on
-   * text and leave the connectors as stubs between them.
+   * Absent is under the marker, which is the shape a row of stages wants: the
+   * rule runs unbroken between the marks and the names hang below it. `beside`
+   * puts the name next to its mark, for a column, where there is no width to
+   * save and a name under its mark would sit in the line's path.
    *
    * On the list rather than on each step, for the reason density is on a region
    * rather than on each control: a row where one name is beside its marker and
@@ -14776,7 +14811,8 @@ export type CustomElements = {
    * - `body`: The name and its description.
    * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line running on to the next step.
+   * - `lead`: The half line arriving from the step before.
+   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
    */
   "helix-step": Partial<HelixStepProps & BaseProps<HelixStep> & BaseEvents>;
@@ -22021,11 +22057,22 @@ export type CustomElementsSolidJs = {
    * Absent is a row, which is what a form header wants. `vertical` stacks them,
    * for a sidebar or a narrow column, and is the shape with room under a step
    * for what the stage holds.
+   * - `appearance`: What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
    * - `labels`: Where a step's name sits against its marker.
    *
-   * Absent is beside it. `below` puts it under, which is the shape a row of
-   * four or five stages wants: names beside markers in a row spend the width on
-   * text and leave the connectors as stubs between them.
+   * Absent is under the marker, which is the shape a row of stages wants: the
+   * rule runs unbroken between the marks and the names hang below it. `beside`
+   * puts the name next to its mark, for a column, where there is no width to
+   * save and a name under its mark would sit in the line's path.
    *
    * On the list rather than on each step, for the reason density is on a region
    * rather than on each control: a row where one name is beside its marker and
@@ -22097,7 +22144,8 @@ export type CustomElementsSolidJs = {
    * - `body`: The name and its description.
    * - `label`: The step's name, which is the button.
    * - `description`: The line under it.
-   * - `connector`: The line running on to the next step.
+   * - `lead`: The half line arriving from the step before.
+   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
    */
   "helix-step": Partial<

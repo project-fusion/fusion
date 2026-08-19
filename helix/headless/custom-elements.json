@@ -28409,11 +28409,21 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'numeric' | undefined"
+              },
+              "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "labels",
               "type": {
-                "text": "'below' | undefined"
+                "text": "'beside' | undefined"
               },
-              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "description": "Where a step's name sits against its marker.\n\nAbsent is under the marker, which is the shape a row of stages wants: the\nrule runs unbroken between the marks and the names hang below it. `beside`\nputs the name next to its mark, for a column, where there is no width to\nsave and a name under its mark would sit in the line's path.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
               "attribute": "labels",
               "reflects": true
             },
@@ -28506,11 +28516,19 @@
               "fieldName": "orientation"
             },
             {
+              "name": "appearance",
+              "type": {
+                "text": "'numeric' | undefined"
+              },
+              "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
+              "fieldName": "appearance"
+            },
+            {
               "name": "labels",
               "type": {
-                "text": "'below' | undefined"
+                "text": "'beside' | undefined"
               },
-              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "description": "Where a step's name sits against its marker.\n\nAbsent is under the marker, which is the shape a row of stages wants: the\nrule runs unbroken between the marks and the names hang below it. `beside`\nputs the name next to its mark, for a column, where there is no width to\nsave and a name under its mark would sit in the line's path.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
               "fieldName": "labels"
             }
           ],
@@ -28564,7 +28582,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The name is a button, and only the name.** A stepper is something a reader\ngoes back through, and the thing they reach for is the name of the stage. The\nmarker is `aria-hidden` decoration, so wrapping it in the button would add\nhit area and no meaning: the accessible name would be the text either way,\nand what is pressable would stop being the same shape as what is readable.\n\nIt says nothing about where a reader may go. Every step is pressable and\nannounces itself with `helix-select`; refusing the ones ahead is `disabled`,\nwhich the consumer sets because only the consumer knows whether a form can be\nskipped. A component that guessed would be wrong on the first wizard that\nlets you jump to the end.\n\n**The marker is a slot whose fallback is the number.** A step is numbered by\na CSS counter in the styled tier, so the digit costs no script and is in the\nserver's markup; a consumer who wants an icon there fills the slot instead.\n`complete` swaps the fallback for a check, because a finished stage has an\nanswer and the number was only ever standing in for one.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n**The `content` slot opens on the current step, and only down a column.** A\nrow has no room under a step to put a form in, and stretching one to fit\nwould set every step's height by the tallest. `current` is what opens it, so\nthe state that says where the reader is is also the state that shows them the\nstage: one attribute, no second flag to keep in step with it, and it renders\nopen on the server rather than after hydration.",
+          "description": "**The name is a button, and only the name.** A stepper is something a reader\ngoes back through, and the thing they reach for is the name of the stage. The\nmarker is `aria-hidden` decoration, so wrapping it in the button would add\nhit area and no meaning: the accessible name would be the text either way,\nand what is pressable would stop being the same shape as what is readable.\n\nIt says nothing about where a reader may go. Every step is pressable and\nannounces itself with `helix-select`; refusing the ones ahead is `disabled`,\nwhich the consumer sets because only the consumer knows whether a form can be\nskipped. A component that guessed would be wrong on the first wizard that\nlets you jump to the end.\n\n**The marker is a slot whose fallback is the state.** A finished stage shows\na check, the current one a target, and one not yet reached an empty ring:\nthree marks that say what a reader wants to know without a legend. A consumer\nwho wants their own fills the slot instead.\n\nThe step renders exactly one of the three, chosen from its own two booleans.\nRendering all three and hiding two in CSS would work and is worse: the\naccessibility tree would carry marks that are not there, and the markup would\nsay three things about a stage that is one.\n\nNumbering is a separate question and belongs to the tier above. `numeric`\nhides the mark and shows a CSS counter, which the browser resolves at layout,\nso the digit costs no script and is right in the server's markup however the\nsteps are ordered. Nothing here knows which appearance is in use, and does\nnot need to.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n**The `content` slot opens on the current step, and only down a column.** A\nrow has no room under a step to put a form in, and stretching one to fit\nwould set every step's height by the tallest. `current` is what opens it, so\nthe state that says where the reader is is also the state that shows them the\nstage: one attribute, no second flag to keep in step with it, and it renders\nopen on the server rather than after hydration.",
           "name": "HelixBaseStep",
           "cssParts": [
             {
@@ -28584,8 +28602,12 @@
               "name": "description"
             },
             {
-              "description": "The line running on to the next step.",
-              "name": "connector"
+              "description": "The half line arriving from the step before.",
+              "name": "lead"
+            },
+            {
+              "description": "The half line running on to the next.",
+              "name": "trail"
             },
             {
               "description": "What the stage holds, while it is open.",
@@ -28666,6 +28688,16 @@
               "type": {
                 "text": "select() => void"
               }
+            },
+            {
+              "kind": "field",
+              "name": "mark",
+              "type": {
+                "text": "TemplateResult"
+              },
+              "privacy": "private",
+              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the fill on\nthe mark is what says they are back in it.",
+              "readonly": true
             },
             {
               "kind": "field",

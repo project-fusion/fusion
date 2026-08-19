@@ -36,57 +36,67 @@
   grid-row: calc(var(--_steps-body-row, 1) + 1);
 }
 
-/* The line running on to the next step, drawn by the step it leaves rather than
-   the one it reaches, and hidden on the last where there is nothing to reach.
-   `:host(:last-child)` works where `:host(:has(...))` does not, because a
-   structural pseudo-class is allowed inside the functional form, and it needs
-   no index and no parent counting its children.
+/* Two half lines, one either side of the mark. Each reaches from the mark to
+   its own step's edge and half the gap beyond, so it meets the one coming the
+   other way in the middle of the gap and the rule reads as continuous without
+   any step knowing the size of its neighbour.
 
-   Under the markers rather than over them, so a line that runs to the middle of
-   the next circle is covered by it and no seam shows where the two meet. */
-[part="connector"] {
+   Under the mark rather than over it, so a line ending at the mark's edge is
+   covered by it and no seam shows where the two meet. */
+[part="lead"],
+[part="trail"] {
   background-color: var(--steps-connector-color, var(--helix-color-border));
-  block-size: var(--_steps-conn-block-size, var(--helix-border-thin));
-  inline-size: var(--_steps-conn-inline-size, 100%);
-  inset-block-start: var(--_steps-conn-block-start, 50%);
-  inset-inline-start: var(--_steps-conn-inline-start, 50%);
   position: absolute;
   z-index: 0;
 }
 
-:host(:last-child) [part="connector"] {
+[part="lead"] {
+  block-size: var(--_steps-lead-block-size, var(--helix-border-thin));
+  inline-size: var(--_steps-lead-inline-size, 0);
+  inset-block-start: var(--_steps-lead-block-start, 50%);
+  inset-inline-start: var(--_steps-lead-inline-start, 0);
+}
+
+[part="trail"] {
+  block-size: var(--_steps-trail-block-size, var(--helix-border-thin));
+  display: var(--_steps-trail-display, block);
+  inline-size: var(--_steps-trail-inline-size, 0);
+  inset-block-start: var(--_steps-trail-block-start, 50%);
+  inset-inline-start: var(--_steps-trail-inline-start, 0);
+}
+
+/* Nothing arrives at the first and nothing leaves the last, which a structural
+   pseudo-class says with no index and no parent counting its children. */
+:host(:first-child) [part="lead"],
+:host(:last-child) [part="trail"] {
   display: none;
 }
 
-/* The shape, and the number inside it. `content` from the counter rather than a
-   rendered digit, so nothing writes it and nothing can get it out of step with
-   the order the steps are actually in.
-
-   Four pixels rather than a circle: `sm` is the house radius and every other
-   small mark in the library takes it, and a row of circles beside a page of
-   rounded rectangles reads as a different set of parts. */
+/* The mark, which is an icon and not a box.
+ *
+ * A ring drawn round a check is a second shape saying what the check already
+ * says, and a row of them reads as a row of buttons rather than as a rule with
+ * marks on it. The box comes back under `numeric`, where there is a digit that
+ * genuinely needs one: a bare "3" beside a name is a number in a sentence. */
 [part="marker"] {
   align-items: center;
-  background-color: var(--helix-color-surface-sunken);
-  block-size: var(--_step-marker);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--steps-marker-radii, var(--helix-radii-sm));
+  background-color: var(--_steps-marker-background, transparent);
+  block-size: var(--_steps-m, var(--helix-size-icon));
+  border: var(--helix-border-thin) solid var(--_steps-marker-border, transparent);
+  border-radius: var(--steps-marker-radii, var(--_steps-marker-radii, var(--helix-radii-none)));
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
-  display: inline-flex;
-  flex: 0 0 auto;
+  color: var(--_steps-marker-color, var(--helix-color-border));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
-  inline-size: var(--_step-marker);
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: var(--_steps-m, var(--helix-size-icon));
   justify-content: center;
-  /* Over the connector, which runs under it to the next marker's middle. */
+  /* Over the halves, which run under it to its own edges. */
   position: relative;
   z-index: 1;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    border-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* The slot is a flex item like the glyph inside it, so it needs the same
@@ -102,42 +112,62 @@
    its separator: filling the slot replaces it and costs the consumer no way to
    opt out. A complete step renders a check into that slot instead, so this only
    draws where neither is there. */
-slot[name="marker"]:not(:has(*))::after {
-  content: counter(helix-step);
-}
+/* The counter, drawn only where the list asked for numbers. `content` takes a
+   custom property whose value is the `counter()` call itself, which is how a
+   step that cannot see `appearance` still knows whether to render a digit.
 
-:host([complete]) slot[name="marker"]:not(:has(*))::after {
-  content: none;
+   On the mark rather than on the slot inside it. The slot's fallback is now an
+   icon, so the slot always has a child and the `:not(:has(*))` this hung on
+   stopped matching the moment the mark became a state rather than a number:
+   every numeric step drew an empty box. Under `numeric` the glyph is
+   `display: none`, so the two can never both show. */
+[part="marker"]::after {
+  content: var(--_steps-count, none);
 }
 
 [part="marker"] svg {
-  block-size: var(--helix-size-icon-sm);
+  block-size: 100%;
+  display: var(--_steps-mark, inline);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-sm);
+  inline-size: 100%;
 }
 
 slot[name="marker"]::slotted(*) {
   --icon-size: var(--helix-size-icon-sm);
 }
 
-/* Finished, and the marker is the answer rather than a number standing in for
-   one. `foreground-muted` rather than the accent, the same call Date Picker and
-   Time Picker take for a chosen value: the accent is for the stage the reader
-   is in, and using it for both leaves nothing to say which is which. */
+/* Green for done, and it is the one place in this component that takes a hue
+   with meaning: a check is already the shape for "finished", so the colour is
+   confirming rather than carrying it, which is what `success` is for.
+
+   Current takes the accent, and it is the only other mark that is not grey. Two
+   states in colour and one out of it is what makes the sequence readable at a
+   glance: everything ahead of the reader is quiet. */
 :host([complete]) [part="marker"] {
-  background-color: var(--steps-complete-color, var(--helix-color-foreground-muted));
-  border-color: var(--steps-complete-color, var(--helix-color-foreground-muted));
-  color: var(--helix-color-foreground-on-accent);
+  background-color: var(--_steps-marker-background-complete, transparent);
+  border-color: var(--_steps-marker-border-complete, transparent);
+  color: var(
+    --_steps-marker-color-complete,
+    var(--steps-complete-color, var(--helix-color-success))
+  );
 }
 
-/* Current wins where a step is both, which happens whenever a reader steps back
-   into a stage they have already finished. The check stays, because they did
-   finish it; the fill says where they are now. */
-:host([current]) [part="marker"],
+:host([current]) [part="marker"] {
+  background-color: var(--_steps-marker-background-current, transparent);
+  border-color: var(--_steps-marker-border-current, transparent);
+  color: var(--_steps-marker-color-current, var(--steps-current-color, var(--helix-color-primary)));
+}
+
+/* Complete wins where a step is both, because the check is the fact and the
+   target is only where the reader happens to be standing. The name and the rule
+   still say which one is open. */
 :host([complete][current]) [part="marker"] {
-  background-color: var(--steps-current-color, var(--helix-color-primary));
-  border-color: var(--steps-current-color, var(--helix-color-primary));
-  color: var(--helix-color-foreground-on-accent);
+  background-color: var(--_steps-marker-background-complete, transparent);
+  border-color: var(--_steps-marker-border-complete, transparent);
+  color: var(
+    --_steps-marker-color-complete,
+    var(--steps-complete-color, var(--helix-color-success))
+  );
 }
 
 [part="body"] {
@@ -236,6 +266,12 @@ slot[name="marker"]::slotted(*) {
   [part="marker"],
   [part="label"],
   [part="content"] {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="marker"] {
     transition: none;
   }
 }

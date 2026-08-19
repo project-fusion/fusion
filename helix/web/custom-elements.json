@@ -36503,11 +36503,25 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'numeric' | undefined"
+              },
+              "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "labels",
               "type": {
-                "text": "'below' | undefined"
+                "text": "'beside' | undefined"
               },
-              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "description": "Where a step's name sits against its marker.\n\nAbsent is under the marker, which is the shape a row of stages wants: the\nrule runs unbroken between the marks and the names hang below it. `beside`\nputs the name next to its mark, for a column, where there is no width to\nsave and a name under its mark would sit in the line's path.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
               "attribute": "labels",
               "reflects": true,
               "inheritedFrom": {
@@ -36608,7 +36622,10 @@
                 "slug": "default"
               },
               {
-                "slug": "below"
+                "slug": "beside"
+              },
+              {
+                "slug": "numeric"
               },
               {
                 "slug": "vertical"
@@ -36654,11 +36671,23 @@
               }
             },
             {
+              "name": "appearance",
+              "type": {
+                "text": "'numeric' | undefined"
+              },
+              "description": "What each step is marked with.\n\nAbsent is the state itself: a check where a stage is done, a target where\nthe reader is, an empty ring ahead of them. Three marks that need no\nlegend, which a number does: \"3\" says where a stage sits in the order and\nnothing about whether it is finished.\n\n`numeric` is the older convention and is still the right one where the\norder is the point, a form that says \"step 3 of 5\" beside it, or a sequence\na reader is told to come back to by number.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "HelixBaseSteps",
+                "module": "src/steps/root/steps-root.ts"
+              }
+            },
+            {
               "name": "labels",
               "type": {
-                "text": "'below' | undefined"
+                "text": "'beside' | undefined"
               },
-              "description": "Where a step's name sits against its marker.\n\nAbsent is beside it. `below` puts it under, which is the shape a row of\nfour or five stages wants: names beside markers in a row spend the width on\ntext and leave the connectors as stubs between them.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
+              "description": "Where a step's name sits against its marker.\n\nAbsent is under the marker, which is the shape a row of stages wants: the\nrule runs unbroken between the marks and the names hang below it. `beside`\nputs the name next to its mark, for a column, where there is no width to\nsave and a name under its mark would sit in the line's path.\n\nOn the list rather than on each step, for the reason density is on a region\nrather than on each control: a row where one name is beside its marker and\nthe next is under it is a row nobody meant, and said once it is unwritable\nrather than merely discouraged.",
               "fieldName": "labels",
               "inheritedFrom": {
                 "name": "HelixBaseSteps",
@@ -36789,6 +36818,20 @@
               "type": {
                 "text": "select() => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "mark",
+              "type": {
+                "text": "TemplateResult"
+              },
+              "privacy": "private",
+              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the fill on\nthe mark is what says they are back in it.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -36950,8 +36993,16 @@
               }
             },
             {
-              "description": "The line running on to the next step.",
-              "name": "connector",
+              "description": "The half line arriving from the step before.",
+              "name": "lead",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The half line running on to the next.",
+              "name": "trail",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"

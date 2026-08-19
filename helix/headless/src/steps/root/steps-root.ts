@@ -58,11 +58,27 @@ export class HelixBaseSteps extends HelixElement {
   orientation?: 'vertical'
 
   /**
+   * What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
+   */
+  @property({ reflect: true })
+  appearance?: 'numeric'
+
+  /**
    * Where a step's name sits against its marker.
    *
-   * Absent is beside it. `below` puts it under, which is the shape a row of
-   * four or five stages wants: names beside markers in a row spend the width on
-   * text and leave the connectors as stubs between them.
+   * Absent is under the marker, which is the shape a row of stages wants: the
+   * rule runs unbroken between the marks and the names hang below it. `beside`
+   * puts the name next to its mark, for a column, where there is no width to
+   * save and a name under its mark would sit in the line's path.
    *
    * On the list rather than on each step, for the reason density is on a region
    * rather than on each control: a row where one name is beside its marker and
@@ -70,7 +86,7 @@ export class HelixBaseSteps extends HelixElement {
    * rather than merely discouraged.
    */
   @property({ reflect: true })
-  labels?: 'below'
+  labels?: 'beside'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

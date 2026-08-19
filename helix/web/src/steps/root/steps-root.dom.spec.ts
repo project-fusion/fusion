@@ -40,13 +40,47 @@ describe('steps', () => {
     expect(all.map((s) => internals(s).ariaCurrent)).toEqual([null, 'step', null])
   })
 
-  test('a finished step draws a check where the number was', async () => {
+  test('every step draws one mark, and which one is its own state', async () => {
+    /* Rendering all three and hiding two in CSS would work and is worse: the
+       markup would say three things about a stage that is one. Told apart by
+       the path data, since that is what actually differs. */
     const host = await steps()
-    const [first, , last] = [...host.querySelectorAll('helix-step')] as HTMLElement[]
-    await (first as unknown as Steps).updateComplete
-    await (last as unknown as Steps).updateComplete
-    expect(first.shadowRoot?.querySelector('svg')).not.toBeNull()
-    expect(last.shadowRoot?.querySelector('svg')).toBeNull()
+    const marks: string[] = []
+    for (const step of [...host.querySelectorAll('helix-step')] as HTMLElement[]) {
+      await (step as unknown as Steps).updateComplete
+      const svgs = step.shadowRoot?.querySelectorAll('svg') ?? []
+      expect(svgs).toHaveLength(1)
+      marks.push(svgs[0]?.innerHTML ?? '')
+    }
+    expect(new Set(marks).size).toBe(3)
+  })
+
+  test('and a step that is both keeps the check, because that is the fact', async () => {
+    // The target is only where the reader happens to be standing; the name and
+    // the rule still say which stage is open.
+    const host = (await mount(
+      `<helix-steps><helix-step complete>A</helix-step>
+       <helix-step complete current>B</helix-step></helix-steps>`,
+    )) as Steps
+    await host.updateComplete
+    const [done, back] = [...host.querySelectorAll('helix-step')] as HTMLElement[]
+    for (const step of [done, back]) {
+      await (step as unknown as Steps).updateComplete
+    }
+    expect(back.shadowRoot?.querySelector('svg')?.innerHTML).toBe(
+      done.shadowRoot?.querySelector('svg')?.innerHTML,
+    )
+  })
+
+  test('both halves of the rule are drawn, and the ends drop one each', async () => {
+    /* Two halves rather than one line, because a line to the next mark has to
+       know how far away it is and a step knows only its own size. */
+    const host = await steps()
+    for (const step of [...host.querySelectorAll('helix-step')] as HTMLElement[]) {
+      await (step as unknown as Steps).updateComplete
+      expect(step.shadowRoot?.querySelector('[part="lead"]')).not.toBeNull()
+      expect(step.shadowRoot?.querySelector('[part="trail"]')).not.toBeNull()
+    }
   })
 
   test('complete and current are independent, because a reader can step back', async () => {
@@ -60,17 +94,6 @@ describe('steps', () => {
     await (step as unknown as Steps).updateComplete
     expect(internals(step).ariaCurrent).toBe('step')
     expect(step.shadowRoot?.querySelector('svg')).not.toBeNull()
-  })
-
-  test('every step carries its own connector, so nothing counts children', async () => {
-    // The first one's is hidden in CSS by `:host(:first-child)`, which needs no
-    // index and no coordination from the list.
-    const host = await steps()
-    const all = [...host.querySelectorAll('helix-step')] as HTMLElement[]
-    for (const step of all) {
-      await (step as unknown as Steps).updateComplete
-      expect(step.shadowRoot?.querySelector('[part="connector"]')).not.toBeNull()
-    }
   })
 })
 

@@ -1,6 +1,6 @@
 import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
-import { check } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { checkCircleFill, circle, record } from '@helix-io/icons'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -20,11 +20,21 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * skipped. A component that guessed would be wrong on the first wizard that
  * lets you jump to the end.
  *
- * **The marker is a slot whose fallback is the number.** A step is numbered by
- * a CSS counter in the styled tier, so the digit costs no script and is in the
- * server's markup; a consumer who wants an icon there fills the slot instead.
- * `complete` swaps the fallback for a check, because a finished stage has an
- * answer and the number was only ever standing in for one.
+ * **The marker is a slot whose fallback is the state.** A finished stage shows
+ * a check, the current one a target, and one not yet reached an empty ring:
+ * three marks that say what a reader wants to know without a legend. A consumer
+ * who wants their own fills the slot instead.
+ *
+ * The step renders exactly one of the three, chosen from its own two booleans.
+ * Rendering all three and hiding two in CSS would work and is worse: the
+ * accessibility tree would carry marks that are not there, and the markup would
+ * say three things about a stage that is one.
+ *
+ * Numbering is a separate question and belongs to the tier above. `numeric`
+ * hides the mark and shows a CSS counter, which the browser resolves at layout,
+ * so the digit costs no script and is right in the server's markup however the
+ * steps are ordered. Nothing here knows which appearance is in use, and does
+ * not need to.
  *
  * **`complete` and `current` are separate, and both can be false.** A stage
  * that is neither is one the reader has not reached, which is the majority of
@@ -54,7 +64,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart body - The name and its description.
  * @csspart label - The step's name, which is the button.
  * @csspart description - The line under it.
- * @csspart connector - The line running on to the next step.
+ * @csspart lead - The half line arriving from the step before.
+ * @csspart trail - The half line running on to the next.
  * @csspart content - What the stage holds, while it is open.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
@@ -85,6 +96,18 @@ export class HelixBaseStep extends HelixElement {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
+  /**
+   * The mark this stage's state calls for.
+   *
+   * `complete` first, so a stage a reader has stepped back into keeps its check
+   * rather than losing it to the target: they did finish it, and the fill on
+   * the mark is what says they are back in it.
+   */
+  private get mark(): TemplateResult {
+    const icon = this.complete ? checkCircleFill : this.current ? record : circle
+    return html`<svg fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg>`
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { role: 'listitem' })
@@ -92,26 +115,22 @@ export class HelixBaseStep extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The connector is the line running on to the *next* step, not the one
-       arriving from the last.
-       Both were tried. Arriving works only where every step is the same width,
-       which is true of a row and false of a column, where a step is as tall as
-       its own description. Running on needs one measurement a step always has,
-       its own size: the next marker sits exactly one step plus one gap away
-       along the axis, whatever that step turns out to hold. The last one has
-       nothing to run on to, and `:host(:last-child)` hides it with no index and
-       no parent counting its children. */
-    return html`<span part="connector" aria-hidden="true"></span>
+    /* Two half lines, one either side of the mark, rather than one line running
+       the whole way to the next step.
+       A single line was tried twice. Drawn to the next marker it has to know
+       how far away that is, which is the next step's size, and a step knows
+       only its own. Drawn across the gap alone it is a stub. Two halves need
+       neither: each reaches from the mark to its own step's edge and half the
+       gap beyond, so it meets the one coming the other way in the middle of the
+       gap and the rule reads as continuous however wide the steps are or how
+       differently they are filled.
+       The first has nothing on its leading side and the last nothing on its
+       trailing one, which `:host(:first-child)` and `:host(:last-child)` say
+       with no index and no parent counting its children. */
+    return html`<span part="lead" aria-hidden="true"></span>
+      <span part="trail" aria-hidden="true"></span>
       <span part="marker" aria-hidden="true">
-        <slot name="marker">
-          ${
-            this.complete
-              ? html`<svg fill="currentColor" viewBox=${check.viewBox}>
-                  ${unsafeSVG(check.content)}
-                </svg>`
-              : nothing
-          }
-        </slot>
+        <slot name="marker">${this.mark}</slot>
       </span>
       <span part="body">
         <button part="label" type="button" ?disabled=${this.disabled} @click=${this.select}>

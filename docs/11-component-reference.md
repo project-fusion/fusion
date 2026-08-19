@@ -3495,8 +3495,9 @@ script involved. Reordering the steps renumbers them; nothing has to be told.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
 | `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
-| `labels` | `labels` | `'below' \| undefined` | - | `HelixBaseSteps` | Where a step's name sits against its marker. |
+| `labels` | `labels` | `'beside' \| undefined` | - | `HelixBaseSteps` | Where a step's name sits against its marker. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
 
 #### Slots
@@ -3560,7 +3561,8 @@ Extends `HelixBaseStep`.
 | `body` | The name and its description. |
 | `label` | The step's name, which is the button. |
 | `description` | The line under it. |
-| `connector` | The line running on to the next step. |
+| `lead` | The half line arriving from the step before. |
+| `trail` | The half line running on to the next. |
 | `content` | What the stage holds, while it is open. |
 
 ## Switch
