@@ -79,19 +79,20 @@ describe('the download control', () => {
     expect(link.getAttribute('rel')).toBe('noreferrer')
   })
 
-  test('and the same-origin half cannot be asserted here, which is the harness', async () => {
-    /* happy-dom serves every document from `about:blank`, whose origin is the
-       string `null`, so nothing resolves same-origin and the branch that writes
-       `download` is unreachable. Rendered against a real page at
-       `http://localhost:3000`: `/media/clip.mp4` came out with `download` and no
-       `target`, and `https://example.com/clip.mp4` with `target="_blank"` and
-       no `download`. Asserted here is the half this environment can answer, and
-       that a relative source at least does not throw. */
-    expect(location.origin).toBe('null')
-    const relative = await player(
-      '<helix-video extra-controls="download" label="A clip" src="/clip.mp4"></helix-video>',
+  test('and asks for a save where the file is ours', async () => {
+    /* A `blob:` source, which is ours by definition and needs no origin to
+       compare against. That matters here because these specs run in two places:
+       happy-dom serves every document from `about:blank`, whose origin is the
+       string `null`, so a relative path resolves to nothing there while
+       resolving perfectly in the browser run. An assertion about the
+       environment passes in one and fails in the other, which is what the first
+       version of this did. */
+    const ours = await player(
+      '<helix-video extra-controls="download" label="A clip" src="blob:whatever"></helix-video>',
     )
-    expect(part(relative, 'download')).not.toBeNull()
+    const link = part(ours, 'download') as HTMLAnchorElement
+    expect(link.hasAttribute('download')).toBe(true)
+    expect(link.hasAttribute('target')).toBe(false)
   })
 })
 

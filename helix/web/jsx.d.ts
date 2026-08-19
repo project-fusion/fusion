@@ -43,7 +43,6 @@ import type {
   HelixFileInput,
   HelixFilterEvent,
   HelixFlex,
-  HelixFormElement,
   HelixGrid,
   HelixIcon,
   HelixIconButton,
@@ -1661,17 +1660,37 @@ export type HelixCheckboxGroupProps = {
   label?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixCheckboxGroup["required"];
-  /** Whether the whole set is out of play.
-
-Its own property rather than an inherited one, because this group is not
-form-associated and `disabled` arrives with `HelixFormElement`. The boxes
-are each form-associated and have their own, which is exactly why the two
-have to be reconciled rather than simply written over. */
-  disabled?: HelixCheckboxGroup["disabled"];
-  /** Name submitted with the form, given to every box that has none. */
-  name?: HelixCheckboxGroup["name"];
   /** The checked values, comma separated. */
   value?: HelixCheckboxGroup["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixCheckboxGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixCheckboxGroup["name"];
 
   /** Fired when any box changes, with the whole set. */
   "onhelix-change"?: (e: HelixCheckboxGroupHelixChangeElementEvent) => void;
@@ -1688,17 +1707,37 @@ export type HelixCheckboxGroupSolidJsProps = {
   "prop:label"?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixCheckboxGroup["required"];
-  /** Whether the whole set is out of play.
-
-Its own property rather than an inherited one, because this group is not
-form-associated and `disabled` arrives with `HelixFormElement`. The boxes
-are each form-associated and have their own, which is exactly why the two
-have to be reconciled rather than simply written over. */
-  "prop:disabled"?: HelixCheckboxGroup["disabled"];
-  /** Name submitted with the form, given to every box that has none. */
-  "prop:name"?: HelixCheckboxGroup["name"];
   /** The checked values, comma separated. */
   "prop:value"?: HelixCheckboxGroup["value"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixCheckboxGroup["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixCheckboxGroup["name"];
   /** Fired when any box changes, with the whole set. */
   "on:helix-change"?: (e: HelixCheckboxGroupHelixChangeElementEvent) => void;
 
@@ -12163,14 +12202,34 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `disabled`: Whether the whole set is out of play.
-   *
-   * Its own property rather than an inherited one, because this group is not
-   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
-   * are each form-associated and have their own, which is exactly why the two
-   * have to be reconciled rather than simply written over.
-   * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -12178,6 +12237,12 @@ export type CustomElements = {
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
@@ -12192,6 +12257,12 @@ export type CustomElements = {
    * - `(default)`: The checkboxes.
    * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Custom Properties
    *
@@ -20617,14 +20688,34 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `disabled`: Whether the whole set is out of play.
-   *
-   * Its own property rather than an inherited one, because this group is not
-   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
-   * are each form-associated and have their own, which is exactly why the two
-   * have to be reconciled rather than simply written over.
-   * - `name`: Name submitted with the form, given to every box that has none.
    * - `value`: The checked values, comma separated.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -20632,6 +20723,12 @@ export type CustomElementsSolidJs = {
    * would point a screen reader at an id that resolves to nothing, which it
    * reads as a description it cannot find. (property only) (readonly)
    * - `boxes`: The boxes, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
    *
    * ## Events
    *
@@ -20646,6 +20743,12 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The checkboxes.
    * - `label`: Richer than a string, where the label is more than one.
    * - `hint`: Richer than a string.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
    * ## CSS Custom Properties
    *

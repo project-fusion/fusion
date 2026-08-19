@@ -1,4 +1,5 @@
 import {
+  capturePointer,
   customElement,
   HelixChangeEvent,
   HelixElement,
@@ -516,7 +517,7 @@ export class HelixBaseSplitter extends HelixElement {
     /* Captured, so the divider keeps the pointer once it has it: a drag that
        outruns a thin target otherwise ends the moment the pointer leaves it,
        which on a fast gesture is immediately. */
-    separator.setPointerCapture(event.pointerId)
+    capturePointer(separator, event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
     // Cleared, so a number from the last gesture cannot settle this one.
     this.reached = undefined
@@ -716,7 +717,7 @@ export class HelixBaseSplitter extends HelixElement {
         ? { length: mine.height, start: mine.top }
         : { length: mine.width, start: mine.left },
     }
-    handle.setPointerCapture(event.pointerId)
+    capturePointer(handle, event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
     crossing.by.opened = crossing.by.collapsed ? undefined : crossing.by.position
     this.reached = undefined

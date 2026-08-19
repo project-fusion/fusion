@@ -36,6 +36,11 @@ describe('a menu row that navigates', () => {
     return item.renderRoot.querySelector('[part="item"]') as HTMLElement
   }
 
+  /* A fragment, not a path. These specs also run in a real browser through
+     `bun run specs:browser`, where pressing Space really does click the anchor
+     and a path really does navigate: it took the whole browser run down, with
+     no results and a message naming no family. A fragment proves the same
+     press and goes nowhere. */
   test('the anchor is the row, carrying the role and the tab stop', async () => {
     /* Not an anchor inside the row. A `menuitem` cannot contain a link:
        measured in Chromium, the row loses its accessible name entirely and the
@@ -43,7 +48,7 @@ describe('a menu row that navigates', () => {
        `treeitem`, and `Option` cannot, because a listbox has to say which option
        is current with `aria-activedescendant` and that reference reaches only
        the option's host. */
-    const linked = await row('href="/docs" value="docs"')
+    const linked = await row('href="#docs" value="docs"')
     expect(linked.localName).toBe('a')
     expect(linked.getAttribute('role')).toBe('menuitem')
     expect(linked.getAttribute('tabindex')).toBe('-1')
@@ -58,7 +63,7 @@ describe('a menu row that navigates', () => {
 
   test('a disabled row renders no href, since a disabled anchor is not a thing', async () => {
     // `aria-disabled` alone would announce it as unavailable and navigate anyway.
-    const off = await row('disabled href="/docs" value="docs"')
+    const off = await row('disabled href="#docs" value="docs"')
     expect(off.localName).toBe('div')
     expect(off.hasAttribute('href')).toBe(false)
   })
@@ -66,7 +71,7 @@ describe('a menu row that navigates', () => {
   test('Enter goes back to the browser, and Space presses the row', async () => {
     /* An anchor answers Enter itself, so preventing it would mean re-issuing
        the navigation by hand. It ignores Space, so that one is ours. */
-    const linked = await row('href="/docs" value="docs"')
+    const linked = await row('href="#docs" value="docs"')
     const press = (key: string) => {
       const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
       linked.dispatchEvent(event)

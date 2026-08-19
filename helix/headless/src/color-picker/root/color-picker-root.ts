@@ -1,5 +1,6 @@
 import {
   CopyController,
+  capturePointer,
   customElement,
   type HelixChangeEvent,
   HelixFormElement,
@@ -319,7 +320,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   private readonly handleGridPointer = (event: PointerEvent): void => {
     const grid = event.currentTarget as HTMLElement
     if (event.type === 'pointerdown') {
-      grid.setPointerCapture(event.pointerId)
+      capturePointer(grid, event.pointerId)
       // So the keyboard carries on from where the pointer left off.
       this.renderRoot?.querySelector<HTMLElement>('[part="grid-saturation"]')?.focus()
     } else if (!grid.hasPointerCapture(event.pointerId)) {

@@ -5639,35 +5639,6 @@
             },
             {
               "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the whole set is out of play.\n\nIts own property rather than an inherited one, because this group is not\nform-associated and `disabled` arrives with `HelixFormElement`. The boxes\nare each form-associated and have their own, which is exactly why the two\nhave to be reconciled rather than simply written over.",
-              "attribute": "disabled",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCheckboxGroup",
-                "module": "src/checkbox-group/root/checkbox-group-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form, given to every box that has none.",
-              "attribute": "name",
-              "inheritedFrom": {
-                "name": "HelixBaseCheckboxGroup",
-                "module": "src/checkbox-group/root/checkbox-group-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "value",
               "type": {
                 "text": "string"
@@ -5754,10 +5725,133 @@
                   "text": "void"
                 }
               },
-              "description": "Refuses an empty set where one was required, which nothing did.\n\n`required` arrives with `MixinField`, reflects, and paints the asterisk\nthrough the composed field sheet, and enforced nothing at all: no validity,\nno message, and nothing cascading to the boxes. A group marked required\nsubmitted empty.\n\nThe group is deliberately not form-associated, its boxes being the controls,\nso the validity is reported through the group's own internals and anchored\non the list: the browser needs somewhere to point the message.",
+              "description": "Refuses an empty set where one was required, which nothing did.\n\n`required` arrives with `MixinField`, reflects, and paints the asterisk\nthrough the composed field sheet, and enforced nothing at all: no validity,\nno message, and nothing cascading to the boxes. A group marked required\nsubmitted empty.\n\n**The group is form-associated, and submits nothing.** It was not, on the\nreasoning that its boxes are the controls and each submits itself, which is\nstill true: nothing here calls `setFormValue`, so the set that reaches the\nserver is exactly the boxes it always was. What form association buys is the\nother half of participation, validity, and there is no other mechanism for\nit: `setValidity` throws `NotSupportedError` on an element the platform does\nnot know is a control.\n\nSo the fix that was written for \"a group marked required submitted empty\"\nthrew on every update in a real browser, and happy-dom's shim does not\nthrow, so the specs passed and the behaviour never worked. Eleven of them\nfailed the moment they were run in Chromium. It is also what makes the rest\nwork: the form now refuses to submit, which fires `invalid`, which is what\nmarks the field touched and puts the message on screen.\n\nAnchored on the list, because the browser needs somewhere to point the\nbubble.",
               "inheritedFrom": {
                 "name": "HelixBaseCheckboxGroup",
                 "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "default": "false",
+              "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The platform's notice that an ancestor fieldset changed.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              },
+              "type": {
+                "text": "formDisabledCallback(disabled: boolean) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
               }
             },
             {
@@ -5892,32 +5986,6 @@
               }
             },
             {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the whole set is out of play.\n\nIts own property rather than an inherited one, because this group is not\nform-associated and `disabled` arrives with `HelixFormElement`. The boxes\nare each form-associated and have their own, which is exactly why the two\nhave to be reconciled rather than simply written over.",
-              "fieldName": "disabled",
-              "inheritedFrom": {
-                "name": "HelixBaseCheckboxGroup",
-                "module": "src/checkbox-group/root/checkbox-group-root.ts"
-              }
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form, given to every box that has none.",
-              "fieldName": "name",
-              "inheritedFrom": {
-                "name": "HelixBaseCheckboxGroup",
-                "module": "src/checkbox-group/root/checkbox-group-root.ts"
-              }
-            },
-            {
               "name": "value",
               "type": {
                 "text": "string"
@@ -5928,6 +5996,32 @@
               "inheritedFrom": {
                 "name": "HelixBaseCheckboxGroup",
                 "module": "src/checkbox-group/root/checkbox-group-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
               }
             }
           ],
@@ -58003,7 +58097,7 @@
                 "text": "boolean"
               },
               "privacy": "private",
-              "description": "Whether the file this points at is ours to hand over.",
+              "description": "Whether the file this points at is ours to hand over.\n\n`blob:` and `data:` named rather than compared, because the rule `download`\nactually follows is same-origin *or one of those two*: a clip a consumer\ngenerated in the page has no origin to match and is theirs to save by\ndefinition. Comparing origins alone called both foreign, so the one case\nwhere a download certainly works was the one case it was not offered.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseVideo",

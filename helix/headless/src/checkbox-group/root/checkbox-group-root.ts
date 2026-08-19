@@ -2,7 +2,7 @@ import {
   customElement,
   DisabledCascadeController,
   HelixChangeEvent,
-  HelixElement,
+  HelixFormElement,
   type HelixToggleEvent,
   hostAria,
   MixinField,
@@ -52,21 +52,12 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @event {HelixChangeEvent} helix-change - Fired when any box changes, with the whole set.
  */
 @customElement('helix-base-checkbox-group')
-export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
-  /**
-   * Whether the whole set is out of play.
-   *
-   * Its own property rather than an inherited one, because this group is not
-   * form-associated and `disabled` arrives with `HelixFormElement`. The boxes
-   * are each form-associated and have their own, which is exactly why the two
-   * have to be reconciled rather than simply written over.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
-  /** Name submitted with the form, given to every box that has none. */
-  @property()
-  name = ''
+export class HelixBaseCheckboxGroup extends MixinField(HelixFormElement) {
+  /* `name` is inherited. It arrives with `HelixFormElement` reflected and with
+     the converter that makes an empty one absent rather than `name=""`, which
+     the copy declared here had neither of. What it means differs slightly and
+     the property does not: the group submits nothing under it, and hands it to
+     every box that has none. */
 
   /** The checked values, comma separated. */
   @property()
@@ -225,9 +216,23 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
    * no message, and nothing cascading to the boxes. A group marked required
    * submitted empty.
    *
-   * The group is deliberately not form-associated, its boxes being the controls,
-   * so the validity is reported through the group's own internals and anchored
-   * on the list: the browser needs somewhere to point the message.
+   * **The group is form-associated, and submits nothing.** It was not, on the
+   * reasoning that its boxes are the controls and each submits itself, which is
+   * still true: nothing here calls `setFormValue`, so the set that reaches the
+   * server is exactly the boxes it always was. What form association buys is the
+   * other half of participation, validity, and there is no other mechanism for
+   * it: `setValidity` throws `NotSupportedError` on an element the platform does
+   * not know is a control.
+   *
+   * So the fix that was written for "a group marked required submitted empty"
+   * threw on every update in a real browser, and happy-dom's shim does not
+   * throw, so the specs passed and the behaviour never worked. Eleven of them
+   * failed the moment they were run in Chromium. It is also what makes the rest
+   * work: the form now refuses to submit, which fires `invalid`, which is what
+   * marks the field touched and puts the message on screen.
+   *
+   * Anchored on the list, because the browser needs somewhere to point the
+   * bubble.
    */
   private validate(): void {
     this.reportRequired(this.value === '', 'Choose at least one to continue.', 'items')

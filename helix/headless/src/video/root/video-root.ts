@@ -251,9 +251,23 @@ export class HelixBaseVideo extends HelixElement {
   @property({ attribute: 'start-control' })
   startControl?: 'none'
 
-  /** Whether the file this points at is ours to hand over. */
+  /**
+   * Whether the file this points at is ours to hand over.
+   *
+   * `blob:` and `data:` named rather than compared, because the rule `download`
+   * actually follows is same-origin *or one of those two*: a clip a consumer
+   * generated in the page has no origin to match and is theirs to save by
+   * definition. Comparing origins alone called both foreign, so the one case
+   * where a download certainly works was the one case it was not offered.
+   */
   private get localFile(): boolean {
-    if (this.src === '' || typeof location === 'undefined') {
+    if (this.src === '') {
+      return false
+    }
+    if (this.src.startsWith('blob:') || this.src.startsWith('data:')) {
+      return true
+    }
+    if (typeof location === 'undefined') {
       return false
     }
     try {
