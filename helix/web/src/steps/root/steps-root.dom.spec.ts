@@ -154,3 +154,72 @@ describe('a step is pressable, and only its name is', () => {
     expect(open.hasAttribute('current')).toBe(true)
   })
 })
+
+describe('the list can hold which step is current', () => {
+  const seq = async (attrs = ''): Promise<Steps> => {
+    const host = (await mount(`<helix-steps ${attrs}>
+      <helix-step complete value="one">One</helix-step>
+      <helix-step value="two">Two</helix-step>
+      <helix-step value="three">Three</helix-step>
+    </helix-steps>`)) as Steps
+    await host.updateComplete
+    return host
+  }
+
+  const currents = (host: Steps): boolean[] =>
+    [...host.querySelectorAll('helix-step')].map((one) => one.hasAttribute('current'))
+
+  test('`default-active` puts it on the step that owns the value', async () => {
+    const host = await seq('default-active="two"')
+    expect(currents(host)).toEqual([false, true, false])
+  })
+
+  test('and it never touches `complete`, because a reader can step back', async () => {
+    /* Deriving both from a position is the obvious design and is wrong the
+       first time anybody goes back: at stage one of three, stages one and two
+       are still finished, while "everything before the active one" says only
+       the first is. */
+    const host = await seq('default-active="one"')
+    const steps = [...host.querySelectorAll('helix-step')]
+    expect(steps.map((one) => one.hasAttribute('complete'))).toEqual([true, false, false])
+    expect(currents(host)).toEqual([true, false, false])
+  })
+
+  test('unset, the steps keep whatever they were given', async () => {
+    /* The case a server renders. This element would have to count its slotted
+       children to know which one is third, and the server has none, so leaving
+       them alone is what stops the whole sequence flashing on hydration. */
+    const host = (await mount(`<helix-steps>
+      <helix-step complete value="one">One</helix-step>
+      <helix-step current value="two">Two</helix-step>
+    </helix-steps>`)) as Steps
+    await host.updateComplete
+    expect(currents(host)).toEqual([false, true])
+  })
+
+  test('pressing a step moves it, uncontrolled', async () => {
+    const host = await seq('default-active="one"')
+    const third = host.querySelectorAll('helix-step')[2] as HTMLElement
+    await (third as unknown as Steps).updateComplete
+    ;(part(third, 'label') as HTMLElement).click()
+    await host.updateComplete
+    expect((host as unknown as { active: string }).active).toBe('three')
+    expect(currents(host)).toEqual([false, false, true])
+  })
+
+  test('and announces without moving where the consumer owns it', async () => {
+    // Controlled is decided once, off whether anything set `active` by the
+    // first update, so this element must announce and wait to be told.
+    const host = await seq('active="one"')
+    const said: string[] = []
+    host.addEventListener('helix-change', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const third = host.querySelectorAll('helix-step')[2] as HTMLElement
+    await (third as unknown as Steps).updateComplete
+    ;(part(third, 'label') as HTMLElement).click()
+    await host.updateComplete
+    expect(said).toEqual(['three'])
+    expect(currents(host)).toEqual([true, false, false])
+  })
+})

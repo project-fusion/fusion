@@ -1072,9 +1072,10 @@ A button that puts a string on the clipboard and says it did.
 
 Extends `HelixBaseCopyButton`.
 
-The styled tier adds one thing the base one cannot: the confirmation and the
-resting content share a grid cell, so the button is the size of the larger of
-them and does not resize mid-press. See the stylesheet for why that matters.
+Takes the icon button's square box, then stacks its two faces in one grid
+cell so the press never changes the button's size. See the stylesheet: a
+control that resizes under the pointer at the moment a reader is looking at
+it for reassurance reads as a second, accidental press.
 
 #### Properties
 
@@ -1082,12 +1083,13 @@ them and does not resize mid-press. See the stylesheet for why that matters.
 | --- | --- | --- | --- | --- | --- |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
+| `copiedLabel` | `copied-label` | `string` | `'Copied'` | `HelixBaseCopyButton` | What it is called, and says, after one. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `focusable` | - | `boolean` | `true` | `HelixBaseButton` | Whether the button holds its group's tab stop. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
+| `label` | `label` | `string` | `'Copy'` | `HelixBaseButton` | What it is called, and says, before a press. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
@@ -1110,8 +1112,8 @@ them and does not resize mid-press. See the stylesheet for why that matters.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | The resting content, usually a copy icon. |
-| `copied` | What replaces it once the write succeeds. |
+| *(default)* | The resting icon. Falls back to a clipboard. |
+| `copied` | What replaces it once the write succeeds. Falls back to a check. |
 | `start` | Content before the label, usually an icon. |
 | `end` | Content after the label. |
 
@@ -1119,6 +1121,7 @@ them and does not resize mid-press. See the stylesheet for why that matters.
 
 | Part | Description |
 | --- | --- |
+| `tooltip` | The bubble, forwarded from the tooltip inside. |
 | `button` | The inner button. |
 
 ## Date Input
@@ -3264,6 +3267,7 @@ what it meant when it was written.
 | Property | Description |
 | --- | --- |
 | `--sandbox-min-block-size` | Minimum height of the sandbox. |
+| `--sandbox-grab` | The invisible width of a divider's drag target. |
 | `--sandbox-separator-color` | Color of the divider. |
 
 ### Preview — `helix-sandbox-preview`
@@ -3506,6 +3510,7 @@ Both slots are bare, so an unfilled one generates no box and costs no gap.
 | Property | Description |
 | --- | --- |
 | `--toolbar-gap` | Space between items. |
+| `--sandbox-toolbar-size` | The bar's height. Defaults to a large control. |
 
 ## Select
 
@@ -3892,9 +3897,24 @@ second name for it here would be a second thing to keep in step.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `appearance` | `appearance` | `'numeric' \| undefined` | - | `HelixBaseSteps` | What each step is marked with. |
+| `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Steps'` | `HelixBaseSteps` | Accessible name for the sequence. |
+| `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
 | `orientation` | `orientation` | `'vertical' \| undefined` | - | `HelixBaseSteps` | Which way the steps run. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestActive()` | `MixinControllerActive` | Requests a new current item, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the active step changes. |
 
 #### Slots
 

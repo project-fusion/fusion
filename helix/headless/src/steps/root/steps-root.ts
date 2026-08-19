@@ -1,22 +1,30 @@
-import { customElement, HelixElement, hostAria } from '@helix-io/core'
+import { customElement, HelixElement, hostAria, MixinControllerActive } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import type { HelixBaseStep } from '../step/step.js'
 
 /**
  * @summary A sequence of stages, and where the reader is in it.
  *
  * @description
- * **Each step states its own position, and nothing here coordinates them.** A
- * step is `complete`, or `current`, or neither, and it says so on itself. The
- * alternative is an `active` index on this element, which reads better in
- * markup and cannot render on a server: this element would have to count its
- * slotted children to know which one is third, and the server has no children
- * to count. A stepper whose state appears only after hydration is a stepper
- * that flashes every stage as unvisited on first paint.
+ * **`active` names where the reader is. `complete` stays on each step.** They
+ * are two different facts and only one of them is positional. Deriving both
+ * from a position is the obvious design and it is wrong the first time anybody
+ * steps back: return to stage one of three and stages one and two are still
+ * finished, while "everything before the active one" says only the first is.
+ * So this element drives `current` and never touches `complete`.
  *
- * The consequence is that the numbering is not JavaScript either. It is a CSS
- * counter in the tier above, which the browser resolves at layout with no
- * script at all, so the third step reads "3" in the server's own markup.
+ * **`active` is optional, and a sequence without it still renders.** Left
+ * unset, each step's own `current` stands and nothing here overwrites it, which
+ * is what lets the whole sequence be right in the server's markup: this element
+ * would have to count its slotted children to know which one is third, and the
+ * server has no children to count. Set it, and it wins, because it is a
+ * statement about the sequence where the attribute on a step is a statement
+ * about one step.
+ *
+ * That is also why the numbering is not JavaScript. It is a CSS counter in the
+ * tier above, which the browser resolves at layout with no script at all, so
+ * the third step reads "3" in the server's own markup.
  *
  * **The connector belongs to the step, not to the list.** Each one draws the
  * line that arrives at it and hides it when it is first, the same arrangement
@@ -35,9 +43,11 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/steps
  *
  * @slot - The steps, which are `helix-step` elements.
+ *
+ * @event {HelixChangeEvent} helix-change - Fired when the active step changes.
  */
 @customElement('helix-base-steps')
-export class HelixBaseSteps extends HelixElement {
+export class HelixBaseSteps extends MixinControllerActive(HelixElement) {
   /**
    * Accessible name for the sequence.
    *
@@ -78,13 +88,65 @@ export class HelixBaseSteps extends HelixElement {
   @property({ reflect: true })
   appearance?: 'numeric'
 
+  /** The steps, in the order the consumer wrote them. */
+  private get steps(): HelixBaseStep[] {
+    return [...this.querySelectorAll<HelixBaseStep>(':scope > *')].filter((one) => 'current' in one)
+  }
+
+  /**
+   * Puts `active` on whichever step owns it.
+   *
+   * Returns without touching anything where nothing has set `active`, which is
+   * the case a server renders: the steps' own `current` is the state then, and
+   * overwriting it on hydration is exactly the flash this design exists to
+   * avoid.
+   *
+   * `current` only. `complete` is the consumer's on each step, because a reader
+   * who steps back has finished more stages than they are standing in front of.
+   */
+  private sync(): void {
+    if (this.active === '') {
+      return
+    }
+    const steps = this.steps
+    const value = this.resolveActive(steps)?.value ?? ''
+    for (const step of steps) {
+      step.current = step.value === value
+    }
+  }
+
+  private readonly handleSelection = (event: Event): void => {
+    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+  }
+
+  private readonly handleSlotChange = (): void => {
+    this.sync()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('helix-select', this.handleSelection)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('helix-select', this.handleSelection)
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'list' })
   }
 
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('active')) {
+      this.sync()
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 
