@@ -4360,6 +4360,28 @@ Nothing reads it from the attribute either. The real `<input>` inside takes
 it as a property binding, which is what makes the keyboard and the
 validation follow. */
   type?: HelixInput["type"];
+  /** Whether the field offers a button that empties it.
+
+Shown only while there is something to clear, because a control that does
+nothing is worse than no control: a reader who presses it and sees no
+change has to work out whether the field was already empty or the button
+is broken. */
+  clearable?: HelixInput["clearable"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "clear-label"?: HelixInput["clearLabel"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  clearLabel?: HelixInput["clearLabel"];
+  /** Whether a password field offers a toggle that shows what was typed.
+
+Ignored on every other type. A reveal on an email field would be a button
+that does nothing visible, and guarding it here rather than asking the
+consumer not to means the property can be set once on a component that
+changes type. */
+  reveal?: HelixInput["reveal"];
+  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  "reveal-label"?: HelixInput["revealLabel"];
+  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  revealLabel?: HelixInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
 The class documentation promised `pattern` and `minlength` "and the rest"
@@ -4468,6 +4490,28 @@ Nothing reads it from the attribute either. The real `<input>` inside takes
 it as a property binding, which is what makes the keyboard and the
 validation follow. */
   "prop:type"?: HelixInput["type"];
+  /** Whether the field offers a button that empties it.
+
+Shown only while there is something to clear, because a control that does
+nothing is worse than no control: a reader who presses it and sees no
+change has to work out whether the field was already empty or the button
+is broken. */
+  "prop:clearable"?: HelixInput["clearable"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "attr:clear-label"?: HelixInput["clearLabel"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "prop:clearLabel"?: HelixInput["clearLabel"];
+  /** Whether a password field offers a toggle that shows what was typed.
+
+Ignored on every other type. A reveal on an email field would be a button
+that does nothing visible, and guarding it here rather than asking the
+consumer not to means the property can be set once on a component that
+changes type. */
+  "prop:reveal"?: HelixInput["reveal"];
+  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  "attr:reveal-label"?: HelixInput["revealLabel"];
+  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  "prop:revealLabel"?: HelixInput["revealLabel"];
   /** A regular expression the value has to match, as the platform reads it.
 
 The class documentation promised `pattern` and `minlength` "and the rest"
@@ -10105,6 +10149,42 @@ export type HelixTreeHelixChangeElementEvent =
   HelixTreeElementEvent<HelixChangeEvent>;
 
 export type HelixTreeProps = {
+  /** Which end of the row the branch chevron sits at.
+
+Styled tier, because it is presentation and nothing else: it moves paint
+and leaves the markup, the ARIA and the reading order exactly as they were.
+It was written on the base class first, which the tier rule forbids for
+precisely this kind of property.
+
+On the tree rather than on the item, because it is a fact about the list. A
+navigation puts every chevron on the same side, and a per-item version
+would make a ragged tree writable and would have to be repeated on every
+row to say one thing.
+
+It is worth owning rather than leaving to `::part(toggle)`, which a
+consumer could reach for: the naive version is `order` plus an auto margin,
+and the row's `end` slot already carries an auto margin of its own, so the
+two split the free space and the chevron lands halfway along. Measured at
+70px short. That is the kind of thing a component should absorb once. */
+  "chevron-placement"?: HelixTree["chevronPlacement"];
+  /** Which end of the row the branch chevron sits at.
+
+Styled tier, because it is presentation and nothing else: it moves paint
+and leaves the markup, the ARIA and the reading order exactly as they were.
+It was written on the base class first, which the tier rule forbids for
+precisely this kind of property.
+
+On the tree rather than on the item, because it is a fact about the list. A
+navigation puts every chevron on the same side, and a per-item version
+would make a ragged tree writable and would have to be repeated on every
+row to say one thing.
+
+It is worth owning rather than leaving to `::part(toggle)`, which a
+consumer could reach for: the naive version is `order` plus an auto margin,
+and the row's `end` slot already carries an auto margin of its own, so the
+two split the free space and the chevron lands halfway along. Measured at
+70px short. That is the kind of thing a component should absorb once. */
+  chevronPlacement?: HelixTree["chevronPlacement"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -10145,6 +10225,42 @@ somewhere different from its siblings' would be a mistake, not a choice. */
 };
 
 export type HelixTreeSolidJsProps = {
+  /** Which end of the row the branch chevron sits at.
+
+Styled tier, because it is presentation and nothing else: it moves paint
+and leaves the markup, the ARIA and the reading order exactly as they were.
+It was written on the base class first, which the tier rule forbids for
+precisely this kind of property.
+
+On the tree rather than on the item, because it is a fact about the list. A
+navigation puts every chevron on the same side, and a per-item version
+would make a ragged tree writable and would have to be repeated on every
+row to say one thing.
+
+It is worth owning rather than leaving to `::part(toggle)`, which a
+consumer could reach for: the naive version is `order` plus an auto margin,
+and the row's `end` slot already carries an auto margin of its own, so the
+two split the free space and the chevron lands halfway along. Measured at
+70px short. That is the kind of thing a component should absorb once. */
+  "attr:chevron-placement"?: HelixTree["chevronPlacement"];
+  /** Which end of the row the branch chevron sits at.
+
+Styled tier, because it is presentation and nothing else: it moves paint
+and leaves the markup, the ARIA and the reading order exactly as they were.
+It was written on the base class first, which the tier rule forbids for
+precisely this kind of property.
+
+On the tree rather than on the item, because it is a fact about the list. A
+navigation puts every chevron on the same side, and a per-item version
+would make a ragged tree writable and would have to be repeated on every
+row to say one thing.
+
+It is worth owning rather than leaving to `::part(toggle)`, which a
+consumer could reach for: the naive version is `order` plus an auto margin,
+and the row's `end` slot already carries an auto margin of its own, so the
+two split the free space and the chevron lands halfway along. Measured at
+70px short. That is the kind of thing a component should absorb once. */
+  "prop:chevronPlacement"?: HelixTree["chevronPlacement"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -13264,6 +13380,20 @@ export type CustomElements = {
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the
    * validation follow.
+   * - `clearable`: Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
+   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called. The state is `aria-pressed`, not this.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -13334,7 +13464,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `start`: Before the text, for an icon or a prefix.
-   * - `end`: After the text, for an icon, a unit, or a clear button.
+   * - `end`: After the text, for an icon or a unit.
    *
    * ## Methods
    *
@@ -13373,6 +13503,8 @@ export type CustomElements = {
    *
    * - `field`: The box holding everything.
    * - `control`: The input itself.
+   * - `clear`: The button that empties the field.
+   * - `reveal`: The button that shows and hides a password.
    */
   "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents>;
 
@@ -17965,6 +18097,23 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron-placement`/`chevronPlacement`: Which end of the row the branch chevron sits at.
+   *
+   * Styled tier, because it is presentation and nothing else: it moves paint
+   * and leaves the markup, the ARIA and the reading order exactly as they were.
+   * It was written on the base class first, which the tier rule forbids for
+   * precisely this kind of property.
+   *
+   * On the tree rather than on the item, because it is a fact about the list. A
+   * navigation puts every chevron on the same side, and a per-item version
+   * would make a ragged tree writable and would have to be repeated on every
+   * row to say one thing.
+   *
+   * It is worth owning rather than leaving to `::part(toggle)`, which a
+   * consumer could reach for: the naive version is `order` plus an auto margin,
+   * and the row's `end` slot already carries an auto margin of its own, so the
+   * two split the free space and the chevron lands halfway along. Measured at
+   * 70px short. That is the kind of thing a component should absorb once.
    * - `active`: Which item is current, by its `value`.
    *
    * Called `active`, which is what this mixin is named for and what it was
@@ -21211,6 +21360,20 @@ export type CustomElementsSolidJs = {
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the
    * validation follow.
+   * - `clearable`: Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
+   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called. The state is `aria-pressed`, not this.
    * - `pattern`: A regular expression the value has to match, as the platform reads it.
    *
    * The class documentation promised `pattern` and `minlength` "and the rest"
@@ -21281,7 +21444,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `start`: Before the text, for an icon or a prefix.
-   * - `end`: After the text, for an icon, a unit, or a clear button.
+   * - `end`: After the text, for an icon or a unit.
    *
    * ## Methods
    *
@@ -21320,6 +21483,8 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box holding everything.
    * - `control`: The input itself.
+   * - `clear`: The button that empties the field.
+   * - `reveal`: The button that shows and hides a password.
    */
   "helix-input": Partial<
     HelixInputProps &
@@ -26089,6 +26254,23 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `chevron-placement`/`chevronPlacement`: Which end of the row the branch chevron sits at.
+   *
+   * Styled tier, because it is presentation and nothing else: it moves paint
+   * and leaves the markup, the ARIA and the reading order exactly as they were.
+   * It was written on the base class first, which the tier rule forbids for
+   * precisely this kind of property.
+   *
+   * On the tree rather than on the item, because it is a fact about the list. A
+   * navigation puts every chevron on the same side, and a per-item version
+   * would make a ragged tree writable and would have to be repeated on every
+   * row to say one thing.
+   *
+   * It is worth owning rather than leaving to `::part(toggle)`, which a
+   * consumer could reach for: the naive version is `order` plus an auto margin,
+   * and the row's `end` slot already carries an auto margin of its own, so the
+   * two split the free space and the chevron lands halfway along. Measured at
+   * 70px short. That is the kind of thing a component should absorb once.
    * - `active`: Which item is current, by its `value`.
    *
    * Called `active`, which is what this mixin is named for and what it was

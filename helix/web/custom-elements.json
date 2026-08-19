@@ -20849,6 +20849,104 @@
             },
             {
               "kind": "field",
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field offers a button that empties it.\n\nShown only while there is something to clear, because a control that does\nnothing is worse than no control: a reader who presses it and sees no\nchange has to work out whether the field was already empty or the button\nis broken.",
+              "attribute": "clearable",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "clearLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Clear'",
+              "description": "What the clear button is called, since an icon has no name of its own.",
+              "attribute": "clear-label",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "reveal",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a password field offers a toggle that shows what was typed.\n\nIgnored on every other type. A reveal on an email field would be a button\nthat does nothing visible, and guarding it here rather than asking the\nconsumer not to means the property can be set once on a component that\nchanges type.",
+              "attribute": "reveal",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "revealLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show password'",
+              "description": "What the reveal toggle is called. The state is `aria-pressed`, not this.",
+              "attribute": "reveal-label",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "revealed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the password is currently showing.\n\nState rather than a property: it is a reader's momentary choice about what\nis on their own screen, it must not survive anything, and a consumer that\ncould set it could reveal a password without the reader asking.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "effectiveType",
+              "type": {
+                "text": "InputType"
+              },
+              "privacy": "private",
+              "description": "The type the real input is given, which is not always the type asked for.\n\nA revealed password is a text field for exactly as long as the reader is\nlooking at it. Reading through a getter rather than mutating `type` keeps\nthe property the consumer's: what they set is what they get back, whatever\nthe button is doing.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showsClear",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether there is a clear button on screen right now.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "shadowRootOptions",
               "type": {
                 "text": "ShadowRootInit"
@@ -20880,6 +20978,17 @@
               "privacy": "private",
               "readonly": true,
               "description": "Every keystroke, cancelable, and put back where it is refused.\n\nThe input has already taken the character by the time this runs, so a\nconsumer that refuses the change has to see the field returned to what the\nelement still holds. Otherwise the text on screen and the value the form\nwould submit disagree, which is the one thing a controlled field must never\ndo.",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleClear",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Empties the field and gives the caret back.\n\nFocus returns to the input rather than staying on the button, which is\nabout to disappear: a reader who cleared a field is going to type in it,\nand focus resting on a control that is being removed lands on the body.\n\nThrough `requestValue` like every other change, so a consumer who owns the\nvalue hears about it and decides, and a cancelled clear leaves the text\nwhere it was.",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -21210,6 +21319,9 @@
                 "slug": "default"
               },
               {
+                "slug": "clearable"
+              },
+              {
                 "slug": "disabled"
               },
               {
@@ -21220,6 +21332,9 @@
               },
               {
                 "slug": "required"
+              },
+              {
+                "slug": "reveal"
               }
             ]
           },
@@ -21343,6 +21458,58 @@
               }
             },
             {
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field offers a button that empties it.\n\nShown only while there is something to clear, because a control that does\nnothing is worse than no control: a reader who presses it and sees no\nchange has to work out whether the field was already empty or the button\nis broken.",
+              "fieldName": "clearable",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "clear-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Clear'",
+              "description": "What the clear button is called, since an icon has no name of its own.",
+              "fieldName": "clearLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "reveal",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a password field offers a toggle that shows what was typed.\n\nIgnored on every other type. A reveal on an email field would be a button\nthat does nothing visible, and guarding it here rather than asking the\nconsumer not to means the property can be set once on a component that\nchanges type.",
+              "fieldName": "reveal",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "name": "reveal-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show password'",
+              "description": "What the reveal toggle is called. The state is `aria-pressed`, not this.",
+              "fieldName": "revealLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
               "name": "pattern",
               "type": {
                 "text": "string"
@@ -21416,7 +21583,7 @@
               }
             },
             {
-              "description": "After the text, for an icon, a unit, or a clear button.",
+              "description": "After the text, for an icon or a unit.",
               "name": "end",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
@@ -21436,6 +21603,22 @@
             {
               "description": "The input itself.",
               "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "The button that empties the field.",
+              "name": "clear",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
+              "description": "The button that shows and hides a password.",
+              "name": "reveal",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -52824,6 +53007,17 @@
           "members": [
             {
               "kind": "field",
+              "name": "chevronPlacement",
+              "type": {
+                "text": "'start' | 'end'"
+              },
+              "default": "'start'",
+              "description": "Which end of the row the branch chevron sits at.\n\nStyled tier, because it is presentation and nothing else: it moves paint\nand leaves the markup, the ARIA and the reading order exactly as they were.\nIt was written on the base class first, which the tier rule forbids for\nprecisely this kind of property.\n\nOn the tree rather than on the item, because it is a fact about the list. A\nnavigation puts every chevron on the same side, and a per-item version\nwould make a ragged tree writable and would have to be repeated on every\nrow to say one thing.\n\nIt is worth owning rather than leaving to `::part(toggle)`, which a\nconsumer could reach for: the naive version is `order` plus an auto margin,\nand the row's `end` slot already carries an auto margin of its own, so the\ntwo split the free space and the chevron lands halfway along. Measured at\n70px short. That is the kind of thing a component should absorb once.",
+              "attribute": "chevron-placement",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "onActiveChange",
               "type": {
                 "text": "((value: string) => void) | undefined"
@@ -53211,35 +53405,16 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseTree",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A tree of items, navigable entirely from the keyboard.",
-          "helix": {
-            "category": "navigation",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/tree",
-            "aliases": [
-              "FileTree",
-              "Navigation tree"
-            ],
-            "tier": "styled",
-            "group": "Tree",
-            "part": "Root",
-            "examples": [
-              {
-                "slug": "default"
-              },
-              {
-                "slug": "with-icons"
-              }
-            ]
-          },
-          "tagName": "helix-tree",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "chevron-placement",
+              "type": {
+                "text": "'start' | 'end'"
+              },
+              "default": "'start'",
+              "description": "Which end of the row the branch chevron sits at.\n\nStyled tier, because it is presentation and nothing else: it moves paint\nand leaves the markup, the ARIA and the reading order exactly as they were.\nIt was written on the base class first, which the tier rule forbids for\nprecisely this kind of property.\n\nOn the tree rather than on the item, because it is a fact about the list. A\nnavigation puts every chevron on the same side, and a per-item version\nwould make a ragged tree writable and would have to be repeated on every\nrow to say one thing.\n\nIt is worth owning rather than leaving to `::part(toggle)`, which a\nconsumer could reach for: the naive version is `order` plus an auto margin,\nand the row's `end` slot already carries an auto margin of its own, so the\ntwo split the free space and the chevron lands halfway along. Measured at\n70px short. That is the kind of thing a component should absorb once.",
+              "fieldName": "chevronPlacement"
+            },
             {
               "name": "active",
               "type": {
@@ -53291,6 +53466,34 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseTree",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A tree of items, navigable entirely from the keyboard.",
+          "helix": {
+            "category": "navigation",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tree",
+            "aliases": [
+              "FileTree",
+              "Navigation tree"
+            ],
+            "tier": "styled",
+            "group": "Tree",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "with-icons"
+              }
+            ]
+          },
+          "tagName": "helix-tree",
+          "customElement": true,
           "modulePath": "src/tree/root/tree-root.ts",
           "definitionPath": "src/tree/root/tree-root.ts"
         }

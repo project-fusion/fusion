@@ -424,3 +424,124 @@ describe('input, controlled and uncontrolled', () => {
     expect(host.value).toBe('changed')
   })
 })
+
+describe('input clears itself', () => {
+  const cleared = async (markup: string): Promise<HTMLElement & { value: string }> => {
+    const host = (await mount(markup)) as HTMLElement & { value: string }
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    return host
+  }
+
+  test('the button is there only while there is something to clear', async () => {
+    /* A control that does nothing is worse than no control: a reader who
+       presses it and sees no change cannot tell whether the field was already
+       empty or the button is broken. */
+    const empty = await cleared('<helix-input clearable label="Search"></helix-input>')
+    expect(part(empty, 'clear')).toBeNull()
+
+    const full = await cleared(
+      '<helix-input clearable default-value="q" label="Search"></helix-input>',
+    )
+    expect(part(full, 'clear')).not.toBeNull()
+  })
+
+  test('and not at all where the field refuses to be changed', async () => {
+    const off = await cleared(
+      '<helix-input clearable default-value="q" disabled label="Search"></helix-input>',
+    )
+    expect(part(off, 'clear')).toBeNull()
+
+    const fixed = await cleared(
+      '<helix-input clearable default-value="q" label="Search" read-only></helix-input>',
+    )
+    expect(part(fixed, 'clear')).toBeNull()
+  })
+
+  test('pressing it empties the value and the input together', async () => {
+    const host = await cleared(
+      '<helix-input clearable default-value="q" label="Search" name="s"></helix-input>',
+    )
+    ;(part(host, 'clear') as HTMLElement).click()
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(host.value).toBe('')
+    expect(control(host)?.value).toBe('')
+    // An empty string, not null: a text field that has been emptied still
+    // submits, and submits nothing. Select reports null because "no option
+    // chosen" and "the empty option" are different answers there.
+    expect(formValue(host)).toBe('')
+  })
+
+  test('a consumer who refuses the clear keeps the text on screen', async () => {
+    /* The same bargain typing makes. The input is emptied by the time anything
+       runs, so a refusal has to put it back, or the text and the value the form
+       would submit disagree. */
+    const host = await cleared('<helix-input clearable label="Search" value="owned"></helix-input>')
+    host.addEventListener('helix-change', (event) => event.preventDefault())
+    ;(part(host, 'clear') as HTMLElement).click()
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(host.value).toBe('owned')
+    expect(control(host)?.value).toBe('owned')
+  })
+})
+
+describe('input reveals a password', () => {
+  const shown = async (markup: string): Promise<HTMLElement> => {
+    const host = await mount(markup)
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    return host
+  }
+
+  test('only on a password, whatever the property says', async () => {
+    const secret = await shown(
+      '<helix-input label="Password" reveal type="password"></helix-input>',
+    )
+    expect(part(secret, 'reveal')).not.toBeNull()
+
+    const plain = await shown('<helix-input label="Name" reveal type="text"></helix-input>')
+    expect(part(plain, 'reveal')).toBeNull()
+  })
+
+  test('the toggle changes what is rendered, not what the consumer set', async () => {
+    /* `type` stays the consumer's: what they set is what they read back, while
+       the field underneath is text for as long as the reader is looking at it. */
+    const host = (await shown(
+      '<helix-input label="Password" reveal type="password"></helix-input>',
+    )) as HTMLElement & { type: string }
+    expect(control(host)?.type).toBe('password')
+
+    ;(part(host, 'reveal') as HTMLElement).click()
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(control(host)?.type).toBe('text')
+    expect(host.type).toBe('password')
+
+    ;(part(host, 'reveal') as HTMLElement).click()
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(control(host)?.type).toBe('password')
+  })
+
+  test('the state is on the toggle, so the name can stay still', async () => {
+    // A toggle button says what it is once and reports its state in
+    // `aria-pressed`, rather than renaming itself under the reader.
+    const host = await shown('<helix-input label="Password" reveal type="password"></helix-input>')
+    const button = part(host, 'reveal') as HTMLElement
+    expect(button.getAttribute('aria-label')).toBe('Show password')
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+
+    button.click()
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect((part(host, 'reveal') as HTMLElement).getAttribute('aria-pressed')).toBe('true')
+    expect((part(host, 'reveal') as HTMLElement).getAttribute('aria-label')).toBe('Show password')
+  })
+
+  test('markup cannot reveal it, because the reader is the only one who may', async () => {
+    /* No attribute for it, so a password cannot arrive on screen already shown:
+       not from a server's markup, not from a framework spreading props, and not
+       from a consumer who copied the attribute list. It is a reader's momentary
+       choice about their own screen and survives nothing. */
+    const host = await shown(
+      '<helix-input label="Password" reveal revealed type="password" value="hunter2"></helix-input>',
+    )
+    expect(control(host)?.type).toBe('password')
+    expect((part(host, 'reveal') as HTMLElement).getAttribute('aria-pressed')).toBe('false')
+  })
+})

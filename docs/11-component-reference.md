@@ -1999,6 +1999,8 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `clearable` | `clearable` | `boolean` | `false` | `HelixBaseInput` | Whether the field offers a button that empties it. |
+| `clearLabel` | `clear-label` | `string` | `'Clear'` | `HelixBaseInput` | What the clear button is called, since an icon has no name of its own. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -2018,6 +2020,8 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `reveal` | `reveal` | `boolean` | `false` | `HelixBaseInput` | Whether a password field offers a toggle that shows what was typed. |
+| `revealLabel` | `reveal-label` | `string` | `'Show password'` | `HelixBaseInput` | What the reveal toggle is called. The state is `aria-pressed`, not this. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseInput` | Focus is delegated to the input, so the host is never the focus target. |
 | `type` | `type` | `InputType` | `'text'` | `HelixBaseInput` | What the field accepts, which decides the keyboard and the validation. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -2045,7 +2049,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | Slot | Description |
 | --- | --- |
 | `start` | Before the text, for an icon or a prefix. |
-| `end` | After the text, for an icon, a unit, or a clear button. |
+| `end` | After the text, for an icon or a unit. |
 
 #### Parts
 
@@ -2053,6 +2057,8 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | --- | --- |
 | `field` | The box holding everything. |
 | `control` | The input itself. |
+| `clear` | The button that empties the field. |
+| `reveal` | The button that shows and hides a password. |
 
 #### Custom properties
 
@@ -5101,6 +5107,7 @@ to it is one more thing between the reader and the label.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `chevron` | `chevron` | `'end' \| undefined` | - | `HelixBaseTree` | Which end of a row the chevron sits at. |
+| `chevronPlacement` | `chevron-placement` | `'start' \| 'end'` | `'start'` | - | Which end of the row the branch chevron sits at. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
 | `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |

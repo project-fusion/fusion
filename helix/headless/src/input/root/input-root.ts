@@ -6,7 +6,10 @@ import {
   restoreValue,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
+/* Side-effect import, because both buttons render a `helix-icon` and a custom
+   element registers on import. File Input's remove button does the same. */
+import '../../icon/index.js'
 
 /** What the control accepts, which is text of one kind or another. */
 export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
@@ -47,14 +50,32 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @aliases TextField, Field, TextInput
  * @documentation https://helix.fusion.dev/components/input
  *
+ * **`clearable` and `reveal` are the field's, not the consumer's.** The `end`
+ * slot used to be the answer to both, which meant every consumer of
+ * `type="search"` built the same button and every consumer of
+ * `type="password"` either built the same toggle or shipped a field a reader
+ * cannot check what they typed into. Neither is a slot's worth of variation:
+ * one empties the value, the other flips the type, and both want the same
+ * position, the same size and the same disabled behaviour. The slot stays for
+ * what actually varies, a unit or a prefix.
+ *
+ * Both opt in rather than following from `type`, and are booleans that default
+ * to false. A Lit boolean property that defaults to *true* cannot be turned off
+ * from HTML at all, only from script, which is the wrong way round for
+ * revealing a password: a consumer should have to ask for it. Drawer's `modal`
+ * defaults true for the opposite reason, that losing a focus trap by forgetting
+ * a word is worse than having to say so.
+ *
  * @slot start - Before the text, for an icon or a prefix.
- * @slot end - After the text, for an icon, a unit, or a clear button.
+ * @slot end - After the text, for an icon or a unit.
  *
  * @event {HelixChangeEvent} helix-change - Fired as the text changes, and cancelable.
  * @event {Event} change - Relayed from the input once the reader has finished.
  *
  * @csspart field - The box holding everything.
  * @csspart control - The input itself.
+ * @csspart clear - The button that empties the field.
+ * @csspart reveal - The button that shows and hides a password.
  */
 @customElement('helix-base-input')
 export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -85,6 +106,63 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
   @property()
   type: InputType = 'text'
 
+  /**
+   * Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /** What the clear button is called, since an icon has no name of its own. */
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
+
+  /**
+   * Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   */
+  @property({ type: Boolean })
+  reveal = false
+
+  /** What the reveal toggle is called. The state is `aria-pressed`, not this. */
+  @property({ attribute: 'reveal-label' })
+  revealLabel = 'Show password'
+
+  /**
+   * Whether the password is currently showing.
+   *
+   * State rather than a property: it is a reader's momentary choice about what
+   * is on their own screen, it must not survive anything, and a consumer that
+   * could set it could reveal a password without the reader asking.
+   */
+  @state()
+  private revealed = false
+
+  /**
+   * The type the real input is given, which is not always the type asked for.
+   *
+   * A revealed password is a text field for exactly as long as the reader is
+   * looking at it. Reading through a getter rather than mutating `type` keeps
+   * the property the consumer's: what they set is what they get back, whatever
+   * the button is doing.
+   */
+  private get effectiveType(): InputType {
+    return this.revealed && this.type === 'password' ? 'text' : this.type
+  }
+
+  /** Whether there is a clear button on screen right now. */
+  private get showsClear(): boolean {
+    return this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly
+  }
+
   /** Focus is delegated to the input, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -114,6 +192,26 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
        given a new one yet. Both are "what is on screen is not the answer". */
     this.requestValue(next)
     restoreValue(control, this.value)
+  }
+
+  /**
+   * Empties the field and gives the caret back.
+   *
+   * Focus returns to the input rather than staying on the button, which is
+   * about to disappear: a reader who cleared a field is going to type in it,
+   * and focus resting on a control that is being removed lands on the body.
+   *
+   * Through `requestValue` like every other change, so a consumer who owns the
+   * value hears about it and decides, and a cancelled clear leaves the text
+   * where it was.
+   */
+  private readonly handleClear = (): void => {
+    this.requestValue('')
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
+      control.focus()
+    }
   }
 
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
@@ -189,7 +287,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
         part="control"
         id="control"
         .value=${this.value}
-        type=${this.type}
+        type=${this.effectiveType}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
         pattern=${this.pattern || nothing}
@@ -203,6 +301,41 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
         @change=${this.handleChange}
       />
       <slot name="end"></slot>
+      <!-- In the tab order, unlike the browser's own search clear, which is not
+           reachable by keyboard at all. That is defensible for a native control
+           a reader can empty with select-all and Delete, and less so for one
+           whose only affordance is an icon: a control that exists on screen and
+           cannot be reached is one a keyboard reader is told about and cannot
+           use. It only exists while there is a value, so the extra stop appears
+           exactly when there is something to do with it. -->
+      ${
+        this.showsClear
+          ? html`<button
+              part="clear"
+              type="button"
+              aria-label=${this.clearLabel}
+              @click=${this.handleClear}
+            >
+              <helix-icon name="x"></helix-icon>
+            </button>`
+          : nothing
+      }
+      ${
+        this.reveal && this.type === 'password'
+          ? html`<button
+              part="reveal"
+              type="button"
+              aria-label=${this.revealLabel}
+              aria-pressed=${this.revealed ? 'true' : 'false'}
+              ?disabled=${this.isDisabled}
+              @click=${() => {
+                this.revealed = !this.revealed
+              }}
+            >
+              <helix-icon name=${this.revealed ? 'eye-slash' : 'eye'}></helix-icon>
+            </button>`
+          : nothing
+      }
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
   }

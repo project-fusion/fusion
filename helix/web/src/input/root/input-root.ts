@@ -1,6 +1,10 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseInput } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+/* The clear and reveal buttons render one, and a custom element registers on
+   import: a consumer importing this family alone would otherwise get an inert
+   unknown element where the mark should be. */
+import '../../icon/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './input-root.css.js'

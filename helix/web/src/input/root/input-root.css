@@ -152,8 +152,56 @@ slot[name="end"]::slotted(*) {
   background-color: var(--helix-color-surface);
 }
 
+/* The two marks the field owns, dressed as one thing.
+ *
+ * `all: unset` first, the way File Input's remove button does it: a `<button>`
+ * arrives with a background, a border, a font and a padding from the UA, and
+ * every one of them has to go before any of this reads as a mark inside a
+ * field rather than a button sitting in one.
+ *
+ * Muted at rest and full ink on hover, which is the same two steps every quiet
+ * icon control in the library takes. Not `danger` on hover, which is what File
+ * Input's does: taking a file out of a set is a delete, and emptying a field
+ * you are about to type in again is not. */
+[part="clear"],
+[part="reveal"] {
+  all: unset;
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-lg);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="clear"]:hover,
+[part="reveal"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="clear"]:focus-visible,
+[part="reveal"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* A revealed password is a state the reader chose and should be able to see
+   they are in, from the mark alone, without hovering it to find out. */
+[part="reveal"][aria-pressed="true"] {
+  color: var(--helix-color-foreground);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  [part="field"] {
+  [part="field"],
+  [part="clear"],
+  [part="reveal"] {
     transition: none;
   }
 }

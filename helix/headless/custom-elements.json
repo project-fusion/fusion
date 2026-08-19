@@ -15833,6 +15833,14 @@
             {
               "description": "The input itself.",
               "name": "control"
+            },
+            {
+              "description": "The button that empties the field.",
+              "name": "clear"
+            },
+            {
+              "description": "The button that shows and hides a password.",
+              "name": "reveal"
             }
           ],
           "slots": [
@@ -15841,7 +15849,7 @@
               "name": "start"
             },
             {
-              "description": "After the text, for an icon, a unit, or a clear button.",
+              "description": "After the text, for an icon or a unit.",
               "name": "end"
             }
           ],
@@ -15879,6 +15887,76 @@
             },
             {
               "kind": "field",
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field offers a button that empties it.\n\nShown only while there is something to clear, because a control that does\nnothing is worse than no control: a reader who presses it and sees no\nchange has to work out whether the field was already empty or the button\nis broken.",
+              "attribute": "clearable"
+            },
+            {
+              "kind": "field",
+              "name": "clearLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Clear'",
+              "description": "What the clear button is called, since an icon has no name of its own.",
+              "attribute": "clear-label"
+            },
+            {
+              "kind": "field",
+              "name": "reveal",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a password field offers a toggle that shows what was typed.\n\nIgnored on every other type. A reveal on an email field would be a button\nthat does nothing visible, and guarding it here rather than asking the\nconsumer not to means the property can be set once on a component that\nchanges type.",
+              "attribute": "reveal"
+            },
+            {
+              "kind": "field",
+              "name": "revealLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show password'",
+              "description": "What the reveal toggle is called. The state is `aria-pressed`, not this.",
+              "attribute": "reveal-label"
+            },
+            {
+              "kind": "field",
+              "name": "revealed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the password is currently showing.\n\nState rather than a property: it is a reader's momentary choice about what\nis on their own screen, it must not survive anything, and a consumer that\ncould set it could reveal a password without the reader asking."
+            },
+            {
+              "kind": "field",
+              "name": "effectiveType",
+              "type": {
+                "text": "InputType"
+              },
+              "privacy": "private",
+              "description": "The type the real input is given, which is not always the type asked for.\n\nA revealed password is a text field for exactly as long as the reader is\nlooking at it. Reading through a getter rather than mutating `type` keeps\nthe property the consumer's: what they set is what they get back, whatever\nthe button is doing.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "showsClear",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether there is a clear button on screen right now.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "shadowRootOptions",
               "type": {
                 "text": "ShadowRootInit"
@@ -15902,6 +15980,13 @@
               "privacy": "private",
               "readonly": true,
               "description": "Every keystroke, cancelable, and put back where it is refused.\n\nThe input has already taken the character by the time this runs, so a\nconsumer that refuses the change has to see the field returned to what the\nelement still holds. Otherwise the text on screen and the value the form\nwould submit disagree, which is the one thing a controlled field must never\ndo."
+            },
+            {
+              "kind": "field",
+              "name": "handleClear",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Empties the field and gives the caret back.\n\nFocus returns to the input rather than staying on the button, which is\nabout to disappear: a reader who cleared a field is going to type in it,\nand focus resting on a control that is being removed lands on the body.\n\nThrough `requestValue` like every other change, so a consumer who owns the\nvalue hears about it and decides, and a cancelled clear leaves the text\nwhere it was."
             },
             {
               "kind": "field",
@@ -16622,6 +16707,42 @@
               "fieldName": "type"
             },
             {
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the field offers a button that empties it.\n\nShown only while there is something to clear, because a control that does\nnothing is worse than no control: a reader who presses it and sees no\nchange has to work out whether the field was already empty or the button\nis broken.",
+              "fieldName": "clearable"
+            },
+            {
+              "name": "clear-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Clear'",
+              "description": "What the clear button is called, since an icon has no name of its own.",
+              "fieldName": "clearLabel"
+            },
+            {
+              "name": "reveal",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a password field offers a toggle that shows what was typed.\n\nIgnored on every other type. A reveal on an email field would be a button\nthat does nothing visible, and guarding it here rather than asking the\nconsumer not to means the property can be set once on a component that\nchanges type.",
+              "fieldName": "reveal"
+            },
+            {
+              "name": "reveal-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show password'",
+              "description": "What the reveal toggle is called. The state is `aria-pressed`, not this.",
+              "fieldName": "revealLabel"
+            },
+            {
               "name": "pattern",
               "type": {
                 "text": "string"
@@ -16769,7 +16890,7 @@
             "category": "forms",
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/input",
+            "documentation": "https://helix.fusion.dev/components/input\n\n**`clearable` and `reveal` are the field's, not the consumer's.** The `end`\nslot used to be the answer to both, which meant every consumer of\n`type=\"search\"` built the same button and every consumer of\n`type=\"password\"` either built the same toggle or shipped a field a reader\ncannot check what they typed into. Neither is a slot's worth of variation:\none empties the value, the other flips the type, and both want the same\nposition, the same size and the same disabled behaviour. The slot stays for\nwhat actually varies, a unit or a prefix.\n\nBoth opt in rather than following from `type`, and are booleans that default\nto false. A Lit boolean property that defaults to *true* cannot be turned off\nfrom HTML at all, only from script, which is the wrong way round for\nrevealing a password: a consumer should have to ask for it. Drawer's `modal`\ndefaults true for the opposite reason, that losing a focus trap by forgetting\na word is worse than having to say so.",
             "aliases": [
               "TextField",
               "Field",
