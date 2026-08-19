@@ -112,12 +112,65 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
-  private readonly handleRowClick = (): void => {
+  /**
+   * Chooses this node the way a reader does, from a press or from Enter.
+   *
+   * Selecting and following are two things and this is where they meet, so the
+   * pointer and the keyboard take one path to the same end. The tree calls this
+   * rather than `select` for the keyboard, which is what fixes Enter: a nav
+   * tree whose rows are links could be walked with the arrows and not entered,
+   * because choosing announced a value and nothing listened for it.
+   */
+  activate(): void {
+    this.select()
+    this.follow()
+  }
+
+  /**
+   * Follows a link slotted into the name, if there is one.
+   *
+   * A row is wider than the words in it: the indent, the padding, and with the
+   * chevron at the far end most of the row's width are all outside the anchor,
+   * so a reader who pressed the row anywhere but on the text got nothing. The
+   * words are the consumer's own content and this does not rewrite them, so
+   * what it does instead is press the link they put there.
+   *
+   * The consumer's anchor rather than an `href` of this element's own,
+   * deliberately: a framework's link component is what carries prefetching and
+   * client-side routing, and a plain `<a href>` rendered in here would be a
+   * full page load on a site that had neither. A synthetic click is what those
+   * components listen for, so both keep working.
+   *
+   * `querySelector` on the light DOM, not the render root: the link is the
+   * consumer's, and it is scoped to this item's own name rather than to the
+   * whole subtree, or a branch would follow the first link belonging to one of
+   * its children.
+   */
+  private follow(): void {
+    for (const node of this.children) {
+      if (node.slot !== '') {
+        continue
+      }
+      const link =
+        node instanceof HTMLAnchorElement ? node : node.querySelector<HTMLAnchorElement>('a[href]')
+      if (link) {
+        link.click()
+        return
+      }
+    }
+  }
+
+  private readonly handleRowClick = (event: MouseEvent): void => {
     if (this.branch) {
       this.toggleOpen()
       return
     }
     this.select()
+    /* Unless the press already landed on the link, which would follow it twice
+       and, where a consumer's router is listening, route twice. */
+    if (!event.composedPath().some((node) => node instanceof HTMLAnchorElement)) {
+      this.follow()
+    }
   }
 
   protected override render(): TemplateResult {

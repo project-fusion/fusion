@@ -53601,6 +53601,38 @@
               }
             },
             {
+              "kind": "method",
+              "name": "activate",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Chooses this node the way a reader does, from a press or from Enter.\n\nSelecting and following are two things and this is where they meet, so the\npointer and the keyboard take one path to the same end. The tree calls this\nrather than `select` for the keyboard, which is what fixes Enter: a nav\ntree whose rows are links could be walked with the arrows and not entered,\nbecause choosing announced a value and nothing listened for it.",
+              "type": {
+                "text": "activate() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "follow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Follows a link slotted into the name, if there is one.\n\nA row is wider than the words in it: the indent, the padding, and with the\nchevron at the far end most of the row's width are all outside the anchor,\nso a reader who pressed the row anywhere but on the text got nothing. The\nwords are the consumer's own content and this does not rewrite them, so\nwhat it does instead is press the link they put there.\n\nThe consumer's anchor rather than an `href` of this element's own,\ndeliberately: a framework's link component is what carries prefetching and\nclient-side routing, and a plain `<a href>` rendered in here would be a\nfull page load on a site that had neither. A synthetic click is what those\ncomponents listen for, so both keep working.\n\n`querySelector` on the light DOM, not the render root: the link is the\nconsumer's, and it is scoped to this item's own name rather than to the\nwhole subtree, or a branch would follow the first link belonging to one of\nits children.",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "handleRowClick",
               "privacy": "private",

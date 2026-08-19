@@ -16864,6 +16864,13 @@ export type CustomElements = {
    *
    * - `focusItem() => void`: Moves focus to this node.
    * - `select() => void`: Selects this node and announces it.
+   * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
+   *
+   * Selecting and following are two things and this is where they meet, so the
+   * pointer and the keyboard take one path to the same end. The tree calls this
+   * rather than `select` for the keyboard, which is what fixes Enter: a nav
+   * tree whose rows are links could be walked with the arrows and not entered,
+   * because choosing announced a value and nothing listened for it.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or
@@ -24818,6 +24825,13 @@ export type CustomElementsSolidJs = {
    *
    * - `focusItem() => void`: Moves focus to this node.
    * - `select() => void`: Selects this node and announces it.
+   * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
+   *
+   * Selecting and following are two things and this is where they meet, so the
+   * pointer and the keyboard take one path to the same end. The tree calls this
+   * rather than `select` for the keyboard, which is what fixes Enter: a nav
+   * tree whose rows are links could be walked with the arrows and not entered,
+   * because choosing announced a value and nothing listened for it.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
    *
    * Announces before it acts, so `preventDefault()` on the `helix-open` or

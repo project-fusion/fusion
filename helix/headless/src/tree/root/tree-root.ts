@@ -207,7 +207,11 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
         current.toggleOpen()
         this.syncItems()
       } else {
-        current.select()
+        /* `activate`, not `select`. Enter announced the choice and stopped
+           there, so a tree used as navigation could be walked with the arrows
+           and never entered: the pointer had a link under it to press and the
+           keyboard had nothing. */
+        current.activate()
       }
     }
 

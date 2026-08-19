@@ -127,6 +127,89 @@ if (hasLayout()) {
   })
 }
 
+describe('a tree used as navigation follows its links', () => {
+  const nav = `<helix-tree label="Docs">
+    <helix-tree-item default-open value="components">
+      Components
+      <helix-tree-item slot="children" value="button"><a href="#button">Button</a></helix-tree-item>
+      <helix-tree-item slot="children" value="plain">No link</helix-tree-item>
+    </helix-tree-item>
+  </helix-tree>`
+
+  const itemNamed = (tree: HTMLElement, value: string): HTMLElement =>
+    tree.querySelector(`helix-tree-item[value="${value}"]`) as HTMLElement
+
+  const clicksOn = (tree: HTMLElement, value: string): string[] => {
+    const seen: string[] = []
+    for (const link of tree.querySelectorAll('a')) {
+      link.addEventListener('click', (event) => {
+        event.preventDefault()
+        seen.push(link.getAttribute('href') ?? '')
+      })
+    }
+    return seen
+  }
+
+  test('pressing the row anywhere follows the link in the name', async () => {
+    /* A row is wider than the words in it. The indent, the padding, and with
+       the chevron at the far end most of the row's width are all outside the
+       anchor, so a reader who pressed anywhere but the text got nothing. */
+    const tree = await mount(nav)
+    const seen = clicksOn(tree, 'button')
+    const item = itemNamed(tree, 'button')
+    part(item, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(seen).toEqual(['#button'])
+  })
+
+  test('pressing the words themselves follows it once, not twice', async () => {
+    // Following again on a press that already landed on the anchor would route
+    // twice wherever a consumer's router is listening.
+    const tree = await mount(nav)
+    const seen = clicksOn(tree, 'button')
+    itemNamed(tree, 'button').querySelector('a')?.click()
+    expect(seen).toEqual(['#button'])
+  })
+
+  test('Enter follows it too, which is what the keyboard could not do', async () => {
+    /* The tree announced the choice and stopped there, so a tree used as
+       navigation could be walked with the arrows and never entered: the pointer
+       had a link under it to press and the keyboard had nothing. */
+    const tree = await mount(nav)
+    const seen = clicksOn(tree, 'button')
+    const item = itemNamed(tree, 'button')
+    ;(item as HTMLElement & { focusItem: () => void }).focusItem()
+    part(item, 'item')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Enter',
+      }),
+    )
+    expect(seen).toEqual(['#button'])
+  })
+
+  test('an item with no link is chosen and nothing else happens', async () => {
+    const tree = await mount(nav)
+    const chosen: string[] = []
+    tree.addEventListener('helix-select', (event) =>
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const item = itemNamed(tree, 'plain')
+    part(item, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(chosen).toEqual(['plain'])
+  })
+
+  test('a branch does not follow a link belonging to one of its children', async () => {
+    // Its own name is what it follows, not the first anchor in its subtree.
+    const tree = await mount(nav)
+    const seen = clicksOn(tree, 'button')
+    const branch = itemNamed(tree, 'components')
+    part(branch, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(seen).toEqual([])
+  })
+})
+
 describe('a branch opening is announced, and can be owned', () => {
   /* It was a bare `this.expanded = !this.expanded`: no event, so a consumer
      could not know a branch had opened, and no mode, so they could not hold it

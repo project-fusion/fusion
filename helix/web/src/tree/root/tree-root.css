@@ -20,7 +20,6 @@
    that is the item. All the tree decides is the policy. */
 :host {
   --tree-chevron-order: 0;
-  --_tree-reserve: 1;
 }
 
 /* The placement, handed down as numbers the item can use.
@@ -39,10 +38,6 @@
  * Measured both: with the first, a leaf sat twenty pixels left of the branch
  * beside it, and with the second a leaf sat twenty right. */
 :host([chevron-placement="end"]) {
-  /* Nothing to reserve once the chevron has gone to the far side: every label
-     starts at the row's own inset, and each level is one indent in from the
-     one above it. */
-  --_tree-reserve: 0;
   /* Past the `end` slot, which already sits at `order: 1` with an auto margin
      of its own. Sharing that order put the two side by side and, more to the
      point, put *two* auto margins on one line: free space is split between
