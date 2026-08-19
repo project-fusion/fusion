@@ -1,0 +1,56 @@
+/* A square that holds its own shape.
+ *
+ * `aspect-ratio` rather than a height to match: the code is square by
+ * definition, and saying it once means a consumer setting the width alone
+ * cannot make a rectangle a scanner will not read. */
+:host {
+  --_qr-size: var(--qr-code-size, 12rem);
+
+  background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
+  block-size: var(--_qr-size);
+  border-radius: var(--helix-radii-sm);
+  color: var(--qr-code-color, var(--helix-color-foreground));
+  display: block;
+  inline-size: var(--_qr-size);
+  position: relative;
+}
+
+[part="code"] {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+}
+
+/* The middle, for a mark that only reads at a high correction.
+ *
+ * Centred over the code rather than punched into it: the modules underneath are
+ * still drawn, and it is the error correction that makes the cover readable,
+ * not a hole. A hole would be a code with data missing rather than data
+ * obscured, and those are not the same thing to a scanner.
+ *
+ * The ground is the code's own, so the mark sits on the same white the quiet
+ * zone is made of and the join does not read as a second shape. */
+[part="logo"] {
+  align-items: center;
+  background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  justify-content: center;
+  max-block-size: var(--qr-code-logo-size, 24%);
+  max-inline-size: var(--qr-code-logo-size, 24%);
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* Nothing at all where nobody filled it, rather than a ground-coloured square
+   over the middle of every code.
+ 
+   On the attribute the element writes, because CSS cannot ask this. `:empty` is
+   false for a box holding a slot, and `::slotted()` is not allowed inside
+   `:has()`: only the element knows what was assigned, so only the element can
+   answer. Command's footer is hidden the same way. */
+[part="logo"][hidden] {
+  display: none;
+}

@@ -69,6 +69,7 @@ import type {
   HelixPinInput,
   HelixPopover,
   HelixProgress,
+  HelixQrCode,
   HelixQuote,
   HelixRadio,
   HelixRadioGroup,
@@ -6792,6 +6793,47 @@ never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
   "prop:valueText"?: HelixProgress["valueText"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixQrCodeProps = {
+  /** What the code encodes, which is usually a URL. */
+  value?: HelixQrCode["value"];
+  /** What the image is called.
+
+Falling back to the value is deliberate: a code almost always holds a URL,
+and a URL is a better name than "QR code" for a reader who cannot see it. */
+  label?: HelixQrCode["label"];
+  /** How much of the code can be lost and still read.
+
+`M` by default, which is the level almost every code in the world uses and
+costs about fifteen percent redundancy. `H` where a mark covers the centre,
+chosen automatically when the slot is filled: it is the level that makes
+covering safe, and a consumer who fills the slot has said what they want
+without having to know that. */
+  correction?: HelixQrCode["correction"];
+};
+
+export type HelixQrCodeSolidJsProps = {
+  /** What the code encodes, which is usually a URL. */
+  "prop:value"?: HelixQrCode["value"];
+  /** What the image is called.
+
+Falling back to the value is deliberate: a code almost always holds a URL,
+and a URL is a better name than "QR code" for a reader who cannot see it. */
+  "prop:label"?: HelixQrCode["label"];
+  /** How much of the code can be lost and still read.
+
+`M` by default, which is the level almost every code in the world uses and
+costs about fifteen percent redundancy. `H` where a mark covers the centre,
+chosen automatically when the slot is filled: it is the level that makes
+covering safe, and a consumer who fills the slot has said what they want
+without having to know that. */
+  "prop:correction"?: HelixQrCode["correction"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15550,6 +15592,59 @@ export type CustomElements = {
   >;
 
   /**
+   * The picture is the base tier's. What this adds is a size that can be set
+   * once, the colours a scanner needs, and the box that holds a centre mark.
+   *
+   * **The ink is `currentColor` and the ground is a real fill.** A code has to be
+   * dark on light to read, and the pair that guarantees it is not the page's
+   * foreground and background: those invert together in dark mode, and a code
+   * drawn light-on-dark is refused by a good half of the scanners in the world.
+   * So the ground is stated and the ink is the foreground it is chosen for.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the code encodes, which is usually a URL.
+   * - `label`: What the image is called.
+   *
+   * Falling back to the value is deliberate: a code almost always holds a URL,
+   * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `logo`: A mark for the centre, which only reads at a high correction.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--qr-code-size`: How wide the square is. Defaults to `12rem`. (default: `undefined`)
+   * - `--qr-code-color`: The dark modules. Defaults to the page's ink. (default: `undefined`)
+   * - `--qr-code-background-color`: Behind them, including the quiet zone. (default: `undefined`)
+   * - `--qr-code-logo-size`: How much of the middle a mark may cover. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The square itself.
+   * - `logo`: The box holding the centre mark.
+   */
+  "helix-qr-code": Partial<
+    HelixQrCodeProps & BaseProps<HelixQrCode> & BaseEvents
+  >;
+
+  /**
    * Takes the surrounding type rather than a size of its own, because a quotation
    * inside a paragraph is that paragraph's text with marks around it.
    *
@@ -23812,6 +23907,62 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The picture is the base tier's. What this adds is a size that can be set
+   * once, the colours a scanner needs, and the box that holds a centre mark.
+   *
+   * **The ink is `currentColor` and the ground is a real fill.** A code has to be
+   * dark on light to read, and the pair that guarantees it is not the page's
+   * foreground and background: those invert together in dark mode, and a code
+   * drawn light-on-dark is refused by a good half of the scanners in the world.
+   * So the ground is stated and the ink is the foreground it is chosen for.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the code encodes, which is usually a URL.
+   * - `label`: What the image is called.
+   *
+   * Falling back to the value is deliberate: a code almost always holds a URL,
+   * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `logo`: A mark for the centre, which only reads at a high correction.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--qr-code-size`: How wide the square is. Defaults to `12rem`. (default: `undefined`)
+   * - `--qr-code-color`: The dark modules. Defaults to the page's ink. (default: `undefined`)
+   * - `--qr-code-background-color`: Behind them, including the quiet zone. (default: `undefined`)
+   * - `--qr-code-logo-size`: How much of the middle a mark may cover. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The square itself.
+   * - `logo`: The box holding the centre mark.
+   */
+  "helix-qr-code": Partial<
+    HelixQrCodeProps &
+      HelixQrCodeSolidJsProps &
+      BaseProps<HelixQrCode> &
+      BaseEvents
+  >;
+
+  /**
    * Takes the surrounding type rather than a size of its own, because a quotation
    * inside a paragraph is that paragraph's text with marks around it.
    *
@@ -27331,6 +27482,14 @@ export type CustomCssProperties = {
   "--progress-ring-size"?: string;
   /** Thickness of its stroke. */
   "--progress-ring-width"?: string;
+  /** How wide the square is. Defaults to `12rem`. */
+  "--qr-code-size"?: string;
+  /** The dark modules. Defaults to the page's ink. */
+  "--qr-code-color"?: string;
+  /** Behind them, including the quiet zone. */
+  "--qr-code-background-color"?: string;
+  /** How much of the middle a mark may cover. */
+  "--qr-code-logo-size"?: string;
   /** Color of the quoted text. */
   "--quote-color"?: string;
   /** Space between the choices. */

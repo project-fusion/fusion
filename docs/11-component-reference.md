@@ -3237,6 +3237,53 @@ thing advancing.
 | `--progress-ring-size` | Diameter of the ring appearance. |
 | `--progress-ring-width` | Thickness of its stroke. |
 
+## Qr Code
+
+### Root — `helix-qr-code`
+
+Encodes a short piece of text as a scannable square.
+
+Extends `HelixBaseQrCode`.
+
+The picture is the base tier's. What this adds is a size that can be set
+once, the colours a scanner needs, and the box that holds a centre mark.
+
+**The ink is `currentColor` and the ground is a real fill.** A code has to be
+dark on light to read, and the pair that guarantees it is not the page's
+foreground and background: those invert together in dark mode, and a code
+drawn light-on-dark is refused by a good half of the scanners in the world.
+So the ground is stated and the ink is the foreground it is chosen for.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `correction` | `correction` | `QrCorrection \| undefined` | - | `HelixBaseQrCode` | How much of the code can be lost and still read. |
+| `label` | `label` | `string` | `''` | `HelixBaseQrCode` | What the image is called. |
+| `value` | `value` | `string` | `''` | `HelixBaseQrCode` | What the code encodes, which is usually a URL. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `logo` | A mark for the centre, which only reads at a high correction. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `code` | The square itself. |
+| `logo` | The box holding the centre mark. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
+| `--qr-code-color` | The dark modules. Defaults to the page's ink. |
+| `--qr-code-background-color` | Behind them, including the quiet zone. |
+| `--qr-code-logo-size` | How much of the middle a mark may cover. |
+
 ## Quote
 
 ### Root — `helix-quote`

@@ -16766,6 +16766,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/qr-code/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/quote/index.js"
           }
         },
@@ -26685,6 +26693,256 @@
           "declaration": {
             "name": "HelixBaseProgress",
             "module": "src/progress/root/progress-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/qr-code/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseQrCode",
+          "declaration": {
+            "name": "HelixBaseQrCode",
+            "module": "./root/qr-code-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QrCorrection",
+          "declaration": {
+            "name": "QrCorrection",
+            "module": "./root/qr-code-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/qr-code/root/qr-code-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The picture is one `<path>`, not a grid of squares.** A code of any useful\nlength is a thousand modules, and drawing each as its own rect is a thousand\nnodes for one image. Runs of adjacent dark modules are joined, so a row of\neight is one horizontal move rather than eight squares.\n\n**It is an image and says so.** `role=\"img\"` with a name, because what a\nreader with a screen reader needs is what the code is *for*, and no amount of\ndescribing the pattern gives them that. Where nothing is passed the value\nitself is the name, which is right far more often than it looks: most codes\nhold a URL, and a URL read aloud is the destination.\n\n**The quiet zone is part of the code.** Four modules of margin are required\nby the specification, not a design choice, and a scanner will refuse a code\nthat is cropped to its edge. It is drawn inside the `viewBox` so it survives\nany size the component is given, including one set in CSS.\n\n`correction` is what buys the middle slot. A code at `H` can lose thirty\npercent of itself and still read, which is what makes covering the centre\nwith a mark safe; at `L` the same mark makes the code unscannable. That is\nwhy the slot exists on the same element as the property, and why the default\nmoves when the slot is filled.",
+          "name": "HelixBaseQrCode",
+          "cssParts": [
+            {
+              "description": "The square itself.",
+              "name": "code"
+            },
+            {
+              "description": "The box holding the centre mark.",
+              "name": "logo"
+            }
+          ],
+          "slots": [
+            {
+              "description": "A mark for the centre, which only reads at a high correction.",
+              "name": "logo"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the code encodes, which is usually a URL.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the image is called.\n\nFalling back to the value is deliberate: a code almost always holds a URL,\nand a URL is a better name than \"QR code\" for a reader who cannot see it.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "correction",
+              "type": {
+                "text": "QrCorrection | undefined"
+              },
+              "description": "How much of the code can be lost and still read.\n\n`M` by default, which is the level almost every code in the world uses and\ncosts about fifteen percent redundancy. `H` where a mark covers the centre,\nchosen automatically when the slot is filled: it is the level that makes\ncovering safe, and a consumer who fills the slot has said what they want\nwithout having to know that.",
+              "attribute": "correction"
+            },
+            {
+              "kind": "field",
+              "name": "logo",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether anything is slotted into the middle."
+            },
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "QrCorrection"
+              },
+              "privacy": "private",
+              "description": "The level actually used, which the slot can raise.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderCode",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "SVGTemplateResult | typeof nothing"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the code encodes, which is usually a URL.",
+              "fieldName": "value"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the image is called.\n\nFalling back to the value is deliberate: a code almost always holds a URL,\nand a URL is a better name than \"QR code\" for a reader who cannot see it.",
+              "fieldName": "label"
+            },
+            {
+              "name": "correction",
+              "type": {
+                "text": "QrCorrection | undefined"
+              },
+              "description": "How much of the code can be lost and still read.\n\n`M` by default, which is the level almost every code in the world uses and\ncosts about fifteen percent redundancy. `H` where a mark covers the centre,\nchosen automatically when the slot is filled: it is the level that makes\ncovering safe, and a consumer who fills the slot has said what they want\nwithout having to know that.",
+              "fieldName": "correction"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Encodes a short piece of text as a scannable square.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/qr-code",
+            "aliases": [
+              "QR",
+              "Barcode",
+              "Scan code"
+            ],
+            "tier": "headless",
+            "group": "BaseQrCode",
+            "part": "Root",
+            "source": "helix/headless/src/qr-code"
+          },
+          "tagName": "helix-base-qr-code",
+          "customElement": true,
+          "modulePath": "src/qr-code/root/qr-code-root.ts",
+          "definitionPath": "src/qr-code/root/qr-code-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseQrCode",
+          "declaration": {
+            "name": "HelixBaseQrCode",
+            "module": "src/qr-code/root/qr-code-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-qr-code",
+          "declaration": {
+            "name": "HelixBaseQrCode",
+            "module": "src/qr-code/root/qr-code-root.ts"
           }
         }
       ]

@@ -34,7 +34,8 @@
   },
   "dependencies": {
     "@helix-io/core": "workspace:*",
-    "@helix-io/icons": "workspace:*"
+    "@helix-io/icons": "workspace:*",
+    "uqr": "^0.1.3"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",

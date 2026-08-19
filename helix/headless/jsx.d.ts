@@ -55,6 +55,7 @@ import type {
   HelixBasePinInput,
   HelixBasePopover,
   HelixBaseProgress,
+  HelixBaseQrCode,
   HelixBaseQuote,
   HelixBaseRadio,
   HelixBaseRadioGroup,
@@ -6143,6 +6144,47 @@ never instead of the value itself: `aria-valuenow` still carries the
 number, because assistive technology that ignores the text still has to
 report progress. */
   "prop:valueText"?: HelixBaseProgress["valueText"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseQrCodeProps = {
+  /** What the code encodes, which is usually a URL. */
+  value?: HelixBaseQrCode["value"];
+  /** What the image is called.
+
+Falling back to the value is deliberate: a code almost always holds a URL,
+and a URL is a better name than "QR code" for a reader who cannot see it. */
+  label?: HelixBaseQrCode["label"];
+  /** How much of the code can be lost and still read.
+
+`M` by default, which is the level almost every code in the world uses and
+costs about fifteen percent redundancy. `H` where a mark covers the centre,
+chosen automatically when the slot is filled: it is the level that makes
+covering safe, and a consumer who fills the slot has said what they want
+without having to know that. */
+  correction?: HelixBaseQrCode["correction"];
+};
+
+export type HelixBaseQrCodeSolidJsProps = {
+  /** What the code encodes, which is usually a URL. */
+  "prop:value"?: HelixBaseQrCode["value"];
+  /** What the image is called.
+
+Falling back to the value is deliberate: a code almost always holds a URL,
+and a URL is a better name than "QR code" for a reader who cannot see it. */
+  "prop:label"?: HelixBaseQrCode["label"];
+  /** How much of the code can be lost and still read.
+
+`M` by default, which is the level almost every code in the world uses and
+costs about fifteen percent redundancy. `H` where a mark covers the centre,
+chosen automatically when the slot is filled: it is the level that makes
+covering safe, and a consumer who fills the slot has said what they want
+without having to know that. */
+  "prop:correction"?: HelixBaseQrCode["correction"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14381,6 +14423,63 @@ export type CustomElements = {
   >;
 
   /**
+   * **The picture is one `<path>`, not a grid of squares.** A code of any useful
+   * length is a thousand modules, and drawing each as its own rect is a thousand
+   * nodes for one image. Runs of adjacent dark modules are joined, so a row of
+   * eight is one horizontal move rather than eight squares.
+   *
+   * **It is an image and says so.** `role="img"` with a name, because what a
+   * reader with a screen reader needs is what the code is *for*, and no amount of
+   * describing the pattern gives them that. Where nothing is passed the value
+   * itself is the name, which is right far more often than it looks: most codes
+   * hold a URL, and a URL read aloud is the destination.
+   *
+   * **The quiet zone is part of the code.** Four modules of margin are required
+   * by the specification, not a design choice, and a scanner will refuse a code
+   * that is cropped to its edge. It is drawn inside the `viewBox` so it survives
+   * any size the component is given, including one set in CSS.
+   *
+   * `correction` is what buys the middle slot. A code at `H` can lose thirty
+   * percent of itself and still read, which is what makes covering the centre
+   * with a mark safe; at `L` the same mark makes the code unscannable. That is
+   * why the slot exists on the same element as the property, and why the default
+   * moves when the slot is filled.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the code encodes, which is usually a URL.
+   * - `label`: What the image is called.
+   *
+   * Falling back to the value is deliberate: a code almost always holds a URL,
+   * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `logo`: A mark for the centre, which only reads at a high correction.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The square itself.
+   * - `logo`: The box holding the centre mark.
+   */
+  "helix-base-qr-code": Partial<
+    HelixBaseQrCodeProps & BaseProps<HelixBaseQrCode> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<q>`, which is what supplies the quotation marks: the browser
    * inserts the right ones for the document's language, and nests them correctly
    * when one quotation sits inside another. Typing the marks into the content
@@ -22380,6 +22479,66 @@ export type CustomElementsSolidJs = {
     HelixBaseProgressProps &
       HelixBaseProgressSolidJsProps &
       BaseProps<HelixBaseProgress> &
+      BaseEvents
+  >;
+
+  /**
+   * **The picture is one `<path>`, not a grid of squares.** A code of any useful
+   * length is a thousand modules, and drawing each as its own rect is a thousand
+   * nodes for one image. Runs of adjacent dark modules are joined, so a row of
+   * eight is one horizontal move rather than eight squares.
+   *
+   * **It is an image and says so.** `role="img"` with a name, because what a
+   * reader with a screen reader needs is what the code is *for*, and no amount of
+   * describing the pattern gives them that. Where nothing is passed the value
+   * itself is the name, which is right far more often than it looks: most codes
+   * hold a URL, and a URL read aloud is the destination.
+   *
+   * **The quiet zone is part of the code.** Four modules of margin are required
+   * by the specification, not a design choice, and a scanner will refuse a code
+   * that is cropped to its edge. It is drawn inside the `viewBox` so it survives
+   * any size the component is given, including one set in CSS.
+   *
+   * `correction` is what buys the middle slot. A code at `H` can lose thirty
+   * percent of itself and still read, which is what makes covering the centre
+   * with a mark safe; at `L` the same mark makes the code unscannable. That is
+   * why the slot exists on the same element as the property, and why the default
+   * moves when the slot is filled.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What the code encodes, which is usually a URL.
+   * - `label`: What the image is called.
+   *
+   * Falling back to the value is deliberate: a code almost always holds a URL,
+   * and a URL is a better name than "QR code" for a reader who cannot see it.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the centre,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `logo`: A mark for the centre, which only reads at a high correction.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `code`: The square itself.
+   * - `logo`: The box holding the centre mark.
+   */
+  "helix-base-qr-code": Partial<
+    HelixBaseQrCodeProps &
+      HelixBaseQrCodeSolidJsProps &
+      BaseProps<HelixBaseQrCode> &
       BaseEvents
   >;
 
