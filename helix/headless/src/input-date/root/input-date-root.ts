@@ -594,6 +594,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-calendar
           part="calendar"
+          ?invalid=${this.resolvedFeedback !== ''}
           mode=${this.mode ?? nothing}
           months=${this.months}
           .value=${this.picked}

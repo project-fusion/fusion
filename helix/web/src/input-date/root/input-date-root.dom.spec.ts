@@ -518,3 +518,26 @@ describe('input date keeps the tag row readable', () => {
     expect(part(host, 'control')?.getAttribute('placeholder')).toBe('YYYY-MM-DD')
   })
 })
+
+describe('an invalid date field marks the calendar too', () => {
+  test('the panel is where the answer is, so the answer is where the mark goes', async () => {
+    /* The field turns its own border red, and the calendar it opens is a grid
+       with no border to turn: what only it can do is ring the day. Both halves
+       come from one state, so a reader who opens the panel to fix the error is
+       not looking at a calendar that says everything is fine. */
+    const host = (await mount(
+      `<helix-input-date feedback="Pick a weekday" label="When"></helix-input-date>`,
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    expect(host.hasAttribute('data-invalid')).toBe(true)
+    expect(part(host, 'calendar')?.hasAttribute('invalid')).toBe(true)
+  })
+
+  test('and drops it when the message goes', async () => {
+    const host = (await mount(
+      `<helix-input-date label="When"></helix-input-date>`,
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    expect(part(host, 'calendar')?.hasAttribute('invalid')).toBe(false)
+  })
+})

@@ -318,3 +318,22 @@
 
   color: var(--helix-color-foreground-muted);
 }
+
+/* Wrong, and the field says so.
+ *
+ * The same four selectors Input carries, and for the reason it records at
+ * length: the focus rule owns the `outline` and nothing here was changing its
+ * colour, so a focused field with an error came out as a red border inside a
+ * blue ring. Hover is named for the same reason from the other side. The border
+ * and the ring are one edge, so when one turns they both do.
+ *
+ * This was missing on every field added after Input, which is what a sweep of
+ * all sixteen form controls turned up: `data-invalid` reached the host and only
+ * the message underneath answered it. */
+:host([data-invalid]) [part="field"],
+:host([data-invalid]) [part="field"]:hover,
+:host([data-invalid]:focus-within) [part="field"],
+:host([data-invalid]:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}

@@ -342,6 +342,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-color-picker
           part="picker"
+          ?invalid=${this.resolvedFeedback !== ''}
           ?alpha=${this.alpha}
           ?no-format=${this.noFormat}
           ?no-value=${this.appearance !== 'swatch'}

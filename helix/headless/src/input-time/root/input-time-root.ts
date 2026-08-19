@@ -468,6 +468,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-time-picker
           part="picker"
+          ?invalid=${this.resolvedFeedback !== ''}
           mode=${this.mode ?? nothing}
           appearance=${this.appearance}
           label=${this.label || 'Time'}
