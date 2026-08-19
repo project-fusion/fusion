@@ -29,6 +29,9 @@ import { styles } from './video-root.css.js'
  * @category content
  * @documentation https://helix.fusion.dev/components/video
  *
+ * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
+ * video's own once known, and `16 / 9` until then.
+ * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
  * @cssproperty --video-radius - The corner it is cut to.
  * @cssproperty --video-controls-color - The ink on the bar.
  * @cssproperty --video-accent-color - The played part of the scrubber.

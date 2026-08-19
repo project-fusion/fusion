@@ -130,6 +130,57 @@ if (hasLayout()) {
       expect(video.currentTime).toBe(before)
     })
 
+    test('the box is the video"s shape before the video has said what it is', async () => {
+      /* A `<video>` is 300 by 150 until its metadata arrives, which is the
+         default every replaced element starts at. At 480 wide the box was 150
+         tall where the frames wanted 270, and the poster is painted into that
+         box: it came out letterboxed and half the height of the video that
+         replaced it a moment later. It is also a layout shift, over exactly the
+         interval a poster is shown for. */
+      const host = await player()
+      const video = part(host, 'video') as HTMLVideoElement
+      const ratio = getComputedStyle(video).aspectRatio
+      expect(ratio.startsWith('auto')).toBe(true)
+      expect(ratio).toContain('16 / 9')
+    })
+
+    test('and whatever fills it is fitted the same way', async () => {
+      // So a poster and a frame cannot disagree, even where a consumer's ratio
+      // and their file's do.
+      const host = await player()
+      expect(getComputedStyle(part(host, 'video') as HTMLElement).objectFit).toBe('contain')
+    })
+
+    test('playback is on the host, because CSS cannot ask a video', async () => {
+      /* `paused` is a property and never an attribute, so `video:not([paused])`
+         matched every video in existence: the rule that hides the bar while
+         playing hid it always, including on a paused video, which is the one
+         state it exists to keep it visible in. */
+      const host = await player()
+      expect(host.hasAttribute('data-playing')).toBe(false)
+
+      const video = part(host, 'video') as HTMLVideoElement
+      video.dispatchEvent(new Event('play'))
+      await (host as Player).updateComplete
+      expect(host.hasAttribute('data-playing')).toBe(true)
+
+      video.dispatchEvent(new Event('pause'))
+      await (host as Player).updateComplete
+      expect(host.hasAttribute('data-playing')).toBe(false)
+    })
+
+    test('the well is dark in both modes, and so is the ink on the bar', async () => {
+      /* `surface-inverse` looks like the token for this and is not: it is
+         near-white in dark mode, so the well came out white on a black page and
+         took the bar's light ink with it. Media sits in a dark well everywhere
+         it has ever been shown. */
+      const host = await player()
+      const well = getComputedStyle(part(host, 'video') as HTMLElement).backgroundColor
+      const ink = getComputedStyle(part(host, 'controls') as HTMLElement).color
+      expect(well).not.toBe(ink)
+      expect(well).toBe('oklch(0 0 0)')
+    })
+
     test('seeking is clamped to what exists', async () => {
       const host = await player()
       const video = part(host, 'video') as HTMLVideoElement

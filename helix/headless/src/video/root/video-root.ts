@@ -311,6 +311,24 @@ export class HelixBaseVideo extends HelixElement {
     }
   }
 
+  /**
+   * Mirrors playback onto the host as `data-playing`.
+   *
+   * Because CSS cannot ask. `paused` is a property of a `<video>` and never an
+   * attribute, so `video:not([paused])` matches every video that has ever
+   * existed: the first version of the rule that hides the bar used exactly that
+   * and hid it always, including on a paused video, which is the one state it
+   * was written to keep it in.
+   *
+   * `data-open` is set the same way and for the same reason. It is a fact about
+   * this element at runtime and never appears in a server's markup, so there is
+   * nothing for hydration to disagree with.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated?.(changed)
+    this.toggleAttribute('data-playing', this.playing)
+  }
+
   private renderBar(): TemplateResult {
     const done = this.duration > 0 ? this.position / this.duration : 0
     return html`<div part="controls">

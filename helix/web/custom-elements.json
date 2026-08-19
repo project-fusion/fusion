@@ -56492,6 +56492,14 @@
           "name": "HelixVideo",
           "cssProperties": [
             {
+              "description": "The shape of the box. Defaults to the video's own once known, and `16 / 9` until then.",
+              "name": "--video-aspect-ratio"
+            },
+            {
+              "description": "Behind the picture, and in the letterbox bars.",
+              "name": "--video-well-color"
+            },
+            {
               "description": "The corner it is cut to.",
               "name": "--video-radius"
             },

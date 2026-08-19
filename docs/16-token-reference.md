@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-125 semantic tokens in 15 categories, every one in exactly
+127 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -36,8 +36,10 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 138 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 95 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 30 |
-| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 9 |
-| `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
+| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
+| `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
+| `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 2 |
+| `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 2 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 151 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 115 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |

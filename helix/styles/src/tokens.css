@@ -153,6 +153,20 @@
   --helix-color-surface-inverse: light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100));
   --helix-color-foreground-inverse: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
 
+  /* The one pair that does not turn over with the mode.
+   *
+   * Media sits in a dark well in every application that has ever shown any, and
+   * the bars beside a video that does not fill its box are black rather than
+   * whatever the page happens to be. `surface-inverse` looks like the token for
+   * it and is not: it is near-white in dark mode, so a video well came out white
+   * on a black page and took the light ink of its own control bar with it.
+   *
+   * Both arms are the same value on purpose, said twice rather than written as
+   * one, so it is visibly a decision and not a token somebody forgot to give a
+   * second mode. */
+  --helix-color-surface-media: light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000));
+  --helix-color-foreground-media: light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0));
+
   /* Lines. One of them.
    *
    * Clear of every surface, which is what a rule has to be to be a rule. The

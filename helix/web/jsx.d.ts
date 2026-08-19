@@ -19158,6 +19158,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--video-aspect-ratio`: The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. (default: `undefined`)
+   * - `--video-well-color`: Behind the picture, and in the letterbox bars. (default: `undefined`)
    * - `--video-radius`: The corner it is cut to. (default: `undefined`)
    * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
    * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
@@ -27722,6 +27724,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--video-aspect-ratio`: The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. (default: `undefined`)
+   * - `--video-well-color`: Behind the picture, and in the letterbox bars. (default: `undefined`)
    * - `--video-radius`: The corner it is cut to. (default: `undefined`)
    * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
    * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
@@ -28147,6 +28151,10 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
+  /** The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. */
+  "--video-aspect-ratio"?: string;
+  /** Behind the picture, and in the letterbox bars. */
+  "--video-well-color"?: string;
   /** The corner it is cut to. */
   "--video-radius"?: string;
   /** The ink on the bar. */

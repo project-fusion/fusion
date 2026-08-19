@@ -5513,6 +5513,8 @@ to do next.
 
 | Property | Description |
 | --- | --- |
+| `--video-aspect-ratio` | The shape of the box. Defaults to the video's own once known, and `16 / 9` until then. |
+| `--video-well-color` | Behind the picture, and in the letterbox bars. |
 | `--video-radius` | The corner it is cut to. |
 | `--video-controls-color` | The ink on the bar. |
 | `--video-accent-color` | The played part of the scrubber. |

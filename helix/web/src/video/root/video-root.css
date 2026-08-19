@@ -18,11 +18,34 @@
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
+/* A box that is the shape of the video before the video says what shape it is.
+ *
+ * `auto 16 / 9` is two answers in one declaration: use the intrinsic ratio once
+ * the metadata has arrived, and this until it has. Without it a `<video>` is
+ * 300 by 150, the default every replaced element starts at, so at 480 wide the
+ * box was 150 tall where the frames wanted 270. The poster is painted into that
+ * box, so it came out letterboxed and half the height of the video that
+ * replaced it a moment later, which is the fault as reported.
+ *
+ * It is also the layout shift. A box that is one height for as long as the
+ * network takes and another afterwards moves everything below it, and a poster
+ * is shown for exactly that interval.
+ *
+ * `object-fit: contain` says the rest: whatever ends up in this box, poster or
+ * frame, is fitted the same way, so the two cannot disagree even where a
+ * consumer's ratio and their file's do. */
 [part="video"] {
-  background-color: var(--helix-color-surface-inverse);
+  aspect-ratio: var(--video-aspect-ratio, auto 16 / 9);
+  /* Dark, and not a token that turns over with the theme. `surface-inverse` is
+     near-white in dark mode, so the well behind an unloaded video came out white
+     on a black page and the bar's light ink vanished into it. A video sits in a
+     dark well everywhere it has ever been shown, and letterbox bars are black
+     rather than whatever the page is. */
+  background-color: var(--video-well-color, var(--helix-color-surface-media));
+  block-size: auto;
   display: block;
   inline-size: 100%;
-  block-size: auto;
+  object-fit: contain;
 }
 
 /* Over the picture, not under it.
@@ -34,7 +57,11 @@
 [part="controls"] {
   align-items: center;
   background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
-  color: var(--video-controls-color, var(--helix-color-foreground-inverse));
+  /* Light, for the same reason and against the same ground: the bar is painted
+     over a dark gradient of its own, so its ink is chosen to sit on that rather
+     than on the page. `foreground-inverse` turns over with the theme and put
+     dark ink on a dark gradient. */
+  color: var(--video-controls-color, var(--helix-color-foreground-media));
   display: flex;
   gap: var(--helix-space-xs);
   inset-block-end: 0;
@@ -48,8 +75,13 @@
 /* Gone while it is playing and nobody is near it. Focus counts as being near
    it, which is what keeps the bar reachable without a pointer: a control that
    is only there on hover is a control a keyboard cannot find. A paused video
-   keeps its bar, because a reader who stopped it is deciding what to do next. */
-:host(:not(:hover):not(:focus-within)) [part="stage"]:has(video:not([paused])) [part="controls"] {
+   keeps its bar, because a reader who stopped it is deciding what to do next.
+
+   On `data-playing`, which the element writes, because CSS cannot ask a video
+   whether it is playing: `paused` is a property and never an attribute, so
+   `video:not([paused])` matched every video in existence and the bar was hidden
+   always, including in the one state this rule exists to keep it visible in. */
+:host([data-playing]:not(:hover):not(:focus-within)) [part="controls"] {
   opacity: 0;
 }
 
@@ -140,12 +172,21 @@
   inline-size: 12px;
 }
 
-/* Anything a consumer puts over the picture covers all of it, and goes as soon
-   as the video has started. */
+/* A poster a consumer slots covers the picture exactly, which is the same
+   promise the `poster` attribute makes: `inset: 0` against the stage, and
+   `object-fit` on whatever they put in it, so an image of any ratio is fitted
+   into the video's box rather than setting its own. */
 [part="poster"] {
   display: block;
   inset: 0;
   position: absolute;
+}
+
+[part="poster"]::slotted(*) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  object-fit: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
