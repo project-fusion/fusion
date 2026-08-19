@@ -4,9 +4,8 @@
    split exists so a page showing a sandbox without an editable pane does not
    pay for one. This page has an editable pane, so it pays. */
 import '@helix-io/sandbox/editor'
-import type { HelixSandbox, HelixSandboxPreview } from '@helix-io/web'
+import type { HelixChangeEvent, HelixSandbox, HelixSandboxPreview } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
-import { useHelixEvent } from '../../../../../lib/use-helix-event'
 
 interface Props {
   /** The example's stylesheet, or empty where it needs none. */
@@ -64,11 +63,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
   const source = edits.html ?? html
   const styles = edits.css ?? css
 
-  /* Bound from an effect, never as a prop. A Helix event handed to React as
-     `onhelix-change` is recorded and never listened for on a server-rendered
-     page, so this would work on a client navigation and silently do nothing on
-     a fresh load. */
-  useHelixEvent(sandbox, 'helix-change', (event) => {
+  const sourceEdited = (event: HelixChangeEvent) => {
     /* Which pane is the element, not the detail: every pane reports `value`,
        and `composedPath()[0]` is what survives the shadow boundary the event
        crossed to get here. */
@@ -79,7 +74,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
     }
     const { value } = event.detail
     setEdits((held) => (held[key] === value ? held : { ...held, [key]: value }))
-  })
+  }
 
   useEffect(() => {
     const frame = preview.current
@@ -94,6 +89,7 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
     <helix-sandbox
       class="docsPreview"
       lead="preview"
+      onhelix-change={sourceEdited}
       orientation="vertical"
       ref={sandbox}
       split={62}

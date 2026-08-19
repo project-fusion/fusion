@@ -635,8 +635,19 @@ that would work, and why it is deliberately unbuilt, is written out beside
 `bindReactHandler`. It becomes real the first time a component declares an
 object property, and not before.
 
-`useHelixEvent` in `site/ui/lib` is no longer needed for hydration. It is still
-right where the element itself can change, which is what `useElementRef` is for.
+`useHelixEvent` is deleted. It existed to bind from an effect because the prop
+did not survive hydration, and all twenty-one of its call sites were binding to
+an element the component itself rendered, so all twenty-one are props now.
+Capture is a prop too: React slices a trailing `Capture` off the name and binds
+with `capture: true`, measured for our hyphenated names as much as its own. What
+is left for an effect is `once` and `passive`, which no prop expresses, and a
+target the component does not render, and both are three lines of `useEffect` at
+the point of need.
+
+`useElementRef` stays, in `lib/use-element-ref.ts`, for the case that is not
+about events at all: an effect or a memo that takes the element as a dependency,
+which a `RefObject` cannot announce. The sandbox observes its splitter's width
+and reads its tree's rows that way.
 
 React's own events are unaffected **where they bubble**: `onClick` on a
 `<helix-button>` goes through the synthetic system, which hydration does set up.

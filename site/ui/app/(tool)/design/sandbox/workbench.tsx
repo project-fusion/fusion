@@ -6,6 +6,7 @@ import '@helix-io/sandbox/editor'
 import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
+  HelixChangeEvent,
   HelixDialog,
   HelixDrawer,
   HelixInput,
@@ -13,6 +14,7 @@ import type {
   HelixSandbox,
   HelixSandboxPreview,
   HelixSandboxTerminal,
+  HelixSelectEvent,
   HelixSplitter,
   HelixTabs,
   HelixToggleGroup,
@@ -21,7 +23,7 @@ import type {
 } from '@helix-io/web'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Family } from '../../../../lib/catalog'
-import { useElementRef, useHelixEvent } from '../../../../lib/use-helix-event'
+import { useElementRef } from '../../../../lib/use-element-ref'
 import { PreferencesDrawer } from '../../../preferences'
 import { Wordmark } from '../../../wordmark'
 import { readHashState, writeHashState } from './hash-state'
@@ -117,13 +119,16 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
 export function SandboxWorkbench({ families }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
   const files = useRef<HelixToggleGroup>(null)
-  /* State, not refs. Both of these are rendered in one of two places depending
-     on the viewport, and a `RefObject` cannot tell `useHelixEvent` that its
-     element moved. See the note there: on a phone the tree was bound to the
-     detached wide-viewport copy and every row in it was dead. */
+  /* Held as state, not as a ref: an effect observes the splitter's width and a
+     memo reads the tree's rows, and both have to run when the element arrives,
+     which a `RefObject` cannot announce. */
   const [tree, setTree] = useElementRef<HelixTree>()
-  const [filterField, setFilterField] = useElementRef<HelixInput>()
-  const [rail, setRail] = useElementRef<HelixDrawer>()
+  const [railSplitter, setRailSplitter] = useElementRef<HelixSplitter>()
+
+  /* Handlers are props now. An element rendered in two places, which the
+     examples tree is, gets the prop in both, and React binds whichever one it
+     rendered. The ref dance this used to need existed because a `RefObject`
+     cannot say that its `.current` moved. */
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const settings = useRef<HelixMenu>(null)
@@ -211,7 +216,6 @@ export function SandboxWorkbench({ families }: Props) {
    * the box is known.
    */
   const [railSize, setRailSize] = useState(RAIL_OPEN)
-  const [railSplitter, setRailSplitter] = useElementRef<HelixSplitter>()
   const [bodyWidth, setBodyWidth] = useState(0)
   // The rail on a wide screen, which is a different thing from the drawer a
   // phone gets: one is a region of the layout and the other is an overlay.
@@ -252,7 +256,7 @@ export function SandboxWorkbench({ families }: Props) {
      back from nothing without reaching for the toggle. */
   const railHome = bodyWidth > 0 ? Math.max(0, 100 - (RAIL_OPEN / bodyWidth) * 100) : 100
 
-  useHelixEvent(railSplitter, 'helix-change', (event) => {
+  const railMoved = (event: HelixChangeEvent) => {
     if (event.detail.property !== 'position' || bodyWidth <= 0) {
       return
     }
@@ -263,7 +267,7 @@ export function SandboxWorkbench({ families }: Props) {
     if (width > 1) {
       setRailSize(width)
     }
-  })
+  }
 
   // Read the URL after mount, not during render: the page is static, so the
   // server has no query string and reading one would make the first paint
@@ -299,7 +303,7 @@ export function SandboxWorkbench({ families }: Props) {
 
   // Written back when a divider is let go, not while it is moving: a drag is a
   // stream of positions and only the one it ends at is a preference.
-  useHelixEvent(sandbox, 'helix-change', (event) => {
+  const sandboxChanged = (event: HelixChangeEvent) => {
     /* Both dividers report themselves now, where this was one `arrangement`
        event carrying a JSON blob nothing read: the handler has always taken the
        numbers off the element below. */
@@ -324,7 +328,7 @@ export function SandboxWorkbench({ families }: Props) {
       ARRANGEMENT,
       JSON.stringify({ panelSize: element.panelSize, split: element.split, syntax }),
     )
-  })
+  }
 
   // Watched, not read once: the preferences drawer is on this page now, so the
   // site's mode can change while the sandbox is open and a preview following it
@@ -362,9 +366,6 @@ export function SandboxWorkbench({ families }: Props) {
     setRailOpen(false)
   }, [])
 
-  // Bound through an effect, not an `onhelix-select` prop. React does not
-  // attach custom-element listeners when it hydrates, so the prop form leaves
-  // both of these dead on a freshly loaded page. See `useHelixEvent`.
   /* The proposed value, off the event, not `event.target.value` off the host.
    *
    * `value` makes this field controlled, and a controlled element reports the
@@ -372,25 +373,23 @@ export function SandboxWorkbench({ families }: Props) {
    * the host set the filter to what it already was, the element put the text
    * back, and the field could not be typed into at all. The sandbox's own
    * examples were unfilterable in the sandbox.
-   *
-   * `useHelixEvent` rather than a prop, for the reason the rules give: an
-   * `onhelix-*` prop is recorded and never bound on a hydrated page. */
-  useHelixEvent(filterField, 'helix-change', (event) => {
+   */
+  const filterChanged = (event: HelixChangeEvent) => {
     setFilter(event.detail.value)
-  })
+  }
 
-  useHelixEvent(files, 'helix-select', (event) => {
+  const paneChosen = (event: HelixChangeEvent) => {
     setPane(event.detail.value as Pane)
-  })
+  }
   // Verbatim. What is typed is what is held and what is handed back.
-  useHelixEvent(sandbox, 'helix-change', (event) => {
+  const paneEdited = (event: HelixChangeEvent) => {
     const pane = event.composedPath()[0] as { name?: string }
     if (pane?.name === 'source') {
       setMarkup(event.detail.value)
     } else if (pane?.name === 'css') {
       setCss(event.detail.value)
     }
-  })
+  }
   /**
    * Switches the language the example is written in.
    *
@@ -415,13 +414,13 @@ export function SandboxWorkbench({ families }: Props) {
      `open` is a prop here, so a close this file did not hear about would leave
      the dialog shut and the state saying it was open, and the next edit would
      reopen it. */
-  useHelixEvent(confirmSyntax, 'helix-close', () => {
+  const confirmClosed = () => {
     setPendingSyntax(null)
-  })
+  }
 
   // One listener for the whole menu: the value says which setting and, where
   // it drilled down, which option.
-  useHelixEvent(settings, 'helix-select', (event) => {
+  const settingChosen = (event: HelixSelectEvent) => {
     const [setting, option] = event.detail.value.split(':')
     if (setting === 'syntax' && option) {
       const next = option as Syntax
@@ -443,16 +442,10 @@ export function SandboxWorkbench({ families }: Props) {
     } else if (setting === 'status') {
       setShowStatus((was) => !was)
     }
-  })
-  useHelixEvent(tree, 'helix-select', (event) => {
+  }
+  const exampleChosen = (event: HelixSelectEvent) => {
     select(event.detail.value)
-  })
-  useHelixEvent(rail, 'helix-close', () => {
-    setRailOpen(false)
-  })
-  useHelixEvent(rail, 'helix-open', () => {
-    setRailOpen(true)
-  })
+  }
 
   /* The address follows the sandbox, in one place rather than at each of the
      handlers that can change it. `replaceState`, not `pushState`: turning the
@@ -787,8 +780,8 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-input
           aria-label="Filter examples"
           class="examplesFilter"
+          onhelix-change={filterChanged}
           placeholder="Filter"
-          ref={setFilterField}
           type="search"
           value={filter}
         >
@@ -821,7 +814,13 @@ export function SandboxWorkbench({ families }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
-          <helix-tree active={activeValue} chevron-placement="end" label="Examples" ref={setTree}>
+          <helix-tree
+            active={activeValue}
+            chevron-placement="end"
+            label="Examples"
+            onhelix-select={exampleChosen}
+            ref={setTree}
+          >
             {shown.map((entry) => (
               <helix-tree-item key={entry.slug} value={entry.slug}>
                 {/* Everything here is experimental, and saying so on each row is the
@@ -898,11 +897,16 @@ export function SandboxWorkbench({ families }: Props) {
       <helix-splitter
         className="workbenchBody"
         default-position={railHome}
+        onhelix-change={railMoved}
         position={railPosition}
         ref={setRailSplitter}
       >
         <div className="workbenchMain" slot="start">
           <helix-sandbox
+            onhelix-change={(event) => {
+              sandboxChanged(event)
+              paneEdited(event)
+            }}
             orientation={narrow ? 'vertical' : 'horizontal'}
             ref={sandbox}
             split={showEditor ? split : 0}
@@ -913,7 +917,12 @@ export function SandboxWorkbench({ families }: Props) {
                 IDREF cannot leave the tab's shadow root to reach it: the
                 component's own note is that pointing at nothing is worse than
                 not pointing. This is a choice among files, and it says so. */}
-              <helix-toggle-group appearance="plain" aria-label="Files" ref={files} value={pane}>
+              <helix-toggle-group
+                appearance="plain"
+                aria-label="Files"
+                onhelix-change={paneChosen}
+                value={pane}
+              >
                 <helix-toggle value="source">{current.file}</helix-toggle>
                 <helix-toggle value="css">styles.css</helix-toggle>
               </helix-toggle-group>
@@ -934,7 +943,7 @@ export function SandboxWorkbench({ families }: Props) {
                 {/* Layout and Direction drill down; the last three tick. The menu
                   reads its state from here rather than holding its own, so what
                   is ticked is what is showing. */}
-                <helix-menu label="Environment" ref={settings}>
+                <helix-menu label="Environment" onhelix-select={settingChosen}>
                   <helix-tooltip content="Sandbox settings" placement="bottom" slot="trigger">
                     <helix-icon-button label="Sandbox settings">
                       <helix-icon name="sliders-horizontal"></helix-icon>
@@ -1146,6 +1155,7 @@ export function SandboxWorkbench({ families }: Props) {
           <helix-dialog
             align="center"
             label="Change environment"
+            onhelix-close={confirmClosed}
             open={pendingSyntax !== null}
             ref={confirmSyntax}
             size="sm"
@@ -1192,7 +1202,13 @@ export function SandboxWorkbench({ families }: Props) {
       </helix-splitter>
 
       {narrow && (
-        <helix-drawer label="Examples" open={railOpen} placement="end" ref={setRail}>
+        <helix-drawer
+          label="Examples"
+          onhelix-close={() => setRailOpen(false)}
+          onhelix-open={() => setRailOpen(true)}
+          open={railOpen}
+          placement="end"
+        >
           {examplesPane}
         </helix-drawer>
       )}

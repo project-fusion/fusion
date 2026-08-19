@@ -2,7 +2,6 @@
 
 import type { HelixDrawer, HelixToggleGroup } from '@helix-io/web'
 import { useEffect, useRef, useState } from 'react'
-import { useHelixEvent } from '../lib/use-helix-event'
 
 type ColorMode = 'system' | 'light' | 'dark'
 
@@ -79,9 +78,6 @@ interface Props {
 export function PreferencesDrawer({ onOpenChange, open }: Props) {
   const [mode, setMode] = useState<ColorMode>('system')
   const [tier, setTier] = useState<ApiTier>('styled')
-  const drawer = useRef<HelixDrawer>(null)
-  const modes = useRef<HelixToggleGroup>(null)
-  const tiers = useRef<HelixToggleGroup>(null)
 
   // Read after mount. The server has no localStorage, so choosing a mode during
   // render would make the first paint disagree with the stored choice.
@@ -104,26 +100,20 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     window.localStorage.setItem(STORAGE_KEY, next)
   }
 
-  // Bound from effects. A Helix event given to React as a prop is never
-  // listened for on a page that was server-rendered. See `useHelixEvent`.
-  useHelixEvent(drawer, 'helix-close', () => {
-    onOpenChange(false)
-  })
-  useHelixEvent(drawer, 'helix-open', () => {
-    onOpenChange(true)
-  })
-  useHelixEvent(modes, 'helix-select', (event) => {
-    choose(event.detail.value as ColorMode)
-  })
-  useHelixEvent(tiers, 'helix-select', (event) => {
-    const next = event.detail.value as ApiTier
+  const chooseTier = (next: ApiTier) => {
     setTier(next)
     applyTier(next)
     window.localStorage.setItem(TIER_KEY, next)
-  })
+  }
 
   return (
-    <helix-drawer label="Preferences" open={open} placement="end" ref={drawer}>
+    <helix-drawer
+      label="Preferences"
+      onhelix-close={() => onOpenChange(false)}
+      onhelix-open={() => onOpenChange(true)}
+      open={open}
+      placement="end"
+    >
       <helix-flex align="start" direction="column" gap="lg">
         <helix-text appearance="subheading" as="h2">
           Preferences
@@ -138,7 +128,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         <helix-toggle-group
           hint="System follows your operating system, and keeps following it."
           label="Color mode"
-          ref={modes}
+          onhelix-change={(event) => choose(event.detail.value as ColorMode)}
           value={mode}
         >
           <helix-toggle value="system">System</helix-toggle>
@@ -149,7 +139,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         <helix-toggle-group
           hint="Styled extends base, so its API is the larger of the two."
           label="API reference"
-          ref={tiers}
+          onhelix-change={(event) => chooseTier(event.detail.value as ApiTier)}
           value={tier}
         >
           <helix-toggle value="styled">Styled</helix-toggle>

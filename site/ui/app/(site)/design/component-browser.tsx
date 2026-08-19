@@ -4,7 +4,6 @@ import type { HelixInput, HelixSelect } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { useHelixEvent } from '../../../lib/use-helix-event'
 import type { stageAppearance } from '../../verticals'
 
 /**
@@ -176,10 +175,6 @@ export function ComponentBrowser({
     const search = next.toString()
     window.history.replaceState(null, '', search ? `${pathname}?${search}` : pathname)
   }
-  const sortControl = useRef<HelixSelect>(null)
-  const search = useRef<HelixInput>(null)
-  const categoryFilter = useRef<HelixSelect>(null)
-  const statusFilter = useRef<HelixSelect>(null)
 
   /* Focus lands in the search on arrival.
    *
@@ -225,29 +220,17 @@ export function ComponentBrowser({
     [index],
   )
 
-  /* `addEventListener` rather than an `onhelix-change` prop. React records the
-     prop and attaches no listener on a server-rendered page, so the handler
-     never runs until some unrelated update happens to commit. */
-  useHelixEvent(search, 'helix-change', (event) => {
-    setQuery(event.detail.value)
-    mirror('q', event.detail.value)
-  })
-  useHelixEvent(categoryFilter, 'helix-change', (event) => {
-    setCategory(event.detail.value)
-    mirror('category', event.detail.value)
-  })
-  useHelixEvent(statusFilter, 'helix-change', (event) => {
-    setStatus(event.detail.value)
-    mirror('status', event.detail.value)
-  })
+  // Still a ref: the search is focused on mount, which no prop can do.
+  const search = useRef<HelixInput>(null)
+
   /* A navigation rather than state, because the server owns the order. `scroll:
      false` so choosing a sort does not throw the reader back to the top of a
      page they were already reading down. */
-  useHelixEvent(sortControl, 'helix-change', (event) => {
+  const sortBy = (value: string) => {
     const next = new URLSearchParams(params)
-    next.set('sort', event.detail.value)
+    next.set('sort', value)
     router.push(`${pathname}?${next}`, { scroll: false })
-  })
+  }
 
   const { hidden, shown } = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -340,6 +323,10 @@ export function ComponentBrowser({
             className="designSearch chromeControl"
             default-value={initialQuery}
             label="Search components"
+            onhelix-change={(event) => {
+              setQuery(event.detail.value)
+              mirror('q', event.detail.value)
+            }}
             placeholder={`Search ${index.length} components…`}
             ref={search}
             type="search"
@@ -391,7 +378,10 @@ export function ComponentBrowser({
               className="chromeControl designFilter"
               default-value={category}
               label="Category"
-              ref={categoryFilter}
+              onhelix-change={(event) => {
+                setCategory(event.detail.value)
+                mirror('category', event.detail.value)
+              }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -417,7 +407,10 @@ export function ComponentBrowser({
                 className="chromeControl designFilter"
                 default-value={status}
                 label="Status"
-                ref={statusFilter}
+                onhelix-change={(event) => {
+                  setStatus(event.detail.value)
+                  mirror('status', event.detail.value)
+                }}
               >
                 <helix-icon name="funnel-simple" slot="start"></helix-icon>
                 <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -445,7 +438,7 @@ export function ComponentBrowser({
               className="chromeControl designFilter"
               default-value={order}
               label="Sort"
-              ref={sortControl}
+              onhelix-change={(event) => sortBy(event.detail.value)}
             >
               {/* A different mark from the filters', because it does a
                   different thing: a funnel takes rows away, and this only

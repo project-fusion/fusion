@@ -4,7 +4,6 @@ import type { HelixDrawer } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { useHelixEvent } from '../lib/use-helix-event'
 import { PreferencesDrawer } from './preferences'
 import { VERTICALS } from './verticals'
 import { Wordmark } from './wordmark'
@@ -38,17 +37,6 @@ export function SiteNav() {
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
-  const nav = useRef<HelixDrawer>(null)
-
-  // Bound from an effect. A Helix event given to React as a prop is never
-  // listened for on a page that was server-rendered. See `useHelixEvent`.
-  useHelixEvent(nav, 'helix-close', () => {
-    setOpen(false)
-  })
-  useHelixEvent(nav, 'helix-open', () => {
-    setOpen(true)
-  })
-
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
     const sync = () => setNarrow(query.matches)
@@ -108,7 +96,13 @@ export function SiteNav() {
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      <helix-drawer label="Site navigation" open={open} placement="end" ref={nav}>
+      <helix-drawer
+        label="Site navigation"
+        onhelix-close={() => setOpen(false)}
+        onhelix-open={() => setOpen(true)}
+        open={open}
+        placement="end"
+      >
         <helix-flex align="start" direction="column" gap="lg">
           {VERTICALS.map((vertical) => (
             <a
