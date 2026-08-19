@@ -85,6 +85,8 @@ const clock = (seconds: number): string => {
  * @csspart mute - Sound on and off.
  * @csspart volume - How loud.
  * @csspart captions - Subtitles on and off.
+ * @csspart speed - Playback speed, where it was asked for.
+ * @csspart pip - Picture in picture, where it was asked for and exists.
  * @csspart fullscreen - The whole screen, and back.
  *
  * @event {Event} play - Relayed, because it does not cross a shadow boundary.
@@ -130,6 +132,26 @@ export class HelixBaseVideo extends HelixElement {
   @property()
   preload: 'auto' | 'metadata' | 'none' = 'metadata'
 
+  /**
+   * Controls beyond the ones every player has, named in the order they appear.
+   *
+   * A list rather than a property apiece. A bar is a row with a budget, and a
+   * boolean per feature invites a consumer to switch all of them on: naming
+   * them makes the row a decision, and makes the order theirs. Anything
+   * unrecognised is skipped rather than throwing, since the list is markup and
+   * a typo should cost a control, not a page.
+   *
+   * `pip` is offered only where the platform has it, checked rather than
+   * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+   * that cannot work is worse than one that is not there.
+   */
+  @property({ attribute: 'extra-controls' })
+  extraControls = ''
+
+  /** The speeds offered, slowest first, as multipliers of normal. */
+  @property({ attribute: 'speeds' })
+  speeds = '0.5 1 1.5 2'
+
   /** What the play control is called while it would start the video. */
   @property({ attribute: 'play-label' })
   playLabel = 'Play'
@@ -165,6 +187,20 @@ export class HelixBaseVideo extends HelixElement {
   /** The words of the cue on screen now, or nothing between cues. */
   @state()
   private cue = ''
+
+  @state()
+  private rate = 1
+
+  /** The extras asked for, in order, and only the ones this platform can do. */
+  private get extras(): string[] {
+    const asked = this.extraControls.split(/\s+/).filter(Boolean)
+    return asked.filter((one) => {
+      if (one === 'pip') {
+        return typeof document !== 'undefined' && document.pictureInPictureEnabled
+      }
+      return one === 'speed'
+    })
+  }
 
   /** The sources and caption tracks to copy into the video, as the consumer wrote them. */
   @state()
@@ -328,6 +364,34 @@ export class HelixBaseVideo extends HelixElement {
     track.mode = next ? 'hidden' : 'disabled'
     this.captioned = next
     this.cue = ''
+  }
+
+  /** Steps through the speeds offered, which is what one button can do. */
+  private cycleSpeed(): void {
+    const speeds = this.speeds
+      .split(/\s+/)
+      .map(Number)
+      .filter((one) => one > 0)
+    const video = this.video
+    if (!video || speeds.length === 0) {
+      return
+    }
+    const at = speeds.indexOf(video.playbackRate)
+    const next = speeds[(at + 1) % speeds.length] ?? 1
+    video.playbackRate = next
+    this.rate = next
+  }
+
+  private async togglePip(): Promise<void> {
+    const video = this.video
+    if (!video) {
+      return
+    }
+    if (document.pictureInPictureElement === video) {
+      await document.exitPictureInPicture()
+      return
+    }
+    await video.requestPictureInPicture()
   }
 
   private async toggleFullscreen(): Promise<void> {
@@ -515,6 +579,25 @@ export class HelixBaseVideo extends HelixElement {
             </button>`
           : nothing
       }
+      ${this.extras.map((one) =>
+        one === 'speed'
+          ? html`<button
+              part="speed"
+              type="button"
+              aria-label="Playback speed"
+              @click=${() => this.cycleSpeed()}
+            >
+              ${this.rate === 1 ? html`<helix-icon name="gauge"></helix-icon>` : `${this.rate}x`}
+            </button>`
+          : html`<button
+              part="pip"
+              type="button"
+              aria-label="Picture in picture"
+              @click=${() => void this.togglePip()}
+            >
+              <helix-icon name="picture-in-picture"></helix-icon>
+            </button>`,
+      )}
       <button
         part="fullscreen"
         type="button"

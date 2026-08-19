@@ -10851,6 +10851,32 @@ either alone, so this one is not drawn at all when it is set. */
   controls?: HelixVideo["controls"];
   /** How much to fetch before anything is asked for. */
   preload?: HelixVideo["preload"];
+  /** Controls beyond the ones every player has, named in the order they appear.
+
+A list rather than a property apiece. A bar is a row with a budget, and a
+boolean per feature invites a consumer to switch all of them on: naming
+them makes the row a decision, and makes the order theirs. Anything
+unrecognised is skipped rather than throwing, since the list is markup and
+a typo should cost a control, not a page.
+
+`pip` is offered only where the platform has it, checked rather than
+assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+that cannot work is worse than one that is not there. */
+  "extra-controls"?: HelixVideo["extraControls"];
+  /** Controls beyond the ones every player has, named in the order they appear.
+
+A list rather than a property apiece. A bar is a row with a budget, and a
+boolean per feature invites a consumer to switch all of them on: naming
+them makes the row a decision, and makes the order theirs. Anything
+unrecognised is skipped rather than throwing, since the list is markup and
+a typo should cost a control, not a page.
+
+`pip` is offered only where the platform has it, checked rather than
+assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+that cannot work is worse than one that is not there. */
+  extraControls?: HelixVideo["extraControls"];
+  /** The speeds offered, slowest first, as multipliers of normal. */
+  speeds?: HelixVideo["speeds"];
   /** What the play control is called while it would start the video. */
   "play-label"?: HelixVideo["playLabel"];
   /** What the play control is called while it would start the video. */
@@ -10892,6 +10918,32 @@ either alone, so this one is not drawn at all when it is set. */
   "prop:controls"?: HelixVideo["controls"];
   /** How much to fetch before anything is asked for. */
   "prop:preload"?: HelixVideo["preload"];
+  /** Controls beyond the ones every player has, named in the order they appear.
+
+A list rather than a property apiece. A bar is a row with a budget, and a
+boolean per feature invites a consumer to switch all of them on: naming
+them makes the row a decision, and makes the order theirs. Anything
+unrecognised is skipped rather than throwing, since the list is markup and
+a typo should cost a control, not a page.
+
+`pip` is offered only where the platform has it, checked rather than
+assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+that cannot work is worse than one that is not there. */
+  "attr:extra-controls"?: HelixVideo["extraControls"];
+  /** Controls beyond the ones every player has, named in the order they appear.
+
+A list rather than a property apiece. A bar is a row with a budget, and a
+boolean per feature invites a consumer to switch all of them on: naming
+them makes the row a decision, and makes the order theirs. Anything
+unrecognised is skipped rather than throwing, since the list is markup and
+a typo should cost a control, not a page.
+
+`pip` is offered only where the platform has it, checked rather than
+assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+that cannot work is worse than one that is not there. */
+  "prop:extraControls"?: HelixVideo["extraControls"];
+  /** The speeds offered, slowest first, as multipliers of normal. */
+  "prop:speeds"?: HelixVideo["speeds"];
   /** What the play control is called while it would start the video. */
   "attr:play-label"?: HelixVideo["playLabel"];
   /** What the play control is called while it would start the video. */
@@ -16200,6 +16252,12 @@ export type CustomElements = {
    * consumer's document rather than something guessed at here.
    *
    * **The source is not trusted, and the frame is what makes that safe.**
+   * `fullscreen` is granted for the same reason and found the same way: a video
+   * in the preview offered a fullscreen button that did nothing at all, because
+   * the policy default is `self`, this frame is not `self`, and a denied request
+   * rejects a promise nobody was watching. Two capabilities now, both explicit,
+   * both starred.
+   *
    * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
    * policy defaults to `self` and this frame has an opaque origin, so it is not
    * `self` and the default denies it. A component inside the preview that copies
@@ -19135,6 +19193,18 @@ export type CustomElements = {
    * A fallback rather than a default. Two bars over one video is worse than
    * either alone, so this one is not drawn at all when it is set.
    * - `preload`: How much to fetch before anything is asked for.
+   * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
+   *
+   * A list rather than a property apiece. A bar is a row with a budget, and a
+   * boolean per feature invites a consumer to switch all of them on: naming
+   * them makes the row a decision, and makes the order theirs. Anything
+   * unrecognised is skipped rather than throwing, since the list is markup and
+   * a typo should cost a control, not a page.
+   *
+   * `pip` is offered only where the platform has it, checked rather than
+   * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+   * that cannot work is worse than one that is not there.
+   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    *
@@ -19186,6 +19256,8 @@ export type CustomElements = {
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
+   * - `speed`: Playback speed, where it was asked for.
+   * - `pip`: Picture in picture, where it was asked for and exists.
    * - `fullscreen`: The whole screen, and back.
    */
   "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
@@ -24665,6 +24737,12 @@ export type CustomElementsSolidJs = {
    * consumer's document rather than something guessed at here.
    *
    * **The source is not trusted, and the frame is what makes that safe.**
+   * `fullscreen` is granted for the same reason and found the same way: a video
+   * in the preview offered a fullscreen button that did nothing at all, because
+   * the policy default is `self`, this frame is not `self`, and a denied request
+   * rejects a promise nobody was watching. Two capabilities now, both explicit,
+   * both starred.
+   *
    * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
    * policy defaults to `self` and this frame has an opaque origin, so it is not
    * `self` and the default denies it. A component inside the preview that copies
@@ -27705,6 +27783,18 @@ export type CustomElementsSolidJs = {
    * A fallback rather than a default. Two bars over one video is worse than
    * either alone, so this one is not drawn at all when it is set.
    * - `preload`: How much to fetch before anything is asked for.
+   * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
+   *
+   * A list rather than a property apiece. A bar is a row with a budget, and a
+   * boolean per feature invites a consumer to switch all of them on: naming
+   * them makes the row a decision, and makes the order theirs. Anything
+   * unrecognised is skipped rather than throwing, since the list is markup and
+   * a typo should cost a control, not a page.
+   *
+   * `pip` is offered only where the platform has it, checked rather than
+   * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
+   * that cannot work is worse than one that is not there.
+   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
    *
@@ -27756,6 +27846,8 @@ export type CustomElementsSolidJs = {
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
+   * - `speed`: Playback speed, where it was asked for.
+   * - `pip`: Picture in picture, where it was asked for and exists.
    * - `fullscreen`: The whole screen, and back.
    */
   "helix-video": Partial<

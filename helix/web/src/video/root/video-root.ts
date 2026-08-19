@@ -44,17 +44,25 @@ export class HelixVideo extends HelixBaseVideo {
   /**
    * How the control bar sits on the picture.
    *
-   * `transparent` is the default and is what a player looks like: the controls
-   * float on a gradient that darkens the frame just enough to read them, and
-   * the picture runs edge to edge behind them. `solid` gives them a bar of
-   * their own, which is what a video embedded in a document usually wants,
-   * where the player is a component on a page rather than the page itself.
+   * `shadow` is the default and is what a player looks like, and what the
+   * platform's own controls do: they float on a gradient that fades up into the
+   * picture, dark enough to read them against a bright frame and gone entirely
+   * a little higher up. The picture runs edge to edge behind them.
+   *
+   * `solid` gives the controls a bar of their own, which is what a video
+   * embedded in a document usually wants, where the player is a component on a
+   * page rather than the page itself. It stays put rather than fading, because
+   * a bar that is part of the frame would leave a strip of the well behind it.
+   *
+   * `plain` is neither: the controls sit straight on the picture with nothing
+   * behind them. For a consumer who knows their footage, or who is putting
+   * their own ground there.
    *
    * A presentation property, so it lives on this tier. The base element renders
-   * the same bar either way.
+   * the same bar for all three.
    */
   @property({ reflect: true })
-  appearance: 'solid' | 'transparent' = 'transparent'
+  appearance: 'plain' | 'shadow' | 'solid' = 'shadow'
 
   static override styles: CSSResultGroup = styles
 }

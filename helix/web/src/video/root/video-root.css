@@ -1,4 +1,18 @@
+/* A video is a dark region, and says so once.
+ *
+ * `color-scheme: dark` rather than a hand-picked colour on every control.
+ * Every token in this library is a `light-dark()` pair and `light-dark()`
+ * follows `color-scheme`, so one declaration resolves the whole subtree the way
+ * a dark page would: the ink comes out light, the surfaces come out dark, and
+ * the controls stop needing colours chosen for them one at a time.
+ *
+ * It also puts the answer where a consumer can change it. Setting
+ * `data-color-mode` on the element wins through `tokens.css`, which is the same
+ * escape hatch a toast has, and it means a light player is a consumer's
+ * decision rather than something this stylesheet forbids. */
 :host {
+  color-scheme: dark;
+
   display: block;
   position: relative;
 }
@@ -47,7 +61,7 @@
      on a black page and the bar's light ink vanished into it. A video sits in a
      dark well everywhere it has ever been shown, and letterbox bars are black
      rather than whatever the page is. */
-  background-color: var(--video-well-color, var(--helix-color-surface-media));
+  background-color: var(--video-well-color, var(--helix-color-surface-sunken));
   block-size: auto;
   display: block;
   inline-size: 100%;
@@ -66,7 +80,7 @@
      over a dark gradient of its own, so its ink is chosen to sit on that rather
      than on the page. `foreground-inverse` turns over with the theme and put
      dark ink on a dark gradient. */
-  color: var(--video-controls-color, var(--helix-color-foreground-media));
+  color: var(--video-controls-color, var(--helix-color-foreground));
   display: flex;
   gap: var(--helix-space-xs);
   inset-block-end: 0;
@@ -82,8 +96,8 @@
    too many, and the point of this appearance is that the controls are a bar and
    not a wash over the picture. */
 :host([appearance="solid"]) [part="controls"] {
-  background-color: var(--helix-color-surface-media);
-  color: var(--helix-color-foreground-media);
+  background-color: var(--helix-color-surface);
+  color: var(--helix-color-foreground);
 }
 
 :host([appearance="solid"]) [part="stage"]::before {
@@ -126,7 +140,9 @@
   opacity: 0;
 }
 
-/* Nothing to shade where the browser draws its own bar. */
+/* Nothing to shade where the browser draws its own bar, or where the consumer
+   asked for no ground at all. */
+:host([appearance="plain"]) [part="stage"]::before,
 :host([controls]) [part="stage"]::before {
   content: none;
 }
@@ -147,6 +163,8 @@
 [part="play"],
 [part="mute"],
 [part="captions"],
+[part="speed"],
+[part="pip"],
 [part="fullscreen"] {
   all: unset;
   --icon-size: var(--helix-size-icon-sm);
@@ -166,6 +184,8 @@
 [part="play"]:focus-visible,
 [part="mute"]:focus-visible,
 [part="captions"]:focus-visible,
+[part="speed"]:focus-visible,
+[part="pip"]:focus-visible,
 [part="fullscreen"]:focus-visible,
 [part="scrubber"]:focus-visible,
 [part="volume"]:focus-visible {
@@ -174,10 +194,16 @@
 }
 
 /* Tabular, so the position does not shuffle the bar sideways every second. */
+/* Tabular, not monospace. The reason for a fixed advance here is that the
+   position ticks once a second and must not shuffle the bar sideways, and
+   `tabular-nums` gives exactly that on the face everything else is set in. A
+   monospace face gives it too, and brings a second typeface into a control bar
+   to say a thing about elapsed time that is not true: this is a clock, not
+   code. */
 [part="time"] {
   color: inherit;
   flex: 0 0 auto;
-  font-family: var(--helix-font-mono);
+  font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
 }
@@ -239,6 +265,8 @@
  * control a keyboard cannot reach, and the level is a real range that Tab lands
  * on. */
 [part="sound"] {
+  --_video-level-size: 4.5rem;
+
   align-items: center;
   display: flex;
   flex: 0 0 auto;
@@ -263,8 +291,9 @@
      out seventy-two by four, lying down as before. */
   block-size: 4px;
   bottom: calc(100% + var(--helix-space-2xs));
+  /* One number for the track's length, read by the ground behind it too. */
   direction: rtl;
-  inline-size: 4.5rem;
+  inline-size: var(--_video-level-size);
   /* Physical, and this is the one place in the library where that is the
      correct choice rather than a lapse. `writing-mode` turns the element's own
      logical axes, and an absolutely positioned box resolves its insets in its
@@ -287,15 +316,20 @@
   pointer-events: auto;
 }
 
-/* The little ground it stands on, so a white track is legible over a bright
-   frame the way the bar's own controls are. */
+/* The little ground it stands on, so the track is legible over a bright frame
+   the way the bar's own controls are.
+ 
+   Sized and offset from the same numbers the slider uses, so the two cannot
+   drift: the ground is the track's length plus a pad at each end, and both are
+   centred on the speaker below. Written independently they did not agree, and a
+   four-pixel slider inside a thirty-two pixel pill shows every pixel of it. */
 [part="sound"]:hover::before,
 [part="sound"]:focus-within::before {
   background-color: var(--helix-color-overlay);
   border-radius: var(--helix-radii-full);
   content: "";
-  block-size: calc(4.5rem + var(--helix-space-sm));
-  bottom: calc(100% + var(--helix-space-2xs));
+  block-size: calc(var(--_video-level-size) + var(--helix-space-xs) * 2);
+  bottom: calc(100% + var(--helix-space-2xs) - var(--helix-space-xs));
   inline-size: var(--helix-size-icon-lg);
   left: 50%;
   position: absolute;
@@ -338,7 +372,7 @@
 [part="cue"] {
   background-color: var(--helix-color-overlay);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-media);
+  color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-md);
   inline-size: max-content;
@@ -360,13 +394,16 @@
   inset-block-end: var(--helix-space-lg);
 }
 
-/* On a solid bar the groove is cut into it rather than laid on top, which is
-   what a bar with a ground of its own wants. The transparent one has no bar to
-   cut into, so its track stays a wash of the ink. */
+/* On a solid bar the groove is a step *up* from the bar, not a step down into
+   it. Sunken is about the shape rather than the value: a channel cut into a
+   dark bar reads by being lighter than the bar, the way a slider's track always
+   has, and darkening it instead made the groove disappear into the ground. The
+   transparent bar has no ground to be a step from, so its track stays a wash of
+   the ink. */
 :host([appearance="solid"]) [part="scrubber"],
 :host([appearance="solid"]) [part="volume"] {
-  background-color: color-mix(in oklab, var(--helix-color-surface-media) 55%, currentColor 18%);
-  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--helix-color-surface-media) 70%, transparent);
+  background-color: var(--helix-color-surface-raised);
+  box-shadow: inset 0 1px 1px color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
 }
 
 [part="poster"] {
@@ -389,4 +426,15 @@
   [part="volume"] {
     transition: none;
   }
+}
+
+/* The speed reads as a number once it is not one, so the button says what it is
+   doing rather than only offering to. Sized to the digits it holds, since a bar
+   that resized itself every time the speed changed would move everything beside
+   it. */
+[part="speed"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
 }

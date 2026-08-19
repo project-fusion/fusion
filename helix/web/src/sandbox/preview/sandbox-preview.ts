@@ -58,6 +58,12 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender
  * consumer's document rather than something guessed at here.
  *
  * **The source is not trusted, and the frame is what makes that safe.**
+ * `fullscreen` is granted for the same reason and found the same way: a video
+ * in the preview offered a fullscreen button that did nothing at all, because
+ * the policy default is `self`, this frame is not `self`, and a denied request
+ * rejects a promise nobody was watching. Two capabilities now, both explicit,
+ * both starred.
+ *
  * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
  * policy defaults to `self` and this frame has an opaque origin, so it is not
  * `self` and the default denies it. A component inside the preview that copies
@@ -264,7 +270,7 @@ export class HelixSandboxPreview extends HelixElement {
       part="frame"
       src=${this.src}
       title=${this.label}
-      allow="clipboard-write *"
+      allow="clipboard-write *; fullscreen *"
       sandbox="allow-scripts allow-forms"
     ></iframe>`
   }

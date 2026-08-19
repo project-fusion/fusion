@@ -3585,6 +3585,12 @@ has its own custom element registry, so `src` has to load them. That is the
 consumer's document rather than something guessed at here.
 
 **The source is not trusted, and the frame is what makes that safe.**
+`fullscreen` is granted for the same reason and found the same way: a video
+in the preview offered a fullscreen button that did nothing at all, because
+the policy default is `self`, this frame is not `self`, and a denied request
+rejects a promise nobody was watching. Two capabilities now, both explicit,
+both starred.
+
 `allow="clipboard-write *"` is granted explicitly, and the star matters: the
 policy defaults to `self` and this frame has an opaque origin, so it is not
 `self` and the default denies it. A component inside the preview that copies
@@ -5461,8 +5467,9 @@ to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'solid' \| 'transparent'` | `'transparent'` | - | Whether the bar floats on the picture or sits on its own ground. |
+| `appearance` | `appearance` | `'plain' \| 'shadow' \| 'solid'` | `'shadow'` | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
+| `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |
 | `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
 | `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |
@@ -5471,6 +5478,7 @@ to do next.
 | `playsInline` | `plays-inline` | `boolean` | `true` | `HelixBaseVideo` | Whether it plays where it sits rather than taking over the screen. |
 | `poster` | `poster` | `string` | `''` | `HelixBaseVideo` | A still shown before it plays, which the platform draws itself. |
 | `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixBaseVideo` | How much to fetch before anything is asked for. |
+| `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixBaseVideo` | The speeds offered, slowest first, as multipliers of normal. |
 | `src` | `src` | `string` | `''` | `HelixBaseVideo` | Where the video is, for the common case of one file. |
 
 #### Methods
@@ -5511,6 +5519,8 @@ to do next.
 | `mute` | Sound on and off. |
 | `volume` | How loud. |
 | `captions` | Subtitles on and off. |
+| `speed` | Playback speed, where it was asked for. |
+| `pip` | Picture in picture, where it was asked for and exists. |
 | `fullscreen` | The whole screen, and back. |
 
 #### Custom properties

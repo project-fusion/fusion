@@ -43336,6 +43336,14 @@
               "name": "captions"
             },
             {
+              "description": "Playback speed, where it was asked for.",
+              "name": "speed"
+            },
+            {
+              "description": "Picture in picture, where it was asked for and exists.",
+              "name": "pip"
+            },
+            {
               "description": "The whole screen, and back.",
               "name": "fullscreen"
             }
@@ -43433,6 +43441,26 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "attribute": "preload"
+            },
+            {
+              "kind": "field",
+              "name": "extraControls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "attribute": "extra-controls"
+            },
+            {
+              "kind": "field",
+              "name": "speeds",
+              "type": {
+                "text": "string"
+              },
+              "default": "'0.5 1 1.5 2'",
+              "description": "The speeds offered, slowest first, as multipliers of normal.",
+              "attribute": "speeds"
             },
             {
               "kind": "field",
@@ -43538,6 +43566,25 @@
             },
             {
               "kind": "field",
+              "name": "rate",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "extras",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The extras asked for, in order, and only the ones this platform can do.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "media",
               "type": {
                 "text": "{ attrs: Record<string, string>; tag: 'source' | 'track' }[]"
@@ -43638,6 +43685,27 @@
                 }
               },
               "description": "Turns the first caption track on or off, which is what the button means."
+            },
+            {
+              "kind": "method",
+              "name": "cycleSpeed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Steps through the speeds offered, which is what one button can do."
+            },
+            {
+              "kind": "method",
+              "name": "togglePip",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
             },
             {
               "kind": "method",
@@ -43840,6 +43908,24 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "fieldName": "preload"
+            },
+            {
+              "name": "extra-controls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "fieldName": "extraControls"
+            },
+            {
+              "name": "speeds",
+              "type": {
+                "text": "string"
+              },
+              "default": "'0.5 1 1.5 2'",
+              "description": "The speeds offered, slowest first, as multipliers of normal.",
+              "fieldName": "speeds"
             },
             {
               "name": "play-label",

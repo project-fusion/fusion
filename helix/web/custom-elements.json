@@ -36822,7 +36822,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A sandboxed `<iframe>` pointed at `src`, which is a document the consumer\nprovides. That document imports whatever the examples need, listens for a\nrender message, and writes the markup into itself.\n\n**A frame rather than the page.** Rendering into the page meant an example\nwas styled by whatever surrounded it, which flatters the preview and lies\nabout it: an example that restyles `helix-card` restyled the sandbox too, a\nscript in an example ran against the real document, and a stray\n`position: fixed` escaped the pane. It also left nothing to capture console\noutput from, and the terminal has to come from somewhere.\n\nThe cost is that the frame starts empty. Styles and element definitions do\nnot cross into it, because a document has its own stylesheets and a window\nhas its own custom element registry, so `src` has to load them. That is the\nconsumer's document rather than something guessed at here.\n\n**The source is not trusted, and the frame is what makes that safe.**\n`allow=\"clipboard-write *\"` is granted explicitly, and the star matters: the\npolicy defaults to `self` and this frame has an opaque origin, so it is not\n`self` and the default denies it. A component inside the preview that copies\nto the clipboard is otherwise a control that silently does nothing, which is\nhow this was found. Nothing else is granted, and a copy still needs the\nreader's own gesture.\n\n`sandbox=\"allow-scripts\"` and no `allow-same-origin`, so the document runs on\nan opaque origin: script in an example cannot reach this page, its storage,\nits cookies, or the editor the source was typed into. Without it they could,\nmeasured, through an `onerror` handler on an image that fails to load, which\n`innerHTML` does not strip the way it refuses a `<script>` tag.\n\nThat is what lets a sandbox hold markup a reader pasted from somewhere, or\none day arrived in a shared link, rather than only what its owner typed.\n\n`allow-forms` is granted because examples have forms in them and a submit\nthat silently does nothing is a worse lie than one that navigates a frame\nnobody is looking at. Top-level navigation, popups and modals are not.",
+          "description": "A sandboxed `<iframe>` pointed at `src`, which is a document the consumer\nprovides. That document imports whatever the examples need, listens for a\nrender message, and writes the markup into itself.\n\n**A frame rather than the page.** Rendering into the page meant an example\nwas styled by whatever surrounded it, which flatters the preview and lies\nabout it: an example that restyles `helix-card` restyled the sandbox too, a\nscript in an example ran against the real document, and a stray\n`position: fixed` escaped the pane. It also left nothing to capture console\noutput from, and the terminal has to come from somewhere.\n\nThe cost is that the frame starts empty. Styles and element definitions do\nnot cross into it, because a document has its own stylesheets and a window\nhas its own custom element registry, so `src` has to load them. That is the\nconsumer's document rather than something guessed at here.\n\n**The source is not trusted, and the frame is what makes that safe.**\n`fullscreen` is granted for the same reason and found the same way: a video\nin the preview offered a fullscreen button that did nothing at all, because\nthe policy default is `self`, this frame is not `self`, and a denied request\nrejects a promise nobody was watching. Two capabilities now, both explicit,\nboth starred.\n\n`allow=\"clipboard-write *\"` is granted explicitly, and the star matters: the\npolicy defaults to `self` and this frame has an opaque origin, so it is not\n`self` and the default denies it. A component inside the preview that copies\nto the clipboard is otherwise a control that silently does nothing, which is\nhow this was found. Nothing else is granted, and a copy still needs the\nreader's own gesture.\n\n`sandbox=\"allow-scripts\"` and no `allow-same-origin`, so the document runs on\nan opaque origin: script in an example cannot reach this page, its storage,\nits cookies, or the editor the source was typed into. Without it they could,\nmeasured, through an `onerror` handler on an image that fails to load, which\n`innerHTML` does not strip the way it refuses a `<script>` tag.\n\nThat is what lets a sandbox hold markup a reader pasted from somewhere, or\none day arrived in a shared link, rather than only what its owner typed.\n\n`allow-forms` is granted because examples have forms in them and a submit\nthat silently does nothing is a worse lie than one that navigates a frame\nnobody is looking at. Top-level navigation, popups and modals are not.",
           "name": "HelixSandboxPreview",
           "cssParts": [
             {
@@ -56524,9 +56524,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'solid' | 'transparent'"
+                "text": "'plain' | 'shadow' | 'solid'"
               },
-              "default": "'transparent'",
+              "default": "'shadow'",
               "description": "Whether the bar floats on the picture or sits on its own ground.",
               "attribute": "appearance",
               "reflects": true
@@ -56641,6 +56641,34 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "attribute": "preload",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "extraControls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "attribute": "extra-controls",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "speeds",
+              "type": {
+                "text": "string"
+              },
+              "default": "'0.5 1 1.5 2'",
+              "description": "The speeds offered, slowest first, as multipliers of normal.",
+              "attribute": "speeds",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -56787,6 +56815,33 @@
               "privacy": "private",
               "default": "''",
               "description": "The words of the cue on screen now, or nothing between cues.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rate",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "extras",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The extras asked for, in order, and only the ones this platform can do.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -56941,6 +56996,35 @@
             },
             {
               "kind": "method",
+              "name": "cycleSpeed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Steps through the speeds offered, which is what one button can do.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "togglePip",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "toggleFullscreen",
               "privacy": "private",
               "return": {
@@ -57062,9 +57146,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'solid' | 'transparent'"
+                "text": "'plain' | 'shadow' | 'solid'"
               },
-              "default": "'transparent'",
+              "default": "'shadow'",
               "description": "Whether the bar floats on the picture or sits on its own ground.",
               "fieldName": "appearance"
             },
@@ -57167,6 +57251,32 @@
               "default": "'metadata'",
               "description": "How much to fetch before anything is asked for.",
               "fieldName": "preload",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "extra-controls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "fieldName": "extraControls",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "speeds",
+              "type": {
+                "text": "string"
+              },
+              "default": "'0.5 1 1.5 2'",
+              "description": "The speeds offered, slowest first, as multipliers of normal.",
+              "fieldName": "speeds",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -57343,6 +57453,22 @@
             {
               "description": "Subtitles on and off.",
               "name": "captions",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Playback speed, where it was asked for.",
+              "name": "speed",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Picture in picture, where it was asked for and exists.",
+              "name": "pip",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"

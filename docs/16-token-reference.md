@@ -27,19 +27,19 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 56 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 42 |
-| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 29 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 44 |
+| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 31 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 37 |
-| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 75 |
+| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 77 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 9 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 240 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 248 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 138 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 95 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 30 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
-| `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 10 |
-| `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
+| `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 2 |
+| `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 2 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 151 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 115 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 9 |
@@ -67,8 +67,8 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 190 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 226 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 189 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 195 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 193 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 193 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 96 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 64 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 20 |
@@ -94,8 +94,8 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 118 |
-| `--helix-font-mono` | `var(--_helix-family-mono)` | 29 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 122 |
+| `--helix-font-mono` | `var(--_helix-family-mono)` | 27 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 9 |
 
 ## text
@@ -104,7 +104,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 75 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 77 |
 | `--helix-text-sm` | `var(--_helix-size-14)` | 95 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 38 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 18 |
@@ -120,7 +120,7 @@ The three weights.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-weight-regular` | `400` | 16 |
-| `--helix-weight-medium` | `500` | 102 |
+| `--helix-weight-medium` | `500` | 104 |
 | `--helix-weight-semibold` | `600` | 47 |
 
 ## leading
