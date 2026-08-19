@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixChangeEvent } from '../../events/events.js'
+import { HelixToggleEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
 
@@ -49,11 +49,6 @@ export declare class MixinControllerCheckedInterface {
   resetChecked(): void
 }
 
-/** The name a form control carries, which the change event reports. */
-interface Named {
-  name?: string
-}
-
 /**
  * Grafts controlled and uncontrolled checked state onto a base class.
  *
@@ -84,7 +79,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Not reflected: the attribute is the consumer's input and stays as they
      * wrote it, and `data-checked` carries the resolved state for stylesheets.
      *
-     * @controlled helix-change
+     * @controlled helix-toggle
      */
     @property({ type: Boolean })
     get checked(): boolean {
@@ -162,11 +157,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
           this.requestUpdate('checked', previous)
         },
         controlled: this.checkedIsControlled,
-        event: (checked) =>
-          new HelixChangeEvent({
-            name: (this as Named).name ?? '',
-            value: String(checked),
-          }),
+        event: (checked) => new HelixToggleEvent({ checked }),
         host: this,
         label: 'checked',
         next,

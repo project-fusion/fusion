@@ -178,6 +178,59 @@ export class HelixChangeEvent extends CustomEvent<ChangeDetail> {
   }
 }
 
+/** Detail carried by `helix-toggle`. */
+export interface ToggleDetail {
+  /** The state being asked for, as a boolean and not a word that reads like one. */
+  checked: boolean
+}
+
+/**
+ * Fired when something that is checked or unchecked is about to change.
+ *
+ * **Separate from `helix-change` because the payload is a boolean and that one
+ * carries a string.** It was not separate, and the cost was exact: the checked
+ * mixin dispatched `value: String(checked)`, so a consumer received `"false"`,
+ * which is truthy. Our own checkbox group decoded it with
+ * `detail.value === 'true'`, which is what a workaround looks like when it has
+ * been in the codebase long enough to read as a convention.
+ *
+ * A generic `HelixChangeEvent<T>` was measured first and reached `jsx.d.ts`
+ * intact, so the manifest and the generator both carry one. It fails one step
+ * later: the map below derives from the registry through
+ * `InstanceType<Registry[K]>`, which resolves an unspecified parameter to
+ * `unknown` rather than to its default, so every `addEventListener` consumer
+ * traded a wrong type for no type. Restoring the entry means an override list
+ * beside the registry, which is the second list the registry exists to abolish.
+ * A union (`string | boolean`) fails differently and worse: every consumer of
+ * every text field narrows for a case that cannot happen to them, and the next
+ * numeric control widens it again.
+ *
+ * So the split follows the shape already in this file. `helix-open` carries
+ * `{ open: boolean }` rather than stringifying into a change, and this is the
+ * same decision for the same reason.
+ *
+ * It also ends a collision. Checkbox Group listened for its boxes' change and
+ * dispatched its own under the same name from the same host, so it had to call
+ * `stopImmediatePropagation` to keep a consumer from receiving one box's
+ * boolean alongside the whole set. Two names, two facts.
+ *
+ * The detail carries no `name`. Which control changed is `composedPath()[0]`,
+ * which is right across a shadow boundary where `event.target` is retargeted,
+ * and the group already identifies its boxes that way.
+ */
+export class HelixToggleEvent extends CustomEvent<ToggleDetail> {
+  static readonly eventName = 'helix-toggle'
+
+  constructor(detail: ToggleDetail) {
+    super(HelixToggleEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-create`. */
 export interface CreateDetail {
   /** What the reader typed, which is being offered as a new answer. */
@@ -435,6 +488,7 @@ const registry = {
   HelixNavigateEvent,
   HelixOpenEvent,
   HelixSelectEvent,
+  HelixToggleEvent,
 } as const
 
 /**

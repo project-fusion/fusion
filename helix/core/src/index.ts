@@ -64,9 +64,11 @@ export {
   HelixNavigateEvent,
   HelixOpenEvent,
   HelixSelectEvent,
+  HelixToggleEvent,
   type NavigateDetail,
   type OpenDetail,
   type SelectDetail,
+  type ToggleDetail,
 } from './events/events.js'
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'

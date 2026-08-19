@@ -1251,6 +1251,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired when something that is checked or unchecked is about to change.\n\n**Separate from `helix-change` because the payload is a boolean and that one\ncarries a string.** It was not separate, and the cost was exact: the checked\nmixin dispatched `value: String(checked)`, so a consumer received `\"false\"`,\nwhich is truthy. Our own checkbox group decoded it with\n`detail.value === 'true'`, which is what a workaround looks like when it has\nbeen in the codebase long enough to read as a convention.\n\nA generic `HelixChangeEvent<T>` was measured first and reached `jsx.d.ts`\nintact, so the manifest and the generator both carry one. It fails one step\nlater: the map below derives from the registry through\n`InstanceType<Registry[K]>`, which resolves an unspecified parameter to\n`unknown` rather than to its default, so every `addEventListener` consumer\ntraded a wrong type for no type. Restoring the entry means an override list\nbeside the registry, which is the second list the registry exists to abolish.\nA union (`string | boolean`) fails differently and worse: every consumer of\nevery text field narrows for a case that cannot happen to them, and the next\nnumeric control widens it again.\n\nSo the split follows the shape already in this file. `helix-open` carries\n`{ open: boolean }` rather than stringifying into a change, and this is the\nsame decision for the same reason.\n\nIt also ends a collision. Checkbox Group listened for its boxes' change and\ndispatched its own under the same name from the same host, so it had to call\n`stopImmediatePropagation` to keep a consumer from receiving one box's\nboolean alongside the whole set. Two names, two facts.\n\nThe detail carries no `name`. Which control changed is `composedPath()[0]`,\nwhich is right across a shadow boundary where `event.target` is retargeted,\nand the group already identifies its boxes that way.",
+          "name": "HelixToggleEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-toggle'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "The reader asked for something the list does not hold.\n\nCancelable, and announced before anything is applied, because the options are\nthe consumer's own light DOM and no component here writes into it. What the\ncontrol can do is say what was asked for and take the value; putting an\noption in the list, or a row in a database, is the consumer's, and a consumer\nwho validates first refuses this and adds nothing.\n\nThe detail carries the text as typed, not a slug of it. Trimming or lowering\nit here would be this element deciding what a name means, and a consumer who\nwants an identifier can make one from what they were given.",
           "name": "HelixCreateEvent",
           "members": [
@@ -1465,6 +1487,14 @@
           "name": "HelixChangeEvent",
           "declaration": {
             "name": "HelixChangeEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixToggleEvent",
+          "declaration": {
+            "name": "HelixToggleEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2214,6 +2244,14 @@
         },
         {
           "kind": "js",
+          "name": "HelixToggleEvent",
+          "declaration": {
+            "name": "HelixToggleEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "NavigateDetail",
           "declaration": {
             "name": "NavigateDetail",
@@ -2233,6 +2271,14 @@
           "name": "SelectDetail",
           "declaration": {
             "name": "SelectDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ToggleDetail",
+          "declaration": {
+            "name": "ToggleDetail",
             "module": "./events/events.js"
           }
         },
@@ -3051,7 +3097,7 @@
               "description": "Whether the control is checked.\n\nReading gives the real state, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them.",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               }
             },
@@ -3119,7 +3165,7 @@
               "attribute": "checked",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               }
             },

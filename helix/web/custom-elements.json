@@ -3454,7 +3454,7 @@
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "attribute": "fill",
               "reflects": true
             },
@@ -3822,7 +3822,7 @@
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the three are independent: a `ghost\nstandard` Cancel beside a `solid primary standard` Save is exactly the\npairing a dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "fieldName": "fill"
             },
             {
@@ -5714,7 +5714,7 @@
             },
             {
               "kind": "field",
-              "name": "handleChange",
+              "name": "handleToggle",
               "privacy": "private",
               "readonly": true,
               "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `checked`\nhere would read the state it still holds and nothing would ever change.",
@@ -6142,7 +6142,7 @@
               "attribute": "checked",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               },
               "inheritedFrom": {
@@ -7075,11 +7075,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-toggle",
+              "reactProp": "onhelix-toggle",
               "inheritedFrom": {
                 "name": "HelixBaseCheckbox",
                 "module": "src/checkbox/root/checkbox-root.ts"
@@ -10799,6 +10799,20 @@
             },
             {
               "kind": "field",
+              "name": "maxTags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many tags to draw before the rest become a count. `multiple` only.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\nchoices would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. `+3` is a fact a reader can act\non, where a row that silently stops is a field that appears to have lost\nwhat was put in it. Date Input and Time Input carry the same property and\nthe same reasoning.",
+              "attribute": "max-tags",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "listLabel",
               "type": {
                 "text": "string"
@@ -10972,6 +10986,34 @@
                 }
               },
               "description": "Takes what the reader typed as an answer, once anyone listening allows it.\n\nAdded to the set with `multiple` and replacing it without, which is the\nsame rule choosing an option follows: what differs about a created answer\nis where it came from, not how many the field holds.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shown",
+              "type": {
+                "text": "{ text: string; value: string }[]"
+              },
+              "privacy": "private",
+              "description": "The choices that get a tag, which is all of them until `maxTags` says not.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "restCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many are held beyond the ones shown.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -11351,6 +11393,10 @@
                 "slug": "invalid"
               },
               {
+                "description": "A cap on the tags drawn, with the rest counted.",
+                "slug": "max-tags"
+              },
+              {
                 "slug": "multiple"
               },
               {
@@ -11546,6 +11592,19 @@
               }
             },
             {
+              "name": "max-tags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many tags to draw before the rest become a count. `multiple` only.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\nchoices would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. `+3` is a fact a reader can act\non, where a row that silently stops is a field that appears to have lost\nwhat was put in it. Date Input and Time Input carry the same property and\nthe same reasoning.",
+              "fieldName": "maxTags",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
               "name": "list-label",
               "type": {
                 "text": "string"
@@ -11686,6 +11745,14 @@
             {
               "description": "One chosen option.",
               "name": "tag",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "description": "The count of choices held beyond `max-tags`.",
+              "name": "rest",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -43916,7 +43983,7 @@
               "attribute": "checked",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               },
               "inheritedFrom": {
@@ -44785,11 +44852,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-toggle",
+              "reactProp": "onhelix-toggle",
               "inheritedFrom": {
                 "name": "HelixBaseSwitch",
                 "module": "src/switch/root/switch-root.ts"

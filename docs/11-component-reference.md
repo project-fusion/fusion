@@ -775,7 +775,7 @@ what a native `<label>` wrapping a checkbox gives and what a reader expects.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable. |
+| `helix-toggle` | `HelixToggleEvent` | Fired before the state changes, and cancelable. |
 | `change` | `Event` | Relayed from the input once the state has changed. |
 
 #### Slots
@@ -1159,6 +1159,7 @@ Input, Color Input and Date Input all take.
 | `listLabel` | `list-label` | `string` | `'Options'` | `HelixBaseCombobox` | Accessible name for the list, which has no visible one of its own. |
 | `loading` | `loading` | `boolean` | `false` | `HelixBaseCombobox` | Whether the options are still on their way. |
 | `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixBaseCombobox` | What the list says while they are on their way. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseCombobox` | How many tags to draw before the rest become a count. `multiple` only. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseCombobox` | Whether more than one option can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
@@ -1206,6 +1207,7 @@ Input, Color Input and Date Input all take.
 | `control` | The text field itself. |
 | `tags` | The row of chosen options, when `multiple` is set. |
 | `tag` | One chosen option. |
+| `rest` | The count of choices held beyond `max-tags`. |
 | `create` | The row offering to add what was typed. |
 | `indicator` | The caret. |
 | `surface` | The floating panel. |
@@ -4325,7 +4327,7 @@ consumer has to keep.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the state changes, and cancelable. |
+| `helix-toggle` | `HelixToggleEvent` | Fired before the state changes, and cancelable. |
 | `change` | `Event` | Relayed from the input once the state has changed. |
 
 #### Slots

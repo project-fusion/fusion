@@ -99,6 +99,7 @@ import type {
   HelixNavigateEvent,
   HelixOpenEvent,
   HelixSelectEvent,
+  HelixToggleEvent,
   fromMinutes,
   initialsOf,
   isTime,
@@ -1093,9 +1094,9 @@ export type HelixBaseCheckboxElementEvent<E = Event> = TypedEvent<
   HelixBaseCheckbox,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseCheckboxHelixChangeElementEvent =
-  HelixBaseCheckboxElementEvent<HelixChangeEvent>;
+/** `helix-toggle` event type */
+export type HelixBaseCheckboxHelixToggleElementEvent =
+  HelixBaseCheckboxElementEvent<HelixToggleEvent>;
 
 export type HelixBaseCheckboxProps = {
   /** Value submitted when the box is checked. */
@@ -1158,7 +1159,7 @@ reflected none of them. */
   name?: HelixBaseCheckbox["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseCheckboxHelixChangeElementEvent) => void;
+  "onhelix-toggle"?: (e: HelixBaseCheckboxHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   onchange?: (e: HelixBaseCheckboxElementEvent) => void;
 };
@@ -1223,7 +1224,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseCheckbox["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseCheckboxHelixChangeElementEvent) => void;
+  "on:helix-toggle"?: (e: HelixBaseCheckboxHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixBaseCheckboxElementEvent) => void;
 
@@ -1844,6 +1845,32 @@ should not have to ask. */
   "remove-label"?: HelixBaseCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   removeLabel?: HelixBaseCombobox["removeLabel"];
+  /** How many tags to draw before the rest become a count. `multiple` only.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+choices would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can act
+on, where a row that silently stops is a field that appears to have lost
+what was put in it. Date Input and Time Input carry the same property and
+the same reasoning. */
+  "max-tags"?: HelixBaseCombobox["maxTags"];
+  /** How many tags to draw before the rest become a count. `multiple` only.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+choices would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can act
+on, where a row that silently stops is a field that appears to have lost
+what was put in it. Date Input and Time Input carry the same property and
+the same reasoning. */
+  maxTags?: HelixBaseCombobox["maxTags"];
   /** Accessible name for the list, which has no visible one of its own. */
   "list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -1986,6 +2013,32 @@ should not have to ask. */
   "attr:remove-label"?: HelixBaseCombobox["removeLabel"];
   /** What a tag's remove control is called, since the mark has no name. */
   "prop:removeLabel"?: HelixBaseCombobox["removeLabel"];
+  /** How many tags to draw before the rest become a count. `multiple` only.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+choices would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can act
+on, where a row that silently stops is a field that appears to have lost
+what was put in it. Date Input and Time Input carry the same property and
+the same reasoning. */
+  "attr:max-tags"?: HelixBaseCombobox["maxTags"];
+  /** How many tags to draw before the rest become a count. `multiple` only.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+choices would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can act
+on, where a row that silently stops is a field that appears to have lost
+what was put in it. Date Input and Time Input carry the same property and
+the same reasoning. */
+  "prop:maxTags"?: HelixBaseCombobox["maxTags"];
   /** Accessible name for the list, which has no visible one of its own. */
   "attr:list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
@@ -7144,9 +7197,9 @@ export type HelixBaseSwitchElementEvent<E = Event> = TypedEvent<
   HelixBaseSwitch,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseSwitchHelixChangeElementEvent =
-  HelixBaseSwitchElementEvent<HelixChangeEvent>;
+/** `helix-toggle` event type */
+export type HelixBaseSwitchHelixToggleElementEvent =
+  HelixBaseSwitchElementEvent<HelixToggleEvent>;
 
 export type HelixBaseSwitchProps = {
   /** Value submitted when the switch is on. */
@@ -7205,7 +7258,7 @@ reflected none of them. */
   name?: HelixBaseSwitch["name"];
 
   /** Fired before the state changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseSwitchHelixChangeElementEvent) => void;
+  "onhelix-toggle"?: (e: HelixBaseSwitchHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   onchange?: (e: HelixBaseSwitchElementEvent) => void;
 };
@@ -7266,7 +7319,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseSwitch["name"];
   /** Fired before the state changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseSwitchHelixChangeElementEvent) => void;
+  "on:helix-toggle"?: (e: HelixBaseSwitchHelixToggleElementEvent) => void;
   /** Relayed from the input once the state has changed. */
   "on:change"?: (e: HelixBaseSwitchElementEvent) => void;
 
@@ -10377,7 +10430,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `helix-toggle`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -10925,6 +10978,18 @@ export type CustomElements = {
    * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `max-tags`/`maxTags`: How many tags to draw before the rest become a count. `multiple` only.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * choices would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
+   * on, where a row that silently stops is a field that appears to have lost
+   * what was put in it. Date Input and Time Input carry the same property and
+   * the same reasoning.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `loading`: Whether the options are still on their way.
    *
@@ -11067,6 +11132,7 @@ export type CustomElements = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `rest`: The count of choices held beyond `max-tags`.
    * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
@@ -15314,7 +15380,7 @@ export type CustomElements = {
    * It is `helix-button`, not a `<button>` this element resets and dresses. The
    * hover wash, the focus ring, the disabled treatment and the way the label sits
    * against an icon are all decisions the button already carries, and a second
-   * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+   * copy of them here is a second copy to keep in step. `ghost` is the quiet
    * shape: transparent until it is pointed at.
    *
    * It says nothing about where a reader may go. Every step is pressable and
@@ -15480,7 +15546,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `helix-toggle`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -18313,7 +18379,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `helix-toggle`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -18876,6 +18942,18 @@ export type CustomElementsSolidJs = {
    * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `max-tags`/`maxTags`: How many tags to draw before the rest become a count. `multiple` only.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * choices would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
+   * on, where a row that silently stops is a field that appears to have lost
+   * what was put in it. Date Input and Time Input carry the same property and
+   * the same reasoning.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
    * - `loading`: Whether the options are still on their way.
    *
@@ -19018,6 +19096,7 @@ export type CustomElementsSolidJs = {
    * - `control`: The text field itself.
    * - `tags`: The row of chosen options, when `multiple` is set.
    * - `tag`: One chosen option.
+   * - `rest`: The count of choices held beyond `max-tags`.
    * - `create`: The row offering to add what was typed.
    * - `indicator`: The caret.
    * - `surface`: The floating panel.
@@ -23396,7 +23475,7 @@ export type CustomElementsSolidJs = {
    * It is `helix-button`, not a `<button>` this element resets and dresses. The
    * hover wash, the focus ring, the disabled treatment and the way the label sits
    * against an icon are all decisions the button already carries, and a second
-   * copy of them here is a second copy to keep in step. `tertiary` is the quiet
+   * copy of them here is a second copy to keep in step. `ghost` is the quiet
    * shape: transparent until it is pointed at.
    *
    * It says nothing about where a reader may go. Every step is pressable and
@@ -23565,7 +23644,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the state changes, and cancelable.
+   * - `helix-toggle`: Fired before the state changes, and cancelable.
    * - `change`: Relayed from the input once the state has changed.
    *
    * ## Slots
@@ -25567,9 +25646,9 @@ type HelixBaseCarouselControlled =
 type HelixBaseCheckboxControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-toggle`. */
         checked: HelixBaseCheckbox["checked"];
-        "onhelix-change": (event: HelixBaseCheckboxHelixChangeElementEvent) => void;
+        "onhelix-toggle": (event: HelixBaseCheckboxHelixToggleElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
@@ -26027,9 +26106,9 @@ type HelixBaseSplitterControlled =
 type HelixBaseSwitchControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-toggle`. */
         checked: HelixBaseSwitch["checked"];
-        "onhelix-change": (event: HelixBaseSwitchHelixChangeElementEvent) => void;
+        "onhelix-toggle": (event: HelixBaseSwitchHelixToggleElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */

@@ -79,6 +79,29 @@ const registered = new Set(
     .map((entry) => entry.trim())
     .filter(Boolean),
 )
+/**
+ * And every registered class is exported, which is a third hand-kept list.
+ *
+ * `helix/core/src/index.ts` re-exports the event classes by name. Adding
+ * `HelixToggleEvent` to the registry, the map and the dispatch site left it out
+ * of the barrel, and the failure was one tier away: `helix/core` compiled, and
+ * `helix/headless` could not import the class it was told to dispatch. The
+ * registry ended the drift between the classes and the map; this ends it
+ * between the classes and what a consumer can import.
+ */
+const barrel = readFileSync('helix/core/src/index.ts', 'utf8')
+const unexported = [...names.keys()].filter((cls) => !new RegExp(`\\b${cls}\\b`).test(barrel))
+if (unexported.length > 0) {
+  console.error(`Event classes missing from the core barrel (${unexported.length}):\n`)
+  for (const cls of unexported) {
+    console.error(
+      `  ${cls} is registered and is not exported from helix/core/src/index.ts, so no other ` +
+        'package can import it, and the one that dispatches it cannot name its type.\n',
+    )
+  }
+  process.exit(1)
+}
+
 const unregistered = [...names.keys()].filter((cls) => !registered.has(cls))
 if (unregistered.length > 0) {
   console.error(`Event classes missing from the registry in events.ts (${unregistered.length}):\n`)

@@ -34,7 +34,7 @@ describe('checkbox', () => {
 
   test('changing announces before it acts, and a refusal holds the state', async () => {
     const box = await checkbox()
-    box.addEventListener('helix-change', (event) => {
+    box.addEventListener('helix-toggle', (event) => {
       event.preventDefault()
     })
     control(box).click()
@@ -43,6 +43,25 @@ describe('checkbox', () => {
     // The input flipped itself first, so it is put back to what the element
     // holds. Otherwise the box shows a state the element refused.
     expect(control(box).checked).toBe(false)
+  })
+
+  /* The reason `helix-toggle` exists. Reported through `helix-change` it was
+     `String(checked)`, so a consumer received the string "false", which is
+     truthy, and our own checkbox group decoded it with `detail.value === 'true'`.
+     A test asserting the value would have passed on the bug; this asserts the
+     type. */
+  test('announces a boolean, and not a word that reads like one', async () => {
+    const box = await checkbox()
+    let seen: unknown = 'unset'
+    box.addEventListener('helix-toggle', (event) => {
+      seen = event.detail.checked
+    })
+
+    control(box).click()
+    await box.updateComplete
+
+    expect(seen).toBe(true)
+    expect(typeof seen).toBe('boolean')
   })
 
   test('a controlled box does not move itself', async () => {

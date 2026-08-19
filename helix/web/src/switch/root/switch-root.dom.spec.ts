@@ -30,7 +30,7 @@ describe('switch', () => {
 
   test('a refused change leaves the control where it was', async () => {
     const host = (await mount('<helix-switch name="a">A</helix-switch>')) as Updatable
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-toggle', (event) => event.preventDefault())
     const field = control(host)
     field.checked = true
     field.dispatchEvent(new Event('change', { bubbles: true }))

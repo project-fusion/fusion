@@ -3836,7 +3836,7 @@
             },
             {
               "kind": "field",
-              "name": "handleChange",
+              "name": "handleToggle",
               "privacy": "private",
               "readonly": true,
               "description": "Reads a box's requested change into `value`, and says so once.\n\nThe box is found from the event's target, which does two things. It tells\nthe group which box asked, where the detail carries only the shared name.\nAnd it ignores the group's own dispatch, which lands on this same listener\nbecause the group is what it is dispatched from: without the guard the\ngroup answers itself until the stack gives out.\n\nThe requested state comes from the event rather than from the box. Driving\nthe boxes from `value` makes them controlled, so a controlled box applies\nnothing on its own and reports what it was asked for. Reading `checked`\nhere would read the state it still holds and nothing would ever change."
@@ -4454,7 +4454,7 @@
               "attribute": "checked",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               },
               "inheritedFrom": {
@@ -5047,11 +5047,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-toggle",
+              "reactProp": "onhelix-toggle"
             },
             {
               "type": {
@@ -7909,6 +7909,10 @@
               "name": "tag"
             },
             {
+              "description": "The count of choices held beyond `max-tags`.",
+              "name": "rest"
+            },
+            {
               "description": "The row offering to add what was typed.",
               "name": "create"
             },
@@ -8011,6 +8015,16 @@
               "default": "'Remove'",
               "description": "What a tag's remove control is called, since the mark has no name.",
               "attribute": "remove-label"
+            },
+            {
+              "kind": "field",
+              "name": "maxTags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many tags to draw before the rest become a count. `multiple` only.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\nchoices would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. `+3` is a fact a reader can act\non, where a row that silently stops is a field that appears to have lost\nwhat was put in it. Date Input and Time Input carry the same property and\nthe same reasoning.",
+              "attribute": "max-tags"
             },
             {
               "kind": "field",
@@ -8139,6 +8153,26 @@
                 }
               },
               "description": "Takes what the reader typed as an answer, once anyone listening allows it.\n\nAdded to the set with `multiple` and replacing it without, which is the\nsame rule choosing an option follows: what differs about a created answer\nis where it came from, not how many the field holds."
+            },
+            {
+              "kind": "field",
+              "name": "shown",
+              "type": {
+                "text": "{ text: string; value: string }[]"
+              },
+              "privacy": "private",
+              "description": "The choices that get a tag, which is all of them until `maxTags` says not.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "restCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many are held beyond the ones shown.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -9030,6 +9064,15 @@
               "default": "'Remove'",
               "description": "What a tag's remove control is called, since the mark has no name.",
               "fieldName": "removeLabel"
+            },
+            {
+              "name": "max-tags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many tags to draw before the rest become a count. `multiple` only.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\nchoices would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. `+3` is a fact a reader can act\non, where a row that silently stops is a field that appears to have lost\nwhat was put in it. Date Input and Time Input carry the same property and\nthe same reasoning.",
+              "fieldName": "maxTags"
             },
             {
               "name": "list-label",
@@ -32601,7 +32644,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**The name is a button, and only the name.** A stepper is something a reader\ngoes back through, and the thing they reach for is the name of the stage. The\nmarker is `aria-hidden` decoration, so wrapping it in the button would add\nhit area and no meaning: the accessible name would be the text either way,\nand what is pressable would stop being the same shape as what is readable.\n\nIt is `helix-button`, not a `<button>` this element resets and dresses. The\nhover wash, the focus ring, the disabled treatment and the way the label sits\nagainst an icon are all decisions the button already carries, and a second\ncopy of them here is a second copy to keep in step. `tertiary` is the quiet\nshape: transparent until it is pointed at.\n\nIt says nothing about where a reader may go. Every step is pressable and\nannounces itself with `helix-select`; refusing the ones ahead is `disabled`,\nwhich the consumer sets because only the consumer knows whether a form can be\nskipped. A component that guessed would be wrong on the first wizard that\nlets you jump to the end.\n\n**The marker is a slot whose fallback is the state.** A finished stage shows\na check, the current one a target, and one not yet reached an empty ring:\nthree marks that say what a reader wants to know without a legend. A consumer\nwho wants their own fills the slot instead.\n\nThe step renders exactly one of the three, chosen from its own two booleans.\nRendering all three and hiding two in CSS would work and is worse: the\naccessibility tree would carry marks that are not there, and the markup would\nsay three things about a stage that is one.\n\nNumbering is a separate question and belongs to the tier above. `numeric`\nhides the mark and shows a CSS counter, which the browser resolves at layout,\nso the digit costs no script and is right in the server's markup however the\nsteps are ordered. Nothing here knows which appearance is in use, and does\nnot need to.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n**The `content` slot opens on the current step, and only down a column.** A\nrow has no room under a step to put a form in, and stretching one to fit\nwould set every step's height by the tallest. `current` is what opens it, so\nthe state that says where the reader is is also the state that shows them the\nstage: one attribute, no second flag to keep in step with it, and it renders\nopen on the server rather than after hydration.",
+          "description": "**The name is a button, and only the name.** A stepper is something a reader\ngoes back through, and the thing they reach for is the name of the stage. The\nmarker is `aria-hidden` decoration, so wrapping it in the button would add\nhit area and no meaning: the accessible name would be the text either way,\nand what is pressable would stop being the same shape as what is readable.\n\nIt is `helix-button`, not a `<button>` this element resets and dresses. The\nhover wash, the focus ring, the disabled treatment and the way the label sits\nagainst an icon are all decisions the button already carries, and a second\ncopy of them here is a second copy to keep in step. `ghost` is the quiet\nshape: transparent until it is pointed at.\n\nIt says nothing about where a reader may go. Every step is pressable and\nannounces itself with `helix-select`; refusing the ones ahead is `disabled`,\nwhich the consumer sets because only the consumer knows whether a form can be\nskipped. A component that guessed would be wrong on the first wizard that\nlets you jump to the end.\n\n**The marker is a slot whose fallback is the state.** A finished stage shows\na check, the current one a target, and one not yet reached an empty ring:\nthree marks that say what a reader wants to know without a legend. A consumer\nwho wants their own fills the slot instead.\n\nThe step renders exactly one of the three, chosen from its own two booleans.\nRendering all three and hiding two in CSS would work and is worse: the\naccessibility tree would carry marks that are not there, and the markup would\nsay three things about a stage that is one.\n\nNumbering is a separate question and belongs to the tier above. `numeric`\nhides the mark and shows a CSS counter, which the browser resolves at layout,\nso the digit costs no script and is right in the server's markup however the\nsteps are ordered. Nothing here knows which appearance is in use, and does\nnot need to.\n\n**`complete` and `current` are separate, and both can be false.** A stage\nthat is neither is one the reader has not reached, which is the majority of\nany sequence and therefore the state that needs no attribute. They can also\nboth be true: a reader who steps back into a finished stage is in it and has\nfinished it, and a stepper that forgets the second is one that loses its\nchecks the moment somebody reviews their answers.\n\n**The `content` slot opens on the current step, and only down a column.** A\nrow has no room under a step to put a form in, and stretching one to fit\nwould set every step's height by the tallest. `current` is what opens it, so\nthe state that says where the reader is is also the state that shows them the\nstage: one attribute, no second flag to keep in step with it, and it renders\nopen on the server rather than after hydration.",
           "name": "HelixBaseStep",
           "cssParts": [
             {
@@ -32990,7 +33033,7 @@
               "attribute": "checked",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-toggle"
                 ]
               },
               "inheritedFrom": {
@@ -33583,11 +33626,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixToggleEvent"
               },
               "description": "Fired before the state changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
+              "name": "helix-toggle",
+              "reactProp": "onhelix-toggle"
             },
             {
               "type": {
