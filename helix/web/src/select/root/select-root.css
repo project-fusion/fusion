@@ -223,21 +223,31 @@
  * own axis, reads as the same mark turning over, and is what the shape is
  * already symmetric about.
  *
- * `::slotted` because the mark is the consumer's own element, and `scale`
- * rather than `transform: scaleY`, so a consumer who wants to translate or
- * rotate it can do that without the two fighting over one property.
+ * Both selectors, and that is the point. The default caret is the indicator
+ * slot's *fallback* content, and `::slotted()` matches assigned nodes only:
+ * fallback content is never assigned to the slot it sits in, so a rule written
+ * for `::slotted` alone reached the one mark a consumer supplied and missed the
+ * one almost every consumer gets. Measured after the fact: the default caret's
+ * computed `scale` read `none` open and shut. `[part="indicator"]` is the
+ * fallback, the `::slotted` half is the replacement.
+ *
+ * `scale` rather than `transform: scaleY`, so a consumer who wants to translate
+ * or rotate the mark can do that without the two fighting over one property.
  *
  * `data-open` and not `[open]`: the resolved state, so a controlled select
  * whose consumer has not applied the change yet does not turn early. */
+[part="indicator"],
 ::slotted([slot="indicator"]) {
   transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+:host([data-open]) [part="indicator"],
 :host([data-open]) ::slotted([slot="indicator"]) {
   scale: 1 -1;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [part="indicator"],
   ::slotted([slot="indicator"]) {
     transition: none;
   }
