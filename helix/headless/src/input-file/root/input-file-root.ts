@@ -7,6 +7,54 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import '../../icon/index.js'
+
+/**
+ * A file's size, at the largest unit that leaves a number worth reading.
+ *
+ * Binary steps, because that is what a file system reports and what the number
+ * beside it in a finder will say. One decimal place from kilobytes up and none
+ * for bytes: `1.2 MB` is the reading, `1.23 MB` is noise, and `1.5 bytes` is not
+ * a thing.
+ *
+ * `Intl.NumberFormat` for the number rather than `toFixed`, so a decimal comma
+ * lands where a decimal comma belongs. The unit is not localised with it: `MB`
+ * is written the same way in the places this ships, and `Intl`'s own byte units
+ * carry no scale to pick from.
+ */
+const size = (bytes: number, locale?: string): string => {
+  const units = ['bytes', 'KB', 'MB', 'GB', 'TB']
+  let value = bytes
+  let step = 0
+  while (value >= 1024 && step < units.length - 1) {
+    value /= 1024
+    step += 1
+  }
+  const written = new Intl.NumberFormat(locale || undefined, {
+    maximumFractionDigits: step === 0 ? 0 : 1,
+  }).format(value)
+  // One byte is a byte. The plural is only wrong at exactly one and it is the
+  // size an empty-ish file has, so it is the one a reader sees while testing.
+  const unit = step === 0 && value === 1 ? 'byte' : units[step]
+  return `${written} ${unit}`
+}
+
+/**
+ * What kind of file it is, in the shortest honest form.
+ *
+ * The subtype of the MIME type, so `image/png` reads `PNG`, which is the word a
+ * reader already has for it. A browser leaves `type` empty for anything it does
+ * not recognise, so the extension is the fallback: it is what the name already
+ * shows, which makes it a poor label and a better one than nothing.
+ */
+const kind = (file: File): string => {
+  const subtype = file.type.split('/')[1]
+  if (subtype) {
+    return subtype.replace(/^x-/, '').split('+')[0]?.toUpperCase() ?? 'File'
+  }
+  const extension = file.name.includes('.') ? file.name.split('.').pop() : ''
+  return extension ? extension.toUpperCase() : 'File'
+}
 
 /**
  * @summary A control for choosing files, by pointer or by dropping them on it.
@@ -57,7 +105,9 @@ import { property, state } from 'lit/decorators.js'
  * @csspart trigger - The label that opens the picker.
  * @csspart list - The chosen files.
  * @csspart file - One chosen file.
+ * @csspart detail - Its name and its reading, stacked.
  * @csspart name - Its name.
+ * @csspart meta - Its size and kind.
  * @csspart remove - The control that takes it back out.
  */
 @customElement('helix-base-input-file')
@@ -77,6 +127,10 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
   /** What the trigger reads, where nothing is slotted into it. */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose files'
+
+  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  @property()
+  locale = ''
 
   /** What the control removing one file is called, per file. */
   @property({ attribute: 'remove-label' })
@@ -308,7 +362,10 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
           : html`<ul part="list">
               ${files.map(
                 (file, at) => html`<li part="file">
-                  <span part="name">${file.name}</span>
+                  <span part="detail">
+                    <span part="name">${file.name}</span>
+                    <span part="meta">${`${size(file.size, this.locale)} · ${kind(file)}`}</span>
+                  </span>
                   <button
                     part="remove"
                     type="button"
@@ -316,7 +373,9 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
                     data-at=${at}
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}
-                  ></button>
+                  >
+                    <helix-icon name="trash"></helix-icon>
+                  </button>
                 </li>`,
               )}
             </ul>`

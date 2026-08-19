@@ -1859,6 +1859,7 @@ invisible.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseInputFile` | Language tag the sizes are written in. Absent uses the runtime's own. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseInputFile` | Whether more than one file can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseInputFile` | What the control removing one file is called, per file. |
@@ -1899,7 +1900,9 @@ invisible.
 | `trigger` | The label that opens the picker. |
 | `list` | The chosen files. |
 | `file` | One chosen file. |
+| `detail` | Its name and its reading, stacked. |
 | `name` | Its name. |
+| `meta` | Its size and kind. |
 | `remove` | The control that takes it back out. |
 
 #### Custom properties

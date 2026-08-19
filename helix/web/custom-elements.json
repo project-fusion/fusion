@@ -17078,6 +17078,20 @@
             },
             {
               "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Language tag the sizes are written in. Absent uses the runtime's own.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "removeLabel",
               "type": {
                 "text": "string"
@@ -17615,6 +17629,19 @@
               }
             },
             {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Language tag the sizes are written in. Absent uses the runtime's own.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
               "name": "remove-label",
               "type": {
                 "text": "string"
@@ -17722,8 +17749,24 @@
               }
             },
             {
+              "description": "Its name and its reading, stacked.",
+              "name": "detail",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
               "description": "Its name.",
               "name": "name",
+              "inheritedFrom": {
+                "name": "HelixBaseInputFile",
+                "module": "src/input-file/root/input-file-root.ts"
+              }
+            },
+            {
+              "description": "Its size and kind.",
+              "name": "meta",
               "inheritedFrom": {
                 "name": "HelixBaseInputFile",
                 "module": "src/input-file/root/input-file-root.ts"

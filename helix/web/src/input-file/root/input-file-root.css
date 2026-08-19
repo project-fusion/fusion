@@ -97,14 +97,44 @@
   padding: var(--helix-space-none);
 }
 
+/* Each file is a card rather than a row.
+ *
+ * A name on a tinted bar is a list item, and what these are is a set of things
+ * that were added and can be taken back out: they carry two readings and a
+ * control, and a bar holding three things reads as a row of a table with no
+ * header. A bordered card on the page's own ground separates them from each
+ * other and from the drop field above, which is the one thing a tinted bar
+ * could not do, being the same tint as the field. */
 [part="file"] {
   align-items: center;
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;
-  gap: var(--helix-space-xs);
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  gap: var(--helix-space-sm);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+/* The name over its reading. `min-inline-size: 0` because a flex item's floor is
+   its content, so a long file name pushes the remove control off the end of the
+   card rather than wrapping: this is the declaration that lets it wrap. */
+[part="detail"] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+}
+
+/* The size and the kind, in one line under the name. A middle dot rather than a
+   comma or a slash: it separates two readings that are not a list and not a
+   ratio, which is the whole job. */
+[part="meta"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 [part="name"] {
@@ -118,27 +148,35 @@
   overflow-wrap: anywhere;
 }
 
-/* The mark is drawn rather than slotted, the same stencil-over-a-coloured-box
-   the checkbox uses, so removing a file costs the component no icon dependency
-   and no second element for a consumer to fill. */
+/* A trash can rather than a cross, and from the icon set rather than drawn.
+ *
+ * It was a stencil in a mask here, on the argument that a file field should cost
+ * no icon dependency. The argument held until the mark was wrong: a cross says
+ * "dismiss this", which is what a tag's control does, and taking a file out of a
+ * set that is about to be uploaded is a delete. The set has a trash can and the
+ * component now uses it, the same way the colour picker uses its eyedropper.
+ *
+ * `danger` on hover only. A row of red bins is a list that looks like a warning,
+ * where the same mark in the muted foreground is a control that is available. */
 [part="remove"] {
   all: unset;
-  background-color: var(--helix-color-foreground-muted);
-  block-size: var(--helix-size-icon-sm);
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
   cursor: pointer;
+  display: flex;
   flex: none;
-  inline-size: var(--helix-size-icon-sm);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: 100%;
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-lg);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="remove"]:hover {
-  background-color: var(--helix-color-danger);
+  color: var(--helix-color-danger);
 }
 
 [part="remove"]:focus-visible {

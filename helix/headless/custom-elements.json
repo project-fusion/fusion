@@ -13040,8 +13040,16 @@
               "name": "file"
             },
             {
+              "description": "Its name and its reading, stacked.",
+              "name": "detail"
+            },
+            {
               "description": "Its name.",
               "name": "name"
+            },
+            {
+              "description": "Its size and kind.",
+              "name": "meta"
             },
             {
               "description": "The control that takes it back out.",
@@ -13102,6 +13110,16 @@
               "default": "'Choose files'",
               "description": "What the trigger reads, where nothing is slotted into it.",
               "attribute": "trigger-label"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Language tag the sizes are written in. Absent uses the runtime's own.",
+              "attribute": "locale"
             },
             {
               "kind": "field",
@@ -13752,6 +13770,15 @@
               "default": "'Choose files'",
               "description": "What the trigger reads, where nothing is slotted into it.",
               "fieldName": "triggerLabel"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Language tag the sizes are written in. Absent uses the runtime's own.",
+              "fieldName": "locale"
             },
             {
               "name": "remove-label",

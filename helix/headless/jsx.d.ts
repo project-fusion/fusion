@@ -3101,6 +3101,8 @@ export type HelixBaseInputFileProps = {
   "trigger-label"?: HelixBaseInputFile["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
   triggerLabel?: HelixBaseInputFile["triggerLabel"];
+  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  locale?: HelixBaseInputFile["locale"];
   /** What the control removing one file is called, per file. */
   "remove-label"?: HelixBaseInputFile["removeLabel"];
   /** What the control removing one file is called, per file. */
@@ -3158,6 +3160,8 @@ export type HelixBaseInputFileSolidJsProps = {
   "attr:trigger-label"?: HelixBaseInputFile["triggerLabel"];
   /** What the trigger reads, where nothing is slotted into it. */
   "prop:triggerLabel"?: HelixBaseInputFile["triggerLabel"];
+  /** Language tag the sizes are written in. Absent uses the runtime's own. */
+  "prop:locale"?: HelixBaseInputFile["locale"];
   /** What the control removing one file is called, per file. */
   "attr:remove-label"?: HelixBaseInputFile["removeLabel"];
   /** What the control removing one file is called, per file. */
@@ -10145,6 +10149,7 @@ export type CustomElements = {
    * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
    * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
+   * - `locale`: Language tag the sizes are written in. Absent uses the runtime's own.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -10240,7 +10245,9 @@ export type CustomElements = {
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
+   * - `detail`: Its name and its reading, stacked.
    * - `name`: Its name.
+   * - `meta`: Its size and kind.
    * - `remove`: The control that takes it back out.
    */
   "helix-base-input-file": Partial<
@@ -16795,6 +16802,7 @@ export type CustomElementsSolidJs = {
    * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
    * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
+   * - `locale`: Language tag the sizes are written in. Absent uses the runtime's own.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
    * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
@@ -16890,7 +16898,9 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
+   * - `detail`: Its name and its reading, stacked.
    * - `name`: Its name.
+   * - `meta`: Its size and kind.
    * - `remove`: The control that takes it back out.
    */
   "helix-base-input-file": Partial<

@@ -83,6 +83,57 @@ describe('input file', () => {
     expect(said).toEqual([{ name: 'files', value: 'one.txt, two.txt' }])
   })
 
+  test('each file carries its size and its kind', async () => {
+    const host = await field('multiple')
+    control(host).files = (() => {
+      const carrier = new DataTransfer()
+      carrier.items.add(new File(['x'.repeat(2048)], 'shot.png', { type: 'image/png' }))
+      carrier.items.add(new File(['x'], 'notes.txt', { type: 'text/plain' }))
+      return carrier.files
+    })()
+    control(host).dispatchEvent(new Event('change', { bubbles: true }))
+    await host.updateComplete
+    const meta = [...(host.shadowRoot?.querySelectorAll('[part="meta"]') ?? [])].map((one) =>
+      one.textContent?.trim(),
+    )
+    // Binary steps, because that is what a file system reports.
+    expect(meta[0]).toBe('2 KB · PNG')
+    expect(meta[1]).toBe('1 byte · PLAIN')
+  })
+
+  test('one byte is a byte', async () => {
+    const host = await field()
+    control(host).files = (() => {
+      const carrier = new DataTransfer()
+      carrier.items.add(new File(['x'], 'tiny.txt', { type: 'text/plain' }))
+      return carrier.files
+    })()
+    control(host).dispatchEvent(new Event('change', { bubbles: true }))
+    await host.updateComplete
+    expect(part(host, 'meta')?.textContent?.trim()).toBe('1 byte · PLAIN')
+  })
+
+  test('and a file the browser cannot name falls back to its extension', async () => {
+    // `type` is empty for anything unrecognised, and the extension is what the
+    // name already shows: a poor label and a better one than nothing.
+    const host = await field()
+    control(host).files = (() => {
+      const carrier = new DataTransfer()
+      carrier.items.add(new File(['x'], 'archive.weird', { type: '' }))
+      return carrier.files
+    })()
+    control(host).dispatchEvent(new Event('change', { bubbles: true }))
+    await host.updateComplete
+    expect(part(host, 'meta')?.textContent?.trim()).toBe('1 byte · WEIRD')
+  })
+
+  test('the remove control is a trash can, because taking a file out is a delete', async () => {
+    // A cross says "dismiss this", which is what a tag does. This is not that.
+    const host = await field()
+    await choose(host, 'one.txt')
+    expect(part(host, 'remove')?.querySelector('helix-icon')?.getAttribute('name')).toBe('trash')
+  })
+
   test('one file can be taken back out, and the rest stay', async () => {
     const host = await field('multiple')
     await choose(host, 'one.txt', 'two.txt', 'three.txt')
