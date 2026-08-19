@@ -138,10 +138,6 @@
   min-inline-size: max-content;
 }
 
-[part="column"] + [part="column"] {
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-}
-
 /* The frame off, for the reason the single list gives, and then the dial.
  *
  * `scroll-snap-type` is what makes a row come to rest in the middle rather than
@@ -194,8 +190,15 @@
 /* Square, and roomy. A wheel's rows are read as positions rather than as lines
    of text, so they want the height of a control rather than the height of a
    sentence, and the same again across: a column sized to `max-content` is
-   otherwise exactly as wide as its widest row, and the digits touch the rule
-   between two wheels. */
+   otherwise exactly as wide as its widest row, and three columns of bare digits
+   sit against each other with nothing between them.
+
+   Which is what the padding is now entirely for. There were rules between the
+   columns as well, and between them and this inset it was two separations doing
+   one job: three numbers side by side are already three numbers, and ruling them
+   apart makes a table out of what is meant to read as one control. Gone, and the
+   inset comes down a step with them, since it was sized to hold digits off a
+   line that is no longer there. */
 [part="column"] [part="option"]::part(item) {
   min-block-size: var(--_time-row);
   min-inline-size: var(--_time-row);
@@ -208,7 +211,7 @@
      drift; measured with the padding left in, the row was 48 and a column of
      "five" held 4.17. */
   padding-block: var(--helix-space-none);
-  padding-inline: var(--helix-space-md);
+  padding-inline: var(--helix-space-sm);
 }
 
 /* A wheel row is a calendar day, and for the same reason it is one there.
