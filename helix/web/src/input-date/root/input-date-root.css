@@ -198,15 +198,30 @@
 }
 
 :host([mode="multiple"]) [part="control"] {
+  /* Takes what is left rather than asking for what it would like.
+   *
+   * A text input's intrinsic width is around a hundred and seventy pixels, and
+   * with `flex-basis: auto` that is what it demands: measured, two tags and an
+   * empty field wrapped a 412 pixel row that had room for both. From zero it
+   * absorbs the remainder instead, so the row stays one line until the tags
+   * genuinely fill it. The floor keeps somewhere to type. */
+  flex-basis: 0;
   min-inline-size: var(--helix-size-icon-lg);
 }
 
 /* The count of what is not shown. Reads as a note rather than as another tag,
    which it must: a reader who cannot tell them apart has been told there are
    fourteen dates and shown thirteen. */
+/* At the end of the row, after the field rather than between the tags and it.
+ *
+ * Between them it read as a third tag with the placeholder running on after it:
+ * "August 4, August 11, 2 more YYYY-MM-DD" is four things where a reader sees
+ * one sentence. At the end it is what it is, a note about the row, and the caret
+ * sits directly after the last tag where typing continues the list. */
 [part="rest"] {
   color: var(--helix-color-foreground-subtle);
   flex: none;
+  margin-inline-start: auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

@@ -476,3 +476,45 @@ describe('input date can cap its tags', () => {
     expect(host.value).toBe('2026-08-04,2026-08-11,2026-08-18')
   })
 })
+
+describe('input date keeps the tag row readable', () => {
+  const many = async (
+    attrs: string,
+  ): Promise<HTMLElement & { updateComplete: Promise<unknown> }> => {
+    const host = (await mount(
+      `<helix-input-date label="Dates" mode="multiple" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('the placeholder goes once anything is held', async () => {
+    /* It exists to say what goes in an empty field. Beside two tags and a count
+       it reads as a fourth item: "August 4, August 11, 2 more, YYYY-MM-DD" is
+       four things where a reader sees one sentence. */
+    const empty = await many('')
+    expect(part(empty, 'control')?.getAttribute('placeholder')).toBe('YYYY-MM-DD')
+    const held = await many('default-value="2026-08-04"')
+    expect(part(held, 'control')?.hasAttribute('placeholder')).toBe(false)
+  })
+
+  test('and the count sits after the field, not between the tags and it', async () => {
+    // At the end it is a note about the row, and the caret sits directly after
+    // the last tag where typing continues the list.
+    const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" max-tags="2"')
+    const nodes = [...(part(host, 'field')?.children ?? [])]
+    const at = (name: string) => nodes.findIndex((one) => one.getAttribute('part') === name)
+    expect(at('control')).toBeLessThan(at('rest'))
+    expect(part(host, 'rest')?.textContent?.trim()).toBe('1 more')
+  })
+
+  test('a single-date field keeps its placeholder, since nothing is held as a tag', async () => {
+    const host = (await mount('<helix-input-date label="d"></helix-input-date>')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await host.updateComplete
+    expect(part(host, 'control')?.getAttribute('placeholder')).toBe('YYYY-MM-DD')
+  })
+})

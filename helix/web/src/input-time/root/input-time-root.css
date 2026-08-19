@@ -101,15 +101,17 @@
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: max-content;
-  /* Inset, and the rows with it.
+  /* Block padding only.
    *
-   * They ran to the panel's edge, on the argument that a row is a band across a
-   * list and a band stopping short of the edge is a pill. That is true of a list
-   * filling a surface and this is a panel: an overlay whose content sits against
-   * its own shadow reads as unfinished, and the rows have their own rounded
-   * highlight now, which is a pill on purpose. */
+   * A row is a band across the list, so its fill runs edge to edge and the
+   * highlight lines up with the edge the eye follows down: inline padding turns
+   * every row into a pill floating in a panel, and the eye then has two left
+   * edges to choose between. The block padding stays, holding the first and last
+   * rows clear of the panel's own rounded corners, which is the same job the
+   * listbox's own frame gives it. */
   overflow: hidden;
-  padding: var(--helix-space-2xs);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-none);
   position: absolute;
 }
 
@@ -180,15 +182,30 @@
 }
 
 :host([mode="multiple"]) [part="control"] {
+  /* Takes what is left rather than asking for what it would like.
+   *
+   * A text input's intrinsic width is around a hundred and seventy pixels, and
+   * with `flex-basis: auto` that is what it demands: measured, two tags and an
+   * empty field wrapped a 412 pixel row that had room for both. From zero it
+   * absorbs the remainder instead, so the row stays one line until the tags
+   * genuinely fill it. The floor keeps somewhere to type. */
+  flex-basis: 0;
   min-inline-size: var(--helix-size-icon-lg);
 }
 
 /* The count of what is not shown, reading as a note rather than as another tag:
    a reader who cannot tell them apart has been told there are nine times and
    shown six. */
+/* At the end of the row, after the field rather than between the tags and it.
+ *
+ * Between them it read as a third tag with the placeholder running on after it:
+ * "August 4, August 11, 2 more YYYY-MM-DD" is four things where a reader sees
+ * one sentence. At the end it is what it is, a note about the row, and the caret
+ * sits directly after the last tag where typing continues the list. */
 [part="rest"] {
   color: var(--helix-color-foreground-subtle);
   flex: none;
+  margin-inline-start: auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

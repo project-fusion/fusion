@@ -555,14 +555,17 @@ export class HelixBaseInputDate extends MixinControllerOpen(
               )
             : nothing
         }
-        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <input
           part="control"
           id="control"
           type="text"
           .value=${this.display}
           name=${this.name || nothing}
-          placeholder=${this.placeholder || nothing}
+          placeholder=${
+            this.mode === 'multiple' && dates(this.value).length > 0
+              ? nothing
+              : this.placeholder || nothing
+          }
           autocomplete="off"
           inputmode="numeric"
           aria-describedby=${this.describedBy ?? nothing}
@@ -573,6 +576,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
         />
+        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <button
           part="trigger"
           type="button"

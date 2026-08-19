@@ -432,14 +432,15 @@ export class HelixBaseInputTime extends MixinControllerOpen(
               )
             : nothing
         }
-        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <input
           part="control"
           id="control"
           type="text"
           .value=${this.display}
           name=${this.name || nothing}
-          placeholder=${this.placeholder || nothing}
+          placeholder=${
+            this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
+          }
           autocomplete="off"
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
@@ -449,6 +450,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
         />
+        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <button
           part="trigger"
           type="button"

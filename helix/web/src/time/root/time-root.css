@@ -28,21 +28,10 @@
  * hold the first and last rows clear of rounded corners there are no longer any
  * of. */
 [part="list"]::part(items) {
-  /* The rows round their own highlight, since they no longer reach the edges:
-     the listbox squares them for a list that fills a surface, and inset in a
-     panel a square band reads as a slab rather than as a row being pointed at. */
-  --option-radii: var(--helix-radii-sm);
-
   background-color: transparent;
   border: none;
   border-radius: var(--helix-radii-none);
   padding-block: var(--helix-space-none);
-}
-
-/* A little room in each row, for the same reason the panel has some: a time set
-   against the edge of its own highlight reads as clipped. */
-[part="list"] [part="option"]::part(item) {
-  padding-inline: var(--helix-space-sm);
 }
 
 /* The times inside a range, which are part of the answer without having been
