@@ -323,7 +323,7 @@ export function ComponentBrowser({
             className="designSearch chromeControl"
             default-value={initialQuery}
             label="Search components"
-            onhelix-change={(event) => {
+            onhelix-input={(event) => {
               setQuery(event.detail.value)
               mirror('q', event.detail.value)
             }}

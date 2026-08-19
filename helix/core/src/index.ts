@@ -61,6 +61,7 @@ export {
   HelixCreateEvent,
   HelixDismissEvent,
   HelixFilterEvent,
+  HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,

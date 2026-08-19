@@ -42,7 +42,7 @@ export type PinType = 'numeric' | 'text'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://helix.fusion.dev/components/pin-input
  *
- * @event {HelixChangeEvent} helix-change - Fired as the code changes, and cancelable.
+ * @event {HelixInputEvent} helix-input - Fired as the code changes, and cancelable.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last box is filled.
  *
  * @csspart field - The row of boxes.
@@ -50,6 +50,9 @@ export type PinType = 'numeric' | 'text'
  */
 @customElement('helix-base-pin-input')
 export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /** How many characters the code has. */
   @property({ type: Number })
   length = 6

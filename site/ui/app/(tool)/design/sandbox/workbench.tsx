@@ -10,6 +10,7 @@ import type {
   HelixDialog,
   HelixDrawer,
   HelixInput,
+  HelixInputEvent,
   HelixMenu,
   HelixSandbox,
   HelixSandboxPreview,
@@ -374,7 +375,7 @@ export function SandboxWorkbench({ families }: Props) {
    * back, and the field could not be typed into at all. The sandbox's own
    * examples were unfilterable in the sandbox.
    */
-  const filterChanged = (event: HelixChangeEvent) => {
+  const filterChanged = (event: HelixInputEvent) => {
     setFilter(event.detail.value)
   }
 
@@ -780,7 +781,7 @@ export function SandboxWorkbench({ families }: Props) {
         <helix-input
           aria-label="Filter examples"
           class="examplesFilter"
-          onhelix-change={filterChanged}
+          onhelix-input={filterChanged}
           placeholder="Filter"
           type="search"
           value={filter}

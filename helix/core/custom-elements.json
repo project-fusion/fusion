@@ -1317,6 +1317,28 @@
         },
         {
           "kind": "class",
+          "description": "Fired as a value changes, on a control the reader edits continuously.\n\n**The platform's pair, and we had only half of it.** `<input type=\"text\">`\nfires `input` on every keystroke and `change` once the edit is committed.\nHelix fired `helix-change` on every keystroke and relayed the native `change`\non commit, so an element carried two events whose names said the opposite of\ntheir timings: a consumer reading \"change\" as \"the reader is done\" wired a\nsearch request to `onhelix-change` and sent one per character. Web Awesome and\nSpectrum both use the native pair, and anyone arriving from either, or from\nHTML, reads ours backwards.\n\nSo a control the reader types or drags in announces `helix-input`, and\n`change` stays what it is: the native one, relayed, on commit. Five carry it:\nInput, Textarea, Number Input, Pin Input and Slider. Everything else changes\nin discrete steps, where one announcement per step is a change and is named\none: choosing an option, moving a tab, settling a divider.\n\nSame detail as `helix-change`, because it is the same fact at a different\nmoment, and same shape: cancelable, announced before the value moves, so\n`preventDefault()` refuses the keystroke and the control is put back.\n\nIt shares a name with the `<helix-input>` element, which is a collision only\nto read: an event name and a tag name occupy different namespaces, and the\nalternative was a name that no longer matches the platform's.",
+          "name": "HelixInputEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-input'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "The reader asked for something the list does not hold.\n\nCancelable, and announced before anything is applied, because the options are\nthe consumer's own light DOM and no component here writes into it. What the\ncontrol can do is say what was asked for and take the value; putting an\noption in the list, or a row in a database, is the consumer's, and a consumer\nwho validates first refuses this and adds nothing.\n\nThe detail carries the text as typed, not a slug of it. Trimming or lowering\nit here would be this element deciding what a name means, and a consumer who\nwants an identifier can make one from what they were given.",
           "name": "HelixCreateEvent",
           "members": [
@@ -1555,6 +1577,14 @@
           "name": "HelixToggleEvent",
           "declaration": {
             "name": "HelixToggleEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixInputEvent",
+          "declaration": {
+            "name": "HelixInputEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2275,6 +2305,14 @@
           "name": "HelixFilterEvent",
           "declaration": {
             "name": "HelixFilterEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixInputEvent",
+          "declaration": {
+            "name": "HelixInputEvent",
             "module": "./events/events.js"
           }
         },
@@ -3621,9 +3659,20 @@
               "description": "What the control holds now, and what its form submits.\n\nReading gives the real value, in either mode. Writing hands ownership to\nthe consumer: from then on the control announces changes and applies none\nof them, and waits to be told.",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "Whether every edit is announced, rather than every settled value.\n\nA control the reader types or drags in moves continuously, and the platform\ncalls that `input`: `<input type=\"text\">` fires one per keystroke and fires\n`change` once, on commit. Five controls here are that shape, and the rest\nchange in discrete steps where a step *is* the change.\n\nIt selects the event rather than the timing. `requestValue` is called\nwhenever the value moves either way; this decides whether that arrives as\n`helix-input` or `helix-change`, so a consumer can read the name and know\nhow often to expect it."
             },
             {
               "kind": "method",
@@ -3699,7 +3748,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               }
             },
@@ -3731,6 +3781,17 @@
               },
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise."
             },
             {
               "kind": "method",

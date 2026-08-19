@@ -42,7 +42,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Range, Range input
  * @documentation https://helix.fusion.dev/components/slider
  *
- * @event {HelixChangeEvent} helix-change - Fired as the value changes, and cancelable.
+ * @event {HelixInputEvent} helix-input - Fired as the value changes, and cancelable.
  * @event {Event} change - Relayed once the reader has let go.
  *
  * @csspart field - The row: the control and its readout.
@@ -54,6 +54,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-slider')
 export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /** The largest value the reader can choose. */
   @property({ type: Number })
   max = 100

@@ -40,7 +40,7 @@ describe('textarea', () => {
     // The control has already taken the character by the time this runs, so
     // refusing has to restore it or the screen and the form disagree.
     const host = (await mount('<helix-textarea label="A" name="q"></helix-textarea>')) as Updatable
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-input', (event) => event.preventDefault())
     const field = control(host)
     field.value = 'nope'
     field.dispatchEvent(new Event('input', { bubbles: true }))

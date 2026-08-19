@@ -7807,7 +7807,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -7851,6 +7852,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -9145,7 +9161,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -9189,6 +9206,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -10351,7 +10383,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -10395,6 +10428,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -13381,7 +13429,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -13425,6 +13474,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -14969,7 +15033,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -15013,6 +15078,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -22147,7 +22227,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -22191,6 +22272,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -23338,11 +23434,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixInputEvent"
               },
               "description": "Fired as the text changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-input",
+              "reactProp": "onhelix-input",
               "inheritedFrom": {
                 "name": "HelixBaseInput",
                 "module": "src/input/root/input-root.ts"
@@ -24250,7 +24346,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -24294,6 +24391,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -26322,6 +26434,14 @@
               }
             },
             {
+              "description": "Before the label. A mark about the row.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseMenuItem",
+                "module": "src/menu/item/menu-item.ts"
+              }
+            },
+            {
               "description": "Rows this one opens, which makes it a way in.",
               "name": "submenu",
               "inheritedFrom": {
@@ -26334,6 +26454,14 @@
             {
               "description": "The row, which is an `<a>` where `href` is set.",
               "name": "item",
+              "inheritedFrom": {
+                "name": "HelixBaseMenuItem",
+                "module": "src/menu/item/menu-item.ts"
+              }
+            },
+            {
+              "description": "The leading column, which is a slot and is always there.",
+              "name": "start",
               "inheritedFrom": {
                 "name": "HelixBaseMenuItem",
                 "module": "src/menu/item/menu-item.ts"
@@ -28460,7 +28588,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -28504,6 +28633,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -29612,11 +29756,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixInputEvent"
               },
               "description": "Fired as the value changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-input",
+              "reactProp": "onhelix-input",
               "inheritedFrom": {
                 "name": "HelixBaseNumberInput",
                 "module": "src/number-input/root/number-input-root.ts"
@@ -32769,7 +32913,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -32813,6 +32958,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -33836,11 +33996,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixInputEvent"
               },
               "description": "Fired as the code changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-input",
+              "reactProp": "onhelix-input",
               "inheritedFrom": {
                 "name": "HelixBasePinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
@@ -35570,7 +35730,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -35614,6 +35775,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -38984,7 +39160,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -39028,6 +39205,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -40448,7 +40640,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -40492,6 +40685,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -41471,11 +41679,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixInputEvent"
               },
               "description": "Fired as the value changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-input",
+              "reactProp": "onhelix-input",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"
@@ -47860,7 +48068,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -47904,6 +48113,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -48864,11 +49088,11 @@
           "events": [
             {
               "type": {
-                "text": "HelixChangeEvent"
+                "text": "HelixInputEvent"
               },
               "description": "Fired as the text changes, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
+              "name": "helix-input",
+              "reactProp": "onhelix-input",
               "inheritedFrom": {
                 "name": "HelixBaseTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
@@ -49100,7 +49324,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -49144,6 +49369,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -50645,7 +50885,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -50689,6 +50930,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -52629,7 +52885,8 @@
               "attribute": "value",
               "helix": {
                 "controlled": [
-                  "helix-change"
+                  "helix-change",
+                  "helix-input"
                 ]
               },
               "inheritedFrom": {
@@ -52673,6 +52930,21 @@
               },
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "announcesInput",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -56760,13 +57032,13 @@
             },
             {
               "kind": "field",
-              "name": "started",
+              "name": "localFile",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
-              "default": "false",
-              "description": "Whether this has ever played, which is not the same as being paused now.\n\nSet on the first `play` and never cleared, since what it answers is whether\nthe reader has begun rather than where they are.",
+              "description": "Whether the file this points at is ours to hand over.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"

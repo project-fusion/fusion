@@ -96,6 +96,7 @@ import type {
   HelixDismissEvent,
   HelixFilterEvent,
   HelixFormElement,
+  HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,
@@ -3872,9 +3873,9 @@ export type HelixBaseInputElementEvent<E = Event> = TypedEvent<
   HelixBaseInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseInputHelixChangeElementEvent =
-  HelixBaseInputElementEvent<HelixChangeEvent>;
+/** `helix-input` event type */
+export type HelixBaseInputHelixInputElementEvent =
+  HelixBaseInputElementEvent<HelixInputEvent>;
 
 export type HelixBaseInputProps = {
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
@@ -3994,7 +3995,7 @@ reflected none of them. */
   name?: HelixBaseInput["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
+  "onhelix-input"?: (e: HelixBaseInputHelixInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
   onchange?: (e: HelixBaseInputElementEvent) => void;
 };
@@ -4116,7 +4117,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseInput["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
+  "on:helix-input"?: (e: HelixBaseInputHelixInputElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
   "on:change"?: (e: HelixBaseInputElementEvent) => void;
 
@@ -4932,9 +4933,9 @@ export type HelixBaseNumberInputElementEvent<E = Event> = TypedEvent<
   HelixBaseNumberInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseNumberInputHelixChangeElementEvent =
-  HelixBaseNumberInputElementEvent<HelixChangeEvent>;
+/** `helix-input` event type */
+export type HelixBaseNumberInputHelixInputElementEvent =
+  HelixBaseNumberInputElementEvent<HelixInputEvent>;
 
 export type HelixBaseNumberInputProps = {
   /** Smallest value the reader may reach. Absent has no floor. */
@@ -5024,7 +5025,7 @@ reflected none of them. */
   name?: HelixBaseNumberInput["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseNumberInputHelixChangeElementEvent) => void;
+  "onhelix-input"?: (e: HelixBaseNumberInputHelixInputElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
   onchange?: (e: HelixBaseNumberInputElementEvent) => void;
 };
@@ -5116,7 +5117,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseNumberInput["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseNumberInputHelixChangeElementEvent) => void;
+  "on:helix-input"?: (e: HelixBaseNumberInputHelixInputElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
   "on:change"?: (e: HelixBaseNumberInputElementEvent) => void;
 
@@ -5683,9 +5684,9 @@ export type HelixBasePinInputElementEvent<E = Event> = TypedEvent<
   HelixBasePinInput,
   E
 >;
-/** `helix-change` event type */
-export type HelixBasePinInputHelixChangeElementEvent =
-  HelixBasePinInputElementEvent<HelixChangeEvent>;
+/** `helix-input` event type */
+export type HelixBasePinInputHelixInputElementEvent =
+  HelixBasePinInputElementEvent<HelixInputEvent>;
 /** `helix-complete` event type */
 export type HelixBasePinInputHelixCompleteElementEvent =
   HelixBasePinInputElementEvent<HelixCompleteEvent>;
@@ -5771,7 +5772,7 @@ reflected none of them. */
   name?: HelixBasePinInput["name"];
 
   /** Fired as the code changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBasePinInputHelixChangeElementEvent) => void;
+  "onhelix-input"?: (e: HelixBasePinInputHelixInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "onhelix-complete"?: (e: HelixBasePinInputHelixCompleteElementEvent) => void;
 };
@@ -5856,7 +5857,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBasePinInput["name"];
   /** Fired as the code changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBasePinInputHelixChangeElementEvent) => void;
+  "on:helix-input"?: (e: HelixBasePinInputHelixInputElementEvent) => void;
   /** Fired when the last box is filled. */
   "on:helix-complete"?: (e: HelixBasePinInputHelixCompleteElementEvent) => void;
 
@@ -6630,9 +6631,9 @@ export type HelixBaseSliderElementEvent<E = Event> = TypedEvent<
   HelixBaseSlider,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseSliderHelixChangeElementEvent =
-  HelixBaseSliderElementEvent<HelixChangeEvent>;
+/** `helix-input` event type */
+export type HelixBaseSliderHelixInputElementEvent =
+  HelixBaseSliderElementEvent<HelixInputEvent>;
 
 export type HelixBaseSliderProps = {
   /** The largest value the reader can choose. */
@@ -6748,7 +6749,7 @@ reflected none of them. */
   name?: HelixBaseSlider["name"];
 
   /** Fired as the value changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
+  "onhelix-input"?: (e: HelixBaseSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
   onchange?: (e: HelixBaseSliderElementEvent) => void;
 };
@@ -6866,7 +6867,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseSlider["name"];
   /** Fired as the value changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
+  "on:helix-input"?: (e: HelixBaseSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixBaseSliderElementEvent) => void;
 
@@ -7775,9 +7776,9 @@ export type HelixBaseTextareaElementEvent<E = Event> = TypedEvent<
   HelixBaseTextarea,
   E
 >;
-/** `helix-change` event type */
-export type HelixBaseTextareaHelixChangeElementEvent =
-  HelixBaseTextareaElementEvent<HelixChangeEvent>;
+/** `helix-input` event type */
+export type HelixBaseTextareaHelixInputElementEvent =
+  HelixBaseTextareaElementEvent<HelixInputEvent>;
 
 export type HelixBaseTextareaProps = {
   /** Whether the box follows its own content rather than scrolling. */
@@ -7865,7 +7866,7 @@ reflected none of them. */
   name?: HelixBaseTextarea["name"];
 
   /** Fired as the text changes, and cancelable. */
-  "onhelix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
+  "onhelix-input"?: (e: HelixBaseTextareaHelixInputElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   onchange?: (e: HelixBaseTextareaElementEvent) => void;
 };
@@ -7955,7 +7956,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseTextarea["name"];
   /** Fired as the text changes, and cancelable. */
-  "on:helix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
+  "on:helix-input"?: (e: HelixBaseTextareaHelixInputElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
   "on:change"?: (e: HelixBaseTextareaElementEvent) => void;
 
@@ -12879,7 +12880,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `helix-input`: Fired as the text changes, and cancelable.
    * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
@@ -13380,6 +13381,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The label.
+   * - `start`: Before the label. A mark about the row.
    * - `submenu`: Rows this one opens, which makes it a way in.
    *
    * ## Methods
@@ -13396,6 +13398,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row, which is an `<a>` where `href` is set.
+   * - `start`: The leading column, which is a slot and is always there.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-base-menu-item": Partial<
@@ -13763,7 +13766,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `helix-input`: Fired as the value changes, and cancelable.
    * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
@@ -14424,7 +14427,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the code changes, and cancelable.
+   * - `helix-input`: Fired as the code changes, and cancelable.
    * - `helix-complete`: Fired when the last box is filled.
    *
    * ## Methods
@@ -15256,7 +15259,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `helix-input`: Fired as the value changes, and cancelable.
    * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
@@ -16355,7 +16358,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `helix-input`: Fired as the text changes, and cancelable.
    * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
@@ -20962,7 +20965,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `helix-input`: Fired as the text changes, and cancelable.
    * - `change`: Relayed from the input once the reader has finished.
    *
    * ## Slots
@@ -21481,6 +21484,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The label.
+   * - `start`: Before the label. A mark about the row.
    * - `submenu`: Rows this one opens, which makes it a way in.
    *
    * ## Methods
@@ -21497,6 +21501,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `item`: The row, which is an `<a>` where `href` is set.
+   * - `start`: The leading column, which is a slot and is always there.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-base-menu-item": Partial<
@@ -21876,7 +21881,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `helix-input`: Fired as the value changes, and cancelable.
    * - `change`: Relayed from the field once the reader has finished.
    *
    * ## Slots
@@ -22554,7 +22559,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the code changes, and cancelable.
+   * - `helix-input`: Fired as the code changes, and cancelable.
    * - `helix-complete`: Fired when the last box is filled.
    *
    * ## Methods
@@ -23413,7 +23418,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the value changes, and cancelable.
+   * - `helix-input`: Fired as the value changes, and cancelable.
    * - `change`: Relayed once the reader has let go.
    *
    * ## Methods
@@ -24557,7 +24562,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired as the text changes, and cancelable.
+   * - `helix-input`: Fired as the text changes, and cancelable.
    * - `change`: Relayed from the textarea once the reader has finished.
    *
    * ## Methods
@@ -26278,9 +26283,9 @@ type HelixBaseDrawerControlled =
 type HelixBaseInputControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-input`. */
         value: HelixBaseInput["value"];
-        "onhelix-change": (event: HelixBaseInputHelixChangeElementEvent) => void;
+        "onhelix-input": (event: HelixBaseInputHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
@@ -26346,9 +26351,9 @@ type HelixBaseMenuControlled =
 type HelixBaseNumberInputControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-input`. */
         value: HelixBaseNumberInput["value"];
-        "onhelix-change": (event: HelixBaseNumberInputHelixChangeElementEvent) => void;
+        "onhelix-input": (event: HelixBaseNumberInputHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
@@ -26382,9 +26387,9 @@ type HelixBasePaginationControlled =
 type HelixBasePinInputControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-input`. */
         value: HelixBasePinInput["value"];
-        "onhelix-change": (event: HelixBasePinInputHelixChangeElementEvent) => void;
+        "onhelix-input": (event: HelixBasePinInputHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
@@ -26469,9 +26474,9 @@ type HelixBaseSelectControlled =
 type HelixBaseSliderControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-input`. */
         value: HelixBaseSlider["value"];
-        "onhelix-change": (event: HelixBaseSliderHelixChangeElementEvent) => void;
+        "onhelix-input": (event: HelixBaseSliderHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
@@ -26536,9 +26541,9 @@ type HelixBaseSwitchControlled =
 type HelixBaseTextareaControlled =
   (
     | {
-        /** Declared, so the consumer owns it and answers `helix-change`. */
+        /** Declared, so the consumer owns it and answers `helix-input`. */
         value: HelixBaseTextarea["value"];
-        "onhelix-change": (event: HelixBaseTextareaHelixChangeElementEvent) => void;
+        "onhelix-input": (event: HelixBaseTextareaHelixInputElementEvent) => void;
       }
     | {
         /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */

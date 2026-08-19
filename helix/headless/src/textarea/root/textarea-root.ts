@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Multiline, TextArea
  * @documentation https://helix.fusion.dev/components/textarea
  *
- * @event {HelixChangeEvent} helix-change - Fired as the text changes, and cancelable.
+ * @event {HelixInputEvent} helix-input - Fired as the text changes, and cancelable.
  * @event {Event} change - Relayed from the textarea once the reader has finished.
  *
  * @csspart field - The box holding the control.
@@ -41,6 +41,9 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-textarea')
 export class HelixBaseTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /** Whether the box follows its own content rather than scrolling. */
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false

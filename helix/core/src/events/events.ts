@@ -311,6 +311,45 @@ export class HelixToggleEvent extends CustomEvent<ToggleDetail> {
   }
 }
 
+/**
+ * Fired as a value changes, on a control the reader edits continuously.
+ *
+ * **The platform's pair, and we had only half of it.** `<input type="text">`
+ * fires `input` on every keystroke and `change` once the edit is committed.
+ * Helix fired `helix-change` on every keystroke and relayed the native `change`
+ * on commit, so an element carried two events whose names said the opposite of
+ * their timings: a consumer reading "change" as "the reader is done" wired a
+ * search request to `onhelix-change` and sent one per character. Web Awesome and
+ * Spectrum both use the native pair, and anyone arriving from either, or from
+ * HTML, reads ours backwards.
+ *
+ * So a control the reader types or drags in announces `helix-input`, and
+ * `change` stays what it is: the native one, relayed, on commit. Five carry it:
+ * Input, Textarea, Number Input, Pin Input and Slider. Everything else changes
+ * in discrete steps, where one announcement per step is a change and is named
+ * one: choosing an option, moving a tab, settling a divider.
+ *
+ * Same detail as `helix-change`, because it is the same fact at a different
+ * moment, and same shape: cancelable, announced before the value moves, so
+ * `preventDefault()` refuses the keystroke and the control is put back.
+ *
+ * It shares a name with the `<helix-input>` element, which is a collision only
+ * to read: an event name and a tag name occupy different namespaces, and the
+ * alternative was a name that no longer matches the platform's.
+ */
+export class HelixInputEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-input'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixInputEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-create`. */
 export interface CreateDetail {
   /** What the reader typed, which is being offered as a new answer. */
@@ -565,6 +604,7 @@ const registry = {
   HelixCreateEvent,
   HelixDismissEvent,
   HelixFilterEvent,
+  HelixInputEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixOpenEvent,

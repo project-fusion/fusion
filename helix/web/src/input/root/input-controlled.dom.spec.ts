@@ -54,7 +54,7 @@ describe('a control that is controlled and unattended says so', () => {
     // The reading has to be taken before the event, or a handler that assigns
     // straight away looks exactly like one that was never there.
     const host = await input('value="Ada"')
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-input', (event) => {
       host.value = (event as CustomEvent<{ value: string }>).detail.value
     })
     expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
@@ -64,7 +64,7 @@ describe('a control that is controlled and unattended says so', () => {
     // Which is what React does: `setState` in the handler, and the property
     // lands when React commits, after the event has finished.
     const host = await input('value="Ada"')
-    host.addEventListener('helix-change', (event) => {
+    host.addEventListener('helix-input', (event) => {
       const { value } = (event as CustomEvent<{ value: string }>).detail
       queueMicrotask(() => {
         host.value = value
@@ -75,7 +75,7 @@ describe('a control that is controlled and unattended says so', () => {
 
   test('a deliberate refusal is silent, because refusing is listening', async () => {
     const host = await input('value="Ada"')
-    host.addEventListener('helix-change', (event) => event.preventDefault())
+    host.addEventListener('helix-input', (event) => event.preventDefault())
     expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
   })
 
@@ -106,10 +106,10 @@ describe('a control that is controlled and unattended says so', () => {
     const answer = (event: Event): void => {
       host.value = (event as CustomEvent<{ value: string }>).detail.value
     }
-    host.addEventListener('helix-change', answer)
+    host.addEventListener('helix-input', answer)
     expect(await warnings(() => host.requestValue('Grace'))).toEqual([])
 
-    host.removeEventListener('helix-change', answer)
+    host.removeEventListener('helix-input', answer)
     expect(await warnings(() => host.requestValue('Hopper'))).toEqual([])
   })
 })

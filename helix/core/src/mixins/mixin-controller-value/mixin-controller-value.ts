@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixChangeEvent } from '../../events/events.js'
+import { HelixChangeEvent, HelixInputEvent } from '../../events/events.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { requestControlledChange } from '../../utils/request-controlled-change/request-controlled-change.js'
 
@@ -31,7 +31,23 @@ export declare class MixinControllerValueInterface {
    */
   value: string
 
+  /**
+   * Whether every edit is announced, rather than every settled value.
+   *
+   * A control the reader types or drags in moves continuously, and the platform
+   * calls that `input`: `<input type="text">` fires one per keystroke and fires
+   * `change` once, on commit. Five controls here are that shape, and the rest
+   * change in discrete steps where a step *is* the change.
+   *
+   * It selects the event rather than the timing. `requestValue` is called
+   * whenever the value moves either way; this decides whether that arrives as
+   * `helix-input` or `helix-change`, so a consumer can read the name and know
+   * how often to expect it.
+   */
+  protected readonly announcesInput: boolean
+
   /** Requests a new value, and reports whether the request stood. */
+
   requestValue(next: string): boolean
 
   /** Returns the control to the value its markup declared. */
@@ -89,7 +105,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * The same shape as the other three mixins, which is the point of them
      * being four of a kind rather than four of three kinds.
      *
-     * @controlled helix-change
+     * @controlled helix-change helix-input
      */
     @property()
     get value(): string {
@@ -140,6 +156,9 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
       }
     }
 
+    /** Discrete by default: only a control the reader edits continuously says otherwise. */
+    protected readonly announcesInput: boolean = false
+
     /**
      * Requests a new value, and reports whether the request stood.
      *
@@ -148,6 +167,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * updates itself; in controlled mode it applies nothing and waits for the
      * consumer to pass a new `value`, which is what controlled means.
      */
+
     requestValue(next: string): boolean {
       if (this.value === next) {
         return true
@@ -162,7 +182,11 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
           this.requestUpdate('value', previous)
         },
         controlled: this.valueIsControlled,
-        event: (value) => new HelixChangeEvent({ property: 'value', value }),
+        event: (value) =>
+          new (this.announcesInput ? HelixInputEvent : HelixChangeEvent)({
+            property: 'value',
+            value,
+          }),
         host: this,
         label: 'value',
         next,

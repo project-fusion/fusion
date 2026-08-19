@@ -2178,7 +2178,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the text changes, and cancelable. |
+| `helix-input` | `HelixInputEvent` | Fired as the text changes, and cancelable. |
 | `change` | `Event` | Relayed from the input once the reader has finished. |
 
 #### Slots
@@ -2554,6 +2554,7 @@ than as a ragged list.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The label. |
+| `start` | Before the label. A mark about the row. |
 | `submenu` | Rows this one opens, which makes it a way in. |
 
 #### Parts
@@ -2561,6 +2562,7 @@ than as a ragged list.
 | Part | Description |
 | --- | --- |
 | `item` | The row, which is an `<a>` where `href` is set. |
+| `start` | The leading column, which is a slot and is always there. |
 | `mark` | The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both. |
 
 #### Custom properties
@@ -2748,7 +2750,7 @@ three times as long to cross.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
+| `helix-input` | `HelixInputEvent` | Fired as the value changes, and cancelable. |
 | `change` | `Event` | Relayed from the field once the reader has finished. |
 
 #### Slots
@@ -3104,7 +3106,7 @@ breathe as a code is typed into it.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the code changes, and cancelable. |
+| `helix-input` | `HelixInputEvent` | Fired as the code changes, and cancelable. |
 | `helix-complete` | `HelixCompleteEvent` | Fired when the last box is filled. |
 
 #### Parts
@@ -3986,7 +3988,7 @@ the thumb being dragged.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the value changes, and cancelable. |
+| `helix-input` | `HelixInputEvent` | Fired as the value changes, and cancelable. |
 | `change` | `Event` | Relayed once the reader has let go. |
 
 #### Parts
@@ -4764,7 +4766,7 @@ dragged wider than the form holding it is a field that breaks the layout.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired as the text changes, and cancelable. |
+| `helix-input` | `HelixInputEvent` | Fired as the text changes, and cancelable. |
 | `change` | `Event` | Relayed from the textarea once the reader has finished. |
 
 #### Parts

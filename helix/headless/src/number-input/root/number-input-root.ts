@@ -58,7 +58,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Before the number, for a unit or an icon.
  * @slot end - After it.
  *
- * @event {HelixChangeEvent} helix-change - Fired as the value changes, and cancelable.
+ * @event {HelixInputEvent} helix-input - Fired as the value changes, and cancelable.
  * @event {Event} change - Relayed from the field once the reader has finished.
  *
  * @csspart field - The box holding everything.
@@ -68,6 +68,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-base-number-input')
 export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /** Smallest value the reader may reach. Absent has no floor. */
   @property({ type: Number })
   min?: number

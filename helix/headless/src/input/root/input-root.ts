@@ -69,7 +69,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @slot start - Before the text, for an icon or a prefix.
  * @slot end - After the text, for an icon or a unit.
  *
- * @event {HelixChangeEvent} helix-change - Fired as the text changes, and cancelable.
+ * @event {HelixInputEvent} helix-input - Fired as the text changes, and cancelable.
  * @event {Event} change - Relayed from the input once the reader has finished.
  *
  * @csspart field - The box holding everything.
@@ -79,6 +79,9 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  */
 @customElement('helix-base-input')
 export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** Typed or dragged, so every edit is announced. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
   /** Shown while the field is empty. Not a label: it goes when typing starts. */
   @property()
   placeholder = ''

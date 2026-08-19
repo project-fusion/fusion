@@ -24,8 +24,10 @@ const unanswered = <helix-input label="Name" value="Ada" />
 // @expect TS2322
 const overlay = <helix-dialog label="Confirm" open />
 
-// Answered through the prop, which is the path the docs send people down.
-const answered = <helix-input label="Name" onhelix-change={() => {}} value="Ada" />
+/* Answered through the prop, which is the path the docs send people down.
+   `helix-input` and not `helix-change`: a field the reader types in announces
+   every edit, which is what the platform calls input. */
+const answered = <helix-input label="Name" onhelix-input={() => {}} value="Ada" />
 
 // Answered imperatively behind a ref, which a type cannot see and must allow.
 const imperative = (field: Ref<HelixInput>) => <helix-input label="Name" ref={field} value="Ada" />

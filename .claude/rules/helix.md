@@ -566,6 +566,23 @@ class in `helix/core/src/events/events.ts` that carries its own name and augment
 `HTMLElementEventMap`. There is no generic `emit(name, detail)` helper: a
 dispatch through one cannot be named by the analyzer.
 
+**A control the reader edits continuously announces `helix-input`; one that
+changes in discrete steps announces `helix-change`.** That is the platform's own
+pair, and we had only half of it: `helix-change` fired on every keystroke while
+the native `change` we relay fired on commit, so an element carried two events
+whose names said the opposite of their timings. A consumer reading "change" as
+"the reader is done" wired a request to `onhelix-change` and sent one per
+character. Web Awesome and Spectrum both use the native names, so anyone
+arriving from either, or from HTML, read ours backwards.
+
+Five controls are continuous: Input, Textarea, Number Input, Pin Input and
+Slider. They set `announcesInput` on `MixinControllerValue`, which picks the
+event; everything else changes one step at a time, and a step is a change.
+
+The `@controlled` tag on `value` names both, and the plugin keeps whichever the
+component declares, so one tag serves both shapes and a component cannot ask a
+consumer for a handler it never fires.
+
 **A controlled property declares itself with `@controlled`**, naming the events
 that answer it:
 
