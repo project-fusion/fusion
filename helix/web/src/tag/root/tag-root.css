@@ -153,9 +153,12 @@
    thing saying what the weight and the space have both said: at tag size it
    also lands within a couple of pixels of the glyphs on either side of it,
    which reads as a stroke that escaped from a letter. */
+/* One gap, not two. The padding and the margin were a pair because a rule sat
+   between them: the padding held the prefix off the line and the margin held
+   the line off the label. With the line gone they are two gaps in a row, which
+   is twice the space at a size where the whole tag is a few characters. */
 slot[name="prefix"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);
   opacity: 0.75;
-  padding-inline-end: var(--_tag-inset);
 }
