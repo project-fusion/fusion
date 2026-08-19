@@ -359,6 +359,19 @@
    promise the `poster` attribute makes: `inset: 0` against the stage, and
    `object-fit` on whatever they put in it, so an image of any ratio is fitted
    into the video's box rather than setting its own. */
+/* On a solid bar the level has to clear the bar itself, not just the speaker.
+ *
+ * The popup is offset from the sound group, which sits inside the bar's own
+ * padding, so on the transparent appearances it lands right at the bar's top
+ * edge and nobody notices. Given a bar with a ground, four pixels of the slider
+ * sat on it. Lifted by the bar's own top padding, which is the number that
+ * created the overlap. */
+:host([appearance="solid"]) [part="volume"],
+:host([appearance="solid"]) [part="sound"]:hover::before,
+:host([appearance="solid"]) [part="sound"]:focus-within::before {
+  bottom: calc(100% + var(--helix-space-xs) * 2);
+}
+
 /* The caption, above the bar and clear of it.
  *
  * Which is the reason the element draws it at all: a browser renders cues

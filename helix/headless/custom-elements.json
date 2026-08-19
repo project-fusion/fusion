@@ -43742,7 +43742,8 @@
                 "type": {
                   "text": "Promise<void>"
                 }
-              }
+              },
+              "description": "Into fullscreen and back, and quiet about being refused.\n\n`requestFullscreen` rejects rather than returning false, and the two\nrefusals a consumer will actually meet are a Permissions Policy that does\nnot grant `fullscreen` to the frame the player is in, and a call without\nuser activation. Both are `TypeError: Permissions check failed`, which is\nthe same message for two different causes.\n\nIt was `void`ed, so a refusal became an unhandled rejection: the button did\nnothing and said nothing, and the console entry it left named neither the\nelement nor the reason. Caught here, the state stays honest because\n`aria-pressed` follows `fullscreenchange` rather than this call, so a\nrefused request leaves a button that correctly reports \"not fullscreen\"."
             },
             {
               "kind": "field",

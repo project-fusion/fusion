@@ -394,12 +394,37 @@ export class HelixBaseVideo extends HelixElement {
     await video.requestPictureInPicture()
   }
 
+  /**
+   * Into fullscreen and back, and quiet about being refused.
+   *
+   * `requestFullscreen` rejects rather than returning false, and the two
+   * refusals a consumer will actually meet are a Permissions Policy that does
+   * not grant `fullscreen` to the frame the player is in, and a call without
+   * user activation. Both are `TypeError: Permissions check failed`, which is
+   * the same message for two different causes.
+   *
+   * It was `void`ed, so a refusal became an unhandled rejection: the button did
+   * nothing and said nothing, and the console entry it left named neither the
+   * element nor the reason. Caught here, the state stays honest because
+   * `aria-pressed` follows `fullscreenchange` rather than this call, so a
+   * refused request leaves a button that correctly reports "not fullscreen".
+   */
   private async toggleFullscreen(): Promise<void> {
-    if (document.fullscreenElement === this) {
-      await document.exitFullscreen()
-      return
+    try {
+      if (document.fullscreenElement === this) {
+        await document.exitFullscreen()
+        return
+      }
+      await this.requestFullscreen()
+    } catch (error) {
+      /* Reported rather than swallowed, and reported once. A player embedded in
+         a frame without the permission is the common case, and the fix is on
+         the frame rather than here, so the message has to say which. */
+      console.warn(
+        '<helix-video> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".',
+        error,
+      )
     }
-    await this.requestFullscreen()
   }
 
   private readonly handleFullscreenChange = (): void => {
