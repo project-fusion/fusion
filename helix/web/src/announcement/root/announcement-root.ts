@@ -13,6 +13,7 @@ import { styles } from './announcement-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Banner, Notification bar, Alert bar
  * @documentation https://helix.fusion.dev/components/announcement
  *

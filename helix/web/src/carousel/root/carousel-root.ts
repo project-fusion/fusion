@@ -16,6 +16,7 @@ import { styles } from './carousel-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://helix.fusion.dev/components/carousel
  *

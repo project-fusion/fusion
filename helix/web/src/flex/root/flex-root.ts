@@ -24,6 +24,7 @@ import { styles } from './flex-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @aliases Stack, Row, Column, HStack, VStack
  * @documentation https://helix.fusion.dev/components/flex
  *

@@ -32,6 +32,7 @@ import { styles } from './input-color-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases ColorField, ColorInput, ColourInput
  * @documentation https://helix.fusion.dev/components/input-color
  *

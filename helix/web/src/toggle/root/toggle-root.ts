@@ -13,6 +13,7 @@ import { styles } from './toggle-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category actions
  * @aliases Segment, NavItem, Option
  * @documentation https://helix.fusion.dev/components/toggle-group
  *

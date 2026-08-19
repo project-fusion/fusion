@@ -92,6 +92,7 @@ const kind = (file: File): string => {
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases FileUpload, FilePicker, Dropzone
  * @documentation https://helix.fusion.dev/components/input-file
  *

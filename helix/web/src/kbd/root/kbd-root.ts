@@ -16,6 +16,7 @@ import { styles } from './kbd-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Key, Shortcut, Hotkey
  * @documentation https://helix.fusion.dev/components/kbd
  *

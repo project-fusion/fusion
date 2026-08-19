@@ -38,6 +38,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Range, Range input
  * @documentation https://helix.fusion.dev/components/slider
  *

@@ -40,6 +40,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases TimeField, TimeInput
  * @documentation https://helix.fusion.dev/components/input-time
  *

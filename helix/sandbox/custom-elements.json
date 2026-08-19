@@ -308,6 +308,7 @@
           },
           "summary": "An editable pane of source, with highlighting and line numbers.",
           "helix": {
+            "category": "tooling",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/sandbox/editor",
@@ -971,7 +972,7 @@
             {
               "kind": "field",
               "name": "panelSize",
-              "default": "192",
+              "default": "160",
               "description": "Height of the panel, in pixels.",
               "attribute": "panel-size",
               "type": {
@@ -1366,6 +1367,7 @@
           },
           "summary": "Pairs an editable source pane with a live preview.",
           "helix": {
+            "category": "tooling",
             "since": "0.1.0",
             "status": "experimental",
             "documentation": "https://helix.fusion.dev/sandbox",

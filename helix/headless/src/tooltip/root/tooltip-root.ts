@@ -72,6 +72,7 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Hint, Popup label
  * @documentation https://helix.fusion.dev/components/tooltip
  *

@@ -19,6 +19,7 @@ import { styles } from './icon-button-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category actions
  * @aliases Icon button, Square button
  * @documentation https://helix.fusion.dev/components/icon-button
  *

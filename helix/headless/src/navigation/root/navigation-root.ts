@@ -24,6 +24,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Nav, NavList, Tabs
  * @documentation https://helix.fusion.dev/components/navigation
  *

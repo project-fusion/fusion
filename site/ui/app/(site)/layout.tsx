@@ -5,9 +5,12 @@ import { SiteNav } from '../site-nav'
 /**
  * Header, content column, and footer: everything except the tools.
  *
- * The header and footer run the full width of the viewport and take the page's
- * own inset, so the wordmark, the copy, and the footer all start on the same
- * line down the left edge.
+ * The header and footer run the full width of the viewport and are inset by
+ * `space-2xl` rather than by the page's own `--site-inset`, so the wordmark and
+ * the copyright start on the same line down the left edge. That clamp opens to
+ * seven rem on a wide screen, which is right for a column of prose and wrong
+ * for chrome: the two edges disagreed by 48 pixels at 1600 while this note said
+ * they did not. The content column between them keeps the clamp.
  *
  * `view-transition-name` on the content is what makes a route change a
  * cross-fade of the middle of the page while the header and its indicator stay

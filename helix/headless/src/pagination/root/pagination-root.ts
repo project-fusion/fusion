@@ -133,6 +133,7 @@ const fill = (
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Pager, Page nav
  * @documentation https://helix.fusion.dev/components/pagination
  *

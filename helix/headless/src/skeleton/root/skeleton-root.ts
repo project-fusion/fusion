@@ -15,6 +15,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://helix.fusion.dev/components/skeleton
  *

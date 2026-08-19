@@ -31,6 +31,7 @@ import { styles } from './input-file-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases FileUpload, FilePicker, Dropzone
  * @documentation https://helix.fusion.dev/components/input-file
  *

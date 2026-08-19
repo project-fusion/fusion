@@ -41,6 +41,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/outline
  *

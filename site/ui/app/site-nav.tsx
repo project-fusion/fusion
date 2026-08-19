@@ -59,6 +59,10 @@ export function SiteNav() {
 
   // The deepest matching vertical, so `/design/components/card` still marks
   // Design rather than nothing.
+  /* Exactly the gallery, not everything under it: `/design/components/card`
+     is a normal page with a white top. */
+  const onHero = pathname === '/design'
+
   const current =
     VERTICALS.map((vertical) => vertical.href)
       .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
@@ -66,7 +70,11 @@ export function SiteNav() {
 
   return (
     <>
-      <helix-app-header sticky>
+      {/* No line under the bar until the page moves. The gallery's hero runs up
+          behind the masthead, so there is nothing up there to separate the bar
+          from, and the component's own `[data-scrolled]` rule brings both the
+          background and the rule back the moment a reader scrolls. */}
+      <helix-app-header appearance={onHero ? 'transparent' : undefined} sticky>
         <a data-link="quiet" href="/" slot="start">
           <Wordmark />
         </a>

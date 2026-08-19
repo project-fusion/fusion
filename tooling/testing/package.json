@@ -3,7 +3,7 @@
   "description": "Shared spec helpers for DOM and server-rendered component tests.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "exports": {
     "./browser": "./src/browser.ts",

@@ -49,6 +49,8 @@ type TypedEvent<T extends EventTarget, E = Event> = E & {
 };
 
 type BaseProps<T extends HTMLElement> = {
+  /** Skips the hydration check for an element whose DOM is written by something other than React, which a custom element writing its own state attributes is. */
+  suppressHydrationWarning?: boolean;
   /** Content added between the opening and closing tags of the element */
   children?: any;
   /** Used for declaratively styling one or more elements using CSS (Cascading Stylesheets) */

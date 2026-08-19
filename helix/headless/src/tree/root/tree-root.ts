@@ -35,6 +35,7 @@ const KEYS = new Set([
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases FileTree, Navigation tree
  * @documentation https://helix.fusion.dev/components/tree
  *

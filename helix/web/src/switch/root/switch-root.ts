@@ -28,6 +28,7 @@ import { styles } from './switch-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Toggle switch, On/off
  * @documentation https://helix.fusion.dev/components/switch
  *

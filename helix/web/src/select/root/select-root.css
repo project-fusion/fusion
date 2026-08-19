@@ -61,7 +61,18 @@
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed
    control taller than the fields beside it. */
+/* The value takes the room, so the trigger reads the same with a leading icon
+   as without one.
+
+   The trigger is `justify-content: space-between` over two children, which puts
+   the value at the start and the indicator at the end. A third child, which is
+   what slotting into `start` adds, would have spread all three and left the
+   value floating in the middle of its own control. Growing the value pins the
+   indicator to the end whatever is in front of it, and changes nothing for a
+   select with an empty `start`: an unassigned slot is `display: contents` and
+   generates no box at all. */
 [part="value"] {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

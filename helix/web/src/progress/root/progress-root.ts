@@ -19,6 +19,7 @@ import { styles } from './progress-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Progress bar, Loading bar
  * @documentation https://helix.fusion.dev/components/progress
  *

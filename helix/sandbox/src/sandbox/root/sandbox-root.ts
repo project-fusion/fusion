@@ -73,6 +73,7 @@ const PANEL_MAX = 0.8
  *
  * @since 0.1.0
  * @status experimental
+ * @category tooling
  * @aliases Playground, REPL, Editor
  * @documentation https://helix.fusion.dev/sandbox
  *

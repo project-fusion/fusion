@@ -15,6 +15,7 @@ import { styles } from './accordion-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @aliases Collapse, Expander group
  * @documentation https://helix.fusion.dev/components/accordion
  *

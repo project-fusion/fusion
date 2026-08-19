@@ -30,6 +30,7 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  *
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @aliases Collapse, Expander group
  * @documentation https://helix.fusion.dev/components/accordion
  *

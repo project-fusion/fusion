@@ -24,6 +24,7 @@ import { styles } from './input-number-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases NumberField, NumberInput, Stepper
  * @documentation https://helix.fusion.dev/components/input-number
  *

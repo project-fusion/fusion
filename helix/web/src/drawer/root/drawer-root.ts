@@ -13,6 +13,7 @@ import { styles } from './drawer-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Sheet, Sidebar, Panel, Off-canvas
  * @documentation https://helix.fusion.dev/components/drawer
  *

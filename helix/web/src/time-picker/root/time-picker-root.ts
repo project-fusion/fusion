@@ -24,6 +24,7 @@ import { styles } from './time-picker-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Time, TimeList
  * @documentation https://helix.fusion.dev/components/time-picker
  *

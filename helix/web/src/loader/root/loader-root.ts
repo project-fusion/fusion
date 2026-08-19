@@ -15,6 +15,7 @@ import { styles } from './loader-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Spinner, Busy, Activity
  * @documentation https://helix.fusion.dev/components/loader
  *

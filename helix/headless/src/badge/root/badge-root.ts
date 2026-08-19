@@ -23,6 +23,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Count, Indicator, Pip
  * @documentation https://helix.fusion.dev/components/badge
  *

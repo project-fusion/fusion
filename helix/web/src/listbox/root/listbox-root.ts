@@ -19,6 +19,7 @@ import { styles } from './listbox-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Options, Select list
  * @documentation https://helix.fusion.dev/components/listbox
  *

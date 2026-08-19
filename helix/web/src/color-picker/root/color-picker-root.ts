@@ -39,6 +39,7 @@ import { styles } from './color-picker-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *

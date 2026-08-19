@@ -23,6 +23,7 @@ import { styles } from './card-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *

@@ -13,6 +13,7 @@ import { styles } from './tabs-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @documentation https://helix.fusion.dev/components/tabs
  *
  * @slot - The tabs.

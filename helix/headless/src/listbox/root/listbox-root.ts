@@ -57,6 +57,7 @@ const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Options, Select list
  * @documentation https://helix.fusion.dev/components/listbox
  *

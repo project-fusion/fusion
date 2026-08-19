@@ -14,6 +14,7 @@ import { styles } from './option-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Item, Choice
  * @documentation https://helix.fusion.dev/components/option
  *

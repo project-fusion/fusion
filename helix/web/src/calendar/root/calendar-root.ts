@@ -20,6 +20,7 @@ import { styles } from './calendar-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Date grid, Month view
  * @documentation https://helix.fusion.dev/components/calendar
  *

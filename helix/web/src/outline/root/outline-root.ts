@@ -17,6 +17,7 @@ import { styles } from './outline-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/outline
  *

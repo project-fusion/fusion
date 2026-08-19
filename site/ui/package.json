@@ -3,7 +3,7 @@
   "description": "fusion.dev: the landing page, the verticals, and the tools under them.",
   "version": "0.0.1",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "bun run frame && next build",

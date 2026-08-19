@@ -14,6 +14,7 @@ import { styles } from './stat-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Metric, KPI, Figure
  * @documentation https://helix.fusion.dev/components/stat
  *

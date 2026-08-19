@@ -104,6 +104,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @aliases SplitPane, Resizable, SplitView
  * @documentation https://helix.fusion.dev/components/splitter
  *

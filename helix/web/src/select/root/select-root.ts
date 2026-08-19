@@ -30,6 +30,7 @@ import '../../option/index.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Dropdown, Picker
  * @documentation https://helix.fusion.dev/components/select
  *

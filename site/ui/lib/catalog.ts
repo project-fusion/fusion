@@ -50,6 +50,8 @@ export interface Example {
 
 export interface Family {
   aliases: string[]
+  /** What the component is for, from `@category`. The gallery groups on it. */
+  category: string
   documentation: string
   elements: Element[]
   examples: Example[]
@@ -73,7 +75,13 @@ interface RawDeclaration {
   cssProperties?: RawNamed[]
   description?: string
   events?: RawNamed[]
-  helix?: { aliases?: string[]; documentation?: string; since?: string; status?: string }
+  helix?: {
+    aliases?: string[]
+    category?: string
+    documentation?: string
+    since?: string
+    status?: string
+  }
   modulePath?: string
   slots?: RawNamed[]
   summary?: string
@@ -179,6 +187,7 @@ const build = (): Family[] => {
 
       return {
         aliases: root.helix?.aliases ?? [],
+        category: root.helix?.category ?? '',
         documentation: root.helix?.documentation ?? '',
         elements: entries
           .map((entry) => ({

@@ -37,6 +37,7 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Dropdown, Action menu
  * @documentation https://helix.fusion.dev/components/menu
  *

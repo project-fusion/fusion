@@ -100,6 +100,7 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Date grid, Month view
  * @documentation https://helix.fusion.dev/components/calendar
  *

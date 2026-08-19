@@ -20,6 +20,7 @@ import { styles } from './popover-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Popper, Flyout, Overlay
  * @documentation https://helix.fusion.dev/components/popover
  *

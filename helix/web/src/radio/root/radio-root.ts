@@ -19,6 +19,7 @@ import { styles } from './radio-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Option, Choice
  * @documentation https://helix.fusion.dev/components/radio
  *

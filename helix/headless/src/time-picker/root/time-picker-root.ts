@@ -94,6 +94,7 @@ const isTwelveHour = (locale?: string): boolean =>
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Time, TimeList
  * @documentation https://helix.fusion.dev/components/time-picker
  *

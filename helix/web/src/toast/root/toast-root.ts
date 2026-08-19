@@ -22,6 +22,7 @@ import { styles } from './toast-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Toaster, Snackbar, Notifications
  * @documentation https://helix.fusion.dev/components/toast
  *

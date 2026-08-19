@@ -21,6 +21,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://helix.fusion.dev/components/empty
  *

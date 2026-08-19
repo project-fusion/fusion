@@ -42,6 +42,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases ColorField, ColorInput, ColourInput
  * @documentation https://helix.fusion.dev/components/input-color
  *

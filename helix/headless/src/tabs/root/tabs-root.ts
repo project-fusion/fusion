@@ -26,6 +26,7 @@ import { HelixBaseTabsTab } from '../tab/tabs-tab.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases TabList, Segmented control
  * @documentation https://helix.fusion.dev/components/tabs
  *

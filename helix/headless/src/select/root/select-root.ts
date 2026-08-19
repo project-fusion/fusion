@@ -34,10 +34,13 @@ import '../../listbox/index.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Dropdown, Picker
  * @documentation https://helix.fusion.dev/components/select
  *
  * @slot - The options, and any groups of them.
+ * @slot start - Before the chosen value, for an icon or a prefix.
+ * @slot end - After it, for a count, a unit, or a clear button.
  * @slot indicator - The mark on the trigger saying this opens, usually a caret.
  * @slot label - Richer than a string.
  * @slot hint - Richer than a string.
@@ -264,7 +267,15 @@ export class HelixBaseSelect extends MixinControllerOpen(
         @click=${() => this.toggleOpen()}
         @keydown=${this.handleTriggerKeydown}
       >
+        <slot name="start"></slot>
         <span part="value">${this.display}</span>
+        ${
+          /* Before the indicator, not after it. The caret is the affordance
+             saying the control opens, so it stays the last thing in the trigger
+             whatever else is put in front of it. */
+          ''
+        }
+        <slot name="end"></slot>
         ${
           /* The slot has a fallback, and had none: a select written without a
              hand-slotted icon drew no mark at all saying it opens, and every

@@ -50,6 +50,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  *
  * @since 0.1.0
  * @status experimental
+ * @category tooling
  * @aliases Code editor, Source pane
  * @documentation https://helix.fusion.dev/sandbox/editor
  *

@@ -66,6 +66,7 @@ const dates = (value: string): string[] =>
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases DatePicker, DateField, DateInput
  * @documentation https://helix.fusion.dev/components/input-date
  *

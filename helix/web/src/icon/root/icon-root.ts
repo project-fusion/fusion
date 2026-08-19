@@ -14,6 +14,7 @@ import { styles } from './icon-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Glyph, Symbol
  * @documentation https://helix.fusion.dev/components/icon
  *

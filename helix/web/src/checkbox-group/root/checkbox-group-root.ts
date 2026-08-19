@@ -15,6 +15,7 @@ import { styles } from './checkbox-group-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category forms
  * @aliases Checkbox list, Multi-select
  * @documentation https://helix.fusion.dev/components/checkbox-group
  *

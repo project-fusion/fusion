@@ -12,6 +12,7 @@ import { styles } from './quote-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category content
  * @aliases Q, InlineQuote
  * @documentation https://helix.fusion.dev/components/quote
  *

@@ -45,6 +45,22 @@ export interface HelixMetadata {
   /** Other names people search for. Tag is also a Chip. */
   aliases?: string[]
 
+  /**
+   * What the component is for, and the one axis the catalog groups on.
+   *
+   * A closed set the metadata plugin checks, so an unknown word is dropped
+   * rather than becoming a category of one.
+   */
+  category?:
+    | 'actions'
+    | 'content'
+    | 'feedback'
+    | 'forms'
+    | 'layout'
+    | 'navigation'
+    | 'overlays'
+    | 'tooling'
+
   /** URL of the component's documentation page. */
   documentation?: string
 

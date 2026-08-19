@@ -21,6 +21,7 @@ import { styles } from './app-header-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://helix.fusion.dev/components/app-header
  *

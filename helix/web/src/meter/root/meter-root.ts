@@ -38,6 +38,7 @@ import { styles } from './meter-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category feedback
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter
  *

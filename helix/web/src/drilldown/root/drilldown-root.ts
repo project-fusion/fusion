@@ -19,6 +19,7 @@ import { styles } from './drilldown-root.css.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category navigation
  * @aliases Panel, Nested list, Drill-in
  * @documentation https://helix.fusion.dev/components/drilldown
  *

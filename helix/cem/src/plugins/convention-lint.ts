@@ -97,6 +97,29 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
           )
         }
 
+        /* A family carries a category; its parts do not.
+         *
+         * `@category` answers "what is this component for", which is a question
+         * about the family. `Tabs.Tab` and `Table.Cell` have no answer separate
+         * from the family they belong to, and giving them one would put a part
+         * in the gallery beside its own root. `part === 'Root'` is the same test
+         * the catalog uses to decide what is a family in the first place.
+         *
+         * Empty rather than absent is the failure this catches. The metadata
+         * plugin drops a word outside the closed set, so a typo does not become
+         * a category of one; it becomes no category at all, and without this
+         * that is silent right up until the filter has a family it cannot
+         * place. */
+        if (declaration.helix?.part === 'Root') {
+          check(
+            Boolean(declaration.helix.category),
+            'documented-category',
+            path,
+            declaration.name,
+            'Missing or unrecognised @category in the class JSDoc.',
+          )
+        }
+
         for (const member of declaration.members ?? []) {
           if (member.privacy && member.privacy !== 'public') {
             continue

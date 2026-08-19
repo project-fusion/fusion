@@ -37,6 +37,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
+ * @category overlays
  * @aliases Modal, Lightbox, Sheet
  * @documentation https://helix.fusion.dev/components/dialog
  *
