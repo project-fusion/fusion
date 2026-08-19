@@ -36452,23 +36452,23 @@
               "name": "--steps-gap"
             },
             {
-              "description": "Size of the numbered marker.",
+              "description": "Size of the mark, glyph or digit.",
               "name": "--steps-marker-size"
             },
             {
-              "description": "Corner radius of that marker.",
-              "name": "--steps-marker-radii"
-            },
-            {
-              "description": "The line between steps not yet reached.",
+              "description": "The rule running through the steps.",
               "name": "--steps-connector-color"
             },
             {
-              "description": "Fill on a finished step's marker.",
+              "description": "Wash behind a step under the pointer.",
+              "name": "--steps-hover-color"
+            },
+            {
+              "description": "The mark on a finished step.",
               "name": "--steps-complete-color"
             },
             {
-              "description": "Fill on the current step's marker.",
+              "description": "The mark on the current step.",
               "name": "--steps-current-color"
             }
           ],

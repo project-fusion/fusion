@@ -14762,11 +14762,11 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
-   * - `--steps-marker-size`: Size of the numbered marker. (default: `undefined`)
-   * - `--steps-marker-radii`: Corner radius of that marker. (default: `undefined`)
-   * - `--steps-connector-color`: The line between steps not yet reached. (default: `undefined`)
-   * - `--steps-complete-color`: Fill on a finished step's marker. (default: `undefined`)
-   * - `--steps-current-color`: Fill on the current step's marker. (default: `undefined`)
+   * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
+   * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
+   * - `--steps-hover-color`: Wash behind a step under the pointer. (default: `undefined`)
+   * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
+   * - `--steps-current-color`: The mark on the current step. (default: `undefined`)
    */
   "helix-steps": Partial<HelixStepsProps & BaseProps<HelixSteps> & BaseEvents>;
 
@@ -22090,11 +22090,11 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
-   * - `--steps-marker-size`: Size of the numbered marker. (default: `undefined`)
-   * - `--steps-marker-radii`: Corner radius of that marker. (default: `undefined`)
-   * - `--steps-connector-color`: The line between steps not yet reached. (default: `undefined`)
-   * - `--steps-complete-color`: Fill on a finished step's marker. (default: `undefined`)
-   * - `--steps-current-color`: Fill on the current step's marker. (default: `undefined`)
+   * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
+   * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
+   * - `--steps-hover-color`: Wash behind a step under the pointer. (default: `undefined`)
+   * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
+   * - `--steps-current-color`: The mark on the current step. (default: `undefined`)
    */
   "helix-steps": Partial<
     HelixStepsProps &
@@ -24264,15 +24264,15 @@ export type CustomCssProperties = {
   "--stat-value-size"?: string;
   /** Space between one step and the next. */
   "--steps-gap"?: string;
-  /** Size of the numbered marker. */
+  /** Size of the mark, glyph or digit. */
   "--steps-marker-size"?: string;
-  /** Corner radius of that marker. */
-  "--steps-marker-radii"?: string;
-  /** The line between steps not yet reached. */
+  /** The rule running through the steps. */
   "--steps-connector-color"?: string;
-  /** Fill on a finished step's marker. */
+  /** Wash behind a step under the pointer. */
+  "--steps-hover-color"?: string;
+  /** The mark on a finished step. */
   "--steps-complete-color"?: string;
-  /** Fill on the current step's marker. */
+  /** The mark on the current step. */
   "--steps-current-color"?: string;
   /** Height of the track. The width follows it. */
   "--switch-height"?: string;

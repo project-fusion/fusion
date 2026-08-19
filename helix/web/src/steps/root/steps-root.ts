@@ -18,11 +18,11 @@ import { styles } from './steps-root.css.js'
  * @documentation https://helix.fusion.dev/components/steps
  *
  * @cssproperty --steps-gap - Space between one step and the next.
- * @cssproperty --steps-marker-size - Size of the numbered marker.
- * @cssproperty --steps-marker-radii - Corner radius of that marker.
- * @cssproperty --steps-connector-color - The line between steps not yet reached.
- * @cssproperty --steps-complete-color - Fill on a finished step's marker.
- * @cssproperty --steps-current-color - Fill on the current step's marker.
+ * @cssproperty --steps-marker-size - Size of the mark, glyph or digit.
+ * @cssproperty --steps-connector-color - The rule running through the steps.
+ * @cssproperty --steps-hover-color - Wash behind a step under the pointer.
+ * @cssproperty --steps-complete-color - The mark on a finished step.
+ * @cssproperty --steps-current-color - The mark on the current step.
  */
 @customElement('helix-steps')
 export class HelixSteps extends HelixBaseSteps {

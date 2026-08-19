@@ -3511,11 +3511,11 @@ script involved. Reordering the steps renumbers them; nothing has to be told.
 | Property | Description |
 | --- | --- |
 | `--steps-gap` | Space between one step and the next. |
-| `--steps-marker-size` | Size of the numbered marker. |
-| `--steps-marker-radii` | Corner radius of that marker. |
-| `--steps-connector-color` | The line between steps not yet reached. |
-| `--steps-complete-color` | Fill on a finished step's marker. |
-| `--steps-current-color` | Fill on the current step's marker. |
+| `--steps-marker-size` | Size of the mark, glyph or digit. |
+| `--steps-connector-color` | The rule running through the steps. |
+| `--steps-hover-color` | Wash behind a step under the pointer. |
+| `--steps-complete-color` | The mark on a finished step. |
+| `--steps-current-color` | The mark on the current step. |
 
 ### Step — `helix-step`
 

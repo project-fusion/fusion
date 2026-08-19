@@ -80,10 +80,7 @@
  * genuinely needs one: a bare "3" beside a name is a number in a sentence. */
 [part="marker"] {
   align-items: center;
-  background-color: var(--_steps-marker-background, transparent);
   block-size: var(--_steps-m, var(--helix-size-icon));
-  border: var(--helix-border-thin) solid var(--_steps-marker-border, transparent);
-  border-radius: var(--steps-marker-radii, var(--_steps-marker-radii, var(--helix-radii-none)));
   box-sizing: border-box;
   color: var(--_steps-marker-color, var(--helix-color-border));
   font-family: var(--helix-font-sans);
@@ -274,4 +271,21 @@ slot[name="marker"]::slotted(*) {
   [part="marker"] {
     transition: none;
   }
+}
+
+/* The step answers the pointer, not just the name inside it.
+ *
+ * The name is what is pressable, but the thing a reader is pointing at is the
+ * stage: mark, name and description together. So the wash goes on the host.
+ *
+ * `box-shadow` with a spread rather than padding, because padding would move
+ * the mark and every line offset is measured from it: the halves start at the
+ * mark's edge and reach half a gap past the step's own, and all of that is
+ * arithmetic on a box that padding would quietly change. A spread paints
+ * outside the box and costs the layout nothing. */
+:host(:not([disabled]):hover) {
+  background-color: var(--steps-hover-color, var(--helix-color-surface-sunken));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: 0 0 0 var(--helix-space-2xs)
+    var(--steps-hover-color, var(--helix-color-surface-sunken));
 }

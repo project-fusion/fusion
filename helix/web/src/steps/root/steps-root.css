@@ -114,22 +114,13 @@
  * a custom property, which is how a step that cannot see this attribute still
  * knows whether to draw one.
  *
- * The box comes back here and only here. A bare numeral beside a name is a
- * number in a sentence; a check needs no ring, because the check is already the
- * shape. And the state moves from the glyph to the fill, since a digit cannot
- * change what it is the way a mark can. */
+ * No box, the same as the marks: a filled square behind a digit is a button
+ * shape, and a row of them reads as a row of controls rather than as a rule
+ * with marks on it. The state is the digit's own colour, which is the same
+ * three colours the marks use, so the two appearances say the same thing in
+ * the same palette and differ only in what is drawn. */
 :host([appearance="numeric"]) {
-  --_steps-m: var(--steps-marker-size, var(--helix-size-control-sm));
   --_steps-mark: none;
   --_steps-count: counter(helix-step);
-  --_steps-marker-background: var(--helix-color-surface-sunken);
-  --_steps-marker-border: var(--helix-color-border);
-  --_steps-marker-radii: var(--helix-radii-sm);
   --_steps-marker-color: var(--helix-color-foreground-muted);
-  --_steps-marker-background-complete: var(--steps-complete-color, var(--helix-color-success));
-  --_steps-marker-border-complete: var(--steps-complete-color, var(--helix-color-success));
-  --_steps-marker-color-complete: var(--helix-color-foreground-on-accent);
-  --_steps-marker-background-current: var(--steps-current-color, var(--helix-color-primary));
-  --_steps-marker-border-current: var(--steps-current-color, var(--helix-color-primary));
-  --_steps-marker-color-current: var(--helix-color-foreground-on-accent);
 }
