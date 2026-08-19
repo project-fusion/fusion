@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, HelixNextEvent, HelixPreviousEvent } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../icon/index.js'
@@ -128,11 +128,16 @@ let owner: HTMLElement | undefined
  * @csspart remote - Play on another device, where one is available.
  * @csspart speed - Playback speed, where it was asked for.
  * @csspart pip - Picture in picture, where it was asked for and exists.
+ * @csspart start - The mark over the picture before anything has played.
+ * @csspart next - Asks for the next item, where it was asked for.
+ * @csspart previous - Asks for the previous one.
  * @csspart download - Saves the file, where it was asked for.
  * @csspart overflow - The menu holding the controls kept off the bar.
  * @csspart more - The button that opens it.
  * @csspart fullscreen - The whole screen, and back.
  *
+ * @event {HelixNextEvent} helix-next - Fired when the reader asks for the next item.
+ * @event {HelixPreviousEvent} helix-previous - Fired when they ask for the previous one.
  * @event {Event} play - Relayed, because it does not cross a shadow boundary.
  * @event {Event} pause - Relayed for the same reason.
  * @event {Event} ended - Relayed for the same reason.
@@ -220,6 +225,40 @@ export class HelixBaseVideo extends HelixElement {
    */
   @property({ attribute: 'overflow-controls' })
   overflowControls = ''
+
+  /**
+   * The big mark over the picture before anything has played, or `none`.
+   *
+   * **On unless it is turned off, because a stopped video has nothing else.**
+   * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+   * target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+   * reader meets first is a still frame with some chrome along the bottom, and
+   * nothing in it says "press to watch".
+   *
+   * `none` is for the cases where that is wrong rather than right: a muted loop
+   * behind a hero, a grid of eight thumbnails, anything where the video is
+   * decoration rather than something to start.
+   *
+   * **Only before the first play.** A video paused halfway already has its bar
+   * up, because a paused video never idles, so the small control is visible and
+   * the reader has just used it. Covering the picture they stopped to look at
+   * would be the opposite of helpful.
+   *
+   * A value rather than a boolean, so the resting state is the attribute's
+   * absence: a boolean defaulting to on would have to be spelled as its own
+   * negation.
+   */
+  @property({ attribute: 'start-control' })
+  startControl?: 'none'
+
+  /**
+   * Whether this has ever played, which is not the same as being paused now.
+   *
+   * Set on the first `play` and never cleared, since what it answers is whether
+   * the reader has begun rather than where they are.
+   */
+  @state()
+  private started = false
 
   /** The speeds offered, slowest first, as multipliers of normal. */
   @property({ attribute: 'speeds' })
@@ -326,6 +365,13 @@ export class HelixBaseVideo extends HelixElement {
        decision already made. */
     if (one === 'download') {
       return this.src !== ''
+    }
+    /* Always offered, because there is nothing to check. Neither of these does
+       anything to the video: they say the reader asked, and whatever holds the
+       set answers. A player that hid them until it could prove a set existed
+       would be a player that cannot know. */
+    if (one === 'next' || one === 'previous') {
+      return true
     }
     return one === 'speed'
   }
@@ -469,6 +515,9 @@ export class HelixBaseVideo extends HelixElement {
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
+    if (this.playing) {
+      this.started = true
+    }
     if (event.type === 'play') {
       this.claimSession()
     }
@@ -514,6 +563,17 @@ export class HelixBaseVideo extends HelixElement {
         this.seek(details.seekTime)
       }
     })
+    /* The skip keys, and only where the consumer has said there is something to
+       skip to. A headset whose skip buttons do nothing is worse than one whose
+       skip buttons are not offered: the platform draws them from whether a
+       handler is set, so setting one unconditionally would put two dead keys on
+       every lock screen showing this video. */
+    const skips = `${this.extraControls} ${this.overflowControls}`.split(/\s+/)
+    session.setActionHandler('nexttrack', skips.includes('next') ? () => this.skip(false) : null)
+    session.setActionHandler(
+      'previoustrack',
+      skips.includes('previous') ? () => this.skip(true) : null,
+    )
   }
 
   private readonly handleVolume = (): void => {
@@ -558,6 +618,22 @@ export class HelixBaseVideo extends HelixElement {
     track.mode = next ? 'hidden' : 'disabled'
     this.captioned = next
     this.cue = undefined
+  }
+
+  /**
+   * Says the reader asked for another item, and does nothing else.
+   *
+   * There is nothing else it could do. A `<video>` plays one resource, so what
+   * comes before or after it is a fact this element does not hold: a playlist
+   * has it, or the consumer does. Announcing is the whole of the contribution,
+   * and the event bubbles so a wrapper hears it.
+   *
+   * The same call answers the button, the row in the overflow menu, and the
+   * skip keys on a headset, which is why the media session's handlers point
+   * here rather than at anything of their own.
+   */
+  private skip(back: boolean): void {
+    this.dispatchEvent(back ? new HelixPreviousEvent() : new HelixNextEvent())
   }
 
   /** Steps through the speeds offered, which is what one button can do. */
@@ -845,6 +921,30 @@ export class HelixBaseVideo extends HelixElement {
         ${this.rate}x
       </button>`
     }
+    /* Two templates rather than one with the name bound in, because a part is
+       read from the source: `check:selectors` scans for the literal, so a part
+       written as `part=${one}` is a part no stylesheet can be proved to reach.
+       It reported both of these as matching nothing. */
+    if (one === 'previous') {
+      return html`<button
+        part="previous"
+        type="button"
+        aria-label="Previous"
+        @click=${() => this.skip(true)}
+      >
+        <helix-icon name="skip-back"></helix-icon>
+      </button>`
+    }
+    if (one === 'next') {
+      return html`<button
+        part="next"
+        type="button"
+        aria-label="Next"
+        @click=${() => this.skip(false)}
+      >
+        <helix-icon name="skip-forward"></helix-icon>
+      </button>`
+    }
     if (one === 'download') {
       /* A real anchor, because saving a file is the browser's job and there is
          no scripted version of it worth having. `download` asks for a save
@@ -889,6 +989,12 @@ export class HelixBaseVideo extends HelixElement {
     if (one === 'speed') {
       return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}
         >Playback speed: ${this.rate}x</helix-menu-item
+      >`
+    }
+    if (one === 'next' || one === 'previous') {
+      const back = one === 'previous'
+      return html`<helix-menu-item value=${one} @helix-select=${() => this.skip(back)}
+        >${back ? 'Previous' : 'Next'}</helix-menu-item
       >`
     }
     if (one === 'download') {
@@ -1059,6 +1165,24 @@ export class HelixBaseVideo extends HelixElement {
       <span aria-hidden="true" hidden><slot @slotchange=${this.handleMedia}></slot></span>
       ${this.cue === undefined ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
       <slot name="poster" part="poster"></slot>
+      ${
+        /* Nothing to press before it has ever played, which is the one state
+           with no affordance in it, and nothing once it has: a video paused
+           halfway keeps its bar, so the small control is already there and the
+           reader has just used it. Not drawn at all where the browser is
+           drawing its own controls, since that bar has a play button of its own
+           and two would be two. */
+        this.controls || this.started || this.startControl === 'none'
+          ? nothing
+          : html`<button
+              part="start"
+              type="button"
+              aria-label=${this.playLabel}
+              @click=${() => this.toggle()}
+            >
+              <helix-icon name="play"></helix-icon>
+            </button>`
+      }
       ${this.controls ? nothing : this.renderBar()}
     </div>`
   }

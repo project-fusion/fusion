@@ -41,6 +41,7 @@ import { styles } from './video-root.css.js'
  * @cssproperty --video-radius - The corner it is cut to.
  * @cssproperty --video-controls-color - The ink on the bar.
  * @cssproperty --video-accent-color - The played part of the scrubber.
+ * @cssproperty --video-start-size - Width of the mark that starts it.
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixBaseVideo {

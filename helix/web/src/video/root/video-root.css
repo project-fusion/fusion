@@ -176,6 +176,8 @@
 [part="pip"],
 [part="remote"],
 [part="download"],
+[part="previous"],
+[part="next"],
 [part="more"],
 [part="fullscreen"] {
   all: unset;
@@ -200,6 +202,8 @@
 [part="pip"]:focus-visible,
 [part="remote"]:focus-visible,
 [part="download"]:focus-visible,
+[part="previous"]:focus-visible,
+[part="next"]:focus-visible,
 [part="more"]:focus-visible,
 [part="fullscreen"]:focus-visible,
 [part="scrubber"]:focus-visible,
@@ -444,6 +448,76 @@
   display: contents;
 }
 
+/* The mark that starts it, in the middle of the picture.
+ *
+ * Sized against the picture rather than fixed, because the thing it has to be
+ * legible against is the picture: a fixed 64px mark is generous on a thumbnail
+ * and lost on a hero. The clamp keeps it a control at both ends, never smaller
+ * than a comfortable target and never a decoration filling the frame.
+ *
+ * A plain percentage, which resolves against the stage because this is
+ * positioned out of it. A container query was the first attempt and the stage
+ * cannot be one: `container-type: size` contains both axes, and the stage takes
+ * its height from the `<video>` inside it, the aspect ratio being on that
+ * element rather than on the host. Measured, every video on the page collapsed
+ * to 528 by 0. A percentage needs no containment to read the same number.
+ *
+ * A disc *and* a ring, because the frame underneath could be anything. The
+ * scrim alone is 64% of near-black in this region, which is a dark disc: over a
+ * bright frame it reads, and over a dark one it disappears into the picture and
+ * leaves the glyph floating on nothing. Measured on the first frame of the
+ * sample clip, which is dark. The hairline is the page's ink, so whichever of
+ * the two vanishes the other one is there.
+ *
+ * It goes when the video starts, which is a render rather than a transition:
+ * the element stops drawing it, because what it marks is a state that does not
+ * come back. */
+[part="start"] {
+  all: unset;
+  --icon-size: 40%;
+
+  align-items: center;
+  aspect-ratio: 1;
+  background-color: var(--helix-color-overlay);
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 var(--helix-border-thin)
+    color-mix(in oklab, var(--helix-color-foreground) 40%, transparent);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: flex;
+  /* A floor and a cap in control heights, and no token above them: the largest
+     size this library names is a control, and the next one up is the app
+     header's, which is a name meaning something else. Derived rather than
+     borrowed for that reason. */
+  inline-size: var(
+    --video-start-size,
+    clamp(var(--helix-size-control-md), 15%, calc(var(--helix-size-control-lg) * 1.5))
+  );
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  justify-content: center;
+  position: absolute;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: -50% -50%;
+}
+
+/* Lifted rather than deepened. The ground is already a scrim, and in the dark
+   region a video declares the ink is near-white, so mixing toward it is what
+   reads as a press. */
+[part="start"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-overlay) 88%,
+    var(--helix-color-foreground)
+  );
+}
+
+[part="start"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* The caption, above the bar and clear of it.
  *
  * Which is the reason the element draws it at all: a browser renders cues
@@ -507,6 +581,7 @@
   [part="controls"],
   [part="cue"],
   [part="stage"]::before,
+  [part="start"],
   [part="volume"] {
     transition: none;
   }

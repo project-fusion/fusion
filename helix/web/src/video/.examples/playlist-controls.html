@@ -1,0 +1,17 @@
+<!-- @summary Skip controls, which announce and leave the set to the consumer. -->
+<helix-video
+  extra-controls="previous next"
+  id="clip"
+  label="One of several"
+  src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
+></helix-video>
+
+<!-- Preview frame: a real page would swap the source for the next one. -->
+<script>
+  const clip = document.getElementById('clip')
+  const say = (words) => {
+    clip.label = words
+  }
+  clip.addEventListener('helix-next', () => say('Asked for the next one'))
+  clip.addEventListener('helix-previous', () => say('Asked for the previous one'))
+</script>

@@ -14,6 +14,97 @@ const player = async (markup = '<helix-video label="A clip" src="/clip.mp4"></he
   return host
 }
 
+describe('the mark that starts it', () => {
+  test('a stopped video has one, because nothing else in it invites a press', async () => {
+    /* Measured on the bar before this existed: the play glyph is 16 by 16 in a
+       24 by 24 target, 0.12% of a 528 by 396 picture. What a reader meets is a
+       still frame with some chrome along the bottom. */
+    const host = await player()
+    expect(part(host, 'start')).not.toBeNull()
+  })
+
+  test('and `none` is for a video that is decoration rather than something to start', async () => {
+    const host = await player(
+      '<helix-video label="A clip" src="/clip.mp4" start-control="none"></helix-video>',
+    )
+    expect(part(host, 'start')).toBeNull()
+  })
+
+  test('the browser drawing its own controls takes it away too', async () => {
+    // That bar has a play button in it, and two would be two.
+    const host = await player('<helix-video controls label="A clip" src="/clip.mp4"></helix-video>')
+    expect(part(host, 'start')).toBeNull()
+  })
+
+  test('it goes on the first play and does not come back on pause', async () => {
+    /* A video paused halfway keeps its bar, because a paused video never idles,
+       so the small control is there and the reader has just used it. Covering
+       the picture they stopped to look at would be the opposite of helpful. */
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    expect(part(host, 'start')).not.toBeNull()
+
+    // `paused` is readonly, here and in a browser: it follows the resource
+    // rather than being set, so the state it reports has to be stood in for.
+    const pausedAs = (value: boolean) => {
+      Object.defineProperty(video, 'paused', { configurable: true, value })
+    }
+
+    pausedAs(false)
+    video.dispatchEvent(new Event('play'))
+    await host.updateComplete
+    expect(part(host, 'start')).toBeNull()
+
+    pausedAs(true)
+    video.dispatchEvent(new Event('pause'))
+    await host.updateComplete
+    expect(part(host, 'start')).toBeNull()
+  })
+})
+
+describe('asking for another item in a set', () => {
+  const skipper = async () =>
+    player(
+      '<helix-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-video>',
+    )
+
+  test('both controls are offered without anything being checked', async () => {
+    /* Neither does anything to the video, so there is nothing to feature-test.
+       A player that hid them until it could prove a set existed would be a
+       player that cannot know: a `<video>` plays one resource. */
+    const host = await skipper()
+    expect(part(host, 'previous')).not.toBeNull()
+    expect(part(host, 'next')).not.toBeNull()
+  })
+
+  test('and pressing one announces, rather than doing anything', async () => {
+    const host = await skipper()
+    const heard: string[] = []
+    host.addEventListener('helix-next', (event) => {
+      heard.push((event as CustomEvent<{ to: string }>).detail.to)
+    })
+    host.addEventListener('helix-previous', (event) => {
+      heard.push((event as CustomEvent<{ to: string }>).detail.to)
+    })
+    ;(part(host, 'next') as HTMLElement).click()
+    ;(part(host, 'previous') as HTMLElement).click()
+    expect(heard).toEqual(['next', 'previous'])
+  })
+
+  test('the events bubble and are composed, so a wrapper can answer them', async () => {
+    // What comes next is a playlist's business, and a playlist is outside.
+    const host = await skipper()
+    let seen: Event | undefined
+    document.addEventListener('helix-next', (event) => {
+      seen = event
+    })
+    ;(part(host, 'next') as HTMLElement).click()
+    expect(seen?.bubbles).toBe(true)
+    expect(seen?.composed).toBe(true)
+    expect(seen?.cancelable).toBe(false)
+  })
+})
+
 describe('video', () => {
   test('the picture is a real video element', async () => {
     /* Decoding, buffering, captions, Picture in Picture and whatever codecs a
