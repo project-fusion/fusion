@@ -63,14 +63,14 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 157 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 159 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 195 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 167 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 170 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 167 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 78 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 59 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 58 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 19 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 27 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 28 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 5 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 
