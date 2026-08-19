@@ -8467,6 +8467,20 @@
             },
             {
               "kind": "field",
+              "name": "noValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nInput Color sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Input Color dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
+              "attribute": "no-value",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "noFormat",
               "type": {
                 "text": "boolean"
@@ -8584,6 +8598,31 @@
               "privacy": "private",
               "description": "The presets, as written, with anything that is not a colour dropped.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "settled",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The last value that was a colour.\n\nHalf-typed input reaches the row on every keystroke and most of it is not a\ncolour, so the square is given the last thing that was one. Typing `#00ff00`\na character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,\n`#00ff00`: two of those are colours and the ones between are not, so without\nthis the square walks red, blue, red, green. Input Color keeps the same\nguard for its own field, each local to the input it protects.",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleValueInput",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes what was typed, and lets the square follow only a whole colour.",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
                 "module": "src/color/root/color-root.ts"
@@ -8989,6 +9028,19 @@
               }
             },
             {
+              "name": "no-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether to leave the value out, for a picker whose value is stated elsewhere.\n\nThe row reads the colour as text and lets it be typed or pasted, which is\nwhat makes this element complete standing on a page: a square and two ramps\ncan build a colour and cannot state one, and a reader who has a hex already\nshould not have to find it by dragging.\n\nInput Color sets this, because its field is that input. Two editable fields\nfor one value is the outcome worth avoiding: two places to type, and no\nanswer to which one is authoritative or which has the caret. The other way\nround was considered, Input Color dropping its own field and letting this be\nthe only one, and it is worse for a form: the value cannot be read or pasted\nwithout opening a panel.",
+              "fieldName": "noValue",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
               "name": "no-format",
               "type": {
                 "text": "boolean"
@@ -9136,8 +9188,16 @@
               }
             },
             {
-              "description": "The row holding the syntax toggle and the presets.",
+              "description": "The row holding the value and the tools.",
               "name": "footer",
+              "inheritedFrom": {
+                "name": "HelixBaseColor",
+                "module": "src/color/root/color-root.ts"
+              }
+            },
+            {
+              "description": "The colour as text, which can be typed or pasted.",
+              "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseColor",
                 "module": "src/color/root/color-root.ts"

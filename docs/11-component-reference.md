@@ -997,6 +997,7 @@ brought its own card would be a card inside a card there.
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `noEyedropper` | `no-eyedropper` | `boolean` | `false` | `HelixBaseColor` | Whether the eyedropper is offered where the browser has one. |
 | `noFormat` | `no-format` | `boolean` | `false` | `HelixBaseColor` | Whether the reader may change the format. |
+| `noValue` | `no-value` | `boolean` | `false` | `HelixBaseColor` | Whether to leave the value out, for a picker whose value is stated elsewhere. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `swatches` | `swatches` | `string` | `''` | `HelixBaseColor` | Colours offered under the picker, as a comma-separated list. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -1032,7 +1033,8 @@ brought its own card would be a card inside a card there.
 | `channel` | One ramp. |
 | `actions` | The group holding the eyedropper and the syntax toggle. |
 | `eyedropper` | The control that samples a colour from the screen. |
-| `footer` | The row holding the syntax toggle and the presets. |
+| `footer` | The row holding the value and the tools. |
+| `value` | The colour as text, which can be typed or pasted. |
 | `format` | The control that changes the syntax the value is written in. |
 | `swatches` | The row of presets. |
 | `swatch` | One preset. |

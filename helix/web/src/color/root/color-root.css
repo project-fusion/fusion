@@ -235,10 +235,6 @@
   --slider-track-color: transparent;
 }
 
-[part="footer"] {
-  padding-inline: var(--color-inset, var(--helix-space-none));
-}
-
 /* Drawn only when it holds something. With no presets and no tools this is an
    empty box, and an empty box still takes its padding. */
 [part="footer"]:empty {
@@ -267,9 +263,54 @@
  * Full width because there are two of them and the row is theirs. Sized to their
  * labels they were a glyph and a three-letter word floating at one end of a
  * panel, with the swatches under them starting somewhere else again. */
+/* The value and the tools share the row: the colour as text on the left, the
+ * two controls on the right.
+ *
+ * The text is what makes this element complete standing on a page. A square and
+ * two ramps can build a colour and cannot state one, and a reader who already
+ * has a hex should not have to find it by dragging. Input Color sets `no-value`
+ * and the tools then take the row, since its own field is that input. */
+[part="footer"] {
+  display: flex;
+  gap: var(--helix-space-xs);
+  margin-block-start: var(--helix-space-sm);
+  padding-inline: var(--color-inset, var(--helix-space-none));
+}
+
+[part="value"] {
+  all: unset;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-control);
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-xs);
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="value"]:hover {
+  border-color: var(--helix-color-foreground-muted);
+}
+
+[part="value"]:focus-visible {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
+/* The tools keep their own width beside the text, and take the row when there is
+   no text: `flex: 1 1 0` on each button splits whatever the row has left, which
+   is everything when the value is withheld and nothing it does not need when it
+   is not. */
 [part="actions"] {
   display: flex;
-  margin-block-start: var(--helix-space-sm);
+  flex: 1 1 auto;
 }
 
 [part="actions"] helix-button {
@@ -313,7 +354,8 @@
  * field. `aria-pressed` stays, because a screen reader has neither of those. */
 @media (prefers-reduced-motion: reduce) {
   [part="eyedropper"],
-  [part="format"] {
+  [part="format"],
+  [part="value"] {
     transition: none;
   }
 }

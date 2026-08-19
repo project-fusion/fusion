@@ -93,7 +93,8 @@ interface EyeDropperConstructor {
  * @csspart channel - One ramp.
  * @csspart actions - The group holding the eyedropper and the syntax toggle.
  * @csspart eyedropper - The control that samples a colour from the screen.
- * @csspart footer - The row holding the syntax toggle and the presets.
+ * @csspart footer - The row holding the value and the tools.
+ * @csspart value - The colour as text, which can be typed or pasted.
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart swatches - The row of presets.
  * @csspart swatch - One preset.
@@ -117,6 +118,24 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
    */
   @property({ reflect: true })
   format: ColorFormat = 'hex'
+
+  /**
+   * Whether to leave the value out, for a picker whose value is stated elsewhere.
+   *
+   * The row reads the colour as text and lets it be typed or pasted, which is
+   * what makes this element complete standing on a page: a square and two ramps
+   * can build a colour and cannot state one, and a reader who has a hex already
+   * should not have to find it by dragging.
+   *
+   * Input Color sets this, because its field is that input. Two editable fields
+   * for one value is the outcome worth avoiding: two places to type, and no
+   * answer to which one is authoritative or which has the caret. The other way
+   * round was considered, Input Color dropping its own field and letting this be
+   * the only one, and it is worse for a form: the value cannot be read or pasted
+   * without opening a panel.
+   */
+  @property({ attribute: 'no-value', type: Boolean })
+  noValue = false
 
   /** Whether the reader may change the format. */
   @property({ attribute: 'no-format', type: Boolean })
@@ -161,7 +180,10 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
 
   /** Where the picker stands: what was moved, or what the value says, or the start. */
   get color(): Color {
-    return this.moved ?? parseColor(this.value) ?? START
+    /* `settled` between the value and the start, so a half-typed value leaves
+       the square where the last whole one put it rather than throwing it back to
+       red. Only reached where the value itself is not a colour. */
+    return this.moved ?? parseColor(this.value) ?? parseColor(this.settled) ?? START
   }
 
   /**
@@ -179,6 +201,29 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
   /** The presets, as written, with anything that is not a colour dropped. */
   private get presets(): string[] {
     return splitColors(this.swatches).filter((one) => parseColor(one) !== null)
+  }
+
+  /**
+   * The last value that was a colour.
+   *
+   * Half-typed input reaches the row on every keystroke and most of it is not a
+   * colour, so the square is given the last thing that was one. Typing `#00ff00`
+   * a character at a time goes `#`, `#0`, `#00`, `#00f`, `#00ff`, `#00ff0`,
+   * `#00ff00`: two of those are colours and the ones between are not, so without
+   * this the square walks red, blue, red, green. Input Color keeps the same
+   * guard for its own field, each local to the input it protects.
+   */
+  private settled = ''
+
+  /** Takes what was typed, and lets the square follow only a whole colour. */
+  private readonly handleValueInput = (event: Event): void => {
+    const typed = (event.target as HTMLInputElement).value
+    const parsed = parseColor(typed)
+    if (parsed) {
+      this.moved = parsed
+      this.owned = true
+    }
+    this.requestValue(typed)
   }
 
   /** Moves part of the model and announces the value that follows from it. */
@@ -284,6 +329,9 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
   protected override updated(changed: import('lit').PropertyValues): void {
     super.updated(changed)
     if (changed.has('value')) {
+      if (parseColor(this.value)) {
+        this.settled = this.value
+      }
       /* Let go only where the value came from somewhere else, so the getter
          reads that value instead. `owned` is cleared here rather than where it
          is set, so it covers exactly the one update this element caused. */
@@ -376,6 +424,20 @@ export class HelixBaseColor extends MixinControllerValue(HelixFormElement) {
            with the two controls stacked in a column beside them the hue bar was
            eighty pixels, and a hue is picked out of three hundred and sixty. -->
       <div part="footer">
+        ${
+          this.noValue
+            ? nothing
+            : html`<input
+                part="value"
+                type="text"
+                aria-label="Colour"
+                autocomplete="off"
+                spellcheck="false"
+                .value=${this.value}
+                ?disabled=${this.isDisabled}
+                @input=${this.handleValueInput}
+              />`
+        }
         ${
           this.tools
             ? html`<helix-button-group part="actions" label="Colour tools">

@@ -36,6 +36,17 @@ describe('input color', () => {
     expect(picker?.tagName.toLowerCase()).toBe('helix-color')
   })
 
+  test('the picker states no value of its own, because the field is that input', async () => {
+    /* Two editable fields for one value is two places to type with no answer to
+       which one is authoritative or which has the caret. The field stays the
+       input, because a form wants the colour readable and pasteable without
+       opening a panel. */
+    const host = await field()
+    const picker = part(host, 'picker') as HTMLElement
+    expect(picker.hasAttribute('no-value')).toBe(true)
+    expect(picker.shadowRoot?.querySelector('[part="value"]')).toBeNull()
+  })
+
   test('the value reaches the picker, and what it answers reaches the form', async () => {
     const host = await field('default-value="#ff0000" name="brand"')
     const picker = part(host, 'picker') as HTMLElement & { value: string }

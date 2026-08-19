@@ -1518,6 +1518,34 @@ did not ask for transparency should not have to strip a byte off each one. */
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
   format?: HelixBaseColor["format"];
+  /** Whether to leave the value out, for a picker whose value is stated elsewhere.
+
+The row reads the colour as text and lets it be typed or pasted, which is
+what makes this element complete standing on a page: a square and two ramps
+can build a colour and cannot state one, and a reader who has a hex already
+should not have to find it by dragging.
+
+Input Color sets this, because its field is that input. Two editable fields
+for one value is the outcome worth avoiding: two places to type, and no
+answer to which one is authoritative or which has the caret. The other way
+round was considered, Input Color dropping its own field and letting this be
+the only one, and it is worse for a form: the value cannot be read or pasted
+without opening a panel. */
+  "no-value"?: HelixBaseColor["noValue"];
+  /** Whether to leave the value out, for a picker whose value is stated elsewhere.
+
+The row reads the colour as text and lets it be typed or pasted, which is
+what makes this element complete standing on a page: a square and two ramps
+can build a colour and cannot state one, and a reader who has a hex already
+should not have to find it by dragging.
+
+Input Color sets this, because its field is that input. Two editable fields
+for one value is the outcome worth avoiding: two places to type, and no
+answer to which one is authoritative or which has the caret. The other way
+round was considered, Input Color dropping its own field and letting this be
+the only one, and it is worse for a form: the value cannot be read or pasted
+without opening a panel. */
+  noValue?: HelixBaseColor["noValue"];
   /** Whether the reader may change the format. */
   "no-format"?: HelixBaseColor["noFormat"];
   /** Whether the reader may change the format. */
@@ -1598,6 +1626,34 @@ did not ask for transparency should not have to strip a byte off each one. */
 Only what is written. Everything is read whatever this says, so a picker on
 `hex` still takes an `rgb()` handed to it and stores the hex for it. */
   "prop:format"?: HelixBaseColor["format"];
+  /** Whether to leave the value out, for a picker whose value is stated elsewhere.
+
+The row reads the colour as text and lets it be typed or pasted, which is
+what makes this element complete standing on a page: a square and two ramps
+can build a colour and cannot state one, and a reader who has a hex already
+should not have to find it by dragging.
+
+Input Color sets this, because its field is that input. Two editable fields
+for one value is the outcome worth avoiding: two places to type, and no
+answer to which one is authoritative or which has the caret. The other way
+round was considered, Input Color dropping its own field and letting this be
+the only one, and it is worse for a form: the value cannot be read or pasted
+without opening a panel. */
+  "bool:no-value"?: HelixBaseColor["noValue"];
+  /** Whether to leave the value out, for a picker whose value is stated elsewhere.
+
+The row reads the colour as text and lets it be typed or pasted, which is
+what makes this element complete standing on a page: a square and two ramps
+can build a colour and cannot state one, and a reader who has a hex already
+should not have to find it by dragging.
+
+Input Color sets this, because its field is that input. Two editable fields
+for one value is the outcome worth avoiding: two places to type, and no
+answer to which one is authoritative or which has the caret. The other way
+round was considered, Input Color dropping its own field and letting this be
+the only one, and it is worse for a form: the value cannot be read or pasted
+without opening a panel. */
+  "prop:noValue"?: HelixBaseColor["noValue"];
   /** Whether the reader may change the format. */
   "bool:no-format"?: HelixBaseColor["noFormat"];
   /** Whether the reader may change the format. */
@@ -8731,6 +8787,19 @@ export type CustomElements = {
    *
    * Only what is written. Everything is read whatever this says, so a picker on
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
+   *
+   * The row reads the colour as text and lets it be typed or pasted, which is
+   * what makes this element complete standing on a page: a square and two ramps
+   * can build a colour and cannot state one, and a reader who has a hex already
+   * should not have to find it by dragging.
+   *
+   * Input Color sets this, because its field is that input. Two editable fields
+   * for one value is the outcome worth avoiding: two places to type, and no
+   * answer to which one is authoritative or which has the caret. The other way
+   * round was considered, Input Color dropping its own field and letting this be
+   * the only one, and it is worse for a form: the value cannot be read or pasted
+   * without opening a panel.
    * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
    * - `swatches`: Colours offered under the picker, as a comma-separated list.
@@ -8831,7 +8900,8 @@ export type CustomElements = {
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
    * - `eyedropper`: The control that samples a colour from the screen.
-   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `footer`: The row holding the value and the tools.
+   * - `value`: The colour as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.
@@ -15284,6 +15354,19 @@ export type CustomElementsSolidJs = {
    *
    * Only what is written. Everything is read whatever this says, so a picker on
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
+   *
+   * The row reads the colour as text and lets it be typed or pasted, which is
+   * what makes this element complete standing on a page: a square and two ramps
+   * can build a colour and cannot state one, and a reader who has a hex already
+   * should not have to find it by dragging.
+   *
+   * Input Color sets this, because its field is that input. Two editable fields
+   * for one value is the outcome worth avoiding: two places to type, and no
+   * answer to which one is authoritative or which has the caret. The other way
+   * round was considered, Input Color dropping its own field and letting this be
+   * the only one, and it is worse for a form: the value cannot be read or pasted
+   * without opening a panel.
    * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
    * - `swatches`: Colours offered under the picker, as a comma-separated list.
@@ -15384,7 +15467,8 @@ export type CustomElementsSolidJs = {
    * - `channel`: One ramp.
    * - `actions`: The group holding the eyedropper and the syntax toggle.
    * - `eyedropper`: The control that samples a colour from the screen.
-   * - `footer`: The row holding the syntax toggle and the presets.
+   * - `footer`: The row holding the value and the tools.
+   * - `value`: The colour as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
    * - `swatch`: One preset.

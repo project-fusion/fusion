@@ -241,6 +241,19 @@ export class HelixBaseInputColor extends MixinControllerOpen(
     this.control?.focus(options)
   }
 
+  /*
+   * The picker is told `no-value` because the field above it is that input.
+   *
+   * Standing on a page, helix-color states its own colour as text: a square and
+   * two ramps can build one and cannot state one, and a reader who already has a
+   * hex should not have to find it by dragging. Here that row would be a second
+   * editable field for the same value, which is two places to type with no
+   * answer to which one is authoritative or which has the caret.
+   *
+   * The other way round was considered, this element dropping its own field and
+   * letting the panel's be the only one. It is worse for a form: the value could
+   * not be read at a glance or pasted without opening a panel.
+   */
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -281,6 +294,7 @@ export class HelixBaseInputColor extends MixinControllerOpen(
           part="picker"
           ?alpha=${this.alpha}
           ?no-format=${this.noFormat}
+          no-value
           .format=${this.format}
           .value=${this.picked}
           swatches=${this.swatches || nothing}

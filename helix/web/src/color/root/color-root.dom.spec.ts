@@ -244,9 +244,48 @@ describe('color picker', () => {
 
   test('the footer is not drawn when it holds nothing', async () => {
     // An empty box still takes its padding, which is a band of nothing under the
-    // ramps on a picker with no presets and no toggle.
-    const host = await picker('no-format')
-    expect(host.shadowRoot?.querySelector('[part="swatch"]')).toBeNull()
+    // ramps on a picker with no value, no tools and no presets.
+    const host = await picker('no-format no-value')
     expect(part(host, 'footer')?.childElementCount).toBe(0)
+  })
+
+  test('the value is stated as text, which is what completes a picker on a page', async () => {
+    // A square and two ramps can build a colour and cannot state one, and a
+    // reader who already has a hex should not have to find it by dragging.
+    const host = await picker('default-value="#ff0000"')
+    expect((part(host, 'value') as HTMLInputElement).value).toBe('#ff0000')
+  })
+
+  test('and typed into, in any syntax', async () => {
+    const host = await picker()
+    const field = part(host, 'value') as HTMLInputElement
+    field.value = 'rgb(0 255 0)'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(host.value).toBe('rgb(0 255 0)')
+    expect(part(host, 'grid')?.getAttribute('style')).toContain('--_hue: 120')
+  })
+
+  test('and half-typed input does not throw the square around', async () => {
+    /* `#00f` and `#00ff` are colours and `#00ff0` is not, so re-reading the
+       square from the value on every keystroke walks it red, blue, red, green.
+       The last whole colour holds it until the next one arrives. */
+    const host = await picker()
+    const field = part(host, 'value') as HTMLInputElement
+    const seen: string[] = []
+    for (const text of ['#', '#0', '#00', '#00f', '#00ff', '#00ff0', '#00ff00']) {
+      field.value = text
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      await host.updateComplete
+      const style = part(host, 'grid')?.getAttribute('style') ?? ''
+      seen.push(/--_hue: (\d+)/.exec(style)?.[1] ?? '?')
+    }
+    expect(seen).toEqual(['0', '0', '0', '240', '240', '240', '120'])
+    expect(host.value).toBe('#00ff00')
+  })
+
+  test('and it can be withheld, for a picker whose value is stated elsewhere', async () => {
+    const host = await picker('no-value')
+    expect(host.shadowRoot?.querySelector('[part="value"]')).toBeNull()
   })
 })
