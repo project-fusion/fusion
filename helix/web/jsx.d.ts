@@ -10293,6 +10293,12 @@ navigation puts every chevron on the same side, and a per-item version
 would make a ragged tree writable and would have to be repeated on every
 row to say one thing.
 
+**Optional, with no default.** A reflected property that defaults to a
+value writes that value onto every host: `chevron-placement="start"`
+appeared in the server's markup for every tree anybody rendered, which is
+the same fault `href` and `target` had on `Button`. The resting arrangement
+is the absence of the attribute, and the stylesheet only asks about `end`.
+
 It is worth owning rather than leaving to `::part(toggle)`, which a
 consumer could reach for: the naive version is `order` plus an auto margin,
 and the row's `end` slot already carries an auto margin of its own, so the
@@ -10310,6 +10316,12 @@ On the tree rather than on the item, because it is a fact about the list. A
 navigation puts every chevron on the same side, and a per-item version
 would make a ragged tree writable and would have to be repeated on every
 row to say one thing.
+
+**Optional, with no default.** A reflected property that defaults to a
+value writes that value onto every host: `chevron-placement="start"`
+appeared in the server's markup for every tree anybody rendered, which is
+the same fault `href` and `target` had on `Button`. The resting arrangement
+is the absence of the attribute, and the stylesheet only asks about `end`.
 
 It is worth owning rather than leaving to `::part(toggle)`, which a
 consumer could reach for: the naive version is `order` plus an auto margin,
@@ -10369,6 +10381,12 @@ navigation puts every chevron on the same side, and a per-item version
 would make a ragged tree writable and would have to be repeated on every
 row to say one thing.
 
+**Optional, with no default.** A reflected property that defaults to a
+value writes that value onto every host: `chevron-placement="start"`
+appeared in the server's markup for every tree anybody rendered, which is
+the same fault `href` and `target` had on `Button`. The resting arrangement
+is the absence of the attribute, and the stylesheet only asks about `end`.
+
 It is worth owning rather than leaving to `::part(toggle)`, which a
 consumer could reach for: the naive version is `order` plus an auto margin,
 and the row's `end` slot already carries an auto margin of its own, so the
@@ -10386,6 +10404,12 @@ On the tree rather than on the item, because it is a fact about the list. A
 navigation puts every chevron on the same side, and a per-item version
 would make a ragged tree writable and would have to be repeated on every
 row to say one thing.
+
+**Optional, with no default.** A reflected property that defaults to a
+value writes that value onto every host: `chevron-placement="start"`
+appeared in the server's markup for every tree anybody rendered, which is
+the same fault `href` and `target` had on `Button`. The resting arrangement
+is the absence of the attribute, and the stylesheet only asks about `end`.
 
 It is worth owning rather than leaving to `::part(toggle)`, which a
 consumer could reach for: the naive version is `order` plus an auto margin,
@@ -18331,6 +18355,12 @@ export type CustomElements = {
    * navigation puts every chevron on the same side, and a per-item version
    * would make a ragged tree writable and would have to be repeated on every
    * row to say one thing.
+   *
+   * **Optional, with no default.** A reflected property that defaults to a
+   * value writes that value onto every host: `chevron-placement="start"`
+   * appeared in the server's markup for every tree anybody rendered, which is
+   * the same fault `href` and `target` had on `Button`. The resting arrangement
+   * is the absence of the attribute, and the stylesheet only asks about `end`.
    *
    * It is worth owning rather than leaving to `::part(toggle)`, which a
    * consumer could reach for: the naive version is `order` plus an auto margin,
@@ -26586,6 +26616,12 @@ export type CustomElementsSolidJs = {
    * navigation puts every chevron on the same side, and a per-item version
    * would make a ragged tree writable and would have to be repeated on every
    * row to say one thing.
+   *
+   * **Optional, with no default.** A reflected property that defaults to a
+   * value writes that value onto every host: `chevron-placement="start"`
+   * appeared in the server's markup for every tree anybody rendered, which is
+   * the same fault `href` and `target` had on `Button`. The resting arrangement
+   * is the absence of the attribute, and the stylesheet only asks about `end`.
    *
    * It is worth owning rather than leaving to `::part(toggle)`, which a
    * consumer could reach for: the naive version is `order` plus an auto margin,

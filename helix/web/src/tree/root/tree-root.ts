@@ -46,6 +46,12 @@ export class HelixTree extends HelixBaseTree {
    * would make a ragged tree writable and would have to be repeated on every
    * row to say one thing.
    *
+   * **Optional, with no default.** A reflected property that defaults to a
+   * value writes that value onto every host: `chevron-placement="start"`
+   * appeared in the server's markup for every tree anybody rendered, which is
+   * the same fault `href` and `target` had on `Button`. The resting arrangement
+   * is the absence of the attribute, and the stylesheet only asks about `end`.
+   *
    * It is worth owning rather than leaving to `::part(toggle)`, which a
    * consumer could reach for: the naive version is `order` plus an auto margin,
    * and the row's `end` slot already carries an auto margin of its own, so the
@@ -53,7 +59,7 @@ export class HelixTree extends HelixBaseTree {
    * 70px short. That is the kind of thing a component should absorb once.
    */
   @property({ attribute: 'chevron-placement', reflect: true })
-  chevronPlacement: 'start' | 'end' = 'start'
+  chevronPlacement?: 'start' | 'end'
 
   static override styles: CSSResultGroup = styles
 }

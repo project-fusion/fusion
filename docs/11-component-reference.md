@@ -5182,7 +5182,7 @@ to it is one more thing between the reader and the label.
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `chevron` | `chevron` | `'end' \| undefined` | - | `HelixBaseTree` | Which end of a row the chevron sits at. |
-| `chevronPlacement` | `chevron-placement` | `'start' \| 'end'` | `'start'` | - | Which end of the row the branch chevron sits at. |
+| `chevronPlacement` | `chevron-placement` | `'start' \| 'end' \| undefined` | - | - | Which end of the row the branch chevron sits at. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
 | `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
