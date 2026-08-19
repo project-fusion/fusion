@@ -14,6 +14,7 @@ import {
   type PropertyDoc,
 } from '../../../../../lib/catalog'
 import { sourceUrl } from '../../../../../lib/source'
+import { DocsNav } from './docs-nav'
 import { ComponentPreview } from './preview'
 
 /**
@@ -309,40 +310,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
 
   return (
     <div className="docsShell">
-      <nav aria-label="Documentation" className="docsNav">
-        {/* A branch, not a flat list. Components is one entry among the guides
-            that will sit beside it rather than the whole of the navigation,
-            which is what a flat tree of sixty-six families quietly asserted. */}
-        <helix-tree active={family.slug} chevron-placement="end" label="Documentation">
-          {/* `default-open`, not `open`. `open` is the controlled half of
-              `MixinControllerOpen`, and setting it declares the consumer owns
-              the state: the branch would freeze open and a reader could not
-              collapse it. Seeding is what markup is for. */}
-          <helix-tree-item default-open suppressHydrationWarning value="components">
-            Components
-            {families.map((entry) => (
-              {/* `href` on the item, not a link inside it. The row is then a
-                  real anchor: the whole row is the target, Enter enters, and
-                  middle-click opens a tab. A `<Link>` slotted into the name was
-                  a 57px anchor in a 240px row, and the keyboard could not
-                  follow it at all.
-
-                  Which costs this nav its client-side routing, since Next only
-                  intercepts anchors it rendered itself. These are static pages
-                  and the trade is worth it: a link that navigates from one
-                  quarter of itself is broken, and one that reloads is slow. */}
-              <helix-tree-item
-                href={`/design/components/${entry.slug}`}
-                key={entry.slug}
-                slot="children"
-                value={entry.slug}
-              >
-                {entry.label}
-              </helix-tree-item>
-            ))}
-          </helix-tree-item>
-        </helix-tree>
-      </nav>
+      <DocsNav active={family.slug} entries={families} />
 
       <article className="docsMain">
         <helix-flex direction="column" gap="2xl">
