@@ -544,9 +544,18 @@ export class HelixBaseSplitter extends HelixElement {
     }
     this.origin = null
     this.dragging = false
+    /* Nothing moved, so nothing is announced.
+       Every press on the divider used to settle, which dispatched a change
+       carrying the position it already had: a plain click rewrote a consumer's
+       stored value from a gesture that moved nothing. Harmless where the value
+       round-trips exactly, and not where it does not, which is any consumer
+       storing pixels and dividing by a box. */
+    if (this.reached === undefined) {
+      return
+    }
     /* `reached` is deliberately left standing. It is what the divider is drawn
        from until the consumer answers, and the setter is what clears it. */
-    this.settle(this.reached ?? this.position)
+    this.settle(this.reached)
   }
 
   /**
@@ -866,7 +875,21 @@ export class HelixBaseSplitter extends HelixElement {
 
   protected override render(): TemplateResult {
     const position = this.showing
-    return html`<div part="start" style="--_splitter-position: ${position}%">
+    /* The panes are marked while the divider moves, so the styled tier can take
+       them out of the pointer's way.
+       A pane holds whatever a consumer put in it, and an `<iframe>` is the case
+       that breaks: a cross-origin frame is its own hit-testing world, and a drag
+       whose path crosses one can be lost to it. The sandbox is exactly this, a
+       sandboxed preview sitting against the panel divider, so the drag that
+       makes the panel bigger is the drag that goes straight over it.
+       On the panes rather than on the host, which the `dragging` state above
+       records as a rule: a `data-` attribute here is one this element owns, and
+       one on the host is one a React consumer's server markup never had. */
+    return html`<div
+        part="start"
+        ?data-dragging=${this.dragging}
+        style="--_splitter-position: ${position}%"
+      >
         <slot name="start"></slot>
       </div>
       <div
@@ -887,7 +910,7 @@ export class HelixBaseSplitter extends HelixElement {
         @pointermove=${this.handlePointerMove}
         @pointerup=${this.handlePointerUp}
       ></div>
-      <div part="end">
+      <div part="end" ?data-dragging=${this.dragging}>
         <slot name="end"></slot>
       </div>
       ${this.crossings.map(

@@ -592,3 +592,44 @@ describe('splitter under a consumer that owns the position', () => {
     expect(host.position).toBe(75)
   })
 })
+
+describe('a press that moves nothing', () => {
+  const pointer = (type: string, y = 0): PointerEvent =>
+    new PointerEvent(type, { bubbles: true, clientY: y, composed: true, pointerId: 1 })
+
+  test('announces nothing, because nothing changed', async () => {
+    /* Every press used to settle, dispatching the position the divider already
+       had. Harmless where a consumer's value round-trips exactly, and not where
+       it does not: the sandbox stores pixels and divides by a box, so a plain
+       click rewrote a stored size from a gesture that moved nothing. */
+    const host = await splitter('default-position="40"')
+    const said: string[] = []
+    host.addEventListener('helix-change', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const bar = separator(host)
+    bar.dispatchEvent(pointer('pointerdown', 100))
+    bar.dispatchEvent(pointer('pointerup', 100))
+    await host.updateComplete
+    expect(said).toEqual([])
+  })
+
+  test('and the panes go inert only while it is actually moving', async () => {
+    /* A pane holds whatever a consumer slotted, and a cross-origin iframe is its
+       own hit-testing world: a drag whose path crosses one can be lost to it.
+       Asserted on both edges, since a pane left inert after the gesture is a
+       pane nobody can click. */
+    const host = await splitter('default-position="40"')
+    const pane = part(host, 'start') as HTMLElement
+    expect(pane.hasAttribute('data-dragging')).toBe(false)
+
+    separator(host).dispatchEvent(pointer('pointerdown', 100))
+    await host.updateComplete
+    expect(pane.hasAttribute('data-dragging')).toBe(true)
+    expect((part(host, 'end') as HTMLElement).hasAttribute('data-dragging')).toBe(true)
+
+    separator(host).dispatchEvent(pointer('pointerup', 100))
+    await host.updateComplete
+    expect(pane.hasAttribute('data-dragging')).toBe(false)
+  })
+})

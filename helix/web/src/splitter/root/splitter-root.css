@@ -353,3 +353,18 @@
     transition: none;
   }
 }
+
+/* Out of the pointer's way while the divider moves.
+ *
+ * A pane holds whatever a consumer put in it, and a cross-origin `<iframe>` is
+ * the case that breaks a drag: it is its own hit-testing world, so a pointer
+ * crossing one can be taken by it. The sandbox is that case exactly, a
+ * sandboxed preview frame sitting against the panel divider, which makes the
+ * drag that grows the panel the drag that passes over the frame.
+ *
+ * The divider keeps the pointer it captured, so this costs the gesture nothing
+ * and only removes what could interrupt it. It lasts for the drag alone. */
+[part="start"][data-dragging],
+[part="end"][data-dragging] {
+  pointer-events: none;
+}
