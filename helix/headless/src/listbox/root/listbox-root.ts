@@ -142,6 +142,15 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
   private activeValue = ''
 
   /**
+   * Whether the key being handled was forwarded rather than typed into this.
+   *
+   * Plain state rather than reactive: it is set and cleared inside one
+   * synchronous call, so nothing renders while it is true and nothing outside
+   * can observe it.
+   */
+  private forwarded = false
+
+  /**
    * Whether anything survived the filter, kept as state rather than counted at
    * render time.
    *
@@ -316,9 +325,46 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     this.activeValue = target.value
     /* Chosen on the way past only where moving is choosing. With `multiple` a
        reader passing over four options on the way to the fifth did not mean to
-       pick all five. */
-    if (!this.multiple) {
+       pick all five.
+
+       Nor where the keys were forwarded. A list with the focus on it selects as
+       it moves, which is the pattern for a listbox; a combobox's arrows move
+       the highlight and Enter takes it, which is the pattern for a combobox,
+       and the two differ by exactly which element the reader is in. Measured
+       before this: the first Down in a combobox committed the second option
+       and shut the panel, one keystroke into the interaction. */
+    if (!this.multiple && !this.forwarded) {
       this.choose(target.value)
+    }
+  }
+
+  /**
+   * Runs the list's own key handling for a caller whose focus is elsewhere.
+   *
+   * A combobox keeps focus in its text field, because that is the whole of what
+   * a combobox is, and still has to move this list with the arrows. Without
+   * this it would have to reimplement the moving, the wrapping, the skipping of
+   * disabled options and the seeding from the current value, and the second
+   * copy would drift from this one the first time either changed.
+   *
+   * Public and taking the event rather than a direction, so a caller forwards
+   * what it received and this decides what the key means. `preventDefault` is
+   * called in here on the keys it acts on, so a caller can hand over every
+   * keydown and let the list ignore the ones that are not its business.
+   *
+   * The entry point is also what says whether moving chooses, which is why the
+   * flag is set here rather than exposed as a property. The difference between
+   * a listbox and a combobox is not a mode a consumer picks: it is which
+   * element the reader's focus is in, and that is exactly what calling this
+   * rather than being typed into means. Enter and Space still choose, because
+   * those are the caller asking for the answer rather than for a move.
+   */
+  navigate(event: KeyboardEvent): void {
+    this.forwarded = true
+    try {
+      this.handleKeydown(event)
+    } finally {
+      this.forwarded = false
     }
   }
 
@@ -387,9 +433,16 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     /* The keyboard cannot sit on something the filter has hidden, so it moves
        to the first thing still showing rather than nowhere: a list whose active
        option has just been filtered away is a list the next arrow press would
-       start from the top of anyway. */
+       start from the top of anyway.
+
+       But only where there is a filter to have hidden it, or a highlight worth
+       rescuing. Clearing one must not *invent* a highlight out of nothing:
+       measured, a combobox clears its filter as it closes, and that alone
+       parked the highlight on the first option while the panel was shut, so
+       the reader's first Down arrived at the second. */
     const shown = this.shown
-    if (!shown.some((option) => option.value === this.activeValue)) {
+    const rescue = needle !== '' || this.activeValue !== ''
+    if (rescue && !shown.some((option) => option.value === this.activeValue)) {
       this.activeValue = shown.find((option) => !option.disabled)?.value ?? ''
     }
     for (const option of this.options) {

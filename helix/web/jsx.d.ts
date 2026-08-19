@@ -22,6 +22,7 @@ import type {
   HelixCloseEvent,
   HelixColorInput,
   HelixColorPicker,
+  HelixCombobox,
   HelixCompleteEvent,
   HelixConsoleEvent,
   HelixCopyButton,
@@ -2349,6 +2350,250 @@ fire at all. */
   "on:helix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
   "on:helix-copy"?: (e: HelixColorPickerHelixCopyElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixCombobox` component event */
+export type HelixComboboxElementEvent<E = Event> = TypedEvent<HelixCombobox, E>;
+/** `helix-change` event type */
+export type HelixComboboxHelixChangeElementEvent =
+  HelixComboboxElementEvent<HelixChangeEvent>;
+/** `helix-open` event type */
+export type HelixComboboxHelixOpenElementEvent =
+  HelixComboboxElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixComboboxHelixCloseElementEvent =
+  HelixComboboxElementEvent<HelixCloseEvent>;
+
+export type HelixComboboxProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixCombobox["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixCombobox["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixCombobox["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixCombobox["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixCombobox["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixCombobox["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixCombobox["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixCombobox["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixCombobox["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixCombobox["required"];
+  /** Text shown while nothing has been chosen. */
+  placeholder?: HelixCombobox["placeholder"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "list-label"?: HelixCombobox["listLabel"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  listLabel?: HelixCombobox["listLabel"];
+  /** Words shown where the filter has hidden everything. */
+  "empty-text"?: HelixCombobox["emptyText"];
+  /** Words shown where the filter has hidden everything. */
+  emptyText?: HelixCombobox["emptyText"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixCombobox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixCombobox["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  onOpenChange?: HelixCombobox["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixCombobox["onValueChange"];
+
+  /** Fired when the chosen option changes. */
+  "onhelix-change"?: (e: HelixComboboxHelixChangeElementEvent) => void;
+  /** Fired when the panel opens. */
+  "onhelix-open"?: (e: HelixComboboxHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "onhelix-close"?: (e: HelixComboboxHelixCloseElementEvent) => void;
+};
+
+export type HelixComboboxSolidJsProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixCombobox["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixCombobox["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixCombobox["defaultOpen"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixCombobox["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixCombobox["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixCombobox["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixCombobox["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  "prop:feedback"?: HelixCombobox["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  "prop:label"?: HelixCombobox["label"];
+  /** Whether the form refuses to submit without it. */
+  "prop:required"?: HelixCombobox["required"];
+  /** Text shown while nothing has been chosen. */
+  "prop:placeholder"?: HelixCombobox["placeholder"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "attr:list-label"?: HelixCombobox["listLabel"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "prop:listLabel"?: HelixCombobox["listLabel"];
+  /** Words shown where the filter has hidden everything. */
+  "attr:empty-text"?: HelixCombobox["emptyText"];
+  /** Words shown where the filter has hidden everything. */
+  "prop:emptyText"?: HelixCombobox["emptyText"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixCombobox["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixCombobox["name"];
+  /** The consumer's callback, invoked after the state is applied.
+
+Not an attribute: it is a function. And not reachable from React's JSX,
+which reserves every `on[A-Z]` prop for its own event system and drops
+what it does not recognize; the generated wrapper listens for the events
+instead. */
+  "prop:onOpenChange"?: HelixCombobox["onOpenChange"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixCombobox["onValueChange"];
+  /** Fired when the chosen option changes. */
+  "on:helix-change"?: (e: HelixComboboxHelixChangeElementEvent) => void;
+  /** Fired when the panel opens. */
+  "on:helix-open"?: (e: HelixComboboxHelixOpenElementEvent) => void;
+  /** Fired when it closes. */
+  "on:helix-close"?: (e: HelixComboboxHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11541,6 +11786,179 @@ export type CustomElements = {
   >;
 
   /**
+   * The frame is the field rather than the input, so the caret, the marks and the
+   * focus ring are drawn once around the whole control, which is the arrangement
+   * Input, Color Input and Date Input all take.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `placeholder`: Text shown while nothing has been chosen.
+   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-open`: Fired when the panel opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, which are `helix-option` elements.
+   * - `start`: Before the text, for an icon.
+   * - `end`: After it, for a unit or a clear button.
+   * - `indicator`: Replaces the caret saying the field opens.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box around the text and its marks.
+   * - `control`: The text field itself.
+   * - `indicator`: The caret.
+   * - `surface`: The floating panel.
+   * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   */
+  "helix-combobox": Partial<
+    HelixComboboxProps & BaseProps<HelixCombobox> & BaseEvents
+  >;
+
+  /**
    * Takes the icon button's square box, then stacks its two faces in one grid
    * cell so the press never changes the button's size. See the stylesheet: a
    * control that resizes under the pointer at the moment a reader is looking at
@@ -13200,6 +13618,25 @@ export type CustomElements = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `navigate(event: KeyboardEvent) => void`: Runs the list's own key handling for a caller whose focus is elsewhere.
+   *
+   * A combobox keeps focus in its text field, because that is the whole of what
+   * a combobox is, and still has to move this list with the arrows. Without
+   * this it would have to reimplement the moving, the wrapping, the skipping of
+   * disabled options and the seeding from the current value, and the second
+   * copy would drift from this one the first time either changed.
+   *
+   * Public and taking the event rather than a direction, so a caller forwards
+   * what it received and this decides what the key means. `preventDefault` is
+   * called in here on the keys it acts on, so a caller can hand over every
+   * keydown and let the list ignore the ones that are not its business.
+   *
+   * The entry point is also what says whether moving chooses, which is why the
+   * flag is set here rather than exposed as a property. The difference between
+   * a listbox and a combobox is not a mode a consumer picks: it is which
+   * element the reader's focus is in, and that is exactly what calling this
+   * rather than being typed into means. Enter and Space still choose, because
+   * those are the caller asking for the answer rather than for a move.
    * - `reveal() => void`: Brings the chosen option to rest in the middle of the list.
    *
    * A method rather than something this does on its own, because a listbox
@@ -19252,6 +19689,182 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The frame is the field rather than the input, so the caret, the marks and the
+   * focus ring are drawn once around the whole control, which is the arrangement
+   * Input, Color Input and Date Input all take.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
+   * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `label`: The accessible name, and the fallback for the `label` slot.
+   * - `required`: Whether the form refuses to submit without it.
+   * - `placeholder`: Text shown while nothing has been chosen.
+   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
+   *
+   * Not an attribute: it is a function. And not reachable from React's JSX,
+   * which reserves every `on[A-Z]` prop for its own event system and drops
+   * what it does not recognize; the generated wrapper listens for the events
+   * instead. (property only)
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
+   * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
+   *
+   * One at a time, because only one of the two is ever rendered. Naming both
+   * would point a screen reader at an id that resolves to nothing, which it
+   * reads as a description it cannot find. (property only) (readonly)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the chosen option changes.
+   * - `helix-open`: Fired when the panel opens.
+   * - `helix-close`: Fired when it closes.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The options, which are `helix-option` elements.
+   * - `start`: Before the text, for an icon.
+   * - `end`: After it, for a unit or a clear button.
+   * - `indicator`: Replaces the caret saying the field opens.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--combobox-background-color`: Fill behind the field. (default: `undefined`)
+   * - `--combobox-panel-size`: Width of the panel. Follows the field by default. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `field`: The box around the text and its marks.
+   * - `control`: The text field itself.
+   * - `indicator`: The caret.
+   * - `surface`: The floating panel.
+   * - `listbox`: The list inside it.
+   * - `items`: The scrolling box of options, forwarded from the listbox.
+   * - `empty`: What shows where the filter has hidden everything, forwarded from the listbox.
+   */
+  "helix-combobox": Partial<
+    HelixComboboxProps &
+      HelixComboboxSolidJsProps &
+      BaseProps<HelixCombobox> &
+      BaseEvents
+  >;
+
+  /**
    * Takes the icon button's square box, then stacks its two faces in one grid
    * cell so the press never changes the button's size. See the stylesheet: a
    * control that resizes under the pointer at the moment a reader is looking at
@@ -20964,6 +21577,25 @@ export type CustomElementsSolidJs = {
    * Falling back to `defaultValue` rather than to empty, because a restore
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
+   * - `navigate(event: KeyboardEvent) => void`: Runs the list's own key handling for a caller whose focus is elsewhere.
+   *
+   * A combobox keeps focus in its text field, because that is the whole of what
+   * a combobox is, and still has to move this list with the arrows. Without
+   * this it would have to reimplement the moving, the wrapping, the skipping of
+   * disabled options and the seeding from the current value, and the second
+   * copy would drift from this one the first time either changed.
+   *
+   * Public and taking the event rather than a direction, so a caller forwards
+   * what it received and this decides what the key means. `preventDefault` is
+   * called in here on the keys it acts on, so a caller can hand over every
+   * keydown and let the list ignore the ones that are not its business.
+   *
+   * The entry point is also what says whether moving chooses, which is why the
+   * flag is set here rather than exposed as a property. The difference between
+   * a listbox and a combobox is not a mode a consumer picks: it is which
+   * element the reader's focus is in, and that is exactly what calling this
+   * rather than being typed into means. Enter and Space still choose, because
+   * those are the caller asking for the answer rather than for a move.
    * - `reveal() => void`: Brings the chosen option to rest in the middle of the list.
    *
    * A method rather than something this does on its own, because a listbox
@@ -25636,6 +26268,10 @@ export type CustomCssProperties = {
   "--color-picker-grid-ratio"?: string;
   /** Corner radius of the square. */
   "--color-picker-grid-radii"?: string;
+  /** Fill behind the field. */
+  "--combobox-background-color"?: string;
+  /** Width of the panel. Follows the field by default. */
+  "--combobox-panel-size"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
   /** Months per row. Two unless there is only one. */

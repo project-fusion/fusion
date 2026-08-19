@@ -1064,6 +1064,91 @@ brought its own card would be a card inside a card there.
 | `--color-picker-grid-ratio` | Aspect ratio of the square. |
 | `--color-picker-grid-radii` | Corner radius of the square. |
 
+## Combobox
+
+### Root — `helix-combobox`
+
+A field that filters a list as it is typed into.
+
+Extends `HelixBaseCombobox`.
+
+The frame is the field rather than the input, so the caret, the marks and the
+focus ring are drawn once around the whole control, which is the arrangement
+Input, Color Input and Date Input all take.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseCombobox` | Words shown where the filter has hidden everything. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `listLabel` | `list-label` | `string` | `'Options'` | `HelixBaseCombobox` | Accessible name for the list, which has no visible one of its own. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBaseCombobox` | Text shown while nothing has been chosen. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the chosen option changes. |
+| `helix-open` | `HelixOpenEvent` | Fired when the panel opens. |
+| `helix-close` | `HelixCloseEvent` | Fired when it closes. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The options, which are `helix-option` elements. |
+| `start` | Before the text, for an icon. |
+| `end` | After it, for a unit or a clear button. |
+| `indicator` | Replaces the caret saying the field opens. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `field` | The box around the text and its marks. |
+| `control` | The text field itself. |
+| `indicator` | The caret. |
+| `surface` | The floating panel. |
+| `listbox` | The list inside it. |
+| `items` | The scrolling box of options, forwarded from the listbox. |
+| `empty` | What shows where the filter has hidden everything, forwarded from the listbox. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--combobox-background-color` | Fill behind the field. |
+| `--combobox-panel-size` | Width of the panel. Follows the field by default. |
+
 ## Copy Button
 
 ### Root — `helix-copy-button`
@@ -2128,6 +2213,7 @@ list moves under the reader rather than the reader moving to find it.
 | `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `navigate()` | `HelixBaseListbox` | Runs the list's own key handling for a caller whose focus is elsewhere. |
 | `requestFilter()` | `HelixBaseListbox` | Requests a narrowing, and reports whether the request stood. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 | `reveal()` | `HelixBaseListbox` | Brings the chosen option to rest in the middle of the list. |
