@@ -148,8 +148,12 @@
  * measured, a tag with no prefix carried nine pixels of border and padding for
  * a slot with nothing in it. On the slotted element there is nothing to style
  * until something is there. */
+/* No rule between the two, because there is already one. The prefix is a
+   heavier face with a gap after it, and a hairline on top of that is a third
+   thing saying what the weight and the space have both said: at tag size it
+   also lands within a couple of pixels of the glyphs on either side of it,
+   which reads as a stroke that escaped from a letter. */
 slot[name="prefix"]::slotted(*) {
-  border-inline-end: var(--helix-border-thin) solid currentColor;
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);
   opacity: 0.75;
