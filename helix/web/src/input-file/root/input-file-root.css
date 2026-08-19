@@ -105,6 +105,28 @@
  * header. A bordered card on the page's own ground separates them from each
  * other and from the drop field above, which is the one thing a tinted bar
  * could not do, being the same tint as the field. */
+/* A card arrives rather than appearing.
+ *
+ * Three files chosen at once were three cards at full strength in one frame,
+ * under a field that had not changed, so the only thing telling a reader
+ * anything had happened was that the page was suddenly taller. A short scale and
+ * fade says "these are new" without asking anyone to wait for it.
+ *
+ * `@starting-style` is what makes it possible at all: a transition needs a value
+ * to come *from*, and an element inserted this frame has no previous value, so
+ * without it the card is simply at its resting style and nothing runs. Tree and
+ * Drawer use it for the same reason.
+ *
+ * **It sits after the resting rule**, which is the bug Drawer records: a
+ * starting style and an ordinary rule of the same specificity are separated by
+ * source order, so written first it loses and the entrance never begins.
+ *
+ * `scale` rather than a height. Height would stop the list jumping, which is the
+ * other half of the abruptness, and it needs `interpolate-size` or a grid row
+ * trick to animate at all: scale is what was asked for, costs no layout, and
+ * leaves that as a separate decision. Nothing animates on the way out, either,
+ * which is honest rather than ideal: an exit needs the element kept in the tree
+ * while it runs, and it is removed from the array the moment it goes. */
 [part="file"] {
   align-items: center;
   background-color: var(--helix-color-surface);
@@ -112,8 +134,20 @@
   border-radius: var(--helix-radii-sm);
   display: flex;
   gap: var(--helix-space-sm);
+  opacity: 1;
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
+  scale: 1;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+@starting-style {
+  [part="file"] {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 
 /* The name and its readings on one line where they fit, and stacked where they
@@ -241,8 +275,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part="field"],
+  [part="file"],
   [part="remove"] {
     transition: none;
+  }
+
+  /* The card still has to arrive, so the starting style goes rather than the
+     card: without this it is inserted at 0.96 and stays there, which is a
+     shrunken card rather than a still one. */
+  [part="file"] {
+    opacity: 1;
+    scale: 1;
   }
 }
 
