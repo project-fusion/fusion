@@ -28,7 +28,12 @@
   /* The label, then one trailing column for the mark. A row is never both a
      choice and a way into a page, so one column serves both and the marks line
      up down the side they are read from. */
-  grid-template-columns: minmax(0, 1fr) var(--helix-size-icon);
+  /* A column each side of the label, and both are there on every row whether or
+     not anything fills them. Sized rather than auto, so a menu where one row has
+     an icon and three do not still reads as one column of labels: `auto` would
+     collapse the empty ones and step every other label left. The mark's column
+     already worked this way and the note under it says why. */
+  grid-template-columns: var(--helix-size-icon) minmax(0, 1fr) var(--helix-size-icon);
   min-block-size: var(--helix-size-control-sm);
   /* The inset is padding on the row and nothing else. A margin here would put
      the same gap back that taking the surface's padding away removed: the row
@@ -58,6 +63,19 @@
 [part="item"][aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* The leading column, holding whatever the consumer put in it at the size every
+   other mark on the row is drawn. */
+[part="start"] {
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
+  block-size: var(--helix-size-icon);
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  inline-size: var(--helix-size-icon);
+  justify-content: center;
 }
 
 /* The column exists on every row, filled or not, so nothing shifts when a tick

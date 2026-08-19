@@ -437,14 +437,16 @@
 /* The menu is a control on the bar like any other, so it takes no width of its
    own: what a reader sees is the trigger inside it. Its panel is in the top
    layer and is the menu's business, not this bar's.
-
-   `color-scheme` is the one thing that has to be said. The bar declares a dark
-   region on the host, which is right for controls drawn over a picture, and the
-   panel is not over the picture: it is a surface of the page, opened from a
-   video that happens to be on it. Left dark it came out as a dark menu on a
-   light page. */
+ *
+ * It keeps the dark region, which is a correction. `color-scheme: normal` was
+ * set here first, on the reasoning that the panel is a surface of the page
+ * rather than something over the picture. It is over the picture: the menu
+ * opens upward from a bar at the bottom of the video, so it lands on the frame.
+ * And `normal` does not mean "whatever the page is", it means the UA default,
+ * so on a dark page the panel came out white. Left alone it inherits the dark
+ * region the bar already declares, which is what a menu opened from these
+ * controls should look like: the rows that did not fit on the bar. */
 [part="overflow"] {
-  color-scheme: normal;
   display: contents;
 }
 

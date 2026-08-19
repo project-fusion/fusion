@@ -29,11 +29,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://helix.fusion.dev/components/menu
  *
  * @slot - The label.
+ * @slot start - Before the label. A mark about the row.
  * @slot submenu - Rows this one opens, which makes it a way in.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
+ * @csspart start - The leading column, which is a slot and is always there.
  * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
  * a page. One column, because a row is never both.
  */
@@ -274,7 +276,8 @@ export class HelixBaseMenuItem extends HelixElement {
     const role = this.checkable || this.checked ? 'menuitemcheckbox' : 'menuitem'
     const checkedState =
       this.checkable || this.checked ? (this.checked ? 'true' : 'false') : nothing
-    const inside = html`<slot></slot>
+    const inside = html`<span part="start"><slot name="start"></slot></span>
+        <slot></slot>
         ${
           // One trailing column, and a row is never both: a way into a page has
           // nothing to tick, and a choice opens nothing. The tick sits after the

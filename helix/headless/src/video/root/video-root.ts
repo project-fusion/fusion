@@ -251,14 +251,17 @@ export class HelixBaseVideo extends HelixElement {
   @property({ attribute: 'start-control' })
   startControl?: 'none'
 
-  /**
-   * Whether this has ever played, which is not the same as being paused now.
-   *
-   * Set on the first `play` and never cleared, since what it answers is whether
-   * the reader has begun rather than where they are.
-   */
-  @state()
-  private started = false
+  /** Whether the file this points at is ours to hand over. */
+  private get localFile(): boolean {
+    if (this.src === '' || typeof location === 'undefined') {
+      return false
+    }
+    try {
+      return new URL(this.src, location.href).origin === location.origin
+    } catch {
+      return false
+    }
+  }
 
   /** The speeds offered, slowest first, as multipliers of normal. */
   @property({ attribute: 'speeds' })
@@ -515,9 +518,6 @@ export class HelixBaseVideo extends HelixElement {
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
-    if (this.playing) {
-      this.started = true
-    }
     if (event.type === 'play') {
       this.claimSession()
     }
@@ -947,14 +947,25 @@ export class HelixBaseVideo extends HelixElement {
     }
     if (one === 'download') {
       /* A real anchor, because saving a file is the browser's job and there is
-         no scripted version of it worth having. `download` asks for a save
-         rather than a navigation, and is ignored cross-origin, which the
-         property's own note records as the browser's rule rather than a gap
-         here. */
+         no scripted version of it worth having.
+       *
+       * **`download` only where it means something.** The attribute is honoured
+       * for a same-origin file and ignored for any other, whatever headers come
+       * back, so on a video served from a CDN it does nothing and the press
+       * *navigates*: measured, clicking it took the whole page to the mp4, which
+       * reads as the player disappearing. Writing an attribute the browser will
+       * ignore is a lie in the markup, so it is written only when it holds.
+       *
+       * A new tab where it does not. That is the best a page can do with someone
+       * else's file, and it is the difference between handing the reader the
+       * video and taking away the one they were watching. */
+      const local = this.localFile
       return html`<a
         part="download"
-        download
+        ?download=${local}
         href=${this.src}
+        target=${local ? nothing : '_blank'}
+        rel=${local ? nothing : 'noreferrer'}
         aria-label="Download"
       >
         <helix-icon name="download"></helix-icon>
@@ -983,28 +994,46 @@ export class HelixBaseVideo extends HelixElement {
       return html`<helix-menu-item
         value="remote"
         @helix-select=${() => void this.promptRemote()}
-        >Play on another device</helix-menu-item
-      >`
+      >
+        <helix-icon name="airplay" slot="start"></helix-icon>
+        Play on another device
+      </helix-menu-item>`
     }
     if (one === 'speed') {
-      return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}
-        >Playback speed: ${this.rate}x</helix-menu-item
-      >`
+      return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}>
+        <helix-icon name="gauge" slot="start"></helix-icon>
+        Playback speed: ${this.rate}x
+      </helix-menu-item>`
     }
-    if (one === 'next' || one === 'previous') {
-      const back = one === 'previous'
-      return html`<helix-menu-item value=${one} @helix-select=${() => this.skip(back)}
-        >${back ? 'Previous' : 'Next'}</helix-menu-item
-      >`
+    if (one === 'previous') {
+      return html`<helix-menu-item value="previous" @helix-select=${() => this.skip(true)}>
+        <helix-icon name="skip-back" slot="start"></helix-icon>
+        Previous
+      </helix-menu-item>`
+    }
+    if (one === 'next') {
+      return html`<helix-menu-item value="next" @helix-select=${() => this.skip(false)}>
+        <helix-icon name="skip-forward" slot="start"></helix-icon>
+        Next
+      </helix-menu-item>`
     }
     if (one === 'download') {
-      return html`<helix-menu-item download href=${this.src} value="download"
-        >Download</helix-menu-item
-      >`
+      const local = this.localFile
+      return html`<helix-menu-item
+        ?download=${local}
+        href=${this.src}
+        rel=${local ? nothing : 'noreferrer'}
+        target=${local ? nothing : '_blank'}
+        value="download"
+      >
+        <helix-icon name="download" slot="start"></helix-icon>
+        Download
+      </helix-menu-item>`
     }
-    return html`<helix-menu-item value="pip" @helix-select=${() => void this.togglePip()}
-      >Picture in picture</helix-menu-item
-    >`
+    return html`<helix-menu-item value="pip" @helix-select=${() => void this.togglePip()}>
+      <helix-icon name="picture-in-picture" slot="start"></helix-icon>
+      Picture in picture
+    </helix-menu-item>`
   }
 
   private renderBar(): TemplateResult {
@@ -1082,7 +1111,7 @@ export class HelixBaseVideo extends HelixElement {
       ${
         this.overflow.length === 0
           ? nothing
-          : html`<helix-menu part="overflow" label="More controls">
+          : html`<helix-menu part="overflow" label="More controls" placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label="More controls">
                 <helix-icon name="dots-three-vertical"></helix-icon>
               </button>
@@ -1166,13 +1195,17 @@ export class HelixBaseVideo extends HelixElement {
       ${this.cue === undefined ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
       <slot name="poster" part="poster"></slot>
       ${
-        /* Nothing to press before it has ever played, which is the one state
-           with no affordance in it, and nothing once it has: a video paused
-           halfway keeps its bar, so the small control is already there and the
-           reader has just used it. Not drawn at all where the browser is
-           drawing its own controls, since that bar has a play button of its own
-           and two would be two. */
-        this.controls || this.started || this.startControl === 'none'
+        /* Whenever it is not playing, which is what the mark means: press this
+           to play. It said that only before the first play, on the reasoning
+           that a paused video keeps its bar so the small control is already
+           there. True, and it makes the mark mean two different things at two
+           moments that are the same state. Every player a reader has used shows
+           it on pause, and the one who paused to study a frame clears it by
+           pressing the thing in the way.
+
+           Not drawn at all where the browser draws its own controls, since that
+           bar has a play button and two would be two. */
+        this.controls || this.playing || this.startControl === 'none'
           ? nothing
           : html`<button
               part="start"

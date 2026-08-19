@@ -36,10 +36,10 @@ describe('the mark that starts it', () => {
     expect(part(host, 'start')).toBeNull()
   })
 
-  test('it goes on the first play and does not come back on pause', async () => {
-    /* A video paused halfway keeps its bar, because a paused video never idles,
-       so the small control is there and the reader has just used it. Covering
-       the picture they stopped to look at would be the opposite of helpful. */
+  test('it goes while playing and comes back on pause', async () => {
+    /* Whenever it is not playing, which is what the mark means: press this to
+       play. It said that only before the first play, which made it mean two
+       different things at two moments that are the same state. */
     const host = await player()
     const video = part(host, 'video') as HTMLVideoElement
     expect(part(host, 'start')).not.toBeNull()
@@ -58,7 +58,40 @@ describe('the mark that starts it', () => {
     pausedAs(true)
     video.dispatchEvent(new Event('pause'))
     await host.updateComplete
-    expect(part(host, 'start')).toBeNull()
+    expect(part(host, 'start')).not.toBeNull()
+  })
+})
+
+describe('the download control', () => {
+  test('claims nothing it cannot do, and does not take the page with it', async () => {
+    /* `download` is honoured for a same-origin file and ignored for any other,
+       whatever headers come back. Measured on a cross-origin clip: the press
+       navigated the whole page to the mp4, which reads as the player
+       disappearing. An attribute the browser will ignore is a lie in the
+       markup, so it is written only when it holds, and a new tab is the best a
+       page can do with somebody else's file. */
+    const away = await player(
+      '<helix-video extra-controls="download" label="A clip" src="https://example.com/clip.mp4"></helix-video>',
+    )
+    const link = part(away, 'download') as HTMLAnchorElement
+    expect(link.hasAttribute('download')).toBe(false)
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noreferrer')
+  })
+
+  test('and the same-origin half cannot be asserted here, which is the harness', async () => {
+    /* happy-dom serves every document from `about:blank`, whose origin is the
+       string `null`, so nothing resolves same-origin and the branch that writes
+       `download` is unreachable. Rendered against a real page at
+       `http://localhost:3000`: `/media/clip.mp4` came out with `download` and no
+       `target`, and `https://example.com/clip.mp4` with `target="_blank"` and
+       no `download`. Asserted here is the half this environment can answer, and
+       that a relative source at least does not throw. */
+    expect(location.origin).toBe('null')
+    const relative = await player(
+      '<helix-video extra-controls="download" label="A clip" src="/clip.mp4"></helix-video>',
+    )
+    expect(part(relative, 'download')).not.toBeNull()
   })
 })
 
