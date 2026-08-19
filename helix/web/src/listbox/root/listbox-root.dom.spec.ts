@@ -291,4 +291,63 @@ if (hasLayout()) {
       expect(host.value).toBe('two')
     })
   })
+
+  describe('listbox marks what it matched', () => {
+    /* Only in a browser, and this time for the API rather than for layout:
+       `CSS.highlights` and `Highlight` are the platform's, happy-dom has
+       neither, and the component checks for both before it paints. */
+    const marks = (): string[] =>
+      [...(CSS.highlights.get('helix-filter-match') ?? [])].map((range) => range.toString())
+
+    const filtered = async (needle: string): Promise<HTMLElement> => {
+      document.body.innerHTML = `<helix-listbox aria-label="L">
+        <helix-option value="rs">Rust</helix-option>
+        <helix-option value="rb">Ruby</helix-option>
+        <helix-option value="go">Go</helix-option>
+      </helix-listbox>`
+      const host = document.body.firstElementChild as HTMLElement & {
+        requestFilter: (next: string) => boolean
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      host.requestFilter(needle)
+      await host.updateComplete
+      return host
+    }
+
+    test('every showing option is marked, at the part that matched', async () => {
+      await filtered('ru')
+      expect(marks()).toEqual(['Ru', 'Ru'])
+    })
+
+    test('matched without regard to case, and marked in the option"s own', async () => {
+      await filtered('RU')
+      expect(marks()).toEqual(['Ru', 'Ru'])
+    })
+
+    test('nothing matching leaves nothing marked', async () => {
+      await filtered('zzz')
+      expect(marks()).toEqual([])
+    })
+
+    test('and clearing the filter clears them', async () => {
+      const host = (await filtered('ru')) as HTMLElement & {
+        requestFilter: (next: string) => boolean
+        updateComplete: Promise<boolean>
+      }
+      host.requestFilter('')
+      await host.updateComplete
+      expect(marks()).toEqual([])
+    })
+
+    test('a list taken off the page takes its marks with it', async () => {
+      /* The registry is the document's and outlives the element, so a list
+         removed while filtered would leave ranges over text that is no longer
+         there. */
+      const host = await filtered('ru')
+      host.remove()
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+      expect(marks()).toEqual([])
+    })
+  })
 }

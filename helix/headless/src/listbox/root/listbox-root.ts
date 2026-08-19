@@ -21,6 +21,86 @@ import { HelixBaseOption } from '../../option/root/option-root.js'
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
 
 /**
+ * The ranges each filtering list has matched, so the union can be rebuilt when
+ * any one of them changes.
+ *
+ * `CSS.highlights` is one registry for the whole document, keyed by name, so a
+ * second list writing under the same name would erase the first one's marks.
+ * Keyed by element and rebuilt from every entry, two filtered lists on a page
+ * both stay marked. A `Map` rather than a `WeakMap` because the union has to be
+ * walked and a `WeakMap` cannot be, which is why a list takes itself out on
+ * disconnect.
+ */
+const matched = new Map<Element, Range[]>()
+
+/** What the marks are called in `CSS.highlights`, and in `base.css`. */
+const HIGHLIGHT = 'helix-filter-match'
+
+/**
+ * Marks what the filter matched, without touching what it matched it in.
+ *
+ * The words are the consumer's own light DOM, slotted through as many as two
+ * shadow roots, and wrapping the matched part in a `<mark>` would mean this
+ * element rewriting their content: markup they wrote would come back changed.
+ * The Custom Highlight API paints a range instead. Nothing is inserted and
+ * nothing is removed, so an option holding a link or an icon is marked as
+ * readily as one holding a bare word.
+ *
+ * The rule that paints it lives in `base.css` rather than in a component's
+ * styles, which is not a choice either: a highlight is styled from the tree its
+ * text lives in, and that text lives in the consumer's document.
+ */
+const paintMatches = (): void => {
+  if (typeof CSS === 'undefined' || !('highlights' in CSS) || typeof Highlight === 'undefined') {
+    return
+  }
+  const all = [...matched.values()].flat()
+  if (all.length === 0) {
+    CSS.highlights.delete(HIGHLIGHT)
+    return
+  }
+  CSS.highlights.set(HIGHLIGHT, new Highlight(...all))
+}
+
+/**
+ * Where a needle sits inside an element, as a range over its text nodes.
+ *
+ * Walked rather than measured off `textContent`, because the words may be split
+ * across several nodes and wrapped in elements of the consumer's, and a match
+ * can begin in one node and end in another. The offsets are mapped back onto
+ * the nodes they came from, so the range covers the real text either way.
+ */
+const rangeFor = (root: Element, needle: string): Range[] => {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  const nodes: Text[] = []
+  let whole = ''
+  for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+    nodes.push(node as Text)
+    whole += node.nodeValue ?? ''
+  }
+  const at = whole.toLowerCase().indexOf(needle)
+  if (at < 0) {
+    return []
+  }
+  const range = document.createRange()
+  let seen = 0
+  let started = false
+  for (const node of nodes) {
+    const length = node.nodeValue?.length ?? 0
+    if (!started && at < seen + length) {
+      range.setStart(node, at - seen)
+      started = true
+    }
+    if (started && at + needle.length <= seen + length) {
+      range.setEnd(node, at + needle.length - seen)
+      return [range]
+    }
+    seen += length
+  }
+  return []
+}
+
+/**
  * @summary A list of options, one or several of which are the answer.
  *
  * @description
@@ -449,9 +529,21 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
       option.active = option.value === this.activeValue
     }
 
-    const matched = shown.length > 0
-    if (matched !== this.hasMatches) {
-      this.hasMatches = matched
+    /* And the marks, from the same needle that did the hiding: the two answers
+       have to come from one place or a list can show a match it does not mark. */
+    if (needle === '') {
+      matched.delete(this)
+    } else {
+      matched.set(
+        this,
+        shown.flatMap((option) => rangeFor(option, needle)),
+      )
+    }
+    paintMatches()
+
+    const anyShown = shown.length > 0
+    if (anyShown !== this.hasMatches) {
+      this.hasMatches = anyShown
     }
 
     const active = shown.find((option) => option.value === this.activeValue)
@@ -477,6 +569,11 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
+    /* Its marks go with it. The registry is the document's and outlives this
+       element, so a list removed while filtered would leave ranges over text
+       that is no longer on the page. */
+    matched.delete(this)
+    paintMatches()
   }
 
   protected override willUpdate(changed: PropertyValues): void {

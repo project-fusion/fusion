@@ -1169,6 +1169,7 @@ Input, Color Input and Date Input all take.
 | `removeLabel` | `remove-label` | `string` | `'Remove'` | `HelixBaseCombobox` | What a tag's remove control is called, since the mark has no name. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `suggest` | `suggest` | `boolean` | `false` | `HelixBaseCombobox` | Whether the field finishes the word as it is typed. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods

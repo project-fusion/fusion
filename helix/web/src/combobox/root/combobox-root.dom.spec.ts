@@ -37,10 +37,10 @@ const shown = (host: Updatable): string[] =>
     .filter((option) => !option.hidden)
     .map((option) => option.textContent?.trim() ?? '')
 
-const type = async (host: Updatable, text: string): Promise<void> => {
+const type = async (host: Updatable, text: string, inputType = 'insertText'): Promise<void> => {
   const field = control(host)
   field.value = text
-  field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true, inputType }))
   await settle(host)
 }
 
@@ -361,6 +361,84 @@ describe('combobox that takes an answer it was not given', () => {
     await press(host, 'Enter')
     expect((host as unknown as { value: string }).value).toBe('rb,Zig')
     expect((host as unknown as { open: boolean }).open).toBe(true)
+  })
+})
+
+describe('combobox that finishes the word', () => {
+  const suggesting = async (extra = ''): Promise<Updatable> => {
+    document.body.innerHTML = `<helix-combobox label="L" name="c" suggest ${extra}>
+      <helix-option value="rs">Rust</helix-option>
+      <helix-option value="rb">Ruby</helix-option>
+      <helix-option value="go">Go</helix-option>
+    </helix-combobox>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    return host
+  }
+
+  test('the field completes to the first match, in the option"s own case', async () => {
+    // The completion is a name from the list, and correcting the reader's
+    // capitals to match it is the whole point of showing it.
+    const host = await suggesting()
+    await type(host, 'ru')
+    expect(control(host).value).toBe('Rust')
+  })
+
+  test('the part they did not type is selected, so the next key replaces it', async () => {
+    const host = await suggesting()
+    await type(host, 'ru')
+    expect(control(host).selectionStart).toBe(2)
+    expect(control(host).selectionEnd).toBe(4)
+  })
+
+  test('the list is filtered by what was typed, not by what was completed', async () => {
+    /* Filtering on the completion would narrow the list to the one option it
+       came from, so a reader typing "ru" would be shown "Rust" alone and never
+       learn Ruby was there. */
+    const host = await suggesting()
+    await type(host, 'ru')
+    expect(shown(host)).toEqual(['Rust', 'Ruby'])
+  })
+
+  test('deleting is never completed, or nothing could be shortened', async () => {
+    const host = await suggesting()
+    await type(host, 'rus')
+    expect(control(host).value).toBe('Rust')
+    await type(host, 'ru', 'deleteContentBackward')
+    expect(control(host).value).toBe('ru')
+  })
+
+  test('nothing is offered where nothing begins with it', async () => {
+    const host = await suggesting()
+    await type(host, 'zz')
+    expect(control(host).value).toBe('zz')
+  })
+
+  test('nor where the typing is already the whole word', async () => {
+    const host = await suggesting()
+    await type(host, 'Rust')
+    expect(control(host).value).toBe('Rust')
+    expect(control(host).selectionStart).toBe(control(host).selectionEnd)
+  })
+
+  test('a field that does not suggest says so, and a field that does says that', async () => {
+    const plain = await combobox()
+    expect(control(plain).getAttribute('aria-autocomplete')).toBe('list')
+    const host = await suggesting()
+    expect(control(host).getAttribute('aria-autocomplete')).toBe('both')
+  })
+
+  test('the completion goes when the panel does', async () => {
+    /* Only the listbox's copy of the filter was cleared on close, so `typed`
+       survived a dismissal: the field looked empty because a closed field shows
+       the chosen words instead, and reopening put the old search back with the
+       whole list behind it. */
+    const host = await suggesting()
+    await type(host, 'ru')
+    await press(host, 'Escape')
+    ;(host as unknown as { open: boolean }).open = true
+    await settle(host)
+    expect(control(host).value).toBe('')
   })
 })
 

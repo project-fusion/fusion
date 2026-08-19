@@ -23,6 +23,19 @@ import '../../listbox/index.js'
 import '../../tag/index.js'
 
 /**
+ * Whether an edit added characters rather than taking them away.
+ *
+ * `beforeinput` and `input` both carry `inputType`, and it is the platform's
+ * own answer to what the reader just did: `insertText` for typing,
+ * `insertFromPaste` for a paste, and one of several `delete*` for the ways of
+ * removing. Anything without one is treated as an insertion, because the only
+ * events with no `inputType` here are the ones a script dispatches, and a test
+ * or a consumer setting the value means it to behave like typing.
+ */
+const isInsertion = (event: Event): boolean =>
+  !(event as InputEvent).inputType?.startsWith('delete')
+
+/**
  * @summary A field that filters a list as it is typed into.
  *
  * @description
@@ -87,6 +100,20 @@ import '../../tag/index.js'
  * the value itself otherwise. No copy is stored, so a consumer who then adds a
  * real option with that value has its words take over on the next render.
  *
+ * **`suggest` finishes the word, and only ever forwards.** The field completes
+ * to the first option the typing begins, with the part the reader did not type
+ * selected, so the next character replaces it and Delete removes it. Applied on
+ * insertion alone: completing after a deletion would put back what the reader
+ * just took out, and a field that cannot be shortened is a field that cannot be
+ * corrected. Measured as the difference between `insertText` and the several
+ * `delete*` input types, which is what the platform already says about which
+ * happened.
+ *
+ * The filter stays what was typed rather than what was completed. Filtering on
+ * the completion would narrow the list to the one option it came from, so a
+ * reader typing "ru" would be shown "Rust" alone and never learn Ruby was
+ * there.
+ *
  * @slot - The options, which are `helix-option` elements.
  * @slot start - Before the text, for an icon.
  * @slot end - After it, for a unit or a clear button.
@@ -141,6 +168,17 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   @property({ type: Boolean })
   creatable = false
 
+  /**
+   * Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
+   */
+  @property({ type: Boolean })
+  suggest = false
+
   /** What the create row says, before the words it would add. */
   @property({ attribute: 'create-label' })
   createLabel = 'Add'
@@ -166,6 +204,17 @@ export class HelixBaseCombobox extends MixinControllerOpen(
    */
   @state()
   private typed = ''
+
+  /**
+   * The completed words, where the field is finishing one, and empty otherwise.
+   *
+   * Held apart from `typed` rather than replacing it, because they are needed
+   * for different things at the same moment: this one is what the input shows,
+   * `typed` is what the list is filtered by, and the selection between them is
+   * what the reader is offered.
+   */
+  @state()
+  private suggestion = ''
 
   private get listbox(): HelixBaseListbox | null {
     return this.renderRoot?.querySelector<HelixBaseListbox>('[part="listbox"]') ?? null
@@ -271,6 +320,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
       return
     }
     this.typed = ''
+    this.suggestion = ''
     this.listbox?.requestFilter('')
     if (!this.multiple) {
       this.close()
@@ -302,11 +352,36 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   }
 
   private readonly handleInput = (event: Event): void => {
-    this.typed = (event.target as HTMLInputElement).value
-    this.listbox?.requestFilter(this.typed)
+    const typed = (event.target as HTMLInputElement).value
+    this.typed = typed
+    /* The list is narrowed before the completion is looked for, because the
+       completion is the first thing still showing and that is not known until
+       the filter has run. */
+    this.listbox?.requestFilter(typed)
+    this.suggestion = this.suggest && isInsertion(event) ? this.completionFor(typed) : ''
     if (!this.open) {
       this.requestOpen(true)
     }
+  }
+
+  /**
+   * The words of the first option the typing begins, or nothing.
+   *
+   * Case-insensitively matched and returned in the option's own case, so a
+   * reader typing "ru" is offered "Rust" rather than "rust": the completion is
+   * a name from the list, and correcting the reader's capitals to match it is
+   * the whole point of showing it.
+   */
+  private completionFor(typed: string): string {
+    if (typed === '') {
+      return ''
+    }
+    const needle = typed.toLowerCase()
+    const match = (this.listbox?.options ?? []).find(
+      (option) =>
+        !option.hidden && !option.disabled && option.text.toLowerCase().startsWith(needle),
+    )
+    return match && match.text.length > typed.length ? match.text : ''
   }
 
   /**
@@ -395,6 +470,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     }
     // Either way the search is spent: it found what it was for.
     this.typed = ''
+    this.suggestion = ''
     this.listbox?.requestFilter('')
     if (!this.multiple) {
       this.close()
@@ -427,13 +503,30 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.sync()
+    /* After the render, not during it: the input's value is a binding, so
+       selecting a range of it before Lit has written it selects a range of the
+       previous value. */
+    if (changed.has('suggestion') && this.suggestion !== '') {
+      this.renderRoot
+        .querySelector<HTMLInputElement>('[part="control"]')
+        ?.setSelectionRange(this.typed.length, this.suggestion.length)
+    }
     if (this.open) {
       this.panel.show()
     } else {
       this.panel.hide()
       /* And the filter goes with it, for the reason the class note records: a
          control reopened still narrowed is one whose second use starts from the
-         first one's leftovers. */
+         first one's leftovers.
+
+         All three of them, which is the fix. Only the listbox's copy was
+         cleared here, so `typed` survived a dismissal: the field looked empty
+         because a closed single-choice field shows the chosen words instead,
+         and the moment it reopened the old search was back in it with the list
+         behind it showing everything. Measured by pressing Escape on "ru" and
+         opening it again. */
+      this.typed = ''
+      this.suggestion = ''
       this.listbox?.requestFilter('')
     }
   }
@@ -466,13 +559,13 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           autocomplete="off"
           spellcheck="false"
           aria-controls="listbox"
-          aria-autocomplete="list"
+          aria-autocomplete=${this.suggest ? 'both' : 'list'}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
           aria-multiselectable=${this.multiple ? 'true' : nothing}
           placeholder=${(this.chosen.length > 0 ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
-          .value=${this.multiple || this.open ? this.typed : this.word}
+          .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
           @click=${() => !this.isDisabled && !this.open && this.requestOpen(true)}

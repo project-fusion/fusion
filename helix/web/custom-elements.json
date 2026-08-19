@@ -11328,6 +11328,9 @@
               },
               {
                 "slug": "required"
+              },
+              {
+                "slug": "suggest"
               }
             ]
           },

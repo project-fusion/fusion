@@ -1086,3 +1086,28 @@ helix-toast:not([data-color-mode]) {
     transition: none;
   }
 }
+
+/* What a filtered list marks, painted rather than wrapped.
+ *
+ * An option's words are the consumer's own light DOM, slotted through as many
+ * as two shadow roots, so marking the matched part with a `<mark>` would mean a
+ * component rewriting markup the consumer wrote. The Custom Highlight API
+ * paints a range over the text instead, and `helix-listbox` registers the
+ * ranges under this name as it filters.
+ *
+ * The rule has to be here rather than in the listbox's own stylesheet, and that
+ * is the API rather than a preference: a highlight is styled from the tree the
+ * text lives in, and that text lives in the document. A `::highlight()` rule
+ * inside a shadow root reaches nothing slotted into it.
+ *
+ * Background only, and no color of its own. Marking a match is saying "this
+ * part is why the row is still here", which the eye takes from a wash; changing
+ * the ink as well would restate it and take the option's own foreground away,
+ * including whatever the consumer put inside it. The same wash a hovered option
+ * takes, one step lighter, so a hovered match still reads as hovered. */
+::highlight(helix-filter-match) {
+  background-color: light-dark(
+    color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
+    color-mix(in oklab, var(--helix-color-primary) 32%, transparent)
+  );
+}
