@@ -7311,9 +7311,55 @@ export type HelixStatGroupSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixStatProps = {};
+export type HelixStatProps = {
+  /** Which way the label and the value are arranged.
+
+Absent is a column, the label over the number, which is how a figure is read
+on a dashboard: the words say what is coming and the number answers.
+`column-reverse` puts the number first, which is right where the number is
+the headline and the label is a caption under it.
+
+The row directions set them side by side, for a figure in a line of text or
+a narrow strip where a stacked pair would be two lines of almost nothing.
+
+A property rather than a `helix-flex` around it, because the unit has to
+stay on the value's baseline whichever way the pair goes, and only this
+element knows which of its children the unit belongs to.
+
+**Optional rather than defaulted to `column`, which is not a style
+preference.** A reflecting property with a default writes its attribute onto
+the host the moment the element upgrades, and the host is markup the
+consumer rendered: React compares what it rendered against what is there and
+reports a hydration mismatch. The absent attribute is the column, which the
+stylesheet reads as the base case. The existing server spec caught this,
+being the one that asserts the host carries nothing nobody wrote. */
+  direction?: HelixStat["direction"];
+};
 
 export type HelixStatSolidJsProps = {
+  /** Which way the label and the value are arranged.
+
+Absent is a column, the label over the number, which is how a figure is read
+on a dashboard: the words say what is coming and the number answers.
+`column-reverse` puts the number first, which is right where the number is
+the headline and the label is a caption under it.
+
+The row directions set them side by side, for a figure in a line of text or
+a narrow strip where a stacked pair would be two lines of almost nothing.
+
+A property rather than a `helix-flex` around it, because the unit has to
+stay on the value's baseline whichever way the pair goes, and only this
+element knows which of its children the unit belongs to.
+
+**Optional rather than defaulted to `column`, which is not a style
+preference.** A reflecting property with a default writes its attribute onto
+the host the moment the element upgrades, and the host is markup the
+consumer rendered: React compares what it rendered against what is there and
+reports a hydration mismatch. The absent attribute is the column, which the
+stylesheet reads as the base case. The existing server spec caught this,
+being the one that asserts the host carries nothing nobody wrote. */
+  "prop:direction"?: HelixStat["direction"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -14488,6 +14534,32 @@ export type CustomElements = {
    * The label sits above it in the label ramp, quiet and wide-tracked, so the
    * pair reads as one object rather than as two lines of text.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the label and the value are arranged.
+   *
+   * Absent is a column, the label over the number, which is how a figure is read
+   * on a dashboard: the words say what is coming and the number answers.
+   * `column-reverse` puts the number first, which is right where the number is
+   * the headline and the label is a caption under it.
+   *
+   * The row directions set them side by side, for a figure in a line of text or
+   * a narrow strip where a stacked pair would be two lines of almost nothing.
+   *
+   * A property rather than a `helix-flex` around it, because the unit has to
+   * stay on the value's baseline whichever way the pair goes, and only this
+   * element knows which of its children the unit belongs to.
+   *
+   * **Optional rather than defaulted to `column`, which is not a style
+   * preference.** A reflecting property with a default writes its attribute onto
+   * the host the moment the element upgrades, and the host is markup the
+   * consumer rendered: React compares what it rendered against what is there and
+   * reports a hydration mismatch. The absent attribute is the column, which the
+   * stylesheet reads as the base case. The existing server spec caught this,
+   * being the one that asserts the host carries nothing nobody wrote.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -14495,7 +14567,6 @@ export type CustomElements = {
    * - `(default)`: The value.
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
-   * - `detail`: A change, comparison, or note under the label.
    *
    * ## CSS Custom Properties
    *
@@ -21609,6 +21680,32 @@ export type CustomElementsSolidJs = {
    * The label sits above it in the label ramp, quiet and wide-tracked, so the
    * pair reads as one object rather than as two lines of text.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the label and the value are arranged.
+   *
+   * Absent is a column, the label over the number, which is how a figure is read
+   * on a dashboard: the words say what is coming and the number answers.
+   * `column-reverse` puts the number first, which is right where the number is
+   * the headline and the label is a caption under it.
+   *
+   * The row directions set them side by side, for a figure in a line of text or
+   * a narrow strip where a stacked pair would be two lines of almost nothing.
+   *
+   * A property rather than a `helix-flex` around it, because the unit has to
+   * stay on the value's baseline whichever way the pair goes, and only this
+   * element knows which of its children the unit belongs to.
+   *
+   * **Optional rather than defaulted to `column`, which is not a style
+   * preference.** A reflecting property with a default writes its attribute onto
+   * the host the moment the element upgrades, and the host is markup the
+   * consumer rendered: React compares what it rendered against what is there and
+   * reports a hydration mismatch. The absent attribute is the column, which the
+   * stylesheet reads as the base case. The existing server spec caught this,
+   * being the one that asserts the host carries nothing nobody wrote.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -21616,7 +21713,6 @@ export type CustomElementsSolidJs = {
    * - `(default)`: The value.
    * - `label`: What the value measures.
    * - `unit`: The unit, set beside the value.
-   * - `detail`: A change, comparison, or note under the label.
    *
    * ## CSS Custom Properties
    *

@@ -1,5 +1,6 @@
 import { customElement, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary One measurement, with the word for what it measures.
@@ -27,15 +28,39 @@ import { html, type TemplateResult } from 'lit'
  * @slot - The value.
  * @slot label - What the value measures.
  * @slot unit - The unit, set beside the value.
- * @slot detail - A change, comparison, or note under the label.
  */
 @customElement('helix-base-stat')
 export class HelixBaseStat extends HelixElement {
+  /**
+   * Which way the label and the value are arranged.
+   *
+   * Absent is a column, the label over the number, which is how a figure is read
+   * on a dashboard: the words say what is coming and the number answers.
+   * `column-reverse` puts the number first, which is right where the number is
+   * the headline and the label is a caption under it.
+   *
+   * The row directions set them side by side, for a figure in a line of text or
+   * a narrow strip where a stacked pair would be two lines of almost nothing.
+   *
+   * A property rather than a `helix-flex` around it, because the unit has to
+   * stay on the value's baseline whichever way the pair goes, and only this
+   * element knows which of its children the unit belongs to.
+   *
+   * **Optional rather than defaulted to `column`, which is not a style
+   * preference.** A reflecting property with a default writes its attribute onto
+   * the host the moment the element upgrades, and the host is markup the
+   * consumer rendered: React compares what it rendered against what is there and
+   * reports a hydration mismatch. The absent attribute is the column, which the
+   * stylesheet reads as the base case. The existing server spec caught this,
+   * being the one that asserts the host carries nothing nobody wrote.
+   */
+  @property({ reflect: true })
+  direction?: 'column-reverse' | 'row' | 'row-reverse'
+
   protected override render(): TemplateResult {
     return html`<slot name="label"></slot>
       <slot></slot>
-      <slot name="unit"></slot>
-      <slot name="detail"></slot>`
+      <slot name="unit"></slot>`
   }
 }
 

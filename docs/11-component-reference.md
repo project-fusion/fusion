@@ -3518,6 +3518,12 @@ because a figure is the one place on a page where the number is the design.
 The label sits above it in the label ramp, quiet and wide-tracked, so the
 pair reads as one object rather than as two lines of text.
 
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `direction` | `direction` | `'column-reverse' \| 'row' \| 'row-reverse' \| undefined` | - | `HelixBaseStat` | Which way the label and the value are arranged. |
+
 #### Slots
 
 | Slot | Description |
@@ -3525,7 +3531,6 @@ pair reads as one object rather than as two lines of text.
 | *(default)* | The value. |
 | `label` | What the value measures. |
 | `unit` | The unit, set beside the value. |
-| `detail` | A change, comparison, or note under the label. |
 
 #### Custom properties
 

@@ -37038,6 +37038,20 @@
           "members": [
             {
               "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'column-reverse' | 'row' | 'row-reverse' | undefined"
+              },
+              "description": "Which way the label and the value are arranged.\n\nAbsent is a column, the label over the number, which is how a figure is read\non a dashboard: the words say what is coming and the number answers.\n`column-reverse` puts the number first, which is right where the number is\nthe headline and the label is a caption under it.\n\nThe row directions set them side by side, for a figure in a line of text or\na narrow strip where a stacked pair would be two lines of almost nothing.\n\nA property rather than a `helix-flex` around it, because the unit has to\nstay on the value's baseline whichever way the pair goes, and only this\nelement knows which of its children the unit belongs to.\n\n**Optional rather than defaulted to `column`, which is not a style\npreference.** A reflecting property with a default writes its attribute onto\nthe host the moment the element upgrades, and the host is markup the\nconsumer rendered: React compares what it rendered against what is there and\nreports a hydration mismatch. The absent attribute is the column, which the\nstylesheet reads as the base case. The existing server spec caught this,\nbeing the one that asserts the host carries nothing nobody wrote.",
+              "attribute": "direction",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStat",
+                "module": "src/stat/root/stat-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -37150,10 +37164,16 @@
                 "name": "HelixBaseStat",
                 "module": "src/stat/root/stat-root.ts"
               }
-            },
+            }
+          ],
+          "attributes": [
             {
-              "description": "A change, comparison, or note under the label.",
-              "name": "detail",
+              "name": "direction",
+              "type": {
+                "text": "'column-reverse' | 'row' | 'row-reverse' | undefined"
+              },
+              "description": "Which way the label and the value are arranged.\n\nAbsent is a column, the label over the number, which is how a figure is read\non a dashboard: the words say what is coming and the number answers.\n`column-reverse` puts the number first, which is right where the number is\nthe headline and the label is a caption under it.\n\nThe row directions set them side by side, for a figure in a line of text or\na narrow strip where a stacked pair would be two lines of almost nothing.\n\nA property rather than a `helix-flex` around it, because the unit has to\nstay on the value's baseline whichever way the pair goes, and only this\nelement knows which of its children the unit belongs to.\n\n**Optional rather than defaulted to `column`, which is not a style\npreference.** A reflecting property with a default writes its attribute onto\nthe host the moment the element upgrades, and the host is markup the\nconsumer rendered: React compares what it rendered against what is there and\nreports a hydration mismatch. The absent attribute is the column, which the\nstylesheet reads as the base case. The existing server spec caught this,\nbeing the one that asserts the host carries nothing nobody wrote.",
+              "fieldName": "direction",
               "inheritedFrom": {
                 "name": "HelixBaseStat",
                 "module": "src/stat/root/stat-root.ts"

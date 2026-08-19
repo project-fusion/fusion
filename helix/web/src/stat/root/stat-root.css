@@ -47,8 +47,34 @@ slot[name="unit"]::slotted(*) {
   font-weight: var(--helix-weight-medium);
 }
 
-slot[name="detail"]::slotted(*) {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
-  grid-column: 1 / -1;
+/* Which way the pair goes.
+ *
+ * The grid stays a grid whichever direction is set, because the unit has to sit
+ * on the value's baseline and that is a grid-area question: switching to a flex
+ * row would put the unit beside the label as readily as beside the number.
+ * Reversing is a row order rather than a `flex-direction`, so the markup order
+ * is untouched and a screen reader still hears the label before the number.
+ *
+ * `dense` is not used and must not be: the auto-placement would pull the unit up
+ * into a gap beside the label the moment the label wrapped. */
+:host([direction="column-reverse"]) slot[name="label"]::slotted(*) {
+  order: 1;
+}
+
+/* Side by side, where a stacked pair would be two lines of almost nothing. The
+   label loses its full-width span, since spanning is what stacks it. */
+:host([direction="row"]),
+:host([direction="row-reverse"]) {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-xs);
+}
+
+:host([direction="row"]) slot[name="label"]::slotted(*),
+:host([direction="row-reverse"]) slot[name="label"]::slotted(*) {
+  grid-column: auto;
+}
+
+:host([direction="row-reverse"]) slot[name="label"] {
+  order: 1;
 }

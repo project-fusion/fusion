@@ -33,7 +33,7 @@ Every colour, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 71 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 3 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 206 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 114 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 112 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 76 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 27 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
@@ -65,7 +65,7 @@ The spacing scale, used for gaps, padding and margins alike.
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 157 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 187 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 165 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 167 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 166 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 74 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 56 |
@@ -103,7 +103,7 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 62 |
-| `--helix-text-sm` | `var(--_helix-size-14)` | 83 |
+| `--helix-text-sm` | `var(--_helix-size-14)` | 81 |
 | `--helix-text-md` | `var(--_helix-size-15)` | 31 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 15 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 16 |
