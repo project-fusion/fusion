@@ -30,6 +30,7 @@ import { styles } from './time-root.css.js'
  * @cssproperty --time-list-height - How tall the list is before it scrolls.
  * @cssproperty --time-wheel-height - How tall a spinner column is. Five rows by default.
  * @cssproperty --time-row-size - Height and least width of one row in a spinner.
+ * @cssproperty --time-range-color - Wash behind the times inside a range.
  */
 @customElement('helix-time')
 export class HelixTime extends HelixBaseTime {

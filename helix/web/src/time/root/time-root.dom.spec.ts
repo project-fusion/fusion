@@ -162,3 +162,67 @@ describe('time as a spinner', () => {
     expect(values(host, 'minute')).toEqual(['0', '20', '40'])
   })
 })
+
+describe('time holds more than one', () => {
+  const many = async (attrs: string): Promise<Time> => {
+    const host = (await mount(`<helix-time ${attrs}></helix-time>`)) as Time
+    await host.updateComplete
+    return host
+  }
+
+  const announce = async (host: Time, value: string): Promise<void> => {
+    part(host, 'list')?.dispatchEvent(
+      new CustomEvent('helix-change', {
+        bubbles: true,
+        composed: true,
+        detail: { name: 'time', value },
+      }),
+    )
+    await host.updateComplete
+  }
+
+  test('a mode puts the list in multiple, which is what marks more than one row', async () => {
+    expect((part(await many('mode="range"'), 'list') as HTMLElement).hasAttribute('multiple')).toBe(
+      true,
+    )
+    expect((part(await many(''), 'list') as HTMLElement).hasAttribute('multiple')).toBe(false)
+  })
+
+  test('a range keeps two and sorts them, whichever end was pressed first', async () => {
+    const host = await many('mode="range"')
+    await announce(host, '17:00,09:00')
+    expect(host.value).toBe('09:00,17:00')
+  })
+
+  test('and a third pick starts over from that third one', async () => {
+    /* The calendar's behaviour, so a reader who has met one has met both.
+       Working out which is newest by difference rather than by position, since
+       a toggle removes as easily as it adds. */
+    const host = await many('default-value="09:00,17:00" mode="range"')
+    await announce(host, '09:00,17:00,12:00')
+    expect(host.value).toBe('12:00')
+  })
+
+  test('the times inside a range are marked, without having been chosen', async () => {
+    const host = await many('default-value="09:00,10:00" max="11:00" min="09:00" mode="range"')
+    const marked = [...(host.shadowRoot?.querySelectorAll('[data-between]') ?? [])].map((one) =>
+      one.getAttribute('value'),
+    )
+    // The ends are chosen rather than between, so they are not in this list.
+    expect(marked).toEqual(['09:15', '09:30', '09:45'])
+  })
+
+  test('a multiple keeps whatever the list announced', async () => {
+    const host = await many('mode="multiple"')
+    await announce(host, '09:00,12:00,15:00')
+    expect(host.value).toBe('09:00,12:00,15:00')
+  })
+
+  test('a mode falls back to the list, because a wheel holds one value', async () => {
+    // A range on wheels is two sets of wheels, which is two controls, and a
+    // multiple is a set, which a wheel cannot hold by construction.
+    const host = await many('appearance="spinner" mode="range"')
+    expect(part(host, 'list')).not.toBeNull()
+    expect(host.shadowRoot?.querySelector('[part="column"]')).toBeNull()
+  })
+})

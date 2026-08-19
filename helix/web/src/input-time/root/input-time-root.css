@@ -5,10 +5,16 @@
 /* The field carries the frame, not the input, so the trigger sits inside the
    same box as the text and the focus ring is drawn once around the whole control
    rather than around a smaller box within it. */
+/* A field that may hold tags is a box rather than a line, so the height becomes
+   a floor: in `multiple` the tags wrap and the field grows with them, where a
+   fixed height would clip the second row. Every other mode has one line in it
+   and measures exactly what it did before. Input Date records the same. */
 [part="field"] {
   align-items: center;
   background-color: var(--input-time-background-color, var(--helix-color-surface-sunken));
-  block-size: var(--helix-size-control);
+  flex-wrap: wrap;
+  min-block-size: var(--helix-size-control);
+  padding-block: var(--helix-space-2xs);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;
@@ -95,13 +101,15 @@
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: max-content;
-  /* No padding, and it clips instead. The rows run the panel's full width and
-     take its rounded corners from being clipped by it, rather than sitting inset
-     with a band of overlay down both sides: a row is a band across the list, and
-     a band that stops short of the edge is a pill. Input Color's panel does the
-     same for its square. */
+  /* Inset, and the rows with it.
+   *
+   * They ran to the panel's edge, on the argument that a row is a band across a
+   * list and a band stopping short of the edge is a pill. That is true of a list
+   * filling a surface and this is a panel: an overlay whose content sits against
+   * its own shadow reads as unfinished, and the rows have their own rounded
+   * highlight now, which is a pill on purpose. */
   overflow: hidden;
-  padding: var(--helix-space-none);
+  padding: var(--helix-space-2xs);
   position: absolute;
 }
 
@@ -165,4 +173,24 @@
  * number lost in the middle of each. */
 :host([appearance="spinner"]) [part="surface"] {
   inline-size: max-content;
+}
+
+[part="time"] {
+  flex: none;
+}
+
+:host([mode="multiple"]) [part="control"] {
+  min-inline-size: var(--helix-size-icon-lg);
+}
+
+/* The count of what is not shown, reading as a note rather than as another tag:
+   a reader who cannot tell them apart has been told there are nine times and
+   shown six. */
+[part="rest"] {
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  white-space: nowrap;
 }

@@ -4328,6 +4328,25 @@ hours has. `spinner` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
 scrolling most of a day. `helix-time` carries the longer note on the trade. */
   appearance?: HelixInputTime["appearance"];
+  /** How many times can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value, which is what a
+form submits. `helix-time` carries the longer note on the interaction and on
+why a spinner cannot do either. */
+  mode?: HelixInputTime["mode"];
+  /** How many times are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default, for the reason Input Date gives: how
+many fit depends on the width of the field and the length of what is in it,
+and this element knows neither. */
+  "max-tags"?: HelixInputTime["maxTags"];
+  /** How many times are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default, for the reason Input Date gives: how
+many fit depends on the width of the field and the length of what is in it,
+and this element knows neither. */
+  maxTags?: HelixInputTime["maxTags"];
   /** How far apart the offered times are, in minutes. */
   step?: HelixInputTime["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
@@ -4467,6 +4486,25 @@ hours has. `spinner` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
 scrolling most of a day. `helix-time` carries the longer note on the trade. */
   "prop:appearance"?: HelixInputTime["appearance"];
+  /** How many times can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value, which is what a
+form submits. `helix-time` carries the longer note on the interaction and on
+why a spinner cannot do either. */
+  "prop:mode"?: HelixInputTime["mode"];
+  /** How many times are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default, for the reason Input Date gives: how
+many fit depends on the width of the field and the length of what is in it,
+and this element knows neither. */
+  "attr:max-tags"?: HelixInputTime["maxTags"];
+  /** How many times are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default, for the reason Input Date gives: how
+many fit depends on the width of the field and the length of what is in it,
+and this element knows neither. */
+  "prop:maxTags"?: HelixInputTime["maxTags"];
   /** How far apart the offered times are, in minutes. */
   "prop:step"?: HelixInputTime["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
@@ -8066,6 +8104,24 @@ Anything under five is a thousand rows and wants a field instead. */
   locale?: HelixTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   label?: HelixTime["label"];
+  /** How many times can be held at once.
+
+Absent is one. `range` holds a start and an end with everything between
+them shown as part of the answer, `multiple` holds any number, and both are
+carried as one comma-separated value: the same shape `helix-calendar` uses,
+because it is the same question asked of a different unit.
+
+**A range is two picks, and a third starts over.** That is the calendar's
+behaviour and a reader who has met one has met both. The alternative, a
+separate "from" and "to" control, is two answers to what a product asks as
+one, and it makes the between part impossible to show.
+
+**Neither works as a spinner and the appearance falls back.** A range on
+wheels is two sets of wheels, which is two controls; a multiple is a set,
+and a wheel has exactly one value by construction. Rather than draw
+something that cannot say what it holds, `spinner` renders as a list
+whenever a mode is set. */
+  mode?: HelixTime["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -8156,6 +8212,24 @@ Anything under five is a thousand rows and wants a field instead. */
   "prop:locale"?: HelixTime["locale"];
   /** Accessible name for the list, which has no visible one of its own. */
   "prop:label"?: HelixTime["label"];
+  /** How many times can be held at once.
+
+Absent is one. `range` holds a start and an end with everything between
+them shown as part of the answer, `multiple` holds any number, and both are
+carried as one comma-separated value: the same shape `helix-calendar` uses,
+because it is the same question asked of a different unit.
+
+**A range is two picks, and a third starts over.** That is the calendar's
+behaviour and a reader who has met one has met both. The alternative, a
+separate "from" and "to" control, is two answers to what a product asks as
+one, and it makes the between part impossible to show.
+
+**Neither works as a spinner and the appearance falls back.** A range on
+wheels is two sets of wheels, which is two controls; a multiple is a set,
+and a wheel has exactly one value by construction. Rather than draw
+something that cannot say what it holds, `spinner` renders as a list
+whenever a mode is set. */
+  "prop:mode"?: HelixTime["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
@@ -12092,6 +12166,17 @@ export type CustomElements = {
    * hours has. `spinner` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
    * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value, which is what a
+   * form submits. `helix-time` carries the longer note on the interaction and on
+   * why a spinner cannot do either.
+   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Input Date gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
    * - `step`: How far apart the offered times are, in minutes.
    * - `min`: Earliest time that can be chosen, as `HH:mm`.
    * - `max`: Latest time that can be chosen, as `HH:mm`.
@@ -12215,6 +12300,8 @@ export type CustomElements = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `time`: One held time, as a tag, in `multiple`.
+   * - `rest`: How many times are held beyond the ones shown.
    * - `trigger`: The control that opens the list.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
@@ -15125,6 +15212,23 @@ export type CustomElements = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end with everything between
+   * them shown as part of the answer, `multiple` holds any number, and both are
+   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * because it is the same question asked of a different unit.
+   *
+   * **A range is two picks, and a third starts over.** That is the calendar's
+   * behaviour and a reader who has met one has met both. The alternative, a
+   * separate "from" and "to" control, is two answers to what a product asks as
+   * one, and it makes the between part impossible to show.
+   *
+   * **Neither works as a spinner and the appearance falls back.** A range on
+   * wheels is two sets of wheels, which is two controls; a multiple is a set,
+   * and a wheel has exactly one value by construction. Rather than draw
+   * something that cannot say what it holds, `spinner` renders as a list
+   * whenever a mode is set.
    * - `appearance`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
@@ -15235,6 +15339,7 @@ export type CustomElements = {
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
    * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
    * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
+   * - `--time-range-color`: Wash behind the times inside a range. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -15245,7 +15350,7 @@ export type CustomElements = {
    * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
-   * - `option`: One time in it.
+   * - `option`: One time in it. Carries `data-between` inside a range.
    */
   "helix-time": Partial<HelixTimeProps & BaseProps<HelixTime> & BaseEvents>;
 
@@ -19096,6 +19201,17 @@ export type CustomElementsSolidJs = {
    * hours has. `spinner` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
    * scrolling most of a day. `helix-time` carries the longer note on the trade.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value, which is what a
+   * form submits. `helix-time` carries the longer note on the interaction and on
+   * why a spinner cannot do either.
+   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Input Date gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
    * - `step`: How far apart the offered times are, in minutes.
    * - `min`: Earliest time that can be chosen, as `HH:mm`.
    * - `max`: Latest time that can be chosen, as `HH:mm`.
@@ -19219,6 +19335,8 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `time`: One held time, as a tag, in `multiple`.
+   * - `rest`: How many times are held beyond the ones shown.
    * - `trigger`: The control that opens the list.
    * - `surface`: The floating panel.
    * - `picker`: The list inside it.
@@ -22249,6 +22367,23 @@ export type CustomElementsSolidJs = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `locale`: Language tag the times are written in. Absent uses the runtime's own.
    * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end with everything between
+   * them shown as part of the answer, `multiple` holds any number, and both are
+   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * because it is the same question asked of a different unit.
+   *
+   * **A range is two picks, and a third starts over.** That is the calendar's
+   * behaviour and a reader who has met one has met both. The alternative, a
+   * separate "from" and "to" control, is two answers to what a product asks as
+   * one, and it makes the between part impossible to show.
+   *
+   * **Neither works as a spinner and the appearance falls back.** A range on
+   * wheels is two sets of wheels, which is two controls; a multiple is a set,
+   * and a wheel has exactly one value by construction. Rather than draw
+   * something that cannot say what it holds, `spinner` renders as a list
+   * whenever a mode is set.
    * - `appearance`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
@@ -22359,6 +22494,7 @@ export type CustomElementsSolidJs = {
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
    * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
    * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
+   * - `--time-range-color`: Wash behind the times inside a range. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -22369,7 +22505,7 @@ export type CustomElementsSolidJs = {
    * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
-   * - `option`: One time in it.
+   * - `option`: One time in it. Carries `data-between` inside a range.
    */
   "helix-time": Partial<
     HelixTimeProps & HelixTimeSolidJsProps & BaseProps<HelixTime> & BaseEvents
@@ -23378,6 +23514,8 @@ export type CustomCssProperties = {
   "--time-wheel-height"?: string;
   /** Height and least width of one row in a spinner. */
   "--time-row-size"?: string;
+  /** Wash behind the times inside a range. */
+  "--time-range-color"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
   /** Distance from the edges of the window. */

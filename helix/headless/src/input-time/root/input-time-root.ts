@@ -13,6 +13,7 @@ import { property, state } from 'lit/decorators.js'
    custom element registers on import. The public tags rather than the base ones,
    the arrangement Input Date has with its calendar. */
 import '../../icon/index.js'
+import '../../tag/index.js'
 import '../../time/index.js'
 import { isTime, toMinutes, writeTime } from '../../time/root/time-root.js'
 
@@ -52,6 +53,8 @@ import { isTime, toMinutes, writeTime } from '../../time/root/time-root.js'
  *
  * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.
+ * @csspart time - One held time, as a tag, in `multiple`.
+ * @csspart rest - How many times are held beyond the ones shown.
  * @csspart trigger - The control that opens the list.
  * @csspart surface - The floating panel.
  * @csspart picker - The list inside it.
@@ -70,6 +73,27 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    */
   @property({ reflect: true })
   appearance: 'list' | 'spinner' = 'list'
+
+  /**
+   * How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value, which is what a
+   * form submits. `helix-time` carries the longer note on the interaction and on
+   * why a spinner cannot do either.
+   */
+  @property({ reflect: true })
+  mode?: 'multiple' | 'range'
+
+  /**
+   * How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Input Date gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
 
   /** How far apart the offered times are, in minutes. */
   @property({ type: Number })
@@ -127,12 +151,78 @@ export class HelixBaseInputTime extends MixinControllerOpen(
     return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
   }
 
+  /** Every time in the value, which may hold more than one. */
+  private get held(): string[] {
+    /* The en dash and the spaced hyphen both mean "to", because a range is shown
+       that way and what is shown is what gets typed back. A time carries a colon
+       rather than a hyphen, so unlike a date there is no ambiguity to guard
+       against, and the guard is kept anyway for the sake of one reading. */
+    return this.value
+      .replace(/\s+[–-]\s+/g, ',')
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+  }
+
+  /** One time, written the way `time-style` asks for. */
+  private written(at: string): string {
+    return this.timeStyle === 'iso' || !isTime(at) ? at : writeTime(at, this.locale)
+  }
+
   /** What the field shows: the value while it is being edited, a reading when not. */
   private get display(): string {
-    if (this.editing || this.timeStyle === 'iso' || !isTime(this.value)) {
-      return this.value
+    if (this.mode === 'multiple') {
+      return this.draft
     }
-    return writeTime(this.value, this.locale)
+    const held = this.held
+    if (this.editing || this.timeStyle === 'iso') {
+      return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
+    }
+    const written = held.map((one) => this.written(one))
+    return this.mode === 'range' ? written.join(' – ') : written.join(', ')
+  }
+
+  /**
+   * What is being typed but not yet held, for `multiple` only.
+   *
+   * The other modes type into the value directly, because one time and a range
+   * are both a whole answer the moment they are complete. A multiple is a set
+   * being added to, so the field needs somewhere to hold a time before it joins.
+   */
+  @state()
+  private draft = ''
+
+  /** The times that get a tag, which is all of them until `maxTags` says not. */
+  private get shownTimes(): string[] {
+    const held = this.held
+    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+  }
+
+  /** How many are held beyond the ones shown. */
+  private get restCount(): number {
+    return Math.max(0, this.held.length - this.shownTimes.length)
+  }
+
+  /** Adds what was typed to the set, or takes the last one back out. */
+  private readonly handleDraftKey = (event: KeyboardEvent): void => {
+    if (this.mode !== 'multiple') {
+      return
+    }
+    const held = this.held
+    if (event.key === 'Enter' && isTime(this.draft)) {
+      event.preventDefault()
+      if (!held.includes(this.draft)) {
+        this.requestValue([...held, this.draft].sort().join(','))
+      }
+      this.draft = ''
+    } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
+      this.requestValue(held.slice(0, -1).join(','))
+    }
+  }
+
+  /** Takes one time back out of the set. */
+  private readonly removeTime = (at: string): void => {
+    this.requestValue(this.held.filter((one) => one !== at).join(','))
   }
 
   /**
@@ -143,12 +233,31 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    * reason Input Date withholds a half-typed date from its calendar.
    */
   private get picked(): string {
-    return isTime(this.value) ? this.value : ''
+    const held = this.held
+    return held.length > 0 && held.every(isTime) ? held.join(',') : ''
   }
 
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()
-    this.requestValue((event.target as HTMLInputElement).value)
+    // Typing is editing, whatever the focus did. The field has to hold the value
+    // while it is being changed, or a keystroke lands in a rendering.
+    this.editing = true
+    const typed = (event.target as HTMLInputElement).value
+    if (this.mode === 'multiple') {
+      this.draft = typed
+      return
+    }
+    /* Stored as commas once every time in it is whole, and kept exactly as typed
+       until then, which is the same rule Input Date follows: a form should
+       submit `09:00,17:00` however the dash was written, and half-typed text
+       must survive so the caret does not move mid-entry. */
+    const held = typed
+      .replace(/\s+[–-]\s+/g, ',')
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+    const whole = held.length > 0 && held.every(isTime)
+    this.requestValue(whole ? held.join(',') : typed)
     this.restore()
   }
 
@@ -156,9 +265,13 @@ export class HelixBaseInputTime extends MixinControllerOpen(
     event.stopPropagation()
     this.requestValue((event as HelixChangeEvent).detail.value)
     this.restore()
-    // One time has nothing more to say, so the list gets out of the way.
-    this.requestOpen(false)
-    this.updateComplete.then(() => this.returnFocus())
+    /* One time has nothing more to say, so the list gets out of the way. A range
+       or a multiple has: the reader is still choosing, and shutting the list
+       under them after the first pick is taking the control away mid-answer. */
+    if (this.mode === undefined) {
+      this.requestOpen(false)
+      this.updateComplete.then(() => this.returnFocus())
+    }
   }
 
   /**
@@ -200,7 +313,13 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    * back and a reader could not get out of it.
    */
   private readonly handleFocus = (event: FocusEvent): void => {
-    this.editing = true
+    /* Not while the caret is being handed back. Picking a time returns focus
+       to the field, and treating that as editing put the field into the shape it
+       takes for typing: a reader chose "10:00 PM" from a list and the field
+       answered "22:00". Focus is a good enough signal for editing everywhere
+       except the one moment this element moved the focus itself, and it already
+       knows when that is. */
+    this.editing = !this.returning
     const from = event.relatedTarget
     if (this.open || this.isDisabled || this.returning) {
       return
@@ -296,6 +415,24 @@ export class HelixBaseInputTime extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
+        ${
+          this.mode === 'multiple'
+            ? this.shownTimes.map(
+                (at) => html`<helix-tag
+                  part="time"
+                  dismissible
+                  dismiss-label=${`Remove ${this.written(at)}`}
+                  ?disabled=${this.isDisabled}
+                  @helix-dismiss=${(event: Event) => {
+                    event.stopPropagation()
+                    this.removeTime(at)
+                  }}
+                  >${this.written(at)}</helix-tag
+                >`,
+              )
+            : nothing
+        }
+        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <input
           part="control"
           id="control"
@@ -310,6 +447,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
           @blur=${this.handleBlur}
           @focus=${this.handleFocus}
           @input=${this.handleInput}
+          @keydown=${this.handleDraftKey}
         />
         <button
           part="trigger"
@@ -328,6 +466,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
         <helix-time
           part="picker"
+          mode=${this.mode ?? nothing}
           appearance=${this.appearance}
           label=${this.label || 'Time'}
           locale=${this.locale || nothing}

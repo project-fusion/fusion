@@ -2113,7 +2113,9 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `locale` | `locale` | `string` | `''` | `HelixBaseInputTime` | Language tag the times are written in. Absent uses the runtime's own. |
 | `max` | `max` | `string` | `'23:59'` | `HelixBaseInputTime` | Latest time that can be chosen, as `HH:mm`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseInputTime` | How many times are shown as tags before the rest are counted, in `multiple`. |
 | `min` | `min` | `string` | `'00:00'` | `HelixBaseInputTime` | Earliest time that can be chosen, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseInputTime` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
@@ -2160,6 +2162,8 @@ belongs to. That is the same reasoning Select gives for its own list.
 | --- | --- |
 | `field` | The box holding the text and the trigger. |
 | `control` | The text input. |
+| `time` | One held time, as a tag, in `multiple`. |
+| `rest` | How many times are held beyond the ones shown. |
 | `trigger` | The control that opens the list. |
 | `surface` | The floating panel. |
 | `picker` | The list inside it. |
@@ -4098,6 +4102,7 @@ card would be a card inside a card there.
 | `locale` | `locale` | `string` | `''` | `HelixBaseTime` | Language tag the times are written in. Absent uses the runtime's own. |
 | `max` | `max` | `string` | `'23:59'` | `HelixBaseTime` | Latest time offered, as `HH:mm`. |
 | `min` | `min` | `string` | `'00:00'` | `HelixBaseTime` | Earliest time offered, as `HH:mm`. |
+| `mode` | `mode` | `'multiple' \| 'range' \| undefined` | - | `HelixBaseTime` | How many times can be held at once. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
 | `step` | `step` | `number` | `15` | `HelixBaseTime` | How far apart the offered times are, in minutes. |
@@ -4129,7 +4134,7 @@ card would be a card inside a card there.
 | `column` | One of them. |
 | `items` | The scrolling column inside it, forwarded from the listbox. |
 | `empty` | What it says when nothing matches, forwarded from the listbox. |
-| `option` | One time in it. |
+| `option` | One time in it. Carries `data-between` inside a range. |
 
 #### Custom properties
 
@@ -4138,6 +4143,7 @@ card would be a card inside a card there.
 | `--time-list-height` | How tall the list is before it scrolls. |
 | `--time-wheel-height` | How tall a spinner column is. Five rows by default. |
 | `--time-row-size` | Height and least width of one row in a spinner. |
+| `--time-range-color` | Wash behind the times inside a range. |
 
 ## Toast
 

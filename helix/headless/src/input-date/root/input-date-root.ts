@@ -288,6 +288,9 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   /** Relayed under this element's name, so a consumer hears one control. */
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()
+    // Typing is editing, whatever the focus did. The field has to hold the value
+    // while it is being changed, or a keystroke lands in a rendering.
+    this.editing = true
     const typed = (event.target as HTMLInputElement).value
     if (this.mode === 'multiple') {
       this.draft = typed
@@ -510,7 +513,13 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   }
 
   private readonly handleFocus = (event: FocusEvent): void => {
-    this.editing = true
+    /* Not while the caret is being handed back. Picking a date returns focus
+       to the field, and treating that as editing put the field into the shape it
+       takes for typing: a reader chose "10:00 PM" from a list and the field
+       answered "22:00". Focus is a good enough signal for editing everywhere
+       except the one moment this element moved the focus itself, and it already
+       knows when that is. */
+    this.editing = !this.returning
     const from = event.relatedTarget
     if (this.open || this.isDisabled || this.returning) {
       return

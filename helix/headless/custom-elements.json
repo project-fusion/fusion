@@ -16204,6 +16204,14 @@
               "name": "control"
             },
             {
+              "description": "One held time, as a tag, in `multiple`.",
+              "name": "time"
+            },
+            {
+              "description": "How many times are held beyond the ones shown.",
+              "name": "rest"
+            },
+            {
               "description": "The control that opens the list.",
               "name": "trigger"
             },
@@ -16241,6 +16249,26 @@
               "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
               "attribute": "appearance",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'multiple' | 'range' | undefined"
+              },
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a spinner cannot do either.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "maxTags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many times are shown as tags before the rest are counted, in `multiple`.\n\n`0` is all of them, and is the default, for the reason Input Date gives: how\nmany fit depends on the width of the field and the length of what is in it,\nand this element knows neither.",
+              "attribute": "max-tags"
             },
             {
               "kind": "field",
@@ -16341,6 +16369,35 @@
             },
             {
               "kind": "field",
+              "name": "held",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "Every time in the value, which may hold more than one.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "written",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One time, written the way `time-style` asks for."
+            },
+            {
+              "kind": "field",
               "name": "display",
               "type": {
                 "text": "string"
@@ -16348,6 +16405,50 @@
               "privacy": "private",
               "description": "What the field shows: the value while it is being edited, a reading when not.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "draft",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What is being typed but not yet held, for `multiple` only.\n\nThe other modes type into the value directly, because one time and a range\nare both a whole answer the moment they are complete. A multiple is a set\nbeing added to, so the field needs somewhere to hold a time before it joins."
+            },
+            {
+              "kind": "field",
+              "name": "shownTimes",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The times that get a tag, which is all of them until `maxTags` says not.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "restCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many are held beyond the ones shown.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleDraftKey",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Adds what was typed to the set, or takes the last one back out."
+            },
+            {
+              "kind": "field",
+              "name": "removeTime",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes one time back out of the set."
             },
             {
               "kind": "field",
@@ -17204,6 +17305,23 @@
               "default": "'list'",
               "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'multiple' | 'range' | undefined"
+              },
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a spinner cannot do either.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "max-tags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many times are shown as tags before the rest are counted, in `multiple`.\n\n`0` is all of them, and is the default, for the reason Input Date gives: how\nmany fit depends on the width of the field and the length of what is in it,\nand this element knows neither.",
+              "fieldName": "maxTags"
             },
             {
               "name": "step",
@@ -33417,7 +33535,7 @@
               "name": "empty"
             },
             {
-              "description": "One time in it.",
+              "description": "One time in it. Carries `data-between` inside a range.",
               "name": "option"
             }
           ],
@@ -33474,6 +33592,16 @@
             },
             {
               "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'multiple' | 'range' | undefined"
+              },
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works as a spinner and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `spinner` renders as a list\nwhenever a mode is set.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "appearance",
               "type": {
                 "text": "'list' | 'spinner'"
@@ -33495,9 +33623,39 @@
             },
             {
               "kind": "field",
+              "name": "held",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The times held, which is a list whether or not a mode is set.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "handleChange",
               "privacy": "private",
-              "readonly": true
+              "readonly": true,
+              "description": "Takes what the list announced and constrains it to what the mode allows.\n\nThe listbox is put in `multiple` for both modes, because that is what marks\nmore than one row and toggles on press. A range then differs only in what is\nkept: two, and a third pick starts again from that third one. Working out\nwhich is newest by difference rather than by position, since a toggle can\nremove as easily as add and the announced list is a set rather than a\nsequence."
+            },
+            {
+              "kind": "method",
+              "name": "between",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Whether a time falls inside a range, which is what gets banded."
             },
             {
               "kind": "field",
@@ -34020,6 +34178,14 @@
               "default": "'Time'",
               "description": "Accessible name for the list, which has no visible one of its own.",
               "fieldName": "label"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'multiple' | 'range' | undefined"
+              },
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works as a spinner and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `spinner` renders as a list\nwhenever a mode is set.",
+              "fieldName": "mode"
             },
             {
               "name": "appearance",

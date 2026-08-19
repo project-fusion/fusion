@@ -104,7 +104,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart column - One of them.
  * @csspart items - The scrolling column inside it, forwarded from the listbox.
  * @csspart empty - What it says when nothing matches, forwarded from the listbox.
- * @csspart option - One time in it.
+ * @csspart option - One time in it. Carries `data-between` inside a range.
  */
 @customElement('helix-base-time')
 export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
@@ -133,6 +133,28 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
   /** Accessible name for the list, which has no visible one of its own. */
   @property()
   label = 'Time'
+
+  /**
+   * How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end with everything between
+   * them shown as part of the answer, `multiple` holds any number, and both are
+   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * because it is the same question asked of a different unit.
+   *
+   * **A range is two picks, and a third starts over.** That is the calendar's
+   * behaviour and a reader who has met one has met both. The alternative, a
+   * separate "from" and "to" control, is two answers to what a product asks as
+   * one, and it makes the between part impossible to show.
+   *
+   * **Neither works as a spinner and the appearance falls back.** A range on
+   * wheels is two sets of wheels, which is two controls; a multiple is a set,
+   * and a wheel has exactly one value by construction. Rather than draw
+   * something that cannot say what it holds, `spinner` renders as a list
+   * whenever a mode is set.
+   */
+  @property({ reflect: true })
+  mode?: 'multiple' | 'range'
 
   /**
    * Whether the times are one list or a column each.
@@ -176,9 +198,51 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     return found
   }
 
+  /** The times held, which is a list whether or not a mode is set. */
+  private get held(): string[] {
+    return this.value
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+  }
+
+  /**
+   * Takes what the list announced and constrains it to what the mode allows.
+   *
+   * The listbox is put in `multiple` for both modes, because that is what marks
+   * more than one row and toggles on press. A range then differs only in what is
+   * kept: two, and a third pick starts again from that third one. Working out
+   * which is newest by difference rather than by position, since a toggle can
+   * remove as easily as add and the announced list is a set rather than a
+   * sequence.
+   */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.requestValue((event as HelixChangeEvent).detail.value)
+    const announced = (event as HelixChangeEvent).detail.value
+    if (this.mode !== 'range') {
+      this.requestValue(announced)
+      return
+    }
+    const next = announced
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+    if (next.length <= 2) {
+      this.requestValue(next.sort().join(','))
+      return
+    }
+    const before = new Set(this.held)
+    const added = next.find((one) => !before.has(one))
+    this.requestValue(added ?? '')
+  }
+
+  /** Whether a time falls inside a range, which is what gets banded. */
+  private between(at: string): boolean {
+    if (this.mode !== 'range') {
+      return false
+    }
+    const [from, to] = this.held
+    return from !== undefined && to !== undefined && at > from && at < to
   }
 
   /** The three readings a spinner shows, from the value or from `min`. */
@@ -241,7 +305,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
    * rather than wrong, which is why it can be left in.
    */
   reveal(): void {
-    if (this.appearance !== 'spinner') {
+    if (this.appearance !== 'spinner' || this.mode !== undefined) {
       return
     }
     for (const column of this.renderRoot?.querySelectorAll<HTMLElement & { reveal?: () => void }>(
@@ -328,19 +392,26 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
   }
 
   protected override render(): TemplateResult {
-    if (this.appearance === 'spinner') {
+    /* A mode falls back to the list, for the reason the property records: a
+       range on wheels is two sets of wheels and a multiple is a set, which a
+       wheel cannot hold. */
+    if (this.appearance === 'spinner' && this.mode === undefined) {
       return this.renderSpinner()
     }
     return html`<helix-listbox
       part="list"
       exportparts="items, empty"
       aria-label=${this.label}
+      ?multiple=${this.mode !== undefined}
       .value=${this.value}
       @helix-change=${this.handleChange}
     >
       ${this.times.map((minutes) => {
         const at = fromMinutes(minutes)
-        return html`<helix-option part="option" value=${at}
+        return html`<helix-option
+          part="option"
+          value=${at}
+          data-between=${this.between(at) ? '' : nothing}
           >${writeTime(at, this.locale)}</helix-option
         >`
       })}
