@@ -2324,6 +2324,7 @@ list moves under the reader rather than the reader moving to find it.
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestFilter()` | `HelixBaseListbox` | Requests a narrowing, and reports whether the request stood. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `reveal()` | `HelixBaseListbox` | Brings the chosen option to rest in the middle of the list. |
 
 #### Events
 
@@ -4107,6 +4108,7 @@ card would be a card inside a card there.
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+| `reveal()` | `HelixBaseTime` | Each wheel comes to rest on its own answer. |
 
 #### Events
 
@@ -4130,6 +4132,7 @@ card would be a card inside a card there.
 | Property | Description |
 | --- | --- |
 | `--time-list-height` | How tall the list is before it scrolls. |
+| `--time-wheel-height` | How tall a spinner column is, in `spinner`. |
 
 ## Toast
 

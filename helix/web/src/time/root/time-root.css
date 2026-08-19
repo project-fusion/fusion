@@ -34,43 +34,72 @@
   padding-block: var(--helix-space-none);
 }
 
-/* Three columns, each scrolling on its own.
+/* Three columns, each scrolling on its own, read as a dial rather than a list.
  *
- * The shape of a spinner without pretending to be a wheel: a wheel is a picture
- * of a control rather than a control, and the thing under it is three lists,
- * which is what these are. Equal widths, so the hour column does not sit narrow
- * beside a meridiem that says AM.
+ * The shape of a spinner without pretending to be a wheel: a wheel drawn in
+ * perspective is a picture of a control, and the thing under it is three lists,
+ * which is what these are. What makes it read as a dial is what a dial does:
+ * rows snap to the middle, the ends fade away, and there is nothing marking a
+ * choice except where it has come to rest.
  *
- * A separator between rather than a border around each: three bordered boxes in
- * a panel is three cards, and what a reader is looking at is one control with
- * three parts. */
+ * Equal widths, so the hour column does not sit narrow beside a meridiem saying
+ * AM. A separator between rather than a border around each, because three
+ * bordered boxes in a panel is three cards and this is one control with three
+ * parts. */
 [part="columns"] {
   display: flex;
 }
 
+/* Shorter than the single list, which is a different job: a list is read down
+   and a dial is read around its middle, so it wants enough rows to show the
+   neighbours and not so many that the centre stops being a centre. */
+/* Each column is at least as wide as its own widest row, and they share what is
+   left equally. `flex-basis: 0` with a zero floor was the first version and it
+   collapsed them: inside a panel sized to its content there is no content to
+   size to, because every column had offered to be nothing. Measured, `AM` came
+   out as one letter and an ellipsis. */
 [part="column"] {
-  --listbox-max-block-size: var(--time-list-height, 16rem);
+  --listbox-max-block-size: var(--time-wheel-height, 11rem);
 
-  flex: 1 1 0;
-  min-inline-size: 0;
+  flex: 1 1 auto;
+  min-inline-size: max-content;
 }
 
 [part="column"] + [part="column"] {
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-/* The same frame removal the single list gets, and for the same reason: whatever
-   holds this supplies the surface. */
+/* The frame off, for the reason the single list gives, and then the dial.
+ *
+ * `scroll-snap-type` is what makes a row come to rest in the middle rather than
+ * wherever the finger left it, and the block padding is what lets the first and
+ * last rows get there at all: without it a column can scroll its first row to
+ * the top and no further, so midnight can never be the thing in the centre. Half
+ * the column less half a row, which is the arithmetic for "one row's worth of
+ * middle".
+ *
+ * The mask is the curve. A dial's far rows are turned away from the reader and a
+ * flat list's are not, and fading them is the honest flat equivalent: it says
+ * these are further from the answer without drawing a perspective that is not
+ * there. */
 [part="column"]::part(items) {
   background-color: transparent;
   border: none;
   border-radius: var(--helix-radii-none);
-  padding-block: var(--helix-space-none);
+  /* In percentages rather than lengths, so the fade stays proportional to a
+     column whose height is a published hook: at a fixed inset a short wheel is
+     almost entirely faded and a tall one barely is. */
+  mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+  padding-block: calc((var(--time-wheel-height, 11rem) - var(--helix-size-control-sm)) / 2);
+  scroll-snap-type: y mandatory;
+}
+
+[part="column"] [part="option"] {
+  scroll-snap-align: center;
 }
 
 /* Centred, because a column of numbers read against its own edge is a list and
- * read against its middle is a dial. This is the one place the spinner borrows
- * the look rather than the mechanism.
+ * read against its middle is a dial.
  *
  * Both the row and the words. `justify-content` on the row alone did nothing
  * visible, measured: it centres the row's children, and the label is a flex item
@@ -82,4 +111,19 @@
 
 [part="column"] [part="option"]::part(label) {
   text-align: center;
+}
+
+/* Room either side of a number, since a column sized to `max-content` is
+   otherwise exactly as wide as its widest row and the digits touch the rule
+   between two wheels. */
+[part="column"] [part="option"]::part(item) {
+  padding-inline: var(--helix-space-sm);
+}
+
+/* No tick. A listbox marks its answer because a reader has to find it among
+   options that are otherwise alike; a dial has exactly one value per column and
+   it is the one in the middle, so a mark beside it says what the position
+   already said and pushes the number off centre doing it. */
+[part="column"] [part="option"]::part(item)::after {
+  content: none;
 }

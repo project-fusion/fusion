@@ -19219,6 +19219,19 @@
             },
             {
               "kind": "method",
+              "name": "reveal",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Brings the chosen option to rest in the middle of the list.\n\nA method rather than something this does on its own, because a listbox\nopening on its answer usually wants it merely *visible* and the browser\nalready manages that: centring is what a caller wants when the list is being\nread as a dial rather than scanned as a list, which is what Time's spinner\ndoes with three of these.\n\nA delta from the two boxes rather than `offsetTop`. An option is a slotted\nlight DOM child, so its `offsetParent` is whatever is positioned above it,\nwhich is not this list and is not guaranteed to be anything: measuring both\nrects and moving by the difference needs no such assumption.",
+              "type": {
+                "text": "reveal() => void"
+              }
+            },
+            {
+              "kind": "method",
               "name": "place",
               "privacy": "private",
               "return": {
@@ -33489,6 +33502,19 @@
               "privacy": "private",
               "description": "Every minute offered within the hour currently shown.",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "reveal",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Each wheel comes to rest on its own answer.\n\nA dial that opens at midnight when it holds ten in the evening is a dial\nshowing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a\nsnap point when something scrolls, and nothing has. Measured before this,\nwith the value at 22:00, the hour wheel sat 288 pixels above its answer.\n\nOn every update rather than on the first, because the columns re-render as\nthe value moves and the minute column's contents change with the hour.\n\n**And it is public, because an update is not the only moment that matters.**\nInside a panel this element renders while the panel is still\n`display: none`, so every box measures zero and there is nothing to centre\nagainst: measured, the hour wheel stayed 288 pixels off its answer because\nthe only call happened before anything had a size. Whatever shows the panel\ncalls this again afterwards. The guard below makes the early call harmless\nrather than wrong, which is why it can be left in.",
+              "type": {
+                "text": "reveal() => void"
+              }
             },
             {
               "kind": "method",

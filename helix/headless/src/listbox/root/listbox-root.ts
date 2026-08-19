@@ -321,6 +321,48 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     }
   }
 
+  /**
+   * Brings the chosen option to rest in the middle of the list.
+   *
+   * A method rather than something this does on its own, because a listbox
+   * opening on its answer usually wants it merely *visible* and the browser
+   * already manages that: centring is what a caller wants when the list is being
+   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * does with three of these.
+   *
+   * A delta from the two boxes rather than `offsetTop`. An option is a slotted
+   * light DOM child, so its `offsetParent` is whatever is positioned above it,
+   * which is not this list and is not guaranteed to be anything: measuring both
+   * rects and moving by the difference needs no such assumption.
+   */
+  reveal(): void {
+    const items = this.renderRoot?.querySelector<HTMLElement>('[part="items"]')
+    const chosen = this.options.find((option) => option.selected && !option.hidden)
+    if (!items || !chosen) {
+      return
+    }
+    /* Twice, and the second pass is not superstition. The first delta is
+       computed against whatever layout is current when this is called, and
+       inside a panel that has just been revealed it is a frame behind: measured,
+       one call landed a whole row short, 672 where 704 was wanted, and calling
+       it again from a settled layout put it exactly on centre. Reading a rect
+       forces layout, so the second pass sees the result of the first and
+       corrects the remainder. It stops as soon as there is nothing left to
+       correct, so the usual case is one pass and a cheap check. */
+    for (let pass = 0; pass < 2; pass += 1) {
+      const box = items.getBoundingClientRect()
+      const row = chosen.getBoundingClientRect()
+      if (box.height === 0 || row.height === 0) {
+        return
+      }
+      const off = row.top + row.height / 2 - (box.top + box.height / 2)
+      if (Math.abs(off) < 1) {
+        return
+      }
+      items.scrollTop += off
+    }
+  }
+
   /** Hides what the filter excludes, and writes the rest onto the options. */
   private place(): void {
     const needle = this.filter.trim().toLowerCase()

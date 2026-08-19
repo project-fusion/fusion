@@ -28,6 +28,7 @@ import { styles } from './time-root.css.js'
  * @documentation https://helix.fusion.dev/components/time
  *
  * @cssproperty --time-list-height - How tall the list is before it scrolls.
+ * @cssproperty --time-wheel-height - How tall a spinner column is, in `spinner`.
  */
 @customElement('helix-time')
 export class HelixTime extends HelixBaseTime {

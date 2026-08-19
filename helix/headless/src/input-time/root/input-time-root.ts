@@ -275,6 +275,14 @@ export class HelixBaseInputTime extends MixinControllerOpen(
        is what a scroll into view cannot work without. */
     if (this.open) {
       this.panel.show()
+      /* After the panel is shown, not before. A spinner centres each wheel on
+         its own answer and cannot do it against a box of zero height, which is
+         what everything in a `popover` measures until something shows it. The
+         picker calls this on its own updates too; that one lands too early and
+         is harmless, and this one is the call that works. */
+      this.renderRoot
+        ?.querySelector<HTMLElement & { reveal?: () => void }>('[part="picker"]')
+        ?.reveal?.()
     } else {
       this.panel.hide()
     }

@@ -11665,6 +11665,18 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reveal() => void`: Brings the chosen option to rest in the middle of the list.
+   *
+   * A method rather than something this does on its own, because a listbox
+   * opening on its answer usually wants it merely *visible* and the browser
+   * already manages that: centring is what a caller wants when the list is being
+   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * does with three of these.
+   *
+   * A delta from the two boxes rather than `offsetTop`. An option is a slotted
+   * light DOM child, so its `offsetParent` is whatever is positioned above it,
+   * which is not this list and is not guaranteed to be anything: measuring both
+   * rects and moving by the difference needs no such assumption.
    * - `requestFilter(next: string) => boolean`: Requests a narrowing, and reports whether the request stood.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -14343,6 +14355,23 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reveal() => void`: Each wheel comes to rest on its own answer.
+   *
+   * A dial that opens at midnight when it holds ten in the evening is a dial
+   * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
+   * snap point when something scrolls, and nothing has. Measured before this,
+   * with the value at 22:00, the hour wheel sat 288 pixels above its answer.
+   *
+   * On every update rather than on the first, because the columns re-render as
+   * the value moves and the minute column's contents change with the hour.
+   *
+   * **And it is public, because an update is not the only moment that matters.**
+   * Inside a panel this element renders while the panel is still
+   * `display: none`, so every box measures zero and there is nothing to centre
+   * against: measured, the hour wheel stayed 288 pixels off its answer because
+   * the only call happened before anything had a size. Whatever shows the panel
+   * calls this again afterwards. The guard below makes the early call harmless
+   * rather than wrong, which is why it can be left in.
    * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the list, which is the only control here.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -18682,6 +18711,18 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reveal() => void`: Brings the chosen option to rest in the middle of the list.
+   *
+   * A method rather than something this does on its own, because a listbox
+   * opening on its answer usually wants it merely *visible* and the browser
+   * already manages that: centring is what a caller wants when the list is being
+   * read as a dial rather than scanned as a list, which is what Time's spinner
+   * does with three of these.
+   *
+   * A delta from the two boxes rather than `offsetTop`. An option is a slotted
+   * light DOM child, so its `offsetParent` is whatever is positioned above it,
+   * which is not this list and is not guaranteed to be anything: measuring both
+   * rects and moving by the difference needs no such assumption.
    * - `requestFilter(next: string) => boolean`: Requests a narrowing, and reports whether the request stood.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *
@@ -21455,6 +21496,23 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reveal() => void`: Each wheel comes to rest on its own answer.
+   *
+   * A dial that opens at midnight when it holds ten in the evening is a dial
+   * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
+   * snap point when something scrolls, and nothing has. Measured before this,
+   * with the value at 22:00, the hour wheel sat 288 pixels above its answer.
+   *
+   * On every update rather than on the first, because the columns re-render as
+   * the value moves and the minute column's contents change with the hour.
+   *
+   * **And it is public, because an update is not the only moment that matters.**
+   * Inside a panel this element renders while the panel is still
+   * `display: none`, so every box measures zero and there is nothing to centre
+   * against: measured, the hour wheel stayed 288 pixels off its answer because
+   * the only call happened before anything had a size. Whatever shows the panel
+   * calls this again afterwards. The guard below makes the early call harmless
+   * rather than wrong, which is why it can be left in.
    * - `focus(options?: FocusOptions) => void`: Puts the keyboard on the list, which is the only control here.
    * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
    *

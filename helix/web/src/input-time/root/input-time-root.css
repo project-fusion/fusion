@@ -156,3 +156,13 @@
     transition: none;
   }
 }
+
+/* A spinner takes its own width, not the field's.
+ *
+ * The field's width is right for a list, whose rows are the same words the field
+ * shows and which reads as an extension of it. Three columns of two digits are
+ * not that: stretched to a 400 pixel field they are three wide bands with a
+ * number lost in the middle of each. */
+:host([appearance="spinner"]) [part="surface"] {
+  inline-size: max-content;
+}

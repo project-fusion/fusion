@@ -221,6 +221,41 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     return this.times.filter((at) => Math.floor(at / 60) === hour).map((at) => at % 60)
   }
 
+  /**
+   * Each wheel comes to rest on its own answer.
+   *
+   * A dial that opens at midnight when it holds ten in the evening is a dial
+   * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
+   * snap point when something scrolls, and nothing has. Measured before this,
+   * with the value at 22:00, the hour wheel sat 288 pixels above its answer.
+   *
+   * On every update rather than on the first, because the columns re-render as
+   * the value moves and the minute column's contents change with the hour.
+   *
+   * **And it is public, because an update is not the only moment that matters.**
+   * Inside a panel this element renders while the panel is still
+   * `display: none`, so every box measures zero and there is nothing to centre
+   * against: measured, the hour wheel stayed 288 pixels off its answer because
+   * the only call happened before anything had a size. Whatever shows the panel
+   * calls this again afterwards. The guard below makes the early call harmless
+   * rather than wrong, which is why it can be left in.
+   */
+  reveal(): void {
+    if (this.appearance !== 'spinner') {
+      return
+    }
+    for (const column of this.renderRoot?.querySelectorAll<HTMLElement & { reveal?: () => void }>(
+      '[part="column"]',
+    ) ?? []) {
+      column.reveal?.()
+    }
+  }
+
+  protected override updated(changed: import('lit').PropertyValues): void {
+    super.updated(changed)
+    this.reveal()
+  }
+
   /** Puts the keyboard on the list, which is the only control here. */
   override focus(options?: FocusOptions): void {
     this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
