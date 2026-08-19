@@ -20309,7 +20309,7 @@
           "name": "HelixBaseMenuItem",
           "cssParts": [
             {
-              "description": "The row.",
+              "description": "The row, which is an `<a>` where `href` is set.",
               "name": "item"
             },
             {
@@ -20370,6 +20370,46 @@
               "description": "Whether the row can be chosen.",
               "attribute": "disabled",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, which makes it a real link.\n\n**The row itself becomes an `<a>`, and the role goes with it.** A\n`menuitem` cannot contain a link: measured in Chromium, an anchor inside\none is exposed as a child and the row loses its accessible name entirely.\nSo the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu\nroves, which is the same manoeuvre `Tree.Item` makes and the reason `href`\nchanges the markup rather than only adding an attribute.\n\n**`Option` cannot have this and the reason is worth knowing**, since a\ncommand palette is the obvious place to want it. A listbox has to keep\nfocus somewhere else, in the text field for a combobox, so it says which\noption is current with `aria-activedescendant`. That reference can only\npoint at the option's host, measured: assigning\n`ariaActiveDescendantElement` an element inside a sibling shadow root reads\nback `null`. So `role=\"option\"` is pinned to the host, and an anchor under\nit hits the naming failure above. A menu has no such constraint because\nfocus really moves to the row.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rows that should leave the page.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The relationship, which `target=\"_blank\"` should always set.",
+              "attribute": "rel"
+            },
+            {
+              "kind": "field",
+              "name": "download",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the link saves the file rather than opening it.\n\nOnly meaningful beside an `href`, and only for a file served from this\norigin: the attribute is ignored cross-origin, which is the browser's rule\nabout who may name a file on somebody's disk rather than a gap here.",
+              "attribute": "download"
             },
             {
               "kind": "field",
@@ -20449,7 +20489,7 @@
               "name": "handleKeydown",
               "privacy": "private",
               "readonly": true,
-              "description": "Enter and Space choose the row, which a `<div>` would not do on its own.\n\nIt is not a `<button>`: a button inside a menu is announced as a button,\nand the roles a menu needs are not roles a button can take."
+              "description": "Enter and Space choose the row, which a `<div>` would not do on its own.\n\nIt is not a `<button>`: a button inside a menu is announced as a button,\nand the roles a menu needs are not roles a button can take.\n\n**A linked row hands Enter back to the browser.** An anchor answers Enter\nitself, by firing a click and following the link, so preventing the default\nhere would mean re-issuing that navigation by hand and losing whatever the\nbrowser does around it. `Tree.Item` records the same trap from the other\nside: its tree prevents every key it handles, which is exactly what was\nswallowing Enter on its rows.\n\nSpace is different, and that is the platform rather than a choice: an\nanchor ignores it. So the row presses itself, and the click that comes back\nboth announces and navigates."
             },
             {
               "kind": "field",
@@ -20567,6 +20607,42 @@
               "default": "false",
               "description": "Whether the row can be chosen.",
               "fieldName": "disabled"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, which makes it a real link.\n\n**The row itself becomes an `<a>`, and the role goes with it.** A\n`menuitem` cannot contain a link: measured in Chromium, an anchor inside\none is exposed as a child and the row loses its accessible name entirely.\nSo the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu\nroves, which is the same manoeuvre `Tree.Item` makes and the reason `href`\nchanges the markup rather than only adding an attribute.\n\n**`Option` cannot have this and the reason is worth knowing**, since a\ncommand palette is the obvious place to want it. A listbox has to keep\nfocus somewhere else, in the text field for a combobox, so it says which\noption is current with `aria-activedescendant`. That reference can only\npoint at the option's host, measured: assigning\n`ariaActiveDescendantElement` an element inside a sibling shadow root reads\nback `null`. So `role=\"option\"` is pinned to the host, and an anchor under\nit hits the naming failure above. A menu has no such constraint because\nfocus really moves to the row.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rows that should leave the page.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The relationship, which `target=\"_blank\"` should always set.",
+              "fieldName": "rel"
+            },
+            {
+              "name": "download",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the link saves the file rather than opening it.\n\nOnly meaningful beside an `href`, and only for a file served from this\norigin: the attribute is ignored cross-origin, which is the browser's rule\nabout who may name a file on somebody's disk rather than a gap here.",
+              "fieldName": "download"
             }
           ],
           "superclass": {
@@ -43206,6 +43282,18 @@
               "name": "pip"
             },
             {
+              "description": "Saves the file, where it was asked for.",
+              "name": "download"
+            },
+            {
+              "description": "The menu holding the controls kept off the bar.",
+              "name": "overflow"
+            },
+            {
+              "description": "The button that opens it.",
+              "name": "more"
+            },
+            {
               "description": "The whole screen, and back.",
               "name": "fullscreen"
             }
@@ -43311,8 +43399,18 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.\n\nThe names are `speed`, `pip`, `remote` and `download`.\n\n**`download` is named and never assumed.** Offering the file is a decision\nabout the content rather than about the player, and plenty of consumers\ndecline it deliberately. It is also the one control whose success is not\nours to promise: the attribute is ignored cross-origin, so a file served\nfrom somewhere else opens rather than saves, which is the browser's rule\nand not something a player can work around.",
               "attribute": "extra-controls"
+            },
+            {
+              "kind": "field",
+              "name": "overflowControls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls that go behind one button instead of onto the bar, named the same\nway.\n\n**Named rather than measured, and the reason is that a width cannot answer\nthis.** A media query asks about the window, and the bar's problem is its\nown width: a video in a 320px sidebar on a desktop is cramped and a\nfull-bleed hero on a phone is not. A container query asks the right\nquestion and still cannot answer it, because how many controls there are is\nthe consumer's, so the threshold is not a width but a width per control,\nwhich is a guess. And a control that moves between the bar and a hidden\nmenu as the layout shifts is a control the reader has to find twice.\n\nSo the consumer says where the fold is, which they can, having already\nnamed the controls in order. A name in both lists is drawn once, on the\nbar: two of the same control is worse than either placement.",
+              "attribute": "overflow-controls"
             },
             {
               "kind": "field",
@@ -43491,6 +43589,25 @@
               "description": "Cancels the availability watch, since it outlives a single render."
             },
             {
+              "kind": "method",
+              "name": "offers",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "one",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Whether this platform can do a named control at all."
+            },
+            {
               "kind": "field",
               "name": "extras",
               "type": {
@@ -43498,6 +43615,16 @@
               },
               "privacy": "private",
               "description": "The extras asked for, in order, and only the ones this platform can do.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "overflow",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The controls asked for behind the overflow button, in order.\n\nA name in both lists is on the bar and not here. Drawing it twice is worse\nthan either placement, and the bar is the one a reader can see.",
               "readonly": true
             },
             {
@@ -43696,6 +43823,44 @@
             },
             {
               "kind": "method",
+              "name": "renderExtra",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "one",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One named control, as a button on the bar.\n\nA method rather than four branches inlined, because the same four names are\nasked for twice now, once for the bar and once for the menu behind it, and\ntwo lists that have to stay in step is how a control ends up offered in one\nplace and not the other."
+            },
+            {
+              "kind": "method",
+              "name": "renderOverflowItem",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "one",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The same control as a row in the overflow menu.\n\nThe label is words rather than a mark, which is the difference between a\nbar and a menu: a row has the width for a name and a reader scanning one is\nreading rather than recognising. `download` is a linked row, which is what\n`Menu.Item`'s `href` is for."
+            },
+            {
+              "kind": "method",
               "name": "renderBar",
               "privacy": "private",
               "return": {
@@ -43879,8 +44044,17 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.",
+              "description": "Controls beyond the ones every player has, named in the order they appear.\n\nA list rather than a property apiece. A bar is a row with a budget, and a\nboolean per feature invites a consumer to switch all of them on: naming\nthem makes the row a decision, and makes the order theirs. Anything\nunrecognised is skipped rather than throwing, since the list is markup and\na typo should cost a control, not a page.\n\n`pip` is offered only where the platform has it, checked rather than\nassumed: it is absent on iPhone and behind a flag in Firefox, and a button\nthat cannot work is worse than one that is not there.\n\nThe names are `speed`, `pip`, `remote` and `download`.\n\n**`download` is named and never assumed.** Offering the file is a decision\nabout the content rather than about the player, and plenty of consumers\ndecline it deliberately. It is also the one control whose success is not\nours to promise: the attribute is ignored cross-origin, so a file served\nfrom somewhere else opens rather than saves, which is the browser's rule\nand not something a player can work around.",
               "fieldName": "extraControls"
+            },
+            {
+              "name": "overflow-controls",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Controls that go behind one button instead of onto the bar, named the same\nway.\n\n**Named rather than measured, and the reason is that a width cannot answer\nthis.** A media query asks about the window, and the bar's problem is its\nown width: a video in a 320px sidebar on a desktop is cramped and a\nfull-bleed hero on a phone is not. A container query asks the right\nquestion and still cannot answer it, because how many controls there are is\nthe consumer's, so the threshold is not a width but a width per control,\nwhich is a guess. And a control that moves between the bar and a hidden\nmenu as the layout shifts is a control the reader has to find twice.\n\nSo the consumer says where the fold is, which they can, having already\nnamed the controls in order. A name in both lists is drawn once, on the\nbar: two of the same control is worse than either placement.",
+              "fieldName": "overflowControls"
             },
             {
               "name": "speeds",

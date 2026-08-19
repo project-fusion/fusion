@@ -1,0 +1,14 @@
+<!-- @summary A box the page owns, answering the event and assigning `checked`. -->
+<helix-checkbox
+  checked
+  id="terms"
+  label="Label"
+></helix-checkbox>
+
+<script>
+  const terms = document.getElementById('terms')
+
+  terms.addEventListener('helix-toggle', (event) => {
+    terms.checked = event.detail.checked
+  })
+</script>

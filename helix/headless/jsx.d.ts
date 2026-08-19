@@ -4478,6 +4478,35 @@ thing they are not.
   checked?: HelixBaseMenuItem["checked"];
   /** Whether the row can be chosen. */
   disabled?: HelixBaseMenuItem["disabled"];
+  /** Where the row goes, which makes it a real link.
+
+**The row itself becomes an `<a>`, and the role goes with it.** A
+`menuitem` cannot contain a link: measured in Chromium, an anchor inside
+one is exposed as a child and the row loses its accessible name entirely.
+So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
+roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+changes the markup rather than only adding an attribute.
+
+**`Option` cannot have this and the reason is worth knowing**, since a
+command palette is the obvious place to want it. A listbox has to keep
+focus somewhere else, in the text field for a combobox, so it says which
+option is current with `aria-activedescendant`. That reference can only
+point at the option's host, measured: assigning
+`ariaActiveDescendantElement` an element inside a sibling shadow root reads
+back `null`. So `role="option"` is pinned to the host, and an anchor under
+it hits the naming failure above. A menu has no such constraint because
+focus really moves to the row. */
+  href?: HelixBaseMenuItem["href"];
+  /** Where the link opens, for the rows that should leave the page. */
+  target?: HelixBaseMenuItem["target"];
+  /** The relationship, which `target="_blank"` should always set. */
+  rel?: HelixBaseMenuItem["rel"];
+  /** Whether the link saves the file rather than opening it.
+
+Only meaningful beside an `href`, and only for a file served from this
+origin: the attribute is ignored cross-origin, which is the browser's rule
+about who may name a file on somebody's disk rather than a gap here. */
+  download?: HelixBaseMenuItem["download"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
@@ -4514,6 +4543,35 @@ thing they are not.
   "prop:checked"?: HelixBaseMenuItem["checked"];
   /** Whether the row can be chosen. */
   "prop:disabled"?: HelixBaseMenuItem["disabled"];
+  /** Where the row goes, which makes it a real link.
+
+**The row itself becomes an `<a>`, and the role goes with it.** A
+`menuitem` cannot contain a link: measured in Chromium, an anchor inside
+one is exposed as a child and the row loses its accessible name entirely.
+So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
+roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+changes the markup rather than only adding an attribute.
+
+**`Option` cannot have this and the reason is worth knowing**, since a
+command palette is the obvious place to want it. A listbox has to keep
+focus somewhere else, in the text field for a combobox, so it says which
+option is current with `aria-activedescendant`. That reference can only
+point at the option's host, measured: assigning
+`ariaActiveDescendantElement` an element inside a sibling shadow root reads
+back `null`. So `role="option"` is pinned to the host, and an anchor under
+it hits the naming failure above. A menu has no such constraint because
+focus really moves to the row. */
+  "prop:href"?: HelixBaseMenuItem["href"];
+  /** Where the link opens, for the rows that should leave the page. */
+  "prop:target"?: HelixBaseMenuItem["target"];
+  /** The relationship, which `target="_blank"` should always set. */
+  "prop:rel"?: HelixBaseMenuItem["rel"];
+  /** Whether the link saves the file rather than opening it.
+
+Only meaningful beside an `href`, and only for a file served from this
+origin: the attribute is ignored cross-origin, which is the browser's rule
+about who may name a file on somebody's disk rather than a gap here. */
+  "prop:download"?: HelixBaseMenuItem["download"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
@@ -9319,7 +9377,16 @@ a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
 assumed: it is absent on iPhone and behind a flag in Firefox, and a button
-that cannot work is worse than one that is not there. */
+that cannot work is worse than one that is not there.
+
+The names are `speed`, `pip`, `remote` and `download`.
+
+**`download` is named and never assumed.** Offering the file is a decision
+about the content rather than about the player, and plenty of consumers
+decline it deliberately. It is also the one control whose success is not
+ours to promise: the attribute is ignored cross-origin, so a file served
+from somewhere else opens rather than saves, which is the browser's rule
+and not something a player can work around. */
   "extra-controls"?: HelixBaseVideo["extraControls"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
@@ -9331,8 +9398,49 @@ a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
 assumed: it is absent on iPhone and behind a flag in Firefox, and a button
-that cannot work is worse than one that is not there. */
+that cannot work is worse than one that is not there.
+
+The names are `speed`, `pip`, `remote` and `download`.
+
+**`download` is named and never assumed.** Offering the file is a decision
+about the content rather than about the player, and plenty of consumers
+decline it deliberately. It is also the one control whose success is not
+ours to promise: the attribute is ignored cross-origin, so a file served
+from somewhere else opens rather than saves, which is the browser's rule
+and not something a player can work around. */
   extraControls?: HelixBaseVideo["extraControls"];
+  /** Controls that go behind one button instead of onto the bar, named the same
+way.
+
+**Named rather than measured, and the reason is that a width cannot answer
+this.** A media query asks about the window, and the bar's problem is its
+own width: a video in a 320px sidebar on a desktop is cramped and a
+full-bleed hero on a phone is not. A container query asks the right
+question and still cannot answer it, because how many controls there are is
+the consumer's, so the threshold is not a width but a width per control,
+which is a guess. And a control that moves between the bar and a hidden
+menu as the layout shifts is a control the reader has to find twice.
+
+So the consumer says where the fold is, which they can, having already
+named the controls in order. A name in both lists is drawn once, on the
+bar: two of the same control is worse than either placement. */
+  "overflow-controls"?: HelixBaseVideo["overflowControls"];
+  /** Controls that go behind one button instead of onto the bar, named the same
+way.
+
+**Named rather than measured, and the reason is that a width cannot answer
+this.** A media query asks about the window, and the bar's problem is its
+own width: a video in a 320px sidebar on a desktop is cramped and a
+full-bleed hero on a phone is not. A container query asks the right
+question and still cannot answer it, because how many controls there are is
+the consumer's, so the threshold is not a width but a width per control,
+which is a guess. And a control that moves between the bar and a hidden
+menu as the layout shifts is a control the reader has to find twice.
+
+So the consumer says where the fold is, which they can, having already
+named the controls in order. A name in both lists is drawn once, on the
+bar: two of the same control is worse than either placement. */
+  overflowControls?: HelixBaseVideo["overflowControls"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   speeds?: HelixBaseVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
@@ -9404,7 +9512,16 @@ a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
 assumed: it is absent on iPhone and behind a flag in Firefox, and a button
-that cannot work is worse than one that is not there. */
+that cannot work is worse than one that is not there.
+
+The names are `speed`, `pip`, `remote` and `download`.
+
+**`download` is named and never assumed.** Offering the file is a decision
+about the content rather than about the player, and plenty of consumers
+decline it deliberately. It is also the one control whose success is not
+ours to promise: the attribute is ignored cross-origin, so a file served
+from somewhere else opens rather than saves, which is the browser's rule
+and not something a player can work around. */
   "attr:extra-controls"?: HelixBaseVideo["extraControls"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
@@ -9416,8 +9533,49 @@ a typo should cost a control, not a page.
 
 `pip` is offered only where the platform has it, checked rather than
 assumed: it is absent on iPhone and behind a flag in Firefox, and a button
-that cannot work is worse than one that is not there. */
+that cannot work is worse than one that is not there.
+
+The names are `speed`, `pip`, `remote` and `download`.
+
+**`download` is named and never assumed.** Offering the file is a decision
+about the content rather than about the player, and plenty of consumers
+decline it deliberately. It is also the one control whose success is not
+ours to promise: the attribute is ignored cross-origin, so a file served
+from somewhere else opens rather than saves, which is the browser's rule
+and not something a player can work around. */
   "prop:extraControls"?: HelixBaseVideo["extraControls"];
+  /** Controls that go behind one button instead of onto the bar, named the same
+way.
+
+**Named rather than measured, and the reason is that a width cannot answer
+this.** A media query asks about the window, and the bar's problem is its
+own width: a video in a 320px sidebar on a desktop is cramped and a
+full-bleed hero on a phone is not. A container query asks the right
+question and still cannot answer it, because how many controls there are is
+the consumer's, so the threshold is not a width but a width per control,
+which is a guess. And a control that moves between the bar and a hidden
+menu as the layout shifts is a control the reader has to find twice.
+
+So the consumer says where the fold is, which they can, having already
+named the controls in order. A name in both lists is drawn once, on the
+bar: two of the same control is worse than either placement. */
+  "attr:overflow-controls"?: HelixBaseVideo["overflowControls"];
+  /** Controls that go behind one button instead of onto the bar, named the same
+way.
+
+**Named rather than measured, and the reason is that a width cannot answer
+this.** A media query asks about the window, and the bar's problem is its
+own width: a video in a 320px sidebar on a desktop is cramped and a
+full-bleed hero on a phone is not. A container query asks the right
+question and still cannot answer it, because how many controls there are is
+the consumer's, so the threshold is not a width but a width per control,
+which is a guess. And a control that moves between the bar and a hidden
+menu as the layout shifts is a control the reader has to find twice.
+
+So the consumer says where the fold is, which they can, having already
+named the controls in order. A name in both lists is drawn once, on the
+bar: two of the same control is worse than either placement. */
+  "prop:overflowControls"?: HelixBaseVideo["overflowControls"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   "prop:speeds"?: HelixBaseVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
@@ -13059,6 +13217,31 @@ export type CustomElements = {
    * `checked` implies it, so a row that is on never has to say both.
    * - `checked`: Whether the row is ticked.
    * - `disabled`: Whether the row can be chosen.
+   * - `href`: Where the row goes, which makes it a real link.
+   *
+   * **The row itself becomes an `<a>`, and the role goes with it.** A
+   * `menuitem` cannot contain a link: measured in Chromium, an anchor inside
+   * one is exposed as a child and the row loses its accessible name entirely.
+   * So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
+   * roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+   * changes the markup rather than only adding an attribute.
+   *
+   * **`Option` cannot have this and the reason is worth knowing**, since a
+   * command palette is the obvious place to want it. A listbox has to keep
+   * focus somewhere else, in the text field for a combobox, so it says which
+   * option is current with `aria-activedescendant`. That reference can only
+   * point at the option's host, measured: assigning
+   * `ariaActiveDescendantElement` an element inside a sibling shadow root reads
+   * back `null`. So `role="option"` is pinned to the host, and an anchor under
+   * it hits the naming failure above. A menu has no such constraint because
+   * focus really moves to the row.
+   * - `target`: Where the link opens, for the rows that should leave the page.
+   * - `rel`: The relationship, which `target="_blank"` should always set.
+   * - `download`: Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
    * - `onPage`: Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -13112,7 +13295,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The row.
+   * - `item`: The row, which is an `<a>` where `href` is set.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-base-menu-item": Partial<
@@ -17301,6 +17484,30 @@ export type CustomElements = {
    * `pip` is offered only where the platform has it, checked rather than
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
+   *
+   * The names are `speed`, `pip`, `remote` and `download`.
+   *
+   * **`download` is named and never assumed.** Offering the file is a decision
+   * about the content rather than about the player, and plenty of consumers
+   * decline it deliberately. It is also the one control whose success is not
+   * ours to promise: the attribute is ignored cross-origin, so a file served
+   * from somewhere else opens rather than saves, which is the browser's rule
+   * and not something a player can work around.
+   * - `overflow-controls`/`overflowControls`: Controls that go behind one button instead of onto the bar, named the same
+   * way.
+   *
+   * **Named rather than measured, and the reason is that a width cannot answer
+   * this.** A media query asks about the window, and the bar's problem is its
+   * own width: a video in a 320px sidebar on a desktop is cramped and a
+   * full-bleed hero on a phone is not. A container query asks the right
+   * question and still cannot answer it, because how many controls there are is
+   * the consumer's, so the threshold is not a width but a width per control,
+   * which is a guess. And a control that moves between the bar and a hidden
+   * menu as the layout shifts is a control the reader has to find twice.
+   *
+   * So the consumer says where the fold is, which they can, having already
+   * named the controls in order. A name in both lists is drawn once, on the
+   * bar: two of the same control is worse than either placement.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
    *
@@ -17355,6 +17562,9 @@ export type CustomElements = {
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `download`: Saves the file, where it was asked for.
+   * - `overflow`: The menu holding the controls kept off the bar.
+   * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
    */
   "helix-base-video": Partial<
@@ -21083,6 +21293,31 @@ export type CustomElementsSolidJs = {
    * `checked` implies it, so a row that is on never has to say both.
    * - `checked`: Whether the row is ticked.
    * - `disabled`: Whether the row can be chosen.
+   * - `href`: Where the row goes, which makes it a real link.
+   *
+   * **The row itself becomes an `<a>`, and the role goes with it.** A
+   * `menuitem` cannot contain a link: measured in Chromium, an anchor inside
+   * one is exposed as a child and the row loses its accessible name entirely.
+   * So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
+   * roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+   * changes the markup rather than only adding an attribute.
+   *
+   * **`Option` cannot have this and the reason is worth knowing**, since a
+   * command palette is the obvious place to want it. A listbox has to keep
+   * focus somewhere else, in the text field for a combobox, so it says which
+   * option is current with `aria-activedescendant`. That reference can only
+   * point at the option's host, measured: assigning
+   * `ariaActiveDescendantElement` an element inside a sibling shadow root reads
+   * back `null`. So `role="option"` is pinned to the host, and an anchor under
+   * it hits the naming failure above. A menu has no such constraint because
+   * focus really moves to the row.
+   * - `target`: Where the link opens, for the rows that should leave the page.
+   * - `rel`: The relationship, which `target="_blank"` should always set.
+   * - `download`: Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
    * - `onPage`: Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -21136,7 +21371,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The row.
+   * - `item`: The row, which is an `<a>` where `href` is set.
    * - `mark`: The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both.
    */
   "helix-base-menu-item": Partial<
@@ -25459,6 +25694,30 @@ export type CustomElementsSolidJs = {
    * `pip` is offered only where the platform has it, checked rather than
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
+   *
+   * The names are `speed`, `pip`, `remote` and `download`.
+   *
+   * **`download` is named and never assumed.** Offering the file is a decision
+   * about the content rather than about the player, and plenty of consumers
+   * decline it deliberately. It is also the one control whose success is not
+   * ours to promise: the attribute is ignored cross-origin, so a file served
+   * from somewhere else opens rather than saves, which is the browser's rule
+   * and not something a player can work around.
+   * - `overflow-controls`/`overflowControls`: Controls that go behind one button instead of onto the bar, named the same
+   * way.
+   *
+   * **Named rather than measured, and the reason is that a width cannot answer
+   * this.** A media query asks about the window, and the bar's problem is its
+   * own width: a video in a 320px sidebar on a desktop is cramped and a
+   * full-bleed hero on a phone is not. A container query asks the right
+   * question and still cannot answer it, because how many controls there are is
+   * the consumer's, so the threshold is not a width but a width per control,
+   * which is a guess. And a control that moves between the bar and a hidden
+   * menu as the layout shifts is a control the reader has to find twice.
+   *
+   * So the consumer says where the fold is, which they can, having already
+   * named the controls in order. A name in both lists is drawn once, on the
+   * bar: two of the same control is worse than either placement.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
    *
@@ -25513,6 +25772,9 @@ export type CustomElementsSolidJs = {
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `download`: Saves the file, where it was asked for.
+   * - `overflow`: The menu holding the controls kept off the bar.
+   * - `more`: The button that opens it.
    * - `fullscreen`: The whole screen, and back.
    */
   "helix-base-video": Partial<

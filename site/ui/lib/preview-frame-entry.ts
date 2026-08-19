@@ -84,6 +84,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
      is a console the reader is meant to trust. The stylesheet arrives in the
      same message instead, already read from disk. */
   host.innerHTML = source.replace(/<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi, '')
+  runScripts(host)
 
   let sheet = document.getElementById('preview-styles')
   if (!sheet) {
@@ -95,6 +96,61 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
 })
 
 post({ type: 'helix-preview-ready' })
+
+/**
+ * Executes the `<script>` elements in a rendered example.
+ *
+ * **`innerHTML` parses a script and refuses to run it**, which is why no example
+ * in the library demonstrated an event: the two ways markup can respond to one
+ * are a `<script>` tag and an inline handler attribute, and measured in Chrome
+ * against this exact injection, neither reached a Helix event:
+ *
+ * ```
+ * inline custom    did not run     <helix-checkbox onhelix-toggle="…">
+ * inline native    RAN             <helix-button onclick="…">
+ * inline onerror   RAN             <img onerror="…">
+ * script tag       did not run     <script>…</script>
+ * ```
+ *
+ * The inline attribute is inert for a reason nothing here can change: HTML's
+ * event handler content attributes are a fixed list and a custom element cannot
+ * add to it, so `onhelix-toggle` is an ordinary attribute and always will be. A
+ * script tag is the only route left.
+ *
+ * **This grants the example no capability it did not have.** Rows two and three
+ * are the whole argument: an example can already run arbitrary JavaScript in
+ * this document through `onclick` or `onerror`, and could already append a
+ * script element from one. What `innerHTML` was providing was not a control, it
+ * was an inconsistency, and the cost of it was that the legible way to write the
+ * thing was the one way that did not work.
+ *
+ * The boundary is where it always was. This document is sandboxed with
+ * `allow-scripts` and never `allow-same-origin`, so it holds an opaque origin
+ * and cannot reach the site's storage, cookies, or DOM. Running a reader's code
+ * is what the frame is for.
+ *
+ * A fresh element is required. The parser marks a script inserted by `innerHTML`
+ * as already started, so re-appending the same node runs nothing; a new one
+ * carrying the same attributes and text is a new script and runs. Attributes are
+ * copied rather than filtered, `src` and `type` included, because a sandbox
+ * should render what was typed and a cross-origin classic script was reachable
+ * from an inline handler already.
+ *
+ * Side effects outlive a re-render, the way they do in any live preview: an
+ * example that adds a listener to `document` has added it, and the next render
+ * adds another. The frame reloads on a source change in development, which is
+ * where that would otherwise accumulate.
+ */
+function runScripts(root: HTMLElement): void {
+  for (const original of [...root.querySelectorAll('script')]) {
+    const script = document.createElement('script')
+    for (const { name, value } of original.attributes) {
+      script.setAttribute(name, value)
+    }
+    script.text = original.text
+    original.replaceWith(script)
+  }
+}
 
 /** Stringifies a logged value without throwing on a cycle. */
 function safeStringify(value: unknown): string {

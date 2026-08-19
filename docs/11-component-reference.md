@@ -2527,10 +2527,14 @@ than as a ragged list.
 | `checkable` | `checkable` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is one of a set of choices. |
 | `checked` | `checked` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row is ticked. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the row can be chosen. |
+| `download` | `download` | `boolean` | `false` | `HelixBaseMenuItem` | Whether the link saves the file rather than opening it. |
 | `hasSubmenu` | - | `boolean` | - | `HelixBaseMenuItem` | Whether anything was slotted into `submenu`. |
+| `href` | `href` | `string` | `''` | `HelixBaseMenuItem` | Where the row goes, which makes it a real link. |
 | `isMenuItem` | - | `boolean` | `true` | `HelixBaseMenuItem` | Marks this as a row a menu should count. Cheaper than an instanceof. |
 | `onPage` | - | `boolean` | `true` | `HelixBaseMenuItem` | Whether this row is on the page currently showing. |
+| `rel` | `rel` | `string` | `''` | `HelixBaseMenuItem` | The relationship, which `target="_blank"` should always set. |
 | `showingSubmenu` | - | `boolean` | `false` | `HelixBaseMenuItem` | Whether this row's submenu is the page showing. |
+| `target` | `target` | `string` | `''` | `HelixBaseMenuItem` | Where the link opens, for the rows that should leave the page. |
 | `value` | `value` | `string` | `''` | `HelixBaseMenuItem` | What this row stands for, carried in the event when it is chosen. |
 
 #### Methods
@@ -2556,7 +2560,7 @@ than as a ragged list.
 
 | Part | Description |
 | --- | --- |
-| `item` | The row. |
+| `item` | The row, which is an `<a>` where `href` is set. |
 | `mark` | The trailing mark: a tick when checked, a caret when it opens a page. One column, because a row is never both. |
 
 #### Custom properties
@@ -5450,6 +5454,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
 | `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |
+| `overflowControls` | `overflow-controls` | `string` | `''` | `HelixBaseVideo` | Controls that go behind one button instead of onto the bar, named the same way. |
 | `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixBaseVideo` | And while it would stop it. |
 | `playLabel` | `play-label` | `string` | `'Play'` | `HelixBaseVideo` | What the play control is called while it would start the video. |
 | `playsInline` | `plays-inline` | `boolean` | `true` | `HelixBaseVideo` | Whether it plays where it sits rather than taking over the screen. |
@@ -5499,6 +5504,9 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `remote` | Play on another device, where one is available. |
 | `speed` | Playback speed, where it was asked for. |
 | `pip` | Picture in picture, where it was asked for and exists. |
+| `download` | Saves the file, where it was asked for. |
+| `overflow` | The menu holding the controls kept off the bar. |
+| `more` | The button that opens it. |
 | `fullscreen` | The whole screen, and back. |
 
 #### Custom properties

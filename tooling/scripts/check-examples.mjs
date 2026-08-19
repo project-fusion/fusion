@@ -45,6 +45,15 @@ for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
     }
     const attributes = new Set((declaration.attributes ?? []).map((a) => a.name))
     tags.set(declaration.tagName, {
+      /* What answers each one, read from `@controlled` rather than derived. The
+         line above knows an attribute is controlled; only the tag knows which
+         event settles it, and an example claiming ownership has to listen for
+         the right one rather than for any event at all. */
+      answers: new Map(
+        (declaration.members ?? [])
+          .filter((member) => member.helix?.controlled?.length && member.name)
+          .map((member) => [member.name, member.helix.controlled]),
+      ),
       attributes,
       /* Which attributes hand the state to a consumer, derived rather than
          listed: an attribute is a controlled state exactly when the element
@@ -66,16 +75,28 @@ for (const module of JSON.parse(readFileSync(MANIFEST, 'utf8')).modules ?? []) {
  * and waits to be told. Six examples were in exactly that state, silently, and
  * a reader opening the sandbox found a calendar whose arrows did nothing.
  *
- * **What makes it absolute here rather than a judgement call.** Nothing in an
- * example can answer. An example is HTML and a stylesheet, the sandbox refuses
- * a `<script>` (`innerHTML` does), and the smoke harness is handed only those
- * two files. So there is no correct way to write a controlled control in one,
- * and the runtime audit that catches this elsewhere fires only once a reader
- * has already interacted with something broken.
+ * **It used to be absolute, and is now conditional.** Nothing in an example
+ * could answer: an example is HTML and a stylesheet, and the preview injected
+ * both with `innerHTML`, which parses a `<script>` and refuses to run it. So
+ * there was no correct way to write a controlled control in one. The preview
+ * executes example scripts now, which makes the answer writable, so the rule
+ * becomes the one that was always meant: **declare a state and answer it, or
+ * seed it with `default-`.**
+ *
+ * What answers is read from the manifest rather than guessed, because
+ * `@controlled` already records it: `checked` is answered by `helix-toggle`,
+ * `open` by `helix-open` and `helix-close`. An example listening for one of
+ * those has said it owns the state and means it.
+ *
+ * An HTML fence in prose is still absolute, because a fence is markup by
+ * definition and a reader copies what is in front of them.
  */
-const declaresState = (where, tag, name) =>
+const declaresState = (where, tag, name, answers) =>
   `${where}: <${tag}> declares "${name}", which hands that state to a consumer. ` +
-  `Nothing in an example can answer, so the control will not respond. Use "default-${name}".`
+  (answers?.length
+    ? `Answer it with a listener for ${answers.map((one) => `\`${one}\``).join(' or ')}, ` +
+      `or seed it with "default-${name}".`
+    : `Nothing here can answer, so the control will not respond. Use "default-${name}".`)
 
 const problems = []
 /* Family directories. `src` also holds `index.ts`, which is not one, and
@@ -187,7 +208,17 @@ for (const family of families) {
           continue
         }
         if (known.controlled.has(name)) {
-          problems.push(declaresState(where, tag, name))
+          const answers = known.answers.get(name) ?? []
+          /* Answered, so the example owns the state on purpose. A listener for
+             the settling event is the whole test: it is what a consumer writes,
+             it is what the runtime audit looks for, and an example that has one
+             works when a reader copies it. */
+          const answered = answers.some(
+            (event) => html.includes(`'${event}'`) || html.includes(`"${event}"`),
+          )
+          if (!answered) {
+            problems.push(declaresState(where, tag, name, answers))
+          }
         }
       }
     }
