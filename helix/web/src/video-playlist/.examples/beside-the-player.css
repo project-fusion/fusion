@@ -1,0 +1,5 @@
+/* The two regions side by side, which is what the hook is for: how a playlist
+   is arranged is a fact about the room it is in, not about the playlist. */
+.wide {
+  --video-playlist-layout: minmax(0, 2fr) minmax(0, 1fr);
+}

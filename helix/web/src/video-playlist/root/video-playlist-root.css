@@ -1,0 +1,25 @@
+/* Two regions, and which way they sit is the consumer's.
+ *
+ * Beside on a wide screen and stacked on a narrow one is what every playlist
+ * does, and neither is this element's to decide: a playlist in a sidebar is
+ * narrow on a desktop, and one filling a phone is not. `--video-playlist-layout`
+ * takes a `grid-template-columns`, so a consumer says it once in the terms the
+ * property already has rather than through an appearance that guesses.
+ */
+:host {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: var(--video-playlist-layout, 1fr);
+}
+
+/* Its own scroller, so a long set does not run the page down past the player.
+   Capped rather than matched to the player: the two are only the same height in
+   the arrangement where they sit side by side, and reaching for the player's
+   height from here would be right in one layout and wrong in the others. */
+[part="items"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  max-block-size: var(--video-playlist-size, 26rem);
+  overflow-y: auto;
+}

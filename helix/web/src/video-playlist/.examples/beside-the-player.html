@@ -1,0 +1,32 @@
+<!-- @summary The list beside the player rather than under it. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-video-playlist
+  class="wide"
+  default-active="one"
+  label="Episodes"
+>
+  <helix-video
+    extra-controls="previous next"
+    label="One of several"
+    slot="player"
+  ></helix-video>
+
+  <helix-video-playlist-item
+    src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
+    value="one"
+  >
+    His Girl Friday
+    <span slot="meta">0:06</span>
+  </helix-video-playlist-item>
+  <helix-video-playlist-item
+    src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+    value="two"
+  >
+    A flower opens
+    <span slot="meta">0:05</span>
+  </helix-video-playlist-item>
+</helix-video-playlist>

@@ -1,0 +1,111 @@
+:host {
+  display: block;
+}
+
+/* `all: unset` first, and `box-sizing` straight back: shadow roots get
+   `border-box` from `HelixElement.finalizeStyles`, and a rule that unsets
+   everything outranks it, so the row would quietly revert to `content-box` and
+   overflow itself by its own padding. Four components were caught by this. */
+[part="item"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  background-color: var(--video-playlist-item-background-color, transparent);
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+  inline-size: 100%;
+  padding: var(--helix-space-2xs);
+  text-align: start;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* A wash of the ink rather than a fixed surface, for the reason the ghost
+   button records: a playlist sits on a page, a card or a panel, and an absolute
+   neutral is a step away from exactly one of them. */
+:host(:not([disabled])) [part="item"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+}
+
+[part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The one playing, and it stays marked under the pointer.
+ *
+ * Keyed on `aria-current`, which the element already writes, rather than on a
+ * second attribute saying the same thing: the accessible fact and the visible
+ * one are then the same fact, and they cannot come apart. `Toggle` reads its own
+ * state the same way.
+ *
+ * The bar rather than a fill of the whole row. A playlist is scanned down its
+ * leading edge, and a filled row a reader has to compare against ten others is
+ * slower to find than a mark in the margin. */
+[part="item"][aria-current="true"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  box-shadow: inset var(--helix-border-thick) 0 0 0 var(--helix-color-primary);
+  color: var(--helix-color-foreground);
+}
+
+:host([disabled]) [part="item"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* A fixed column, so a set where one entry has a thumbnail and the rest do not
+   still reads as one column of names. The mark's column in a menu row carries
+   the same note.
+ *
+ * No fill of its own. It had one, and an entry with neither a poster nor
+ * anything slotted came out as a grey rectangle per row, which reads as a
+ * thumbnail that failed rather than as a row that has none. Empty, the column is
+ * space that keeps the names aligned and draws nothing. */
+[part="media"] {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--helix-radii-sm);
+  flex: 0 0 auto;
+  inline-size: var(--video-playlist-media-size, 5rem);
+  overflow: hidden;
+}
+
+/* Both the consumer's and ours. `::slotted()` never matches fallback content,
+   which belongs to the shadow tree that wrote it, so a rule for the slotted
+   image alone would leave the one this element draws unsized. `CopyButton`
+   records the same failure: a correctly coloured control containing a 0x0
+   glyph. */
+[part="media"] ::slotted(*),
+[part="thumbnail"] {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  min-inline-size: 0;
+}
+
+[part="label"] ::slotted([slot="meta"]) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="item"] {
+    transition: none;
+  }
+}
