@@ -156,9 +156,9 @@
 }
 
 /* Interest darkens the line and thickens it. */
-[part="separator"]:hover::before,
-[part="separator"]:focus-visible::before,
-[part="separator"][data-dragging]::before {
+:host(:not([appearance="grip"])) [part="separator"]:hover::before,
+:host(:not([appearance="grip"])) [part="separator"]:focus-visible::before,
+:host(:not([appearance="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
   inline-size: var(--helix-border-thick);
 }
@@ -175,13 +175,13 @@
  * fast one leaves the eight pixel target behind, and the nested divider a corner
  * moves is never hovered at all. After the interest rules, so a divider being
  * dragged under the pointer is primary rather than muted. */
-[part="separator"][data-dragging]::before {
+:host(:not([appearance="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
-:host([orientation="vertical"]) [part="separator"]:hover::before,
-:host([orientation="vertical"]) [part="separator"]:focus-visible::before,
-:host([orientation="vertical"]) [part="separator"][data-dragging]::before {
+:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"]:hover::before,
+:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"]:focus-visible::before,
+:host([orientation="vertical"]:not([appearance="grip"])) [part="separator"][data-dragging]::before {
   block-size: var(--helix-border-thick);
   inline-size: auto;
 }
@@ -286,17 +286,32 @@
  * reads as a defect in the border; beside it, the two are separate marks and the
  * line stays a line.
  *
+ * **Nothing at rest, and the grip is the whole answer on approach.** It was
+ * drawn at rest first, on the argument that a splitter nobody knows about has
+ * to be visible before it is pointed at. A page of nested splitters is a page
+ * of pills saying "boundary" at something that already looks like a boundary,
+ * and the line under each one is the mark that belongs there. What the grip is
+ * for is the moment the pointer arrives, where a cursor change is the only
+ * thing a plain divider offers and a cursor is easy to miss.
+ *
+ * **And it answers alone.** The line keeps its colour and its width in this
+ * shape, which is what the `:not([appearance="grip"])` on the interest rules
+ * above is doing. Two marks responding to one pointer reads as two things.
+ *
  * Drawn on the separator's second pseudo-element, so it costs no markup and no
  * part: `::before` is already the line. A pseudo-element hit-tests as its
  * originating element, so the grip lights the divider by being pointed at
  * without being a target of its own, which is also why it is `grip` and not
  * `handle`: the corner is the thing here that is a box the reader grabs. */
 :host([appearance="grip"]) [part="separator"]::after {
-  background-color: var(--splitter-grip-color, var(--helix-color-foreground-subtle));
+  background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
   border-radius: var(--helix-radii-full);
   content: "";
+  opacity: 0;
   position: absolute;
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* Along the run, centred, and offset to the leading side of the line. */
@@ -314,31 +329,21 @@
   inset-inline-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
 }
 
-/* A pane shut to nothing loses its line, and the grip goes with it: the grip is
-   what says where the divider is, and left alone over a border drawn by
-   something else it is a floating capsule pointing at nothing.
-   Before the interest rules and not after, the same order the line's own flush
-   rule is in and for the same reason: the target is still eight pixels and still
-   answers, so hover, focus and a drag have to bring both back or a pane shut to
-   nothing can never be opened again. */
-:host([appearance="grip"]) [part="separator"][data-flush]::after {
-  background-color: transparent;
-}
-
-/* And it answers with the line rather than beside it, on the same two hooks the
-   line uses. The grip is not a second control with a state of its own: it marks
-   where this divider is, so a reader who darkens the line and sees a grip that
-   did not move is looking at two things where there is one.
-   Grey at rest and accent only while moving, for the reason the corner records:
-   hover is a question and a drag is an answer. A grip that were accent at rest
-   would also put a row of coloured pills down a workbench of nested splitters,
-   which is a lot of ink spent saying "this is a boundary" four times. */
+/* Interest brings it in. No `data-flush` rule to go with it, unlike the line:
+   the line is hidden when a pane is shut because there is already an edge drawn
+   there by whatever contains the splitter, and the grip is hidden at rest
+   anyway. Both come back the same way, which is what lets a pane shut to
+   nothing be found and opened again. */
 :host([appearance="grip"]) [part="separator"]:hover::after,
 :host([appearance="grip"]) [part="separator"]:focus-visible::after,
 :host([appearance="grip"]) [part="separator"][data-dragging]::after {
-  background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
+  opacity: 1;
 }
 
+/* And a drag goes accent, for the reason the corner records: hover is a
+   question and a drag is an answer, and a corner moving two dividers at once
+   needs the pair to read as one gesture. The only thing that ever changes
+   colour in this shape. */
 :host([appearance="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }

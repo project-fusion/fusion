@@ -48,7 +48,7 @@ import { styles } from './splitter-root.css.js'
  * @cssproperty --splitter-color - The line between the panes.
  * @cssproperty --splitter-corner - How wide the handle at a crossing is.
  * @cssproperty --splitter-drag-color - The line while it is being moved.
- * @cssproperty --splitter-grip-color - The grip beside the line, at rest.
+ * @cssproperty --splitter-grip-color - The grip beside the line, once it is shown.
  * @cssproperty --splitter-grip-length - How far the grip runs along the divider.
  * @cssproperty --splitter-hover-color - The target under the pointer.
  * @cssproperty --splitter-target - How wide the draggable box is.
