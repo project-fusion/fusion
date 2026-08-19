@@ -194,7 +194,23 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    */
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
-    boundary: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    /* The surface *and* the trigger.
+     *
+     * A control is not always one element: the button that opens this panel is
+     * part of it, and a press on it is not a press outside. Scoped to the
+     * surface alone, `pointerdown` on the trigger closed the panel and the
+     * trigger's own `toggleOpen` reopened it on the `click` that followed, so
+     * the panel could never be closed by the button that opened it. Measured
+     * across all five popover-bearing components: Menu, Popover and Tooltip
+     * already named their invoker; this one and its three siblings did not, and
+     * all four stayed open on a second press where Menu closed.
+     *
+     * `DismissController` documents this exact failure and takes a list for it.
+     * The list was the fix; using it was the part that did not happen here. */
+    boundary: (): readonly (Element | null | undefined)[] => [
+      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+    ],
     /* Wider than the four every other panel here takes. Those sit against a
        control the same width as themselves and read as an extension of it; this
        one is a calendar of its own size hanging off a field, so the gap is what

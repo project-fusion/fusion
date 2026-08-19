@@ -270,3 +270,45 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('the trigger closes the panel it opened', () => {
+  /* A real press is `pointerdown` then `click`, and the order is the whole bug:
+     the dismisser listens on `pointerdown` and the trigger toggles on `click`.
+     Dispatching `click` alone never reaches the dismisser and the spec passes
+     on the broken code. */
+  const press = (el: Element): void => {
+    for (const type of ['pointerdown', 'pointerup']) {
+      el.dispatchEvent(new Event(type, { bubbles: true, composed: true }))
+    }
+    el.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+  }
+
+  test('a second press closes it, rather than closing and reopening', async () => {
+    const host = (await select()) as Updatable & { open: boolean }
+    const trigger = part(host, 'trigger') as HTMLElement
+
+    press(trigger)
+    await settle(host)
+    expect(host.open).toBe(true)
+
+    press(trigger)
+    await settle(host)
+    expect(host.open).toBe(false)
+
+    press(trigger)
+    await settle(host)
+    expect(host.open).toBe(true)
+  })
+
+  test('and a press outside still closes it, which is what the boundary is for', async () => {
+    // The trigger joined the boundary; the rest of the document must not have.
+    const host = (await select()) as Updatable & { open: boolean }
+    press(part(host, 'trigger') as HTMLElement)
+    await settle(host)
+    expect(host.open).toBe(true)
+
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(host.open).toBe(false)
+  })
+})

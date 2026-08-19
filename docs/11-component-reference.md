@@ -993,6 +993,7 @@ brought its own card would be a card inside a card there.
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
 | `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the current selection fails validation. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
@@ -4108,6 +4109,7 @@ card would be a card inside a card there.
 | `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseTimePicker` | Whether the current selection fails validation. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `'Time'` | `HelixBaseTimePicker` | Accessible name for the list, which has no visible one of its own. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
