@@ -54042,20 +54042,6 @@
             },
             {
               "kind": "field",
-              "name": "chevron",
-              "type": {
-                "text": "'end' | undefined"
-              },
-              "description": "Which end of a row the chevron sits at.\n\nUnset is the start, which is what a tree of folders looks like. `end` puts\nit at the far side, where it reads as a control belonging to the row rather\nthan as part of the name, and it lets every label start at one place\nwithout a row that has no chevron reserving space for one.\n\nOn the tree rather than on each item, because a row whose chevron sat\nsomewhere different from its siblings' would be a mistake, not a choice.",
-              "attribute": "chevron",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -54332,18 +54318,6 @@
               "inheritedFrom": {
                 "name": "MixinControllerActive",
                 "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
-              }
-            },
-            {
-              "name": "chevron",
-              "type": {
-                "text": "'end' | undefined"
-              },
-              "description": "Which end of a row the chevron sits at.\n\nUnset is the start, which is what a tree of folders looks like. `end` puts\nit at the far side, where it reads as a control belonging to the row rather\nthan as part of the name, and it lets every label start at one place\nwithout a row that has no chevron reserving space for one.\n\nOn the tree rather than on each item, because a row whose chevron sat\nsomewhere different from its siblings' would be a mistake, not a choice.",
-              "fieldName": "chevron",
-              "inheritedFrom": {
-                "name": "HelixBaseTree",
-                "module": "src/tree/root/tree-root.ts"
               }
             },
             {

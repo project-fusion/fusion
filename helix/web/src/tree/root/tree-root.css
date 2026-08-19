@@ -19,24 +19,30 @@
    branch at the same depth. The width belongs to whoever draws the thing, and
    that is the item. All the tree decides is the policy. */
 :host {
-  --_tree-chevron-order: 0;
+  --tree-chevron-order: 0;
   --_tree-reserve: 1;
 }
 
-/* At the end there is nothing to reserve: every label starts at the row's own
-   inset, and the chevron is what moves. */
-:host([chevron="end"]) {
-  --_tree-chevron-order: 2;
-  --_tree-reserve: 0;
-}
-
-/* The placement, handed down as a number the item can use for `order`.
+/* The placement, handed down as numbers the item can use.
  *
  * A custom property rather than each item asking its parent: it crosses the
  * light DOM and then the item's shadow boundary by itself, so a tree of any
  * depth is covered by one declaration and nothing has to re-render when it
- * changes. */
+ * changes.
+ *
+ * One rule, and that is the fix. There were two, keyed on two attributes for
+ * one idea: a `chevron` left on the base class when the property moved up to
+ * this tier, and `chevron-placement` which replaced it. Each did half the job.
+ * `chevron="end"` dropped the gutter and never moved the chevron, because the
+ * order it set was overridden further down by the hook this rule writes;
+ * `chevron-placement="end"` moved the chevron and never dropped the gutter.
+ * Measured both: with the first, a leaf sat twenty pixels left of the branch
+ * beside it, and with the second a leaf sat twenty right. */
 :host([chevron-placement="end"]) {
+  /* Nothing to reserve once the chevron has gone to the far side: every label
+     starts at the row's own inset, and each level is one indent in from the
+     one above it. */
+  --_tree-reserve: 0;
   /* Past the `end` slot, which already sits at `order: 1` with an auto margin
      of its own. Sharing that order put the two side by side and, more to the
      point, put *two* auto margins on one line: free space is split between

@@ -10347,16 +10347,6 @@ how markup says where to start. */
   "default-active"?: HelixTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   defaultActive?: HelixTree["defaultActive"];
-  /** Which end of a row the chevron sits at.
-
-Unset is the start, which is what a tree of folders looks like. `end` puts
-it at the far side, where it reads as a control belonging to the row rather
-than as part of the name, and it lets every label start at one place
-without a row that has no chevron reserving space for one.
-
-On the tree rather than on each item, because a row whose chevron sat
-somewhere different from its siblings' would be a mistake, not a choice. */
-  chevron?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   label?: HelixTree["label"];
   /** The consumer's callback, invoked after the change is applied. */
@@ -10435,16 +10425,6 @@ how markup says where to start. */
   "attr:default-active"?: HelixTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   "prop:defaultActive"?: HelixTree["defaultActive"];
-  /** Which end of a row the chevron sits at.
-
-Unset is the start, which is what a tree of folders looks like. `end` puts
-it at the far side, where it reads as a control belonging to the row rather
-than as part of the name, and it lets every label start at one place
-without a row that has no chevron reserving space for one.
-
-On the tree rather than on each item, because a row whose chevron sat
-somewhere different from its siblings' would be a mistake, not a choice. */
-  "prop:chevron"?: HelixTree["chevron"];
   /** Accessible name for the tree. */
   "prop:label"?: HelixTree["label"];
   /** The consumer's callback, invoked after the change is applied. */
@@ -18381,15 +18361,6 @@ export type CustomElements = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `chevron`: Which end of a row the chevron sits at.
-   *
-   * Unset is the start, which is what a tree of folders looks like. `end` puts
-   * it at the far side, where it reads as a control belonging to the row rather
-   * than as part of the name, and it lets every label start at one place
-   * without a row that has no chevron reserving space for one.
-   *
-   * On the tree rather than on each item, because a row whose chevron sat
-   * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
    * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
@@ -26642,15 +26613,6 @@ export type CustomElementsSolidJs = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `chevron`: Which end of a row the chevron sits at.
-   *
-   * Unset is the start, which is what a tree of folders looks like. `end` puts
-   * it at the far side, where it reads as a control belonging to the row rather
-   * than as part of the name, and it lets every label start at one place
-   * without a row that has no chevron reserving space for one.
-   *
-   * On the tree rather than on each item, because a row whose chevron sat
-   * somewhere different from its siblings' would be a mistake, not a choice.
    * - `label`: Accessible name for the tree.
    * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *

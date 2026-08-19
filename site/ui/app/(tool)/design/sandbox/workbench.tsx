@@ -816,7 +816,7 @@ export function SandboxWorkbench({ families }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
-          <helix-tree active={activeValue} chevron="end" label="Examples" ref={setTree}>
+          <helix-tree active={activeValue} chevron-placement="end" label="Examples" ref={setTree}>
             {shown.map((entry) => (
               <helix-tree-item key={entry.slug} value={entry.slug}>
                 {/* Everything here is experimental, and saying so on each row is the

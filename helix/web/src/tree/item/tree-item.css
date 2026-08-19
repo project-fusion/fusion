@@ -151,7 +151,6 @@ slot[name="children"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
   flex: 0 0 auto;
   inline-size: var(--_tree-chevron);
-  order: var(--_tree-chevron-order, 0);
   transform: rotate(-90deg);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }

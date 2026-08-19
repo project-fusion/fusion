@@ -5181,7 +5181,6 @@ to it is one more thing between the reader and the label.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `chevron` | `chevron` | `'end' \| undefined` | - | `HelixBaseTree` | Which end of a row the chevron sits at. |
 | `chevronPlacement` | `chevron-placement` | `'start' \| 'end' \| undefined` | - | - | Which end of the row the branch chevron sits at. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |

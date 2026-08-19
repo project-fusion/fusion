@@ -10,7 +10,14 @@
 [part="code"] {
   background-color: var(--helix-color-surface-raised);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-syntax-name);
+  /* The prose's own ink, one step quieter, and not a syntax colour.
+   *
+   * It was `syntax-name`, which is blue: a fragment of code inside a sentence
+   * is one word of that sentence, and a coloured word in running text reads as
+   * a link. Nothing here is being highlighted either, so borrowing a highlighter
+   * colour was saying a thing that is not true. The fill and the face already
+   * say it is code; the ink only has to stay readable. */
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-mono);
   /* A hook defaulting to a semantic token, which `check:tokens` is right to
      insist on. The first draft was `0.9em` so the fragment tracked whatever
