@@ -61,7 +61,17 @@
      on a black page and the bar's light ink vanished into it. A video sits in a
      dark well everywhere it has ever been shown, and letterbox bars are black
      rather than whatever the page is. */
-  background-color: var(--video-well-color, var(--helix-color-surface-sunken));
+  /* `surface-media`, which is the token written for exactly this well and which
+     this well did not read. Its note in `tokens.css` is about a video: media
+     sits in a dark region everywhere it has ever been shown, and `surface-inverse`
+     looks like the token for it and is near-white in dark mode. `surface-sunken`
+     was what stood here, which is the page's own well and turns over with the
+     mode, so the letterbox bars were a light grey on a light page.
+
+     The bar's ink stays `foreground`, not `foreground-media`. The host declares
+     `color-scheme: dark`, so it already resolves to near-white in either mode,
+     and the pair's other half is for a consumer who has no such region. */
+  background-color: var(--video-well-color, var(--helix-color-surface-media));
   block-size: auto;
   display: block;
   inline-size: 100%;

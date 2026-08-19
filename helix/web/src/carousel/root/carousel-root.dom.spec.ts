@@ -253,6 +253,14 @@ describe('carousel settling', () => {
       Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: at * 100 })
     }
     Object.defineProperty(track, 'offsetLeft', { configurable: true, value: 0 })
+    /* And `scrollLeft`, which is the one that has to be stated in a browser.
+       It is a real accessor there and clamps to the scrollable range, and this
+       track has none: the slides are empty divs whose widths are faked by the
+       `offsetLeft` above, so every position written to it read back as 0 and
+       the component was asked which slide is nearest to the left edge. A
+       writable own property shadows the prototype's accessor, which is what the
+       stated offsets need to be believed. */
+    Object.defineProperty(track, 'scrollLeft', { configurable: true, value: 0, writable: true })
     track.scrollTo = ((options: ScrollToOptions) => {
       track.scrollLeft = options.left ?? 0
     }) as typeof track.scrollTo

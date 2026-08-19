@@ -327,12 +327,21 @@ if (hasLayout()) {
          tall where the frames wanted 270, and the poster is painted into that
          box: it came out letterboxed and half the height of the video that
          replaced it a moment later. It is also a layout shift, over exactly the
-         interval a poster is shown for. */
+         interval a poster is shown for.
+
+         **Sixteen by nine, and deliberately not `auto 16 / 9`**, which is what
+         this asserted while never running. `auto` takes the element's intrinsic
+         ratio, and a video carrying a poster reports the *poster's*, so the box
+         took the still's shape and the clip letterboxed inside it. The element
+         writes `--_video-ratio` from `videoWidth` and `videoHeight` instead,
+         which is the only source that is always the video. */
       const host = await player()
       const video = part(host, 'video') as HTMLVideoElement
-      const ratio = getComputedStyle(video).aspectRatio
-      expect(ratio.startsWith('auto')).toBe(true)
-      expect(ratio).toContain('16 / 9')
+      expect(getComputedStyle(video).aspectRatio).toBe('16 / 9')
+
+      // And it follows the real one the moment the element knows it.
+      ;(host as HTMLElement).style.setProperty('--_video-ratio', '4 / 3')
+      expect(getComputedStyle(video).aspectRatio).toBe('4 / 3')
     })
 
     test('and whatever fills it is fitted the same way', async () => {
@@ -351,10 +360,21 @@ if (hasLayout()) {
       expect(host.hasAttribute('data-playing')).toBe(false)
 
       const video = part(host, 'video') as HTMLVideoElement
+      /* The state as well as the event. The element reads `video.paused` rather
+         than trusting that a `play` event means playing, which is right and is
+         what this spec did not do: dispatching alone leaves `paused` true in a
+         real engine, so the flag never moved and the spec only passed against a
+         shim whose `paused` was not backed by anything. */
+      const pausedAs = (value: boolean) => {
+        Object.defineProperty(video, 'paused', { configurable: true, value })
+      }
+
+      pausedAs(false)
       video.dispatchEvent(new Event('play'))
       await (host as Player).updateComplete
       expect(host.hasAttribute('data-playing')).toBe(true)
 
+      pausedAs(true)
       video.dispatchEvent(new Event('pause'))
       await (host as Player).updateComplete
       expect(host.hasAttribute('data-playing')).toBe(false)
