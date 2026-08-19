@@ -164,7 +164,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
           this.requestUpdate('active', previous)
         },
         controlled: this.activeIsControlled,
-        event: (value) => new HelixChangeEvent({ name: '', value }),
+        event: (value) => new HelixChangeEvent({ property: 'active', value }),
         host: this,
         label: 'active',
         next,

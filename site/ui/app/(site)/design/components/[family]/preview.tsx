@@ -69,8 +69,16 @@ export function ComponentPreview({ css, html, sandboxHref }: Props) {
      page, so this would work on a client navigation and silently do nothing on
      a fresh load. */
   useHelixEvent(sandbox, 'helix-change', (event) => {
-    const { name, value } = event.detail as { name: string; value: string }
-    setEdits((held) => (held[name] === value ? held : { ...held, [name]: value }))
+    /* Which pane is the element, not the detail: every pane reports `value`,
+       and `composedPath()[0]` is what survives the shadow boundary the event
+       crossed to get here. */
+    const pane = event.composedPath()[0] as { name?: string }
+    const key = pane?.name
+    if (key !== 'html' && key !== 'css') {
+      return
+    }
+    const { value } = event.detail
+    setEdits((held) => (held[key] === value ? held : { ...held, [key]: value }))
   })
 
   useEffect(() => {

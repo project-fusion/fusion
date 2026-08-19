@@ -373,9 +373,9 @@ describe('splitter collapsing', () => {
     let named = ''
     let value = ''
     host.addEventListener('helix-change', (event) => {
-      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
-      if (detail.name === 'collapsed') {
-        named = detail.name
+      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
+      if (detail.property === 'collapsed') {
+        named = detail.property
         value = detail.value
       }
     })
@@ -434,8 +434,8 @@ describe('splitter collapsing', () => {
     const host = (await splitter('collapsed="start"')) as Splitter & { collapsed?: 'end' | 'start' }
     let asked = ''
     host.addEventListener('helix-change', (event) => {
-      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
-      if (detail.name === 'collapsed') {
+      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
+      if (detail.property === 'collapsed') {
         asked = detail.value
       }
     })
@@ -484,8 +484,8 @@ describe('splitter under a consumer that owns the position', () => {
     })
     let asked = ''
     host.addEventListener('helix-change', (event) => {
-      const detail = (event as CustomEvent<{ name: string; value: string }>).detail
-      if (detail.name === 'position') {
+      const detail = (event as CustomEvent<{ property: string; value: string }>).detail
+      if (detail.property === 'position') {
         asked = detail.value
       }
     })

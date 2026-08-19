@@ -330,15 +330,19 @@ describe('sandbox dividers', () => {
   })
 
   test('the arrangement is announced once, and the splitters inside are not', async () => {
-    // A consumer stores one arrangement. What the two elements inside said to
-    // each other on the way there is not their business.
+    /* A consumer stores one arrangement. What the two elements inside said to
+       each other on the way there is not their business.
+
+       It names the property that settled rather than the word `arrangement`,
+       which named nothing on this element and carried both numbers as JSON that
+       every consumer of it then ignored in favour of reading the element. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
     const named: string[] = []
     sandbox.addEventListener('helix-change', (event) => {
-      named.push((event as CustomEvent<{ name: string }>).detail.name)
+      named.push((event as CustomEvent<{ property: string }>).detail.property)
     })
     await press(sandbox, panes(sandbox), 'ArrowRight')
-    expect(named).toEqual(['arrangement'])
+    expect(named).toEqual(['split'])
   })
 
   test('an unrelated key is left alone', async () => {

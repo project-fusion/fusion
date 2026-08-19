@@ -83,14 +83,14 @@ describe('pagination size', () => {
     const heard: string[] = []
     it.addEventListener('helix-change', (event) => {
       heard.push(
-        `${(event as CustomEvent<{ name: string }>).detail.name}=${
+        `${(event as CustomEvent<{ property: string }>).detail.property}=${
           (event as CustomEvent<{ value: string }>).detail.value
         }`,
       )
     })
     control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
-    expect(heard).toEqual(['page-size=25'])
+    expect(heard).toEqual(['value=25'])
   })
 
   test('announces before it moves, so a listener can refuse', async () => {

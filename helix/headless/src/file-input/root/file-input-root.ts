@@ -226,7 +226,7 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
     this.requestUpdate()
     this.dispatchEvent(
       new HelixChangeEvent({
-        name: 'files',
+        property: 'files',
         value: this.files.map((file) => file.name).join(', '),
       }),
     )

@@ -182,7 +182,7 @@ export class HelixBaseCheckboxGroup extends MixinField(HelixElement) {
       .map((box) => box.value)
       .join(',')
 
-    if (!this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: next }))) {
+    if (!this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: next }))) {
       return
     }
     this.value = next

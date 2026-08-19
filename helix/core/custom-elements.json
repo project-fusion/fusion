@@ -1207,6 +1207,50 @@
         },
         {
           "kind": "class",
+          "description": "Fired when the reader asks for the next thing in a set.\n\nPaired with `helix-previous` rather than being one event carrying a\ndirection, which is the reason `helix-open` gives for its own pair: a\nlistener that only cares about one direction says so by which event it\nlistens for. The detail carries the direction anyway, so a consumer who does\nwant one handler can have one.\n\nBubbles and is composed, because the thing that answers this is usually not\nthe thing that asked. A video has no notion of a set: it plays one resource,\nand what comes next is a playlist's business or the consumer's, so the event\nhas to reach a wrapper.\n\nNot cancelable. There is no default action to refuse: the component that\nfires this does nothing on its own, and an event whose `preventDefault` means\nnothing is an event that lies about what it offers.",
+          "name": "HelixNextEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-next'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "Fired when the reader asks for the previous one. See `HelixNextEvent`.",
+          "name": "HelixPreviousEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-previous'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and an announcement closing\nitself are the same act from the element's side.",
           "name": "HelixDismissEvent",
           "members": [
@@ -1471,6 +1515,22 @@
           "name": "HelixCloseEvent",
           "declaration": {
             "name": "HelixCloseEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixNextEvent",
+          "declaration": {
+            "name": "HelixNextEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixPreviousEvent",
+          "declaration": {
+            "name": "HelixPreviousEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2228,9 +2288,25 @@
         },
         {
           "kind": "js",
+          "name": "HelixNextEvent",
+          "declaration": {
+            "name": "HelixNextEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HelixOpenEvent",
           "declaration": {
             "name": "HelixOpenEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixPreviousEvent",
+          "declaration": {
+            "name": "HelixPreviousEvent",
             "module": "./events/events.js"
           }
         },
@@ -2271,6 +2347,14 @@
           "name": "SelectDetail",
           "declaration": {
             "name": "SelectDetail",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SkipDetail",
+          "declaration": {
+            "name": "SkipDetail",
             "module": "./events/events.js"
           }
         },

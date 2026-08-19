@@ -75,12 +75,12 @@ describe('input file', () => {
     // The native `change` is stopped and relayed, so a consumer hears one event
     // from one element rather than two from two.
     const host = await field('multiple')
-    const said: { name: string; value: string }[] = []
+    const said: { property: string; value: string }[] = []
     host.addEventListener('helix-change', (event) => {
-      said.push((event as CustomEvent<{ name: string; value: string }>).detail)
+      said.push((event as CustomEvent<{ property: string; value: string }>).detail)
     })
     await choose(host, 'one.txt', 'two.txt')
-    expect(said).toEqual([{ name: 'files', value: 'one.txt, two.txt' }])
+    expect(said).toEqual([{ property: 'files', value: 'one.txt, two.txt' }])
   })
 
   test('each file carries its size and its kind', async () => {

@@ -467,7 +467,7 @@ export class HelixBaseSplitter extends HelixElement {
         this.requestUpdate('position', previous)
       },
       controlled: this.positionIsControlled,
-      event: (value) => new HelixChangeEvent({ name: 'position', value: String(value) }),
+      event: (value) => new HelixChangeEvent({ property: 'position', value: String(value) }),
       host: this,
       label: 'position',
       next: wanted,
@@ -498,7 +498,7 @@ export class HelixBaseSplitter extends HelixElement {
           this.requestUpdate('collapsed', previous)
         },
         controlled: this.collapsedIsControlled,
-        event: (value) => new HelixChangeEvent({ name: 'collapsed', value }),
+        event: (value) => new HelixChangeEvent({ property: 'collapsed', value }),
         host: this,
         label: 'collapsed',
         next: shut ?? '',

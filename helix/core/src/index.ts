@@ -62,12 +62,15 @@ export {
   HelixDismissEvent,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixNextEvent,
   HelixOpenEvent,
+  HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
   type NavigateDetail,
   type OpenDetail,
   type SelectDetail,
+  type SkipDetail,
   type ToggleDetail,
 } from './events/events.js'
 export { HelixElement } from './helix-element/helix-element.js'

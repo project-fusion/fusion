@@ -95,6 +95,57 @@ export class HelixCloseEvent extends CustomEvent<OpenDetail> {
   }
 }
 
+/**
+ * Fired when the reader asks for the next thing in a set.
+ *
+ * Paired with `helix-previous` rather than being one event carrying a
+ * direction, which is the reason `helix-open` gives for its own pair: a
+ * listener that only cares about one direction says so by which event it
+ * listens for. The detail carries the direction anyway, so a consumer who does
+ * want one handler can have one.
+ *
+ * Bubbles and is composed, because the thing that answers this is usually not
+ * the thing that asked. A video has no notion of a set: it plays one resource,
+ * and what comes next is a playlist's business or the consumer's, so the event
+ * has to reach a wrapper.
+ *
+ * Not cancelable. There is no default action to refuse: the component that
+ * fires this does nothing on its own, and an event whose `preventDefault` means
+ * nothing is an event that lies about what it offers.
+ */
+export class HelixNextEvent extends CustomEvent<SkipDetail> {
+  static readonly eventName = 'helix-next'
+
+  constructor() {
+    super(HelixNextEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail: { to: 'next' },
+    })
+  }
+}
+
+/** Fired when the reader asks for the previous one. See `HelixNextEvent`. */
+export class HelixPreviousEvent extends CustomEvent<SkipDetail> {
+  static readonly eventName = 'helix-previous'
+
+  constructor() {
+    super(HelixPreviousEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail: { to: 'previous' },
+    })
+  }
+}
+
+/** Detail carried by `helix-next` and `helix-previous`. */
+export interface SkipDetail {
+  /** Which way the reader asked to go. */
+  to: 'next' | 'previous'
+}
+
 /** Detail carried by `helix-navigate`. */
 export interface NavigateDetail {
   /** Where the view is moving to, in whatever the component pages by. */
@@ -155,13 +206,27 @@ export class HelixDismissEvent extends CustomEvent<DismissDetail> {
  */
 export interface ChangeDetail {
   /**
-   * Which value changed, so one listener can serve several fields.
+   * The property that changed, named as the element declares it.
    *
-   * A sandbox with a markup pane and a stylesheet pane emits the same event
-   * from both; without a name the parent would have to identify the sender by
-   * reference, which couples it to how the panes were arranged.
+   * **One provenance, which it did not have.** This was `name`, and it carried
+   * three different things depending on who dispatched: the property for the
+   * splitter's `position`, the form control's name for a checkbox group, a
+   * pane's identity for the sandbox, a literal nobody could derive for
+   * `page-size`, and the empty string from the active mixin, which is no
+   * identification at all. A listener switching on it was switching on a value
+   * with four meanings.
+   *
+   * It answers one question now: *which property*. The other question, *which
+   * element*, is `composedPath()[0]`, which is the one that survives a shadow
+   * boundary where `event.target` is retargeted to the outermost host. Both
+   * sandbox panes report `value` and are told apart by the element, which is
+   * what the old comment here described doing by reference and dismissed.
+   *
+   * A form control's name is on the element too, so a form-level listener reads
+   * it from the element it just identified rather than from a field that might
+   * have been empty.
    */
-  name: string
+  property: string
   /** The value after the change. */
   value: string
 }
@@ -501,7 +566,9 @@ const registry = {
   HelixDismissEvent,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixNextEvent,
   HelixOpenEvent,
+  HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
 } as const

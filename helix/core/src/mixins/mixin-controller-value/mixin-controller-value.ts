@@ -7,11 +7,6 @@ import { requestControlledChange } from '../../utils/request-controlled-change/r
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
 
-/** The name a form control carries, which the change event reports. */
-interface Named {
-  name?: string
-}
-
 /**
  * The public surface `MixinControllerValue` adds.
  *
@@ -167,7 +162,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
           this.requestUpdate('value', previous)
         },
         controlled: this.valueIsControlled,
-        event: (value) => new HelixChangeEvent({ name: (this as Named).name ?? '', value }),
+        event: (value) => new HelixChangeEvent({ property: 'value', value }),
         host: this,
         label: 'value',
         next,

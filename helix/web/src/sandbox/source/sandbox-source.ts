@@ -59,7 +59,7 @@ export class HelixSandboxSource extends HelixElement {
 
   private readonly handleInput = (event: Event): void => {
     this.value = (event.target as HTMLTextAreaElement).value
-    this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
+    this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -80,7 +80,7 @@ export class HelixSandboxSource extends HelixElement {
     field.selectionStart = selectionStart + 2
     field.selectionEnd = field.selectionStart
     this.value = field.value
-    this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
+    this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
   }
 
   protected override render(): TemplateResult {

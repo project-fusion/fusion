@@ -253,7 +253,7 @@ export function SandboxWorkbench({ families }: Props) {
   const railHome = bodyWidth > 0 ? Math.max(0, 100 - (RAIL_OPEN / bodyWidth) * 100) : 100
 
   useHelixEvent(railSplitter, 'helix-change', (event) => {
-    if (event.detail.name !== 'position' || bodyWidth <= 0) {
+    if (event.detail.property !== 'position' || bodyWidth <= 0) {
       return
     }
     const width = ((100 - Number(event.detail.value)) / 100) * bodyWidth
@@ -300,7 +300,11 @@ export function SandboxWorkbench({ families }: Props) {
   // Written back when a divider is let go, not while it is moving: a drag is a
   // stream of positions and only the one it ends at is a preference.
   useHelixEvent(sandbox, 'helix-change', (event) => {
-    if (event.detail.name !== 'arrangement') {
+    /* Both dividers report themselves now, where this was one `arrangement`
+       event carrying a JSON blob nothing read: the handler has always taken the
+       numbers off the element below. */
+    const settled = event.detail.property
+    if (settled !== 'split' && settled !== 'panelSize') {
       return
     }
     const element = sandbox.current
@@ -380,9 +384,10 @@ export function SandboxWorkbench({ families }: Props) {
   })
   // Verbatim. What is typed is what is held and what is handed back.
   useHelixEvent(sandbox, 'helix-change', (event) => {
-    if (event.detail.name === 'source') {
+    const pane = event.composedPath()[0] as { name?: string }
+    if (pane?.name === 'source') {
       setMarkup(event.detail.value)
-    } else if (event.detail.name === 'css') {
+    } else if (pane?.name === 'css') {
       setCss(event.detail.value)
     }
   })

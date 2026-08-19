@@ -5462,6 +5462,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixBaseVideo` | How much to fetch before anything is asked for. |
 | `speeds` | `speeds` | `string` | `'0.5 1 1.5 2'` | `HelixBaseVideo` | The speeds offered, slowest first, as multipliers of normal. |
 | `src` | `src` | `string` | `''` | `HelixBaseVideo` | Where the video is, for the common case of one file. |
+| `startControl` | `start-control` | `'none' \| undefined` | - | `HelixBaseVideo` | The big mark over the picture before anything has played, or `none`. |
 
 #### Methods
 
@@ -5474,6 +5475,8 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-next` | `HelixNextEvent` | Fired when the reader asks for the next item. |
+| `helix-previous` | `HelixPreviousEvent` | Fired when they ask for the previous one. |
 | `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
 | `pause` | `Event` | Relayed for the same reason. |
 | `ended` | `Event` | Relayed for the same reason. |
@@ -5504,6 +5507,9 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `remote` | Play on another device, where one is available. |
 | `speed` | Playback speed, where it was asked for. |
 | `pip` | Picture in picture, where it was asked for and exists. |
+| `start` | The mark over the picture before anything has played. |
+| `next` | Asks for the next item, where it was asked for. |
+| `previous` | Asks for the previous one. |
 | `download` | Saves the file, where it was asked for. |
 | `overflow` | The menu holding the controls kept off the bar. |
 | `more` | The button that opens it. |
@@ -5519,3 +5525,4 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `--video-radius` | The corner it is cut to. |
 | `--video-controls-color` | The ink on the bar. |
 | `--video-accent-color` | The played part of the scrubber. |
+| `--video-start-size` | Width of the mark that starts it. |

@@ -97,7 +97,9 @@ import type {
   HelixFilterEvent,
   HelixFormElement,
   HelixNavigateEvent,
+  HelixNextEvent,
   HelixOpenEvent,
+  HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
   fromMinutes,
@@ -9344,6 +9346,12 @@ export type HelixBaseVideoElementEvent<E = Event> = TypedEvent<
   HelixBaseVideo,
   E
 >;
+/** `helix-next` event type */
+export type HelixBaseVideoHelixNextElementEvent =
+  HelixBaseVideoElementEvent<HelixNextEvent>;
+/** `helix-previous` event type */
+export type HelixBaseVideoHelixPreviousElementEvent =
+  HelixBaseVideoElementEvent<HelixPreviousEvent>;
 
 export type HelixBaseVideoProps = {
   /** Where the video is, for the common case of one file. */
@@ -9441,6 +9449,48 @@ So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
   overflowControls?: HelixBaseVideo["overflowControls"];
+  /** The big mark over the picture before anything has played, or `none`.
+
+**On unless it is turned off, because a stopped video has nothing else.**
+Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+reader meets first is a still frame with some chrome along the bottom, and
+nothing in it says "press to watch".
+
+`none` is for the cases where that is wrong rather than right: a muted loop
+behind a hero, a grid of eight thumbnails, anything where the video is
+decoration rather than something to start.
+
+**Only before the first play.** A video paused halfway already has its bar
+up, because a paused video never idles, so the small control is visible and
+the reader has just used it. Covering the picture they stopped to look at
+would be the opposite of helpful.
+
+A value rather than a boolean, so the resting state is the attribute's
+absence: a boolean defaulting to on would have to be spelled as its own
+negation. */
+  "start-control"?: HelixBaseVideo["startControl"];
+  /** The big mark over the picture before anything has played, or `none`.
+
+**On unless it is turned off, because a stopped video has nothing else.**
+Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+reader meets first is a still frame with some chrome along the bottom, and
+nothing in it says "press to watch".
+
+`none` is for the cases where that is wrong rather than right: a muted loop
+behind a hero, a grid of eight thumbnails, anything where the video is
+decoration rather than something to start.
+
+**Only before the first play.** A video paused halfway already has its bar
+up, because a paused video never idles, so the small control is visible and
+the reader has just used it. Covering the picture they stopped to look at
+would be the opposite of helpful.
+
+A value rather than a boolean, so the resting state is the attribute's
+absence: a boolean defaulting to on would have to be spelled as its own
+negation. */
+  startControl?: HelixBaseVideo["startControl"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   speeds?: HelixBaseVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
@@ -9472,6 +9522,10 @@ regardless, because a reader who stopped it is deciding what to do next. */
   /** And while it would stop it. */
   pauseLabel?: HelixBaseVideo["pauseLabel"];
 
+  /** Fired when the reader asks for the next item. */
+  "onhelix-next"?: (e: HelixBaseVideoHelixNextElementEvent) => void;
+  /** Fired when they ask for the previous one. */
+  "onhelix-previous"?: (e: HelixBaseVideoHelixPreviousElementEvent) => void;
   /** Relayed, because it does not cross a shadow boundary. */
   onplay?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
@@ -9576,6 +9630,48 @@ So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
   "prop:overflowControls"?: HelixBaseVideo["overflowControls"];
+  /** The big mark over the picture before anything has played, or `none`.
+
+**On unless it is turned off, because a stopped video has nothing else.**
+Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+reader meets first is a still frame with some chrome along the bottom, and
+nothing in it says "press to watch".
+
+`none` is for the cases where that is wrong rather than right: a muted loop
+behind a hero, a grid of eight thumbnails, anything where the video is
+decoration rather than something to start.
+
+**Only before the first play.** A video paused halfway already has its bar
+up, because a paused video never idles, so the small control is visible and
+the reader has just used it. Covering the picture they stopped to look at
+would be the opposite of helpful.
+
+A value rather than a boolean, so the resting state is the attribute's
+absence: a boolean defaulting to on would have to be spelled as its own
+negation. */
+  "attr:start-control"?: HelixBaseVideo["startControl"];
+  /** The big mark over the picture before anything has played, or `none`.
+
+**On unless it is turned off, because a stopped video has nothing else.**
+Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+reader meets first is a still frame with some chrome along the bottom, and
+nothing in it says "press to watch".
+
+`none` is for the cases where that is wrong rather than right: a muted loop
+behind a hero, a grid of eight thumbnails, anything where the video is
+decoration rather than something to start.
+
+**Only before the first play.** A video paused halfway already has its bar
+up, because a paused video never idles, so the small control is visible and
+the reader has just used it. Covering the picture they stopped to look at
+would be the opposite of helpful.
+
+A value rather than a boolean, so the resting state is the attribute's
+absence: a boolean defaulting to on would have to be spelled as its own
+negation. */
+  "prop:startControl"?: HelixBaseVideo["startControl"];
   /** The speeds offered, slowest first, as multipliers of normal. */
   "prop:speeds"?: HelixBaseVideo["speeds"];
   /** How long the bar waits after the pointer stops before it goes, in ms.
@@ -9606,6 +9702,10 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "attr:pause-label"?: HelixBaseVideo["pauseLabel"];
   /** And while it would stop it. */
   "prop:pauseLabel"?: HelixBaseVideo["pauseLabel"];
+  /** Fired when the reader asks for the next item. */
+  "on:helix-next"?: (e: HelixBaseVideoHelixNextElementEvent) => void;
+  /** Fired when they ask for the previous one. */
+  "on:helix-previous"?: (e: HelixBaseVideoHelixPreviousElementEvent) => void;
   /** Relayed, because it does not cross a shadow boundary. */
   "on:play"?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
@@ -17508,6 +17608,26 @@ export type CustomElements = {
    * So the consumer says where the fold is, which they can, having already
    * named the controls in order. A name in both lists is drawn once, on the
    * bar: two of the same control is worse than either placement.
+   * - `start-control`/`startControl`: The big mark over the picture before anything has played, or `none`.
+   *
+   * **On unless it is turned off, because a stopped video has nothing else.**
+   * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+   * target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+   * reader meets first is a still frame with some chrome along the bottom, and
+   * nothing in it says "press to watch".
+   *
+   * `none` is for the cases where that is wrong rather than right: a muted loop
+   * behind a hero, a grid of eight thumbnails, anything where the video is
+   * decoration rather than something to start.
+   *
+   * **Only before the first play.** A video paused halfway already has its bar
+   * up, because a paused video never idles, so the small control is visible and
+   * the reader has just used it. Covering the picture they stopped to look at
+   * would be the opposite of helpful.
+   *
+   * A value rather than a boolean, so the resting state is the attribute's
+   * absence: a boolean defaulting to on would have to be spelled as its own
+   * negation.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
    *
@@ -17525,6 +17645,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-next`: Fired when the reader asks for the next item.
+   * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
    * - `ended`: Relayed for the same reason.
@@ -17562,6 +17684,9 @@ export type CustomElements = {
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `start`: The mark over the picture before anything has played.
+   * - `next`: Asks for the next item, where it was asked for.
+   * - `previous`: Asks for the previous one.
    * - `download`: Saves the file, where it was asked for.
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.
@@ -25718,6 +25843,26 @@ export type CustomElementsSolidJs = {
    * So the consumer says where the fold is, which they can, having already
    * named the controls in order. A name in both lists is drawn once, on the
    * bar: two of the same control is worse than either placement.
+   * - `start-control`/`startControl`: The big mark over the picture before anything has played, or `none`.
+   *
+   * **On unless it is turned off, because a stopped video has nothing else.**
+   * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+   * target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+   * reader meets first is a still frame with some chrome along the bottom, and
+   * nothing in it says "press to watch".
+   *
+   * `none` is for the cases where that is wrong rather than right: a muted loop
+   * behind a hero, a grid of eight thumbnails, anything where the video is
+   * decoration rather than something to start.
+   *
+   * **Only before the first play.** A video paused halfway already has its bar
+   * up, because a paused video never idles, so the small control is visible and
+   * the reader has just used it. Covering the picture they stopped to look at
+   * would be the opposite of helpful.
+   *
+   * A value rather than a boolean, so the resting state is the attribute's
+   * absence: a boolean defaulting to on would have to be spelled as its own
+   * negation.
    * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
    * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
    *
@@ -25735,6 +25880,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-next`: Fired when the reader asks for the next item.
+   * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
    * - `ended`: Relayed for the same reason.
@@ -25772,6 +25919,9 @@ export type CustomElementsSolidJs = {
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
+   * - `start`: The mark over the picture before anything has played.
+   * - `next`: Asks for the next item, where it was asked for.
+   * - `previous`: Asks for the previous one.
    * - `download`: Saves the file, where it was asked for.
    * - `overflow`: The menu holding the controls kept off the bar.
    * - `more`: The button that opens it.

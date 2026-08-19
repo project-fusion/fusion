@@ -149,7 +149,7 @@ export class HelixSandboxEditor extends HelixElement {
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               this.value = update.state.doc.toString()
-              this.dispatchEvent(new HelixChangeEvent({ name: this.name, value: this.value }))
+              this.dispatchEvent(new HelixChangeEvent({ property: 'value', value: this.value }))
             }
             if (update.selectionSet || update.docChanged || update.focusChanged) {
               this.dispatchEvent(new HelixCaretEvent(this.caret))

@@ -276,17 +276,26 @@ export class HelixSandbox extends HelixElement {
     if (!this.fromSource(event.target)) {
       return
     }
-    const { name, value } = (event as HelixChangeEvent).detail
-    // Named, not guessed. The rule was that `css` is the stylesheet and
-    // anything else is markup, which was true while there were two panes and
-    // wrong the moment there was a third: a pane showing the example as JSX
-    // announced itself the same way, and the preview rendered the text of a
-    // React component as though it were markup.
-    if (name !== 'css' && name !== 'html') {
+    const { value } = (event as HelixChangeEvent).detail
+    /* Which pane is the element, and the element is `composedPath()[0]` rather
+       than `event.target`, which is retargeted to the outermost host once the
+       event has crossed a shadow boundary.
+
+       Named, not guessed. The rule was that `css` is the stylesheet and
+       anything else is markup, which was true while there were two panes and
+       wrong the moment there was a third: a pane showing the example as JSX
+       announced itself the same way, and the preview rendered the text of a
+       React component as though it were markup.
+
+       The name used to arrive in the detail, where it was one of four different
+       things that field carried. It is on the pane, which is where a name
+       belongs. */
+    const pane = event.composedPath()[0] as { name?: string }
+    if (pane?.name !== 'css' && pane?.name !== 'html') {
       return
     }
     for (const preview of this.previews) {
-      if (name === 'css') {
+      if (pane.name === 'css') {
         preview.styles = value
       } else {
         preview.source = value
@@ -377,11 +386,11 @@ export class HelixSandbox extends HelixElement {
    * wrote to storage on its own would be deciding for all of them under a key
    * it chose.
    */
-  private settled(): void {
+  private settled(property: 'panelSize' | 'split'): void {
     this.dispatchEvent(
       new HelixChangeEvent({
-        name: 'arrangement',
-        value: JSON.stringify({ panelSize: this.panelSize, split: this.split }),
+        property,
+        value: String(property === 'split' ? this.split : this.panelSize),
       }),
     )
   }
@@ -403,29 +412,29 @@ export class HelixSandbox extends HelixElement {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { name, value } = (event as HelixChangeEvent).detail
+    const { property, value } = (event as HelixChangeEvent).detail
     event.stopPropagation()
-    if (name !== 'position') {
+    if (property !== 'position') {
       return
     }
     this.split = Number(value)
-    this.settled()
+    this.settled('split')
   }
 
   private readonly handlePanelChange = (event: Event): void => {
     if (event.target !== event.currentTarget) {
       return
     }
-    const { name, value } = (event as HelixChangeEvent).detail
+    const { property, value } = (event as HelixChangeEvent).detail
     event.stopPropagation()
-    if (name !== 'position' || this.bodyHeight <= 0) {
+    if (property !== 'position' || this.bodyHeight <= 0) {
       return
     }
     // Back into pixels, which is what this element promises and what a consumer
     // stored. The divider's position is the panes' share, so the panel is the
     // rest of it.
     this.panelSize = Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight)
-    this.settled()
+    this.settled('panelSize')
   }
 
   override connectedCallback(): void {

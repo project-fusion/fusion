@@ -171,7 +171,7 @@ export class HelixBasePaginationSize extends HelixElement {
         this.requestUpdate('value', previous)
       },
       controlled: this.valueIsControlled,
-      event: (size) => new HelixChangeEvent({ name: 'page-size', value: String(size) }),
+      event: (size) => new HelixChangeEvent({ property: 'value', value: String(size) }),
       host: this,
       label: 'value',
       next,

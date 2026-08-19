@@ -37635,6 +37635,14 @@
                   "text": "void"
                 }
               },
+              "parameters": [
+                {
+                  "name": "property",
+                  "type": {
+                    "text": "'panelSize' | 'split'"
+                  }
+                }
+              ],
               "description": "Says the arrangement has settled, so a consumer can keep it.\n\nWhen it settles, not while it moves. A drag is a stream of positions and\nonly the one it ends at is a preference; announcing each would ask whoever\nis listening to write to storage a hundred times to record one decision.\n\nThe sandbox does not keep it. Where a preference lives, and whether it\nshould be kept at all, is the consumer's to decide, and a component that\nwrote to storage on its own would be deciding for all of them under a key\nit chose."
             },
             {
@@ -56576,6 +56584,10 @@
             {
               "description": "The played part of the scrubber.",
               "name": "--video-accent-color"
+            },
+            {
+              "description": "Width of the mark that starts it.",
+              "name": "--video-start-size"
             }
           ],
           "members": [
@@ -56728,6 +56740,33 @@
               "default": "''",
               "description": "Controls that go behind one button instead of onto the bar, named the same\nway.\n\n**Named rather than measured, and the reason is that a width cannot answer\nthis.** A media query asks about the window, and the bar's problem is its\nown width: a video in a 320px sidebar on a desktop is cramped and a\nfull-bleed hero on a phone is not. A container query asks the right\nquestion and still cannot answer it, because how many controls there are is\nthe consumer's, so the threshold is not a width but a width per control,\nwhich is a guess. And a control that moves between the bar and a hidden\nmenu as the layout shifts is a control the reader has to find twice.\n\nSo the consumer says where the fold is, which they can, having already\nnamed the controls in order. A name in both lists is drawn once, on the\nbar: two of the same control is worse than either placement.",
               "attribute": "overflow-controls",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "startControl",
+              "type": {
+                "text": "'none' | undefined"
+              },
+              "description": "The big mark over the picture before anything has played, or `none`.\n\n**On unless it is turned off, because a stopped video has nothing else.**\nMeasured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24\ntarget, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a\nreader meets first is a still frame with some chrome along the bottom, and\nnothing in it says \"press to watch\".\n\n`none` is for the cases where that is wrong rather than right: a muted loop\nbehind a hero, a grid of eight thumbnails, anything where the video is\ndecoration rather than something to start.\n\n**Only before the first play.** A video paused halfway already has its bar\nup, because a paused video never idles, so the small control is visible and\nthe reader has just used it. Covering the picture they stopped to look at\nwould be the opposite of helpful.\n\nA value rather than a boolean, so the resting state is the attribute's\nabsence: a boolean defaulting to on would have to be spelled as its own\nnegation.",
+              "attribute": "start-control",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "started",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether this has ever played, which is not the same as being paused now.\n\nSet on the first `play` and never cleared, since what it answers is whether\nthe reader has begun rather than where they are.",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -57200,6 +57239,29 @@
             },
             {
               "kind": "method",
+              "name": "skip",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "back",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Says the reader asked for another item, and does nothing else.\n\nThere is nothing else it could do. A `<video>` plays one resource, so what\ncomes before or after it is a fact this element does not hold: a playlist\nhas it, or the consumer does. Announcing is the whole of the contribution,\nand the event bubbles so a wrapper hears it.\n\nThe same call answers the button, the row in the overflow menu, and the\nskip keys on a headset, which is why the media session's handlers point\nhere rather than at anything of their own.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "cycleSpeed",
               "privacy": "private",
               "return": {
@@ -57585,6 +57647,18 @@
               }
             },
             {
+              "name": "start-control",
+              "type": {
+                "text": "'none' | undefined"
+              },
+              "description": "The big mark over the picture before anything has played, or `none`.\n\n**On unless it is turned off, because a stopped video has nothing else.**\nMeasured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24\ntarget, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a\nreader meets first is a still frame with some chrome along the bottom, and\nnothing in it says \"press to watch\".\n\n`none` is for the cases where that is wrong rather than right: a muted loop\nbehind a hero, a grid of eight thumbnails, anything where the video is\ndecoration rather than something to start.\n\n**Only before the first play.** A video paused halfway already has its bar\nup, because a paused video never idles, so the small control is visible and\nthe reader has just used it. Covering the picture they stopped to look at\nwould be the opposite of helpful.\n\nA value rather than a boolean, so the resting state is the attribute's\nabsence: a boolean defaulting to on would have to be spelled as its own\nnegation.",
+              "fieldName": "startControl",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
               "name": "speeds",
               "type": {
                 "text": "string"
@@ -57671,6 +57745,10 @@
                 "slug": "plain"
               },
               {
+                "description": "Skip controls, which announce and leave the set to the consumer.",
+                "slug": "playlist-controls"
+              },
+              {
                 "slug": "shadow"
               },
               {
@@ -57678,6 +57756,10 @@
               },
               {
                 "slug": "sources"
+              },
+              {
+                "description": "The mark over the picture, and the video that does without one.",
+                "slug": "start-control"
               }
             ],
             "source": "helix/web/src/video"
@@ -57824,6 +57906,30 @@
               }
             },
             {
+              "description": "The mark over the picture before anything has played.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Asks for the next item, where it was asked for.",
+              "name": "next",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Asks for the previous one.",
+              "name": "previous",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
               "description": "Saves the file, where it was asked for.",
               "name": "download",
               "inheritedFrom": {
@@ -57857,6 +57963,30 @@
             }
           ],
           "events": [
+            {
+              "type": {
+                "text": "HelixNextEvent"
+              },
+              "description": "Fired when the reader asks for the next item.",
+              "name": "helix-next",
+              "reactProp": "onhelix-next",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixPreviousEvent"
+              },
+              "description": "Fired when they ask for the previous one.",
+              "name": "helix-previous",
+              "reactProp": "onhelix-previous",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
             {
               "type": {
                 "text": "Event"
