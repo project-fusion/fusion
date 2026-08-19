@@ -214,15 +214,30 @@ export class HelixBaseOutline extends HelixElement {
    * Whether the page has no more scroll left.
    *
    * `Math.ceil` and a pixel of slack, because a fractional device pixel ratio
-   * leaves `scrollY + innerHeight` a hair under `scrollHeight` at the very
-   * bottom and an exact comparison never fires.
+   * leaves the position a hair under the height at the very bottom and an exact
+   * comparison never fires.
+   *
+   * **All three numbers off the same element**, which this did not do: it added
+   * `scrollY` and `innerHeight`, both of the window, and compared them against
+   * `documentElement.scrollHeight`. Those are one coordinate system only while
+   * the viewport is what scrolls, and the body takes that job the moment it
+   * becomes a scroll container. Measured on a page whose body is
+   * `overflow: clip visible`, which is a pair CSS resolves by making the
+   * `visible` axis `auto`: `documentElement.scrollTop` read 1126 at the bottom
+   * of the page and `window.scrollY` read 240, so a contents rail never learned
+   * it had reached the end and its last item stayed unreachable. That page is
+   * this library's own base layer.
+   *
+   * `clientHeight` rather than `innerHeight` for the same reason, and because it
+   * is the one that excludes a scrollbar, which is what `scrollHeight` is
+   * measured against.
    */
   private get atEnd(): boolean {
-    const doc = globalThis.document?.documentElement
+    const doc = globalThis.document?.scrollingElement ?? globalThis.document?.documentElement
     if (!doc) {
       return false
     }
-    return Math.ceil(globalThis.scrollY + globalThis.innerHeight) >= doc.scrollHeight - 1
+    return Math.ceil(doc.scrollTop + doc.clientHeight) >= doc.scrollHeight - 1
   }
 
   /** The frame a mark is already scheduled for, so a scroll asks for one. */

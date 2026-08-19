@@ -30809,7 +30809,7 @@
                 "text": "boolean"
               },
               "privacy": "private",
-              "description": "Whether the page has no more scroll left.\n\n`Math.ceil` and a pixel of slack, because a fractional device pixel ratio\nleaves `scrollY + innerHeight` a hair under `scrollHeight` at the very\nbottom and an exact comparison never fires.",
+              "description": "Whether the page has no more scroll left.\n\n`Math.ceil` and a pixel of slack, because a fractional device pixel ratio\nleaves the position a hair under the height at the very bottom and an exact\ncomparison never fires.\n\n**All three numbers off the same element**, which this did not do: it added\n`scrollY` and `innerHeight`, both of the window, and compared them against\n`documentElement.scrollHeight`. Those are one coordinate system only while\nthe viewport is what scrolls, and the body takes that job the moment it\nbecomes a scroll container. Measured on a page whose body is\n`overflow: clip visible`, which is a pair CSS resolves by making the\n`visible` axis `auto`: `documentElement.scrollTop` read 1126 at the bottom\nof the page and `window.scrollY` read 240, so a contents rail never learned\nit had reached the end and its last item stayed unreachable. That page is\nthis library's own base layer.\n\n`clientHeight` rather than `innerHeight` for the same reason, and because it\nis the one that excludes a scrollbar, which is what `scrollHeight` is\nmeasured against.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseOutline",

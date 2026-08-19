@@ -276,9 +276,15 @@ describe('color picker', () => {
   })
 
   test('the footer is not drawn when it holds nothing', async () => {
-    // An empty box still takes its padding, which is a band of nothing under the
-    // ramps on a picker with no value, no tools and no presets.
-    const host = await picker('no-format no-value')
+    /* An empty box still takes its padding, which is a band of nothing under the
+       ramps on a picker with no value, no tools and no presets.
+     *
+     * `no-eyedropper` as well, which this did not say. The eyedropper is offered
+     * where the platform has one, so on a browser with `EyeDropper` the tools
+     * group rendered and the footer held it: the spec asserted "holds nothing"
+     * while naming only two of the three things it can hold, and passed under
+     * happy-dom because nothing there implements the API. */
+    const host = await picker('no-eyedropper no-format no-value')
     expect(part(host, 'footer')?.childElementCount).toBe(0)
   })
 

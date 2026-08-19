@@ -40,22 +40,16 @@
 }
 
 [part="item"] {
-  /* A wrapping row: the mark, the message and anything to do about it, with
-     the close in the corner and out of flow.
+  /* The mark, the message and anything to do about it, with the close in the
+     corner and out of flow. What goes where is the grid below; this is how the
+     things sharing the first row sit on it.
    *
-   * Inline when it fits and on its own row when it does not, and flex gives
-   * that for free rather than needing the line count. Line breaking uses each
-   * item's *hypothetical* main size, which for the message is its max-content
-   * width, so a short message leaves room on the line and the action sits
-   * beside it, while a message that would fill the line pushes the action to
-   * the next one. Nothing measures anything and nothing has to run to find
-   * out.
-   *
-   * Actions were inline, which is right for "Project saved. [Undo]" and wrong
-   * the moment the message wraps: pinned to the first line they float up beside
-   * the close and compete with it for the corner. On their own row they sit
-   * where the reading finishes, at any message length, and the close keeps the
-   * corner to itself.
+   * The paragraph that stood here described a wrapping flex, where a short
+   * message left room and the action sat beside it. That is what this was, and
+   * the note under `display` records why it stopped being that, thirty lines
+   * later in the same comment: an action belongs under the words rather than
+   * beside them. Two accounts of one row, and the browser suite believed the
+   * older one, having never run.
    *
    * Aligned to the top, and then each thing on the first row nudged onto the
    * *first line* of the message rather than onto the top of its own box.

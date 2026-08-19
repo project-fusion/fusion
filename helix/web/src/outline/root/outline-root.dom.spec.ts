@@ -53,8 +53,16 @@ if (hasLayout()) {
       return nav
     }
 
+    /* Frames, not a duration. The component coalesces scroll measurements onto
+       `requestAnimationFrame`, so what has to elapse is a frame and not a number
+       of milliseconds: 120 of them is a guess that holds until a machine is busy
+       and the browser run is exactly where one is. Two, because the listener
+       schedules on the first and the measurement lands on the next, with a
+       macrotask after them for the render the measurement asks for. */
     const settle = async (): Promise<void> => {
-      await new Promise((done) => setTimeout(done, 120))
+      await new Promise((done) => requestAnimationFrame(() => done(null)))
+      await new Promise((done) => requestAnimationFrame(() => done(null)))
+      await new Promise((done) => setTimeout(done, 0))
     }
 
     const marked = (nav: Nav): string | null =>
@@ -179,7 +187,11 @@ if (hasLayout()) {
       const outline = nav.querySelector('helix-outline') as Nav
       await outline.updateComplete
 
-      window.scrollTo(0, document.documentElement.scrollHeight)
+      /* To the bottom, which is where the rule under test only fires.
+         `scrollingElement`, not `window`: this library's own base layer makes
+         the body a scroll container, so `window.scrollY` is not what moves. */
+      const scroller = document.scrollingElement as HTMLElement
+      scroller.scrollTop = scroller.scrollHeight
       await settle()
       expect(outline.current).toBe('c')
     })

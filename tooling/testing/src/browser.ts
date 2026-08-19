@@ -87,6 +87,17 @@ const show = (value: unknown): string => {
   if (value === null || value === undefined || typeof value !== 'object') {
     return String(value)
   }
+  /* Named for the same reason they are named in `same`: `JSON.stringify` renders
+     either as `{}`, so a failure said "expected {} not to equal {}" and told the
+     reader nothing about which sets those were. */
+  if (value instanceof Set) {
+    return `Set(${value.size}) {${[...value].map((item) => show(item)).join(', ')}}`
+  }
+  if (value instanceof Map) {
+    return `Map(${value.size}) {${[...value]
+      .map(([key, item]) => `${show(key)} => ${show(item)}`)
+      .join(', ')}}`
+  }
   try {
     return JSON.stringify(value)
   } catch {
@@ -94,13 +105,33 @@ const show = (value: unknown): string => {
   }
 }
 
-/** Structural equality, enough for the shapes the specs compare. */
+/**
+ * Structural equality, enough for the shapes the specs compare.
+ *
+ * **Sets and Maps are named, because the object branch below silently passes
+ * them.** `Object.keys(new Set([1, 2, 3]))` is `[]`, so two sets of anything
+ * compared equal and every assertion about one asserted nothing. Caught by a
+ * spec that both `toEqual`d one set and `not.toEqual`d a different one and had
+ * the second fail, which is a pair of results no real comparison can produce.
+ *
+ * Membership by identity for a set, which is what `has` does: the specs here
+ * hold strings. A set of objects would need pairing every member against every
+ * other, and nothing compares one.
+ */
 const same = (a: unknown, b: unknown): boolean => {
   if (Object.is(a, b)) {
     return true
   }
   if (Array.isArray(a) && Array.isArray(b)) {
     return a.length === b.length && a.every((item, index) => same(item, b[index]))
+  }
+  if (a instanceof Set && b instanceof Set) {
+    return a.size === b.size && [...a].every((item) => b.has(item))
+  }
+  if (a instanceof Map && b instanceof Map) {
+    return (
+      a.size === b.size && [...a].every(([key, value]) => b.has(key) && same(value, b.get(key)))
+    )
   }
   if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
     const left = a as Record<string, unknown>

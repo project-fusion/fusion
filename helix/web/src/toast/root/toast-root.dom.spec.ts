@@ -379,7 +379,7 @@ if (hasLayout()) {
       void middle
     })
 
-    test('the mark and the close hold the first line, and the action wraps only when it must', async () => {
+    test('the mark and the close hold the first line, and the action sits under the words', async () => {
       /* Not centered, which floated them to the middle of a long message, and
          not plain `start`, which is what an earlier version of this row did:
          boxes of 16px, 21px and 32px sharing a top edge have centers 8px apart,
@@ -413,15 +413,19 @@ if (hasLayout()) {
         const icon = center(part(found, 'icon') as HTMLElement)
         expect(Math.abs(center(part(found, 'dismiss') as HTMLElement) - icon)).toBeLessThan(2)
 
-        /* The action goes where it fits. Flex line breaking uses each item's
-           hypothetical main size, so a short message leaves room and the action
-           sits beside it, and a message that would fill the line pushes it to
-           the next. Nothing counts lines and nothing has to run to find out. */
+        /* The action gets a row of its own, in the message's column, at every
+           message length. This asserted the opposite, that a short message
+           leaves room on the line and the action sits beside it, which is what
+           the row was when it was a wrapping flex: an action is a thing to do
+           about the message, so it belongs under the words rather than beside
+           them or under the mark. The component's own note says so and this
+           spec did not, having never run. */
         const action = found.querySelector('helix-button') as HTMLElement
         const content = part(found, 'content') as HTMLElement
-        const beside =
-          Math.abs(action.getBoundingClientRect().top - content.getBoundingClientRect().top) < 8
-        expect(beside).toBe(id === 'short')
+        const actionBox = action.getBoundingClientRect()
+        const contentBox = content.getBoundingClientRect()
+        expect(actionBox.top).toBeGreaterThan(contentBox.top)
+        expect(Math.abs(actionBox.left - contentBox.left)).toBeLessThan(2)
       }
     })
 
