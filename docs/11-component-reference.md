@@ -3785,7 +3785,7 @@ a movement instead of two separate fills.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
-| `appearance` | `appearance` | `'segmented' \| 'underline' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
+| `appearance` | `appearance` | `'segmented' \| 'underlined' \| undefined` | - | `HelixBaseTabs` | How the row reads. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
 | `label` | `label` | `string` | `'Tabs'` | `HelixBaseTabs` | Accessible name for the tab list. |
 | `manual` | `manual` | `boolean` | `false` | `HelixBaseTabs` | Whether arrowing to a tab also selects it. |
