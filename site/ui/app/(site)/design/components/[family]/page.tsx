@@ -321,10 +321,23 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
           <helix-tree-item default-open suppressHydrationWarning value="components">
             Components
             {families.map((entry) => (
-              <helix-tree-item key={entry.slug} slot="children" value={entry.slug}>
-                <Link data-link="quiet" href={`/design/components/${entry.slug}`}>
-                  {entry.label}
-                </Link>
+              {/* `href` on the item, not a link inside it. The row is then a
+                  real anchor: the whole row is the target, Enter enters, and
+                  middle-click opens a tab. A `<Link>` slotted into the name was
+                  a 57px anchor in a 240px row, and the keyboard could not
+                  follow it at all.
+
+                  Which costs this nav its client-side routing, since Next only
+                  intercepts anchors it rendered itself. These are static pages
+                  and the trade is worth it: a link that navigates from one
+                  quarter of itself is broken, and one that reloads is slow. */}
+              <helix-tree-item
+                href={`/design/components/${entry.slug}`}
+                key={entry.slug}
+                slot="children"
+                value={entry.slug}
+              >
+                {entry.label}
               </helix-tree-item>
             ))}
           </helix-tree-item>

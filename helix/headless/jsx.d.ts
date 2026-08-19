@@ -9033,6 +9033,21 @@ export type HelixBaseTreeItemHelixCloseElementEvent =
 export type HelixBaseTreeItemProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
   value?: HelixBaseTreeItem["value"];
+  /** Where this node goes, which makes its row a real link.
+
+Unset by default, and unreflected: a tree of choosable nodes is not a tree
+of links, and an empty `href` written onto every row would be a link to the
+current page on every item a consumer never asked to be one. */
+  href?: HelixBaseTreeItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixBaseTreeItem["target"];
+  /** What the link declares about where it goes.
+
+Set by the consumer rather than derived from `target`: `noreferrer` is a
+decision about their own analytics and a component should not make it for
+them. `noopener` is not needed as a default either, since every browser
+this library supports implies it for `target="_blank"` already. */
+  rel?: HelixBaseTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -9101,6 +9116,21 @@ instead. */
 export type HelixBaseTreeItemSolidJsProps = {
   /** Identifies the item to the consumer, carried in `helix-select`. */
   "prop:value"?: HelixBaseTreeItem["value"];
+  /** Where this node goes, which makes its row a real link.
+
+Unset by default, and unreflected: a tree of choosable nodes is not a tree
+of links, and an empty `href` written onto every row would be a link to the
+current page on every item a consumer never asked to be one. */
+  "prop:href"?: HelixBaseTreeItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixBaseTreeItem["target"];
+  /** What the link declares about where it goes.
+
+Set by the consumer rather than derived from `target`: `noreferrer` is a
+decision about their own analytics and a component should not make it for
+them. `noopener` is not needed as a default either, since every browser
+this library supports implies it for `target="_blank"` already. */
+  "prop:rel"?: HelixBaseTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -16791,6 +16821,18 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: Identifies the item to the consumer, carried in `helix-select`.
+   * - `href`: Where this node goes, which makes its row a real link.
+   *
+   * Unset by default, and unreflected: a tree of choosable nodes is not a tree
+   * of links, and an empty `href` written onto every row would be a link to the
+   * current page on every item a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * Set by the consumer rather than derived from `target`: `noreferrer` is a
+   * decision about their own analytics and a component should not make it for
+   * them. `noopener` is not needed as a default either, since every browser
+   * this library supports implies it for `target="_blank"` already.
    * - `selected`: Whether this item is the current one.
    *
    * Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -16863,6 +16905,10 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `focusItem() => void`: Moves focus to this node.
+   *
+   * Which element that is moves with `href`: the thing carrying `treeitem` is
+   * the thing the tree's roving tab stop lives on, and with a link that is the
+   * row rather than the wrapper around it.
    * - `select() => void`: Selects this node and announces it.
    * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
    *
@@ -16884,8 +16930,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The node, and the focus target.
-   * - `row`: The clickable label row.
+   * - `item`: The node, and the focus target unless `href` moves it to the row.
+   * - `row`: The clickable label row, which is an `<a>` where `href` is set.
    * - `toggle`: The expand and collapse control.
    * - `label`: The label text.
    * - `group`: The container for nested items.
@@ -24752,6 +24798,18 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `value`: Identifies the item to the consumer, carried in `helix-select`.
+   * - `href`: Where this node goes, which makes its row a real link.
+   *
+   * Unset by default, and unreflected: a tree of choosable nodes is not a tree
+   * of links, and an empty `href` written onto every row would be a link to the
+   * current page on every item a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * Set by the consumer rather than derived from `target`: `noreferrer` is a
+   * decision about their own analytics and a component should not make it for
+   * them. `noopener` is not needed as a default either, since every browser
+   * this library supports implies it for `target="_blank"` already.
    * - `selected`: Whether this item is the current one.
    *
    * Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -24824,6 +24882,10 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `focusItem() => void`: Moves focus to this node.
+   *
+   * Which element that is moves with `href`: the thing carrying `treeitem` is
+   * the thing the tree's roving tab stop lives on, and with a link that is the
+   * row rather than the wrapper around it.
    * - `select() => void`: Selects this node and announces it.
    * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
    *
@@ -24845,8 +24907,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The node, and the focus target.
-   * - `row`: The clickable label row.
+   * - `item`: The node, and the focus target unless `href` moves it to the row.
+   * - `row`: The clickable label row, which is an `<a>` where `href` is set.
    * - `toggle`: The expand and collapse control.
    * - `label`: The label text.
    * - `group`: The container for nested items.

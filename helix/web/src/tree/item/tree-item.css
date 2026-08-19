@@ -40,10 +40,21 @@
   min-block-size: var(--tree-row-size, var(--helix-size-control-sm));
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-xs);
+  /* One step per level, and the step is the gutter a chevron sits in.
+   *
+   * Which is the whole of the rule: with a chevron on the left, a branch's own
+   * chevron pushes its label right by exactly one gutter, and its children are
+   * one level deeper, so parent and child land on the same column. The chevron
+   * column *is* the indent rather than a second measurement beside it.
+   *
+   * With the chevron at the far end nothing pushes the branch's label, so it
+   * sits at its row's own inset and its children are one gutter in from it.
+   * Lined up where there is a mark on the left, indented where there is not,
+   * and one declaration covers both because the mark is what does the work. */
   padding-inline-start: calc(
     var(--helix-space-xs) +
     (var(--_tree-level, 1) - 1) *
-    var(--tree-indent, var(--helix-space-md))
+    var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
@@ -68,74 +79,6 @@
    without becoming the same. */
 [part="row"]:not(:has([part="toggle"])) {
   font-weight: var(--helix-weight-medium);
-}
-
-/* A leaf holds the space a chevron would take, always, whichever end the tree
-   puts its chevrons at.
- 
-   Which is what keeps a child where it is when the placement changes. The
-   indent is a fact about depth and does not move; what moves is a *branch's own
-   label*, pushed right by its chevron when the chevron is on the left and
-   sitting at the row's own inset when it is not. So a child stays put and its
-   parent slides left underneath it, which is the arrangement asked for and the
-   one a reader is used to: nothing below the parent shifts because a control
-   moved to the other side of it.
-
-   Unconditional, where it used to be multiplied by a `--_tree-reserve` the tree
-   sent down. Turning it off at `end` lined a leaf up with the branch beside it
-   and moved every child left by a chevron's width to do it, which is a trade
-   the other way round: siblings gained a shared edge and parents and children
-   lost the one that says which contains which. Depth is the thing being read.
-
-   The reservation is the chevron's own fixed width, not `1em`: a parent reads
-   at one size and its child at another, and a gutter measured in the row's own
-   type could never line the two up. It is written here, where the chevron's
-   width already is, rather than passed down from the tree: the tree used to
-   send the whole measurement and sent a different one, `--helix-size-icon`
-   against the `--helix-size-icon-sm` drawn here, so every leaf sat four pixels
-   right of every branch beside it. The gap is added because the row is a flex
-   line and a drawn chevron takes one after it. */
-[part="row"]:not(:has([part="toggle"])) {
-  --_tree-leaf-inset: calc(
-    var(--helix-space-xs) +
-    (var(--_tree-level, 1) - 1) *
-    var(--tree-indent, var(--helix-space-md)) +
-    var(--_tree-chevron) +
-    var(--helix-space-2xs)
-  );
-
-  padding-inline-start: var(--_tree-leaf-inset);
-}
-
-/* A slotted link is the row, not the words in it.
- *
- * The row carries the padding and the indent, so an anchor inside the label
- * could never cover either however wide the label grew: measured, 216px of a
- * 240px row, and the rest still belonged to the row's own click handler, which
- * selects and does not navigate. That is what reads as needing two clicks.
- *
- * The anchor cannot be moved out here, because it is the consumer's: a router
- * renders its own `<a>` and cannot render one inside this shadow root, which is
- * the same constraint `Outline` works under. So the anchor is pulled out by
- * exactly the row's own insets and given them back as its own padding. The text
- * does not move; the boundary does, and the whole row becomes the target.
- *
- * Leaves only. A branch row's press toggles it, and stretching a link over that
- * would make one press do two things. */
-[part="row"]:not(:has([part="toggle"])) [part="label"] slot::slotted(a) {
-  /* A flex box so the words centre in a target taller than they are, and
-     `100%` of a label that now stretches to the row. `display: block` sized to
-     the text vertically; a flex *item* would size to the text horizontally,
-     which is why the label above stays a plain block. */
-  align-items: center;
-  block-size: 100%;
-  display: flex;
-  margin-block: calc(var(--helix-space-xs) * -1);
-  margin-inline-end: calc(var(--helix-space-xs) * -1);
-  margin-inline-start: calc(var(--_tree-leaf-inset) * -1);
-  padding-block: var(--helix-space-xs);
-  padding-inline-end: var(--helix-space-xs);
-  padding-inline-start: var(--_tree-leaf-inset);
 }
 
 /* Children read as children: one step down the type scale, and one only. A
@@ -176,9 +119,24 @@ slot[name="children"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
-[part="item"]:focus-visible [part="row"] {
+/* Both, because `href` moves which element the tab stop is on: without one the
+   wrapper is the `treeitem` and the ring is drawn on the row inside it; with
+   one the row is the `treeitem` and takes the ring itself. The ring lands in
+   the same place either way, which is the point. */
+[part="item"]:focus-visible [part="row"],
+[part="row"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A row that is a link is still a row. An `<a>` arrives underlined and in the
+   link colour, and neither belongs on something already shaped like a row: the
+   selection wash and the hover say what it does, and a column of blue
+   underlined rows reads as prose that has been marked up rather than as a list
+   to move around in. */
+a[part="row"] {
+  color: inherit;
+  text-decoration: none;
 }
 
 /* Rotation rather than a swapped glyph: opening a branch is a short movement,

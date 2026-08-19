@@ -53501,6 +53501,48 @@
             },
             {
               "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this node goes, which makes its row a real link.\n\nUnset by default, and unreflected: a tree of choosable nodes is not a tree\nof links, and an empty `href` written onto every row would be a link to the\ncurrent page on every item a consumer never asked to be one.",
+              "attribute": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "attribute": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes.\n\nSet by the consumer rather than derived from `target`: `noreferrer` is a\ndecision about their own analytics and a component should not make it for\nthem. `noopener` is not needed as a default either, since every browser\nthis library supports implies it for `target=\"_blank\"` already.",
+              "attribute": "rel",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "selected",
               "type": {
                 "text": "boolean"
@@ -53574,7 +53616,7 @@
                   "text": "void"
                 }
               },
-              "description": "Moves focus to this node.",
+              "description": "Moves focus to this node.\n\nWhich element that is moves with `href`: the thing carrying `treeitem` is\nthe thing the tree's roving tab stop lives on, and with a link that is the\nrow rather than the wrapper around it.",
               "type": {
                 "text": "focusItem() => void"
               },
@@ -53634,9 +53676,34 @@
             },
             {
               "kind": "field",
+              "name": "handleToggleClick",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "handleRowClick",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderRow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "Everything inside the row, which is the same whichever element it is.",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"
@@ -53804,6 +53871,45 @@
               "default": "''",
               "description": "Identifies the item to the consumer, carried in `helix-select`.",
               "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this node goes, which makes its row a real link.\n\nUnset by default, and unreflected: a tree of choosable nodes is not a tree\nof links, and an empty `href` written onto every row would be a link to the\ncurrent page on every item a consumer never asked to be one.",
+              "fieldName": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "fieldName": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseTreeItem",
+                "module": "src/tree/item/tree-item.ts"
+              }
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes.\n\nSet by the consumer rather than derived from `target`: `noreferrer` is a\ndecision about their own analytics and a component should not make it for\nthem. `noopener` is not needed as a default either, since every browser\nthis library supports implies it for `target=\"_blank\"` already.",
+              "fieldName": "rel",
               "inheritedFrom": {
                 "name": "HelixBaseTreeItem",
                 "module": "src/tree/item/tree-item.ts"

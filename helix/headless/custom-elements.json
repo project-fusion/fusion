@@ -40584,11 +40584,11 @@
           "name": "HelixBaseTreeItem",
           "cssParts": [
             {
-              "description": "The node, and the focus target.",
+              "description": "The node, and the focus target unless `href` moves it to the row.",
               "name": "item"
             },
             {
-              "description": "The clickable label row.",
+              "description": "The clickable label row, which is an `<a>` where `href` is set.",
               "name": "row"
             },
             {
@@ -40632,6 +40632,36 @@
               "default": "''",
               "description": "Identifies the item to the consumer, carried in `helix-select`.",
               "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this node goes, which makes its row a real link.\n\nUnset by default, and unreflected: a tree of choosable nodes is not a tree\nof links, and an empty `href` written onto every row would be a link to the\ncurrent page on every item a consumer never asked to be one.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes.\n\nSet by the consumer rather than derived from `target`: `noreferrer` is a\ndecision about their own analytics and a component should not make it for\nthem. `noopener` is not needed as a default either, since every browser\nthis library supports implies it for `target=\"_blank\"` already.",
+              "attribute": "rel"
             },
             {
               "kind": "field",
@@ -40688,7 +40718,7 @@
                   "text": "void"
                 }
               },
-              "description": "Moves focus to this node.",
+              "description": "Moves focus to this node.\n\nWhich element that is moves with `href`: the thing carrying `treeitem` is\nthe thing the tree's roving tab stop lives on, and with a link that is the\nrow rather than the wrapper around it.",
               "type": {
                 "text": "focusItem() => void"
               }
@@ -40732,9 +40762,26 @@
             },
             {
               "kind": "field",
+              "name": "handleToggleClick",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "handleRowClick",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderRow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "Everything inside the row, which is the same whichever element it is."
             },
             {
               "kind": "field",
@@ -40966,6 +41013,33 @@
               "fieldName": "value"
             },
             {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where this node goes, which makes its row a real link.\n\nUnset by default, and unreflected: a tree of choosable nodes is not a tree\nof links, and an empty `href` written onto every row would be a link to the\ncurrent page on every item a consumer never asked to be one.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes.\n\nSet by the consumer rather than derived from `target`: `noreferrer` is a\ndecision about their own analytics and a component should not make it for\nthem. `noopener` is not needed as a default either, since every browser\nthis library supports implies it for `target=\"_blank\"` already.",
+              "fieldName": "rel"
+            },
+            {
               "name": "selected",
               "type": {
                 "text": "boolean"
@@ -41022,7 +41096,7 @@
           "helix": {
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/tree",
+            "documentation": "https://helix.fusion.dev/components/tree\n\n**`href` makes the row itself the link.** A tree used as navigation is a list\nof links, and the row is what a reader presses: with the anchor slotted into\nthe name instead, everything outside the words is dead, Enter does nothing,\nand there is no middle-click, no status bar and no open-in-new-tab. Given an\n`href` the row *is* an `<a>`, so the platform provides all of that and the\nkeyboard needs no handler at all.\n\nIt changes the shape of the ARIA, which is why it is a property and not the\ndefault. An anchor cannot contain the group, since the group holds more\nanchors and nesting them is invalid, so the row carries `treeitem` and the\ngroup becomes its sibling under a presentational wrapper. That is exactly the\nnavigation flavour of the tree pattern, and the arrangement without an `href`\nstays as it was: `treeitem` containing `group`, which is what an `<li>`\nholding a `<ul>` is.\n\nA consumer whose framework owns routing slots its own link instead and leaves\n`href` unset. The row follows that one too, so the whole row works either\nway; what the anchor adds is what only a real anchor can give.",
             "aliases": [
               "TreeNode",
               "Branch",

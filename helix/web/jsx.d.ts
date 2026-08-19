@@ -10161,6 +10161,21 @@ state for stylesheets, which is what it has always been for. */
   defaultOpen?: HelixTreeItem["defaultOpen"];
   /** Identifies the item to the consumer, carried in `helix-select`. */
   value?: HelixTreeItem["value"];
+  /** Where this node goes, which makes its row a real link.
+
+Unset by default, and unreflected: a tree of choosable nodes is not a tree
+of links, and an empty `href` written onto every row would be a link to the
+current page on every item a consumer never asked to be one. */
+  href?: HelixTreeItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixTreeItem["target"];
+  /** What the link declares about where it goes.
+
+Set by the consumer rather than derived from `target`: `noreferrer` is a
+decision about their own analytics and a component should not make it for
+them. `noopener` is not needed as a default either, since every browser
+this library supports implies it for `target="_blank"` already. */
+  rel?: HelixTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -10229,6 +10244,21 @@ state for stylesheets, which is what it has always been for. */
   "prop:defaultOpen"?: HelixTreeItem["defaultOpen"];
   /** Identifies the item to the consumer, carried in `helix-select`. */
   "prop:value"?: HelixTreeItem["value"];
+  /** Where this node goes, which makes its row a real link.
+
+Unset by default, and unreflected: a tree of choosable nodes is not a tree
+of links, and an empty `href` written onto every row would be a link to the
+current page on every item a consumer never asked to be one. */
+  "prop:href"?: HelixTreeItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixTreeItem["target"];
+  /** What the link declares about where it goes.
+
+Set by the consumer rather than derived from `target`: `noreferrer` is a
+decision about their own analytics and a component should not make it for
+them. `noopener` is not needed as a default either, since every browser
+this library supports implies it for `target="_blank"` already. */
+  "prop:rel"?: HelixTreeItem["rel"];
   /** Whether this item is the current one.
 
 Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -18233,6 +18263,18 @@ export type CustomElements = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `value`: Identifies the item to the consumer, carried in `helix-select`.
+   * - `href`: Where this node goes, which makes its row a real link.
+   *
+   * Unset by default, and unreflected: a tree of choosable nodes is not a tree
+   * of links, and an empty `href` written onto every row would be a link to the
+   * current page on every item a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * Set by the consumer rather than derived from `target`: `noreferrer` is a
+   * decision about their own analytics and a component should not make it for
+   * them. `noopener` is not needed as a default either, since every browser
+   * this library supports implies it for `target="_blank"` already.
    * - `selected`: Whether this item is the current one.
    *
    * Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -18290,6 +18332,10 @@ export type CustomElements = {
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `focusItem() => void`: Moves focus to this node.
+   *
+   * Which element that is moves with `href`: the thing carrying `treeitem` is
+   * the thing the tree's roving tab stop lives on, and with a link that is the
+   * row rather than the wrapper around it.
    * - `select() => void`: Selects this node and announces it.
    * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
    *
@@ -26489,6 +26535,18 @@ export type CustomElementsSolidJs = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `value`: Identifies the item to the consumer, carried in `helix-select`.
+   * - `href`: Where this node goes, which makes its row a real link.
+   *
+   * Unset by default, and unreflected: a tree of choosable nodes is not a tree
+   * of links, and an empty `href` written onto every row would be a link to the
+   * current page on every item a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes.
+   *
+   * Set by the consumer rather than derived from `target`: `noreferrer` is a
+   * decision about their own analytics and a component should not make it for
+   * them. `noopener` is not needed as a default either, since every browser
+   * this library supports implies it for `target="_blank"` already.
    * - `selected`: Whether this item is the current one.
    *
    * Not reflected, for the reason `level` below gives in full: the tree assigns
@@ -26546,6 +26604,10 @@ export type CustomElementsSolidJs = {
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
    * - `focusItem() => void`: Moves focus to this node.
+   *
+   * Which element that is moves with `href`: the thing carrying `treeitem` is
+   * the thing the tree's roving tab stop lives on, and with a link that is the
+   * row rather than the wrapper around it.
    * - `select() => void`: Selects this node and announces it.
    * - `activate() => void`: Chooses this node the way a reader does, from a press or from Enter.
    *

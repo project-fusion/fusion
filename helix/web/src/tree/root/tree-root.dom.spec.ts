@@ -210,6 +210,86 @@ describe('a tree used as navigation follows its links', () => {
   })
 })
 
+describe('a tree item that is a link', () => {
+  const linked = `<helix-tree label="Docs">
+    <helix-tree-item default-open href="/components" value="components">
+      Components
+      <helix-tree-item href="/components/button" slot="children" value="button">Button</helix-tree-item>
+    </helix-tree-item>
+  </helix-tree>`
+
+  const itemNamed = (tree: HTMLElement, value: string): HTMLElement =>
+    tree.querySelector(`helix-tree-item[value="${value}"]`) as HTMLElement
+
+  test('the row is the anchor, so the whole row is the target', async () => {
+    /* With the link slotted into the name instead, a 240px row had a 57px
+       anchor in it: everything outside the words was dead. */
+    const tree = await mount(linked)
+    const row = part(itemNamed(tree, 'button'), 'row') as HTMLElement
+    expect(row.tagName).toBe('A')
+    expect(row.getAttribute('href')).toBe('/components/button')
+  })
+
+  test('and the row is the treeitem, since an anchor cannot hold the group', async () => {
+    /* The group holds more anchors and nesting them is invalid. So the row
+       carries the semantics and the wrapper drops to `none`, which is the
+       navigation flavour of the pattern. */
+    const tree = await mount(linked)
+    const item = itemNamed(tree, 'button')
+    expect(part(item, 'item')?.getAttribute('role')).toBe('none')
+    expect(part(item, 'item')?.hasAttribute('tabindex')).toBe(false)
+    const row = part(item, 'row') as HTMLElement
+    expect(row.getAttribute('role')).toBe('treeitem')
+    expect(row.getAttribute('aria-level')).toBe('2')
+    expect(row.hasAttribute('tabindex')).toBe(true)
+  })
+
+  test('without an href nothing moves, and the wrapper keeps the semantics', async () => {
+    const tree = await mount(markup)
+    const item = tree.querySelector('helix-tree-item[value="web"]') as HTMLElement
+    expect(part(item, 'item')?.getAttribute('role')).toBe('treeitem')
+    expect((part(item, 'row') as HTMLElement).tagName).toBe('DIV')
+  })
+
+  test('the tab stop follows the semantics onto the row', async () => {
+    const tree = await mount(linked)
+    const item = itemNamed(tree, 'button') as HTMLElement & { focusItem: () => void }
+    item.focusItem()
+    expect(item.shadowRoot?.activeElement).toBe(part(item, 'row'))
+  })
+
+  test('a linked branch goes where it points, and its chevron opens it', async () => {
+    /* A branch that is not a link toggles from anywhere in its row, because
+       there is nowhere else for the press to mean. One that is a link has both
+       jobs and they need separate targets. */
+    const tree = await mount(linked)
+    const branch = itemNamed(tree, 'components') as HTMLElement & { open: boolean }
+    expect(branch.open).toBe(true)
+
+    part(branch, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await (tree as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(branch.open).toBe(true)
+
+    part(branch, 'toggle')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, composed: true }),
+    )
+    await (branch as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    expect(branch.open).toBe(false)
+  })
+
+  test('an unlinked branch still toggles from anywhere in its row', async () => {
+    const tree = await mount(markup)
+    const branch = tree.querySelector('helix-tree-item[value="helix"]') as HTMLElement & {
+      open: boolean
+      updateComplete: Promise<boolean>
+    }
+    expect(branch.open).toBe(true)
+    part(branch, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await branch.updateComplete
+    expect(branch.open).toBe(false)
+  })
+})
+
 describe('a branch opening is announced, and can be owned', () => {
   /* It was a bare `this.expanded = !this.expanded`: no event, so a consumer
      could not know a branch had opened, and no mode, so they could not hold it

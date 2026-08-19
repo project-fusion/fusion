@@ -31,13 +31,32 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://helix.fusion.dev/components/tree
  *
+ * **`href` makes the row itself the link.** A tree used as navigation is a list
+ * of links, and the row is what a reader presses: with the anchor slotted into
+ * the name instead, everything outside the words is dead, Enter does nothing,
+ * and there is no middle-click, no status bar and no open-in-new-tab. Given an
+ * `href` the row *is* an `<a>`, so the platform provides all of that and the
+ * keyboard needs no handler at all.
+ *
+ * It changes the shape of the ARIA, which is why it is a property and not the
+ * default. An anchor cannot contain the group, since the group holds more
+ * anchors and nesting them is invalid, so the row carries `treeitem` and the
+ * group becomes its sibling under a presentational wrapper. That is exactly the
+ * navigation flavour of the tree pattern, and the arrangement without an `href`
+ * stays as it was: `treeitem` containing `group`, which is what an `<li>`
+ * holding a `<ul>` is.
+ *
+ * A consumer whose framework owns routing slots its own link instead and leaves
+ * `href` unset. The row follows that one too, so the whole row works either
+ * way; what the anchor adds is what only a real anchor can give.
+ *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
  * @slot start - Before the label, after the chevron. A mark about the item.
  * @slot end - After the label, at the row's far side. A count, or a state.
  *
- * @csspart item - The node, and the focus target.
- * @csspart row - The clickable label row.
+ * @csspart item - The node, and the focus target unless `href` moves it to the row.
+ * @csspart row - The clickable label row, which is an `<a>` where `href` is set.
  * @csspart toggle - The expand and collapse control.
  * @csspart label - The label text.
  * @csspart group - The container for nested items.
@@ -51,6 +70,31 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
   /** Identifies the item to the consumer, carried in `helix-select`. */
   @property()
   value = ''
+
+  /**
+   * Where this node goes, which makes its row a real link.
+   *
+   * Unset by default, and unreflected: a tree of choosable nodes is not a tree
+   * of links, and an empty `href` written onto every row would be a link to the
+   * current page on every item a consumer never asked to be one.
+   */
+  @property()
+  href = ''
+
+  /** Where the link opens, for the rare row that leaves the site. */
+  @property()
+  target = ''
+
+  /**
+   * What the link declares about where it goes.
+   *
+   * Set by the consumer rather than derived from `target`: `noreferrer` is a
+   * decision about their own analytics and a component should not make it for
+   * them. `noopener` is not needed as a default either, since every browser
+   * this library supports implies it for `target="_blank"` already.
+   */
+  @property()
+  rel = ''
 
   /**
    * Whether this item is the current one.
@@ -102,9 +146,17 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
     return this.branch
   }
 
-  /** Moves focus to this node. */
+  /**
+   * Moves focus to this node.
+   *
+   * Which element that is moves with `href`: the thing carrying `treeitem` is
+   * the thing the tree's roving tab stop lives on, and with a link that is the
+   * row rather than the wrapper around it.
+   */
   focusItem(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.renderRoot
+      .querySelector<HTMLElement>(this.href === '' ? '[part="item"]' : '[part="row"]')
+      ?.focus()
   }
 
   /** Selects this node and announces it. */
@@ -147,6 +199,15 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
    * its children.
    */
   private follow(): void {
+    /* Its own row first, where `href` made one. Pressed with a pointer the
+       anchor has already navigated and this never runs; from the keyboard it
+       has not, because the tree calls `preventDefault` on every key it handles
+       and that is what would otherwise swallow Enter on a link. */
+    const own = this.renderRoot?.querySelector<HTMLAnchorElement>('a[part="row"]')
+    if (own) {
+      own.click()
+      return
+    }
     for (const node of this.children) {
       if (node.slot !== '') {
         continue
@@ -160,8 +221,21 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  private readonly handleToggleClick = (event: MouseEvent): void => {
+    /* Only where the row is a link, and then it has to stop: the row would
+       navigate away from the branch the reader was trying to open. Without an
+       `href` the whole row toggles, which is what a tree of folders wants, so
+       there is nothing here to intercept. */
+    event.preventDefault()
+    event.stopPropagation()
+    this.toggleOpen()
+  }
+
   private readonly handleRowClick = (event: MouseEvent): void => {
-    if (this.branch) {
+    /* A branch that is also a link goes where it points, and its chevron is
+       what opens it. A branch that is not toggles from anywhere in the row,
+       because there is nowhere else for the press to mean. */
+    if (this.branch && this.href === '') {
       this.toggleOpen()
       return
     }
@@ -173,32 +247,74 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** Everything inside the row, which is the same whichever element it is. */
+  private renderRow(): TemplateResult {
+    return html`${
+      this.branch
+        ? html`<svg
+            part="toggle"
+            fill="currentColor"
+            viewBox=${caretDown.viewBox}
+            aria-hidden="true"
+            @click=${this.href === '' ? nothing : this.handleToggleClick}
+          >
+          ${unsafeSVG(caretDown.content)}
+        </svg>`
+        : nothing
+    }
+      <slot name="start"></slot>
+      <span part="label"><slot></slot></span>
+      <slot name="end"></slot>`
+  }
+
   protected override render(): TemplateResult {
+    /* Where the semantics sit, which `href` decides.
+     *
+     * A link row carries them itself and the wrapper drops to `none`, because
+     * an anchor cannot contain the group: the group holds more anchors and
+     * nesting them is invalid markup that no assistive technology reads the way
+     * it looks. So the row becomes the `treeitem` and the group becomes its
+     * sibling, which is the navigation flavour of the pattern.
+     *
+     * Without one, nothing changes: the wrapper is the `treeitem` and holds the
+     * group, which is what an `<li>` holding a `<ul>` is, and what this was
+     * fixed to be when the group rendered outside the node it belonged to. */
+    const linked = this.href !== ''
+    const level = this.level ?? 1
+    const expanded = this.branch ? (this.open ? 'true' : 'false') : nothing
+    const tabIndex = this.focusable ? '0' : '-1'
+
     return html`<div
         part="item"
-        role="treeitem"
-        aria-expanded=${this.branch ? (this.open ? 'true' : 'false') : nothing}
-        aria-selected=${this.selected ? 'true' : 'false'}
-        aria-level=${this.level ?? 1}
-        tabindex=${this.focusable ? '0' : '-1'}
+        role=${linked ? 'none' : 'treeitem'}
+        aria-expanded=${linked ? nothing : expanded}
+        aria-selected=${linked ? nothing : this.selected ? 'true' : 'false'}
+        aria-level=${linked ? nothing : level}
+        tabindex=${linked ? nothing : tabIndex}
       >
-        <div
-          part="row"
-          data-selected=${this.selected ? '' : nothing}
-          style="--_tree-level: ${this.level ?? 1}"
-          @click=${this.handleRowClick}
-        >
-          ${
-            this.branch
-              ? html`<svg part="toggle" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
-                ${unsafeSVG(caretDown.content)}
-              </svg>`
-              : nothing
-          }
-          <slot name="start"></slot>
-          <span part="label"><slot></slot></span>
-          <slot name="end"></slot>
-        </div>
+        ${
+          linked
+            ? html`<a
+                part="row"
+                role="treeitem"
+                href=${this.href}
+                target=${this.target || nothing}
+                rel=${this.rel || nothing}
+                aria-expanded=${expanded}
+                aria-selected=${this.selected ? 'true' : 'false'}
+                aria-level=${level}
+                tabindex=${tabIndex}
+                data-selected=${this.selected ? '' : nothing}
+                style="--_tree-level: ${level}"
+                @click=${this.handleRowClick}
+              >${this.renderRow()}</a>`
+            : html`<div
+                part="row"
+                data-selected=${this.selected ? '' : nothing}
+                style="--_tree-level: ${level}"
+                @click=${this.handleRowClick}
+              >${this.renderRow()}</div>`
+        }
         <!-- Inside the treeitem, not beside it. It rendered as a sibling, so
              the row's \`aria-expanded\` described a group the row did not own and
              the branch reported children it had no relationship to. The pattern
