@@ -82,6 +82,29 @@ export class HelixButton extends HelixBaseButton {
   tone?: 'danger' | 'neutral' | 'primary'
 
   /**
+   * One word for the four pairings anybody actually writes.
+   *
+   * - `primary` is `appearance="solid" tone="primary"`.
+   * - `secondary` is the resting button, and writing it says so out loud.
+   * - `tertiary` is `appearance="ghost"`.
+   * - `danger` is `appearance="solid" tone="danger"`.
+   *
+   * **A spelling of the two axes, not a third thing beside them.** It exists
+   * because the split cost a second attribute on the commonest control, and the
+   * mapping lives in the stylesheet as extra selectors on the blocks that
+   * already exist, so there is nowhere for the shorthand and the axes to drift
+   * apart. Anything the four do not cover is written the long way, which is what
+   * the axes are for: an outlined Delete is `appearance="outlined"
+   * tone="danger"` and has no short name, because it is not one of four.
+   *
+   * **An axis said out loud wins.** `variant="primary" appearance="ghost"` is a
+   * ghost in the brand colour. That is the only reading of such markup that is
+   * not a guess, and the selectors say it rather than relying on their order.
+   */
+  @property({ reflect: true })
+  variant?: 'danger' | 'primary' | 'secondary' | 'tertiary'
+
+  /**
    * How much of the space available to it the button takes.
    *
    * - `auto` is the default and is never written: the button is as wide as its

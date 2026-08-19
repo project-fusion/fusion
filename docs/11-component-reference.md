@@ -494,6 +494,7 @@ ring is declared here rather than inherited, because the base layer's
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+| `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings anybody actually writes. |
 
 #### Methods
 
@@ -2086,6 +2087,7 @@ common way a toolbar becomes unusable without sight.
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
 | `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
+| `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings. See `Button` for the full note. |
 
 #### Methods
 

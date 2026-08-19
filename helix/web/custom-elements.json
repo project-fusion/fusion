@@ -3450,6 +3450,16 @@
             },
             {
               "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+              },
+              "description": "One word for the four pairings anybody actually writes.\n\n- `primary` is `appearance=\"solid\" tone=\"primary\"`.\n- `secondary` is the resting button, and writing it says so out loud.\n- `tertiary` is `appearance=\"ghost\"`.\n- `danger` is `appearance=\"solid\" tone=\"danger\"`.\n\n**A spelling of the two axes, not a third thing beside them.** It exists\nbecause the split cost a second attribute on the commonest control, and the\nmapping lives in the stylesheet as extra selectors on the blocks that\nalready exist, so there is nowhere for the shorthand and the axes to drift\napart. Anything the four do not cover is written the long way, which is what\nthe axes are for: an outlined Delete is `appearance=\"outlined\"\ntone=\"danger\"` and has no short name, because it is not one of four.\n\n**An axis said out loud wins.** `variant=\"primary\" appearance=\"ghost\"` is a\nghost in the brand colour. That is the only reading of such markup that is\nnot a guess, and the selectors say it rather than relying on their order.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "fill",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
@@ -3818,6 +3828,14 @@
               "fieldName": "tone"
             },
             {
+              "name": "variant",
+              "type": {
+                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+              },
+              "description": "One word for the four pairings anybody actually writes.\n\n- `primary` is `appearance=\"solid\" tone=\"primary\"`.\n- `secondary` is the resting button, and writing it says so out loud.\n- `tertiary` is `appearance=\"ghost\"`.\n- `danger` is `appearance=\"solid\" tone=\"danger\"`.\n\n**A spelling of the two axes, not a third thing beside them.** It exists\nbecause the split cost a second attribute on the commonest control, and the\nmapping lives in the stylesheet as extra selectors on the blocks that\nalready exist, so there is nowhere for the shorthand and the axes to drift\napart. Anything the four do not cover is written the long way, which is what\nthe axes are for: an outlined Delete is `appearance=\"outlined\"\ntone=\"danger\"` and has no short name, because it is not one of four.\n\n**An axis said out loud wins.** `variant=\"primary\" appearance=\"ghost\"` is a\nghost in the brand colour. That is the only reading of such markup that is\nnot a guess, and the selectors say it rather than relying on their order.",
+              "fieldName": "variant"
+            },
+            {
               "name": "fill",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
@@ -3933,6 +3951,10 @@
               },
               {
                 "slug": "fill"
+              },
+              {
+                "description": "One word for the four pairings most buttons are.",
+                "slug": "variants"
               },
               {
                 "slug": "width"
@@ -20831,6 +20853,16 @@
             },
             {
               "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+              },
+              "description": "One word for the four pairings. See `Button` for the full note.\n\nThe mapping differs by one, because this control rests as a ghost:\n`tertiary` is the resting state here, and `danger` is a red mark on it\nrather than a filled red square.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "aria",
               "privacy": "protected",
               "readonly": true,
@@ -21187,6 +21219,14 @@
               },
               "description": "What the button means, which decides its colour and nothing else.",
               "fieldName": "tone"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'danger' | 'primary' | 'secondary' | 'tertiary' | undefined"
+              },
+              "description": "One word for the four pairings. See `Button` for the full note.\n\nThe mapping differs by one, because this control rests as a ghost:\n`tertiary` is the resting state here, and `danger` is a red mark on it\nrather than a filled red square.",
+              "fieldName": "variant"
             },
             {
               "name": "type",

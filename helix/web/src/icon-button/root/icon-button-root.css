@@ -27,7 +27,15 @@
   );
 }
 
-:host([tone="primary"]) {
+/* The `variant` shorthand, joining the rules rather than repeating them. See
+   `Button` for the whole argument, including why an axis said out loud wins
+   through `:not()` rather than through source order.
+
+   The mapping differs by one, because this control rests as a ghost: `tertiary`
+   is the resting state and needs no rule, and `danger` is a red mark on it
+   rather than a filled red square, so it sets the tone and no appearance. */
+:host([tone="primary"]),
+:host(:not([tone])[variant="primary"]) {
   --_icon-button-edge: var(--helix-color-primary);
   --_icon-button-ink: var(--helix-color-primary);
   --_icon-button-ink-hover: var(--helix-color-primary);
@@ -36,7 +44,8 @@
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
 }
 
-:host([tone="danger"]) {
+:host([tone="danger"]),
+:host(:not([tone])[variant="danger"]) {
   --_icon-button-edge: var(--helix-color-danger);
   --_icon-button-ink: var(--helix-color-danger);
   --_icon-button-ink-hover: var(--helix-color-danger);
@@ -107,13 +116,15 @@
  * an appearance without a hover of its own loses its fill the moment a pointer
  * touches it. Both notes below were written the first time that happened here.
  */
-:host([appearance="solid"]) [part="button"] {
+:host([appearance="solid"]) [part="button"],
+:host(:not([appearance])[variant="primary"]) [part="button"] {
   background-color: var(--_icon-button-tone);
   border-color: transparent;
   color: var(--_icon-button-on-tone);
 }
 
-:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover,
+:host(:not(:disabled):not([appearance])[variant="primary"]) [part="button"]:hover {
   background-color: var(--_icon-button-tone-hover);
   color: var(--_icon-button-on-tone);
 }
@@ -128,13 +139,15 @@
  * border and radius, so a row holding one of each read as two kinds of control.
  * A percentage of the ink is a step away from whatever it sits on in either
  * mode, where a fixed neutral is not. */
-:host([appearance="outlined"]) [part="button"] {
+:host([appearance="outlined"]) [part="button"],
+:host(:not([appearance])[variant="secondary"]) [part="button"] {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 6%, transparent);
   border-color: var(--_icon-button-edge);
   color: var(--_icon-button-tone);
 }
 
-:host(:not(:disabled)[appearance="outlined"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="outlined"]) [part="button"]:hover,
+:host(:not(:disabled):not([appearance])[variant="secondary"]) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 12%, transparent);
   color: var(--_icon-button-tone);
 }

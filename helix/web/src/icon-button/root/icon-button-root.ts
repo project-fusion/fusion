@@ -44,6 +44,16 @@ export class HelixIconButton extends HelixBaseIconButton {
   @property({ reflect: true })
   tone?: 'danger' | 'neutral' | 'primary'
 
+  /**
+   * One word for the four pairings. See `Button` for the full note.
+   *
+   * The mapping differs by one, because this control rests as a ghost:
+   * `tertiary` is the resting state here, and `danger` is a red mark on it
+   * rather than a filled red square.
+   */
+  @property({ reflect: true })
+  variant?: 'danger' | 'primary' | 'secondary' | 'tertiary'
+
   static override styles: CSSResultGroup = styles
 }
 
