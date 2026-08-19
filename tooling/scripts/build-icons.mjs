@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
  * Generates the icon set.
  *
  * The set is a list of names in `helix/icons/icons.txt`, and each one is
- * resolved from `@phosphor-icons/core` at build time: regular weight, then
- * fill, then `raw/` for the marks that are not Phosphor at all. That package is
+ * resolved from `@phosphor-icons/core` at build time: bold weight, then fill,
+ * then `raw/` for the marks that are not Phosphor at all. That package is
  * a devDependency and nothing imports it at runtime. Six megabytes of every
  * icon at every weight sits in `node_modules`; what ships is the handful named
  * here, inlined into `generated.ts`.
@@ -39,13 +39,30 @@ const LIST = join(ROOT, 'helix/icons/icons.txt')
 const PHOSPHOR = join(ROOT, 'node_modules/@phosphor-icons/core/assets')
 const OUT = join(ROOT, 'helix/icons/src/generated.ts')
 
-/* Regular first, then fill: the four `-fill` names in the set are the solid
-   variants Phosphor keeps in a separate weight, and asking for regular first
-   means a name only lands there when it is genuinely a fill. `raw/` last, for
-   the marks Phosphor does not draw. */
+/* Bold first, then fill, then `raw/` for the marks Phosphor does not draw.
+ *
+ * Bold rather than regular, which is what this drew before. Phosphor's regular
+ * is a hairline next to the type it sits beside: at `icon-sm` in a tree row or
+ * a listbox option it reads as a lighter grey than the words it belongs to,
+ * which is the opposite of what a mark is for. Bold matches the medium weight
+ * every row in this library is set in.
+ *
+ * The four `-fill` names are unaffected, and that is deliberate rather than
+ * incidental: fill is a different statement from weight, chosen by the
+ * components that use it to say a thing is complete or is a state rather than a
+ * control, and there is no bold of a fill to want. They miss in `bold/` and land
+ * in `fill/`, which is the same fall-through that used to catch them.
+ *
+ * Only `regular/` names its files bare. Every other weight suffixes them, so
+ * the bold of `caret-down` is `caret-down-bold.svg`, and the lookup has to say
+ * so. A directory alone is not enough to find a glyph in this package. */
 const sourceFor = (slug) => {
-  for (const dir of [join(PHOSPHOR, 'regular'), join(PHOSPHOR, 'fill'), RAW]) {
-    const file = join(dir, `${slug}.svg`)
+  const candidates = [
+    join(PHOSPHOR, 'bold', `${slug}-bold.svg`),
+    join(PHOSPHOR, 'fill', `${slug}.svg`),
+    join(RAW, `${slug}.svg`),
+  ]
+  for (const file of candidates) {
     if (existsSync(file)) {
       return readFileSync(file, 'utf8')
     }
