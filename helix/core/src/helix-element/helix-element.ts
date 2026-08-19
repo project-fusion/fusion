@@ -54,6 +54,76 @@ const HIDDEN = css`
 `
 
 /**
+ * The prefix React puts on the props bag it stashes on every node it owns.
+ *
+ * The rest of the key is a random suffix generated per page, so the whole thing
+ * has to be discovered rather than written down.
+ */
+const REACT_PROPS = '__reactProps$'
+
+/**
+ * The discovered key, which is the same for every node on a page.
+ *
+ * Cached because `helix-caret` fires on every keystroke and a scan per dispatch
+ * would be a scan per keystroke. Re-scanned whenever the cached key comes back
+ * empty, so a second React root with a suffix of its own still resolves.
+ */
+let reactPropsKey: string | undefined
+
+/** The props React is holding for a node, if React is holding any. */
+const reactPropsOf = (node: EventTarget): Record<string, unknown> | undefined => {
+  const stash = node as unknown as Record<string, unknown>
+  if (reactPropsKey !== undefined && stash[reactPropsKey] !== undefined) {
+    return stash[reactPropsKey] as Record<string, unknown>
+  }
+  reactPropsKey = Object.keys(stash).find((key) => key.startsWith(REACT_PROPS))
+  return reactPropsKey === undefined ? undefined : (stash[reactPropsKey] as Record<string, unknown>)
+}
+
+/**
+ * Binds the handler React is holding for this event, if it has not bound it.
+ *
+ * **React attaches no custom element listener while hydrating.** Measured in
+ * Chrome against 19.2.8: on a server-rendered page every `onhelix-*` prop is
+ * dead, whatever it is called, until React commits an update for some other
+ * reason, at which point it silently starts working. That is why it looks fine
+ * while developing and fails on a page somebody actually loaded. It is React's
+ * own bug, filed as facebook/react#35446 and unfixed, and it is not something a
+ * consumer can be asked to work around per component.
+ *
+ * The handler is on the node the whole time: React stashes the props it is
+ * holding under a key of its own, hydration included. So the element reads it
+ * and binds it itself, immediately before announcing, which is late enough that
+ * hydration has certainly finished and early enough that this dispatch reaches
+ * the listener just added.
+ *
+ * **The raw prop function is bound, never a wrapper, and that is what makes it
+ * safe.** Two independent mechanisms stop it firing twice. If React has already
+ * bound this handler, `addEventListener` with the same type, callback and
+ * capture flag is a no-op by specification. And when React next commits, it
+ * removes the previous handler before attaching its own, which matches ours
+ * exactly, so ownership passes over cleanly. Measured across a commit: four
+ * dispatches, four calls.
+ *
+ * If React ever renames its key this finds nothing and does nothing, which
+ * returns the pre-hydration behavior rather than breaking anything.
+ *
+ * **Hyphenated names only.** A relayed native event keeps its native name and
+ * goes through React's synthetic system, which hydration does set up. `onChange`
+ * is React's to bind, and reaching for `onchange` here would put a second
+ * listener beside it.
+ */
+const bindReactHandler = (host: EventTarget, type: string): void => {
+  if (!type.includes('-')) {
+    return
+  }
+  const handler = reactPropsOf(host)?.[`on${type}`]
+  if (typeof handler === 'function') {
+    host.addEventListener(type, handler as EventListener)
+  }
+}
+
+/**
  * @summary Base class every Helix element extends.
  *
  * @description
@@ -88,6 +158,22 @@ export class HelixElement extends LitElement {
   constructor() {
     super()
     this.internals = this.attachInternals()
+  }
+
+  /**
+   * Announces an event, having first bound whatever React is holding for it.
+   *
+   * Every event this library sends passes through here, the concrete classes in
+   * `events.ts` and the relayed native ones alike, and `requestControlledChange`
+   * dispatches through the host as well. One override therefore covers all
+   * ninety-seven of them, which is the reason it is here rather than at each
+   * dispatch. See `bindReactHandler`.
+   *
+   * @internal
+   */
+  override dispatchEvent(event: Event): boolean {
+    bindReactHandler(this, event.type)
+    return super.dispatchEvent(event)
   }
 
   /**

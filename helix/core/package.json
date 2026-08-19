@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@fusion-io/testing": "workspace:*",
     "@helix-io/cem": "workspace:*",
     "lit": "^3.2.1"
   },

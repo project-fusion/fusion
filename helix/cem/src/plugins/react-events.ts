@@ -7,9 +7,16 @@ import { eachComponent } from '../types.js'
  * a custom element: it strips `on` and listens for exactly what is left. So
  * `helix-open` is `onhelix-open`.
  *
- * Measured against React 19.2.8. It stops at one hyphen: `onhelix-open` binds,
- * `onhelix-value-change` binds nothing at all, which is why no event here
- * carries two. `conventionLint` enforces that.
+ * Verbatim really is verbatim. `react-dom` slices `on` off the prop and hands
+ * the remainder to `addEventListener` without inspecting it, so the hyphens in
+ * a name are nothing to it: measured in Chrome against React 19.2.8, `ona-b-c-d`
+ * binds exactly as `onhelix-open` does.
+ *
+ * What no prop survives is hydration. React attaches no custom element listener
+ * while hydrating server-rendered markup, whatever it is called, until it
+ * commits an update for some other reason. That is React's own bug, filed as
+ * facebook/react#35446, and it is what an earlier reading here mistook for a
+ * limit on hyphens.
  */
 export const toReactProp = (eventName: string): string => `on${eventName}`
 

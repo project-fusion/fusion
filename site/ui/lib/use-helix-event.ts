@@ -5,12 +5,18 @@ import { type RefObject, useEffect, useRef, useState } from 'react'
 /**
  * Binds a Helix event to an element, without going through a React prop.
  *
- * **`onhelix-*` does not survive hydration.** React records the prop and
- * attaches no listener, so on a server-rendered page every Helix event handler
- * is dead: the element does its own job, the consumer's callback never runs,
- * and nothing is logged. It repairs itself the moment React commits an update
- * for any other reason, which is why it looks like it works while developing
- * and fails on a page someone actually loaded.
+ * **No longer required, as of 19 Aug 2026.** `HelixElement.dispatchEvent` now
+ * binds the handler React is holding on the node before it announces anything,
+ * so `onhelix-*` in plain JSX survives hydration on its own. This stays for the
+ * case below, where the element can change under a ref, and for anyone binding
+ * an event on something that is not a Helix element.
+ *
+ * **What it was written for: `onhelix-*` did not survive hydration.** React
+ * records the prop and attaches no listener, so on a server-rendered page every
+ * Helix event handler was dead: the element did its own job, the consumer's
+ * callback never ran, and nothing was logged. It repaired itself the moment
+ * React committed an update for any other reason, which is why it looked like it
+ * worked while developing and failed on a page someone actually loaded.
  *
  * Measured on the sandbox against React 19.2.8. Hydrated, a click on a file tab
  * moved the tab and left `pane` at its initial value, and dispatching the event

@@ -21,18 +21,24 @@
  * bare `input` from a `<helix-input>` is indistinguishable from the inner
  * control's own. Prefixed, it cannot be mistaken for either.
  *
- * The name also decides the framework prop, because the manifest derives one
- * from the other by stripping `helix-` and camel-casing: `helix-open` is
- * `onOpen`. Two consequences:
+ * The name also decides the framework prop, and decides it verbatim: React
+ * slices `on` off the prop and listens for exactly what is left, so `helix-open`
+ * is `onhelix-open`. Nothing strips the prefix and nothing camel-cases it, which
+ * is what leaves the prefix free to do the third job below.
  *
- * 1. **A verb React has claimed cannot be used.** React's synthetic system owns
- *    `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
- *    `focus` and `blur` on custom elements: a `helix-change` would strip to
- *    `onChange`, which React has already wired to the native `change`, so ours
- *    would never fire. That is why a value change is `helix-change`.
- * 2. **The rest are free.** `open`, `close`, `toggle`, `select`, `dismiss`,
- *    `navigate` and `remove` are all unclaimed on a custom element, which is
- *    what lets the verb-only form work everywhere else.
+ * The prefix earns its place three times over:
+ *
+ * 1. **Retargeting.** Stated above, and the reason it exists.
+ * 2. **React's claimed verbs.** Its synthetic system owns `change`, `input`,
+ *    `submit`, `copy`, `focus` and the rest, and a prop matching one of those
+ *    is wired to the native event. Prefixed, `onhelix-change` matches none of
+ *    them and reaches us.
+ * 3. **The type map below, which is global.** `HTMLElementEventMap` is shared
+ *    with every element in a consumer's application, and our classes extend
+ *    `Event`, so an entry named `select` does not fail to compile: it silently
+ *    retypes `textarea.addEventListener('select', …)` as carrying our detail,
+ *    which at runtime is `undefined`. Measured. An unprefixed name is not a
+ *    collision we would notice, it is one a consumer would.
  *
  * Propagation follows the event's role rather than a single house rule:
  *
@@ -148,10 +154,11 @@ export interface ChangeDetail {
 /**
  * Fired when a value changes on something that is not a native input.
  *
- * One hyphen, which is the limit of what React binds on a custom element.
- * `onhelix-change` reaches this; `onhelix-value-change`, which this was called,
- * reached nothing, because React stops at one hyphen and binds no event whose
- * name carries two.
+ * `helix-change` rather than the `helix-value-change` this was called. The
+ * rename was made on the belief that React binds no event whose name carries
+ * two hyphens, which is false: it binds them fine, measured in Chrome against
+ * 19.2.8. The shorter name stays for being shorter and for naming the thing
+ * rather than the thing's field, and not for the reason it was chosen.
  *
  * The prefix is what keeps it clear of the native `change`. A consumer writes
  * `onhelix-change` for this and `onChange` for a real input's own, and the two
@@ -399,25 +406,51 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
   }
 }
 
+/**
+ * Every event this file publishes, and the one place a new one is added.
+ *
+ * The map below is derived from this rather than written beside it. Kept by
+ * hand, the two drifted: `helix-filter` and `helix-navigate` were dispatched by
+ * the calendar, the listbox and the pagination and were missing from the map
+ * for weeks, so the one thing the augmentation exists to do was not done for
+ * them and a consumer writing `addEventListener('helix-navigate', …)` got
+ * `Event` and had to reach into `detail` through a cast. Nothing failed, which
+ * is why two of the nine went missing.
+ *
+ * Derived, a class that is in here is typed and a class that is not is absent
+ * from both halves at once, so the two cannot disagree. `check:events` fails
+ * the build on an exported event class left out of this object, which is the
+ * only step left that can be forgotten.
+ */
+const registry = {
+  HelixCaretEvent,
+  HelixChangeEvent,
+  HelixCloseEvent,
+  HelixCompleteEvent,
+  HelixConsoleEvent,
+  HelixCopyEvent,
+  HelixCreateEvent,
+  HelixDismissEvent,
+  HelixFilterEvent,
+  HelixNavigateEvent,
+  HelixOpenEvent,
+  HelixSelectEvent,
+} as const
+
+type Registry = typeof registry
+
+/**
+ * The registry keyed by what each class dispatches as.
+ *
+ * `eventName` is `static readonly` with no annotation, so TypeScript infers the
+ * string literal and it can be used as a key. That is also what makes the name
+ * on the class the single source of it: the map key, the dispatch and the
+ * listener all read the same declaration.
+ */
+type HelixEventMap = {
+  [K in keyof Registry as Registry[K]['eventName']]: InstanceType<Registry[K]>
+}
+
 declare global {
-  interface HTMLElementEventMap {
-    'helix-caret': HelixCaretEvent
-    'helix-change': HelixChangeEvent
-    'helix-close': HelixCloseEvent
-    'helix-complete': HelixCompleteEvent
-    'helix-console': HelixConsoleEvent
-    'helix-copy': HelixCopyEvent
-    'helix-create': HelixCreateEvent
-    'helix-dismiss': HelixDismissEvent
-    /* Both of these were declared as classes, dispatched by the calendar, the
-       listbox and now the pagination, and left out of here, so the one thing
-       this augmentation exists to do was not done for them: a consumer writing
-       `addEventListener('helix-navigate', …)` got `Event` and had to reach into
-       `detail` through a cast. Nothing fails when an entry is missing, which is
-       why two of the nine went missing. */
-    'helix-filter': HelixFilterEvent
-    'helix-navigate': HelixNavigateEvent
-    'helix-open': HelixOpenEvent
-    'helix-select': HelixSelectEvent
-  }
+  interface HTMLElementEventMap extends HelixEventMap {}
 }

@@ -1229,7 +1229,7 @@
         },
         {
           "kind": "class",
-          "description": "Fired when a value changes on something that is not a native input.\n\nOne hyphen, which is the limit of what React binds on a custom element.\n`onhelix-change` reaches this; `onhelix-value-change`, which this was called,\nreached nothing, because React stops at one hyphen and binds no event whose\nname carries two.\n\nThe prefix is what keeps it clear of the native `change`. A consumer writes\n`onhelix-change` for this and `onChange` for a real input's own, and the two\ncannot be confused for each other. A control wrapping a native input relays\nthat input's `change` under its own name as well.",
+          "description": "Fired when a value changes on something that is not a native input.\n\n`helix-change` rather than the `helix-value-change` this was called. The\nrename was made on the belief that React binds no event whose name carries\ntwo hyphens, which is false: it binds them fine, measured in Chrome against\n19.2.8. The shorter name stays for being shorter and for naming the thing\nrather than the thing's field, and not for the reason it was chosen.\n\nThe prefix is what keeps it clear of the native `change`. A consumer writes\n`onhelix-change` for this and `onChange` for a real input's own, and the two\ncannot be confused for each other. A control wrapping a native input relays\nthat input's `change` under its own name as well.",
           "name": "HelixChangeEvent",
           "members": [
             {

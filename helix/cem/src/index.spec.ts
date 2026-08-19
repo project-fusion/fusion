@@ -166,16 +166,20 @@ describe('conventionLint', () => {
     expect(lintOf({ events: [{ description: 'x', name: 'change' }] })).not.toThrow()
   })
 
-  // React strips `on` and listens for exactly what is left, and it stops at one
-  // hyphen. An event nobody can listen for from JSX is one nobody can use.
-  test('rejects an event name carrying two hyphens', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'helix-value-change' }] })).toThrow(
-      /bindable-events/,
-    )
-  })
+  /* `bindable-events` barred a second hyphen until 19 Aug 2026, on the grounds
+     that React binds no event whose name carries two. It binds them fine.
+     Measured in Chrome against React 19.2.8, `ona-b-c-d` binds exactly as
+     `onhelix-open` does, and `react-dom` slices `on` off the prop and hands
+     the remainder to `addEventListener` without inspecting it.
 
-  test('allows a single hyphen', () => {
-    expect(lintOf({ events: [{ description: 'x', name: 'helix-change' }] })).not.toThrow()
+     What the original reading caught was hydration. On a server-rendered page
+     React attaches no custom element listener at all, whatever it is called,
+     until it commits an update for some other reason, so which names appeared
+     to bind depended on what else was on the page. A rule was drawn through
+     noise. Web Awesome ships `wa-after-hide` and `wa-column-resize`, which is
+     the same finding from the other direction. */
+  test('allows an event name carrying two hyphens', () => {
+    expect(lintOf({ events: [{ description: 'x', name: 'helix-value-change' }] })).not.toThrow()
   })
 
   test('rejects an undocumented CSS part', () => {

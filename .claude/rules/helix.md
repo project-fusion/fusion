@@ -505,27 +505,35 @@ own. Prefixed, it can be mistaken for neither. PascalCase was proposed as a
 cheaper version of the same protection, on the grounds that every native name is
 lowercase; it is not wrong, and it was given up for the reason below.
 
-**At most one hyphen, and that is a measurement rather than a preference.**
-React binds a custom element's events from a prop, and a probe dispatching each
-candidate from a real element found that it stops at one: `onhelix-open` reaches
-`helix-open`, and `onhelix-value-change` binds nothing at all. `conventionLint`
-fails the build on a name carrying two.
+**Hyphens are not limited, and the rule that said so was wrong.** *Deleted 19
+Aug 2026.* `bindable-events` barred a second hyphen on the grounds that React
+binds no event whose name carries two. It binds them fine. Measured in Chrome
+against React 19.2.8, `ona-b-c-d` binds exactly as `onhelix-open` does, and
+`react-dom` slices `on` off the prop and hands the remainder to
+`addEventListener` without inspecting it. Web Awesome ships `wa-after-hide` and
+`wa-column-resize` to production, which is the same finding from outside.
 
-**Which verbs are usable was measured the same way.** React's synthetic system
-owns `change`, `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`,
-`focus` and `blur`, and a prop deriving from one of those is wired to the native
-event, so ours would never fire. `open`, `close`, `toggle`, `select`, `dismiss`,
-`navigate` and `remove` are free. That is why a value change is `helix-change`
-and the rest can be bare verbs, and the linter carries the measured list.
+**What the original probe caught was hydration, read as a fact about names.** On
+a server-rendered page React attaches no custom element listener at all,
+whatever it is called, until it commits an update for some other reason, so
+which names appeared to bind depended on what else was on the page. The earlier
+reading in `docs/09` had already contradicted itself once and said so. A rule
+drawn through noise survives exactly as long as nobody re-runs the probe, which
+is the argument for re-running it.
+
+**A verb React has claimed is reachable anyway, because of the prefix.** Its
+synthetic system owns `change`, `input`, `submit`, `copy`, `focus` and the rest,
+and a prop matching one of those is wired to the native event. Nothing strips
+our prefix, so `onhelix-change` matches none of them and arrives.
 
 **The same probe is what ended the PascalCase scheme.** Its argument was that
 React strips `on` from a prop and listens for the remainder verbatim, so
-`OpenChange` would be `onOpenChange`. Measured, React reserves *every* prop
-matching `on[A-Z]` for its own system and drops what it does not recognize,
-whether or not the element declares the property, so `onOpenChange` in raw JSX
-never reached the element and never had. A callback prop is a feature of the
-generated wrappers; the DOM event is the universal channel, and it needs a name
-a plain listener can use.
+`OpenChange` would be `onOpenChange`. It does listen for the remainder
+verbatim, and that is the problem: `onOpenChange` binds an event called
+`OpenChange`, which nothing dispatches. The prop is not dropped, and it is not
+assigned to the property of that name either, because React takes its `on`
+branch before reaching the one that would assign it. The DOM event is the
+universal channel, and it needs a name a plain listener can use.
 
 The type in braces is what lets the React generator emit
 `(event: HelixOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
@@ -546,21 +554,29 @@ consumer would guess simply does nothing.
 **Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
 React, and no React package: there is not one.
 
-**Bind Helix events with `addEventListener`, not a prop.** `onhelix-select` and
-its siblings do not survive hydration: React records the prop and attaches no
-listener, so on a server-rendered page the handler never runs. The element still
-does its own job, nothing is logged, and it repairs itself the moment React
-commits an update for any other reason. That last part is why it passes every
-casual check. Use `useHelixEvent` in `site/ui/lib`, which binds from an effect
-and therefore runs on hydration and on mount alike.
+**Bind Helix events with `onhelix-*`, and the element repairs the rest.**
+*Reversed 19 Aug 2026, which is the day it was written.* This read "bind with
+`addEventListener`, not a prop", because those props do not survive hydration:
+React records them, attaches no listener, and the handler never runs until React
+commits an update for some other reason. Nothing is logged and the element goes
+on doing its own job, which is why it passes every casual check. Before it was
+found, the sandbox's example tree and file tabs were dead on every fresh page
+load.
 
-Measured on the sandbox against React 19.2.8. Hydrated, a click on a file tab
-moved the tab and left the consumer's state untouched, and dispatching the event
-straight at the host reached nothing either, which is what distinguishes an
-absent listener from one that ignored the event. Navigating away and back so the
-same component *mounted* rather than hydrated, the first click worked. Before
-this was found, the sandbox's example tree and file tabs were dead on every
-fresh page load.
+The handler is on the node the whole time, under a key React stashes there, so
+`HelixElement.dispatchEvent` reads it and binds it immediately before
+announcing. It binds the **raw prop function**, which is what makes the handover
+safe: React adding the same handler again is a no-op by specification, and React
+removing it on its next commit matches ours exactly. Measured in Chrome against
+19.2.8 on a real hydrated page, four events produced four calls across a commit.
+See `bindReactHandler` for the whole argument.
+
+The bug underneath is React's, [facebook/react#35446](https://github.com/facebook/react/issues/35446),
+open since January 2026 with a proposed fix unmerged. When it lands this becomes
+dead weight and should go.
+
+`useHelixEvent` in `site/ui/lib` is no longer needed for hydration. It is still
+right where the element itself can change, which is what `useElementRef` is for.
 
 React's own events are unaffected: `onClick` on a `<helix-button>` goes through
 the synthetic system, which hydration does set up.
@@ -568,10 +584,12 @@ the synthetic system, which hydration does set up.
 **The prop form still decides event names**, because it is what a consumer
 reaches for first and what has to keep working once React fixes this.
 `onhelix-open` reaches `helix-open`; `onHelixOpen` binds an event called
-`HelixOpen` that nobody dispatches. **And it stops at one hyphen**:
-`onhelix-value-change` binds nothing at all, measured against the same version.
-Every Helix event name therefore carries at most one hyphen, and
-`conventionLint` fails the build on one that carries two.
+`HelixOpen` that nobody dispatches, and never reaches the property of that name
+either, because React takes the `on` branch before the one that would assign it.
+
+That last part is the whole of why `onCheckedChange` and its siblings do not
+work from JSX. They are not dropped: `addEventListener('CheckedChange', …)` is
+called, for an event nothing sends.
 
 **Register once, in a client component.** A custom element registers as a side
 effect of importing its module, and that import has to be in the client graph to

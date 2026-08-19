@@ -17,42 +17,41 @@ export default function Page() {
 Everything below is a trap that has actually cost time, rather than general
 advice.
 
-## Bind Helix events with `addEventListener`, not a prop
-
-`onhelix-select` and its siblings **do not survive hydration**. React records the
-prop and attaches no listener, so on a server-rendered page the handler never
-runs. The element still does its own job, nothing is logged, and it repairs
-itself the moment React commits an update for any other reason — which is why it
-passes every casual check.
-
-Use `useHelixEvent`, which binds from an effect and therefore runs on hydration
-and on mount alike.
+## Bind Helix events with `onhelix-*`
 
 ```tsx
-const tabs = useRef<HelixTabs>(null)
-useHelixEvent(tabs, 'helix-change', (event) => setPane(event.detail.value))
+<helix-tabs onhelix-change={(event) => setPane(event.detail.value)} />
 ```
 
-Measured against React 19.2.8: hydrated, a click on a file tab moved the tab and
-left the consumer's state untouched, and dispatching the event straight at the
-host reached nothing either — which is what distinguishes an absent listener
-from one that ignored the event. Navigating away and back so the component
-*mounted* rather than hydrated, the first click worked.
+There is a real bug underneath this, and the elements work around it for you.
+**React attaches no custom element listener while hydrating**, so on a
+server-rendered page every one of these props is dead until React commits an
+update for some other reason, at which point it silently starts working. Nothing
+is logged. It is [facebook/react#35446](https://github.com/facebook/react/issues/35446),
+open and unfixed.
+
+Every Helix element binds the handler itself, immediately before it announces
+anything, using the function React is already holding for it. Measured in Chrome
+against React 19.2.8: on a hydrated page the first event reaches the handler, and
+it is never delivered twice once React binds its own listener.
+
+Nothing is required of you, and nothing changes once React fixes it.
 
 React's own events are unaffected. `onClick` on a `<helix-button>` goes through
 the synthetic system, which hydration does set up.
 
-## Event names carry at most one hyphen
+## The prop is `on` and the event name, verbatim
 
-The prop form is what decides an event's name, because it is what a consumer
-reaches for first and what has to keep working once React fixes the above.
+React slices `on` off the prop and listens for exactly what is left, without
+inspecting it.
 
 - `onhelix-open` reaches `helix-open`. ✅
+- `onhelix-value-change` reaches `helix-value-change`. ✅
 - `onHelixOpen` binds an event called `HelixOpen`, which nobody dispatches. ❌
-- `onhelix-value-change` binds **nothing at all**. ❌
 
-Two hyphens is a hard stop, measured against the same version. Every Helix event
-name therefore carries at most one, and the build fails on one that carries two.
+The number of hyphens does not matter, measured in Chrome against React 19.2.8.
+An earlier version of this page said two were a hard stop; that was the
+hydration bug above, read as a fact about names.
 
 ## Register once, in a client component
 

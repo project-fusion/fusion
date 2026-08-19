@@ -176,18 +176,6 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             `${declaration.name}:${event.name}`,
             'Event names must be `helix-{verb}`, or a native name being relayed.',
           )
-          // React binds a custom event on a custom element by stripping `on`
-          // and listening for exactly what is left, and it stops at one hyphen:
-          // measured against 19.2.8, `onhelix-open` binds and
-          // `onhelix-value-change` binds nothing at all. An event nobody can
-          // listen for from JSX is one nobody can use.
-          check(
-            (event.name.match(/-/g) ?? []).length <= 1,
-            'bindable-events',
-            path,
-            `${declaration.name}:${event.name}`,
-            'At most one hyphen: React binds no event whose name carries two.',
-          )
         }
 
         for (const part of declaration.cssParts ?? []) {

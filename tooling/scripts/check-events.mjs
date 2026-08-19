@@ -63,6 +63,35 @@ if (names.size === 0) {
   process.exit(1)
 }
 
+/**
+ * Every event class reaches `HTMLElementEventMap`, and the registry is how.
+ *
+ * That augmentation is derived from `registry` rather than written beside it,
+ * so the map cannot disagree with the classes. What is left is one step a
+ * person can still forget: a class exported and dispatched and never added to
+ * the object. Forgotten, `addEventListener` types it as a bare `Event` and a
+ * consumer reaches `detail` through a cast, which is what happened to
+ * `helix-filter` and `helix-navigate` while the map was kept by hand.
+ */
+const registered = new Set(
+  (eventSource.match(/const registry = \{([\s\S]*?)\} as const/)?.[1] ?? '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean),
+)
+const unregistered = [...names.keys()].filter((cls) => !registered.has(cls))
+if (unregistered.length > 0) {
+  console.error(`Event classes missing from the registry in events.ts (${unregistered.length}):\n`)
+  for (const cls of unregistered) {
+    console.error(
+      `  ${cls} is exported and is not in \`registry\`, so \`HTMLElementEventMap\` does not carry ` +
+        'it. `addEventListener` types it as a bare `Event`, nothing fails, and a consumer reads ' +
+        '`detail` through a cast.\n',
+    )
+  }
+  process.exit(1)
+}
+
 const components = new Map()
 
 for (const tier of TIERS) {
