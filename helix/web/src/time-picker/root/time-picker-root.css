@@ -199,6 +199,15 @@
 [part="column"] [part="option"]::part(item) {
   min-block-size: var(--_time-row);
   min-inline-size: var(--_time-row);
+  /* No block padding, which Option gives every row so that a slotted avatar has
+     somewhere to sit. Here the label *is* the row's height, so four pixels above
+     and below make the row forty-eight while `--_time-row` still says forty, and
+     that number is read three times: by this rule, by the column height that is
+     five of them, and by the block padding that lets the first and last rows
+     reach the middle. The comment on `--_time-row` warns about exactly this
+     drift; measured with the padding left in, the row was 48 and a column of
+     "five" held 4.17. */
+  padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-md);
 }
 
@@ -213,21 +222,26 @@
  * So the row becomes the calendar's cell, carrying nothing, and the label
  * becomes its day. `min-inline-size` rather than a fixed one, because a day is
  * always one or two digits and a wheel also holds `AM`: fixed, the meridiem
- * clipped. Below the row height by the same gap the calendar leaves, so a
- * selected row does not touch the one above it. */
+ * clipped.
+ *
+ * The full row in both axes, where the calendar's day is inset within its cell.
+ * The inset exists there to keep two chosen days in a run from touching, and a
+ * wheel cannot have a run: it holds exactly one value per column, so there is
+ * never a second mark for this one to close a gap with. What is left is a
+ * forty pixel row with a twenty-eight pixel mark adrift in it. */
 [part="column"] [part="option"]::part(item) {
   background-color: transparent;
 }
 
 [part="column"] [part="option"]::part(label) {
   align-items: center;
-  block-size: calc(var(--_time-row) - var(--helix-space-sm));
+  block-size: var(--_time-row);
   /* `sm`, not `full`, which the calendar's own note argues: a pill is a shape
      for a word, and a grid of circles reads as beads rather than as numbers. */
   border-radius: var(--helix-radii-sm);
   display: inline-flex;
   justify-content: center;
-  min-inline-size: calc(var(--_time-row) - var(--helix-space-sm));
+  min-inline-size: var(--_time-row);
   padding-inline: var(--helix-space-2xs);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
