@@ -3432,10 +3432,20 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much visual weight the button carries.\n\n- `primary` is the one action a region is for, and there should be one. Two\n  primary buttons are two things claiming to be the most important, and the\n  reader has to work out which of you meant it.\n- `secondary` is an action that is real but not the point, which is most\n  buttons on most pages. A page whose every button is primary has said\n  nothing about which one matters.\n- `tertiary` is quiet enough to sit in a row of them without the row\n  becoming loud: for actions that are available rather than suggested.\n  Cancel, dismiss, the contents of a toolbar.\n- `danger` says the action is destructive before the confirmation does. The\n  shape of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThis is also where emphasis comes from, rather than size: a filled primary\nbutton says \"this one matters\" far louder than eight more pixels would.",
+              "description": "How much of its colour the button wears, which is how much it matters.\n\n- `outlined` is the resting state and is never written: a line, a hairline\n  wash inside it, and the label in the tone's own ink. Most buttons on most\n  pages are this, and a page whose every button is filled has said nothing\n  about which one matters.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  action a region is for. There should be one.\n- `subtle` is the tone as a wash with no line, for a button that should\n  read as coloured without reading as the thing to press.\n- `ghost` is the label alone until a pointer is over it: for actions that\n  are available rather than suggested. Cancel, dismiss, a toolbar.\n\nThis is where emphasis comes from, rather than size: a filled button says\n\"this one matters\" far louder than eight more pixels would.\n\n**Independent of `tone`, which is the point of there being two.** Until\nthese were split, colour and fill were welded together as `primary`,\n`secondary`, `tertiary` and `danger`: three of those are a rank and the\nfourth is a meaning, so an outlined Delete and a Delete in a menu row could\nnot be written at all, and neither could a filled neutral. `Tag` reached\nthe same conclusion first and its note carries the longer argument.",
               "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -3444,7 +3454,7 @@
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"primary\" data-button-fill=\"standard\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "attribute": "fill",
               "reflects": true
             },
@@ -3794,17 +3804,25 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much visual weight the button carries.\n\n- `primary` is the one action a region is for, and there should be one. Two\n  primary buttons are two things claiming to be the most important, and the\n  reader has to work out which of you meant it.\n- `secondary` is an action that is real but not the point, which is most\n  buttons on most pages. A page whose every button is primary has said\n  nothing about which one matters.\n- `tertiary` is quiet enough to sit in a row of them without the row\n  becoming loud: for actions that are available rather than suggested.\n  Cancel, dismiss, the contents of a toolbar.\n- `danger` says the action is destructive before the confirmation does. The\n  shape of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThis is also where emphasis comes from, rather than size: a filled primary\nbutton says \"this one matters\" far louder than eight more pixels would.",
+              "description": "How much of its colour the button wears, which is how much it matters.\n\n- `outlined` is the resting state and is never written: a line, a hairline\n  wash inside it, and the label in the tone's own ink. Most buttons on most\n  pages are this, and a page whose every button is filled has said nothing\n  about which one matters.\n- `solid` fills with the tone and puts the label on top of it, for the one\n  action a region is for. There should be one.\n- `subtle` is the tone as a wash with no line, for a button that should\n  read as coloured without reading as the thing to press.\n- `ghost` is the label alone until a pointer is over it: for actions that\n  are available rather than suggested. Cancel, dismiss, a toolbar.\n\nThis is where emphasis comes from, rather than size: a filled button says\n\"this one matters\" far louder than eight more pixels would.\n\n**Independent of `tone`, which is the point of there being two.** Until\nthese were split, colour and fill were welded together as `primary`,\n`secondary`, `tertiary` and `danger`: three of those are a rank and the\nfourth is a meaning, so an outlined Delete and a Delete in a menu row could\nnot be written at all, and neither could a filled neutral. `Tag` reached\nthe same conclusion first and its note carries the longer argument.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
+              "fieldName": "tone"
             },
             {
               "name": "fill",
               "type": {
                 "text": "'auto' | 'full' | 'standard' | undefined"
               },
-              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"primary\" data-button-fill=\"standard\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
+              "description": "How much of the space available to it the button takes.\n\n- `auto` is the default and is never written: the button is as wide as its\n  label, which is what a control in a toolbar or beside a field should be.\n- `standard` is one width for every button that takes it, so a column or\n  row of actions lines up instead of following the length of each word.\n- `full` fills the container, for a single action at the foot of a form or\n  a card, and on a phone where a control is a target before it is a label.\n\nWidth and not weight. `appearance` says how much a button matters and this\nsays how much room it takes, and the two are independent: a `tertiary\nstandard` Cancel beside a `primary standard` Save is exactly the pairing\na dialog wants.\n\n**A consumer's own anchor takes it as `data-button-fill`**, the way it\ntakes the appearance as `data-button`:\n\n```html\n<a data-button=\"solid\" data-button-fill=\"standard\" data-button-tone=\"primary\" href=\"/save\">Save</a>\n```\n\nBoth are one declaration in the base layer. They were not, and that was a\nreal gap rather than a missing convenience: this class promises a link\nstyled as a button and a real button are indistinguishable, and a dialog's\nbutton row is built on `standard`, so the one place the promise mattered\nmost was the one place it did not hold.",
               "fieldName": "fill"
             },
             {
@@ -3904,25 +3922,17 @@
                 "slug": "default"
               },
               {
-                "slug": "as-link"
+                "description": "Every fill against every tone.",
+                "slug": "appearances"
               },
               {
-                "slug": "danger"
+                "slug": "as-link"
               },
               {
                 "slug": "disabled"
               },
               {
                 "slug": "fill"
-              },
-              {
-                "slug": "primary"
-              },
-              {
-                "slug": "secondary"
-              },
-              {
-                "slug": "tertiary"
               },
               {
                 "slug": "width"
@@ -20652,10 +20662,20 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much visual weight the button carries.",
+              "description": "How much of its colour the button wears. See `Button` for the full note.\n\n`ghost` is the resting state here rather than `outlined`, and is never\nwritten: a toolbar of framed squares is a toolbar of boxes.",
               "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What the button means, which decides its colour and nothing else.",
+              "attribute": "tone",
               "reflects": true
             },
             {
@@ -21004,10 +21024,18 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | undefined"
+                "text": "'ghost' | 'outlined' | 'solid' | 'subtle' | undefined"
               },
-              "description": "How much visual weight the button carries.",
+              "description": "How much of its colour the button wears. See `Button` for the full note.\n\n`ghost` is the resting state here rather than `outlined`, and is never\nwritten: a toolbar of framed squares is a toolbar of boxes.",
               "fieldName": "appearance"
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'neutral' | 'primary' | undefined"
+              },
+              "description": "What the button means, which decides its colour and nothing else.",
+              "fieldName": "tone"
             },
             {
               "name": "type",
@@ -21110,6 +21138,7 @@
                 "slug": "default"
               },
               {
+                "description": "Every fill against every tone.",
                 "slug": "appearances"
               }
             ],

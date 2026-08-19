@@ -71,7 +71,7 @@ export default function Home() {
             that makes that practical.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <Link data-button="primary" href="/design">
+            <Link data-button="solid" data-button-tone="primary" href="/design">
               See what is shipping
             </Link>
             <a data-button href="mailto:hello@fusion.dev">
@@ -220,7 +220,12 @@ export default function Home() {
             that is what you need, say so plainly and we will tell you whether we are the right
             people.
           </helix-text>
-          <a data-button="primary" data-density="lg" href="mailto:hello@fusion.dev">
+          <a
+            data-button="solid"
+            data-button-tone="primary"
+            data-density="lg"
+            href="mailto:hello@fusion.dev"
+          >
             hello@fusion.dev
           </a>
         </helix-flex>

@@ -479,7 +479,7 @@ ring is declared here rather than inherited, because the base layer's
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| undefined` | - | - | How much visual weight the button carries. |
+| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of its colour the button wears, which is how much it matters. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -492,6 +492,7 @@ ring is declared here rather than inherited, because the base layer's
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 
 #### Methods
@@ -2069,7 +2070,7 @@ common way a toolbar becomes unusable without sight.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| undefined` | - | - | How much visual weight the button carries. |
+| `appearance` | `appearance` | `'ghost' \| 'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of its colour the button wears. See `Button` for the full note. |
 | `command` | `command` | `string` | `''` | `HelixBaseButton` | What to send when the button is activated, and what to send it to. |
 | `commandFor` | `commandfor` | `string` | `''` | `HelixBaseButton` | The id of the element the command is sent to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -2081,6 +2082,7 @@ common way a toolbar becomes unusable without sight.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 
 #### Methods

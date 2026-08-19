@@ -31,9 +31,18 @@ import { styles } from './icon-button-root.css.js'
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends HelixBaseIconButton {
-  /** How much visual weight the button carries. */
+  /**
+   * How much of its colour the button wears. See `Button` for the full note.
+   *
+   * `ghost` is the resting state here rather than `outlined`, and is never
+   * written: a toolbar of framed squares is a toolbar of boxes.
+   */
   @property({ reflect: true })
-  appearance?: 'primary' | 'secondary' | 'tertiary' | 'danger'
+  appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
+
+  /** What the button means, which decides its colour and nothing else. */
+  @property({ reflect: true })
+  tone?: 'danger' | 'neutral' | 'primary'
 
   static override styles: CSSResultGroup = styles
 }

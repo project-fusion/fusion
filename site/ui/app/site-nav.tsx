@@ -100,7 +100,7 @@ export function SiteNav() {
         </helix-tooltip>
 
         {narrow && (
-          <helix-button appearance="tertiary" onClick={() => setOpen(true)} slot="end">
+          <helix-button appearance="ghost" onClick={() => setOpen(true)} slot="end">
             Menu
           </helix-button>
         )}
@@ -121,7 +121,12 @@ export function SiteNav() {
               {vertical.label}
             </a>
           ))}
-          <a data-button="primary" data-density="lg" href="mailto:hello@fusion.dev">
+          <a
+            data-button="solid"
+            data-button-tone="primary"
+            data-density="lg"
+            href="mailto:hello@fusion.dev"
+          >
             Get in touch
           </a>
         </helix-flex>

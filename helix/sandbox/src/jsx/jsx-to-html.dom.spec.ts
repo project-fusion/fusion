@@ -64,7 +64,7 @@ describe('the two directions agree', () => {
   // The guarantee that matters: the file on screen is the file that runs, so
   // markup turned into JSX and back has to be the markup it started as.
   const examples = [
-    '<helix-button appearance="primary">Go</helix-button>',
+    '<helix-button appearance="solid" tone="primary">Go</helix-button>',
     '<helix-badge label="Online" style="--badge-offset: 0.25rem">\n  <helix-avatar name="A B" size="lg"></helix-avatar>\n</helix-badge>',
     '<helix-checkbox default-checked disabled name="a">Checked</helix-checkbox>',
     '<helix-date-picker disable-days="0,6" first-day-of-week="1"></helix-date-picker>',

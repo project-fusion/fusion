@@ -4,7 +4,7 @@
   <helix-sandbox-toolbar slot="toolbar">
     <helix-tag>index.html</helix-tag>
     <helix-button
-      appearance="tertiary"
+      appearance="ghost"
       slot="end"
     >Reset</helix-button>
   </helix-sandbox-toolbar>
@@ -19,7 +19,10 @@
        an example has no document to point one at, so what would show is an
        empty frame. -->
   <div slot="preview">
-    <helix-button appearance="primary">Save</helix-button>
+    <helix-button
+      appearance="solid"
+      tone="primary"
+    >Save</helix-button>
   </div>
 
   <helix-sandbox-status-bar slot="status">

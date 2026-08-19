@@ -83,7 +83,10 @@ stretch-aligned parent does to its children:
 
 ```html
 <helix-flex direction="column">
-  <helix-button appearance="primary">Fills its column</helix-button>
+  <helix-button
+    appearance="solid"
+    tone="primary"
+  >Fills its column</helix-button>
 </helix-flex>
 ```
 
@@ -96,10 +99,7 @@ To make one hug its label instead, tell the layout:
 ```
 
 ```html
-<helix-button
-  appearance="secondary"
-  class="hug"
->Hugs its label</helix-button>
+<helix-button class="hug">Hugs its label</helix-button>
 ```
 
 That is the whole of it, and it is worth saying out loud because the default

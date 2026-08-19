@@ -10,7 +10,7 @@
  * component in the repo composed a button, which read as taste and was a wall.
  *
  * So the component owns its presentation and the base layer keeps the recipe,
- * which is what the recipe was always for: `<Link data-button="primary">` is a
+ * which is what the recipe was always for: `<Link data-button="solid">` is a
  * router's own anchor, a thing this element cannot render, and it needs those
  * declarations written for the light DOM. The two now say the same thing twice,
  * deliberately, in the two places they have to be said.
@@ -22,6 +22,58 @@
  */
 :host {
   display: inline-flex;
+}
+
+/* Two axes, and the colour is the one the appearances read.
+ *
+ * `appearance` is the fill (solid, outlined, subtle, ghost) and `tone` is what
+ * the button means (neutral, primary, danger). They were one property, and it
+ * held a rank ladder with a colour wedged into it: `primary`, `secondary` and
+ * `tertiary` say how much a button matters, and `danger` says what it does. So
+ * there was no way to write an outlined Delete or a Delete in a menu row, which
+ * are the two commonest destructive buttons there are, and no way to write a
+ * filled neutral. `Tag` made this same split first and its note carries the
+ * argument.
+ *
+ * Every appearance below is written once against these four, so a tone is four
+ * declarations rather than four rules, and adding one is one block.
+ *
+ * The neutral values are chosen so the resting button does not move: neutral's
+ * tone *is* the foreground, so the outlined wash below resolves to the same 6%
+ * of the foreground the old `secondary` had, and ghost's hover to the same 8%
+ * the old `tertiary` had. */
+:host {
+  --_button-edge: var(--helix-color-border);
+  --_button-on-tone: var(--helix-color-background);
+  --_button-tone: var(--helix-color-foreground);
+  /* Softened toward the page rather than deepened, because neutral's tone is
+     already the darkest ink there is and there is nothing past it to go to. */
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 86%,
+    var(--helix-color-background)
+  );
+}
+
+:host([tone="primary"]) {
+  --_button-edge: var(--helix-color-primary);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-primary);
+  --_button-tone-hover: var(--helix-color-primary-hover);
+}
+
+:host([tone="danger"]) {
+  --_button-edge: var(--helix-color-danger);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-danger);
+  /* No `danger-hover` token exists, and inventing one for a single consumer is
+     a token nobody else would ever read. Mixed toward the ink, which deepens it
+     in light mode and in dark alike. */
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-danger) 86%,
+    var(--helix-color-foreground)
+  );
 }
 
 /* `all: unset` first, so the UA's own button styling is gone before anything
@@ -45,12 +97,12 @@
    * six points of a wash separates them only by degree. */
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+    color-mix(in oklab, var(--_button-tone) 6%, transparent)
   );
   block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-thin) solid var(--_button-edge);
   box-sizing: border-box;
-  color: var(--button-foreground-color, var(--helix-color-foreground));
+  color: var(--button-foreground-color, var(--_button-tone));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -104,7 +156,7 @@
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+    color-mix(in oklab, var(--_button-tone) 12%, transparent)
   );
 }
 
@@ -113,44 +165,69 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-:host([appearance="primary"]) [part="button"] {
-  background-color: var(--button-background-color, var(--helix-color-primary));
+/* The three departures from it. `outlined` is the resting state and needs no
+ * rule: written out, it selects nothing and lands on the block above, which is
+ * how `orientation` and `chevron-placement` already work.
+ *
+ * **Every one of them names its own hover, including the ones whose fill does
+ * not change.** The generic hover above is `:host(:not(:disabled))
+ * [part="button"]:hover`, four class-equivalents, and an appearance rule is
+ * three, so without a hover of its own an appearance loses its fill the moment
+ * a pointer touches it. Measured on the old `danger`, which had no hover rule:
+ * a red button that turned neutral grey under the pointer, in every build since
+ * it was written. */
+:host([appearance="solid"]) [part="button"] {
+  background-color: var(--button-background-color, var(--_button-tone));
   border-color: transparent;
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
+  color: var(--button-foreground-color, var(--_button-on-tone));
 }
 
-:host(:not(:disabled)[appearance="primary"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--helix-color-primary-hover));
+:host(:not(:disabled)[appearance="solid"]) [part="button"]:hover {
+  background-color: var(--button-background-color, var(--_button-tone-hover));
   border-color: transparent;
 }
 
-:host([appearance="tertiary"]) [part="button"] {
+/* A wash with no line, for a button that should read as coloured without
+   reading as the one thing to press. */
+:host([appearance="subtle"]) [part="button"] {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 14%, transparent)
+  );
+  border-color: transparent;
+  color: var(--button-foreground-color, var(--_button-tone));
+}
+
+:host(:not(:disabled)[appearance="subtle"]) [part="button"]:hover {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 22%, transparent)
+  );
+  border-color: transparent;
+}
+
+:host([appearance="ghost"]) [part="button"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
+  color: var(--button-foreground-color, var(--_button-tone));
 }
 
-/* A wash of the foreground, not a fixed surface.
+/* A wash of the tone, not a fixed surface.
  *
  * `--helix-color-surface-sunken` is an absolute value, and every one of these
- * sits on a surface whose own lightness is not. Measured on a tertiary button
+ * sits on a surface whose own lightness is not. Measured on a ghost button
  * inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
  * `oklch(0.29)`, so the hover was a 1.39 step darker than the surface it was on,
  * which on a raised panel reads as a hole rather than as a press. On the page,
  * where the token was chosen, the step is 1.11 and correct. A translucent mix
  * composites against whatever is behind it, so one value is right on every
  * surface and there is nothing to keep in sync. */
-:host(:not(:disabled)[appearance="tertiary"]) [part="button"]:hover {
+:host(:not(:disabled)[appearance="ghost"]) [part="button"]:hover {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    color-mix(in oklab, var(--_button-tone) 8%, transparent)
   );
   border-color: transparent;
-}
-
-:host([appearance="danger"]) [part="button"] {
-  background-color: var(--button-background-color, var(--helix-color-danger));
-  border-color: transparent;
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
 /* How much of the room available to it the button takes. On the host, since the

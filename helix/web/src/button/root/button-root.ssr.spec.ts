@@ -32,7 +32,7 @@ describe('button server output', () => {
     // recipe so one declaration serves this control and a consumer's own
     // anchor. What ships in the shadow root is what a document rule cannot
     // reach, which is why the focus ring is the thing to assert on here.
-    const markup = ssr(html`<helix-button appearance="primary">Go</helix-button>`)
+    const markup = ssr(html`<helix-button appearance="solid" tone="primary">Go</helix-button>`)
     expect(markup).toContain('shadowrootmode="open"')
     expect(markup).toContain('--helix-color-focus-ring')
   })

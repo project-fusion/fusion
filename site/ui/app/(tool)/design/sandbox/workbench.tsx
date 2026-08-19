@@ -796,7 +796,7 @@ export function SandboxWorkbench({ families }: Props) {
             is missing. */}
         <helix-tooltip content={allOpen ? 'Collapse all' : 'Expand all'} placement="bottom">
           <helix-icon-button
-            appearance="secondary"
+            appearance="outlined"
             label={allOpen ? 'Collapse all' : 'Expand all'}
             onClick={toggleAll}
           >
@@ -871,7 +871,7 @@ export function SandboxWorkbench({ families }: Props) {
             settings are in its toolbar. */}
         <helix-flex align="center" gap="2xs" slot="end">
           {narrow && (
-            <helix-button appearance="tertiary" onClick={() => setRailOpen(true)}>
+            <helix-button appearance="ghost" onClick={() => setRailOpen(true)}>
               Examples
             </helix-button>
           )}
@@ -1152,7 +1152,7 @@ export function SandboxWorkbench({ families }: Props) {
             You have edited this example.
             <helix-flex gap="sm" slot="footer">
               <helix-button
-                appearance="primary"
+                appearance="solid"
                 fill="standard"
                 onClick={() => {
                   const next = pendingSyntax
@@ -1161,14 +1161,11 @@ export function SandboxWorkbench({ families }: Props) {
                     applySyntax(next)
                   }
                 }}
+                tone="primary"
               >
                 Change anyway
               </helix-button>
-              <helix-button
-                appearance="secondary"
-                fill="standard"
-                onClick={() => setPendingSyntax(null)}
-              >
+              <helix-button fill="standard" onClick={() => setPendingSyntax(null)}>
                 Keep editing
               </helix-button>
             </helix-flex>

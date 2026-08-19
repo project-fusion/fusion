@@ -1,25 +1,53 @@
-<helix-icon-button
-  appearance="primary"
-  label="Confirm"
+<!-- @summary Every fill against every tone. -->
+<helix-flex
+  direction="column"
+  gap="md"
 >
-  <helix-icon name="check"></helix-icon>
-</helix-icon-button>
-<helix-icon-button
-  appearance="danger"
-  label="Delete"
->
-  <helix-icon name="trash"></helix-icon>
-</helix-icon-button>
-<helix-icon-button
-  appearance="secondary"
-  label="Notes"
->
-  <helix-icon name="notebook"></helix-icon>
-</helix-icon-button>
-<helix-icon-button
-  appearance="tertiary"
-  disabled
-  label="Unavailable"
->
-  <helix-icon name="x"></helix-icon>
-</helix-icon-button>
+  <helix-flex gap="sm">
+    <helix-icon-button label="Confirm">
+      <helix-icon name="check"></helix-icon>
+    </helix-icon-button>
+    <helix-icon-button
+      label="Confirm"
+      tone="primary"
+    >
+      <helix-icon name="check"></helix-icon>
+    </helix-icon-button>
+    <helix-icon-button
+      label="Delete"
+      tone="danger"
+    >
+      <helix-icon name="trash"></helix-icon>
+    </helix-icon-button>
+  </helix-flex>
+
+  <helix-flex gap="sm">
+    <helix-icon-button
+      appearance="outlined"
+      label="Notes"
+    >
+      <helix-icon name="notebook"></helix-icon>
+    </helix-icon-button>
+    <helix-icon-button
+      appearance="solid"
+      label="Confirm"
+      tone="primary"
+    >
+      <helix-icon name="check"></helix-icon>
+    </helix-icon-button>
+    <helix-icon-button
+      appearance="subtle"
+      label="Delete"
+      tone="danger"
+    >
+      <helix-icon name="trash"></helix-icon>
+    </helix-icon-button>
+  </helix-flex>
+
+  <helix-icon-button
+    disabled
+    label="Unavailable"
+  >
+    <helix-icon name="x"></helix-icon>
+  </helix-icon-button>
+</helix-flex>

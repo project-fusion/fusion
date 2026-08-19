@@ -37,26 +37,49 @@ import { styles } from './button-root.css.js'
 @customElement('helix-button')
 export class HelixButton extends HelixBaseButton {
   /**
-   * How much visual weight the button carries.
+   * How much of its colour the button wears, which is how much it matters.
    *
-   * - `primary` is the one action a region is for, and there should be one. Two
-   *   primary buttons are two things claiming to be the most important, and the
-   *   reader has to work out which of you meant it.
-   * - `secondary` is an action that is real but not the point, which is most
-   *   buttons on most pages. A page whose every button is primary has said
-   *   nothing about which one matters.
-   * - `tertiary` is quiet enough to sit in a row of them without the row
-   *   becoming loud: for actions that are available rather than suggested.
-   *   Cancel, dismiss, the contents of a toolbar.
-   * - `danger` says the action is destructive before the confirmation does. The
-   *   shape of the control is what a reader recognizes at a glance, where a red
-   *   word inside a neutral button is something they have to read first.
+   * - `outlined` is the resting state and is never written: a line, a hairline
+   *   wash inside it, and the label in the tone's own ink. Most buttons on most
+   *   pages are this, and a page whose every button is filled has said nothing
+   *   about which one matters.
+   * - `solid` fills with the tone and puts the label on top of it, for the one
+   *   action a region is for. There should be one.
+   * - `subtle` is the tone as a wash with no line, for a button that should
+   *   read as coloured without reading as the thing to press.
+   * - `ghost` is the label alone until a pointer is over it: for actions that
+   *   are available rather than suggested. Cancel, dismiss, a toolbar.
    *
-   * This is also where emphasis comes from, rather than size: a filled primary
-   * button says "this one matters" far louder than eight more pixels would.
+   * This is where emphasis comes from, rather than size: a filled button says
+   * "this one matters" far louder than eight more pixels would.
+   *
+   * **Independent of `tone`, which is the point of there being two.** Until
+   * these were split, colour and fill were welded together as `primary`,
+   * `secondary`, `tertiary` and `danger`: three of those are a rank and the
+   * fourth is a meaning, so an outlined Delete and a Delete in a menu row could
+   * not be written at all, and neither could a filled neutral. `Tag` reached
+   * the same conclusion first and its note carries the longer argument.
    */
   @property({ reflect: true })
-  appearance?: 'primary' | 'secondary' | 'tertiary' | 'danger'
+  appearance?: 'ghost' | 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * What the button means, which decides its colour and nothing else.
+   *
+   * - `neutral` is the resting state and is never written. The button is drawn
+   *   in the page's own ink.
+   * - `primary` is the brand colour, for the action a region is about.
+   * - `danger` says the action is destructive before the confirmation does. The
+   *   colour of the control is what a reader recognizes at a glance, where a red
+   *   word inside a neutral button is something they have to read first.
+   *
+   * Three and not six. `Tag` carries the full status set because a tag reports
+   * a state, and a button performs an action: a success button and a warning
+   * button are not things anybody writes, and offering them invites a page
+   * where the colour of a control means nothing in particular.
+   */
+  @property({ reflect: true })
+  tone?: 'danger' | 'neutral' | 'primary'
 
   /**
    * How much of the space available to it the button takes.
@@ -77,7 +100,7 @@ export class HelixButton extends HelixBaseButton {
    * takes the appearance as `data-button`:
    *
    * ```html
-   * <a data-button="primary" data-button-fill="standard" href="/save">Save</a>
+   * <a data-button="solid" data-button-fill="standard" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
    * Both are one declaration in the base layer. They were not, and that was a

@@ -326,7 +326,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                     ref is this site's to choose, which is what lets a versioned
                     reference point at the source it documents instead of at
                     whatever `main` holds when it is read. */}
-                <a data-button="secondary" href={source} rel="noreferrer" target="_blank">
+                <a data-button="" href={source} rel="noreferrer" target="_blank">
                   View Source
                 </a>
                 <helix-menu label="Document actions">
@@ -337,7 +337,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                       resolves from Phosphor at build time. */}
                   {/* `secondary`, the same as View Source beside it. The two
                       are one row of controls and were two appearances. */}
-                  <helix-icon-button appearance="secondary" label="More" slot="trigger">
+                  <helix-icon-button appearance="outlined" label="More" slot="trigger">
                     <helix-icon name="dots-three-vertical"></helix-icon>
                   </helix-icon-button>
                   <helix-menu-item value="view-sandbox">View in Sandbox</helix-menu-item>

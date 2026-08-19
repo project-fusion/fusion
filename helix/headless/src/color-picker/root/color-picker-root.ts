@@ -468,7 +468,6 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                   this.sampling && !this.noEyedropper
                     ? html`<helix-button
                         part="eyedropper"
-                        appearance="secondary"
                         aria-label="Sample a color from the screen"
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
@@ -482,7 +481,6 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                     ? nothing
                     : html`<helix-button
                         part="format"
-                        appearance="secondary"
                         aria-label=${`Syntax: ${this.format}. Change it.`}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}

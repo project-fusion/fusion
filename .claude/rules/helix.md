@@ -267,13 +267,38 @@ Lit's server shim does, so the gap is the test double's alone and the fix
 belongs there. A guard in `HelixFormElement` would make production code
 defensive about a capability every browser has, and swallow a real failure.
 
+## Appearance is the treatment, tone is the meaning
+
+**Two properties, never one.** `appearance` is how a thing is drawn (`solid`,
+`outlined`, `subtle`, `ghost`; `elevated`, `plain`, `card` where those fit) and
+`tone` is what it means (`neutral`, `primary`, `danger`, and the status set on
+anything that reports a status).
+
+`Tag` found this first and `Button` followed it 19 Aug 2026. Button held
+`primary`, `secondary`, `tertiary` and `danger` on one property: the first three
+are a rank and the fourth is a meaning, so an outlined Delete and a Delete in a
+menu row could not be written at all, and neither could a filled neutral. The
+same test applies to anything new: *can two of these values be true at once?* If
+yes they are two axes, whatever the count of combinations looks like.
+
+**The resting state is the absence of both**, per the reflected-property rule
+above: `outlined` on Button, `ghost` on IconButton, and `neutral` everywhere.
+Written out, those values select nothing and land on the base rule.
+
+**Every appearance names its own hover.** A generic
+`:host(:not(:disabled)) [part="button"]:hover` is four class-equivalents and an
+appearance rule is three, so an appearance without a hover of its own loses its
+fill the moment a pointer touches it. Measured on the old `danger`, which had no
+hover rule and turned neutral grey under the pointer in every build since it was
+written.
+
 ## Size and density
 
 **A control has no size. It takes its height from the region it is in.**
 
 ```html
 <helix-flex data-density="lg">
-  <helix-button appearance="primary">See what is shipping</helix-button>
+  <helix-button appearance="solid" tone="primary">See what is shipping</helix-button>
 </helix-flex>
 ```
 
@@ -281,8 +306,8 @@ The reasoning, because the conclusion looks like a restriction and is not. Size
 gets asked to do three jobs at once, and only one of them belongs to the
 control:
 
-- **Emphasis.** `appearance` carries it. A filled primary button says "this one
-  matters" far louder than eight more pixels.
+- **Emphasis.** `appearance` carries it. A filled button says "this one matters"
+  far louder than eight more pixels.
 - **Fit.** A fact about the region: a toolbar is tight, a hero is spacious, a
   table row is tighter still.
 - **Optical role.** Real, and only for things that are not controls. An avatar

@@ -146,7 +146,7 @@ export class HelixBaseStep extends HelixElement {
       <span part="body">
         <helix-button
           part="label"
-          appearance="tertiary"
+          appearance="ghost"
           ?disabled=${this.disabled}
           @click=${this.select}
         >

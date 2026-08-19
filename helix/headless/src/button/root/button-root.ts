@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
  * intercept a click and cannot render one inside this shadow root, so a button
  * that could also be a link forced every such navigation to be a full page
  * load. A link that looks like a button is styling rather than behavior, so it
- * is a recipe in the base layer: `<Link data-button="primary">` is the same
+ * is a recipe in the base layer: `<Link data-button="solid">` is the same
  * control, and the consumer keeps their anchor.
  *
  * `delegatesFocus` puts focus on the inner control, and it serializes into the

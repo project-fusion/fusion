@@ -393,7 +393,7 @@ helix-text[tone="danger"] {
 
 /* The button recipe, for elements this library does not render.
  *
- * `<Link data-button="primary">` is a router's own anchor, and `Button` renders
+ * `<Link data-button="solid">` is a router's own anchor, and `Button` renders
  * no anchor because a router cannot render one inside a shadow root. So the
  * declarations have to exist for the light DOM, and this is where they live.
  *
@@ -417,7 +417,21 @@ helix-text[tone="danger"] {
  * hook as well. A consumer who names an exact color and then watches it change
  * under the pointer has been given a hook that half works.
  */
+/* Two axes here as well, `data-button` for the fill and `data-button-tone` for
+ * the colour, matching the component exactly. `data-button-tone` rather than a
+ * bare `data-tone` follows `data-button-fill`: a second axis on a recipe carries
+ * the recipe's name, and it cannot ride in the `data-button` value either,
+ * because that value is the appearance and the rules below match it exactly. */
 [data-button] {
+  --_button-edge: var(--helix-color-border);
+  --_button-on-tone: var(--helix-color-background);
+  --_button-tone: var(--helix-color-foreground);
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 86%,
+    var(--helix-color-background)
+  );
+
   align-items: center;
   /* A wash of the foreground, inside a hairline.
    *
@@ -443,12 +457,12 @@ helix-text[tone="danger"] {
    * the seams measured -1.0px before and after and no edge is drawn twice. */
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+    color-mix(in oklab, var(--_button-tone) 6%, transparent)
   );
   block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-thin) solid var(--_button-edge);
   border-radius: var(--button-radii, var(--helix-radii-sm));
-  color: var(--button-foreground-color, var(--helix-color-foreground));
+  color: var(--button-foreground-color, var(--_button-tone));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -467,11 +481,29 @@ helix-text[tone="danger"] {
   white-space: nowrap;
 }
 
+[data-button][data-button-tone="primary"] {
+  --_button-edge: var(--helix-color-primary);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-primary);
+  --_button-tone-hover: var(--helix-color-primary-hover);
+}
+
+[data-button][data-button-tone="danger"] {
+  --_button-edge: var(--helix-color-danger);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-danger);
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-danger) 86%,
+    var(--helix-color-foreground)
+  );
+}
+
 /* Hover deepens the wash rather than drawing a line that was not there. */
 [data-button]:not(:disabled):hover {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+    color-mix(in oklab, var(--_button-tone) 12%, transparent)
   );
 }
 
@@ -479,7 +511,7 @@ helix-text[tone="danger"] {
  *
  * Paired like everything else here, and it had to move to be pairable: `fill`
  * was the one part of the button's box declared inside the shadow root, as
- * `:host([fill])`, so a `<Link data-button="primary">` and a `<helix-button>`
+ * `:host([fill])`, so a `<Link data-button="solid">` and a `<helix-button>`
  * were the same control at every width except the one a dialog's button row is
  * built on. Measured side by side with the pairing in place: 200 and 200 at
  * `standard`, 600 and 600 at `full`, 65 and 65 unset, and 120 and 120 inside a
@@ -516,14 +548,36 @@ helix-text[tone="danger"] {
   inline-size: 100%;
 }
 
-[data-button="primary"] {
-  background-color: var(--button-background-color, var(--helix-color-primary));
+/* Every appearance names its own hover, including where the fill does not move.
+   `[data-button]:not(:disabled):hover` is three class-equivalents and an
+   appearance rule is one, so without a hover of its own an appearance loses its
+   fill the moment a pointer touches it. That is what happened to the old
+   `danger`, which had no hover rule anywhere: a red button that turned neutral
+   grey under the pointer. */
+[data-button="solid"] {
+  background-color: var(--button-background-color, var(--_button-tone));
   border-color: transparent;
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
+  color: var(--button-foreground-color, var(--_button-on-tone));
 }
 
-[data-button="primary"]:not(:disabled):hover {
-  background-color: var(--button-background-color, var(--helix-color-primary-hover));
+[data-button="solid"]:not(:disabled):hover {
+  background-color: var(--button-background-color, var(--_button-tone-hover));
+  border-color: transparent;
+}
+
+[data-button="subtle"] {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 14%, transparent)
+  );
+  border-color: transparent;
+}
+
+[data-button="subtle"]:not(:disabled):hover {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 22%, transparent)
+  );
   border-color: transparent;
 }
 
@@ -549,7 +603,7 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
   border-end-end-radius: 0;
 }
 
-[data-button="tertiary"] {
+[data-button="ghost"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
 }
@@ -568,18 +622,12 @@ helix-button-group:not([appearance="spaced"]) > [data-button]:not(:last-child) {
  * buttons have always worked this way, which is why they measured identically
  * on both panels while tertiary did not, and `IconButton` was moved to it
  * earlier for the same reason. 8% wherever the resting state is transparent. */
-[data-button="tertiary"]:not(:disabled):hover {
+[data-button="ghost"]:not(:disabled):hover {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    color-mix(in oklab, var(--_button-tone) 8%, transparent)
   );
   border-color: transparent;
-}
-
-[data-button="danger"] {
-  background-color: var(--button-background-color, var(--helix-color-danger));
-  border-color: transparent;
-  color: var(--button-foreground-color, var(--helix-color-foreground-on-accent));
 }
 
 /* Type and inset follow the density the button is in, the same way its height

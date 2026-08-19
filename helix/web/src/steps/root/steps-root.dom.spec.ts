@@ -117,7 +117,7 @@ describe('a step is pressable, and only its name is', () => {
     const step = await one('value="pay"')
     const label = part(step, 'label') as HTMLElement
     expect(label.tagName).toBe('HELIX-BUTTON')
-    expect(label.getAttribute('appearance')).toBe('tertiary')
+    expect(label.getAttribute('appearance')).toBe('ghost')
     expect(step.shadowRoot?.querySelector('[part="marker"]')?.tagName).toBe('SPAN')
   })
 
