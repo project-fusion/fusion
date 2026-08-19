@@ -63,6 +63,28 @@ await rm(entries, { force: true, recursive: true })
 await rm(out, { force: true, recursive: true })
 await mkdir(entries, { recursive: true })
 
+/**
+ * Lit's two unsafe directives, named by every entry so they share one chunk.
+ *
+ * `unsafe-svg` extends `unsafe-html`, and splitting groups a module by which
+ * entries reach it: nearly every family reaches `unsafe-svg`, through the icons,
+ * and far fewer reach `unsafe-html`. So the two landed in different chunks with
+ * the subclass in the shared one, and the chunks imported each other, because
+ * the subclass needs its base and the base needs Lit's directive machinery back
+ * out of the shared chunk.
+ *
+ * An `extends` clause is evaluated the moment its module runs, so neither chunk
+ * could go first: `Cannot access 'JZ' before initialization`, on 66 of 74
+ * families, which is every family that reaches the cycle at all. Naming both
+ * here makes them reachable from every entry, so they are grouped together and
+ * the edge between them stops crossing a chunk boundary.
+ *
+ * Imported for the grouping rather than for the bindings, which is why nothing
+ * is named: this is a statement about chunking, and deleting it puts the cycle
+ * back.
+ */
+const SHARED = "import 'lit/directives/unsafe-html.js'\nimport 'lit/directives/unsafe-svg.js'\n"
+
 const written = []
 for (const [family, specs] of found) {
   const file = join(entries, `${family}.ts`)
@@ -73,7 +95,7 @@ for (const [family, specs] of found) {
   // it as well.
   await writeFile(
     file,
-    `${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const run = claim()\n`,
+    `${SHARED}${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const run = claim()\n`,
   )
   written.push(file)
 }

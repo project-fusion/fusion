@@ -81,48 +81,71 @@ describe('tree selection can be refused', () => {
 
 if (hasLayout()) {
   describe('tree alignment', () => {
-    test('a leaf and a branch at one depth start their labels in one place', async () => {
-      /* The gutter a leaf leaves where a chevron would be was sent down from
-         the tree as a whole measurement, and the tree named a different token
-         from the one the item draws with: `--helix-size-icon` against
-         `--helix-size-icon-sm`. Four pixels, which is small enough to look like
-         nothing and large enough that the eye reads two columns where there is
-         one list.
+    const labelX = (item: Element): number =>
+      (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
 
-         Only a browser can answer it. The values are custom properties resolved
-         through two shadow boundaries, and the fault was that two resolutions
-         disagreed, so anything short of laying it out and measuring would have
-         been asserting the same arithmetic that was already wrong. */
-      const tree = (await mount(markup)) as HTMLElement
-      const items = [...tree.querySelectorAll('helix-tree-item')]
-      const labelX = (item: Element): number =>
-        (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
+    const laidOut = async (attrs = ''): Promise<HTMLElement[]> => {
+      const tree = (await mount(`<helix-tree label="Repository" ${attrs}>
+        <helix-tree-item default-open value="helix">
+          helix
+          <helix-tree-item slot="children" value="web">web</helix-tree-item>
+        </helix-tree-item>
+        <helix-tree-item value="cortex">cortex</helix-tree-item>
+      </helix-tree>`)) as HTMLElement
+      return [...tree.querySelectorAll('helix-tree-item')] as HTMLElement[]
+    }
 
-      const branch = items.find((item) => item.hasAttribute('default-open'))
-      const leaf = items.find((item) => item.getAttribute('value') === 'cortex')
-      if (!branch || !leaf) {
-        throw new Error('the fixture no longer holds a branch and a leaf at the top level')
+    const named = (items: HTMLElement[], value: string): HTMLElement => {
+      const found = items.find((item) => item.getAttribute('value') === value)
+      if (!found) {
+        throw new Error(`the fixture no longer holds ${value}`)
       }
+      return found
+    }
 
-      expect(labelX(branch)).toBeGreaterThan(0)
-      expect(labelX(leaf)).toBe(labelX(branch))
+    /* Only a browser can answer any of this. The indent is a custom property
+       resolved through two shadow boundaries and multiplied by a depth the tree
+       writes on the row, so anything short of laying it out and measuring would
+       be asserting the same arithmetic that produced it. */
+    test('a child starts where its parent does, when the chevron is on the left', async () => {
+      /* The chevron column is the indent. A branch's own chevron pushes its
+         label right by exactly one gutter and its children are one level
+         deeper, so the two land on the same column. */
+      const items = await laidOut()
+      expect(labelX(named(items, 'helix'))).toBeGreaterThan(0)
+      expect(labelX(named(items, 'web'))).toBe(labelX(named(items, 'helix')))
     })
 
-    test('a child is indented from its parent, so depth is still visible', async () => {
-      /* The other half. Reserving the gutter on every leaf lines the columns up
-         and would line them up just as well if the indent had gone missing
-         entirely, which is a tree that has stopped being one. */
-      const tree = (await mount(markup)) as HTMLElement
-      const items = [...tree.querySelectorAll('helix-tree-item')]
-      const labelX = (item: Element): number =>
-        (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x
+    test('and is indented from it when there is no chevron on the left', async () => {
+      // Nothing pushes the branch's label there, so it sits at its row's own
+      // inset and its child stays one gutter in.
+      const items = await laidOut('chevron-placement="end"')
+      expect(labelX(named(items, 'web'))).toBeGreaterThan(labelX(named(items, 'helix')))
+    })
 
-      const parent = items.find((item) => item.getAttribute('value') === 'helix')
-      const child = items.find((item) => item.getAttribute('value') === 'web')
-      if (!parent || !child) {
-        throw new Error('the fixture no longer holds a parent and a child')
-      }
-      expect(labelX(child)).toBeGreaterThan(labelX(parent))
+    test('the child does not move when the chevron does, only the parent', async () => {
+      /* Which is the point of reserving nothing on a leaf: depth is a fact about
+         the tree and does not change because a control moved sides.
+
+         Each tree is measured before the next is mounted. `mount` writes the
+         body, so holding on to the first one's elements and reading them after
+         the second arrives measures nodes that are no longer in a document, and
+         every rect comes back zero. */
+      const first = await laidOut()
+      const before = { helix: labelX(named(first, 'helix')), web: labelX(named(first, 'web')) }
+      const second = await laidOut('chevron-placement="end"')
+      const after = { helix: labelX(named(second, 'helix')), web: labelX(named(second, 'web')) }
+      expect(after.web).toBe(before.web)
+      expect(after.helix).toBeLessThan(before.helix)
+    })
+
+    test('a leaf beside a branch sits where that branch keeps its chevron', async () => {
+      /* The trade, pinned so it is a decision rather than a surprise. Lining a
+         leaf up with the branch next to it and lining a child up with its
+         parent cannot both be had: a branch's label is one gutter into its own
+         row and a leaf's is not. Depth is the thing being read. */
+      const items = await laidOut()
+      expect(labelX(named(items, 'cortex'))).toBeLessThan(labelX(named(items, 'helix')))
     })
   })
 }
@@ -261,20 +284,29 @@ describe('a tree item that is a link', () => {
   test('a linked branch goes where it points, and its chevron opens it', async () => {
     /* A branch that is not a link toggles from anywhere in its row, because
        there is nowhere else for the press to mean. One that is a link has both
-       jobs and they need separate targets. */
+       jobs and they need separate targets.
+
+       The press is caught before the browser acts on it. These are real anchors
+       with real `href`s, and in a real engine following one takes the whole page
+       with it, which ends the run rather than failing a test. */
     const tree = await mount(linked)
+    const stay = (event: Event) => event.preventDefault()
+    document.addEventListener('click', stay)
     const branch = itemNamed(tree, 'components') as HTMLElement & { open: boolean }
     expect(branch.open).toBe(true)
 
-    part(branch, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    part(branch, 'row')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }),
+    )
     await (tree as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
     expect(branch.open).toBe(true)
 
     part(branch, 'toggle')?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, composed: true }),
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }),
     )
     await (branch as unknown as { updateComplete: Promise<boolean> }).updateComplete
     expect(branch.open).toBe(false)
+    document.removeEventListener('click', stay)
   })
 
   test('an unlinked branch still toggles from anywhere in its row', async () => {
