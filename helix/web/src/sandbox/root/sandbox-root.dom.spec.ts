@@ -29,6 +29,29 @@ const withCss = `
 
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
+/**
+ * A message that looks like it came from the frame.
+ *
+ * `Object.defineProperty`, not assignment. `origin` and `source` are readonly
+ * getters on `MessageEvent`, so `Object.assign` throws `TypeError` in a browser
+ * and only ever worked because happy-dom does not define them that way: three
+ * specs here passed under it and threw the moment they ran in Chromium.
+ *
+ * `origin` could go through the constructor. `source` cannot, because the
+ * platform requires a real `WindowProxy` there and these specs stub
+ * `contentWindow` with a plain object on purpose, the assertion being about
+ * identity rather than about frames. Defining an own property shadows the
+ * prototype's getter, which is what a synthetic event needs.
+ */
+const fromFrame = (source: unknown, origin: string, data: unknown): MessageEvent => {
+  const event = new MessageEvent('message', { data })
+  Object.defineProperties(event, {
+    origin: { value: origin },
+    source: { value: source },
+  })
+  return event
+}
+
 describe('sandbox coordination', () => {
   test('an edit in the source reaches the preview', async () => {
     // By event, like the accordion. Neither child knows the other exists.
@@ -115,12 +138,11 @@ describe('sandbox coordination', () => {
 
     const post = (source: unknown, origin: string) =>
       window.dispatchEvent(
-        Object.assign(
-          new MessageEvent('message', {
-            data: { level: 'warn', text: 'from the example', type: 'helix-preview-console' },
-          }),
-          { origin, source },
-        ),
+        fromFrame(source, origin, {
+          level: 'warn',
+          text: 'from the example',
+          type: 'helix-preview-console',
+        }),
       )
 
     post(sender, 'null')
@@ -148,12 +170,7 @@ describe('sandbox coordination', () => {
       value: { postMessage: (message: Record<string, unknown>) => sent.push(message) },
     })
 
-    window.dispatchEvent(
-      Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
-        origin: 'null',
-        source: frame.contentWindow,
-      }),
-    )
+    window.dispatchEvent(fromFrame(frame.contentWindow, 'null', { type: 'helix-preview-ready' }))
 
     preview.layout = 'centered'
     preview.direction = 'rtl'
@@ -179,12 +196,7 @@ describe('sandbox coordination', () => {
       value: { postMessage: (_: unknown, origin: string) => origins.push(origin) },
     })
 
-    window.dispatchEvent(
-      Object.assign(new MessageEvent('message', { data: { type: 'helix-preview-ready' } }), {
-        origin: 'null',
-        source: frame.contentWindow,
-      }),
-    )
+    window.dispatchEvent(fromFrame(frame.contentWindow, 'null', { type: 'helix-preview-ready' }))
 
     expect(origins).toEqual(['*'])
   })

@@ -414,14 +414,7 @@ export class HelixBaseListbox extends MixinCollection(
     }
     event.preventDefault()
 
-    /* Where the reader is, and failing that where the answer is.
-     *
-     * `activeValue` starts empty, so the first arrow press in a list that
-     * already has a chosen option started from nowhere: Down went to the first
-     * option, which is a move backwards from anything below it, and Up went to
-     * the last. Seeding from the value means the first press moves from what
-     * the reader can see is selected. */
-    const from = this.activeValue || (this.value.split(',')[0] ?? '')
+    const from = this.currentValue
     const at = shown.findIndex((option) => option.value === from)
     let next = at
     if (event.key === 'ArrowDown') {
@@ -647,12 +640,32 @@ export class HelixBaseListbox extends MixinCollection(
    * this. Where it is missing the list still works and still announces its
    * selection; what is lost is the running commentary as the keys move.
    */
+  /**
+   * Where the reader is, and failing that where the answer is.
+   *
+   * `activeValue` starts empty, so the first arrow press in a list that already
+   * has a chosen option started from nowhere: Down went to the first option,
+   * which is a move backwards from anything below it, and Up went to the last.
+   * Seeding from the value means the first press moves from what the reader can
+   * see is selected.
+   *
+   * **The keyboard knew this and the announcement did not.** `linkActive` asked
+   * for `activeValue` alone, so a list that had been given a value and not yet
+   * arrowed through pointed `aria-activedescendant` at nothing: a screen reader
+   * was told the list and its selection, and nothing about where the cursor
+   * was, until a key moved it. Both read this now, so the thing announced and
+   * the thing the arrows move from cannot disagree.
+   */
+  private get currentValue(): string {
+    return this.activeValue || (this.value.split(',')[0] ?? '')
+  }
+
   private linkActive(): void {
     const list = this.renderRoot.querySelector('[part="items"]')
     if (!list || !('ariaActiveDescendantElement' in list)) {
       return
     }
-    const active = this.options.find((option) => option.value === this.activeValue)
+    const active = this.options.find((option) => option.value === this.currentValue)
     ;(
       list as Element & { ariaActiveDescendantElement: Element | null }
     ).ariaActiveDescendantElement = active ?? null

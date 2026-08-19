@@ -25247,6 +25247,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "currentValue",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "Where the reader is, and failing that where the answer is.\n\n`activeValue` starts empty, so the first arrow press in a list that already\nhas a chosen option started from nowhere: Down went to the first option,\nwhich is a move backwards from anything below it, and Up went to the last.\nSeeding from the value means the first press moves from what the reader can\nsee is selected.\n\n**The keyboard knew this and the announcement did not.** `linkActive` asked\nfor `activeValue` alone, so a list that had been given a value and not yet\narrowed through pointed `aria-activedescendant` at nothing: a screen reader\nwas told the list and its selection, and nothing about where the cursor\nwas, until a key moved it. Both read this now, so the thing announced and\nthe thing the arrows move from cannot disagree.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "linkActive",
               "privacy": "private",
@@ -25255,7 +25269,6 @@
                   "text": "void"
                 }
               },
-              "description": "Points the focused list at the option the keyboard is on.\n\n**The gap this closes.** Focus stays on `[part=\"items\"]` while a highlight\nmoves between options, which is the half of the ARIA listbox pattern we\nhad. The other half is saying *which* option, and nothing did: a screen\nreader heard the list and its selection and never heard the item being\nmoved over. Neither `aria-activedescendant` nor a roving `tabindex` was\nwired, and the pattern requires one of the two.\n\n**An element reference and not an id, because an IDREF cannot do this.**\nThe options are the consumer's light DOM and the element that takes focus\nis in this shadow root, so `aria-activedescendant=\"whatever\"` resolves\nagainst the shadow tree, finds nothing, and is dropped in silence. Element\nreferences are the platform's answer to exactly that, and they resolve\noutward: a shadow-tree element may point at a light-DOM one, which is the\ndirection this needs.\n\nFeature-tested rather than assumed, for the reason `hostAria` gives:\nassigning to a property an engine does not implement is a no-op rather than\nan error, so the guard is what makes the absence visible to anyone reading\nthis. Where it is missing the list still works and still announces its\nselection; what is lost is the running commentary as the keys move.",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
