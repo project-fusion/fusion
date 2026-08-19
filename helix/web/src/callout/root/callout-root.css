@@ -1,8 +1,14 @@
-/* The host is the box, and the leading corners are square.
+/* The host is the box, rounded on all four corners, and the accent edge is a
+   clipped bar rather than a border.
    A rounded corner with a thick border on one side draws a crescent: the border
    follows the radius and thins to nothing at each end, which reads as a
-   rendering mistake rather than as a bar. Square on the accent edge, rounded on
-   the other three, so the bar is a bar. */
+   rendering mistake rather than as a bar. Squaring the two leading corners was
+   the first answer and it fixes the crescent by giving up the shape: a callout
+   is a container, and a container with two square corners in a page of rounded
+   ones reads as a container that failed to render.
+   A bar drawn inside the box and clipped by it has neither problem. The bar is a
+   straight rectangle, so nothing thins, and the corner it sits in is the host's
+   own, so the outside is a rounded box like everything beside it. */
 :host {
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
@@ -13,20 +19,33 @@
     --callout-background-color,
     color-mix(in oklab, var(--_callout-color) 10%, transparent)
   );
-  border-inline-start: var(--helix-border-thick) solid var(--_callout-color);
+  overflow: hidden;
+  position: relative;
   /* The house radius. `Card` wrote the argument and the sweep that applied it
      everywhere else passed this file by: at `md` the corner is softer than the
      controls inside it and the container stops receding, which is the one thing a
      container should do. Everything a callout sits beside is `sm`. */
   border-radius: var(--callout-radii, var(--helix-radii-sm));
-  border-start-start-radius: var(--helix-radii-none);
-  border-end-start-radius: var(--helix-radii-none);
   color: var(--helix-color-foreground);
   display: flex;
   gap: var(--helix-space-sm);
+  /* The bar's width added to the inset, so the text sits where it did when the
+     bar was a border and the border box was doing this arithmetic. */
   padding: var(--helix-space-md);
+  padding-inline-start: calc(var(--helix-space-md) + var(--helix-border-thick));
 
   --_callout-color: var(--helix-color-info);
+}
+
+/* The accent edge. Straight, and clipped to the host's corners by the overflow
+   above, which is what lets the box be round and the bar be a bar. */
+:host::before {
+  background-color: var(--_callout-color);
+  content: "";
+  inline-size: var(--helix-border-thick);
+  inset-block: 0;
+  inset-inline-start: 0;
+  position: absolute;
 }
 
 :host([severity="success"]) {
