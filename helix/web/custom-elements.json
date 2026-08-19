@@ -40227,12 +40227,28 @@
                 "name": "HelixBaseTag",
                 "module": "src/tag/root/tag-root.ts"
               }
+            },
+            {
+              "description": "The category before the label.",
+              "name": "prefix",
+              "inheritedFrom": {
+                "name": "HelixBaseTag",
+                "module": "src/tag/root/tag-root.ts"
+              }
             }
           ],
           "slots": [
             {
               "description": "The tag's label.",
               "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTag",
+                "module": "src/tag/root/tag-root.ts"
+              }
+            },
+            {
+              "description": "A category the label belongs to, set before it and weightier.",
+              "name": "prefix",
               "inheritedFrom": {
                 "name": "HelixBaseTag",
                 "module": "src/tag/root/tag-root.ts"

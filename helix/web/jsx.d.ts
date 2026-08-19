@@ -15045,6 +15045,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tag's label.
+   * - `prefix`: A category the label belongs to, set before it and weightier.
    *
    * ## Methods
    *
@@ -15065,6 +15066,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `dismiss`: The remove button, when `dismissible`.
+   * - `prefix`: The category before the label.
    */
   "helix-tag": Partial<HelixTagProps & BaseProps<HelixTag> & BaseEvents>;
 
@@ -22218,6 +22220,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The tag's label.
+   * - `prefix`: A category the label belongs to, set before it and weightier.
    *
    * ## Methods
    *
@@ -22238,6 +22241,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `dismiss`: The remove button, when `dismissible`.
+   * - `prefix`: The category before the label.
    */
   "helix-tag": Partial<
     HelixTagProps & HelixTagSolidJsProps & BaseProps<HelixTag> & BaseEvents

@@ -32200,11 +32200,19 @@
           "name": "HelixBaseTag",
           "cssParts": [
             {
+              "description": "The category before the label.",
+              "name": "prefix"
+            },
+            {
               "description": "The control that asks to remove the tag.",
               "name": "dismiss"
             }
           ],
           "slots": [
+            {
+              "description": "A category the label belongs to, set before it and weightier.",
+              "name": "prefix"
+            },
             {
               "description": "The tag's label.",
               "name": ""

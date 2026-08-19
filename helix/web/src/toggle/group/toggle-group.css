@@ -28,6 +28,19 @@
   --_toggle-height: 100%;
   /* No track, so nothing to be concentric with. */
   --_toggle-radius: var(--helix-radii-sm);
+
+  /* Inset even where nothing is drawn around it.
+   *
+   * The framed appearances get this from their own padding, and `plain` had
+   * none, so its items were the full forty and the control was the item: a
+   * selected tab's thumb ran edge to edge and the group read as one tall block
+   * rather than as a marker inside a strip. Measured, 40 against the framed
+   * 30.
+   *
+   * The padding is the same either way. What `plain` drops is the background
+   * and the border, which is what makes it plain; the room the items sit in is
+   * not decoration. */
+  padding: var(--helix-space-2xs);
   /* And no groove either, which decides the thumb's color. Without a track the
      marker is a pill lying *on* whatever surface the group was put on, so it
      has to be darker than it: that is `raised`. The grooved appearances below

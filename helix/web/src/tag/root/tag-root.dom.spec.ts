@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { mount, part, registerDom, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -54,5 +54,28 @@ describe('tag', () => {
     ;(part(tag, 'dismiss') as HTMLElement).click()
     expect(cancelable).toBe(true)
     expect(tag.isConnected).toBe(true)
+  })
+})
+
+describe('tag prefix', () => {
+  test('a category sits before the label and is weightier than it', async () => {
+    // The same kind of word doing a different job, so weight rather than colour:
+    // `Priority: high` is one phrase, and colouring half makes it two things.
+    const tag = await mount('<helix-tag><span slot="prefix">Priority</span>High</helix-tag>')
+    expect(slotted(tag, 'prefix')[0]?.textContent).toBe('Priority')
+    /* The label is read off the host rather than through `slotted`, which
+       returns assigned elements: a tag's label is usually bare text between the
+       tags, and a text node is not one. */
+    expect(tag.textContent?.replace('Priority', '').trim()).toBe('High')
+  })
+
+  test('and a tag without one carries nothing at all', async () => {
+    /* Every declaration is on the slotted element rather than the slot. A slot
+       is `display: contents`, so an unassigned one generates no box: giving it
+       `display: flex` to hold the rule is what takes that away, and measured, a
+       tag with no prefix carried nine pixels of border and padding for a slot
+       with nothing in it. */
+    const tag = await mount('<helix-tag>Plain</helix-tag>')
+    expect(slotted(tag, 'prefix')).toHaveLength(0)
   })
 })

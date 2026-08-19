@@ -21,8 +21,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Chip, Pill, Label
  * @documentation https://helix.fusion.dev/components/tag
  *
+ * @slot prefix - A category the label belongs to, set before it and weightier.
  * @slot - The tag's label.
  *
+ * @csspart prefix - The category before the label.
  * @csspart dismiss - The control that asks to remove the tag.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
@@ -35,7 +37,8 @@ export class HelixBaseTag extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove'
 
   protected override render(): TemplateResult {
-    return html`<slot></slot>
+    return html`<slot name="prefix" part="prefix"></slot>
+      <slot></slot>
       ${
         this.dismissible
           ? html`<button

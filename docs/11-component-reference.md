@@ -3927,12 +3927,14 @@ the status colors gets the tints with them.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The tag's label. |
+| `prefix` | A category the label belongs to, set before it and weightier. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `dismiss` | The remove button, when `dismissible`. |
+| `prefix` | The category before the label. |
 
 #### Custom properties
 

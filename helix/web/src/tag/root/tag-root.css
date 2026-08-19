@@ -130,3 +130,28 @@
   block-size: 0.85em;
   inline-size: 0.85em;
 }
+
+/* The category a tag belongs to, before the label it qualifies.
+ *
+ * Heavier than the label rather than a different colour, because it is the same
+ * kind of word doing a different job: `Priority: high` is one phrase, and
+ * colouring the first half would make it two things sitting next to each other.
+ * Weight says "this names what follows" without leaving the sentence.
+ *
+ * A rule between the two rather than a gap, since a gap alone reads as an
+ * accidental space in a phrase, and a colon would be a character the consumer
+ * did not write.
+ *
+ * **Every declaration is on the slotted element, none on the slot.** A slot is
+ * `display: contents` in the UA stylesheet, so an unassigned one generates no
+ * box: giving it `display: flex` to hold a border is what takes that away, and
+ * measured, a tag with no prefix carried nine pixels of border and padding for
+ * a slot with nothing in it. On the slotted element there is nothing to style
+ * until something is there. */
+slot[name="prefix"]::slotted(*) {
+  border-inline-end: var(--helix-border-thin) solid currentColor;
+  font-weight: var(--helix-weight-semibold);
+  margin-inline-end: var(--_tag-inset);
+  opacity: 0.75;
+  padding-inline-end: var(--_tag-inset);
+}
