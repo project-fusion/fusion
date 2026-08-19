@@ -6,10 +6,18 @@
 :host {
   --_qr-size: var(--qr-code-size, 12rem);
 
-  background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
+  /* Ink on paper, which is the media pair the other way up.
+   *
+   * The commit that added this claimed the ground was stated so the code could
+   * not come out light on dark, and then stated it with tokens that turn over
+   * with the mode: on a dark page the ground went dark and the modules went
+   * light, which is a code a good half of the scanners in the world refuse. The
+   * media pair is the only one here that does not turn over, so a code is drawn
+   * with it inverted: the light arm is the paper and the dark arm is the ink. */
+  background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
   block-size: var(--_qr-size);
   border-radius: var(--helix-radii-sm);
-  color: var(--qr-code-color, var(--helix-color-foreground));
+  color: var(--qr-code-color, var(--helix-color-surface-media));
   display: block;
   inline-size: var(--_qr-size);
   position: relative;
@@ -34,14 +42,33 @@
   align-items: center;
   background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
   border-radius: var(--helix-radii-sm);
+  /* A quiet zone of its own. The mark needs the modules held off it for the
+     same reason the code needs a margin: a scanner reads the boundary, and a
+     glyph butted straight against the pattern is a glyph the scanner tries to
+     read as data. It also looks like a sticker rather than a hole without it. */
+  box-sizing: border-box;
   display: flex;
   inset-block-start: 50%;
   inset-inline-start: 50%;
   justify-content: center;
-  max-block-size: var(--qr-code-logo-size, 24%);
-  max-inline-size: var(--qr-code-logo-size, 24%);
+  max-block-size: var(--qr-code-logo-size, 22%);
+  max-inline-size: var(--qr-code-logo-size, 22%);
+  min-block-size: var(--qr-code-logo-size, 22%);
+  min-inline-size: var(--qr-code-logo-size, 22%);
+  padding: var(--qr-code-logo-inset, 6%);
   position: absolute;
   translate: -50% -50%;
+}
+
+/* Whatever is in it is fitted to the room it has, so a consumer's mark of any
+   shape lands inside the quiet zone rather than setting its own size.
+ 
+   On the slot, not on the box around it: `::slotted()` only ever attaches to a
+   `<slot>`, so written against the wrapper it matches nothing at all. */
+[part="logo"] slot::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: contain;
 }
 
 /* Nothing at all where nobody filled it, rather than a ground-coloured square

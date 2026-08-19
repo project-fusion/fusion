@@ -25,6 +25,8 @@ import { styles } from './qr-code-root.css.js'
  * @cssproperty --qr-code-color - The dark modules. Defaults to the page's ink.
  * @cssproperty --qr-code-background-color - Behind them, including the quiet zone.
  * @cssproperty --qr-code-logo-size - How much of the middle a mark may cover.
+ * Defaults to `22%`, which `H` correction carries comfortably.
+ * @cssproperty --qr-code-logo-inset - The quiet zone around that mark.
  */
 @customElement('helix-qr-code')
 export class HelixQrCode extends HelixBaseQrCode {

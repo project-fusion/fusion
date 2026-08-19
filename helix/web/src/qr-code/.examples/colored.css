@@ -1,0 +1,7 @@
+/* Dark on light is what a scanner needs, and the pair has to hold whichever
+   mode the page is in. Both are stated for that reason: taking one from the
+   page would invert with it. */
+helix-qr-code {
+  --qr-code-background-color: oklch(0.98 0.02 260);
+  --qr-code-color: oklch(0.35 0.13 265);
+}

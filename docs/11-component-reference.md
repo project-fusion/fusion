@@ -3292,7 +3292,8 @@ So the ground is stated and the ink is the foreground it is chosen for.
 | `--qr-code-size` | How wide the square is. Defaults to `12rem`. |
 | `--qr-code-color` | The dark modules. Defaults to the page's ink. |
 | `--qr-code-background-color` | Behind them, including the quiet zone. |
-| `--qr-code-logo-size` | How much of the middle a mark may cover. |
+| `--qr-code-logo-size` | How much of the middle a mark may cover. Defaults to `22%`, which `H` correction carries comfortably. |
+| `--qr-code-logo-inset` | The quiet zone around that mark. |
 
 ## Quote
 
