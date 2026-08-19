@@ -46,16 +46,38 @@
  * does not sit on the accent, and this is the one place in this component where
  * a row stops being a row on the panel. */
 :host([mode="range"]) [part="option"][selected]::part(item) {
-  background-color: var(--helix-color-primary);
+  /* `foreground-muted` rather than `foreground`, which was tried first and is a
+     slab of near-black in a list of grey rows: measured at 21:1 against its own
+     label, where the muted step is 6.01, comfortably past AA and leaving black
+     to the text that is actually text. `foreground-on-accent` for the label,
+     since that is the token for words on a filled control and this is one. */
+  background-color: var(--helix-color-foreground-muted);
   color: var(--helix-color-foreground-on-accent);
 }
 
 /* The times inside a range, which are part of the answer without having been
-   chosen. A wash rather than the fill, so the two ends stay the things that were
-   picked: the calendar draws its own range the same way, and a reader who has
-   seen one reads this without being told. */
+ * chosen. A wash rather than the fill, so the two ends stay the things that were
+ * picked: the calendar draws its own range the same way, and a reader who has
+ * seen one reads this without being told.
+ *
+ * A translucent wash of the foreground rather than a step on the surface ladder,
+ * which is the note Option carries about its own hover: an absolute surface is
+ * a fixed lightness on a panel whose lightness is not, and the two collided in
+ * dark mode last time somebody tried it. This has to clear a second bar as well,
+ * being darker than the hover it sits beside, which is why it is sixteen and
+ * twenty against that rule's eight and twelve.
+ *
+ * `light-dark()` wraps the two mixes rather than the two percentages. Not a
+ * style choice: it returns a color, so a percentage inside it is invalid and the
+ * whole declaration is dropped. Option records the same, having found out. */
 [part="option"][data-between]::part(item) {
-  background-color: var(--time-range-color, var(--helix-color-primary-subtle));
+  background-color: var(
+    --time-range-color,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-foreground) 16%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 20%, transparent)
+    )
+  );
 }
 
 /* A dot where a terminus has its tick.

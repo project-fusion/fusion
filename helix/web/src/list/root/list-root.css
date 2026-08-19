@@ -33,10 +33,15 @@
  */
 :host([kind="ordered"]),
 :host([kind="unordered"]) {
-  /* Wide enough for a two-digit marker and no wider. It was `space-xl`, which
-     is 32px for a glyph about fourteen across, so a numbered list read as a
-     column of numbers and a separate column of words. */
-  padding-inline-start: var(--list-marker-gutter, var(--helix-space-lg));
+  /* Wide enough for a two-digit marker and no wider.
+   *
+   * `space-xl` first, which is 32px for a glyph about fourteen across, then
+   * `lg` at 24, and it still read as a column of numbers beside a separate
+   * column of words: with `outside`, the gap a reader sees is the gutter less
+   * the marker, so a single digit was carrying most of the 24 as empty space.
+   * `md` puts the words next to the numbers and still fits `10.`, which is the
+   * widest marker a list of this kind usually reaches. */
+  padding-inline-start: var(--list-marker-gutter, var(--helix-space-md));
 }
 
 :host([kind="ordered"]) ::slotted(*),
