@@ -1,0 +1,38 @@
+<helix-tree
+  default-active="two"
+  label="Label"
+>
+  <helix-tree-item
+    default-open
+    value="one"
+  >
+    <helix-icon
+      name="folder-open"
+      slot="start"
+    ></helix-icon>
+    Item One
+    <helix-tree-item
+      slot="children"
+      value="two"
+    >Item Two</helix-tree-item>
+    <helix-tree-item
+      slot="children"
+      value="three"
+    >Item Three</helix-tree-item>
+  </helix-tree-item>
+  <helix-tree-item
+    default-open
+    value="four"
+  >
+    <helix-icon
+      name="folder-open"
+      slot="start"
+    ></helix-icon>
+    Item Four
+    <helix-tree-item
+      slot="children"
+      value="five"
+    >Item Five</helix-tree-item>
+  </helix-tree-item>
+  <helix-tree-item value="six">Item Six</helix-tree-item>
+</helix-tree>
