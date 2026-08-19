@@ -1355,6 +1355,21 @@ helix-drawer {
 }
 
 .docsMain {
+  /* Fills its track, then caps.
+   *
+   * `100%` said out loud because the auto margins below would otherwise stop it
+   * filling at all: a grid item stretches to its track only while it has no
+   * auto margin in that axis, and one that has is sized to fit its contents
+   * instead. So the article was as wide as whatever the widest thing on the
+   * page happened to be, and two reference pages side by side were different
+   * widths for no reason a reader could see. Measured at 1440: Button Group
+   * came out 768 because its examples reach the track, Breadcrumbs 641 because
+   * nothing on it does.
+   *
+   * The margins still do their job. They only have space to divide once the cap
+   * below is narrower than the track, which is the case this was written for
+   * and the only one it was ever right in. */
+  inline-size: 100%;
   margin-inline: auto;
   /* The measure, in the unit that means it. `54rem` was a guess that happened
      to be near it; `80ch` is the thing itself, and it tracks the font rather
