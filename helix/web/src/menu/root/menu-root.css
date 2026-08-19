@@ -225,3 +225,26 @@
 :host(:dir(rtl)) [part="back"] svg {
   scale: -1 1;
 }
+
+/* What a collection says instead of rows: the same two lines everywhere, in the
+   same voice, because a reader meeting "Loading" in a menu and a different
+   arrangement of the same idea in a table is a reader learning the same thing
+   twice. Quiet and centred, since neither is content: they are the absence of
+   it, and an absence set like a heading reads as an error. */
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-sm);
+  text-align: center;
+}
+
+/* Rows that are already there stay, and dim, while a new set arrives. Removing
+   them would collapse the box and throw the page around under the reader for
+   as long as the request takes; dimming says the same thing and holds still. */
+:host([loading]) [part="menu"] {
+  opacity: 0.5;
+}

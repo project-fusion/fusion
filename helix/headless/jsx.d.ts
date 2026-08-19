@@ -1918,6 +1918,15 @@ should not have to ask. */
   "list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   listLabel?: HelixBaseCombobox["listLabel"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. */
+  loading?: HelixBaseCombobox["loading"];
+  /** What the list says while they are on their way. */
+  "loading-text"?: HelixBaseCombobox["loadingText"];
+  /** What the list says while they are on their way. */
+  loadingText?: HelixBaseCombobox["loadingText"];
   /** Words shown where the filter has hidden everything. */
   "empty-text"?: HelixBaseCombobox["emptyText"];
   /** Words shown where the filter has hidden everything. */
@@ -2065,6 +2074,15 @@ should not have to ask. */
   "attr:list-label"?: HelixBaseCombobox["listLabel"];
   /** Accessible name for the list, which has no visible one of its own. */
   "prop:listLabel"?: HelixBaseCombobox["listLabel"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. */
+  "prop:loading"?: HelixBaseCombobox["loading"];
+  /** What the list says while they are on their way. */
+  "attr:loading-text"?: HelixBaseCombobox["loadingText"];
+  /** What the list says while they are on their way. */
+  "prop:loadingText"?: HelixBaseCombobox["loadingText"];
   /** Words shown where the filter has hidden everything. */
   "attr:empty-text"?: HelixBaseCombobox["emptyText"];
   /** Words shown where the filter has hidden everything. */
@@ -3595,6 +3613,20 @@ export type HelixBaseDrilldownProps = {
   "back-label"?: HelixBaseDrilldown["backLabel"];
   /** What the control returning from a page reads. */
   backLabel?: HelixBaseDrilldown["backLabel"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixBaseDrilldown["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixBaseDrilldown["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixBaseDrilldown["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixBaseDrilldown["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixBaseDrilldown["emptyText"];
 
   /** Fired when a row with no page is chosen. */
   "onhelix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
@@ -3607,6 +3639,20 @@ export type HelixBaseDrilldownSolidJsProps = {
   "attr:back-label"?: HelixBaseDrilldown["backLabel"];
   /** What the control returning from a page reads. */
   "prop:backLabel"?: HelixBaseDrilldown["backLabel"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixBaseDrilldown["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixBaseDrilldown["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixBaseDrilldown["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixBaseDrilldown["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixBaseDrilldown["emptyText"];
   /** Fired when a row with no page is chosen. */
   "on:helix-select"?: (e: HelixBaseDrilldownHelixSelectElementEvent) => void;
 
@@ -4335,10 +4381,30 @@ to prevent. */
   filterLabel?: HelixBaseListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixBaseListbox["multiple"];
-  /** What is shown when a filter has hidden every option. */
+  /** What is shown when a filter has hidden every option.
+
+From `MixinCollection`, which every collection in the library now shares,
+and re-declared here only to keep this list's own wording: "No matches" is
+about a filter, and the mixin's "Nothing to show" is about a list that was
+never given anything. */
   "empty-text"?: HelixBaseListbox["emptyText"];
-  /** What is shown when a filter has hidden every option. */
+  /** What is shown when a filter has hidden every option.
+
+From `MixinCollection`, which every collection in the library now shares,
+and re-declared here only to keep this list's own wording: "No matches" is
+about a filter, and the mixin's "Nothing to show" is about a list that was
+never given anything. */
   emptyText?: HelixBaseListbox["emptyText"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixBaseListbox["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixBaseListbox["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixBaseListbox["loadingText"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4433,10 +4499,30 @@ to prevent. */
   "prop:filterLabel"?: HelixBaseListbox["filterLabel"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixBaseListbox["multiple"];
-  /** What is shown when a filter has hidden every option. */
+  /** What is shown when a filter has hidden every option.
+
+From `MixinCollection`, which every collection in the library now shares,
+and re-declared here only to keep this list's own wording: "No matches" is
+about a filter, and the mixin's "Nothing to show" is about a list that was
+never given anything. */
   "attr:empty-text"?: HelixBaseListbox["emptyText"];
-  /** What is shown when a filter has hidden every option. */
+  /** What is shown when a filter has hidden every option.
+
+From `MixinCollection`, which every collection in the library now shares,
+and re-declared here only to keep this list's own wording: "No matches" is
+about a filter, and the mixin's "Nothing to show" is about a list that was
+never given anything. */
   "prop:emptyText"?: HelixBaseListbox["emptyText"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixBaseListbox["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixBaseListbox["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixBaseListbox["loadingText"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -4631,6 +4717,20 @@ export type HelixBaseMenuProps = {
   "back-label"?: HelixBaseMenu["backLabel"];
   /** What the row returning from a submenu reads. */
   backLabel?: HelixBaseMenu["backLabel"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixBaseMenu["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixBaseMenu["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixBaseMenu["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixBaseMenu["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixBaseMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -4685,6 +4785,20 @@ export type HelixBaseMenuSolidJsProps = {
   "attr:back-label"?: HelixBaseMenu["backLabel"];
   /** What the row returning from a submenu reads. */
   "prop:backLabel"?: HelixBaseMenu["backLabel"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixBaseMenu["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixBaseMenu["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixBaseMenu["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixBaseMenu["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixBaseMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -6418,6 +6532,20 @@ was never read: it reflected, it type-checked, and nothing anywhere
 rendered a field. API that does nothing is worse than API that is missing,
 because a consumer sets it and believes it. */
   filterable?: HelixBaseSelect["filterable"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. Two components saying "Loading" about one request is a
+consumer wiring the same flag twice. */
+  loading?: HelixBaseSelect["loading"];
+  /** What the list says while they are on their way. */
+  "loading-text"?: HelixBaseSelect["loadingText"];
+  /** What the list says while they are on their way. */
+  loadingText?: HelixBaseSelect["loadingText"];
+  /** What it says where there are none. */
+  "empty-text"?: HelixBaseSelect["emptyText"];
+  /** What it says where there are none. */
+  emptyText?: HelixBaseSelect["emptyText"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixBaseSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
@@ -6534,6 +6662,20 @@ was never read: it reflected, it type-checked, and nothing anywhere
 rendered a field. API that does nothing is worse than API that is missing,
 because a consumer sets it and believes it. */
   "prop:filterable"?: HelixBaseSelect["filterable"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. Two components saying "Loading" about one request is a
+consumer wiring the same flag twice. */
+  "prop:loading"?: HelixBaseSelect["loading"];
+  /** What the list says while they are on their way. */
+  "attr:loading-text"?: HelixBaseSelect["loadingText"];
+  /** What the list says while they are on their way. */
+  "prop:loadingText"?: HelixBaseSelect["loadingText"];
+  /** What it says where there are none. */
+  "attr:empty-text"?: HelixBaseSelect["emptyText"];
+  /** What it says where there are none. */
+  "prop:emptyText"?: HelixBaseSelect["emptyText"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixBaseSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
@@ -7505,6 +7647,20 @@ and said nothing. Columns carry both halves now. */
   columns?: HelixBaseTable["columns"];
   /** Accessible name for the table. */
   label?: HelixBaseTable["label"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixBaseTable["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixBaseTable["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixBaseTable["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixBaseTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixBaseTable["emptyText"];
 };
 
 export type HelixBaseTableSolidJsProps = {
@@ -7520,6 +7676,20 @@ and said nothing. Columns carry both halves now. */
   "prop:columns"?: HelixBaseTable["columns"];
   /** Accessible name for the table. */
   "prop:label"?: HelixBaseTable["label"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixBaseTable["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixBaseTable["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixBaseTable["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixBaseTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixBaseTable["emptyText"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -9391,6 +9561,20 @@ export type HelixBaseTreeHelixSelectElementEvent =
 export type HelixBaseTreeProps = {
   /** Accessible name for the tree. */
   label?: HelixBaseTree["label"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  loading?: HelixBaseTree["loading"];
+  /** What is said while they are on their way. */
+  "loading-text"?: HelixBaseTree["loadingText"];
+  /** What is said while they are on their way. */
+  loadingText?: HelixBaseTree["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixBaseTree["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixBaseTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -9421,6 +9605,20 @@ how markup says where to start. */
 export type HelixBaseTreeSolidJsProps = {
   /** Accessible name for the tree. */
   "prop:label"?: HelixBaseTree["label"];
+  /** Whether the rows are still on their way.
+
+Reflected, because a stylesheet needs it: the rows that are already there
+are dimmed rather than removed while a new set arrives, and only CSS can
+say that without the component knowing what a row looks like. */
+  "prop:loading"?: HelixBaseTree["loading"];
+  /** What is said while they are on their way. */
+  "attr:loading-text"?: HelixBaseTree["loadingText"];
+  /** What is said while they are on their way. */
+  "prop:loadingText"?: HelixBaseTree["loadingText"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixBaseTree["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixBaseTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Called `active`, which is what this mixin is named for and what it was
@@ -11088,6 +11286,11 @@ export type CustomElements = {
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `open`: Whether the element is open.
    *
@@ -12247,6 +12450,13 @@ export type CustomElements = {
    *
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    *
    * ## Events
    *
@@ -12960,6 +13170,17 @@ export type CustomElements = {
    * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -13278,6 +13499,13 @@ export type CustomElements = {
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -14818,6 +15046,13 @@ export type CustomElements = {
    * was never read: it reflected, it type-checked, and nothing anywhere
    * rendered a field. API that does nothing is worse than API that is missing,
    * because a consumer sets it and believes it.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs. Two components saying "Loading" about one request is a
+   * consumer wiring the same flag twice.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
+   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `multiple`: Whether more than one option can be the answer.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `open`: Whether the element is open.
@@ -15860,6 +16095,13 @@ export type CustomElements = {
    * list, which a grid ignores in silence: the table collapsed to one column
    * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Slots
@@ -17388,6 +17630,13 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the tree.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `active`: Which item is current, by its `value`.
    *
    * Called `active`, which is what this mixin is named for and what it was
@@ -19133,6 +19382,11 @@ export type CustomElementsSolidJs = {
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
    * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
    * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
    * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
    * - `open`: Whether the element is open.
    *
@@ -20319,6 +20573,13 @@ export type CustomElementsSolidJs = {
    *
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    *
    * ## Events
    *
@@ -21059,6 +21320,17 @@ export type CustomElementsSolidJs = {
    * - `filter-label`/`filterLabel`: Placeholder for the field that narrows the list.
    * - `multiple`: Whether more than one option can be the answer.
    * - `empty-text`/`emptyText`: What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -21386,6 +21658,13 @@ export type CustomElementsSolidJs = {
    * - `offset`: Space between the trigger and the surface, in pixels.
    * - `label`: Accessible name for the surface.
    * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -22973,6 +23252,13 @@ export type CustomElementsSolidJs = {
    * was never read: it reflected, it type-checked, and nothing anywhere
    * rendered a field. API that does nothing is worse than API that is missing,
    * because a consumer sets it and believes it.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs. Two components saying "Loading" about one request is a
+   * consumer wiring the same flag twice.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
+   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `multiple`: Whether more than one option can be the answer.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `open`: Whether the element is open.
@@ -24048,6 +24334,13 @@ export type CustomElementsSolidJs = {
    * list, which a grid ignores in silence: the table collapsed to one column
    * and said nothing. Columns carry both halves now.
    * - `label`: Accessible name for the table.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `tableColumns`: The columns declared as children, in the order they are written. (property only) (readonly)
    *
    * ## Slots
@@ -25624,6 +25917,13 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: Accessible name for the tree.
+   * - `loading`: Whether the rows are still on their way.
+   *
+   * Reflected, because a stylesheet needs it: the rows that are already there
+   * are dimmed rather than removed while a new set arrives, and only CSS can
+   * say that without the component knowing what a row looks like.
+   * - `loading-text`/`loadingText`: What is said while they are on their way.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `active`: Which item is current, by its `value`.
    *
    * Called `active`, which is what this mixin is named for and what it was

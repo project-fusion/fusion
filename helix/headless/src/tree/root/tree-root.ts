@@ -2,10 +2,11 @@ import {
   closestInstance,
   customElement,
   HelixElement,
+  MixinCollection,
   MixinControllerActive,
   scrollItemIntoView,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseTreeItem } from '../item/tree-item.js'
 
@@ -48,7 +49,7 @@ const KEYS = new Set([
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to.
  */
 @customElement('helix-base-tree')
-export class HelixBaseTree extends MixinControllerActive(HelixElement) {
+export class HelixBaseTree extends MixinCollection(MixinControllerActive(HelixElement)) {
   /** Accessible name for the tree. */
   @property()
   label = 'Tree'
@@ -270,8 +271,19 @@ export class HelixBaseTree extends MixinControllerActive(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="tree" role="tree" aria-label=${this.label}>
-      <slot @slotchange=${() => this.syncItems()}></slot>
+    return html`<div
+      part="tree"
+      role="tree"
+      aria-busy=${this.loading ? 'true' : nothing}
+      aria-label=${this.label}
+    >
+      <slot
+        @slotchange=${(event: Event) => {
+          this.countRows(event)
+          this.syncItems()
+        }}
+      ></slot>
+      ${this.renderStatus(this.hasRows)}
     </div>`
   }
 }

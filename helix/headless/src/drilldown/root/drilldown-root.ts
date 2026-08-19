@@ -1,6 +1,12 @@
-import { customElement, DrilldownController, HelixElement, hostAria } from '@helix-io/core'
+import {
+  customElement,
+  DrilldownController,
+  HelixElement,
+  hostAria,
+  MixinCollection,
+} from '@helix-io/core'
 import { caretLeft } from '@helix-io/icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
@@ -46,7 +52,7 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
  * @csspart page - The region the rows are in.
  */
 @customElement('helix-base-drilldown')
-export class HelixBaseDrilldown extends HelixElement {
+export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
   /** Accessible name for the region. */
   @property()
   /* Not "Menu", which is what it was: this component's own description is built
@@ -259,7 +265,10 @@ export class HelixBaseDrilldown extends HelixElement {
             <span part="title">${this.drilldown.label}</span>
           </div>`
     }
-      <div part="page"><slot></slot></div>`
+      <div aria-busy=${this.loading ? 'true' : nothing} part="page">
+        <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
+        ${this.renderStatus(this.hasRows)}
+      </div>`
   }
 }
 

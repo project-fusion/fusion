@@ -1160,6 +1160,8 @@ Input, Color Input and Date Input all take.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `listLabel` | `list-label` | `string` | `'Options'` | `HelixBaseCombobox` | Accessible name for the list, which has no visible one of its own. |
+| `loading` | `loading` | `boolean` | `false` | `HelixBaseCombobox` | Whether the options are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixBaseCombobox` | What the list says while they are on their way. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseCombobox` | Whether more than one option can be chosen. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
@@ -1736,7 +1738,10 @@ from: the page arriving was not in the DOM a frame ago. Under
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseDrilldown` | What the control returning from a page reads. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `label` | `label` | `string` | `'Navigation'` | `HelixBaseDrilldown` | Accessible name for the region. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 
 #### Methods
 
@@ -2333,7 +2338,7 @@ list moves under the reader rather than the reader moving to find it.
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseListbox` | What is shown when a filter has hidden every option. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `filter` | `filter` | `string` | - | `HelixBaseListbox` | What the list is narrowed to, if anything. |
 | `filterable` | `filterable` | `boolean` | `false` | `HelixBaseListbox` | Whether the list renders a field for narrowing itself. |
@@ -2344,6 +2349,8 @@ list moves under the reader rather than the reader moving to find it.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseListbox` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
@@ -2464,7 +2471,10 @@ one panel and reads the same on a phone as on a desk.
 | --- | --- | --- | --- | --- | --- |
 | `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseMenu` | What the row returning from a submenu reads. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `label` | `label` | `string` | `'Menu'` | `HelixBaseMenu` | Accessible name for the surface. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 | `offset` | `offset` | `number` | `4` | `HelixBaseMenu` | Space between the trigger and the surface, in pixels. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
@@ -3817,6 +3827,7 @@ from the field it came out of.
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `emptyText` | `empty-text` | `string` | `'No matches'` | `HelixBaseSelect` | What it says where there are none. |
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `filterable` | `filterable` | `boolean` | `false` | `HelixBaseSelect` | Whether the list can be narrowed by typing. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -3825,6 +3836,8 @@ from the field it came out of.
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `loading` | `loading` | `boolean` | `false` | `HelixBaseSelect` | Whether the options are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `HelixBaseSelect` | What the list says while they are on their way. |
 | `multiple` | `multiple` | `boolean` | `false` | `HelixBaseSelect` | Whether more than one option can be the answer. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `onOpenChange` | - | `((open: boolean) => void) \| undefined` | `undefined` | `MixinControllerOpen` | The consumer's callback, invoked after the state is applied. |
@@ -4367,7 +4380,10 @@ decorating none of it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `columns` | `columns` | `string` | `''` | `HelixBaseTable` | Column track list, as CSS. Deprecated: declare columns instead. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `label` | `label` | `string` | `''` | `HelixBaseTable` | Accessible name for the table. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixElement.shadowRootOptions, slotAssignment: 'manual', }` | `HelixBaseTable` | Nothing is assigned by name, so the columns can be put in a row. |
 | `tableColumns` | - | `HelixBaseTableColumn[]` | - | `HelixBaseTable` | The columns declared as children, in the order they are written. |
 
@@ -5297,7 +5313,10 @@ to it is one more thing between the reader and the label.
 | `active` | `active` | `string` | - | `MixinControllerActive` | Which item is current, by its `value`. |
 | `chevronPlacement` | `chevron-placement` | `'start' \| 'end' \| undefined` | - | - | Which end of the row the branch chevron sits at. |
 | `defaultActive` | `default-active` | `string` | `''` | `MixinControllerActive` | Initial item for uncontrolled use. Ignored once `active` is written. |
+| `emptyText` | `empty-text` | `string` | `'Nothing to show'` | `MixinCollection` | What is said where there are none, and none are coming. |
 | `label` | `label` | `string` | `'Tree'` | `HelixBaseTree` | Accessible name for the tree. |
+| `loading` | `loading` | `boolean` | `false` | `MixinCollection` | Whether the rows are still on their way. |
+| `loadingText` | `loading-text` | `string` | `'Loading'` | `MixinCollection` | What is said while they are on their way. |
 | `onActiveChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerActive` | The consumer's callback, invoked after the change is applied. |
 
 #### Methods

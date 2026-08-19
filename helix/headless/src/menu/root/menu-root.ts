@@ -3,6 +3,7 @@ import {
   customElement,
   DrilldownController,
   HelixElement,
+  MixinCollection,
   MixinControllerOpen,
   type Placement,
   PopoverController,
@@ -55,7 +56,7 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @csspart title - The name of the submenu that is showing.
  */
 @customElement('helix-base-menu')
-export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
+export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
   /** Preferred side. It moves if that side does not fit. */
   @property()
   placement: Placement = 'bottom-start'
@@ -332,6 +333,7 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
         part="menu"
         popover="manual"
         role="menu"
+        aria-busy=${this.loading ? 'true' : nothing}
         aria-label=${this.label}
         data-drilled=${this.drilldown.atRoot ? nothing : ''}
         ?hidden=${!this.open}
@@ -356,7 +358,8 @@ export class HelixBaseMenu extends MixinControllerOpen(HelixElement) {
                 <span part="title">${this.drilldown.label}</span>
               </div>`
         }
-        <slot></slot>
+        <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
+        ${this.renderStatus(this.hasRows)}
       </div>`
   }
 }

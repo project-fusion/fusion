@@ -5,13 +5,14 @@ import {
   HelixFormElement,
   type HelixSelectEvent,
   hostAria,
+  MixinCollection,
   MixinControllerValue,
   MixinField,
   requestControlledChange,
   scrollItemIntoView,
 } from '@helix-io/core'
 import { magnifyingGlass } from '@helix-io/icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixBaseOptionGroup } from '../../option/group/option-group.js'
@@ -170,7 +171,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart feedback - What is wrong with it.
  */
 @customElement('helix-base-listbox')
-export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormElement)) {
+export class HelixBaseListbox extends MixinCollection(
+  MixinControllerValue(MixinField(HelixFormElement)),
+) {
   /**
    * What the list is narrowed to, if anything.
    *
@@ -225,9 +228,16 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
   @property({ reflect: true, type: Boolean })
   multiple = false
 
-  /** What is shown when a filter has hidden every option. */
+  /**
+   * What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   */
   @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
+  override emptyText = 'No matches'
 
   /** Which option the keyboard is on, which is not what is chosen. */
   @state()
@@ -255,6 +265,18 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
    */
   @state()
   private hasMatches = true
+
+  /**
+   * Whether the options have been looked at yet.
+   *
+   * Emptiness is a fact about light DOM children, and the server has none to
+   * count: without this the list shipped "Nothing to show" over markup that was
+   * about to have options in it, which is the one thing an empty state must
+   * never do. `place` runs from `updated`, which the server never reaches, so
+   * this is false exactly when the answer is unknown.
+   */
+  @state()
+  private counted = false
 
   /* Stated once, and the group never thinks about it again. See the
      controller: the cascade was four hand calls from four different
@@ -557,6 +579,7 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
     if (anyShown !== this.hasMatches) {
       this.hasMatches = anyShown
     }
+    this.counted = true
 
     const active = shown.find((option) => option.value === this.activeValue)
     if (active) {
@@ -774,9 +797,26 @@ export class HelixBaseListbox extends MixinControllerValue(MixinField(HelixFormE
             </div>`
           : ''
       }
-      <div part="items" id="items" tabindex=${this.disabled ? -1 : 0}>
+      <div
+        part="items"
+        id="items"
+        aria-busy=${this.loading ? 'true' : nothing}
+        tabindex=${this.disabled ? -1 : 0}
+      >
         <slot @slotchange=${() => this.place()}></slot>
-        ${this.filter !== '' && !this.hasMatches ? html`<p part="empty">${this.emptyText}</p>` : ''}
+        ${
+          /* Loading and empty come from the shared mixin; what is local is what
+             counts as content. A list with a filter that matched nothing is
+             empty, and one with no filter and no options is empty too, but a
+             list still waiting on its options is neither. */
+          this.renderStatus(
+            this.counted && !this.loading
+              ? this.filter === ''
+                ? this.options.length > 0
+                : this.hasMatches
+              : true,
+          )
+        }
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

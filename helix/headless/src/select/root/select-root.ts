@@ -76,6 +76,24 @@ export class HelixBaseSelect extends MixinControllerOpen(
   @property({ reflect: true, type: Boolean })
   filterable = false
 
+  /**
+   * Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs. Two components saying "Loading" about one request is a
+   * consumer wiring the same flag twice.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /** What the list says while they are on their way. */
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading'
+
+  /** What it says where there are none. */
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No matches'
+
   /** Whether more than one option can be the answer. */
   @property({ reflect: true, type: Boolean })
   multiple = false
@@ -293,6 +311,9 @@ export class HelixBaseSelect extends MixinControllerOpen(
 
       <div part="surface" popover="manual" ?hidden=${!this.open}>
         <helix-listbox
+          empty-text=${this.emptyText}
+          loading-text=${this.loadingText}
+          ?loading=${this.loading}
           part="listbox"
           exportparts="items, empty"
           .value=${this.value}

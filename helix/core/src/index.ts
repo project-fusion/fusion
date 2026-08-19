@@ -71,6 +71,10 @@ export {
 export { HelixElement } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export {
+  type CollectionElement,
+  MixinCollection,
+} from './mixins/mixin-collection/mixin-collection.js'
+export {
   MixinControllerActive,
   type MixinControllerActiveInterface,
 } from './mixins/mixin-controller-active/mixin-controller-active.js'

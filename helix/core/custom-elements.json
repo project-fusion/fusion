@@ -2237,6 +2237,22 @@
         },
         {
           "kind": "js",
+          "name": "CollectionElement",
+          "declaration": {
+            "name": "CollectionElement",
+            "module": "./mixins/mixin-collection/mixin-collection.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinCollection",
+          "declaration": {
+            "name": "MixinCollection",
+            "module": "./mixins/mixin-collection/mixin-collection.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "MixinControllerActive",
           "declaration": {
             "name": "MixinControllerActive",
@@ -2513,6 +2529,275 @@
           "declaration": {
             "name": "slotFilled",
             "module": "./utils/slot-filled/slot-filled.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-collection/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CollectionElement",
+          "declaration": {
+            "name": "CollectionElement",
+            "module": "./mixin-collection.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinCollection",
+          "declaration": {
+            "name": "MixinCollection",
+            "module": "./mixin-collection.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/mixins/mixin-collection/mixin-collection.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The API a collection has for the two states that are not its content.",
+          "name": "CollectionElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the rows are still on their way."
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "description": "What is said while they are."
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "description": "What is said where there are none and none are coming."
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where the collection has content to show.\n\nRendered by the component wherever its rows would be."
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Binds to a rows slot's `slotchange`, and answers `hasRows` from it."
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "description": "Whether there is anything to show, as far as anything can tell.\n\nTrue until the rows have been counted, which is what keeps a server from\nclaiming a list is empty.",
+              "readonly": true
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "mixin",
+          "description": "Grafts the two states a collection has that are not its content.\n\n**Empty and loading are different answers and a reader can tell them apart.**\n\"No results\" under a spinner is a lie for as long as the request is in\nflight, and a blank box is not an answer at all: a reader cannot know whether\na list is empty, still arriving, or broken. Six components each rendered rows\nand none of them said either thing, so every consumer wrote their own and\nwrote it differently.\n\n**`aria-busy` on the collection, not on the message.** A reader with a screen\nreader is told the region is changing and then told once, politely, what it\nsettled on: a live region that fires on every intermediate state is a reader\nbeing read a progress bar.\n\n**The status replaces the rows rather than sitting above them.** A list that\nshows \"Loading\" over the last request's results is a list that lies about\nwhich question it is answering, and this is the point in a component's life\nwhen a consumer is most likely to be looking at stale content.\n\nListbox had `empty-text` and nothing else, and Combobox forwarded it. Both\nkeep the name, so nothing a consumer wrote has moved.",
+          "name": "MixinCollection",
+          "members": [
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text"
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text"
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet."
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked."
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that."
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading"
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText"
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText"
+            }
+          ],
+          "parameters": [
+            {
+              "name": "Base",
+              "type": {
+                "text": "T"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CollectionElement",
+          "declaration": {
+            "name": "CollectionElement",
+            "module": "src/mixins/mixin-collection/mixin-collection.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MixinCollection",
+          "declaration": {
+            "name": "MixinCollection",
+            "module": "src/mixins/mixin-collection/mixin-collection.ts"
           }
         }
       ]

@@ -191,6 +191,19 @@ export class HelixBaseCombobox extends MixinControllerOpen(
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
 
+  /**
+   * Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /** What the list says while they are on their way. */
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading'
+
   /** Words shown where the filter has hidden everything. */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
@@ -584,6 +597,8 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           exportparts="items, empty"
           aria-label=${this.listLabel}
           empty-text=${this.emptyText}
+          loading-text=${this.loadingText}
+          ?loading=${this.loading}
           ?multiple=${this.multiple}
           .value=${this.value}
           @helix-change=${this.handleChange}

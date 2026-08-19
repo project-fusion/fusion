@@ -10844,6 +10844,35 @@
             },
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the options are still on their way.\n\nPassed straight to the list, which is where the rows are and so where the\nmessage belongs.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What the list says while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "emptyText",
               "type": {
                 "text": "string"
@@ -11544,6 +11573,32 @@
               "default": "'Options'",
               "description": "Accessible name for the list, which has no visible one of its own.",
               "fieldName": "listLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the options are still on their way.\n\nPassed straight to the list, which is where the rows are and so where the\nmessage belongs.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What the list says while they are on their way.",
+              "fieldName": "loadingText",
               "inheritedFrom": {
                 "name": "HelixBaseCombobox",
                 "module": "src/combobox/root/combobox-root.ts"
@@ -18040,6 +18095,136 @@
           "members": [
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -18322,6 +18507,73 @@
           },
           "tagName": "helix-drilldown",
           "customElement": true,
+          "attributes": [
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Navigation'",
+              "description": "Accessible name for the region.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "name": "back-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Back'",
+              "description": "What the control returning from a page reads.",
+              "fieldName": "backLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            }
+          ],
           "slots": [
             {
               "description": "The rows of the top page.",
@@ -18360,34 +18612,6 @@
             {
               "description": "The region the rows are in.",
               "name": "page",
-              "inheritedFrom": {
-                "name": "HelixBaseDrilldown",
-                "module": "src/drilldown/root/drilldown-root.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Navigation'",
-              "description": "Accessible name for the region.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseDrilldown",
-                "module": "src/drilldown/root/drilldown-root.ts"
-              }
-            },
-            {
-              "name": "back-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Back'",
-              "description": "What the control returning from a page reads.",
-              "fieldName": "backLabel",
               "inheritedFrom": {
                 "name": "HelixBaseDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
@@ -23872,6 +24096,136 @@
           "members": [
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "defaultValue",
               "type": {
                 "text": "string"
@@ -24375,20 +24729,6 @@
               "description": "Whether more than one option can be the answer.",
               "attribute": "multiple",
               "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseListbox",
-                "module": "src/listbox/root/listbox-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "emptyText",
-              "type": {
-                "text": "string"
-              },
-              "default": "'No matches'",
-              "description": "What is shown when a filter has hidden every option.",
-              "attribute": "empty-text",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -24952,6 +25292,45 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
               "name": "default-value",
               "type": {
                 "text": "string"
@@ -25087,19 +25466,6 @@
               "default": "false",
               "description": "Whether more than one option can be the answer.",
               "fieldName": "multiple",
-              "inheritedFrom": {
-                "name": "HelixBaseListbox",
-                "module": "src/listbox/root/listbox-root.ts"
-              }
-            },
-            {
-              "name": "empty-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "'No matches'",
-              "description": "What is shown when a filter has hidden every option.",
-              "fieldName": "emptyText",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -26063,6 +26429,136 @@
           "members": [
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "open",
               "type": {
                 "text": "boolean"
@@ -26542,6 +27038,45 @@
           "tagName": "helix-menu",
           "customElement": true,
           "attributes": [
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
             {
               "name": "open",
               "type": {
@@ -38688,6 +39223,49 @@
             },
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the options are still on their way.\n\nPassed straight to the list, which is where the rows are and so where the\nmessage belongs. Two components saying \"Loading\" about one request is a\nconsumer wiring the same flag twice.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What the list says while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'No matches'",
+              "description": "What it says where there are none.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "multiple",
               "type": {
                 "text": "boolean"
@@ -39146,6 +39724,45 @@
               "default": "false",
               "description": "Whether the list can be narrowed by typing.\n\nPassed to the listbox rather than acted on here, because the listbox owns\nthe filtering, the empty state and the keyboard. This property existed and\nwas never read: it reflected, it type-checked, and nothing anywhere\nrendered a field. API that does nothing is worse than API that is missing,\nbecause a consumer sets it and believes it.",
               "fieldName": "filterable",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the options are still on their way.\n\nPassed straight to the list, which is where the rows are and so where the\nmessage belongs. Two components saying \"Loading\" about one request is a\nconsumer wiring the same flag twice.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What the list says while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'No matches'",
+              "description": "What it says where there are none.",
+              "fieldName": "emptyText",
               "inheritedFrom": {
                 "name": "HelixBaseSelect",
                 "module": "src/select/root/select-root.ts"
@@ -44777,6 +45394,136 @@
           "members": [
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "columns",
               "type": {
                 "text": "string"
@@ -44961,6 +45708,45 @@
           "tagName": "helix-table",
           "customElement": true,
           "attributes": [
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
             {
               "name": "columns",
               "type": {
@@ -55019,6 +55805,136 @@
             },
             {
               "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "attribute": "loading",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loadingText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "attribute": "loading-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "counted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the rows have been looked at yet.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many there were, the last time anyone looked.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "countRows",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Counts what a rows slot was given.\n\nEmptiness is a fact about light DOM children and the server has none to\ncount. `slotchange` never fires there, so `counted` is false exactly when\nthe answer is unknown, and an unknown answer is not \"empty\": a list that\nshipped \"Nothing to show\" over markup about to have rows in it is the one\nthing an empty state must never do. Listbox's spec caught precisely that.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasRows",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderStatus",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "hasContent",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The status line, or nothing where there is content to show.\n\nLoading wins over empty. A collection that has not answered yet is not\nempty, and saying so is the most common version of this fault: the reader\nis told there is nothing a moment before there is something.",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "onActiveChange",
               "type": {
                 "text": "((value: string) => void) | undefined"
@@ -55400,6 +56316,45 @@
               },
               "description": "Which end of the row the branch chevron sits at.\n\nStyled tier, because it is presentation and nothing else: it moves paint\nand leaves the markup, the ARIA and the reading order exactly as they were.\nIt was written on the base class first, which the tier rule forbids for\nprecisely this kind of property.\n\nOn the tree rather than on the item, because it is a fact about the list. A\nnavigation puts every chevron on the same side, and a per-item version\nwould make a ragged tree writable and would have to be repeated on every\nrow to say one thing.\n\n**Optional, with no default.** A reflected property that defaults to a\nvalue writes that value onto every host: `chevron-placement=\"start\"`\nappeared in the server's markup for every tree anybody rendered, which is\nthe same fault `href` and `target` had on `Button`. The resting arrangement\nis the absence of the attribute, and the stylesheet only asks about `end`.\n\nIt is worth owning rather than leaving to `::part(toggle)`, which a\nconsumer could reach for: the naive version is `order` plus an auto margin,\nand the row's `end` slot already carries an auto margin of its own, so the\ntwo split the free space and the chevron lands halfway along. Measured at\n70px short. That is the kind of thing a component should absorb once.",
               "fieldName": "chevronPlacement"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the rows are still on their way.\n\nReflected, because a stylesheet needs it: the rows that are already there\nare dimmed rather than removed while a new set arrives, and only CSS can\nsay that without the component knowing what a row looks like.",
+              "fieldName": "loading",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "loading-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What is said while they are on their way.",
+              "fieldName": "loadingText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText",
+              "inheritedFrom": {
+                "name": "MixinCollection",
+                "module": "src/mixins/mixin-collection/mixin-collection.ts"
+              }
             },
             {
               "name": "active",

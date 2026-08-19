@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, MixinCollection } from '@helix-io/core'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixBaseTableColumn } from '../column/table-column.js'
 
@@ -31,7 +31,7 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  * @cssproperty --table-columns - Track list for the columns.
  */
 @customElement('helix-base-table')
-export class HelixBaseTable extends HelixElement {
+export class HelixBaseTable extends MixinCollection(HelixElement) {
   /**
    * Column track list, as CSS. Deprecated: declare columns instead.
    *
@@ -131,11 +131,18 @@ export class HelixBaseTable extends HelixElement {
     return html`<div
       part="table"
       role="table"
+      aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || 'Table'}
       style=${template ? `--_table-template: ${template}` : ''}
     >
       <div part="head" role="row"><slot name="columns"></slot></div>
-      <slot @slotchange=${this.handleSlotChange}></slot>
+      <slot
+        @slotchange=${(event: Event) => {
+          this.countRows(event)
+          this.handleSlotChange()
+        }}
+      ></slot>
+      ${this.renderStatus(this.hasRows)}
     </div>`
   }
 }

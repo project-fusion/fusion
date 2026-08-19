@@ -75,7 +75,11 @@
 
 /* Not an empty state component, which would be a picture and a heading in a box
    this size. A filter that matches nothing wants one line saying so. */
-[part="empty"] {
+/* `loading` joins `empty` rather than getting a look of its own: they occupy the
+   same place for the same reason, and the only thing that differs is which is
+   true. */
+[part="empty"],
+[part="loading"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
@@ -152,4 +156,11 @@ slot[name="filter-icon"]::slotted(*) {
    a box. The caret says where the typing goes. */
 [part="search-field"]:focus-visible {
   outline: none;
+}
+
+/* Options already showing stay and dim while a new set arrives. Removing them
+   would collapse the panel and move everything under the reader for as long as
+   the request takes. */
+:host([loading]) [part="items"] {
+  opacity: 0.5;
 }
