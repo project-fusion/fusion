@@ -358,13 +358,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseAccordionItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseAccordionItem["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseAccordionItem["onOpenChange"];
 
   /** Fired before the section closes, and cancelable. */
   "onhelix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
@@ -418,13 +411,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseAccordionItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseAccordionItem["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseAccordionItem["onOpenChange"];
   /** Fired before the section closes, and cancelable. */
   "on:helix-close"?: (e: HelixBaseAccordionItemHelixCloseElementEvent) => void;
   /** Fired when the item opens or closes. */
@@ -1170,13 +1156,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseCheckbox["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the event
-instead. */
-  onCheckedChange?: HelixBaseCheckbox["onCheckedChange"];
 
   /** Fired before the state changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseCheckboxHelixChangeElementEvent) => void;
@@ -1243,13 +1222,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseCheckbox["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the event
-instead. */
-  "prop:onCheckedChange"?: HelixBaseCheckbox["onCheckedChange"];
   /** Fired before the state changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseCheckboxHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
@@ -1449,20 +1421,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseColorInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseColorInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseColorInput["onValueChange"];
 
   /** Fired when the color changes. */
   "onhelix-change"?: (e: HelixBaseColorInputHelixChangeElementEvent) => void;
@@ -1585,20 +1543,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseColorInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseColorInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseColorInput["onValueChange"];
   /** Fired when the color changes. */
   "on:helix-change"?: (e: HelixBaseColorInputHelixChangeElementEvent) => void;
   /** Fired when the panel opens. */
@@ -1727,13 +1671,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseColorPicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseColorPicker["onValueChange"];
 
   /** Fired when the color changes. */
   "onhelix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
@@ -1844,13 +1781,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseColorPicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseColorPicker["onValueChange"];
   /** Fired when the color changes. */
   "on:helix-change"?: (e: HelixBaseColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
@@ -2011,20 +1941,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseCombobox["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseCombobox["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseCombobox["onValueChange"];
 
   /** Fired when the chosen option changes. */
   "onhelix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
@@ -2167,20 +2083,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseCombobox["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseCombobox["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseCombobox["onValueChange"];
   /** Fired when the chosen option changes. */
   "on:helix-change"?: (e: HelixBaseComboboxHelixChangeElementEvent) => void;
   /** Fired when the reader asks for something the list does not hold, and cancelable. */
@@ -2253,13 +2155,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseCommand["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseCommand["onOpenChange"];
 
   /** Fired when a command is chosen. */
   "onhelix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
@@ -2311,13 +2206,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseCommand["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseCommand["onOpenChange"];
   /** Fired when a command is chosen. */
   "on:helix-select"?: (e: HelixBaseCommandHelixSelectElementEvent) => void;
   /** Fired when the palette opens. */
@@ -2718,20 +2606,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseDateInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseDateInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseDateInput["onValueChange"];
 
   /** Fired when the date changes. */
   "onhelix-change"?: (e: HelixBaseDateInputHelixChangeElementEvent) => void;
@@ -2928,20 +2802,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseDateInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseDateInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseDateInput["onValueChange"];
   /** Fired when the date changes. */
   "on:helix-change"?: (e: HelixBaseDateInputHelixChangeElementEvent) => void;
   /** Fired when the calendar opens. */
@@ -3071,13 +2931,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseDatePicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseDatePicker["onValueChange"];
 
   /** Fired before the dates change, and cancelable. */
   "onhelix-change"?: (e: HelixBaseDatePickerHelixChangeElementEvent) => void;
@@ -3191,13 +3044,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseDatePicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseDatePicker["onValueChange"];
   /** Fired before the dates change, and cancelable. */
   "on:helix-change"?: (e: HelixBaseDatePickerHelixChangeElementEvent) => void;
   /** Fired before the month on show changes, and cancelable. */
@@ -3269,13 +3115,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseDialog["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseDialog["onOpenChange"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
@@ -3329,13 +3168,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseDialog["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseDialog["onOpenChange"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseDialogHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -3449,13 +3281,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseDrawer["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseDrawer["onOpenChange"];
 
   /** Fired before the panel closes, and cancelable. */
   "onhelix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
@@ -3512,13 +3337,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseDrawer["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseDrawer["onOpenChange"];
   /** Fired before the panel closes, and cancelable. */
   "on:helix-close"?: (e: HelixBaseDrawerHelixCloseElementEvent) => void;
   /** Fired when the drawer opens or closes. */
@@ -4119,13 +3937,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseInput["onValueChange"];
 
   /** Fired as the text changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
@@ -4249,13 +4060,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseInput["onValueChange"];
   /** Fired as the text changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseInputHelixChangeElementEvent) => void;
   /** Relayed from the input once the reader has finished. */
@@ -4458,13 +4262,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseListbox["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseListbox["onValueChange"];
 
   /** Fired when the answer changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
@@ -4576,13 +4373,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseListbox["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseListbox["onValueChange"];
   /** Fired when the answer changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseListboxHelixChangeElementEvent) => void;
   /** Fired before the list narrows, and cancelable. */
@@ -4758,13 +4548,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseMenu["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseMenu["onOpenChange"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseMenuHelixOpenElementEvent) => void;
@@ -4826,13 +4609,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseMenu["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseMenu["onOpenChange"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseMenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -5133,13 +4909,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseNumberInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseNumberInput["onValueChange"];
 
   /** Fired as the value changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseNumberInputHelixChangeElementEvent) => void;
@@ -5233,13 +5002,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseNumberInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseNumberInput["onValueChange"];
   /** Fired as the value changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseNumberInputHelixChangeElementEvent) => void;
   /** Relayed from the field once the reader has finished. */
@@ -5894,13 +5656,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBasePinInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBasePinInput["onValueChange"];
 
   /** Fired as the code changes, and cancelable. */
   "onhelix-change"?: (e: HelixBasePinInputHelixChangeElementEvent) => void;
@@ -5987,13 +5742,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBasePinInput["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBasePinInput["onValueChange"];
   /** Fired as the code changes, and cancelable. */
   "on:helix-change"?: (e: HelixBasePinInputHelixChangeElementEvent) => void;
   /** Fired when the last box is filled. */
@@ -6051,13 +5799,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBasePopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBasePopover["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBasePopover["onOpenChange"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
@@ -6099,13 +5840,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBasePopover["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBasePopover["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBasePopover["onOpenChange"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixBasePopoverHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -6411,13 +6145,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseRadioGroup["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseRadioGroup["onValueChange"];
 
   /** Fired when the answer changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
@@ -6479,13 +6206,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseRadioGroup["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseRadioGroup["onValueChange"];
   /** Fired when the answer changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseRadioGroupHelixChangeElementEvent) => void;
 
@@ -6654,20 +6374,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseSelect["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseSelect["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseSelect["onValueChange"];
 
   /** Relayed from the listbox when the answer changes. */
   "onhelix-change"?: (e: HelixBaseSelectHelixChangeElementEvent) => void;
@@ -6784,20 +6490,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseSelect["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseSelect["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseSelect["onValueChange"];
   /** Relayed from the listbox when the answer changes. */
   "on:helix-change"?: (e: HelixBaseSelectHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
@@ -6941,13 +6633,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseSlider["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseSlider["onValueChange"];
 
   /** Fired as the value changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
@@ -7067,13 +6752,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseSlider["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseSlider["onValueChange"];
   /** Fired as the value changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseSliderHelixChangeElementEvent) => void;
   /** Relayed once the reader has let go. */
@@ -7362,8 +7040,6 @@ how markup says where to start. */
   "default-active"?: HelixBaseSteps["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   defaultActive?: HelixBaseSteps["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  onActiveChange?: HelixBaseSteps["onActiveChange"];
 
   /** Fired when the active step changes. */
   "onhelix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
@@ -7416,8 +7092,6 @@ how markup says where to start. */
   "attr:default-active"?: HelixBaseSteps["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   "prop:defaultActive"?: HelixBaseSteps["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  "prop:onActiveChange"?: HelixBaseSteps["onActiveChange"];
   /** Fired when the active step changes. */
   "on:helix-change"?: (e: HelixBaseStepsHelixChangeElementEvent) => void;
 
@@ -7529,13 +7203,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseSwitch["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the event
-instead. */
-  onCheckedChange?: HelixBaseSwitch["onCheckedChange"];
 
   /** Fired before the state changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseSwitchHelixChangeElementEvent) => void;
@@ -7598,13 +7265,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseSwitch["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the event
-instead. */
-  "prop:onCheckedChange"?: HelixBaseSwitch["onCheckedChange"];
   /** Fired before the state changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseSwitchHelixChangeElementEvent) => void;
   /** Relayed from the input once the state has changed. */
@@ -7837,8 +7497,6 @@ how markup says where to start. */
   "default-active"?: HelixBaseTabs["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   defaultActive?: HelixBaseTabs["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  onActiveChange?: HelixBaseTabs["onActiveChange"];
 
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "onhelix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
@@ -7897,8 +7555,6 @@ how markup says where to start. */
   "attr:default-active"?: HelixBaseTabs["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   "prop:defaultActive"?: HelixBaseTabs["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  "prop:onActiveChange"?: HelixBaseTabs["onActiveChange"];
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
   "on:helix-change"?: (e: HelixBaseTabsHelixChangeElementEvent) => void;
   /** Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. */
@@ -8094,13 +7750,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseTextarea["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseTextarea["onValueChange"];
 
   /** Fired as the text changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
@@ -8192,13 +7841,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseTextarea["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseTextarea["onValueChange"];
   /** Fired as the text changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseTextareaHelixChangeElementEvent) => void;
   /** Relayed from the textarea once the reader has finished. */
@@ -8360,20 +8002,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseTimeInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseTimeInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseTimeInput["onValueChange"];
 
   /** Fired when the time changes. */
   "onhelix-change"?: (e: HelixBaseTimeInputHelixChangeElementEvent) => void;
@@ -8518,20 +8146,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseTimeInput["name"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseTimeInput["onOpenChange"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseTimeInput["onValueChange"];
   /** Fired when the time changes. */
   "on:helix-change"?: (e: HelixBaseTimeInputHelixChangeElementEvent) => void;
   /** Fired when the list opens. */
@@ -8681,13 +8295,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseTimePicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseTimePicker["onValueChange"];
 
   /** Fired when the time changes. */
   "onhelix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
@@ -8820,13 +8427,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseTimePicker["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseTimePicker["onValueChange"];
   /** Fired when the time changes. */
   "on:helix-change"?: (e: HelixBaseTimePickerHelixChangeElementEvent) => void;
 
@@ -9038,13 +8638,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseToggleGroup["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixBaseToggleGroup["onValueChange"];
 
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
   "onhelix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
@@ -9106,13 +8699,6 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseToggleGroup["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixBaseToggleGroup["onValueChange"];
   /** Fired before the answer moves, and cancelable. The only way to refuse one. */
   "on:helix-change"?: (e: HelixBaseToggleGroupHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here. */
@@ -9282,13 +8868,6 @@ state for stylesheets, which is what it has always been for. */
   "default-open"?: HelixBaseTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixBaseTooltip["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseTooltip["onOpenChange"];
 
   /** Fired before the bubble shows, and cancelable. */
   "onhelix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
@@ -9370,13 +8949,6 @@ state for stylesheets, which is what it has always been for. */
   "bool:default-open"?: HelixBaseTooltip["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixBaseTooltip["defaultOpen"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseTooltip["onOpenChange"];
   /** Fired before the bubble shows, and cancelable. */
   "on:helix-open"?: (e: HelixBaseTooltipHelixOpenElementEvent) => void;
   /** Fired before it hides, and cancelable. */
@@ -9470,13 +9042,6 @@ state for stylesheets, which is what it has always been for. */
   defaultOpen?: HelixBaseTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
   focusable?: HelixBaseTreeItem["focusable"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  onOpenChange?: HelixBaseTreeItem["onOpenChange"];
 
   /** Fired when the item is chosen. */
   "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
@@ -9553,13 +9118,6 @@ state for stylesheets, which is what it has always been for. */
   "prop:defaultOpen"?: HelixBaseTreeItem["defaultOpen"];
   /** Whether this item holds the tree's single tab stop. */
   "prop:focusable"?: HelixBaseTreeItem["focusable"];
-  /** The consumer's callback, invoked after the state is applied.
-
-Not an attribute: it is a function. And not reachable from React's JSX,
-which reserves every `on[A-Z]` prop for its own event system and drops
-what it does not recognize; the generated wrapper listens for the events
-instead. */
-  "prop:onOpenChange"?: HelixBaseTreeItem["onOpenChange"];
   /** Fired when the item is chosen. */
   "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
@@ -9617,8 +9175,6 @@ how markup says where to start. */
   "default-active"?: HelixBaseTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   defaultActive?: HelixBaseTree["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  onActiveChange?: HelixBaseTree["onActiveChange"];
 
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "onhelix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
@@ -9661,8 +9217,6 @@ how markup says where to start. */
   "attr:default-active"?: HelixBaseTree["defaultActive"];
   /** Initial item for uncontrolled use. Ignored once `active` is written. */
   "prop:defaultActive"?: HelixBaseTree["defaultActive"];
-  /** The consumer's callback, invoked after the change is applied. */
-  "prop:onActiveChange"?: HelixBaseTree["onActiveChange"];
   /** Fired before the current node moves, and cancelable. The only way to refuse one. */
   "on:helix-change"?: (e: HelixBaseTreeHelixChangeElementEvent) => void;
   /** Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. */
@@ -9859,12 +9413,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -10772,12 +10320,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the event
-   * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -11043,18 +10585,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -11235,12 +10765,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -11434,18 +10958,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -11585,12 +11097,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -11918,18 +11424,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -12102,12 +11596,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -12231,12 +11719,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -12383,12 +11865,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -13022,12 +12498,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -13306,12 +12776,6 @@ export type CustomElements = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -13605,12 +13069,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -13899,12 +13357,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -14566,12 +14018,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -14679,12 +14125,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -14985,12 +14425,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -15210,18 +14644,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -15428,12 +14850,6 @@ export type CustomElements = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -15820,7 +15236,6 @@ export type CustomElements = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -16008,12 +15423,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the event
-   * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -16331,7 +15740,6 @@ export type CustomElements = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -16541,12 +15949,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -16718,18 +16120,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -16930,12 +16320,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -17248,12 +16632,6 @@ export type CustomElements = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -17516,12 +16894,6 @@ export type CustomElements = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -17641,12 +17013,6 @@ export type CustomElements = {
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -17740,7 +17106,6 @@ export type CustomElements = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -17926,12 +17291,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -18887,12 +18246,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the event
-   * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -19167,18 +18520,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -19362,12 +18703,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `color`: Where the picker stands: what was moved, or what the value says, or the start. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -19564,18 +18899,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -19718,12 +19041,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -20057,18 +19374,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -20244,12 +19549,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -20376,12 +19675,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -20534,12 +19827,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -21194,12 +20481,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -21490,12 +20771,6 @@ export type CustomElementsSolidJs = {
    * list and its options and the keyboard has to move through a grouped list
    * exactly as it moves through a flat one. (property only) (readonly)
    * - `values`: The chosen values, which is a list whether or not `multiple` is set. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -21798,12 +21073,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -22101,12 +21370,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -22785,12 +22048,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -22901,12 +22158,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -23219,12 +22470,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `items`: The radios, in light-DOM order. Client only: the server has no tree. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -23450,18 +22695,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -23674,12 +22907,6 @@ export type CustomElementsSolidJs = {
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
    * - `valueAsNumber`: The chosen value as a number, for anything doing arithmetic on it. (property only) (readonly)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -24078,7 +23305,6 @@ export type CustomElementsSolidJs = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -24272,12 +23498,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onCheckedChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the event
-   * instead. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -24613,7 +23833,6 @@ export type CustomElementsSolidJs = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *
@@ -24832,12 +24051,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -25012,18 +24225,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -25227,12 +24428,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
    *
    * What a component should bind to rather than `disabled`, which is only the
@@ -25554,12 +24749,6 @@ export type CustomElementsSolidJs = {
    *
    * Here rather than on each control, where it was declared eight times and
    * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
    * - `resolvedFeedback`: The message actually shown: the consumer's, or the platform's, or none. (property only) (readonly)
    * - `describedBy`: Id of the description node, for `aria-describedby` on the control.
    *
@@ -25831,12 +25020,6 @@ export type CustomElementsSolidJs = {
    * back controlled and stop responding. `data-open` carries the resolved
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -25959,12 +25142,6 @@ export type CustomElementsSolidJs = {
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `isBranch`: Whether this node has children. (property only) (readonly)
-   * - `onOpenChange`: The consumer's callback, invoked after the state is applied.
-   *
-   * Not an attribute: it is a function. And not reachable from React's JSX,
-   * which reserves every `on[A-Z]` prop for its own event system and drops
-   * what it does not recognize; the generated wrapper listens for the events
-   * instead. (property only)
    *
    * ## Events
    *
@@ -26061,7 +25238,6 @@ export type CustomElementsSolidJs = {
    * active="one">` is a set that stays on that tab and `default-active` is
    * how markup says where to start.
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use. Ignored once `active` is written.
-   * - `onActiveChange`: The consumer's callback, invoked after the change is applied. (property only)
    *
    * ## Events
    *

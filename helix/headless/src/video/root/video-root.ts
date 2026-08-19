@@ -624,7 +624,7 @@ export class HelixBaseVideo extends HelixElement {
               aria-label="Playback speed"
               @click=${() => this.cycleSpeed()}
             >
-              ${this.rate === 1 ? html`<helix-icon name="gauge"></helix-icon>` : `${this.rate}x`}
+              ${this.rate}x
             </button>`
           : html`<button
               part="pip"

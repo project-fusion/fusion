@@ -35,6 +35,8 @@ import { styles } from './video-root.css.js'
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
  * video's own once known, and `16 / 9` until then.
  * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
+ * @cssproperty --video-speed-size - How wide the playback speed control is
+ * held, so the row does not move when the number changes.
  * @cssproperty --video-radius - The corner it is cut to.
  * @cssproperty --video-controls-color - The ink on the bar.
  * @cssproperty --video-accent-color - The played part of the scrubber.

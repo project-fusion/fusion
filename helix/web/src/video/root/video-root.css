@@ -266,11 +266,13 @@
  * on. */
 [part="sound"] {
   --_video-level-size: 4.5rem;
-  /* How far the level stands off the bar, in one place, because the ground
-     behind it has to follow: written separately they drifted, and on the solid
-     appearance the pill ended up sixteen pixels above the track it belongs to,
-     all of the gap above the thumb and none below it. */
-  --_video-level-lift: calc(100% + var(--helix-space-2xs));
+  /* The gap the level stands off the speaker, and the lift derived from it.
+     One number, because three things need it: the track, the ground behind the
+     track, and the bridge that keeps the gap hoverable. Written separately they
+     drifted, and on the solid appearance the ground ended up sixteen pixels
+     above the track, all of its slack above the thumb and none below. */
+  --_video-level-gap: var(--helix-space-2xs);
+  --_video-level-lift: calc(100% + var(--_video-level-gap));
 
   align-items: center;
   display: flex;
@@ -319,6 +321,26 @@
 [part="sound"]:focus-within [part="volume"] {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* The gap between the speaker and the level, made hoverable.
+ *
+ * The level opens on hovering the speaker and lives above it with a gap
+ * between, so reaching for it left the speaker and shut it before it could be
+ * touched. Wider on the solid appearance, where the gap is bigger to clear the
+ * bar, which is where it became impossible rather than merely fiddly.
+ *
+ * Invisible and only while open, so it never eats a press meant for the
+ * picture. `::after` because `::before` is the ground the track stands on. */
+[part="sound"]:hover::after,
+[part="sound"]:focus-within::after {
+  block-size: var(--_video-level-gap);
+  bottom: 100%;
+  content: "";
+  inline-size: var(--helix-size-icon-lg);
+  left: 50%;
+  position: absolute;
+  translate: -50% 0;
 }
 
 /* The little ground it stands on, so the track is legible over a bright frame
@@ -374,7 +396,7 @@
  * sat on it. Lifted by the bar's own top padding, which is the number that
  * created the overlap. */
 :host([appearance="solid"]) [part="sound"] {
-  --_video-level-lift: calc(100% + var(--helix-space-xs) * 2);
+  --_video-level-gap: calc(var(--helix-space-xs) * 2);
 }
 
 /* The caption, above the bar and clear of it.
@@ -427,7 +449,18 @@
 [part="poster"] {
   display: block;
   inset: 0;
+  /* Transparent to the pointer, which is the fix for a slot that covers the
+     whole picture whether or not anybody filled it. Empty, it was still an
+     invisible sheet over the video: with `controls` set, every press meant for
+     the browser's own bar landed on this instead, so the native player looked
+     rendered and could not be used at all. Anything actually slotted takes its
+     presses back below. */
+  pointer-events: none;
   position: absolute;
+}
+
+[part="poster"]::slotted(*) {
+  pointer-events: auto;
 }
 
 [part="poster"]::slotted(*) {
@@ -450,9 +483,17 @@
    doing rather than only offering to. Sized to the digits it holds, since a bar
    that resized itself every time the speed changed would move everything beside
    it. */
+/* One width, whatever it says.
+ *
+ * It rendered a mark at normal speed and a number otherwise, so the button
+ * changed width the moment anyone used it and the scrubber beside it jumped by
+ * the difference. The label is always a number now, which also says what the
+ * speed *is* rather than only offering to change it, and the box is sized for
+ * the longest one so the row holds still. */
 [part="speed"] {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
+  min-inline-size: var(--video-speed-size, 2.5rem);
 }

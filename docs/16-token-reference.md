@@ -35,7 +35,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 248 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 138 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 95 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 30 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 29 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 7 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 2 |
@@ -66,7 +66,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 190 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 226 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 224 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 195 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 193 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 96 |
@@ -234,7 +234,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 16 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 80 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 36 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 38 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 63 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 124 |

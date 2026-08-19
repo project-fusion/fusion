@@ -60,10 +60,10 @@
   inset-block-start: 50%;
   inset-inline-start: 50%;
   justify-content: center;
-  max-block-size: var(--qr-code-logo-size, 22%);
-  max-inline-size: var(--qr-code-logo-size, 22%);
-  min-block-size: var(--qr-code-logo-size, 22%);
-  min-inline-size: var(--qr-code-logo-size, 22%);
+  max-block-size: var(--qr-code-logo-size, 27%);
+  max-inline-size: var(--qr-code-logo-size, 27%);
+  min-block-size: var(--qr-code-logo-size, 27%);
+  min-inline-size: var(--qr-code-logo-size, 27%);
   padding: var(--qr-code-logo-inset, 6%);
   position: absolute;
   translate: -50% -50%;

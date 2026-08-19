@@ -652,28 +652,6 @@ helix-drawer {
   padding-block: var(--helix-space-2xl);
 }
 
-/* The masthead over the hero, and only while it is over it.
- *
- * The bar is transparent there, so everything slotted into it is sitting on the
- * brand and resolving its color against a page it is no longer over. Light DOM,
- * so a descendant selector reaches all of it, and `currentColor` carries it into
- * the icon button. The component restores its own background on `[data-scrolled]`
- * and this stops at the same moment for the same reason. */
-.headerOnHero:not([data-scrolled]) {
-  color: var(--helix-color-foreground-on-accent);
-}
-
-.headerOnHero:not([data-scrolled]) a,
-.headerOnHero:not([data-scrolled]) helix-navigation a {
-  color: currentColor;
-}
-
-.headerOnHero:not([data-scrolled]) .fusionLogo {
-  --logo-color-from: currentColor;
-  --logo-color-mid: currentColor;
-  --logo-color-to: currentColor;
-}
-
 /* Five across, stepping down as the window narrows.
  *
  * A fixed count rather than a floor, because `auto-fit` cannot express "exactly

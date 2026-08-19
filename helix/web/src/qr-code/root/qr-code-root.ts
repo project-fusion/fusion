@@ -27,7 +27,7 @@ import { styles } from './qr-code-root.css.js'
  * the same ink as the modules.
  * @cssproperty --qr-code-background-color - Behind them, including the quiet zone.
  * @cssproperty --qr-code-logo-size - How much of the middle a mark may cover.
- * Defaults to `22%`, which `H` correction carries comfortably.
+ * Defaults to `27%`, which `H` correction carries: it can lose thirty percent.
  * @cssproperty --qr-code-logo-inset - The quiet zone around that mark.
  */
 @customElement('helix-qr-code')

@@ -195,19 +195,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -4515,19 +4502,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onCheckedChange",
-              "type": {
-                "text": "((checked: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the event\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerChecked",
-                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestChecked",
               "return": {
@@ -5959,19 +5933,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -6076,19 +6037,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -7444,19 +7392,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -8338,19 +8273,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -8455,19 +8377,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -9503,19 +9412,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -10872,19 +10768,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -10989,19 +10872,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -12388,19 +12258,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -13119,19 +12976,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -13741,19 +13585,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -17489,19 +17320,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -19354,19 +19172,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -21092,19 +20897,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -22445,19 +22237,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -25743,19 +25522,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -26692,19 +26458,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
@@ -27861,19 +27614,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -29117,19 +28857,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -29234,19 +28961,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -30422,19 +30136,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -32425,19 +32126,6 @@
             },
             {
               "kind": "field",
-              "name": "onActiveChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the change is applied.",
-              "inheritedFrom": {
-                "name": "MixinControllerActive",
-                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "active",
               "type": {
                 "text": "string"
@@ -33183,19 +32871,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerChecked",
-                "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onCheckedChange",
-              "type": {
-                "text": "((checked: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the event\ninstead.",
               "inheritedFrom": {
                 "name": "MixinControllerChecked",
                 "module": "src/mixins/mixin-controller-checked/mixin-controller-checked.ts"
@@ -35162,19 +34837,6 @@
             },
             {
               "kind": "field",
-              "name": "onActiveChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the change is applied.",
-              "inheritedFrom": {
-                "name": "MixinControllerActive",
-                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "active",
               "type": {
                 "text": "string"
@@ -36216,19 +35878,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -37427,19 +37076,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -37544,19 +37180,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -38918,19 +38541,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestValue",
               "return": {
@@ -40201,19 +39811,6 @@
               },
               "privacy": "private",
               "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -41821,19 +41418,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -42404,19 +41988,6 @@
               }
             },
             {
-              "kind": "field",
-              "name": "onOpenChange",
-              "type": {
-                "text": "((open: boolean) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the state is applied.\n\nNot an attribute: it is a function. And not reachable from React's JSX,\nwhich reserves every `on[A-Z]` prop for its own event system and drops\nwhat it does not recognize; the generated wrapper listens for the events\ninstead.",
-              "inheritedFrom": {
-                "name": "MixinControllerOpen",
-                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
-              }
-            },
-            {
               "kind": "method",
               "name": "requestOpen",
               "return": {
@@ -42942,19 +42513,6 @@
               "inheritedFrom": {
                 "name": "MixinCollection",
                 "module": "src/mixins/mixin-collection/mixin-collection.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onActiveChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the change is applied.",
-              "inheritedFrom": {
-                "name": "MixinControllerActive",
-                "module": "src/mixins/mixin-controller-active/mixin-controller-active.ts"
               }
             },
             {
