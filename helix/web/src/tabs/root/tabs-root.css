@@ -70,7 +70,7 @@
    inside the tab's own shadow root: `::slotted()` reaches the tab and stops
    there, and an attribute written onto each tab would be an attribute the
    element gave itself. Custom properties cross both boundaries on their own. */
-:host([appearance="underline"]) {
+:host([appearance="underlined"]) {
   --_tabs-rule: linear-gradient(var(--helix-color-border), var(--helix-color-border));
   --_tab-radius: var(--helix-radii-none);
   --_tab-selected-rule: var(--helix-color-primary);
@@ -189,7 +189,7 @@
 }
 
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
-:host([appearance="underline"]) [part="indicator"] {
+:host([appearance="underlined"]) [part="indicator"] {
   --_indicator-block: var(--helix-border-thick);
   --_indicator-color: var(--helix-color-primary);
   --_indicator-offset: calc(var(--_indicator-h, 0px) - var(--helix-border-thick));

@@ -66,7 +66,7 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
    * How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
-   * which is what a set sitting inside other chrome wants. `underline` is a
+   * which is what a set sitting inside other chrome wants. `underlined` is a
    * rule under the row and a thicker one under the selected tab, for a set that
    * heads a page. `segmented` puts the pill in a framed, sunken track, which
    * reads as one control rather than as a row.
@@ -75,15 +75,20 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
    * value that is another component's name says "it looks like that one", which
    * a reader can only act on if they already know what that one looks like, and
    * every other appearance in the library describes itself: `outlined`,
-   * `spaced`, `underline`, `plain`. This component's own comments called it
-   * segmented in both places it explained itself, which is the name that was
-   * doing the work.
+   * `spaced`, `plain`. This component's own comments called it segmented in
+   * both places it explained itself, which is the name that was doing the work.
+   *
+   * `underlined` and not `underline` for the shape of the word rather than the
+   * sense: the two values sit in one list and read as a pair, and `segmented`
+   * is a participle. `outlined` on Accordion is the same word doing the same
+   * job. The example file was already `underlined.html`, which is what a reader
+   * meets first.
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
    */
   @property({ reflect: true })
-  appearance?: 'segmented' | 'underline'
+  appearance?: 'segmented' | 'underlined'
 
   /** Accessible name for the tab list. */
   @property()
