@@ -109,6 +109,7 @@ import type {
   HelixTooltip,
   HelixTree,
   HelixTreeItem,
+  HelixVideo,
 } from '@helix-io/web';
 
 /**
@@ -10645,6 +10646,91 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
+/** `HelixVideo` component event */
+export type HelixVideoElementEvent<E = Event> = TypedEvent<HelixVideo, E>;
+
+export type HelixVideoProps = {
+  /** Where the video is, for the common case of one file. */
+  src?: HelixVideo["src"];
+  /** A still shown before it plays, which the platform draws itself. */
+  poster?: HelixVideo["poster"];
+  /** Accessible name, since a video is not described by its filename. */
+  label?: HelixVideo["label"];
+  /** Whether it starts again at the end. */
+  loop?: HelixVideo["loop"];
+  /** Whether it starts silent, which is what an autoplaying video must do. */
+  muted?: HelixVideo["muted"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  "plays-inline"?: HelixVideo["playsInline"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  playsInline?: HelixVideo["playsInline"];
+  /** Whether the browser draws the controls instead of this element.
+
+A fallback rather than a default. Two bars over one video is worse than
+either alone, so this one is not drawn at all when it is set. */
+  controls?: HelixVideo["controls"];
+  /** How much to fetch before anything is asked for. */
+  preload?: HelixVideo["preload"];
+  /** What the play control is called while it would start the video. */
+  "play-label"?: HelixVideo["playLabel"];
+  /** What the play control is called while it would start the video. */
+  playLabel?: HelixVideo["playLabel"];
+  /** And while it would stop it. */
+  "pause-label"?: HelixVideo["pauseLabel"];
+  /** And while it would stop it. */
+  pauseLabel?: HelixVideo["pauseLabel"];
+
+  /** Relayed, because it does not cross a shadow boundary. */
+  onplay?: (e: HelixVideoElementEvent) => void;
+  /** Relayed for the same reason. */
+  onpause?: (e: HelixVideoElementEvent) => void;
+  /** Relayed for the same reason. */
+  onended?: (e: HelixVideoElementEvent) => void;
+};
+
+export type HelixVideoSolidJsProps = {
+  /** Where the video is, for the common case of one file. */
+  "prop:src"?: HelixVideo["src"];
+  /** A still shown before it plays, which the platform draws itself. */
+  "prop:poster"?: HelixVideo["poster"];
+  /** Accessible name, since a video is not described by its filename. */
+  "prop:label"?: HelixVideo["label"];
+  /** Whether it starts again at the end. */
+  "prop:loop"?: HelixVideo["loop"];
+  /** Whether it starts silent, which is what an autoplaying video must do. */
+  "prop:muted"?: HelixVideo["muted"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  "bool:plays-inline"?: HelixVideo["playsInline"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  "prop:playsInline"?: HelixVideo["playsInline"];
+  /** Whether the browser draws the controls instead of this element.
+
+A fallback rather than a default. Two bars over one video is worse than
+either alone, so this one is not drawn at all when it is set. */
+  "prop:controls"?: HelixVideo["controls"];
+  /** How much to fetch before anything is asked for. */
+  "prop:preload"?: HelixVideo["preload"];
+  /** What the play control is called while it would start the video. */
+  "attr:play-label"?: HelixVideo["playLabel"];
+  /** What the play control is called while it would start the video. */
+  "prop:playLabel"?: HelixVideo["playLabel"];
+  /** And while it would stop it. */
+  "attr:pause-label"?: HelixVideo["pauseLabel"];
+  /** And while it would stop it. */
+  "prop:pauseLabel"?: HelixVideo["pauseLabel"];
+  /** Relayed, because it does not cross a shadow boundary. */
+  "on:play"?: (e: HelixVideoElementEvent) => void;
+  /** Relayed for the same reason. */
+  "on:pause"?: (e: HelixVideoElementEvent) => void;
+  /** Relayed for the same reason. */
+  "on:ended"?: (e: HelixVideoElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 export type CustomElements = {
   /**
    * The open and close transition animates `grid-template-rows` from `0fr` to
@@ -18787,6 +18873,88 @@ export type CustomElements = {
    * - `tree`: The tree container.
    */
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
+
+  /**
+   * The player is the base tier's. What this adds is the bar: where it sits, when
+   * it is there, and what the two ranges look like, which is the whole reason to
+   * replace a control set that cannot be styled.
+   *
+   * **The bar is over the picture, not under it.** A bar in the layout would move
+   * everything below the video by its own height and would leave a strip of page
+   * colour under a picture that is meant to be the whole of it. Over it, the
+   * video is the component's size and the controls belong to it.
+   *
+   * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
+   * while playing and untouched, shown on hover, and shown whenever anything
+   * inside it has focus, which is what keeps it reachable without a pointer. A
+   * paused video keeps its bar, because a reader who stopped it is deciding what
+   * to do next.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Where the video is, for the common case of one file.
+   * - `poster`: A still shown before it plays, which the platform draws itself.
+   * - `label`: Accessible name, since a video is not described by its filename.
+   * - `loop`: Whether it starts again at the end.
+   * - `muted`: Whether it starts silent, which is what an autoplaying video must do.
+   * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `controls`: Whether the browser draws the controls instead of this element.
+   *
+   * A fallback rather than a default. Two bars over one video is worse than
+   * either alone, so this one is not drawn at all when it is set.
+   * - `preload`: How much to fetch before anything is asked for.
+   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
+   * - `pause-label`/`pauseLabel`: And while it would stop it.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `play`: Relayed, because it does not cross a shadow boundary.
+   * - `pause`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: `<source>` and `<track>` elements, which the video takes as its own.
+   * - `poster`: Shown over the video until it starts.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
+   * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-radius`: The corner it is cut to. (default: `undefined`)
+   * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
+   * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
+   * - `video`: The video itself.
+   * - `poster`: What covers it before it plays.
+   * - `controls`: The bar along the bottom.
+   * - `play`: Play and pause.
+   * - `scrubber`: Where it is, and where to go.
+   * - `time`: The position and the duration.
+   * - `mute`: Sound on and off.
+   * - `volume`: How loud.
+   * - `captions`: Subtitles on and off.
+   * - `fullscreen`: The whole screen, and back.
+   */
+  "helix-video": Partial<HelixVideoProps & BaseProps<HelixVideo> & BaseEvents>;
 };
 
 export type CustomElementsSolidJs = {
@@ -27223,6 +27391,93 @@ export type CustomElementsSolidJs = {
   "helix-tree": Partial<
     HelixTreeProps & HelixTreeSolidJsProps & BaseProps<HelixTree> & BaseEvents
   >;
+
+  /**
+   * The player is the base tier's. What this adds is the bar: where it sits, when
+   * it is there, and what the two ranges look like, which is the whole reason to
+   * replace a control set that cannot be styled.
+   *
+   * **The bar is over the picture, not under it.** A bar in the layout would move
+   * everything below the video by its own height and would leave a strip of page
+   * colour under a picture that is meant to be the whole of it. Over it, the
+   * video is the component's size and the controls belong to it.
+   *
+   * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
+   * while playing and untouched, shown on hover, and shown whenever anything
+   * inside it has focus, which is what keeps it reachable without a pointer. A
+   * paused video keeps its bar, because a reader who stopped it is deciding what
+   * to do next.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Where the video is, for the common case of one file.
+   * - `poster`: A still shown before it plays, which the platform draws itself.
+   * - `label`: Accessible name, since a video is not described by its filename.
+   * - `loop`: Whether it starts again at the end.
+   * - `muted`: Whether it starts silent, which is what an autoplaying video must do.
+   * - `plays-inline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `controls`: Whether the browser draws the controls instead of this element.
+   *
+   * A fallback rather than a default. Two bars over one video is worse than
+   * either alone, so this one is not drawn at all when it is set.
+   * - `preload`: How much to fetch before anything is asked for.
+   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
+   * - `pause-label`/`pauseLabel`: And while it would stop it.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `play`: Relayed, because it does not cross a shadow boundary.
+   * - `pause`: Relayed for the same reason.
+   * - `ended`: Relayed for the same reason.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: `<source>` and `<track>` elements, which the video takes as its own.
+   * - `poster`: Shown over the video until it starts.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
+   * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--video-radius`: The corner it is cut to. (default: `undefined`)
+   * - `--video-controls-color`: The ink on the bar. (default: `undefined`)
+   * - `--video-accent-color`: The played part of the scrubber. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
+   * - `video`: The video itself.
+   * - `poster`: What covers it before it plays.
+   * - `controls`: The bar along the bottom.
+   * - `play`: Play and pause.
+   * - `scrubber`: Where it is, and where to go.
+   * - `time`: The position and the duration.
+   * - `mute`: Sound on and off.
+   * - `volume`: How loud.
+   * - `captions`: Subtitles on and off.
+   * - `fullscreen`: The whole screen, and back.
+   */
+  "helix-video": Partial<
+    HelixVideoProps &
+      HelixVideoSolidJsProps &
+      BaseProps<HelixVideo> &
+      BaseEvents
+  >;
 };
 
 export type CustomCssProperties = {
@@ -27622,6 +27877,12 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
+  /** The corner it is cut to. */
+  "--video-radius"?: string;
+  /** The ink on the bar. */
+  "--video-controls-color"?: string;
+  /** The played part of the scrubber. */
+  "--video-accent-color"?: string;
 };
 
 declare module "react" {

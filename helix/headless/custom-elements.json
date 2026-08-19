@@ -16928,6 +16928,14 @@
             "name": "*",
             "module": "src/tree/index.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/video/index.js"
+          }
         }
       ]
     },
@@ -42304,6 +42312,606 @@
           "declaration": {
             "name": "HelixBaseTree",
             "module": "src/tree/root/tree-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseVideo",
+          "declaration": {
+            "name": "HelixBaseVideo",
+            "module": "./root/video-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video/root/video-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The picture is a real `<video>`.** Decoding, buffering, captions, Picture\nin Picture, AirPlay and the codecs a device happens to have are all the\nplatform's, and none of them can be had from anything else. What is replaced\nis the control bar, which is the one part of a video element that cannot be\nstyled and looks different in every browser.\n\n**Every control is a real control.** The scrubber and the volume are\n`<input type=\"range\">`, so a reader gets arrow keys, Home and End, the\nplatform's own touch target and its screen reader announcement without this\nelement implementing any of it. Drawing a div and listening for pointer moves\nis how a media player ends up unusable from a keyboard.\n\n**Native controls are the fallback, not the default.** Where a consumer sets\n`controls`, the browser's bar is used and this one is not drawn: two sets of\ncontrols over one video is worse than either alone, and a consumer who asked\nfor the native bar has a reason.\n\nThe keys are the ones every player uses: Space and `k` to play or pause, the\narrows to seek and to change the volume, `m` to mute, `f` for fullscreen.\nThey are bound on this element rather than on the document, because a video\nis not a palette: keys belong to it only while a reader is on it.",
+          "name": "HelixBaseVideo",
+          "cssParts": [
+            {
+              "description": "The box holding the picture and its controls, and the focus target the keys are bound to.",
+              "name": "stage"
+            },
+            {
+              "description": "The video itself.",
+              "name": "video"
+            },
+            {
+              "description": "What covers it before it plays.",
+              "name": "poster"
+            },
+            {
+              "description": "The bar along the bottom.",
+              "name": "controls"
+            },
+            {
+              "description": "Play and pause.",
+              "name": "play"
+            },
+            {
+              "description": "Where it is, and where to go.",
+              "name": "scrubber"
+            },
+            {
+              "description": "The position and the duration.",
+              "name": "time"
+            },
+            {
+              "description": "Sound on and off.",
+              "name": "mute"
+            },
+            {
+              "description": "How loud.",
+              "name": "volume"
+            },
+            {
+              "description": "Subtitles on and off.",
+              "name": "captions"
+            },
+            {
+              "description": "The whole screen, and back.",
+              "name": "fullscreen"
+            }
+          ],
+          "slots": [
+            {
+              "description": "`<source>` and `<track>` elements, which the video takes as its own.",
+              "name": ""
+            },
+            {
+              "description": "Shown over the video until it starts.",
+              "name": "poster"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the video is, for the common case of one file.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A still shown before it plays, which the platform draws itself.",
+              "attribute": "poster"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, since a video is not described by its filename.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts again at the end.",
+              "attribute": "loop",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts silent, which is what an autoplaying video must do.",
+              "attribute": "muted",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "playsInline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether it plays where it sits rather than taking over the screen.",
+              "attribute": "plays-inline"
+            },
+            {
+              "kind": "field",
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser draws the controls instead of this element.\n\nA fallback rather than a default. Two bars over one video is worse than\neither alone, so this one is not drawn at all when it is set.",
+              "attribute": "controls",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "preload",
+              "type": {
+                "text": "'auto' | 'metadata' | 'none'"
+              },
+              "default": "'metadata'",
+              "description": "How much to fetch before anything is asked for.",
+              "attribute": "preload"
+            },
+            {
+              "kind": "field",
+              "name": "playLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Play'",
+              "description": "What the play control is called while it would start the video.",
+              "attribute": "play-label"
+            },
+            {
+              "kind": "field",
+              "name": "pauseLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pause'",
+              "description": "And while it would stop it.",
+              "attribute": "pause-label"
+            },
+            {
+              "kind": "field",
+              "name": "playing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "loudness",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "silent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "full",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "captioned",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hasCaptions",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "video",
+              "type": {
+                "text": "HTMLVideoElement | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Toggles playback, which is what every key and the button both come to.",
+              "type": {
+                "text": "toggle() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "seek",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "seconds",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Moves to a point in seconds, clamped to what exists.",
+              "type": {
+                "text": "seek(seconds: number) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleLoaded",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleTime",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleState",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Relayed, because none of these cross a shadow boundary on their own.\n\nThe video is inside this element's shadow root, so a consumer listening on\nthe element they wrote hears nothing at all without this. Input relays\n`change` for the same reason."
+            },
+            {
+              "kind": "field",
+              "name": "handleVolume",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "toggleCaptions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Turns the first caption track on or off, which is what the button means."
+            },
+            {
+              "kind": "method",
+              "name": "toggleFullscreen",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFullscreenChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The keys every player uses, bound to this element rather than the document.\n\nA video is not a command palette: its keys belong to it while a reader is\non it, and a page with two videos on it would otherwise have both answering\nthe same press.\n\nNothing is taken while focus is in a range. The scrubber and the volume are\nreal inputs and the arrows are already theirs, so intercepting would mean\nseeking twice for one press."
+            },
+            {
+              "kind": "method",
+              "name": "renderBar",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because it does not cross a shadow boundary.",
+              "name": "play",
+              "reactProp": "onplay"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed for the same reason.",
+              "name": "pause",
+              "reactProp": "onpause"
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed for the same reason.",
+              "name": "ended",
+              "reactProp": "onended"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the video is, for the common case of one file.",
+              "fieldName": "src"
+            },
+            {
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A still shown before it plays, which the platform draws itself.",
+              "fieldName": "poster"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, since a video is not described by its filename.",
+              "fieldName": "label"
+            },
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts again at the end.",
+              "fieldName": "loop"
+            },
+            {
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts silent, which is what an autoplaying video must do.",
+              "fieldName": "muted"
+            },
+            {
+              "name": "plays-inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether it plays where it sits rather than taking over the screen.",
+              "fieldName": "playsInline"
+            },
+            {
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser draws the controls instead of this element.\n\nA fallback rather than a default. Two bars over one video is worse than\neither alone, so this one is not drawn at all when it is set.",
+              "fieldName": "controls"
+            },
+            {
+              "name": "preload",
+              "type": {
+                "text": "'auto' | 'metadata' | 'none'"
+              },
+              "default": "'metadata'",
+              "description": "How much to fetch before anything is asked for.",
+              "fieldName": "preload"
+            },
+            {
+              "name": "play-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Play'",
+              "description": "What the play control is called while it would start the video.",
+              "fieldName": "playLabel"
+            },
+            {
+              "name": "pause-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pause'",
+              "description": "And while it would stop it.",
+              "fieldName": "pauseLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Plays a video, with controls this library draws rather than the\nbrowser's.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/video",
+            "aliases": [
+              "Player",
+              "Media",
+              "Movie"
+            ],
+            "tier": "headless",
+            "group": "BaseVideo",
+            "part": "Root",
+            "source": "helix/headless/src/video"
+          },
+          "tagName": "helix-base-video",
+          "customElement": true,
+          "modulePath": "src/video/root/video-root.ts",
+          "definitionPath": "src/video/root/video-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseVideo",
+          "declaration": {
+            "name": "HelixBaseVideo",
+            "module": "src/video/root/video-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-video",
+          "declaration": {
+            "name": "HelixBaseVideo",
+            "module": "src/video/root/video-root.ts"
           }
         }
       ]

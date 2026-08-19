@@ -5412,3 +5412,88 @@ the row itself stays flat.
 | `--tree-chevron-size` | Size of the chevron, and the gutter a leaf reserves. |
 | `--tree-gap` | Space between rows. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
+
+## Video
+
+### Root — `helix-video`
+
+Plays a video, with controls this library draws rather than the
+browser's.
+
+Extends `HelixBaseVideo`.
+
+The player is the base tier's. What this adds is the bar: where it sits, when
+it is there, and what the two ranges look like, which is the whole reason to
+replace a control set that cannot be styled.
+
+**The bar is over the picture, not under it.** A bar in the layout would move
+everything below the video by its own height and would leave a strip of page
+colour under a picture that is meant to be the whole of it. Over it, the
+video is the component's size and the controls belong to it.
+
+**It goes when nobody is using it, and comes back for the keyboard.** Hidden
+while playing and untouched, shown on hover, and shown whenever anything
+inside it has focus, which is what keeps it reachable without a pointer. A
+paused video keeps its bar, because a reader who stopped it is deciding what
+to do next.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
+| `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
+| `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
+| `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |
+| `pauseLabel` | `pause-label` | `string` | `'Pause'` | `HelixBaseVideo` | And while it would stop it. |
+| `playLabel` | `play-label` | `string` | `'Play'` | `HelixBaseVideo` | What the play control is called while it would start the video. |
+| `playsInline` | `plays-inline` | `boolean` | `true` | `HelixBaseVideo` | Whether it plays where it sits rather than taking over the screen. |
+| `poster` | `poster` | `string` | `''` | `HelixBaseVideo` | A still shown before it plays, which the platform draws itself. |
+| `preload` | `preload` | `'auto' \| 'metadata' \| 'none'` | `'metadata'` | `HelixBaseVideo` | How much to fetch before anything is asked for. |
+| `src` | `src` | `string` | `''` | `HelixBaseVideo` | Where the video is, for the common case of one file. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `seek()` | `HelixBaseVideo` | Moves to a point in seconds, clamped to what exists. |
+| `toggle()` | `HelixBaseVideo` | Toggles playback, which is what every key and the button both come to. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
+| `pause` | `Event` | Relayed for the same reason. |
+| `ended` | `Event` | Relayed for the same reason. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | `<source>` and `<track>` elements, which the video takes as its own. |
+| `poster` | Shown over the video until it starts. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
+| `video` | The video itself. |
+| `poster` | What covers it before it plays. |
+| `controls` | The bar along the bottom. |
+| `play` | Play and pause. |
+| `scrubber` | Where it is, and where to go. |
+| `time` | The position and the duration. |
+| `mute` | Sound on and off. |
+| `volume` | How loud. |
+| `captions` | Subtitles on and off. |
+| `fullscreen` | The whole screen, and back. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--video-radius` | The corner it is cut to. |
+| `--video-controls-color` | The ink on the bar. |
+| `--video-accent-color` | The played part of the scrubber. |

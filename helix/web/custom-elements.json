@@ -21824,6 +21824,14 @@
             "name": "*",
             "module": "src/tree/index.js"
           }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/video/index.js"
+          }
         }
       ]
     },
@@ -55480,6 +55488,873 @@
           "declaration": {
             "name": "HelixTree",
             "module": "src/tree/root/tree-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixVideo",
+          "declaration": {
+            "name": "HelixVideo",
+            "module": "./root/video-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video/root/video-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/video/root/video-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video/root/video-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The player is the base tier's. What this adds is the bar: where it sits, when\nit is there, and what the two ranges look like, which is the whole reason to\nreplace a control set that cannot be styled.\n\n**The bar is over the picture, not under it.** A bar in the layout would move\neverything below the video by its own height and would leave a strip of page\ncolour under a picture that is meant to be the whole of it. Over it, the\nvideo is the component's size and the controls belong to it.\n\n**It goes when nobody is using it, and comes back for the keyboard.** Hidden\nwhile playing and untouched, shown on hover, and shown whenever anything\ninside it has focus, which is what keeps it reachable without a pointer. A\npaused video keeps its bar, because a reader who stopped it is deciding what\nto do next.",
+          "name": "HelixVideo",
+          "cssProperties": [
+            {
+              "description": "The corner it is cut to.",
+              "name": "--video-radius"
+            },
+            {
+              "description": "The ink on the bar.",
+              "name": "--video-controls-color"
+            },
+            {
+              "description": "The played part of the scrubber.",
+              "name": "--video-accent-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the video is, for the common case of one file.",
+              "attribute": "src",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A still shown before it plays, which the platform draws itself.",
+              "attribute": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, since a video is not described by its filename.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts again at the end.",
+              "attribute": "loop",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts silent, which is what an autoplaying video must do.",
+              "attribute": "muted",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "playsInline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether it plays where it sits rather than taking over the screen.",
+              "attribute": "plays-inline",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser draws the controls instead of this element.\n\nA fallback rather than a default. Two bars over one video is worse than\neither alone, so this one is not drawn at all when it is set.",
+              "attribute": "controls",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "preload",
+              "type": {
+                "text": "'auto' | 'metadata' | 'none'"
+              },
+              "default": "'metadata'",
+              "description": "How much to fetch before anything is asked for.",
+              "attribute": "preload",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "playLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Play'",
+              "description": "What the play control is called while it would start the video.",
+              "attribute": "play-label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pauseLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pause'",
+              "description": "And while it would stop it.",
+              "attribute": "pause-label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "playing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "loudness",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "silent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "full",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "captioned",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hasCaptions",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "video",
+              "type": {
+                "text": "HTMLVideoElement | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Toggles playback, which is what every key and the button both come to.",
+              "type": {
+                "text": "toggle() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "seek",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "seconds",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Moves to a point in seconds, clamped to what exists.",
+              "type": {
+                "text": "seek(seconds: number) => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleLoaded",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleTime",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleState",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Relayed, because none of these cross a shadow boundary on their own.\n\nThe video is inside this element's shadow root, so a consumer listening on\nthe element they wrote hears nothing at all without this. Input relays\n`change` for the same reason.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleVolume",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleCaptions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Turns the first caption track on or off, which is what the button means.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleFullscreen",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleFullscreenChange",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The keys every player uses, bound to this element rather than the document.\n\nA video is not a command palette: its keys belong to it while a reader is\non it, and a page with two videos on it would otherwise have both answering\nthe same press.\n\nNothing is taken while focus is in a range. The scrubber and the volume are\nreal inputs and the arrows are already theirs, so intercepting would mean\nseeking twice for one press.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderBar",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseVideo",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Plays a video, with controls this library draws rather than the\nbrowser's.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/video",
+            "tier": "styled",
+            "group": "Video",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "slug": "captions"
+              },
+              {
+                "slug": "native"
+              },
+              {
+                "slug": "sources"
+              }
+            ],
+            "source": "helix/web/src/video"
+          },
+          "tagName": "helix-video",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "`<source>` and `<track>` elements, which the video takes as its own.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Shown over the video until it starts.",
+              "name": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The box holding the picture and its controls, and the focus target the keys are bound to.",
+              "name": "stage",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The video itself.",
+              "name": "video",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "What covers it before it plays.",
+              "name": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The bar along the bottom.",
+              "name": "controls",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Play and pause.",
+              "name": "play",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Where it is, and where to go.",
+              "name": "scrubber",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The position and the duration.",
+              "name": "time",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Sound on and off.",
+              "name": "mute",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "How loud.",
+              "name": "volume",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "Subtitles on and off.",
+              "name": "captions",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The whole screen, and back.",
+              "name": "fullscreen",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the video is, for the common case of one file.",
+              "fieldName": "src",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "poster",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A still shown before it plays, which the platform draws itself.",
+              "fieldName": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name, since a video is not described by its filename.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts again at the end.",
+              "fieldName": "loop",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it starts silent, which is what an autoplaying video must do.",
+              "fieldName": "muted",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "plays-inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether it plays where it sits rather than taking over the screen.",
+              "fieldName": "playsInline",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the browser draws the controls instead of this element.\n\nA fallback rather than a default. Two bars over one video is worse than\neither alone, so this one is not drawn at all when it is set.",
+              "fieldName": "controls",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "preload",
+              "type": {
+                "text": "'auto' | 'metadata' | 'none'"
+              },
+              "default": "'metadata'",
+              "description": "How much to fetch before anything is asked for.",
+              "fieldName": "preload",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "play-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Play'",
+              "description": "What the play control is called while it would start the video.",
+              "fieldName": "playLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "pause-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Pause'",
+              "description": "And while it would stop it.",
+              "fieldName": "pauseLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed, because it does not cross a shadow boundary.",
+              "name": "play",
+              "reactProp": "onplay",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed for the same reason.",
+              "name": "pause",
+              "reactProp": "onpause",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "Event"
+              },
+              "description": "Relayed for the same reason.",
+              "name": "ended",
+              "reactProp": "onended",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/video/root/video-root.ts",
+          "definitionPath": "src/video/root/video-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixVideo",
+          "declaration": {
+            "name": "HelixVideo",
+            "module": "src/video/root/video-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-video",
+          "declaration": {
+            "name": "HelixVideo",
+            "module": "src/video/root/video-root.ts"
           }
         }
       ]

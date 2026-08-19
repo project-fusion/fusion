@@ -1,0 +1,155 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+[part="stage"] {
+  border-radius: var(--video-radius, var(--helix-radii-md));
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Focus on the box rather than on the picture, and drawn inside it: the stage
+   is clipped to its own corner, so a ring drawn outward has its outer half cut
+   off by the very rule that rounds it. */
+[part="stage"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="video"] {
+  background-color: var(--helix-color-surface-inverse);
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* Over the picture, not under it.
+ *
+ * A bar in the layout moves everything below the video down by its own height
+ * and leaves a strip of page colour under a picture meant to be the whole of
+ * it. The gradient is the bar's own ground: a flat panel over a light frame
+ * hides part of the video, and over a dark one disappears. */
+[part="controls"] {
+  align-items: center;
+  background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
+  color: var(--video-controls-color, var(--helix-color-foreground-inverse));
+  display: flex;
+  gap: var(--helix-space-xs);
+  inset-block-end: 0;
+  inset-inline: 0;
+  opacity: 1;
+  padding: var(--helix-space-lg) var(--helix-space-sm) var(--helix-space-xs);
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Gone while it is playing and nobody is near it. Focus counts as being near
+   it, which is what keeps the bar reachable without a pointer: a control that
+   is only there on hover is a control a keyboard cannot find. A paused video
+   keeps its bar, because a reader who stopped it is deciding what to do next. */
+:host(:not(:hover):not(:focus-within)) [part="stage"]:has(video:not([paused])) [part="controls"] {
+  opacity: 0;
+}
+
+[part="play"],
+[part="mute"],
+[part="captions"],
+[part="fullscreen"] {
+  all: unset;
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-lg);
+}
+
+[part="play"]:focus-visible,
+[part="mute"]:focus-visible,
+[part="captions"]:focus-visible,
+[part="fullscreen"]:focus-visible,
+[part="scrubber"]:focus-visible,
+[part="volume"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Tabular, so the position does not shuffle the bar sideways every second. */
+[part="time"] {
+  color: inherit;
+  flex: 0 0 auto;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Both ranges are real inputs, stripped rather than replaced: the keyboard, the
+   touch target and the screen reader announcement are the platform's, and only
+   the paint is ours. */
+[part="scrubber"],
+[part="volume"] {
+  appearance: none;
+  background-color: color-mix(in oklab, currentColor 30%, transparent);
+  block-size: 4px;
+  border-radius: var(--helix-radii-full);
+  cursor: pointer;
+  margin: var(--helix-space-none);
+}
+
+[part="scrubber"] {
+  /* The played part, painted from the same number the thumb sits at rather than
+     from a second element that would have to be kept in step with it. */
+  background-image: linear-gradient(
+    to right,
+    var(--video-accent-color, var(--helix-color-primary)) calc(var(--_video-progress, 0) * 100%),
+    transparent calc(var(--_video-progress, 0) * 100%)
+  );
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+[part="volume"] {
+  flex: 0 0 auto;
+  inline-size: 4rem;
+}
+
+[part="scrubber"]::-webkit-slider-thumb,
+[part="volume"]::-webkit-slider-thumb {
+  appearance: none;
+  background-color: currentColor;
+  block-size: 12px;
+  border: none;
+  border-radius: var(--helix-radii-full);
+  inline-size: 12px;
+}
+
+[part="scrubber"]::-moz-range-thumb,
+[part="volume"]::-moz-range-thumb {
+  background-color: currentColor;
+  block-size: 12px;
+  border: none;
+  border-radius: var(--helix-radii-full);
+  inline-size: 12px;
+}
+
+/* Anything a consumer puts over the picture covers all of it, and goes as soon
+   as the video has started. */
+[part="poster"] {
+  display: block;
+  inset: 0;
+  position: absolute;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="controls"] {
+    transition: none;
+  }
+}

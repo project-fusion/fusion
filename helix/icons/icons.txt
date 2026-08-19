@@ -25,9 +25,12 @@ check-circle
 check-circle-fill
 circle
 clock
+closed-captioning
 cloud
 compass
 copy
+corners-in
+corners-out
 cube
 dots-three-vertical
 download
@@ -55,6 +58,7 @@ monitor
 moon
 notebook
 palette
+pause
 play
 plus
 pulse
@@ -68,6 +72,8 @@ shield-check
 sidebar-simple
 sign-out
 sliders-horizontal
+speaker-high
+speaker-x
 stack
 stop
 strategy
