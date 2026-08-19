@@ -66,8 +66,8 @@ A custom element registers on import. A tag nobody imported is not an error and
 not a warning: it is an inert unknown element, laying out as an empty inline
 box. A panel built around one looks like a panel that failed to open.
 
-So a template names the **public** tag, `helix-calendar` rather than
-`helix-base-calendar`, and **each tier side-effect imports its own version of
+So a template names the **public** tag, `helix-date-picker` rather than
+`helix-base-date-picker`, and **each tier side-effect imports its own version of
 it**. A consumer on the styled tier then gets the styled calendar; one on the
 headless tier brings a calendar of their own under that name. Select does this
 for its listbox and Pagination for its select.

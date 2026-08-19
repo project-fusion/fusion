@@ -31,7 +31,7 @@ describe('html to jsx', () => {
     // verbatim: `field-label` reaches `fieldLabel`, and `fieldLabel` reaches
     // nothing at all.
     const out = htmlToJsx(
-      '<helix-calendar disable-days="0,6" first-day-of-week="1"></helix-calendar>',
+      '<helix-date-picker disable-days="0,6" first-day-of-week="1"></helix-date-picker>',
     )
     expect(out).toContain('disable-days="0,6"')
     expect(out).toContain('first-day-of-week="1"')

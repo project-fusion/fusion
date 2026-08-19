@@ -48,7 +48,7 @@ interface EyeDropperConstructor {
  *
  * @description
  * **The picker itself, with no field around it.** Color Input is this element in
- * a panel behind a text field, the same way Date Input is `helix-calendar` in a
+ * a panel behind a text field, the same way Date Input is `helix-date-picker` in a
  * panel: a form wants a field, and a settings pane or a toolbar wants the picker
  * sitting flat on the page with nothing to open. Neither should be the other one
  * with parts hidden.
@@ -105,7 +105,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   /**
    * Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -385,7 +385,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   }
 
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
-     Calendar takes and for the reason the whole library records: a `role` or a
+     Date Picker takes and for the reason the whole library records: a `role` or a
      state written onto the host as an attribute is one a React consumer's
      server markup never had. */
   protected override willUpdate(changed: PropertyValues): void {

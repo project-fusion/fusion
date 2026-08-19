@@ -1,14 +1,14 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseDateInput } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect import, because the headless tier's template names `helix-calendar`
+/* Side-effect import, because the headless tier's template names `helix-date-picker`
    rather than the base tag, and a custom element registers on import. Without it
    a consumer importing this one family got a panel with an unknown element in
-   it: `helix-base-calendar` was registered by the tier below and the tag being
+   it: `helix-base-date-picker` was registered by the tier below and the tag being
    rendered was not, so the calendar was an empty inert box. It only ever looked
    right because the sandbox imports the whole barrel. Same arrangement Select
    uses for its listbox and Pagination for its select. */
-import '../../calendar/index.js'
+import '../../date-picker/index.js'
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
@@ -23,7 +23,7 @@ import { styles } from './date-input-root.css.js'
  * control. The trigger is a mark within that box rather than a button beside it:
  * a second frame inside the first is two controls where a reader sees one.
  *
- * The calendar is the real `helix-calendar`, in a panel with no border of its
+ * The calendar is the real `helix-date-picker`, in a panel with no border of its
  * own. A surface over the page is told apart by its shadow and by what it
  * covers, and a line around it as well reads as a box drawn around something
  * already separate.

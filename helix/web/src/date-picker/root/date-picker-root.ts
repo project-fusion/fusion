@@ -1,7 +1,7 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseCalendar } from '@helix-io/headless'
+import { HelixBaseDatePicker } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './calendar-root.css.js'
+import { styles } from './date-picker-root.css.js'
 
 /**
  * @summary Shows a month, and takes a date from it.
@@ -21,23 +21,23 @@ import { styles } from './calendar-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category forms
- * @aliases Date grid, Month view
- * @documentation https://helix.fusion.dev/components/calendar
+ * @aliases Calendar, Date grid, Month view
+ * @documentation https://helix.fusion.dev/components/date-picker
  *
- * @cssproperty --calendar-columns - Months per row. Two unless there is only one.
- * @cssproperty --calendar-day-size - Width and height of a day.
- * @cssproperty --calendar-track-size - Width of a column, which is what sets the space between days.
- * @cssproperty --calendar-row-size - Height of a week row.
- * @cssproperty --calendar-selected-color - Fill behind a selected day.
- * @cssproperty --calendar-range-color - Band behind the days in a range.
+ * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.
+ * @cssproperty --date-picker-day-size - Width and height of a day.
+ * @cssproperty --date-picker-track-size - Width of a column, which is what sets the space between days.
+ * @cssproperty --date-picker-row-size - Height of a week row.
+ * @cssproperty --date-picker-selected-color - Fill behind a selected day.
+ * @cssproperty --date-picker-range-color - Band behind the days in a range.
  */
-@customElement('helix-calendar')
-export class HelixCalendar extends HelixBaseCalendar {
+@customElement('helix-date-picker')
+export class HelixDatePicker extends HelixBaseDatePicker {
   static override styles: CSSResultGroup = styles
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-calendar': HelixCalendar
+    'helix-date-picker': HelixDatePicker
   }
 }

@@ -8,15 +8,15 @@
  * to open rather than like a missing import.
  *
  * The convention this enforces is the one Select and Pagination already follow:
- * a template names the *public* tag, `helix-calendar` rather than
- * `helix-base-calendar`, and each tier side-effect imports its own version of
+ * a template names the *public* tag, `helix-date-picker` rather than
+ * `helix-base-date-picker`, and each tier side-effect imports its own version of
  * it. A consumer on the styled tier then gets the styled calendar, and one on
  * the headless tier brings a calendar of their own under that name.
  *
  * **It went wrong the first time it was used.** Date Input's headless tier
- * imported the base calendar and rendered `helix-calendar`, and its styled tier
+ * imported the base calendar and rendered `helix-date-picker`, and its styled tier
  * imported no calendar at all. Measured: importing that one family registered
- * `helix-date-input` and `helix-base-calendar`, and left `helix-calendar`
+ * `helix-date-input` and `helix-base-date-picker`, and left `helix-date-picker`
  * undefined. Every example still looked right, because the sandbox and the docs
  * site both import the whole barrel, which is exactly the condition under which
  * a missing import is invisible. It would have shipped that way to the first
@@ -33,13 +33,13 @@
  * the tag is written in is the version of this check that does not work: it was
  * written that way first, and it passed with the Date Input bug reintroduced,
  * because the headless file did import a calendar. It was the styled tier that
- * imported none, and the styled tier has no `<helix-calendar>` in it to find.
+ * imported none, and the styled tier has no `<helix-date-picker>` in it to find.
  * So each styled file is held to what its counterpart one tier down renders,
  * matched by the path they share.
  *
  * **What counts as importing it.** A side-effect `import '…/index.js'` whose path
  * ends in the family's folder. The family is the tag with the tier prefix taken
- * off, so `helix-base-calendar` and `helix-calendar` both resolve to `calendar`
+ * off, so `helix-base-date-picker` and `helix-date-picker` both resolve to `calendar`
  * and one rule covers both tiers.
  *
  * A component rendering its own family is exempt, since a part rendering a

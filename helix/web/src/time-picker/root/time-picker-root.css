@@ -297,7 +297,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* And with nothing chosen, the surface, for the reason Calendar records at
+/* And with nothing chosen, the surface, for the reason Date Picker records at
    length: `required` and unanswered is the commonest invalid a picker has, and
    there is no row to ring. */
 :host([invalid]) [part="list"][data-unset],

@@ -13,7 +13,6 @@ import type {
   HelixBreadcrumbs,
   HelixButton,
   HelixButtonGroup,
-  HelixCalendar,
   HelixCallout,
   HelixCard,
   HelixCarousel,
@@ -26,6 +25,7 @@ import type {
   HelixCompleteEvent,
   HelixCopyEvent,
   HelixDateInput,
+  HelixDatePicker,
   HelixDialog,
   HelixDismissEvent,
   HelixDivider,
@@ -1094,255 +1094,6 @@ anything a consumer sets. */
   textContent?: string | number;
 };
 
-/** `HelixCalendar` component event */
-export type HelixCalendarElementEvent<E = Event> = TypedEvent<HelixCalendar, E>;
-/** `helix-change` event type */
-export type HelixCalendarHelixChangeElementEvent =
-  HelixCalendarElementEvent<HelixChangeEvent>;
-/** `helix-navigate` event type */
-export type HelixCalendarHelixNavigateElementEvent =
-  HelixCalendarElementEvent<HelixNavigateEvent>;
-
-export type HelixCalendarProps = {
-  /** The value the markup declared, which is where a reset returns to. */
-  "default-value"?: HelixCalendar["defaultValue"];
-  /** The value the markup declared, which is where a reset returns to. */
-  defaultValue?: HelixCalendar["defaultValue"];
-  /** What the control holds now, and what its form submits.
-
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
-  value?: HelixCalendar["value"];
-  /** How many dates can be held at once. */
-  mode?: HelixCalendar["mode"];
-  /** How many months to show, side by side. */
-  months?: HelixCalendar["months"];
-  /** Locale for month and day names. Absent uses the runtime's own. */
-  locale?: HelixCalendar["locale"];
-  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "disable-dates"?: HelixCalendar["disableDates"];
-  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  disableDates?: HelixCalendar["disableDates"];
-  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "disable-days"?: HelixCalendar["disableDays"];
-  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  disableDays?: HelixCalendar["disableDays"];
-  /** Whether the current selection fails validation. */
-  invalid?: HelixCalendar["invalid"];
-  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
-
-Separate from `value` on purpose, so paging selects nothing and a consumer
-can drive the view. It said that and could not do it: the calendar wrote
-this when the reader paged, so a consumer holding it was overwritten and
-never told. Reading gives the month on show; writing declares it theirs,
-and `default-month` seeds one the calendar owns. */
-  month?: HelixCalendar["month"];
-  /** Accessible name for the control that pages back.
-
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
-  "previous-label"?: HelixCalendar["previousLabel"];
-  /** Accessible name for the control that pages back.
-
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
-  previousLabel?: HelixCalendar["previousLabel"];
-  /** Accessible name for the control that pages forward. */
-  "next-label"?: HelixCalendar["nextLabel"];
-  /** Accessible name for the control that pages forward. */
-  nextLabel?: HelixCalendar["nextLabel"];
-  /** Month to open on, where nothing declared one. */
-  "default-month"?: HelixCalendar["defaultMonth"];
-  /** Month to open on, where nothing declared one. */
-  defaultMonth?: HelixCalendar["defaultMonth"];
-  /** Earliest selectable date, as `YYYY-MM-DD`. */
-  min?: HelixCalendar["min"];
-  /** Latest selectable date, as `YYYY-MM-DD`. */
-  max?: HelixCalendar["max"];
-  /** Accessible name for the grid. */
-  label?: HelixCalendar["label"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "first-day-of-week"?: HelixCalendar["firstDayOfWeek"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  firstDayOfWeek?: HelixCalendar["firstDayOfWeek"];
-  /** Whether the control is non-interactive.
-
-Reflected, because the styled tier selects on it, and mirrored to
-`aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists.
-
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
-  disabled?: HelixCalendar["disabled"];
-  /** Name submitted with the form.
-
-**Reflected, and it is the exception to "reflect only what CSS selects
-on".** The platform builds a form's entry list from the `name` *content
-attribute*, not from the property, so a control named through the property
-submitted under no name at all and was silently dropped. Measured: two
-inputs in one form, one named by attribute and one by property, and the
-form carried a single entry.
-
-Safe for a React consumer, which is what the rule is protecting: React
-renders a custom element's props as attributes on the server, so the name
-is already in the markup being hydrated and reflecting it writes what is
-there. It is only a change to the markup when a consumer assigns it
-imperatively later, and nothing is hydrating by then.
-
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
-  name?: HelixCalendar["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  onValueChange?: HelixCalendar["onValueChange"];
-
-  /** Fired before the dates change, and cancelable. */
-  "onhelix-change"?: (e: HelixCalendarHelixChangeElementEvent) => void;
-  /** Fired before the month on show changes, and cancelable. */
-  "onhelix-navigate"?: (e: HelixCalendarHelixNavigateElementEvent) => void;
-};
-
-export type HelixCalendarSolidJsProps = {
-  /** The value the markup declared, which is where a reset returns to. */
-  "attr:default-value"?: HelixCalendar["defaultValue"];
-  /** The value the markup declared, which is where a reset returns to. */
-  "prop:defaultValue"?: HelixCalendar["defaultValue"];
-  /** What the control holds now, and what its form submits.
-
-One property, not two. Reading gives the real value whichever mode the
-control is in, so `input.value` answers the question anyone asking it
-meant. Writing hands ownership to the consumer, which is what
-`<helix-input value="x">` says too, and matches what a controlled input
-means in React: the value is theirs and the control waits to be told.
-`default-value` is how markup seeds one it does not want to own.
-
-The same shape as the other three mixins, which is the point of them
-being four of a kind rather than four of three kinds. */
-  "prop:value"?: HelixCalendar["value"];
-  /** How many dates can be held at once. */
-  "prop:mode"?: HelixCalendar["mode"];
-  /** How many months to show, side by side. */
-  "prop:months"?: HelixCalendar["months"];
-  /** Locale for month and day names. Absent uses the runtime's own. */
-  "prop:locale"?: HelixCalendar["locale"];
-  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "attr:disable-dates"?: HelixCalendar["disableDates"];
-  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
-  "prop:disableDates"?: HelixCalendar["disableDates"];
-  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "attr:disable-days"?: HelixCalendar["disableDays"];
-  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
-  "prop:disableDays"?: HelixCalendar["disableDays"];
-  /** Whether the current selection fails validation. */
-  "prop:invalid"?: HelixCalendar["invalid"];
-  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
-
-Separate from `value` on purpose, so paging selects nothing and a consumer
-can drive the view. It said that and could not do it: the calendar wrote
-this when the reader paged, so a consumer holding it was overwritten and
-never told. Reading gives the month on show; writing declares it theirs,
-and `default-month` seeds one the calendar owns. */
-  "prop:month"?: HelixCalendar["month"];
-  /** Accessible name for the control that pages back.
-
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
-  "attr:previous-label"?: HelixCalendar["previousLabel"];
-  /** Accessible name for the control that pages back.
-
-A property because this is the one component in the library that takes a
-`locale`, and it carried two hardcoded English names with no way to change
-them: a calendar rendering its own month names in Japanese still announced
-its controls in English. `attribute:` spelled out, since Lit lowercases a
-camelCase name rather than dash-casing it. */
-  "prop:previousLabel"?: HelixCalendar["previousLabel"];
-  /** Accessible name for the control that pages forward. */
-  "attr:next-label"?: HelixCalendar["nextLabel"];
-  /** Accessible name for the control that pages forward. */
-  "prop:nextLabel"?: HelixCalendar["nextLabel"];
-  /** Month to open on, where nothing declared one. */
-  "attr:default-month"?: HelixCalendar["defaultMonth"];
-  /** Month to open on, where nothing declared one. */
-  "prop:defaultMonth"?: HelixCalendar["defaultMonth"];
-  /** Earliest selectable date, as `YYYY-MM-DD`. */
-  "prop:min"?: HelixCalendar["min"];
-  /** Latest selectable date, as `YYYY-MM-DD`. */
-  "prop:max"?: HelixCalendar["max"];
-  /** Accessible name for the grid. */
-  "prop:label"?: HelixCalendar["label"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "attr:first-day-of-week"?: HelixCalendar["firstDayOfWeek"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "prop:firstDayOfWeek"?: HelixCalendar["firstDayOfWeek"];
-  /** Whether the control is non-interactive.
-
-Reflected, because the styled tier selects on it, and mirrored to
-`aria-disabled` rather than removing the element from the accessibility
-tree, so a screen reader can still announce that the control exists.
-
-The mirror is below and was for a while only a sentence: this paragraph
-described it, four components had their own copies of it, and the class
-itself did nothing. Here is where it belongs, because here is where
-`disabled` is. */
-  "prop:disabled"?: HelixCalendar["disabled"];
-  /** Name submitted with the form.
-
-**Reflected, and it is the exception to "reflect only what CSS selects
-on".** The platform builds a form's entry list from the `name` *content
-attribute*, not from the property, so a control named through the property
-submitted under no name at all and was silently dropped. Measured: two
-inputs in one form, one named by attribute and one by property, and the
-form carried a single entry.
-
-Safe for a React consumer, which is what the rule is protecting: React
-renders a custom element's props as attributes on the server, so the name
-is already in the markup being hydrated and reflecting it writes what is
-there. It is only a change to the markup when a consumer assigns it
-imperatively later, and nothing is hydrating by then.
-
-Here rather than on each control, where it was declared eight times and
-reflected none of them. */
-  "prop:name"?: HelixCalendar["name"];
-  /** The consumer's callback, invoked after the value is applied.
-
-Not an attribute: it is a function. `onValueChange` and not `onChange`,
-because React reserves the latter for its own synthetic system and wires
-it to the native `change`, so a Helix event named `Change` would never
-fire at all. */
-  "prop:onValueChange"?: HelixCalendar["onValueChange"];
-  /** Fired before the dates change, and cancelable. */
-  "on:helix-change"?: (e: HelixCalendarHelixChangeElementEvent) => void;
-  /** Fired before the month on show changes, and cancelable. */
-  "on:helix-navigate"?: (e: HelixCalendarHelixNavigateElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
 export type HelixCalloutProps = {
   /** What kind of attention the passage needs. */
   severity?: HelixCallout["severity"];
@@ -2376,7 +2127,7 @@ being four of a kind rather than four of three kinds. */
   value?: HelixColorPicker["value"];
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Calendar already drew and
+A flag rather than a message, which is the split Date Picker already drew and
 these two now follow. A flat picker has no room of its own for a sentence:
 the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
@@ -2493,7 +2244,7 @@ being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixColorPicker["value"];
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Calendar already drew and
+A flag rather than a message, which is the split Date Picker already drew and
 these two now follow. A flat picker has no room of its own for a sentence:
 the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
@@ -3027,6 +2778,258 @@ fire at all. */
   "on:helix-open"?: (e: HelixDateInputHelixOpenElementEvent) => void;
   /** Fired when it closes. */
   "on:helix-close"?: (e: HelixDateInputHelixCloseElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixDatePicker` component event */
+export type HelixDatePickerElementEvent<E = Event> = TypedEvent<
+  HelixDatePicker,
+  E
+>;
+/** `helix-change` event type */
+export type HelixDatePickerHelixChangeElementEvent =
+  HelixDatePickerElementEvent<HelixChangeEvent>;
+/** `helix-navigate` event type */
+export type HelixDatePickerHelixNavigateElementEvent =
+  HelixDatePickerElementEvent<HelixNavigateEvent>;
+
+export type HelixDatePickerProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixDatePicker["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixDatePicker["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixDatePicker["value"];
+  /** How many dates can be held at once. */
+  mode?: HelixDatePicker["mode"];
+  /** How many months to show, side by side. */
+  months?: HelixDatePicker["months"];
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  locale?: HelixDatePicker["locale"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "disable-dates"?: HelixDatePicker["disableDates"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  disableDates?: HelixDatePicker["disableDates"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "disable-days"?: HelixDatePicker["disableDays"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  disableDays?: HelixDatePicker["disableDays"];
+  /** Whether the current selection fails validation. */
+  invalid?: HelixDatePicker["invalid"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+
+Separate from `value` on purpose, so paging selects nothing and a consumer
+can drive the view. It said that and could not do it: the calendar wrote
+this when the reader paged, so a consumer holding it was overwritten and
+never told. Reading gives the month on show; writing declares it theirs,
+and `default-month` seeds one the calendar owns. */
+  month?: HelixDatePicker["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "previous-label"?: HelixDatePicker["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  previousLabel?: HelixDatePicker["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "next-label"?: HelixDatePicker["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  nextLabel?: HelixDatePicker["nextLabel"];
+  /** Month to open on, where nothing declared one. */
+  "default-month"?: HelixDatePicker["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  defaultMonth?: HelixDatePicker["defaultMonth"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  min?: HelixDatePicker["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  max?: HelixDatePicker["max"];
+  /** Accessible name for the grid. */
+  label?: HelixDatePicker["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  firstDayOfWeek?: HelixDatePicker["firstDayOfWeek"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixDatePicker["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixDatePicker["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  onValueChange?: HelixDatePicker["onValueChange"];
+
+  /** Fired before the dates change, and cancelable. */
+  "onhelix-change"?: (e: HelixDatePickerHelixChangeElementEvent) => void;
+  /** Fired before the month on show changes, and cancelable. */
+  "onhelix-navigate"?: (e: HelixDatePickerHelixNavigateElementEvent) => void;
+};
+
+export type HelixDatePickerSolidJsProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "attr:default-value"?: HelixDatePicker["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "prop:defaultValue"?: HelixDatePicker["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  "prop:value"?: HelixDatePicker["value"];
+  /** How many dates can be held at once. */
+  "prop:mode"?: HelixDatePicker["mode"];
+  /** How many months to show, side by side. */
+  "prop:months"?: HelixDatePicker["months"];
+  /** Locale for month and day names. Absent uses the runtime's own. */
+  "prop:locale"?: HelixDatePicker["locale"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "attr:disable-dates"?: HelixDatePicker["disableDates"];
+  /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
+  "prop:disableDates"?: HelixDatePicker["disableDates"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "attr:disable-days"?: HelixDatePicker["disableDays"];
+  /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
+  "prop:disableDays"?: HelixDatePicker["disableDays"];
+  /** Whether the current selection fails validation. */
+  "prop:invalid"?: HelixDatePicker["invalid"];
+  /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+
+Separate from `value` on purpose, so paging selects nothing and a consumer
+can drive the view. It said that and could not do it: the calendar wrote
+this when the reader paged, so a consumer holding it was overwritten and
+never told. Reading gives the month on show; writing declares it theirs,
+and `default-month` seeds one the calendar owns. */
+  "prop:month"?: HelixDatePicker["month"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "attr:previous-label"?: HelixDatePicker["previousLabel"];
+  /** Accessible name for the control that pages back.
+
+A property because this is the one component in the library that takes a
+`locale`, and it carried two hardcoded English names with no way to change
+them: a calendar rendering its own month names in Japanese still announced
+its controls in English. `attribute:` spelled out, since Lit lowercases a
+camelCase name rather than dash-casing it. */
+  "prop:previousLabel"?: HelixDatePicker["previousLabel"];
+  /** Accessible name for the control that pages forward. */
+  "attr:next-label"?: HelixDatePicker["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  "prop:nextLabel"?: HelixDatePicker["nextLabel"];
+  /** Month to open on, where nothing declared one. */
+  "attr:default-month"?: HelixDatePicker["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  "prop:defaultMonth"?: HelixDatePicker["defaultMonth"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixDatePicker["min"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixDatePicker["max"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixDatePicker["label"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "attr:first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "prop:firstDayOfWeek"?: HelixDatePicker["firstDayOfWeek"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  "prop:disabled"?: HelixDatePicker["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  "prop:name"?: HelixDatePicker["name"];
+  /** The consumer's callback, invoked after the value is applied.
+
+Not an attribute: it is a function. `onValueChange` and not `onChange`,
+because React reserves the latter for its own synthetic system and wires
+it to the native `change`, so a Helix event named `Change` would never
+fire at all. */
+  "prop:onValueChange"?: HelixDatePicker["onValueChange"];
+  /** Fired before the dates change, and cancelable. */
+  "on:helix-change"?: (e: HelixDatePickerHelixChangeElementEvent) => void;
+  /** Fired before the month on show changes, and cancelable. */
+  "on:helix-navigate"?: (e: HelixDatePickerHelixNavigateElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8250,7 +8253,7 @@ being four of a kind rather than four of three kinds. */
   value?: HelixTimePicker["value"];
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Calendar already drew and
+A flag rather than a message, which is the split Date Picker already drew and
 these two now follow. A flat picker has no room of its own for a sentence:
 the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
@@ -8269,7 +8272,7 @@ Anything under five is a thousand rows and wants a field instead. */
   max?: HelixTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
-The counterpart to Calendar's `disable-dates`, and it exists for the same
+The counterpart to Date Picker's `disable-dates`, and it exists for the same
 shape of problem: `min` and `max` take away a span, and what a booking
 usually has to take away is a scatter. A morning with 09:30 and 11:00
 already gone is not two bounds.
@@ -8280,7 +8283,7 @@ reached honestly rather than by handing over an empty range. */
   "disable-times"?: HelixTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
-The counterpart to Calendar's `disable-dates`, and it exists for the same
+The counterpart to Date Picker's `disable-dates`, and it exists for the same
 shape of problem: `min` and `max` take away a span, and what a booking
 usually has to take away is a scatter. A morning with 09:30 and 11:00
 already gone is not two bounds.
@@ -8297,7 +8300,7 @@ reached honestly rather than by handing over an empty range. */
 
 Absent is one. `range` holds a start and an end with everything between
 them shown as part of the answer, `multiple` holds any number, and both are
-carried as one comma-separated value: the same shape `helix-calendar` uses,
+carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
@@ -8389,7 +8392,7 @@ being four of a kind rather than four of three kinds. */
   "prop:value"?: HelixTimePicker["value"];
   /** Whether the current selection fails validation.
 
-A flag rather than a message, which is the split Calendar already drew and
+A flag rather than a message, which is the split Date Picker already drew and
 these two now follow. A flat picker has no room of its own for a sentence:
 the field that wraps one owns the label, the hint and the feedback, and a
 second message inside the panel would be the same error said twice. What is
@@ -8408,7 +8411,7 @@ Anything under five is a thousand rows and wants a field instead. */
   "prop:max"?: HelixTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
-The counterpart to Calendar's `disable-dates`, and it exists for the same
+The counterpart to Date Picker's `disable-dates`, and it exists for the same
 shape of problem: `min` and `max` take away a span, and what a booking
 usually has to take away is a scatter. A morning with 09:30 and 11:00
 already gone is not two bounds.
@@ -8419,7 +8422,7 @@ reached honestly rather than by handing over an empty range. */
   "attr:disable-times"?: HelixTimePicker["disableTimes"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
-The counterpart to Calendar's `disable-dates`, and it exists for the same
+The counterpart to Date Picker's `disable-dates`, and it exists for the same
 shape of problem: `min` and `max` take away a span, and what a booking
 usually has to take away is a scatter. A morning with 09:30 and 11:00
 already gone is not two bounds.
@@ -8436,7 +8439,7 @@ reached honestly rather than by handing over an empty range. */
 
 Absent is one. `range` holds a start and an end with everything between
 them shown as part of the answer, `multiple` holds any number, and both are
-carried as one comma-separated value: the same shape `helix-calendar` uses,
+carried as one comma-separated value: the same shape `helix-date-picker` uses,
 because it is the same question asked of a different unit.
 
 **A range is two picks, and a third starts over.** That is the calendar's
@@ -10057,160 +10060,6 @@ export type CustomElements = {
   >;
 
   /**
-   * Six week rows always, so the grid keeps one height and a month change does
-   * not move whatever sits beneath it.
-   *
-   * The column track is wider than the day, and the day is centered in it. The
-   * difference is the space between days, which belongs to the track rather than
-   * to a `gap`, so a range can paint across the whole track and stay continuous.
-   *
-   * Days from the neighbouring months stay in place and stay selectable, marked
-   * quieter rather than hidden, so the first and last weeks are whole and the
-   * grid reads as a continuous run of dates.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
-   * - `value`: What the control holds now, and what its form submits.
-   *
-   * One property, not two. Reading gives the real value whichever mode the
-   * control is in, so `input.value` answers the question anyone asking it
-   * meant. Writing hands ownership to the consumer, which is what
-   * `<helix-input value="x">` says too, and matches what a controlled input
-   * means in React: the value is theirs and the control waits to be told.
-   * `default-value` is how markup seeds one it does not want to own.
-   *
-   * The same shape as the other three mixins, which is the point of them
-   * being four of a kind rather than four of three kinds.
-   * - `mode`: How many dates can be held at once.
-   * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
-   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
-   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
-   * - `invalid`: Whether the current selection fails validation.
-   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
-   *
-   * Separate from `value` on purpose, so paging selects nothing and a consumer
-   * can drive the view. It said that and could not do it: the calendar wrote
-   * this when the reader paged, so a consumer holding it was overwritten and
-   * never told. Reading gives the month on show; writing declares it theirs,
-   * and `default-month` seeds one the calendar owns.
-   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
-   *
-   * A property because this is the one component in the library that takes a
-   * `locale`, and it carried two hardcoded English names with no way to change
-   * them: a calendar rendering its own month names in Japanese still announced
-   * its controls in English. `attribute:` spelled out, since Lit lowercases a
-   * camelCase name rather than dash-casing it.
-   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
-   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
-   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
-   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
-   * - `label`: Accessible name for the grid.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   *
-   * The mirror is below and was for a while only a sentence: this paragraph
-   * described it, four components had their own copies of it, and the class
-   * itself did nothing. Here is where it belongs, because here is where
-   * `disabled` is.
-   * - `name`: Name submitted with the form.
-   *
-   * **Reflected, and it is the exception to "reflect only what CSS selects
-   * on".** The platform builds a form's entry list from the `name` *content
-   * attribute*, not from the property, so a control named through the property
-   * submitted under no name at all and was silently dropped. Measured: two
-   * inputs in one form, one named by attribute and one by property, and the
-   * form carried a single entry.
-   *
-   * Safe for a React consumer, which is what the rule is protecting: React
-   * renders a custom element's props as attributes on the server, so the name
-   * is already in the markup being hydrated and reflecting it writes what is
-   * there. It is only a change to the markup when a consumer assigns it
-   * imperatively later, and nothing is hydrating by then.
-   *
-   * Here rather than on each control, where it was declared eight times and
-   * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-change`: Fired before the dates change, and cancelable.
-   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
-   *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
-   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
-   *
-   * Both halves are dropped, the consumer's and the control's, because a
-   * reset means the form is as it was served. Clearing only the internal one
-   * would leave a control that had been written to stuck at that value.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
-   *
-   * Falling back to `defaultValue` rather than to empty, because a restore
-   * with no state is a form the browser has nothing recorded for, which is
-   * the same situation as a fresh one.
-   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--calendar-columns`: Months per row. Two unless there is only one. (default: `undefined`)
-   * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
-   * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
-   * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
-   * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
-   * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `months`: The run of months.
-   * - `month`: One month, its header and its grid.
-   * - `header`: The month name and its controls.
-   * - `previous`: The control that moves to the previous month.
-   * - `next`: The control that moves to the next month.
-   * - `heading`: The month and year being shown.
-   * - `grid`: The grid of days.
-   * - `weekday`: A column header naming a day of the week.
-   * - `week`: One row of days.
-   * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
-   */
-  "helix-calendar": Partial<
-    HelixCalendarProps & BaseProps<HelixCalendar> & BaseEvents
-  >;
-
-  /**
    * Tinted from the severity's status color with `color-mix`, and marked with a
    * bar on the inline start so the severity survives being read in greyscale or
    * by anyone who does not distinguish the hues.
@@ -10924,7 +10773,7 @@ export type CustomElements = {
    * being four of a kind rather than four of three kinds.
    * - `invalid`: Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -11065,7 +10914,7 @@ export type CustomElements = {
    * control. The trigger is a mark within that box rather than a button beside it:
    * a second frame inside the first is two controls where a reader sees one.
    *
-   * The calendar is the real `helix-calendar`, in a panel with no border of its
+   * The calendar is the real `helix-date-picker`, in a panel with no border of its
    * own. A surface over the page is told apart by its shadow and by what it
    * covers, and a line around it as well reads as a box drawn around something
    * already separate.
@@ -11282,10 +11131,164 @@ export type CustomElements = {
    * - `rest`: How many dates are held beyond the ones shown.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
-   * - `calendar`: The calendar inside it.
+   * - `picker`: The date picker inside it.
    */
   "helix-date-input": Partial<
     HelixDateInputProps & BaseProps<HelixDateInput> & BaseEvents
+  >;
+
+  /**
+   * Six week rows always, so the grid keeps one height and a month change does
+   * not move whatever sits beneath it.
+   *
+   * The column track is wider than the day, and the day is centered in it. The
+   * difference is the space between days, which belongs to the track rather than
+   * to a `gap`, so a range can paint across the whole track and stay continuous.
+   *
+   * Days from the neighbouring months stay in place and stay selectable, marked
+   * quieter rather than hidden, so the first and last weeks are whole and the
+   * grid reads as a continuous run of dates.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `invalid`: Whether the current selection fails validation.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   *
+   * Separate from `value` on purpose, so paging selects nothing and a consumer
+   * can drive the view. It said that and could not do it: the calendar wrote
+   * this when the reader paged, so a consumer holding it was overwritten and
+   * never told. Reading gives the month on show; writing declares it theirs,
+   * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--date-picker-columns`: Months per row. Two unless there is only one. (default: `undefined`)
+   * - `--date-picker-day-size`: Width and height of a day. (default: `undefined`)
+   * - `--date-picker-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--date-picker-row-size`: Height of a week row. (default: `undefined`)
+   * - `--date-picker-selected-color`: Fill behind a selected day. (default: `undefined`)
+   * - `--date-picker-range-color`: Band behind the days in a range. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `months`: The run of months.
+   * - `month`: One month, its header and its grid.
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
+   */
+  "helix-date-picker": Partial<
+    HelixDatePickerProps & BaseProps<HelixDatePicker> & BaseEvents
   >;
 
   /**
@@ -15508,7 +15511,7 @@ export type CustomElements = {
    * being four of a kind rather than four of three kinds.
    * - `invalid`: Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -15523,7 +15526,7 @@ export type CustomElements = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
    *
-   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * The counterpart to Date Picker's `disable-dates`, and it exists for the same
    * shape of problem: `min` and `max` take away a span, and what a booking
    * usually has to take away is a scatter. A morning with 09:30 and 11:00
    * already gone is not two bounds.
@@ -15537,7 +15540,7 @@ export type CustomElements = {
    *
    * Absent is one. `range` holds a start and an end with everything between
    * them shown as part of the answer, `multiple` holds any number, and both are
-   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * carried as one comma-separated value: the same shape `helix-date-picker` uses,
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
@@ -17130,163 +17133,6 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Six week rows always, so the grid keeps one height and a month change does
-   * not move whatever sits beneath it.
-   *
-   * The column track is wider than the day, and the day is centered in it. The
-   * difference is the space between days, which belongs to the track rather than
-   * to a `gap`, so a range can paint across the whole track and stay continuous.
-   *
-   * Days from the neighbouring months stay in place and stay selectable, marked
-   * quieter rather than hidden, so the first and last weeks are whole and the
-   * grid reads as a continuous run of dates.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
-   * - `value`: What the control holds now, and what its form submits.
-   *
-   * One property, not two. Reading gives the real value whichever mode the
-   * control is in, so `input.value` answers the question anyone asking it
-   * meant. Writing hands ownership to the consumer, which is what
-   * `<helix-input value="x">` says too, and matches what a controlled input
-   * means in React: the value is theirs and the control waits to be told.
-   * `default-value` is how markup seeds one it does not want to own.
-   *
-   * The same shape as the other three mixins, which is the point of them
-   * being four of a kind rather than four of three kinds.
-   * - `mode`: How many dates can be held at once.
-   * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
-   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
-   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
-   * - `invalid`: Whether the current selection fails validation.
-   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
-   *
-   * Separate from `value` on purpose, so paging selects nothing and a consumer
-   * can drive the view. It said that and could not do it: the calendar wrote
-   * this when the reader paged, so a consumer holding it was overwritten and
-   * never told. Reading gives the month on show; writing declares it theirs,
-   * and `default-month` seeds one the calendar owns.
-   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
-   *
-   * A property because this is the one component in the library that takes a
-   * `locale`, and it carried two hardcoded English names with no way to change
-   * them: a calendar rendering its own month names in Japanese still announced
-   * its controls in English. `attribute:` spelled out, since Lit lowercases a
-   * camelCase name rather than dash-casing it.
-   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
-   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
-   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
-   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
-   * - `label`: Accessible name for the grid.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
-   * - `disabled`: Whether the control is non-interactive.
-   *
-   * Reflected, because the styled tier selects on it, and mirrored to
-   * `aria-disabled` rather than removing the element from the accessibility
-   * tree, so a screen reader can still announce that the control exists.
-   *
-   * The mirror is below and was for a while only a sentence: this paragraph
-   * described it, four components had their own copies of it, and the class
-   * itself did nothing. Here is where it belongs, because here is where
-   * `disabled` is.
-   * - `name`: Name submitted with the form.
-   *
-   * **Reflected, and it is the exception to "reflect only what CSS selects
-   * on".** The platform builds a form's entry list from the `name` *content
-   * attribute*, not from the property, so a control named through the property
-   * submitted under no name at all and was silently dropped. Measured: two
-   * inputs in one form, one named by attribute and one by property, and the
-   * form carried a single entry.
-   *
-   * Safe for a React consumer, which is what the rule is protecting: React
-   * renders a custom element's props as attributes on the server, so the name
-   * is already in the markup being hydrated and reflecting it writes what is
-   * there. It is only a change to the markup when a consumer assigns it
-   * imperatively later, and nothing is hydrating by then.
-   *
-   * Here rather than on each control, where it was declared eight times and
-   * reflected none of them.
-   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
-   *
-   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
-   * because React reserves the latter for its own synthetic system and wires
-   * it to the native `change`, so a Helix event named `Change` would never
-   * fire at all. (property only)
-   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
-   *
-   * What a component should bind to rather than `disabled`, which is only the
-   * half of it the consumer wrote. (property only) (readonly)
-   * - `form`: The form this control belongs to, if any. (property only) (readonly)
-   * - `labels`: Labels associated with this control. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-change`: Fired before the dates change, and cancelable.
-   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
-   *
-   * ## Methods
-   *
-   * Methods that can be called to access component functionality.
-   *
-   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
-   *
-   * Announces before it acts, so `preventDefault()` on the `helix-change` is
-   * a refusal and nothing moves. In uncontrolled mode the control then
-   * updates itself; in controlled mode it applies nothing and waits for the
-   * consumer to pass a new `value`, which is what controlled means.
-   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
-   *
-   * Both halves are dropped, the consumer's and the control's, because a
-   * reset means the form is as it was served. Clearing only the internal one
-   * would leave a control that had been written to stuck at that value.
-   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
-   *
-   * Falling back to `defaultValue` rather than to empty, because a restore
-   * with no state is a form the browser has nothing recorded for, which is
-   * the same situation as a fresh one.
-   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
-   *
-   * ## CSS Custom Properties
-   *
-   * CSS variables available for styling the component.
-   *
-   * - `--calendar-columns`: Months per row. Two unless there is only one. (default: `undefined`)
-   * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
-   * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
-   * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
-   * - `--calendar-selected-color`: Fill behind a selected day. (default: `undefined`)
-   * - `--calendar-range-color`: Band behind the days in a range. (default: `undefined`)
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `months`: The run of months.
-   * - `month`: One month, its header and its grid.
-   * - `header`: The month name and its controls.
-   * - `previous`: The control that moves to the previous month.
-   * - `next`: The control that moves to the next month.
-   * - `heading`: The month and year being shown.
-   * - `grid`: The grid of days.
-   * - `weekday`: A column header naming a day of the week.
-   * - `week`: One row of days.
-   * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints.
-   */
-  "helix-calendar": Partial<
-    HelixCalendarProps &
-      HelixCalendarSolidJsProps &
-      BaseProps<HelixCalendar> &
-      BaseEvents
-  >;
-
-  /**
    * Tinted from the severity's status color with `color-mix`, and marked with a
    * bar on the inline start so the severity survives being read in greyscale or
    * by anyone who does not distinguish the hues.
@@ -18017,7 +17863,7 @@ export type CustomElementsSolidJs = {
    * being four of a kind rather than four of three kinds.
    * - `invalid`: Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -18161,7 +18007,7 @@ export type CustomElementsSolidJs = {
    * control. The trigger is a mark within that box rather than a button beside it:
    * a second frame inside the first is two controls where a reader sees one.
    *
-   * The calendar is the real `helix-calendar`, in a panel with no border of its
+   * The calendar is the real `helix-date-picker`, in a panel with no border of its
    * own. A surface over the page is told apart by its shadow and by what it
    * covers, and a line around it as well reads as a box drawn around something
    * already separate.
@@ -18378,12 +18224,169 @@ export type CustomElementsSolidJs = {
    * - `rest`: How many dates are held beyond the ones shown.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
-   * - `calendar`: The calendar inside it.
+   * - `picker`: The date picker inside it.
    */
   "helix-date-input": Partial<
     HelixDateInputProps &
       HelixDateInputSolidJsProps &
       BaseProps<HelixDateInput> &
+      BaseEvents
+  >;
+
+  /**
+   * Six week rows always, so the grid keeps one height and a month change does
+   * not move whatever sits beneath it.
+   *
+   * The column track is wider than the day, and the day is centered in it. The
+   * difference is the space between days, which belongs to the track rather than
+   * to a `gap`, so a range can paint across the whole track and stay continuous.
+   *
+   * Days from the neighbouring months stay in place and stay selectable, marked
+   * quieter rather than hidden, so the first and last weeks are whole and the
+   * grid reads as a continuous run of dates.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
+   * - `value`: What the control holds now, and what its form submits.
+   *
+   * One property, not two. Reading gives the real value whichever mode the
+   * control is in, so `input.value` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what
+   * `<helix-input value="x">` says too, and matches what a controlled input
+   * means in React: the value is theirs and the control waits to be told.
+   * `default-value` is how markup seeds one it does not want to own.
+   *
+   * The same shape as the other three mixins, which is the point of them
+   * being four of a kind rather than four of three kinds.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `locale`: Locale for month and day names. Absent uses the runtime's own.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `invalid`: Whether the current selection fails validation.
+   * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   *
+   * Separate from `value` on purpose, so paging selects nothing and a consumer
+   * can drive the view. It said that and could not do it: the calendar wrote
+   * this when the reader paged, so a consumer holding it was overwritten and
+   * never told. Reading gives the month on show; writing declares it theirs,
+   * and `default-month` seeds one the calendar owns.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
+   *
+   * A property because this is the one component in the library that takes a
+   * `locale`, and it carried two hardcoded English names with no way to change
+   * them: a calendar rendering its own month names in Japanese still announced
+   * its controls in English. `attribute:` spelled out, since Lit lowercases a
+   * camelCase name rather than dash-casing it.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `label`: Accessible name for the grid.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
+   * - `disabled`: Whether the control is non-interactive.
+   *
+   * Reflected, because the styled tier selects on it, and mirrored to
+   * `aria-disabled` rather than removing the element from the accessibility
+   * tree, so a screen reader can still announce that the control exists.
+   *
+   * The mirror is below and was for a while only a sentence: this paragraph
+   * described it, four components had their own copies of it, and the class
+   * itself did nothing. Here is where it belongs, because here is where
+   * `disabled` is.
+   * - `name`: Name submitted with the form.
+   *
+   * **Reflected, and it is the exception to "reflect only what CSS selects
+   * on".** The platform builds a form's entry list from the `name` *content
+   * attribute*, not from the property, so a control named through the property
+   * submitted under no name at all and was silently dropped. Measured: two
+   * inputs in one form, one named by attribute and one by property, and the
+   * form carried a single entry.
+   *
+   * Safe for a React consumer, which is what the rule is protecting: React
+   * renders a custom element's props as attributes on the server, so the name
+   * is already in the markup being hydrated and reflecting it writes what is
+   * there. It is only a change to the markup when a consumer assigns it
+   * imperatively later, and nothing is hydrating by then.
+   *
+   * Here rather than on each control, where it was declared eight times and
+   * reflected none of them.
+   * - `onValueChange`: The consumer's callback, invoked after the value is applied.
+   *
+   * Not an attribute: it is a function. `onValueChange` and not `onChange`,
+   * because React reserves the latter for its own synthetic system and wires
+   * it to the native `change`, so a Helix event named `Change` would never
+   * fire at all. (property only)
+   * - `isDisabled`: Whether the control is off, by its own attribute or by an ancestor.
+   *
+   * What a component should bind to rather than `disabled`, which is only the
+   * half of it the consumer wrote. (property only) (readonly)
+   * - `form`: The form this control belongs to, if any. (property only) (readonly)
+   * - `labels`: Labels associated with this control. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the dates change, and cancelable.
+   * - `helix-navigate`: Fired before the month on show changes, and cancelable.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestValue(next: string) => boolean`: Requests a new value, and reports whether the request stood.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-change` is
+   * a refusal and nothing moves. In uncontrolled mode the control then
+   * updates itself; in controlled mode it applies nothing and waits for the
+   * consumer to pass a new `value`, which is what controlled means.
+   * - `formResetCallback() => void`: Returns the control to the value its markup declared.
+   *
+   * Both halves are dropped, the consumer's and the control's, because a
+   * reset means the form is as it was served. Clearing only the internal one
+   * would leave a control that had been written to stuck at that value.
+   * - `formStateRestoreCallback(state: string | null) => void`: Restores the value when the browser brings a form back.
+   *
+   * Falling back to `defaultValue` rather than to empty, because a restore
+   * with no state is a form the browser has nothing recorded for, which is
+   * the same situation as a fresh one.
+   * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--date-picker-columns`: Months per row. Two unless there is only one. (default: `undefined`)
+   * - `--date-picker-day-size`: Width and height of a day. (default: `undefined`)
+   * - `--date-picker-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
+   * - `--date-picker-row-size`: Height of a week row. (default: `undefined`)
+   * - `--date-picker-selected-color`: Fill behind a selected day. (default: `undefined`)
+   * - `--date-picker-range-color`: Band behind the days in a range. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `months`: The run of months.
+   * - `month`: One month, its header and its grid.
+   * - `header`: The month name and its controls.
+   * - `previous`: The control that moves to the previous month.
+   * - `next`: The control that moves to the next month.
+   * - `heading`: The month and year being shown.
+   * - `grid`: The grid of days.
+   * - `weekday`: A column header naming a day of the week.
+   * - `week`: One row of days.
+   * - `cell`: One column of a row, which is what a range paints.
+   * - `day`: The shape inside a cell, which is what a single date paints.
+   */
+  "helix-date-picker": Partial<
+    HelixDatePickerProps &
+      HelixDatePickerSolidJsProps &
+      BaseProps<HelixDatePicker> &
       BaseEvents
   >;
 
@@ -22765,7 +22768,7 @@ export type CustomElementsSolidJs = {
    * being four of a kind rather than four of three kinds.
    * - `invalid`: Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -22780,7 +22783,7 @@ export type CustomElementsSolidJs = {
    * - `max`: Latest time offered, as `HH:mm`.
    * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
    *
-   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * The counterpart to Date Picker's `disable-dates`, and it exists for the same
    * shape of problem: `min` and `max` take away a span, and what a booking
    * usually has to take away is a scatter. A morning with 09:30 and 11:00
    * already gone is not two bounds.
@@ -22794,7 +22797,7 @@ export type CustomElementsSolidJs = {
    *
    * Absent is one. `range` holds a start and an end with everything between
    * them shown as part of the answer, `multiple` holds any number, and both are
-   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * carried as one comma-separated value: the same shape `helix-date-picker` uses,
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
@@ -23683,18 +23686,6 @@ export type CustomCssProperties = {
   "--button-radii-start"?: string;
   /** Trailing corners, which a group flattens. */
   "--button-radii-end"?: string;
-  /** Months per row. Two unless there is only one. */
-  "--calendar-columns"?: string;
-  /** Width and height of a day. */
-  "--calendar-day-size"?: string;
-  /** Width of a column, which is what sets the space between days. */
-  "--calendar-track-size"?: string;
-  /** Height of a week row. */
-  "--calendar-row-size"?: string;
-  /** Fill behind a selected day. */
-  "--calendar-selected-color"?: string;
-  /** Band behind the days in a range. */
-  "--calendar-range-color"?: string;
   /** Fill behind the callout. */
   "--callout-background-color"?: string;
   /** Corner radius of the callout. */
@@ -23751,6 +23742,18 @@ export type CustomCssProperties = {
   "--color-picker-grid-radii"?: string;
   /** Fill behind the field. */
   "--date-input-background-color"?: string;
+  /** Months per row. Two unless there is only one. */
+  "--date-picker-columns"?: string;
+  /** Width and height of a day. */
+  "--date-picker-day-size"?: string;
+  /** Width of a column, which is what sets the space between days. */
+  "--date-picker-track-size"?: string;
+  /** Height of a week row. */
+  "--date-picker-row-size"?: string;
+  /** Fill behind a selected day. */
+  "--date-picker-selected-color"?: string;
+  /** Band behind the days in a range. */
+  "--date-picker-range-color"?: string;
   /** How big the mark above the title is. */
   "--dialog-icon-size"?: string;
   /** Width of the panel. */

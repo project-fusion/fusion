@@ -3835,1359 +3835,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/calendar/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/calendar/root/calendar-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/calendar/root/calendar-root.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "styles"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "styles",
-          "declaration": {
-            "name": "styles",
-            "module": "src/calendar/root/calendar-root.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/calendar/root/calendar-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Six week rows always, so the grid keeps one height and a month change does\nnot move whatever sits beneath it.\n\nThe column track is wider than the day, and the day is centered in it. The\ndifference is the space between days, which belongs to the track rather than\nto a `gap`, so a range can paint across the whole track and stay continuous.\n\nDays from the neighbouring months stay in place and stay selectable, marked\nquieter rather than hidden, so the first and last weeks are whole and the\ngrid reads as a continuous run of dates.",
-          "name": "HelixCalendar",
-          "cssProperties": [
-            {
-              "description": "Months per row. Two unless there is only one.",
-              "name": "--calendar-columns"
-            },
-            {
-              "description": "Width and height of a day.",
-              "name": "--calendar-day-size"
-            },
-            {
-              "description": "Width of a column, which is what sets the space between days.",
-              "name": "--calendar-track-size"
-            },
-            {
-              "description": "Height of a week row.",
-              "name": "--calendar-row-size"
-            },
-            {
-              "description": "Fill behind a selected day.",
-              "name": "--calendar-selected-color"
-            },
-            {
-              "description": "Band behind the days in a range.",
-              "name": "--calendar-range-color"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "defaultValue",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The value the markup declared, which is where a reset returns to.",
-              "attribute": "default-value",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
-              "attribute": "value",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "valueState",
-              "type": {
-                "text": "string | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "valueMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "valueIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "onValueChange",
-              "type": {
-                "text": "((value: string) => void) | undefined"
-              },
-              "default": "undefined",
-              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "requestValue",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "next",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. In uncontrolled mode the control then\nupdates itself; in controlled mode it applies nothing and waits for the\nconsumer to pass a new `value`, which is what controlled means.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              },
-              "type": {
-                "text": "requestValue(next: string) => boolean"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Returns the control to the value its markup declared.\n\nBoth halves are dropped, the consumer's and the control's, because a\nreset means the form is as it was served. Clearing only the internal one\nwould leave a control that had been written to stuck at that value.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              },
-              "type": {
-                "text": "formResetCallback() => void"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string | null"
-                  }
-                }
-              ],
-              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              },
-              "type": {
-                "text": "formStateRestoreCallback(state: string | null) => void"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "mode",
-              "type": {
-                "text": "'range' | 'multiple' | undefined"
-              },
-              "description": "How many dates can be held at once.",
-              "attribute": "mode",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "months",
-              "type": {
-                "text": "number"
-              },
-              "default": "1",
-              "description": "How many months to show, side by side.",
-              "attribute": "months",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "locale",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Locale for month and day names. Absent uses the runtime's own.",
-              "attribute": "locale",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "disableDates",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
-              "attribute": "disable-dates",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "disableDays",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
-              "attribute": "disable-days",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "invalid",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the current selection fails validation.",
-              "attribute": "invalid",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "month",
-              "type": {
-                "text": "string"
-              },
-              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
-              "attribute": "month",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "previousLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Previous month'",
-              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
-              "attribute": "previous-label",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "nextLabel",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Next month'",
-              "description": "Accessible name for the control that pages forward.",
-              "attribute": "next-label",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "defaultMonth",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Month to open on, where nothing declared one.",
-              "attribute": "default-month",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "monthState",
-              "type": {
-                "text": "string | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "The month on show, whoever set it, and `undefined` until somebody has.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "monthMode",
-              "type": {
-                "text": "boolean | undefined"
-              },
-              "privacy": "private",
-              "default": "undefined",
-              "description": "Whether the consumer owns the view, decided once and then fixed.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "monthIsControlled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "min",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
-              "attribute": "min",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "max",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Latest selectable date, as `YYYY-MM-DD`.",
-              "attribute": "max",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Calendar'",
-              "description": "Accessible name for the grid.",
-              "attribute": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "firstDayOfWeek",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "attribute": "first-day-of-week",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "focused",
-              "type": {
-                "text": "string"
-              },
-              "privacy": "private",
-              "default": "''",
-              "description": "The date the grid's tab stop is on. Absent until the grid is used.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "selected",
-              "type": {
-                "text": "string[]"
-              },
-              "privacy": "private",
-              "description": "The selected dates, in order.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "range",
-              "type": {
-                "text": "[string, string] | null"
-              },
-              "privacy": "private",
-              "description": "The range's ends, when there are two and the mode asks for them.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "isSelected",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "iso",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "shown",
-              "type": {
-                "text": "Date"
-              },
-              "privacy": "private",
-              "description": "The month being shown, resolved from `month`, then `value`, then today.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "derivedMonth",
-              "type": {
-                "text": "Date"
-              },
-              "privacy": "private",
-              "description": "The month to open on when nothing has declared one.\n\nSplit out from `shown` so `month` can report what is on display without the\ntwo calling each other: `month` reading `shown` and `shown` reading `month`\nis a stack overflow, and the specs found it immediately.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "anchor",
-              "type": {
-                "text": "Date"
-              },
-              "privacy": "private",
-              "description": "The date the tab stop sits on, which is where the arrows move from.\n\nIt has to be a date the grid actually renders, so the month is compared\nwith its year. Comparing the month alone puts the stop on the same date a\nyear away, which is rendered nowhere, and the grid is left with no tab stop\nat all and no way into it from the keyboard.\n\nEach candidate is tested in turn rather than the first one winning\noutright. Where the last date focused is in some other month, the selected\ndate still holds the stop, and only with neither in view does it fall to\nthe first of the month.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "weeksOf",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Date[][]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "month",
-                  "type": {
-                    "text": "Date"
-                  }
-                }
-              ],
-              "description": "Six weeks of dates, so a grid does not change height between months.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "barred",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "date",
-                  "type": {
-                    "text": "Date"
-                  }
-                }
-              ],
-              "description": "Whether a date is barred, by bound, by weekday, or by name.\n\n`barred`, not `disabled`: the calendar is a form control now, and\n`HelixFormElement.disabled` is a boolean about the whole control. A method\nand a flag cannot share a name, and of the two it is the method that should\nmove, because \"disabled\" on a control means one thing everywhere else in\nthe library.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "show",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "date",
-                  "type": {
-                    "text": "Date"
-                  }
-                }
-              ],
-              "description": "Moves the view, announcing it first.\n\n`helix-navigate` and not `helix-change`: paging chooses nothing, and a\nconsumer driving the view has to hear that it moved without being told the\nanswer did. In controlled mode nothing moves and the consumer decides,\nwhich is the point of them holding it.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "moveTo",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "date",
-                  "type": {
-                    "text": "Date"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "select",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "date",
-                  "type": {
-                    "text": "Date"
-                  }
-                }
-              ],
-              "description": "Adds a date to the selection, as the mode allows.\n\n`range` starts over once it holds two, so a third click begins a new range\nrather than extending or replacing an end at random. `multiple` toggles, so\nclicking a chosen date takes it out.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleKeydown",
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "report",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Reports the dates to the form, one entry each.\n\n`FormData` rather than the comma-joined string the property holds, because\n`mode=\"multiple\"` is genuinely several answers and a server reading\n`dates=2026-08-04,2026-08-06` has to know to split it on a convention this\nlibrary invented. One entry per date is what every other multi-valued\ncontrol on the platform sends, and `range` sends its two the same way, in\norder, so start and end arrive as the pair they already are.\n\n**Nothing at all without a `name`, and that is the mechanism rather than a\ndetail.** It is what lets a calendar sit inside something that owns the\nform value, which is how `DatePicker` will hold one. The guard has to be\nexplicit here in a way it does not for `Listbox`: a control reporting a\nplain string is skipped by the form when it has no name, but a `FormData`\ncarries its own names and its entries are appended whatever the element is\ncalled, so an unnamed calendar would submit empty-named dates.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "monthCount",
-              "type": {
-                "text": "number"
-              },
-              "privacy": "private",
-              "description": "How many months are shown, clamped once.\n\n`months` was clamped at the call site and read raw where the last month is\nidentified, so a zero, a negative or a non-numeric value rendered nothing\nand took the forward control with it: `index === this.months - 1` is never\ntrue for `NaN`. One getter both read.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "cachedFormats",
-              "type": {
-                "text": "| {\n        full: Intl.DateTimeFormat\n        heading: Intl.DateTimeFormat\n        locale: string\n        weekday: Intl.DateTimeFormat\n      }\n    | undefined"
-              },
-              "privacy": "private",
-              "description": "The three date formatters, built once per locale rather than per render.\n\n`Intl.DateTimeFormat` is expensive to construct and these depend on nothing\nbut `locale`, and they were built inside the per-month render: three\nconstructions for every month on show, on every update, so a two-month\ncalendar rebuilt six of them each time an arrow key moved the anchor.\nMeasured elsewhere at about a quarter of a millisecond apiece, which is not\na crisis and is pure waste.\n\nKeyed on the locale so a change to it is picked up, which a plain lazy\nfield would not do.",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "formats",
-              "type": {
-                "text": "{\n    full: Intl.DateTimeFormat\n    heading: Intl.DateTimeFormat\n    weekday: Intl.DateTimeFormat\n  }"
-              },
-              "privacy": "private",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "renderMonth",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "month",
-                  "type": {
-                    "text": "Date"
-                  }
-                },
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "readonly": true,
-              "default": "true",
-              "description": "Opts the element into form ownership, labels, and submission.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
-              "attribute": "disabled",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "formDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "protected",
-              "default": "false",
-              "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "isDisabled",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formDisabledCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "disabled",
-                  "type": {
-                    "text": "boolean"
-                  }
-                }
-              ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              },
-              "type": {
-                "text": "formDisabledCallback(disabled: boolean) => void"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
-              "attribute": "name",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "The form this control belongs to, if any.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "labels",
-              "type": {
-                "text": "NodeList"
-              },
-              "description": "Labels associated with this control.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "superclass": {
-            "name": "HelixBaseCalendar",
-            "package": "@helix-io/headless"
-          },
-          "summary": "Shows a month, and takes a date from it.",
-          "helix": {
-            "category": "forms",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/calendar",
-            "aliases": [
-              "Date grid",
-              "Month view"
-            ],
-            "tier": "styled",
-            "group": "Calendar",
-            "part": "Root"
-          },
-          "tagName": "helix-calendar",
-          "customElement": true,
-          "attributes": [
-            {
-              "name": "default-value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The value the markup declared, which is where a reset returns to.",
-              "fieldName": "defaultValue",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
-              "fieldName": "value",
-              "inheritedFrom": {
-                "name": "MixinControllerValue",
-                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
-              }
-            },
-            {
-              "name": "mode",
-              "type": {
-                "text": "'range' | 'multiple' | undefined"
-              },
-              "description": "How many dates can be held at once.",
-              "fieldName": "mode",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "months",
-              "type": {
-                "text": "number"
-              },
-              "default": "1",
-              "description": "How many months to show, side by side.",
-              "fieldName": "months",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "locale",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Locale for month and day names. Absent uses the runtime's own.",
-              "fieldName": "locale",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "disable-dates",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
-              "fieldName": "disableDates",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "disable-days",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
-              "fieldName": "disableDays",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "invalid",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the current selection fails validation.",
-              "fieldName": "invalid",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "month",
-              "type": {
-                "text": "string"
-              },
-              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
-              "fieldName": "month",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "previous-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Previous month'",
-              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
-              "fieldName": "previousLabel",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "next-label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Next month'",
-              "description": "Accessible name for the control that pages forward.",
-              "fieldName": "nextLabel",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "default-month",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Month to open on, where nothing declared one.",
-              "fieldName": "defaultMonth",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "min",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
-              "fieldName": "min",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "max",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Latest selectable date, as `YYYY-MM-DD`.",
-              "fieldName": "max",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Calendar'",
-              "description": "Accessible name for the grid.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "first-day-of-week",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
-              "fieldName": "firstDayOfWeek",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
-              "fieldName": "disabled",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
-              "fieldName": "name",
-              "inheritedFrom": {
-                "name": "HelixFormElement",
-                "module": "src/helix-form-element/helix-form-element.ts"
-              }
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The run of months.",
-              "name": "months",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "One month, its header and its grid.",
-              "name": "month",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The month name and its controls.",
-              "name": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the previous month.",
-              "name": "previous",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the next month.",
-              "name": "next",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The month and year being shown.",
-              "name": "heading",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The grid of days.",
-              "name": "grid",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "A column header naming a day of the week.",
-              "name": "weekday",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "One row of days.",
-              "name": "week",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "One column of a row, which is what a range paints.",
-              "name": "cell",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "description": "The shape inside a cell, which is what a single date paints.",
-              "name": "day",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixChangeEvent"
-              },
-              "description": "Fired before the dates change, and cancelable.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            },
-            {
-              "type": {
-                "text": "HelixNavigateEvent"
-              },
-              "description": "Fired before the month on show changes, and cancelable.",
-              "name": "helix-navigate",
-              "reactProp": "onhelix-navigate",
-              "inheritedFrom": {
-                "name": "HelixBaseCalendar",
-                "module": "src/calendar/root/calendar-root.ts"
-              }
-            }
-          ],
-          "modulePath": "src/calendar/root/calendar-root.ts",
-          "definitionPath": "src/calendar/root/calendar-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCalendar",
-          "declaration": {
-            "name": "HelixCalendar",
-            "module": "src/calendar/root/calendar-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-calendar",
-          "declaration": {
-            "name": "HelixCalendar",
-            "module": "src/calendar/root/calendar-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/callout/index.ts",
       "declarations": [],
       "exports": [
@@ -9913,7 +8560,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Calendar already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
+              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Date Picker already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
               "attribute": "invalid",
               "reflects": true,
               "inheritedFrom": {
@@ -10494,7 +9141,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Calendar already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
+              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Date Picker already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
               "fieldName": "invalid",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -10818,7 +9465,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol. The trigger is a mark within that box rather than a button beside it:\na second frame inside the first is two controls where a reader sees one.\n\nThe calendar is the real `helix-calendar`, in a panel with no border of its\nown. A surface over the page is told apart by its shadow and by what it\ncovers, and a line around it as well reads as a box drawn around something\nalready separate.\n\nHeight comes from the region, like every other control: `data-density` on\nwhatever holds it.",
+          "description": "The frame is the field rather than the input, so the trigger sits inside the\nsame box as the text and the focus ring is drawn once around the whole\ncontrol. The trigger is a mark within that box rather than a button beside it:\na second frame inside the first is two controls where a reader sees one.\n\nThe calendar is the real `helix-date-picker`, in a panel with no border of its\nown. A surface over the page is told apart by its shadow and by what it\ncovers, and a line around it as well reads as a box drawn around something\nalready separate.\n\nHeight comes from the region, like every other control: `data-density` on\nwhatever holds it.",
           "name": "HelixDateInput",
           "cssProperties": [
             {
@@ -12380,8 +11027,8 @@
               }
             },
             {
-              "description": "The calendar inside it.",
-              "name": "calendar",
+              "description": "The date picker inside it.",
+              "name": "picker",
               "inheritedFrom": {
                 "name": "HelixBaseDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -12445,6 +11092,1360 @@
           "declaration": {
             "name": "HelixDateInput",
             "module": "src/date-input/root/date-input-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/date-picker/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/date-picker/root/date-picker-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/date-picker/root/date-picker-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/date-picker/root/date-picker-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/date-picker/root/date-picker-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Six week rows always, so the grid keeps one height and a month change does\nnot move whatever sits beneath it.\n\nThe column track is wider than the day, and the day is centered in it. The\ndifference is the space between days, which belongs to the track rather than\nto a `gap`, so a range can paint across the whole track and stay continuous.\n\nDays from the neighbouring months stay in place and stay selectable, marked\nquieter rather than hidden, so the first and last weeks are whole and the\ngrid reads as a continuous run of dates.",
+          "name": "HelixDatePicker",
+          "cssProperties": [
+            {
+              "description": "Months per row. Two unless there is only one.",
+              "name": "--date-picker-columns"
+            },
+            {
+              "description": "Width and height of a day.",
+              "name": "--date-picker-day-size"
+            },
+            {
+              "description": "Width of a column, which is what sets the space between days.",
+              "name": "--date-picker-track-size"
+            },
+            {
+              "description": "Height of a week row.",
+              "name": "--date-picker-row-size"
+            },
+            {
+              "description": "Fill behind a selected day.",
+              "name": "--date-picker-selected-color"
+            },
+            {
+              "description": "Band behind the days in a range.",
+              "name": "--date-picker-range-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "attribute": "default-value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nOne field and not two. Writing always applies, the way a native control\ndoes when a script assigns to it. What the write does not do is change\nwhich mode the element is in.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `value` by the first update, which is\nwhere markup, a hydrating server's attributes and a framework's initial\nproperties have all landed. See `MixinControllerOpen` for why this is\ndecided once rather than continuously.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "valueIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onValueChange",
+              "type": {
+                "text": "((value: string) => void) | undefined"
+              },
+              "default": "undefined",
+              "description": "The consumer's callback, invoked after the value is applied.\n\nNot an attribute: it is a function. `onValueChange` and not `onChange`,\nbecause React reserves the latter for its own synthetic system and wires\nit to the native `change`, so a Helix event named `Change` would never\nfire at all.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestValue",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Requests a new value, and reports whether the request stood.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-change` is\na refusal and nothing moves. In uncontrolled mode the control then\nupdates itself; in controlled mode it applies nothing and waits for the\nconsumer to pass a new `value`, which is what controlled means.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "requestValue(next: string) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Returns the control to the value its markup declared.\n\nBoth halves are dropped, the consumer's and the control's, because a\nreset means the form is as it was served. Clearing only the internal one\nwould leave a control that had been written to stuck at that value.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formResetCallback() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Restores the value when the browser brings a form back.\n\nFalling back to `defaultValue` rather than to empty, because a restore\nwith no state is a form the browser has nothing recorded for, which is\nthe same situation as a fresh one.",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              },
+              "type": {
+                "text": "formStateRestoreCallback(state: string | null) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "attribute": "mode",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "attribute": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "attribute": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableDates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "attribute": "disable-dates",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableDays",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "attribute": "disable-days",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "attribute": "invalid",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
+              "attribute": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "previousLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous month'",
+              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
+              "attribute": "previous-label",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "nextLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next month'",
+              "description": "Accessible name for the control that pages forward.",
+              "attribute": "next-label",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultMonth",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Month to open on, where nothing declared one.",
+              "attribute": "default-month",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "monthState",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The month on show, whoever set it, and `undefined` until somebody has.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "monthMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the view, decided once and then fixed.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "monthIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
+              "attribute": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Latest selectable date, as `YYYY-MM-DD`.",
+              "attribute": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Date Picker'",
+              "description": "Accessible name for the grid.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "firstDayOfWeek",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
+              "attribute": "first-day-of-week",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "focused",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "The date the grid's tab stop is on. Absent until the grid is used.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The selected dates, in order.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "range",
+              "type": {
+                "text": "[string, string] | null"
+              },
+              "privacy": "private",
+              "description": "The range's ends, when there are two and the mode asks for them.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isSelected",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "iso",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shown",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The month being shown, resolved from `month`, then `value`, then today.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "derivedMonth",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The month to open on when nothing has declared one.\n\nSplit out from `shown` so `month` can report what is on display without the\ntwo calling each other: `month` reading `shown` and `shown` reading `month`\nis a stack overflow, and the specs found it immediately.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "anchor",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "description": "The date the tab stop sits on, which is where the arrows move from.\n\nIt has to be a date the grid actually renders, so the month is compared\nwith its year. Comparing the month alone puts the stop on the same date a\nyear away, which is rendered nowhere, and the grid is left with no tab stop\nat all and no way into it from the keyboard.\n\nEach candidate is tested in turn rather than the first one winning\noutright. Where the last date focused is in some other month, the selected\ndate still holds the stop, and only with neither in view does it fall to\nthe first of the month.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "weeksOf",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Date[][]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Six weeks of dates, so a grid does not change height between months.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "barred",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Whether a date is barred, by bound, by weekday, or by name.\n\n`barred`, not `disabled`: the calendar is a form control now, and\n`HelixFormElement.disabled` is a boolean about the whole control. A method\nand a flag cannot share a name, and of the two it is the method that should\nmove, because \"disabled\" on a control means one thing everywhere else in\nthe library.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Moves the view, announcing it first.\n\n`helix-navigate` and not `helix-change`: paging chooses nothing, and a\nconsumer driving the view has to hear that it moved without being told the\nanswer did. In controlled mode nothing moves and the consumer decides,\nwhich is the point of them holding it.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "moveTo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ],
+              "description": "Adds a date to the selection, as the mode allows.\n\n`range` starts over once it holds two, so a third click begins a new range\nrather than extending or replacing an end at random. `multiple` toggles, so\nclicking a chosen date takes it out.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "report",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reports the dates to the form, one entry each.\n\n`FormData` rather than the comma-joined string the property holds, because\n`mode=\"multiple\"` is genuinely several answers and a server reading\n`dates=2026-08-04,2026-08-06` has to know to split it on a convention this\nlibrary invented. One entry per date is what every other multi-valued\ncontrol on the platform sends, and `range` sends its two the same way, in\norder, so start and end arrive as the pair they already are.\n\n**Nothing at all without a `name`, and that is the mechanism rather than a\ndetail.** It is what lets a calendar sit inside something that owns the\nform value, which is how `DatePicker` will hold one. The guard has to be\nexplicit here in a way it does not for `Listbox`: a control reporting a\nplain string is skipped by the form when it has no name, but a `FormData`\ncarries its own names and its entries are appended whatever the element is\ncalled, so an unnamed calendar would submit empty-named dates.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "monthCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many months are shown, clamped once.\n\n`months` was clamped at the call site and read raw where the last month is\nidentified, so a zero, a negative or a non-numeric value rendered nothing\nand took the forward control with it: `index === this.months - 1` is never\ntrue for `NaN`. One getter both read.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cachedFormats",
+              "type": {
+                "text": "| {\n        full: Intl.DateTimeFormat\n        heading: Intl.DateTimeFormat\n        locale: string\n        weekday: Intl.DateTimeFormat\n      }\n    | undefined"
+              },
+              "privacy": "private",
+              "description": "The three date formatters, built once per locale rather than per render.\n\n`Intl.DateTimeFormat` is expensive to construct and these depend on nothing\nbut `locale`, and they were built inside the per-month render: three\nconstructions for every month on show, on every update, so a two-month\ncalendar rebuilt six of them each time an arrow key moved the anchor.\nMeasured elsewhere at about a quarter of a millisecond apiece, which is not\na crisis and is pure waste.\n\nKeyed on the locale so a change to it is picked up, which a plain lazy\nfield would not do.",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formats",
+              "type": {
+                "text": "{\n    full: Intl.DateTimeFormat\n    heading: Intl.DateTimeFormat\n    weekday: Intl.DateTimeFormat\n  }"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderMonth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "month",
+                  "type": {
+                    "text": "Date"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "true",
+              "description": "Opts the element into form ownership, labels, and submission.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "formDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "default": "false",
+              "description": "Whether an ancestor `<fieldset disabled>` has switched this control off.\n\nThe platform tells a form-associated element through `formDisabledCallback`\nand nothing here implemented it, so a control inside a disabled fieldset\nstayed fully typeable and announced itself as enabled. Measured: a\n`helix-input` in one accepted text, reported `disabled` as false, and\ncarried no `aria-disabled`.\n\nWhat the platform already did on its own is the submission half. The same\nmeasurement showed the fieldset's controls absent from the form's entry\nlist and the host matching `:disabled`, so the value never went anywhere.\nWhat was missing is everything a reader can see or touch.\n\nState rather than the `disabled` property. Writing that would reflect an\nattribute the consumer's server markup does not have, which React reports\non hydration and does not patch up, and it would also silently overwrite\nwhat the consumer set.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the control is off, by its own attribute or by an ancestor.\n\nWhat a component should bind to rather than `disabled`, which is only the\nhalf of it the consumer wrote.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The platform's notice that an ancestor fieldset changed.",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              },
+              "type": {
+                "text": "formDisabledCallback(disabled: boolean) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "attribute": "name",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "The form this control belongs to, if any.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "labels",
+              "type": {
+                "text": "NodeList"
+              },
+              "description": "Labels associated with this control.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseDatePicker",
+            "package": "@helix-io/headless"
+          },
+          "summary": "Shows a month, and takes a date from it.",
+          "helix": {
+            "category": "forms",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/date-picker",
+            "aliases": [
+              "Calendar",
+              "Date grid",
+              "Month view"
+            ],
+            "tier": "styled",
+            "group": "DatePicker",
+            "part": "Root"
+          },
+          "tagName": "helix-date-picker",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "default-value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The value the markup declared, which is where a reset returns to.",
+              "fieldName": "defaultValue",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "What the control holds now, and what its form submits.\n\nOne property, not two. Reading gives the real value whichever mode the\ncontrol is in, so `input.value` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what\n`<helix-input value=\"x\">` says too, and matches what a controlled input\nmeans in React: the value is theirs and the control waits to be told.\n`default-value` is how markup seeds one it does not want to own.\n\nThe same shape as the other three mixins, which is the point of them\nbeing four of a kind rather than four of three kinds.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "MixinControllerValue",
+                "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
+              }
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'range' | 'multiple' | undefined"
+              },
+              "description": "How many dates can be held at once.",
+              "fieldName": "mode",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "months",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How many months to show, side by side.",
+              "fieldName": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Locale for month and day names. Absent uses the runtime's own.",
+              "fieldName": "locale",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "disable-dates",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.",
+              "fieldName": "disableDates",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "disable-days",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Days of the week that cannot be chosen, comma separated, `0` to `6`.",
+              "fieldName": "disableDays",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the current selection fails validation.",
+              "fieldName": "invalid",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "description": "The month on show, as `YYYY-MM`. Follows `value`, then the current month.\n\nSeparate from `value` on purpose, so paging selects nothing and a consumer\ncan drive the view. It said that and could not do it: the calendar wrote\nthis when the reader paged, so a consumer holding it was overwritten and\nnever told. Reading gives the month on show; writing declares it theirs,\nand `default-month` seeds one the calendar owns.",
+              "fieldName": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "previous-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Previous month'",
+              "description": "Accessible name for the control that pages back.\n\nA property because this is the one component in the library that takes a\n`locale`, and it carried two hardcoded English names with no way to change\nthem: a calendar rendering its own month names in Japanese still announced\nits controls in English. `attribute:` spelled out, since Lit lowercases a\ncamelCase name rather than dash-casing it.",
+              "fieldName": "previousLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "next-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next month'",
+              "description": "Accessible name for the control that pages forward.",
+              "fieldName": "nextLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "default-month",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Month to open on, where nothing declared one.",
+              "fieldName": "defaultMonth",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Earliest selectable date, as `YYYY-MM-DD`.",
+              "fieldName": "min",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Latest selectable date, as `YYYY-MM-DD`.",
+              "fieldName": "max",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Date Picker'",
+              "description": "Accessible name for the grid.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "first-day-of-week",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "First column of the week, `0` for Sunday through `6` for Saturday.",
+              "fieldName": "firstDayOfWeek",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the control is non-interactive.\n\nReflected, because the styled tier selects on it, and mirrored to\n`aria-disabled` rather than removing the element from the accessibility\ntree, so a screen reader can still announce that the control exists.\n\nThe mirror is below and was for a while only a sentence: this paragraph\ndescribed it, four components had their own copies of it, and the class\nitself did nothing. Here is where it belongs, because here is where\n`disabled` is.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Name submitted with the form.\n\n**Reflected, and it is the exception to \"reflect only what CSS selects\non\".** The platform builds a form's entry list from the `name` *content\nattribute*, not from the property, so a control named through the property\nsubmitted under no name at all and was silently dropped. Measured: two\ninputs in one form, one named by attribute and one by property, and the\nform carried a single entry.\n\nSafe for a React consumer, which is what the rule is protecting: React\nrenders a custom element's props as attributes on the server, so the name\nis already in the markup being hydrated and reflecting it writes what is\nthere. It is only a change to the markup when a consumer assigns it\nimperatively later, and nothing is hydrating by then.\n\nHere rather than on each control, where it was declared eight times and\nreflected none of them.",
+              "fieldName": "name",
+              "inheritedFrom": {
+                "name": "HelixFormElement",
+                "module": "src/helix-form-element/helix-form-element.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The run of months.",
+              "name": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The month name and its controls.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the previous month.",
+              "name": "previous",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the next month.",
+              "name": "next",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The month and year being shown.",
+              "name": "heading",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The grid of days.",
+              "name": "grid",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "A column header naming a day of the week.",
+              "name": "weekday",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "One row of days.",
+              "name": "week",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "One column of a row, which is what a range paints.",
+              "name": "cell",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The shape inside a cell, which is what a single date paints.",
+              "name": "day",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the dates change, and cancelable.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixNavigateEvent"
+              },
+              "description": "Fired before the month on show changes, and cancelable.",
+              "name": "helix-navigate",
+              "reactProp": "onhelix-navigate",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/date-picker/root/date-picker-root.ts",
+          "definitionPath": "src/date-picker/root/date-picker-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixDatePicker",
+          "declaration": {
+            "name": "HelixDatePicker",
+            "module": "src/date-picker/root/date-picker-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-date-picker",
+          "declaration": {
+            "name": "HelixDatePicker",
+            "module": "src/date-picker/root/date-picker-root.ts"
           }
         }
       ]
@@ -17509,14 +17510,6 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/calendar/index.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
             "module": "src/callout/index.js"
           }
         },
@@ -17574,6 +17567,14 @@
           "declaration": {
             "name": "*",
             "module": "src/date-input/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/date-picker/index.js"
           }
         },
         {
@@ -42216,7 +42217,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Calendar already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
+              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Date Picker already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
               "attribute": "invalid",
               "reflects": true,
               "inheritedFrom": {
@@ -42273,7 +42274,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
+              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Date Picker's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
               "attribute": "disable-times",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
@@ -42314,7 +42315,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-date-picker` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
               "attribute": "mode",
               "reflects": true,
               "inheritedFrom": {
@@ -42368,7 +42369,7 @@
                   }
                 }
               ],
-              "description": "Whether a time is barred by name.\n\n`barred`, not `disabled`, for the reason Calendar records: this is a form\ncontrol and `HelixFormElement.disabled` is a boolean about the whole of it,\nso a method and a flag cannot share the name.\n\nOnly the named list. `min` and `max` are not consulted here because they\nnever produce a row to bar: `times` builds the list between them, so a time\noutside the bounds is absent rather than present and refused.",
+              "description": "Whether a time is barred by name.\n\n`barred`, not `disabled`, for the reason Date Picker records: this is a form\ncontrol and `HelixFormElement.disabled` is a boolean about the whole of it,\nso a method and a flag cannot share the name.\n\nOnly the named list. `min` and `max` are not consulted here because they\nnever produce a row to bar: `times` builds the list between them, so a time\noutside the bounds is absent rather than present and refused.",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"
@@ -42899,7 +42900,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Calendar already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
+              "description": "Whether the current selection fails validation.\n\nA flag rather than a message, which is the split Date Picker already drew and\nthese two now follow. A flat picker has no room of its own for a sentence:\nthe field that wraps one owns the label, the hint and the feedback, and a\nsecond message inside the panel would be the same error said twice. What is\nleft for the picker is the one thing the field cannot draw from outside, the\nmark on the answer itself.",
               "fieldName": "invalid",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
@@ -42951,7 +42952,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Calendar's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
+              "description": "Times that cannot be chosen, comma separated, as `HH:mm`.\n\nThe counterpart to Date Picker's `disable-dates`, and it exists for the same\nshape of problem: `min` and `max` take away a span, and what a booking\nusually has to take away is a scatter. A morning with 09:30 and 11:00\nalready gone is not two bounds.\n\nA time not on the step is simply never offered, so it is not an error to\nname one, and naming every time in the list is how the empty state is\nreached honestly rather than by handing over an empty range.",
               "fieldName": "disableTimes",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
@@ -42989,7 +42990,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-date-picker` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
               "fieldName": "mode",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",

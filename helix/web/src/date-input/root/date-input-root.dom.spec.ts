@@ -22,8 +22,8 @@ const field = async (attrs = ''): Promise<InputDate> => {
 }
 
 const control = (host: InputDate): HTMLInputElement => part(host, 'control') as HTMLInputElement
-const calendar = (host: InputDate): HTMLElement & { value: string } =>
-  part(host, 'calendar') as HTMLElement & { value: string }
+const picker = (host: InputDate): HTMLElement & { value: string } =>
+  part(host, 'picker') as HTMLElement & { value: string }
 
 /* Focus first, because typing into an unfocused field is not a thing that
    happens and the two are not equivalent here: the field renders when it is
@@ -39,7 +39,7 @@ const type = async (host: InputDate, text: string): Promise<void> => {
 describe('input date', () => {
   test('the calendar is the real one, not a grid written here', async () => {
     const host = await field()
-    expect(calendar(host).tagName).toBe('HELIX-CALENDAR')
+    expect(picker(host).tagName).toBe('HELIX-DATE-PICKER')
   })
 
   test('typing sets the value, so a reader who knows the date never uses the grid', async () => {
@@ -49,7 +49,7 @@ describe('input date', () => {
     const host = await field()
     await type(host, '2026-08-18')
     expect(host.value).toBe('2026-08-18')
-    expect(calendar(host).value).toBe('2026-08-18')
+    expect(picker(host).value).toBe('2026-08-18')
   })
 
   test('a half-typed date is kept but not handed to the calendar', async () => {
@@ -58,13 +58,13 @@ describe('input date', () => {
     const host = await field()
     await type(host, '2026-08-1')
     expect(host.value).toBe('2026-08-1')
-    expect(calendar(host).value).toBe('')
+    expect(picker(host).value).toBe('')
   })
 
   test('and the calendar follows once the field says something whole', async () => {
     const host = await field()
     await type(host, '2026-08-18')
-    expect(calendar(host).value).toBe('2026-08-18')
+    expect(picker(host).value).toBe('2026-08-18')
   })
 
   test('picking a date takes it and shuts the panel', async () => {
@@ -74,7 +74,7 @@ describe('input date', () => {
     await host.updateComplete
     expect(host.open).toBe(true)
 
-    calendar(host).dispatchEvent(
+    picker(host).dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
         composed: true,
@@ -93,7 +93,7 @@ describe('input date', () => {
     host.addEventListener('helix-change', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
-    calendar(host).dispatchEvent(
+    picker(host).dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
         composed: true,
@@ -106,9 +106,9 @@ describe('input date', () => {
 
   test('bounds reach the calendar, which is what enforces them in the grid', async () => {
     const host = await field('min="2026-01-01" max="2026-12-31" first-day-of-week="1"')
-    expect(calendar(host).getAttribute('min')).toBe('2026-01-01')
-    expect(calendar(host).getAttribute('max')).toBe('2026-12-31')
-    expect(calendar(host).getAttribute('first-day-of-week')).toBe('1')
+    expect(picker(host).getAttribute('min')).toBe('2026-01-01')
+    expect(picker(host).getAttribute('max')).toBe('2026-12-31')
+    expect(picker(host).getAttribute('first-day-of-week')).toBe('1')
   })
 
   test('the trigger says what it opens, and whether it is open', async () => {
@@ -202,16 +202,16 @@ describe('input date holds more than one', () => {
 
   test('the mode and the month count reach the calendar', async () => {
     const host = await many('mode="range" months="2"')
-    const calendar = part(host, 'calendar')
-    expect(calendar?.getAttribute('mode')).toBe('range')
-    expect(calendar?.getAttribute('months')).toBe('2')
+    const picker = part(host, 'picker')
+    expect(picker?.getAttribute('mode')).toBe('range')
+    expect(picker?.getAttribute('months')).toBe('2')
   })
 
   test('a range is two dates in one value, which is what a form submits', async () => {
     const host = await many('default-value="2026-08-04,2026-08-11" mode="range"')
     expect(
-      part(host, 'calendar')?.getAttribute('value') ??
-        (part(host, 'calendar') as unknown as { value: string }).value,
+      part(host, 'picker')?.getAttribute('value') ??
+        (part(host, 'picker') as unknown as { value: string }).value,
     ).toBe('2026-08-04,2026-08-11')
   })
 
@@ -235,7 +235,7 @@ describe('input date holds more than one', () => {
     const host = await many('mode="range"')
     host.open = true
     await host.updateComplete
-    part(host, 'calendar')?.dispatchEvent(
+    part(host, 'picker')?.dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
         composed: true,
@@ -250,7 +250,7 @@ describe('input date holds more than one', () => {
     const host = await many('')
     host.open = true
     await host.updateComplete
-    part(host, 'calendar')?.dispatchEvent(
+    part(host, 'picker')?.dispatchEvent(
       new CustomEvent('helix-change', {
         bubbles: true,
         composed: true,
@@ -530,7 +530,7 @@ describe('an invalid date field marks the calendar too', () => {
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
     expect(host.hasAttribute('data-invalid')).toBe(true)
-    expect(part(host, 'calendar')?.hasAttribute('invalid')).toBe(true)
+    expect(part(host, 'picker')?.hasAttribute('invalid')).toBe(true)
   })
 
   test('and drops it when the message goes', async () => {
@@ -538,6 +538,6 @@ describe('an invalid date field marks the calendar too', () => {
       `<helix-date-input label="When"></helix-date-input>`,
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await host.updateComplete
-    expect(part(host, 'calendar')?.hasAttribute('invalid')).toBe(false)
+    expect(part(host, 'picker')?.hasAttribute('invalid')).toBe(false)
   })
 })

@@ -101,8 +101,8 @@ const addMonths = (date: Date, months: number): Date => {
  * @since 0.1.0
  * @status experimental
  * @category forms
- * @aliases Date grid, Month view
- * @documentation https://helix.fusion.dev/components/calendar
+ * @aliases Calendar, Date grid, Month view
+ * @documentation https://helix.fusion.dev/components/date-picker
  *
  * `helix-change` was `helix-select`, and it moved when the calendar became a
  * form control. A control whose value changes dispatches `helix-change` here:
@@ -129,8 +129,8 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart cell - One column of a row, which is what a range paints.
  * @csspart day - The shape inside a cell, which is what a single date paints.
  */
-@customElement('helix-base-calendar')
-export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
+@customElement('helix-base-date-picker')
+export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) {
   /** How many dates can be held at once. */
   @property({ reflect: true })
   mode?: 'range' | 'multiple'
@@ -222,7 +222,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
 
   /** Accessible name for the grid. */
   @property()
-  label = 'Calendar'
+  label = 'Date Picker'
 
   /** First column of the week, `0` for Sunday through `6` for Saturday. */
   @property({ attribute: 'first-day-of-week', type: Number })
@@ -679,7 +679,7 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
        Data rather than styling, the same arrangement Slider uses for its
        fraction: only this element knows how many months there are, and a
        stylesheet cannot count children into a `repeat()`. Capped at two, and a
-       consumer wanting more sets `--calendar-columns`. */
+       consumer wanting more sets `--date-picker-columns`. */
     return html`<div part="months" style="--_calendar-columns: ${Math.min(count, 2)}">
       ${Array.from({ length: count }, (_, index) =>
         this.renderMonth(addMonths(shown, index), index),
@@ -690,6 +690,6 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-calendar': HelixBaseCalendar
+    'helix-base-date-picker': HelixBaseDatePicker
   }
 }

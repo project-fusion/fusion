@@ -9,7 +9,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import '../../calendar/index.js'
+import '../../date-picker/index.js'
 import '../../tag/index.js'
 
 /** Whether a string is a date the rest of this component can reason about. */
@@ -38,7 +38,7 @@ const dates = (value: string): string[] =>
  * @summary A date, typed or picked from a calendar.
  *
  * @description
- * **The calendar is `helix-calendar`, not a second one written here.** It
+ * **The calendar is `helix-date-picker`, not a second one written here.** It
  * already knows about months, ranges, disabled days, the first day of the week
  * and every keyboard rule a grid owes a reader, and a picker that reimplemented
  * a tenth of that would be a worse grid that also had to be maintained. This
@@ -84,7 +84,7 @@ const dates = (value: string): string[] =>
  * @csspart rest - How many dates are held beyond the ones shown.
  * @csspart trigger - The control that opens the calendar.
  * @csspart surface - The floating panel.
- * @csspart calendar - The calendar inside it.
+ * @csspart picker - The date picker inside it.
  */
 @customElement('helix-base-date-input')
 export class HelixBaseDateInput extends MixinControllerOpen(
@@ -465,7 +465,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
       // Only on the update that opened it, or every keystroke while it is up
       // would steal focus back into the grid.
       if (changed.has('open')) {
-        this.renderRoot?.querySelector<HTMLElement>('[part="calendar"]')?.focus()
+        this.renderRoot?.querySelector<HTMLElement>('[part="picker"]')?.focus()
       }
     } else {
       this.panel.hide()
@@ -609,8 +609,8 @@ export class HelixBaseDateInput extends MixinControllerOpen(
       </div>
 
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-calendar
-          part="calendar"
+        <helix-date-picker
+          part="picker"
           ?invalid=${this.resolvedFeedback !== ''}
           mode=${this.mode ?? nothing}
           months=${this.months}
@@ -622,7 +622,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
           max=${this.max || nothing}
           min=${this.min || nothing}
           @helix-change=${this.handleCalendarChange}
-        ></helix-calendar>
+        ></helix-date-picker>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

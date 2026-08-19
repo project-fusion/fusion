@@ -112,7 +112,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
   /**
    * Whether the current selection fails validation.
    *
-   * A flag rather than a message, which is the split Calendar already drew and
+   * A flag rather than a message, which is the split Date Picker already drew and
    * these two now follow. A flat picker has no room of its own for a sentence:
    * the field that wraps one owns the label, the hint and the feedback, and a
    * second message inside the panel would be the same error said twice. What is
@@ -143,7 +143,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
   /**
    * Times that cannot be chosen, comma separated, as `HH:mm`.
    *
-   * The counterpart to Calendar's `disable-dates`, and it exists for the same
+   * The counterpart to Date Picker's `disable-dates`, and it exists for the same
    * shape of problem: `min` and `max` take away a span, and what a booking
    * usually has to take away is a scatter. A morning with 09:30 and 11:00
    * already gone is not two bounds.
@@ -168,7 +168,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    *
    * Absent is one. `range` holds a start and an end with everything between
    * them shown as part of the answer, `multiple` holds any number, and both are
-   * carried as one comma-separated value: the same shape `helix-calendar` uses,
+   * carried as one comma-separated value: the same shape `helix-date-picker` uses,
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
@@ -230,7 +230,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
   /**
    * Whether a time is barred by name.
    *
-   * `barred`, not `disabled`, for the reason Calendar records: this is a form
+   * `barred`, not `disabled`, for the reason Date Picker records: this is a form
    * control and `HelixFormElement.disabled` is a boolean about the whole of it,
    * so a method and a flag cannot share the name.
    *
@@ -441,7 +441,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
   }
 
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
-     Calendar takes and for the reason the whole library records: a `role` or a
+     Date Picker takes and for the reason the whole library records: a `role` or a
      state written onto the host as an attribute is one a React consumer's
      server markup never had. */
   protected override willUpdate(changed: PropertyValues): void {

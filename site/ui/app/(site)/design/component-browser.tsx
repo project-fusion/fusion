@@ -361,7 +361,7 @@ export function ComponentBrowser({
                 Get Started
               </Link>
               <Link data-button data-button-fill="standard" href="/design/sandbox">
-                Explore the Sandbox
+                Open the Sandbox
               </Link>
             </helix-button-group>
           </helix-flex>

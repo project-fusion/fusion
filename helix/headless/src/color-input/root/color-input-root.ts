@@ -24,7 +24,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * square, the ramps, the eyedropper and the syntax toggle, and it is worth
  * having on its own: a settings pane wants a picker flat on the page with
  * nothing to open. This element is the field, the overlay, and the form.
- * Exactly the arrangement Date Input has with `helix-calendar`.
+ * Exactly the arrangement Date Input has with `helix-date-picker`.
  *
  * **Typed as well as picked, and the typing is the reason this is not
  * `<input type="color">`.** The native control gives a free picker and takes

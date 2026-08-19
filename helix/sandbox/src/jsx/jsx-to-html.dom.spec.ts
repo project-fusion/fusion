@@ -67,7 +67,7 @@ describe('the two directions agree', () => {
     '<helix-button appearance="primary">Go</helix-button>',
     '<helix-badge label="Online" style="--badge-offset: 0.25rem">\n  <helix-avatar name="A B" size="lg"></helix-avatar>\n</helix-badge>',
     '<helix-checkbox default-checked disabled name="a">Checked</helix-checkbox>',
-    '<helix-calendar disable-days="0,6" first-day-of-week="1"></helix-calendar>',
+    '<helix-date-picker disable-days="0,6" first-day-of-week="1"></helix-date-picker>',
     '<helix-flex direction="column" gap="sm">\n  <helix-text as="p">one</helix-text>\n  <helix-text as="p">two</helix-text>\n</helix-flex>',
     '<img alt="" src="a.png" />',
   ]

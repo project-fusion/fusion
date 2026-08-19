@@ -561,96 +561,6 @@ therefore serves a consumer's own anchor styled as a button.
 | --- | --- |
 | `--button-group-gap` | Space between the buttons, when `spaced`. |
 
-## Calendar
-
-### Root — `helix-calendar`
-
-Shows a month, and takes a date from it.
-
-Extends `HelixBaseCalendar`.
-
-Six week rows always, so the grid keeps one height and a month change does
-not move whatever sits beneath it.
-
-The column track is wider than the day, and the day is centered in it. The
-difference is the space between days, which belongs to the track rather than
-to a `gap`, so a range can paint across the whole track and stay continuous.
-
-Days from the neighbouring months stay in place and stay selectable, marked
-quieter rather than hidden, so the first and last weeks are whole and the
-grid reads as a continuous run of dates.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `defaultMonth` | `default-month` | `string` | `''` | `HelixBaseCalendar` | Month to open on, where nothing declared one. |
-| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
-| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
-| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseCalendar` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
-| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseCalendar` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
-| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseCalendar` | First column of the week, `0` for Sunday through `6` for Saturday. |
-| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
-| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseCalendar` | Whether the current selection fails validation. |
-| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
-| `label` | `label` | `string` | `'Calendar'` | `HelixBaseCalendar` | Accessible name for the grid. |
-| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
-| `locale` | `locale` | `string` | `''` | `HelixBaseCalendar` | Locale for month and day names. Absent uses the runtime's own. |
-| `max` | `max` | `string` | `''` | `HelixBaseCalendar` | Latest selectable date, as `YYYY-MM-DD`. |
-| `min` | `min` | `string` | `''` | `HelixBaseCalendar` | Earliest selectable date, as `YYYY-MM-DD`. |
-| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseCalendar` | How many dates can be held at once. |
-| `month` | `month` | `string` | - | `HelixBaseCalendar` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
-| `months` | `months` | `number` | `1` | `HelixBaseCalendar` | How many months to show, side by side. |
-| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixBaseCalendar` | Accessible name for the control that pages forward. |
-| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
-| `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixBaseCalendar` | Accessible name for the control that pages back. |
-| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
-
-#### Methods
-
-| Method | From | Description |
-| --- | --- | --- |
-| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
-| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
-| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
-| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the dates change, and cancelable. |
-| `helix-navigate` | `HelixNavigateEvent` | Fired before the month on show changes, and cancelable. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `months` | The run of months. |
-| `month` | One month, its header and its grid. |
-| `header` | The month name and its controls. |
-| `previous` | The control that moves to the previous month. |
-| `next` | The control that moves to the next month. |
-| `heading` | The month and year being shown. |
-| `grid` | The grid of days. |
-| `weekday` | A column header naming a day of the week. |
-| `week` | One row of days. |
-| `cell` | One column of a row, which is what a range paints. |
-| `day` | The shape inside a cell, which is what a single date paints. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--calendar-columns` | Months per row. Two unless there is only one. |
-| `--calendar-day-size` | Width and height of a day. |
-| `--calendar-track-size` | Width of a column, which is what sets the space between days. |
-| `--calendar-row-size` | Height of a week row. |
-| `--calendar-selected-color` | Fill behind a selected day. |
-| `--calendar-range-color` | Band behind the days in a range. |
-
 ## Callout
 
 ### Root — `helix-callout`
@@ -1167,7 +1077,7 @@ same box as the text and the focus ring is drawn once around the whole
 control. The trigger is a mark within that box rather than a button beside it:
 a second frame inside the first is two controls where a reader sees one.
 
-The calendar is the real `helix-calendar`, in a panel with no border of its
+The calendar is the real `helix-date-picker`, in a panel with no border of its
 own. A surface over the page is told apart by its shadow and by what it
 covers, and a line around it as well reads as a box drawn around something
 already separate.
@@ -1248,13 +1158,103 @@ whatever holds it.
 | `rest` | How many dates are held beyond the ones shown. |
 | `trigger` | The control that opens the calendar. |
 | `surface` | The floating panel. |
-| `calendar` | The calendar inside it. |
+| `picker` | The date picker inside it. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
 | `--date-input-background-color` | Fill behind the field. |
+
+## Date Picker
+
+### Root — `helix-date-picker`
+
+Shows a month, and takes a date from it.
+
+Extends `HelixBaseDatePicker`.
+
+Six week rows always, so the grid keeps one height and a month change does
+not move whatever sits beneath it.
+
+The column track is wider than the day, and the day is centered in it. The
+difference is the space between days, which belongs to the track rather than
+to a `gap`, so a range can paint across the whole track and stay continuous.
+
+Days from the neighbouring months stay in place and stay selectable, marked
+quieter rather than hidden, so the first and last weeks are whole and the
+grid reads as a continuous run of dates.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultMonth` | `default-month` | `string` | `''` | `HelixBaseDatePicker` | Month to open on, where nothing declared one. |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `disableDates` | `disable-dates` | `string` | `''` | `HelixBaseDatePicker` | Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. |
+| `disableDays` | `disable-days` | `string` | `''` | `HelixBaseDatePicker` | Days of the week that cannot be chosen, comma separated, `0` to `6`. |
+| `firstDayOfWeek` | `first-day-of-week` | `number` | `0` | `HelixBaseDatePicker` | First column of the week, `0` for Sunday through `6` for Saturday. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `invalid` | `invalid` | `boolean` | `false` | `HelixBaseDatePicker` | Whether the current selection fails validation. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `'Date Picker'` | `HelixBaseDatePicker` | Accessible name for the grid. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `locale` | `locale` | `string` | `''` | `HelixBaseDatePicker` | Locale for month and day names. Absent uses the runtime's own. |
+| `max` | `max` | `string` | `''` | `HelixBaseDatePicker` | Latest selectable date, as `YYYY-MM-DD`. |
+| `min` | `min` | `string` | `''` | `HelixBaseDatePicker` | Earliest selectable date, as `YYYY-MM-DD`. |
+| `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseDatePicker` | How many dates can be held at once. |
+| `month` | `month` | `string` | - | `HelixBaseDatePicker` | The month on show, as `YYYY-MM`. Follows `value`, then the current month. |
+| `months` | `months` | `number` | `1` | `HelixBaseDatePicker` | How many months to show, side by side. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `nextLabel` | `next-label` | `string` | `'Next month'` | `HelixBaseDatePicker` | Accessible name for the control that pages forward. |
+| `onValueChange` | - | `((value: string) => void) \| undefined` | `undefined` | `MixinControllerValue` | The consumer's callback, invoked after the value is applied. |
+| `previousLabel` | `previous-label` | `string` | `'Previous month'` | `HelixBaseDatePicker` | Accessible name for the control that pages back. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the dates change, and cancelable. |
+| `helix-navigate` | `HelixNavigateEvent` | Fired before the month on show changes, and cancelable. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `months` | The run of months. |
+| `month` | One month, its header and its grid. |
+| `header` | The month name and its controls. |
+| `previous` | The control that moves to the previous month. |
+| `next` | The control that moves to the next month. |
+| `heading` | The month and year being shown. |
+| `grid` | The grid of days. |
+| `weekday` | A column header naming a day of the week. |
+| `week` | One row of days. |
+| `cell` | One column of a row, which is what a range paints. |
+| `day` | The shape inside a cell, which is what a single date paints. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--date-picker-columns` | Months per row. Two unless there is only one. |
+| `--date-picker-day-size` | Width and height of a day. |
+| `--date-picker-track-size` | Width of a column, which is what sets the space between days. |
+| `--date-picker-row-size` | Height of a week row. |
+| `--date-picker-selected-color` | Fill behind a selected day. |
+| `--date-picker-range-color` | Band behind the days in a range. |
 
 ## Dialog
 

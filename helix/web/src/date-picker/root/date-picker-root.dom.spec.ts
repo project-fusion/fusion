@@ -6,7 +6,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Calendar = HTMLElement & {
+type DatePicker = HTMLElement & {
   month: string
   value: string
   min: string
@@ -16,20 +16,22 @@ type Calendar = HTMLElement & {
 
 const calendar = async (
   attrs = 'default-month="2026-08" default-value="2026-08-14"',
-): Promise<Calendar> =>
-  (await mount(`<helix-calendar label="Choose a date" ${attrs}></helix-calendar>`)) as Calendar
+): Promise<DatePicker> =>
+  (await mount(
+    `<helix-date-picker label="Choose a date" ${attrs}></helix-date-picker>`,
+  )) as DatePicker
 
 /** The cells, which is what carries a day's role, state, and tab stop. */
-const days = (cal: Calendar): HTMLElement[] => [
+const days = (cal: DatePicker): HTMLElement[] => [
   ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="cell"]') ?? []),
 ]
 
 /** Presses the forward arrow, which is the only way a reader pages. */
-const next = (cal: Calendar): void => {
+const next = (cal: DatePicker): void => {
   cal.shadowRoot?.querySelector<HTMLElement>('[part="next"]')?.click()
 }
 
-const stop = (cal: Calendar): string | null =>
+const stop = (cal: DatePicker): string | null =>
   cal.shadowRoot?.querySelector('[part="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
 
 /* From the grid, which is where a reader's presses come from.
@@ -39,7 +41,7 @@ const stop = (cal: Calendar): string | null =>
  * "next month" button was read as "choose the focused day" and then
  * `preventDefault`ed, so the month never moved. The handler asks where the
  * press came from now, and so does this. */
-const press = async (cal: Calendar, key: string, shiftKey = false): Promise<void> => {
+const press = async (cal: DatePicker, key: string, shiftKey = false): Promise<void> => {
   const grid = (cal as unknown as { renderRoot: ShadowRoot }).renderRoot.querySelector(
     '[part="grid"]',
   )
@@ -58,7 +60,7 @@ const press = async (cal: Calendar, key: string, shiftKey = false): Promise<void
   await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
 }
 
-describe('calendar', () => {
+describe('date picker', () => {
   test('renders six weeks, so the grid keeps one height between months', async () => {
     const cal = await calendar()
     expect(days(cal)).toHaveLength(42)
@@ -219,12 +221,12 @@ describe('calendar', () => {
   })
 })
 
-describe('calendar selection can be refused', () => {
+describe('date picker selection can be refused', () => {
   /* Same fault the carousel had: `value` was written and then announced, so a
      listener refusing a date was refusing one already chosen. Every other
      stateful component in the library announces first, through the helper whose
      own documentation calls itself the one audited path for this. */
-  const press = (cal: Calendar, label: string): void => {
+  const press = (cal: DatePicker, label: string): void => {
     const day = days(cal).find((one) => one.getAttribute('aria-label')?.includes(label))
     if (!day) {
       throw new Error(`the fixture no longer renders ${label}`)
@@ -259,9 +261,9 @@ describe('calendar selection can be refused', () => {
   })
 })
 
-describe('calendar as a form control', () => {
+describe('date picker as a form control', () => {
   /** The dates a submission would carry, in order. */
-  const submitted = (cal: Calendar): string[] => {
+  const submitted = (cal: DatePicker): string[] => {
     const reported = formValue(cal as HTMLElement)
     if (reported === null || reported === undefined) {
       return []
@@ -326,7 +328,7 @@ describe('calendar as a form control', () => {
   test('a reset returns to the date the markup declared', async () => {
     const cal = (await calendar(
       'name="when" default-month="2026-08" default-value="2026-08-14"',
-    )) as Calendar & { formResetCallback(): void; updateComplete: Promise<boolean> }
+    )) as DatePicker & { formResetCallback(): void; updateComplete: Promise<boolean> }
     expect(cal.value).toBe('2026-08-14')
 
     cal.value = '2026-08-20'
@@ -343,7 +345,7 @@ describe('calendar as a form control', () => {
     const cal = await calendar()
     cal.addEventListener('helix-navigate', (event) => event.preventDefault())
     next(cal)
-    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-08')
   })
 
@@ -368,26 +370,26 @@ describe('calendar as a form control', () => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     next(cal)
-    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(announced).toBe('2026-09')
     expect(cal.month).toBe('2026-08')
 
     // And the consumer moving it is what moves it.
     cal.month = '2026-09'
-    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-09')
   })
 
   test("a month nobody declared is the calendar's, and the arrows move it", async () => {
     const cal = await calendar()
     next(cal)
-    await (cal as Calendar & { updateComplete: Promise<boolean> }).updateComplete
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-09')
   })
 })
 
 describe('a day from a neighbouring month is filler', () => {
-  const outside = (cal: Calendar): HTMLElement[] =>
+  const outside = (cal: DatePicker): HTMLElement[] =>
     days(cal).filter((one) => one.hasAttribute('data-outside'))
 
   test('clicking one chooses nothing', async () => {

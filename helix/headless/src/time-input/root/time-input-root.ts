@@ -24,7 +24,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * **The list is `helix-time-picker`, not a second one written here.** It is worth
  * having on its own, flat in a settings pane with nothing to open, and this
  * element is the field, the overlay and the form. Exactly the arrangement Input
- * Date has with `helix-calendar` and Color Input with `helix-color-picker`.
+ * Date has with `helix-date-picker` and Color Input with `helix-color-picker`.
  *
  * **Typed as well as picked, and that is the division the list depends on.** A
  * list at a step offers the times a product actually has, and the field is how a

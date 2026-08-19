@@ -19,7 +19,7 @@
  * cell holding four paragraphs is a table nobody reads, so a property's own
  * reasoning stays on the component and on `/components/<family>`, which renders
  * the manifest in a browser. A component's description is not in a cell: it is
- * prose under a heading, and truncating that threw away everything `Calendar`
+ * prose under a heading, and truncating that threw away everything `Date Picker`
  * says about its three modes.
  *
  * Run `bun run reference` to write it, and `bun run check:reference` to fail

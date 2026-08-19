@@ -5,9 +5,9 @@
      the day is the smaller shape centered in it. The difference is the space
      between days, and it belongs to the track rather than to a `gap`, so a
      range can paint the whole track and stay continuous. */
-  --_calendar-track: var(--calendar-track-size, 2.5rem);
-  --_calendar-row: var(--calendar-row-size, 2.25rem);
-  --_calendar-day: var(--calendar-day-size, 1.875rem);
+  --_calendar-track: var(--date-picker-track-size, 2.5rem);
+  --_calendar-row: var(--date-picker-row-size, 2.25rem);
+  --_calendar-day: var(--date-picker-day-size, 1.875rem);
 }
 
 /* Two months to a row, and the rest underneath.
@@ -25,18 +25,21 @@
  * below, capped at two, because a stylesheet cannot count children into a
  * `repeat()` and only that tier knows how many months there are.
  *
- * `--calendar-columns` overrides it, for a consumer with the room and the reason.
+ * `--date-picker-columns` overrides it, for a consumer with the room and the reason.
  *
  * `align-items: start` so a row whose months have different week counts still
  * lines their headers up. Wrapping rather than shrinking, because a month has an
- * honest intrinsic width: seven day cells at `--calendar-day-size`, and
+ * honest intrinsic width: seven day cells at `--date-picker-day-size`, and
  * squeezing them makes a grid of dates that no longer reads as a calendar. A
  * consumer who wants more months in less room sets that token. */
 [part="months"] {
   align-items: start;
   display: grid;
   gap: var(--helix-space-md);
-  grid-template-columns: repeat(var(--calendar-columns, var(--_calendar-columns, 1)), max-content);
+  grid-template-columns: repeat(
+      var(--date-picker-columns, var(--_calendar-columns, 1)),
+      max-content
+    );
   justify-content: start;
 }
 
@@ -184,7 +187,7 @@
  * exactly what the ring is. */
 [part="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
   background-color: var(
-    --calendar-range-color,
+    --date-picker-range-color,
     light-dark(
       color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
       color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
@@ -196,7 +199,7 @@
   [part="day"] {
   box-shadow: 0 0 0 calc((var(--_calendar-row) - var(--_calendar-day)) / 2)
     var(
-      --calendar-range-color,
+      --date-picker-range-color,
       light-dark(
         color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
         color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
@@ -223,7 +226,7 @@
    grid of grey squares: measured at 21:1 against its own label where the muted
    step is 6.01, past AA with room and leaving black to the text. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
-  background-color: var(--calendar-selected-color, var(--helix-color-foreground-muted));
+  background-color: var(--date-picker-selected-color, var(--helix-color-foreground-muted));
   color: var(--helix-color-foreground-on-accent);
 }
 
