@@ -23,6 +23,7 @@ import { styles } from './calendar-root.css.js'
  * @aliases Date grid, Month view
  * @documentation https://helix.fusion.dev/components/calendar
  *
+ * @cssproperty --calendar-columns - Months per row. Two unless there is only one.
  * @cssproperty --calendar-day-size - Width and height of a day.
  * @cssproperty --calendar-track-size - Width of a column, which is what sets the space between days.
  * @cssproperty --calendar-row-size - Height of a week row.

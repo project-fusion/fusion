@@ -9,6 +9,7 @@ import type { CSSResultGroup } from 'lit'
    right because the sandbox imports the whole barrel. Same arrangement Select
    uses for its listbox and Pagination for its select. */
 import '../../calendar/index.js'
+import '../../tag/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
 import { styles } from './input-date-root.css.js'

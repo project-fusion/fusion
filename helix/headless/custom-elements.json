@@ -11592,6 +11592,10 @@
               "name": "control"
             },
             {
+              "description": "One held date, as a tag, in `multiple`.",
+              "name": "date"
+            },
+            {
               "description": "The control that opens the calendar.",
               "name": "trigger"
             },
@@ -11748,10 +11752,44 @@
             },
             {
               "kind": "field",
+              "name": "display",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "What the field shows, which is the value in every mode but one.\n\nA range reads `2026-08-04 – 2026-08-11`, because two dates separated by a\ncomma is a list and a range is a span: the comma says \"and these\", the dash\nsays \"through\". It is the one place this component shows something other\nthan the value it holds, and it is safe because the dash reads back: `dates`\ntakes a spaced dash as a separator, so what is shown is what can be typed.\n\n`multiple` shows nothing here at all. Its dates are tags beside the input\nand the input is a draft, which is the next thing down.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "draft",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "What is being typed but not yet held, for `multiple` only.\n\nThe other modes type into the value directly, because one date and a range\nare both a whole answer at the moment they are complete. A multiple is not:\nit is a set being added to, so the field needs somewhere to hold a date\nbefore it joins the set and somewhere to leave a half-typed one that is not\na date yet."
+            },
+            {
+              "kind": "field",
               "name": "handleInput",
               "privacy": "private",
               "readonly": true,
               "description": "Relayed under this element's name, so a consumer hears one control."
+            },
+            {
+              "kind": "field",
+              "name": "handleDraftKey",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Adds what was typed to the set, or takes the last one back out."
+            },
+            {
+              "kind": "field",
+              "name": "removeDate",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Takes one date back out of the set."
             },
             {
               "kind": "field",

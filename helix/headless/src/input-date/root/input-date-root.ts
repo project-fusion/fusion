@@ -8,8 +8,9 @@ import {
   PopoverController,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import '../../calendar/index.js'
+import '../../tag/index.js'
 
 /** Whether a string is a date the rest of this component can reason about. */
 const isIso = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
@@ -22,7 +23,13 @@ const isIso = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
  * entries are dropped so a trailing comma while typing is not a date.
  */
 const dates = (value: string): string[] =>
+  /* The en dash and the spaced hyphen both mean "to", because a range is shown
+     that way and what is shown is what gets typed back. An ISO date holds
+     hyphens of its own, so only a spaced one separates: `2026-08-04-2026-08-11`
+     is not a thing anybody writes, and treating a bare hyphen as a separator
+     would take `2026-08-04` apart into three numbers. */
   value
+    .replace(/\s+[–-]\s+/g, ',')
     .split(',')
     .map((one) => one.trim())
     .filter(Boolean)
@@ -72,6 +79,7 @@ const dates = (value: string): string[] =>
  *
  * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.
+ * @csspart date - One held date, as a tag, in `multiple`.
  * @csspart trigger - The control that opens the calendar.
  * @csspart surface - The floating panel.
  * @csspart calendar - The calendar inside it.
@@ -173,11 +181,85 @@ export class HelixBaseInputDate extends MixinControllerOpen(
     return held.length > 0 && held.every(isIso) ? held.join(',') : ''
   }
 
+  /**
+   * What the field shows, which is the value in every mode but one.
+   *
+   * A range reads `2026-08-04 – 2026-08-11`, because two dates separated by a
+   * comma is a list and a range is a span: the comma says "and these", the dash
+   * says "through". It is the one place this component shows something other
+   * than the value it holds, and it is safe because the dash reads back: `dates`
+   * takes a spaced dash as a separator, so what is shown is what can be typed.
+   *
+   * `multiple` shows nothing here at all. Its dates are tags beside the input
+   * and the input is a draft, which is the next thing down.
+   */
+  private get display(): string {
+    if (this.mode === 'multiple') {
+      return this.draft
+    }
+    const held = dates(this.value)
+    return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
+  }
+
+  /**
+   * What is being typed but not yet held, for `multiple` only.
+   *
+   * The other modes type into the value directly, because one date and a range
+   * are both a whole answer at the moment they are complete. A multiple is not:
+   * it is a set being added to, so the field needs somewhere to hold a date
+   * before it joins the set and somewhere to leave a half-typed one that is not
+   * a date yet.
+   */
+  @state()
+  private draft = ''
+
   /** Relayed under this element's name, so a consumer hears one control. */
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()
-    this.requestValue((event.target as HTMLInputElement).value)
+    const typed = (event.target as HTMLInputElement).value
+    if (this.mode === 'multiple') {
+      this.draft = typed
+      return
+    }
+    /* Stored as commas once every date in it is whole, and kept exactly as typed
+       until then. A form should submit `2026-08-04,2026-08-11` however the dash
+       was written, and the dash is a reading of that rather than a second value
+       shape to support. Half-typed text stays verbatim, for the reason the class
+       gives about a document being edited: normalising `2026-08-0` would take
+       the caret away mid-date. */
+    const held = dates(typed)
+    const whole = held.length > 0 && held.every(isIso)
+    this.requestValue(whole ? held.join(',') : typed)
     this.restore()
+  }
+
+  /** Adds what was typed to the set, or takes the last one back out. */
+  private readonly handleDraftKey = (event: KeyboardEvent): void => {
+    if (this.mode !== 'multiple') {
+      return
+    }
+    const held = dates(this.value)
+    if (event.key === 'Enter' && isIso(this.draft)) {
+      event.preventDefault()
+      if (!held.includes(this.draft)) {
+        this.requestValue([...held, this.draft].join(','))
+      }
+      this.draft = ''
+    } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
+      /* The convention every tag field has: an empty field and a backspace takes
+         the last one back, so a mistake costs one key rather than a hunt for a
+         small control. */
+      this.requestValue(held.slice(0, -1).join(','))
+    }
+  }
+
+  /** Takes one date back out of the set. */
+  private readonly removeDate = (date: string): void => {
+    this.requestValue(
+      dates(this.value)
+        .filter((one) => one !== date)
+        .join(','),
+    )
   }
 
   private readonly handleCalendarChange = (event: Event): void => {
@@ -206,8 +288,8 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    */
   private restore(): void {
     const control = this.control
-    if (control && control.value !== this.value) {
-      control.value = this.value
+    if (control && control.value !== this.display) {
+      control.value = this.display
     }
     this.sync()
   }
@@ -327,11 +409,28 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
+        ${
+          this.mode === 'multiple'
+            ? dates(this.value).map(
+                (date) => html`<helix-tag
+                  part="date"
+                  dismissible
+                  dismiss-label=${`Remove ${date}`}
+                  ?disabled=${this.isDisabled}
+                  @helix-dismiss=${(event: Event) => {
+                    event.stopPropagation()
+                    this.removeDate(date)
+                  }}
+                  >${date}</helix-tag
+                >`,
+              )
+            : nothing
+        }
         <input
           part="control"
           id="control"
           type="text"
-          .value=${this.value}
+          .value=${this.display}
           name=${this.name || nothing}
           placeholder=${this.placeholder || nothing}
           autocomplete="off"
@@ -341,6 +440,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
           ?required=${this.required}
           @focus=${this.handleFocus}
           @input=${this.handleInput}
+          @keydown=${this.handleDraftKey}
         />
         <button
           part="trigger"

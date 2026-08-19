@@ -9189,6 +9189,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--calendar-columns`: Months per row. Two unless there is only one. (default: `undefined`)
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
    * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
    * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
@@ -10846,6 +10847,7 @@ export type CustomElements = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `date`: One held date, as a tag, in `multiple`.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.
@@ -15687,6 +15689,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--calendar-columns`: Months per row. Two unless there is only one. (default: `undefined`)
    * - `--calendar-day-size`: Width and height of a day. (default: `undefined`)
    * - `--calendar-track-size`: Width of a column, which is what sets the space between days. (default: `undefined`)
    * - `--calendar-row-size`: Height of a week row. (default: `undefined`)
@@ -17398,6 +17401,7 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `date`: One held date, as a tag, in `multiple`.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.
@@ -21534,6 +21538,8 @@ export type CustomCssProperties = {
   "--button-radii-start"?: string;
   /** Trailing corners, which a group flattens. */
   "--button-radii-end"?: string;
+  /** Months per row. Two unless there is only one. */
+  "--calendar-columns"?: string;
   /** Width and height of a day. */
   "--calendar-day-size"?: string;
   /** Width of a column, which is what sets the space between days. */

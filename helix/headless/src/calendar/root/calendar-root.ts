@@ -655,7 +655,12 @@ export class HelixBaseCalendar extends MixinControllerValue(HelixFormElement) {
   protected override render(): TemplateResult {
     const shown = this.shown
     const count = this.monthCount
-    return html`<div part="months">
+    /* The column count, written out for the tier above.
+       Data rather than styling, the same arrangement Slider uses for its
+       fraction: only this element knows how many months there are, and a
+       stylesheet cannot count children into a `repeat()`. Capped at two, and a
+       consumer wanting more sets `--calendar-columns`. */
+    return html`<div part="months" style="--_calendar-columns: ${Math.min(count, 2)}">
       ${Array.from({ length: count }, (_, index) =>
         this.renderMonth(addMonths(shown, index), index),
       )}

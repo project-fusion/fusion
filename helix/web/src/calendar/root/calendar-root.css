@@ -10,39 +10,68 @@
   --_calendar-day: var(--calendar-day-size, 1.875rem);
 }
 
-/* As many months as fit, and the rest on the next line.
+/* Two months to a row, and the rest underneath.
  *
  * A flex row without `wrap` cannot do anything but overflow, and it did:
  * `months="3"` measured 872px wide in an 820px container, a 560px one and a
- * 320px one alike, always three across and always past the edge. The component
- * was the same width whatever it was put in, which is the one thing a run of
- * months should not be.
+ * 320px one alike, always three across and always past the edge. Wrapping fixed
+ * the overflow and left the layout at the mercy of whatever box it was in, so
+ * three months were three across in a wide panel and two-and-one in a narrower
+ * one, which is a calendar that changes shape as the page does.
  *
- * Wrapping rather than shrinking, because a month has an honest intrinsic
- * width: seven day cells at `--calendar-day-size`, and squeezing them makes a
- * grid of dates that no longer reads as a calendar. A consumer who wants three
- * months in less room sets that token, which is what it is for.
+ * A grid with a stated column count instead. Two, because that is the pairing a
+ * range wants, a start month beside an end month; three across is wider than
+ * most panels and a run of four is a wall. The count is written by the tier
+ * below, capped at two, because a stylesheet cannot count children into a
+ * `repeat()` and only that tier knows how many months there are.
  *
- * `align-items: start` so a wrapped row whose months have different week counts
- * still lines their headers up. */
+ * `--calendar-columns` overrides it, for a consumer with the room and the reason.
+ *
+ * `align-items: start` so a row whose months have different week counts still
+ * lines their headers up. Wrapping rather than shrinking, because a month has an
+ * honest intrinsic width: seven day cells at `--calendar-day-size`, and
+ * squeezing them makes a grid of dates that no longer reads as a calendar. A
+ * consumer who wants more months in less room sets that token. */
 [part="months"] {
   align-items: start;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--helix-space-md);
+  grid-template-columns: repeat(var(--calendar-columns, var(--_calendar-columns, 1)), max-content);
+  justify-content: start;
 }
 
+/* Three columns, whether or not there is anything in the outer two.
+ *
+ * `space-between` on a flex row is what this was, and only the first month
+ * carries a back arrow while only the last carries a forward one, so a run of
+ * three put the first heading against its arrow, the second hard left and the
+ * third against the other arrow. Measured across `months="3"`: three headings,
+ * three different positions, none of them centred.
+ *
+ * A grid places the heading in the middle column whether the arrows exist or
+ * not, so every month in a row reads at the same height and the same offset,
+ * and nothing has to be rendered to hold a space. */
 [part="header"] {
   align-items: center;
-  display: flex;
+  display: grid;
   gap: var(--helix-space-2xs);
-  justify-content: space-between;
+  grid-template-columns: var(--_calendar-day) 1fr var(--_calendar-day);
   margin-block-end: var(--helix-space-lg);
 }
 
 [part="heading"] {
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
+  grid-column: 2;
+  text-align: center;
+}
+
+[part="previous"] {
+  grid-column: 1;
+}
+
+[part="next"] {
+  grid-column: 3;
 }
 
 [part="previous"],

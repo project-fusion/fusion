@@ -9877,6 +9877,7 @@ export type CustomElements = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `date`: One held date, as a tag, in `multiple`.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.
@@ -16474,6 +16475,7 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
+   * - `date`: One held date, as a tag, in `multiple`.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.

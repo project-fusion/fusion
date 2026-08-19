@@ -643,6 +643,7 @@ grid reads as a continuous run of dates.
 
 | Property | Description |
 | --- | --- |
+| `--calendar-columns` | Months per row. Two unless there is only one. |
 | `--calendar-day-size` | Width and height of a day. |
 | `--calendar-track-size` | Width of a column, which is what sets the space between days. |
 | `--calendar-row-size` | Height of a week row. |
@@ -1802,6 +1803,7 @@ whatever holds it.
 | --- | --- |
 | `field` | The box holding the text and the trigger. |
 | `control` | The text input. |
+| `date` | One held date, as a tag, in `multiple`. |
 | `trigger` | The control that opens the calendar. |
 | `surface` | The floating panel. |
 | `calendar` | The calendar inside it. |

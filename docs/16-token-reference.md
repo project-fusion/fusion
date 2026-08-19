@@ -64,7 +64,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 147 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 171 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 173 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 165 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 160 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 70 |
@@ -232,7 +232,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-spinner-lg` | `calc(2rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 14 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 58 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 8 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 10 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 7 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 49 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 94 |

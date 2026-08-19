@@ -253,3 +253,101 @@ describe('input date holds more than one', () => {
     expect(host.open).toBe(false)
   })
 })
+
+describe('input date shows what it holds', () => {
+  const field = async (
+    attrs: string,
+  ): Promise<HTMLElement & { open: boolean; updateComplete: Promise<unknown>; value: string }> => {
+    const host = (await mount(
+      `<helix-input-date label="Dates" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      open: boolean
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('a range reads with a dash, because it is a span rather than a list', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11" mode="range"')
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04 – 2026-08-11')
+  })
+
+  test('and the dash reads back, so what is shown can be typed', async () => {
+    const host = await field('mode="range"')
+    const control = part(host, 'control') as HTMLInputElement
+    for (const typed of ['2026-08-04 – 2026-08-11', '2026-08-04 - 2026-08-11']) {
+      control.value = typed
+      control.dispatchEvent(new Event('input', { bubbles: true }))
+      await host.updateComplete
+      expect(host.value).toBe('2026-08-04,2026-08-11')
+    }
+  })
+
+  test('a bare hyphen is not a separator, or a date comes apart into three numbers', async () => {
+    const host = await field('mode="range"')
+    const control = part(host, 'control') as HTMLInputElement
+    control.value = '2026-08-04'
+    control.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04')
+    expect((host as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      '',
+    )
+  })
+
+  test('a single date is shown as itself, with no dash anywhere near it', async () => {
+    const host = await field('default-value="2026-08-04"')
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04')
+  })
+
+  test('multiple holds its dates as tags, and the input is a draft', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11" mode="multiple"')
+    const tags = [...(host.shadowRoot?.querySelectorAll('[part="date"]') ?? [])]
+    expect(tags.map((one) => one.textContent?.trim())).toEqual(['2026-08-04', '2026-08-11'])
+    // The value is a set being added to, so the input holds what is not in it yet.
+    expect((part(host, 'control') as HTMLInputElement).value).toBe('')
+  })
+
+  test('typing a date and pressing Enter adds it', async () => {
+    const host = await field('default-value="2026-08-04" mode="multiple"')
+    const control = part(host, 'control') as HTMLInputElement
+    control.value = '2026-08-11'
+    control.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    control.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04,2026-08-11')
+    expect(control.value).toBe('')
+  })
+
+  test('and the same date twice is once', async () => {
+    const host = await field('default-value="2026-08-04" mode="multiple"')
+    const control = part(host, 'control') as HTMLInputElement
+    control.value = '2026-08-04'
+    control.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    control.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04')
+  })
+
+  test('backspace on an empty draft takes the last one back', async () => {
+    // The convention every tag field has: a mistake costs one key rather than a
+    // hunt for a small control.
+    const host = await field('default-value="2026-08-04,2026-08-11" mode="multiple"')
+    const control = part(host, 'control') as HTMLInputElement
+    control.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Backspace' }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04')
+  })
+
+  test('and a tag can be dismissed on its own', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11,2026-08-18" mode="multiple"')
+    const tag = host.shadowRoot?.querySelectorAll('[part="date"]')[1] as HTMLElement
+    tag.dispatchEvent(new CustomEvent('helix-dismiss', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-04,2026-08-18')
+  })
+})
