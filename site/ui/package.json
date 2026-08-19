@@ -6,9 +6,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "bun run frame && next build",
-    "dev": "bun run frame && next dev --port 3000",
+    "build": "bun run frame && bun run specs && next build",
+    "dev": "bun run frame && bun run specs && next dev --port 3000",
     "frame": "bun ../../tooling/scripts/build-frame.mjs",
+    "specs": "bun ../../tooling/scripts/build-specs.mjs",
     "start": "next start --port 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
