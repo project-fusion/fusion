@@ -72,7 +72,7 @@ describe('input color', () => {
 
   test('a required swatch is checked here, since a block of colour has no validity', async () => {
     const empty = await field('appearance="swatch" required')
-    expect(internals(empty).validationMessage).toBe('Choose a colour.')
+    expect(internals(empty).validationMessage).toBe('Choose a color.')
     const filled = await field('appearance="swatch" default-value="#ff0000" required')
     expect(internals(filled).validationMessage).toBe('')
   })

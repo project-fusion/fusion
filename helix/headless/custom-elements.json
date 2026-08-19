@@ -6432,7 +6432,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Choose a colour'",
+              "default": "'Choose a color'",
               "description": "Accessible name for the control that opens the panel.",
               "attribute": "trigger-label"
             },
@@ -7369,7 +7369,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "'Choose a colour'",
+              "default": "'Choose a color'",
               "description": "Accessible name for the control that opens the panel.",
               "fieldName": "triggerLabel"
             },

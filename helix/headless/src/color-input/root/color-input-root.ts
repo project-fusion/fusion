@@ -107,7 +107,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
 
   /** Accessible name for the control that opens the panel. */
   @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose a colour'
+  triggerLabel = 'Choose a color'
 
   /** The overlay, placed against the field for the reason Date Input gives. */
   protected readonly panel = new PopoverController(this, {
@@ -255,7 +255,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
          a required field is the one state a block of colour can be wrong in. */
       this.internals.setValidity(
         this.required && this.value === '' ? { valueMissing: true } : {},
-        this.required && this.value === '' ? 'Choose a colour.' : '',
+        this.required && this.value === '' ? 'Choose a color.' : '',
         anchor,
       )
     }

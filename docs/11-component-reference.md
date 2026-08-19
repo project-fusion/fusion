@@ -1004,7 +1004,7 @@ pads its own lower rows.
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `swatches` | `swatches` | `string` | `''` | `HelixBaseColorInput` | Colours offered under the picker, as a comma-separated list. |
-| `triggerLabel` | `trigger-label` | `string` | `'Choose a colour'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
+| `triggerLabel` | `trigger-label` | `string` | `'Choose a color'` | `HelixBaseColorInput` | Accessible name for the control that opens the panel. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 
 #### Methods

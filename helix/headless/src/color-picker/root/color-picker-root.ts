@@ -431,7 +431,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
         <button
           part="sample"
           type="button"
-          aria-label=${this.copier.copied ? 'Copied' : `Copy ${this.value || 'the colour'}`}
+          aria-label=${this.copier.copied ? 'Copied' : `Copy ${this.value || 'the color'}`}
           data-copied=${this.copier.copied ? '' : nothing}
           ?disabled=${this.isDisabled || this.value === ''}
           @click=${() => this.copier.copy(this.value)}
@@ -453,7 +453,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
             : html`<input
                 part="value"
                 type="text"
-                aria-label="Colour"
+                aria-label="Color"
                 autocomplete="off"
                 spellcheck="false"
                 .value=${this.value}
@@ -469,7 +469,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                     ? html`<helix-button
                         part="eyedropper"
                         appearance="secondary"
-                        aria-label="Sample a colour from the screen"
+                        aria-label="Sample a color from the screen"
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
