@@ -2531,6 +2531,7 @@ reading are what say how far past.
 | `max` | `max` | `number` | `100` | `HelixBaseMeter` | Top of the range. |
 | `min` | `min` | `number` | `0` | `HelixBaseMeter` | Bottom of the range. |
 | `optimum` | `optimum` | `number \| undefined` | - | `HelixBaseMeter` | Where in the range it is best to be. |
+| `shape` | `shape` | `'arc' \| 'ring' \| undefined` | - | `HelixBaseMeter` | Whether the reading is drawn as a bar, a ring or an arc. |
 | `showValue` | `show-value` | `boolean` | `false` | `HelixBaseMeter` | Whether the reading is shown beside the bar. |
 | `value` | `value` | `number` | `0` | `HelixBaseMeter` | The reading. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseMeter` | What the reading says, where a number is not the whole story. |
@@ -2543,11 +2544,14 @@ reading are what say how far past.
 | `indicator` | The part of it the value fills. |
 | `tick` | A mark at `low` or at `high`. |
 | `value` | The reading, under `show-value`. |
+| `groove` | The unfilled circle, in `ring` and `arc`. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--meter-ring-size` | Edge length of the drawing, in `ring` and `arc`. |
+| `--meter-ring-width` | Thickness of the stroke there. |
 | `--meter-color` | The fill, overriding the band's own tone. |
 | `--meter-size` | How thick the bar is. |
 | `--meter-tick-color` | The mark at a threshold. |

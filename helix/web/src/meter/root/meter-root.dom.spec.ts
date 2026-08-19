@@ -194,3 +194,63 @@ describe('meter band, said outright', () => {
     expect(band(far)).toBe('fair')
   })
 })
+
+describe('meter drawn round', () => {
+  const round = async (
+    attrs: string,
+  ): Promise<HTMLElement & { updateComplete: Promise<unknown> }> => {
+    const host = (await mount(
+      `<helix-meter label="Disk" ${attrs}></helix-meter>`,
+    )) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('a shape draws circles instead of a bar, and reports the same thing', async () => {
+    /* A gauge and a meter are the same measurement, so this is a shape rather
+       than a second component: the value, the range and the bands are untouched
+       and only the geometry carrying them changes. */
+    const host = await round('shape="ring" value="40"')
+    expect(part(host, 'track')?.tagName.toLowerCase()).toBe('svg')
+    expect(part(host, 'groove')?.tagName.toLowerCase()).toBe('circle')
+    // The reading is announced through internals rather than as an attribute,
+    // which the shape does not change and this is the point of the test.
+    expect(internals(host).ariaValueNow).toBe('40')
+  })
+
+  test('a ring sweeps the whole circle and an arc three quarters of it', async () => {
+    // `pathLength="100"` makes every number here a percentage, so nothing
+    // computes a circumference, a radius or pi.
+    const ring = await round('shape="ring" value="50"')
+    expect(part(ring, 'groove')?.getAttribute('style')).toContain('--_meter-sweep: 100')
+    expect(part(ring, 'indicator')?.getAttribute('style')).toContain('--_meter-along: 50')
+
+    const arc = await round('shape="arc" value="50"')
+    expect(part(arc, 'groove')?.getAttribute('style')).toContain('--_meter-sweep: 75')
+    // Half the range is half the sweep, not half the circle.
+    expect(part(arc, 'indicator')?.getAttribute('style')).toContain('--_meter-along: 37.5')
+  })
+
+  test('the ticks are segments of the same circle, placed by the same arithmetic', async () => {
+    // One unit of a hundred, pushed round to where the threshold falls: no
+    // trigonometry, and right at any radius and any thickness.
+    const host = await round('high="80" low="50" optimum="0" shape="arc" value="40"')
+    const ticks = [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])]
+    expect(ticks.map((one) => one.tagName.toLowerCase())).toEqual(['circle', 'circle'])
+    expect(ticks[0]?.getAttribute('style')).toContain('--_meter-along: 37.5')
+    expect(ticks[1]?.getAttribute('style')).toContain('--_meter-along: 60')
+  })
+
+  test('and the bands still resolve, because the shape changed and nothing else did', async () => {
+    const host = await round('high="80" low="50" optimum="0" shape="ring" value="90"')
+    expect(part(host, 'indicator')?.getAttribute('data-band')).toBe('poor')
+  })
+
+  test('no shape is still a bar', async () => {
+    const host = await round('value="40"')
+    expect(part(host, 'track')?.tagName.toLowerCase()).toBe('div')
+    expect(host.shadowRoot?.querySelector('[part="groove"]')).toBeNull()
+  })
+})

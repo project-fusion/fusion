@@ -4706,6 +4706,23 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
   band?: HelixBaseMeter["band"];
+  /** Whether the reading is drawn as a bar, a ring or an arc.
+
+A gauge and a meter are the same thing measured: a value in a range, with
+bands saying which part of it is the good part. What differs between the two
+words in practice is the drawing, so this is a shape rather than a second
+component, the same call `Progress` made with its ring and `Skeleton` with
+its own shapes.
+
+A bar is right in a row of them, in a table, or under a label. A ring is
+right in a tile, where the number goes in the middle. An arc is the shape a
+dashboard gauge has always had: open at the bottom, so the two ends of the
+range have somewhere to be that is not each other.
+
+There is no needle in any of them. A needle is a picture of an instrument
+rather than a reading, it costs a rotation and a shape to draw it with, and
+it says nothing the end of the arc does not already say. */
+  shape?: HelixBaseMeter["shape"];
   /** Whether the reading is shown beside the bar. */
   "show-value"?: HelixBaseMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
@@ -4775,6 +4792,23 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 reflecting here would write an attribute onto the host for no reader. Third
 time this rule has caught something today. */
   "prop:band"?: HelixBaseMeter["band"];
+  /** Whether the reading is drawn as a bar, a ring or an arc.
+
+A gauge and a meter are the same thing measured: a value in a range, with
+bands saying which part of it is the good part. What differs between the two
+words in practice is the drawing, so this is a shape rather than a second
+component, the same call `Progress` made with its ring and `Skeleton` with
+its own shapes.
+
+A bar is right in a row of them, in a table, or under a label. A ring is
+right in a tile, where the number goes in the middle. An arc is the shape a
+dashboard gauge has always had: open at the bottom, so the two ends of the
+range have somewhere to be that is not each other.
+
+There is no needle in any of them. A needle is a picture of an instrument
+rather than a reading, it costs a rotation and a shape to draw it with, and
+it says nothing the end of the arc does not already say. */
+  "prop:shape"?: HelixBaseMeter["shape"];
   /** Whether the reading is shown beside the bar. */
   "bool:show-value"?: HelixBaseMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
@@ -11976,6 +12010,22 @@ export type CustomElements = {
    * `data-band` on the fill, because that is the element being coloured, so
    * reflecting here would write an attribute onto the host for no reader. Third
    * time this rule has caught something today.
+   * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
+   *
+   * A gauge and a meter are the same thing measured: a value in a range, with
+   * bands saying which part of it is the good part. What differs between the two
+   * words in practice is the drawing, so this is a shape rather than a second
+   * component, the same call `Progress` made with its ring and `Skeleton` with
+   * its own shapes.
+   *
+   * A bar is right in a row of them, in a table, or under a label. A ring is
+   * right in a tile, where the number goes in the middle. An arc is the shape a
+   * dashboard gauge has always had: open at the bottom, so the two ends of the
+   * range have somewhere to be that is not each other.
+   *
+   * There is no needle in any of them. A needle is a picture of an instrument
+   * rather than a reading, it costs a rotation and a shape to draw it with, and
+   * it says nothing the end of the arc does not already say.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
@@ -11987,7 +12037,8 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The whole range.
+   * - `track`: The whole range, or the drawing in `ring` and `arc`.
+   * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
    * - `value`: The reading, under `show-value`.
@@ -19031,6 +19082,22 @@ export type CustomElementsSolidJs = {
    * `data-band` on the fill, because that is the element being coloured, so
    * reflecting here would write an attribute onto the host for no reader. Third
    * time this rule has caught something today.
+   * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
+   *
+   * A gauge and a meter are the same thing measured: a value in a range, with
+   * bands saying which part of it is the good part. What differs between the two
+   * words in practice is the drawing, so this is a shape rather than a second
+   * component, the same call `Progress` made with its ring and `Skeleton` with
+   * its own shapes.
+   *
+   * A bar is right in a row of them, in a table, or under a label. A ring is
+   * right in a tile, where the number goes in the middle. An arc is the shape a
+   * dashboard gauge has always had: open at the bottom, so the two ends of the
+   * range have somewhere to be that is not each other.
+   *
+   * There is no needle in any of them. A needle is a picture of an instrument
+   * rather than a reading, it costs a rotation and a shape to draw it with, and
+   * it says nothing the end of the arc does not already say.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
@@ -19042,7 +19109,8 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `track`: The whole range.
+   * - `track`: The whole range, or the drawing in `ring` and `arc`.
+   * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
    * - `value`: The reading, under `show-value`.

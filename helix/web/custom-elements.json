@@ -26206,6 +26206,14 @@
           "name": "HelixMeter",
           "cssProperties": [
             {
+              "description": "Edge length of the drawing, in `ring` and `arc`.",
+              "name": "--meter-ring-size"
+            },
+            {
+              "description": "Thickness of the stroke there.",
+              "name": "--meter-ring-width"
+            },
+            {
               "description": "The fill, overriding the band's own tone.",
               "name": "--meter-color"
             },
@@ -26250,6 +26258,14 @@
             {
               "description": "The reading, under `show-value`.",
               "name": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "description": "The unfilled circle, in `ring` and `arc`.",
+              "name": "groove",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
                 "module": "src/meter/root/meter-root.ts"
@@ -26360,6 +26376,20 @@
               },
               "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being coloured, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
               "attribute": "band",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'arc' | 'ring' | undefined"
+              },
+              "description": "Whether the reading is drawn as a bar, a ring or an arc.\n\nA gauge and a meter are the same thing measured: a value in a range, with\nbands saying which part of it is the good part. What differs between the two\nwords in practice is the drawing, so this is a shape rather than a second\ncomponent, the same call `Progress` made with its ring and `Skeleton` with\nits own shapes.\n\nA bar is right in a row of them, in a table, or under a label. A ring is\nright in a tile, where the number goes in the middle. An arc is the shape a\ndashboard gauge has always had: open at the bottom, so the two ends of the\nrange have somewhere to be that is not each other.\n\nThere is no needle in any of them. A needle is a picture of an instrument\nrather than a reading, it costs a rotation and a shape to draw it with, and\nit says nothing the end of the arc does not already say.",
+              "attribute": "shape",
+              "reflects": true,
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
                 "module": "src/meter/root/meter-root.ts"
@@ -26501,6 +26531,21 @@
               "privacy": "private",
               "description": "What the reading says, which is the consumer's words or a percentage.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderRound",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The same reading, drawn round.\n\n`pathLength=\"100\"` is what makes every number here a percentage: the path is\ndeclared a hundred units long, so nothing computes a circumference, a radius\nor pi, and a consumer changing the thickness moves the circle that carries\nit without this element recalculating anything. Progress does the same and\nfor the same reason.\n\nThe sweep is what separates the two shapes. A ring is the whole circle and\nan arc is three quarters of it, open at the bottom, which is where a gauge\nhas always had its gap: the two ends need somewhere to be that is not each\nother, and the opening is where a reading of the value goes.\n\nTicks are segments of the same circle rather than marks placed on it. One\nunit of a hundred, offset to where the threshold falls, which needs no\ntrigonometry and stays correct at any radius or thickness. Placing them by\nhand would mean sine and cosine in a template and a second definition of\nwhere the arc starts.",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
                 "module": "src/meter/root/meter-root.ts"
@@ -26692,6 +26737,18 @@
               },
               "description": "The band, said outright, where the three thresholds cannot say it.\n\n**The specification's model has a shape, and it is worth knowing before\nreaching for this.** Three bands and a point mean it can express a\n*direction* in three grades, or a *target* in two, and never a target in\nthree. Measured across a grid: with `low=\"25\" high=\"50\" optimum=\"0\"` the\nreadings 5, 28 and 60 come out good, fair and poor; with `low=\"15\"\nhigh=\"25\" optimum=\"20\"` the readings 28 and 90 both come out fair, because\nfrom a middle band nothing is ever two bands away.\n\nSo a target you can miss badly in either direction has no expression in\n`low`, `high` and `optimum`, and neither has a rule that is not about\ndistance at all: 28 against a target of 20 is fine for a room's temperature\nand is not fine for a dosage, and no arrangement of thresholds knows which\none it is looking at.\n\nWritten, this wins outright and the thresholds are only for drawing the\nticks. A consumer whose rule is more than three buckets already knows the\nanswer, and asking them to encode it as thresholds so this can decode it\nagain is a worse API than letting them say it.\n\nNot reflected. Nothing selects on it: the band reaches the stylesheet as\n`data-band` on the fill, because that is the element being coloured, so\nreflecting here would write an attribute onto the host for no reader. Third\ntime this rule has caught something today.",
               "fieldName": "band",
+              "inheritedFrom": {
+                "name": "HelixBaseMeter",
+                "module": "src/meter/root/meter-root.ts"
+              }
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "'arc' | 'ring' | undefined"
+              },
+              "description": "Whether the reading is drawn as a bar, a ring or an arc.\n\nA gauge and a meter are the same thing measured: a value in a range, with\nbands saying which part of it is the good part. What differs between the two\nwords in practice is the drawing, so this is a shape rather than a second\ncomponent, the same call `Progress` made with its ring and `Skeleton` with\nits own shapes.\n\nA bar is right in a row of them, in a table, or under a label. A ring is\nright in a tile, where the number goes in the middle. An arc is the shape a\ndashboard gauge has always had: open at the bottom, so the two ends of the\nrange have somewhere to be that is not each other.\n\nThere is no needle in any of them. A needle is a picture of an instrument\nrather than a reading, it costs a rotation and a shape to draw it with, and\nit says nothing the end of the arc does not already say.",
+              "fieldName": "shape",
               "inheritedFrom": {
                 "name": "HelixBaseMeter",
                 "module": "src/meter/root/meter-root.ts"

@@ -46,6 +46,8 @@ import { styles } from './meter-root.css.js'
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart value - The reading, under `show-value`.
  *
+ * @cssproperty --meter-ring-size - Edge length of the drawing, in `ring` and `arc`.
+ * @cssproperty --meter-ring-width - Thickness of the stroke there.
  * @cssproperty --meter-color - The fill, overriding the band's own tone.
  * @cssproperty --meter-size - How thick the bar is.
  * @cssproperty --meter-tick-color - The mark at a threshold.

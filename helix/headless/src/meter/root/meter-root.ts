@@ -38,7 +38,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @aliases Gauge, Level, Capacity
  * @documentation https://helix.fusion.dev/components/meter
  *
- * @csspart track - The whole range.
+ * @csspart track - The whole range, or the drawing in `ring` and `arc`.
+ * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of it the value fills.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart value - The reading, under `show-value`.
@@ -116,6 +117,27 @@ export class HelixBaseMeter extends HelixElement {
    */
   @property()
   band?: MeterBand
+
+  /**
+   * Whether the reading is drawn as a bar, a ring or an arc.
+   *
+   * A gauge and a meter are the same thing measured: a value in a range, with
+   * bands saying which part of it is the good part. What differs between the two
+   * words in practice is the drawing, so this is a shape rather than a second
+   * component, the same call `Progress` made with its ring and `Skeleton` with
+   * its own shapes.
+   *
+   * A bar is right in a row of them, in a table, or under a label. A ring is
+   * right in a tile, where the number goes in the middle. An arc is the shape a
+   * dashboard gauge has always had: open at the bottom, so the two ends of the
+   * range have somewhere to be that is not each other.
+   *
+   * There is no needle in any of them. A needle is a picture of an instrument
+   * rather than a reading, it costs a rotation and a shape to draw it with, and
+   * it says nothing the end of the arc does not already say.
+   */
+  @property({ reflect: true })
+  shape?: 'arc' | 'ring'
 
   /** Whether the reading is shown beside the bar. */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
@@ -247,24 +269,75 @@ export class HelixBaseMeter extends HelixElement {
       this.valueText || (this.beyond ? `${Math.round(this.ratio * 100)}%` : null)
   }
 
+  /**
+   * The same reading, drawn round.
+   *
+   * `pathLength="100"` is what makes every number here a percentage: the path is
+   * declared a hundred units long, so nothing computes a circumference, a radius
+   * or pi, and a consumer changing the thickness moves the circle that carries
+   * it without this element recalculating anything. Progress does the same and
+   * for the same reason.
+   *
+   * The sweep is what separates the two shapes. A ring is the whole circle and
+   * an arc is three quarters of it, open at the bottom, which is where a gauge
+   * has always had its gap: the two ends need somewhere to be that is not each
+   * other, and the opening is where a reading of the value goes.
+   *
+   * Ticks are segments of the same circle rather than marks placed on it. One
+   * unit of a hundred, offset to where the threshold falls, which needs no
+   * trigonometry and stays correct at any radius or thickness. Placing them by
+   * hand would mean sine and cosine in a template and a second definition of
+   * where the arc starts.
+   */
+  private renderRound(): TemplateResult {
+    const bounds = this.thresholds
+    const { max, min } = this.span
+    const sweep = this.shape === 'arc' ? 75 : 100
+    const along = (value: number): number => ((value - min) / (max - min)) * sweep
+    return html`<svg part="track" viewBox="0 0 100 100" aria-hidden="true">
+      <circle part="groove" pathLength="100" style="--_meter-sweep: ${sweep}" />
+      ${
+        bounds
+          ? html`<circle
+                part="tick"
+                pathLength="100"
+                style="--_meter-along: ${along(bounds.low)}"
+              />
+              <circle part="tick" pathLength="100" style="--_meter-along: ${along(bounds.high)}" />`
+          : nothing
+      }
+      <circle
+        part="indicator"
+        pathLength="100"
+        data-band=${this.computedBand ?? nothing}
+        data-beyond=${this.beyond ?? nothing}
+        style="--_meter-along: ${this.fraction * sweep}"
+      />
+    </svg>`
+  }
+
   protected override render(): TemplateResult {
     const bounds = this.thresholds
     const { max, min } = this.span
     const at = (value: number): string => `${((value - min) / (max - min)) * 100}%`
-    return html`<div part="track">
-        ${
-          bounds
-            ? html`<span part="tick" style="--_meter-at: ${at(bounds.low)}"></span>
-                <span part="tick" style="--_meter-at: ${at(bounds.high)}"></span>`
-            : nothing
-        }
-        <div
-          part="indicator"
-          data-band=${this.computedBand ?? nothing}
-          data-beyond=${this.beyond ?? nothing}
-          style="--_meter-fraction: ${this.fraction}"
-        ></div>
-      </div>
+    return html`${
+      this.shape
+        ? this.renderRound()
+        : html`<div part="track">
+            ${
+              bounds
+                ? html`<span part="tick" style="--_meter-at: ${at(bounds.low)}"></span>
+                    <span part="tick" style="--_meter-at: ${at(bounds.high)}"></span>`
+                : nothing
+            }
+            <div
+              part="indicator"
+              data-band=${this.computedBand ?? nothing}
+              data-beyond=${this.beyond ?? nothing}
+              style="--_meter-fraction: ${this.fraction}"
+            ></div>
+          </div>`
+    }
       ${this.showValue ? html`<span part="value">${this.text}</span>` : nothing}`
   }
 }
