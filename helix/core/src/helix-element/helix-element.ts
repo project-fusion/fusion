@@ -170,23 +170,77 @@ const auditReactProps = (host: EventTarget, props: Record<string, unknown>): voi
  * If React ever renames its key this finds nothing and does nothing, which
  * returns the pre-hydration behavior rather than breaking anything.
  *
- * **Hyphenated names only.** A relayed native event keeps its native name and
- * goes through React's synthetic system, which hydration does set up. `onChange`
- * is React's to bind, and reaching for `onchange` here would put a second
- * listener beside it.
+ * **Relayed native events are handled too, on a different rule.** See
+ * `reactPropFor`: a bubbling one already reaches React's delegated listener and
+ * must not be bound twice, and a non-bubbling one reaches nothing at all.
  */
-const bindReactHandler = (host: EventTarget, type: string): void => {
-  if (!type.includes('-')) {
-    return
+/**
+ * Events React already wires on a custom element, whatever their bubbling.
+ *
+ * `setPropOnCustomElement` calls `listenToNonDelegatedEvent` for these two by
+ * name, and assigns a no-op `onclick` so the delegated path picks up clicks.
+ * Nothing here relays them today; the list exists so that the day something
+ * does, it does not arrive twice.
+ */
+const REACT_WIRES = new Set(['scroll', 'scrollend'])
+
+/**
+ * The prop React would be holding for this event, if it is holding one.
+ *
+ * **A relayed native event needs a different answer from one of ours, and
+ * getting it wrong doubles every call.** Measured against React 19.2.8:
+ *
+ * ```
+ * onhelix-change <- helix-change  REACHED    (React binds it with addEventListener)
+ * onChange       <- change        REACHED    (React's delegated root listener)
+ * onLoad         <- load          not reached
+ * onError        <- error         not reached
+ * onEnded        <- ended         not reached
+ * ```
+ *
+ * React binds a hyphenated prop directly on the element, so our own events are
+ * reached by name and are safe to bind again: same type, same callback, same
+ * capture flag is a no-op by specification. A native name is different. React
+ * recognises `onChange` and `onLoad` as its own registration names and attaches
+ * nothing to the element for either; it relies on a delegated listener at the
+ * root, which sees an event only if it **bubbles**, and on a non-delegated list
+ * it sets up for `<video>`, `<audio>` and `<img>` and never for a custom
+ * element.
+ *
+ * So a bubbling relay already arrives and must not be bound again: React's
+ * listener is at the root rather than on the element, so nothing deduplicates
+ * it and the consumer's handler runs twice. A non-bubbling relay arrives
+ * nowhere, and is the bug this exists to close: `<helix-avatar>` relays `load`
+ * and `error`, `<helix-video>` relays `ended`, `play` and `pause`, all of them
+ * declared public API, all of them silent in React until now. An avatar
+ * fallback is a shipped feature that did nothing.
+ *
+ * The name is React's own casing, `onError` rather than `onerror`, because that
+ * is what a consumer writes and therefore what is in the props bag. Every
+ * native we relay is a single word, so capitalising the first letter is the
+ * whole of the rule; a two-word name like `loadeddata` would be `onLoadedData`
+ * and needs the list extending rather than the rule generalising.
+ */
+const reactPropFor = (event: Event): string | undefined => {
+  if (event.type.includes('-')) {
+    return `on${event.type}`
   }
+  if (event.bubbles || REACT_WIRES.has(event.type)) {
+    return undefined
+  }
+  return `on${event.type.charAt(0).toUpperCase()}${event.type.slice(1)}`
+}
+
+const bindReactHandler = (host: EventTarget, event: Event): void => {
   const props = reactPropsOf(host)
   if (props === undefined) {
     return
   }
   auditReactProps(host, props)
-  const handler = props[`on${type}`]
+  const key = reactPropFor(event)
+  const handler = key === undefined ? undefined : props[key]
   if (typeof handler === 'function') {
-    host.addEventListener(type, handler as EventListener)
+    host.addEventListener(event.type, handler as EventListener)
   }
 }
 
@@ -268,7 +322,7 @@ export class HelixElement extends LitElement {
    * @internal
    */
   override dispatchEvent(event: Event): boolean {
-    bindReactHandler(this, event.type)
+    bindReactHandler(this, event)
     return super.dispatchEvent(event)
   }
 

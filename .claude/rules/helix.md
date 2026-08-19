@@ -638,8 +638,22 @@ object property, and not before.
 `useHelixEvent` in `site/ui/lib` is no longer needed for hydration. It is still
 right where the element itself can change, which is what `useElementRef` is for.
 
-React's own events are unaffected: `onClick` on a `<helix-button>` goes through
-the synthetic system, which hydration does set up.
+React's own events are unaffected **where they bubble**: `onClick` on a
+`<helix-button>` goes through the synthetic system, which hydration does set up.
+
+**A relayed native event that does not bubble reaches nothing, and the element
+binds that one too.** React recognises `onError` and `onLoad` as its own names
+and attaches nothing to a custom element for either: its delegated listener sits
+at the root and sees only what bubbles, and the non-delegated list it wires for
+`<video>`, `<audio>` and `<img>` is never wired for a custom element. Avatar
+relays `load` and `error`, Video relays `ended`, `play` and `pause`, all five
+declared public API and all five silent in React. An avatar fallback was a
+shipped feature that did nothing.
+
+The rule splits by bubbling, and getting it backwards would be worse than the
+bug: React's listener for a bubbling relay is at the root rather than on the
+element, so a second one bound here is not deduplicated and the handler runs
+twice. `reactPropFor` carries the measurement.
 
 **The prop form still decides event names**, because it is what a consumer
 reaches for first and what has to keep working once React fixes this.

@@ -37,8 +37,13 @@ it is never delivered twice once React binds its own listener.
 
 Nothing is required of you, and nothing changes once React fixes it.
 
-React's own events are unaffected. `onClick` on a `<helix-button>` goes through
-the synthetic system, which hydration does set up.
+React's own events are unaffected where they bubble. `onClick` on a
+`<helix-button>` goes through the synthetic system, which hydration does set up.
+
+A few of ours are native events relayed from inside the component, and the ones
+that do not bubble (`load` and `error` on Avatar, `ended`, `play` and `pause` on
+Video) reach nothing React sets up. The elements bind those for you, so
+`onError` on a `<helix-avatar>` works like the rest.
 
 ## The prop is `on` and the event name, verbatim
 

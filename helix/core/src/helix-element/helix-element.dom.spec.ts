@@ -156,3 +156,54 @@ describe('a handler prop attached to nothing', () => {
     expect(warnings).toHaveLength(1)
   })
 })
+
+describe('a relayed native event', () => {
+  /* React recognises `onError` and `onLoad` as its own and attaches nothing to
+     a custom element for either: the delegated listener at the root sees only
+     what bubbles, and the non-delegated list it sets up for `<video>` and
+     `<img>` is never set up for a custom element. Avatar relays `load` and
+     `error`, Video relays `ended`, `play` and `pause`, and all five were
+     silent. */
+  test('reaches the prop React uses for it, when nothing else would', () => {
+    let calls = 0
+    const element = hydrated({
+      onError: () => {
+        calls += 1
+      },
+    })
+
+    element.dispatchEvent(new Event('error'))
+
+    expect(calls).toBe(1)
+  })
+
+  /* The other half, and the one that would have made this worse than the bug.
+     React's listener for a bubbling native sits at the root rather than on the
+     element, so nothing deduplicates a second one bound here and the consumer's
+     handler runs twice. `change` is the relay this actually applies to. */
+  test('is left alone when it bubbles, because React is already listening', () => {
+    let calls = 0
+    const element = hydrated({
+      onChange: () => {
+        calls += 1
+      },
+    })
+
+    element.dispatchEvent(new Event('change', { bubbles: true }))
+
+    expect(calls).toBe(0)
+  })
+
+  test('is left alone where React wires the element itself', () => {
+    let calls = 0
+    const element = hydrated({
+      onScroll: () => {
+        calls += 1
+      },
+    })
+
+    element.dispatchEvent(new Event('scroll'))
+
+    expect(calls).toBe(0)
+  })
+})
