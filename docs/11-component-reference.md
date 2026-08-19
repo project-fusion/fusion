@@ -2099,7 +2099,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'spinner'` | `'list'` | `HelixBaseInputTime` | Whether the panel is one list of times or a column each. |
+| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseInputTime` | Whether the panel is one list of times or a column each. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -4096,7 +4096,7 @@ card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'spinner'` | `'list'` | `HelixBaseTime` | Whether the times are one list or a column each. |
+| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTime` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
@@ -4135,7 +4135,7 @@ card would be a card inside a card there.
 | Part | Description |
 | --- | --- |
 | `list` | The listbox holding the times, in `list`. |
-| `columns` | The row of columns, in `spinner`. |
+| `columns` | The row of columns, in `wheels`. |
 | `column` | One of them. |
 | `items` | The scrolling column inside it, forwarded from the listbox. |
 | `empty` | What it says when nothing matches, forwarded from the listbox. |
@@ -4146,8 +4146,8 @@ card would be a card inside a card there.
 | Property | Description |
 | --- | --- |
 | `--time-list-height` | How tall the list is before it scrolls. |
-| `--time-wheel-height` | How tall a spinner column is. Five rows by default. |
-| `--time-row-size` | Height and least width of one row in a spinner. |
+| `--time-wheel-height` | How tall a wheel is. Five rows by default. |
+| `--time-row-size` | Height and least width of one row in a wheel. |
 | `--time-range-color` | Wash behind the times inside a range. |
 
 ## Toast

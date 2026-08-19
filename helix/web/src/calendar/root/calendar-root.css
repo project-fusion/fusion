@@ -143,7 +143,10 @@
 [part="day"] {
   align-items: center;
   block-size: var(--_calendar-day);
-  border-radius: var(--helix-radii-full);
+  /* `sm`, not `full`. A pill is a shape for a word; a date is a number in a
+     grid, and a grid of circles reads as beads rather than as days. Four pixels
+     is the house radius and is what every other small mark here takes. */
+  border-radius: var(--helix-radii-sm);
   display: inline-flex;
   font-size: var(--helix-text-sm);
   inline-size: var(--_calendar-day);
@@ -178,31 +181,47 @@
  * is round because the day is square, and the gap between the two sizes is
  * exactly what the ring is. */
 [part="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
-  background-color: var(--calendar-range-color, var(--helix-color-primary-subtle));
+  background-color: var(
+    --calendar-range-color,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+    )
+  );
 }
 
 [part="cell"][aria-selected]:not([data-range-start]):not([data-range-middle]):not([data-range-end])
   [part="day"] {
   box-shadow: 0 0 0 calc((var(--_calendar-row) - var(--_calendar-day)) / 2)
-    var(--calendar-range-color, var(--helix-color-primary-subtle));
+    var(
+      --calendar-range-color,
+      light-dark(
+        color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
+        color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+      )
+    );
 }
 
 [part="cell"][data-range-start],
 [part="cell"][aria-selected]:not([data-range-middle]):not([data-range-end]) {
-  border-end-start-radius: var(--helix-radii-full);
-  border-start-start-radius: var(--helix-radii-full);
+  border-end-start-radius: var(--helix-radii-sm);
+  border-start-start-radius: var(--helix-radii-sm);
 }
 
 [part="cell"][data-range-end],
 [part="cell"][aria-selected]:not([data-range-middle]):not([data-range-start]) {
-  border-end-end-radius: var(--helix-radii-full);
-  border-start-end-radius: var(--helix-radii-full);
+  border-end-end-radius: var(--helix-radii-sm);
+  border-start-end-radius: var(--helix-radii-sm);
 }
 
 /* The ends of a range, and a single date, are the solid mark. The days between
    them carry only the band. */
+/* Greys rather than the accent, the same call Time's range takes.
+   `foreground-muted` and not `foreground`, which is a slab of near-black in a
+   grid of grey squares: measured at 21:1 against its own label where the muted
+   step is 6.01, past AA with room and leaving black to the text. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
-  background-color: var(--calendar-selected-color, var(--helix-color-primary));
+  background-color: var(--calendar-selected-color, var(--helix-color-foreground-muted));
   color: var(--helix-color-foreground-on-accent);
 }
 

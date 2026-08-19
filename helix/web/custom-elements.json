@@ -20953,10 +20953,10 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'list' | 'spinner'"
+                "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
@@ -20970,7 +20970,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a spinner cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "attribute": "mode",
               "reflects": true,
               "inheritedFrom": {
@@ -21713,10 +21713,10 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'list' | 'spinner'"
+                "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `spinner` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time` carries the longer note on the trade.",
               "fieldName": "appearance",
               "inheritedFrom": {
                 "name": "HelixBaseInputTime",
@@ -21728,7 +21728,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a spinner cannot do either.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end, `multiple` holds any\nnumber, and both are carried as one comma-separated value, which is what a\nform submits. `helix-time` carries the longer note on the interaction and on\nwhy a wheel cannot do either.",
               "fieldName": "mode",
               "inheritedFrom": {
                 "name": "HelixBaseInputTime",
@@ -41879,11 +41879,11 @@
               "name": "--time-list-height"
             },
             {
-              "description": "How tall a spinner column is. Five rows by default.",
+              "description": "How tall a wheel is. Five rows by default.",
               "name": "--time-wheel-height"
             },
             {
-              "description": "Height and least width of one row in a spinner.",
+              "description": "Height and least width of one row in a wheel.",
               "name": "--time-row-size"
             },
             {
@@ -42116,7 +42116,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works as a spinner and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `spinner` renders as a list\nwhenever a mode is set.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
               "attribute": "mode",
               "reflects": true,
               "inheritedFrom": {
@@ -42128,10 +42128,10 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'list' | 'spinner'"
+                "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `spinner` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a spinner cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `spinner` where any time is allowed\nand the range is a whole day.",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.",
               "attribute": "appearance",
               "reflects": true,
               "inheritedFrom": {
@@ -42208,7 +42208,7 @@
                 "text": "{ hour: number; meridiem: 'AM' | 'PM'; minute: number }"
               },
               "privacy": "private",
-              "description": "The three readings a spinner shows, from the value or from `min`.",
+              "description": "The three readings a wheel shows, from the value or from `min`.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseTime",
@@ -42338,7 +42338,7 @@
                   }
                 }
               ],
-              "description": "One column of a spinner, which is a listbox like the whole list is.",
+              "description": "One wheel, which is a listbox like the whole list is.",
               "inheritedFrom": {
                 "name": "HelixBaseTime",
                 "module": "src/time/root/time-root.ts"
@@ -42666,7 +42666,7 @@
               "type": {
                 "text": "'multiple' | 'range' | undefined"
               },
-              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works as a spinner and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `spinner` renders as a list\nwhenever a mode is set.",
+              "description": "How many times can be held at once.\n\nAbsent is one. `range` holds a start and an end with everything between\nthem shown as part of the answer, `multiple` holds any number, and both are\ncarried as one comma-separated value: the same shape `helix-calendar` uses,\nbecause it is the same question asked of a different unit.\n\n**A range is two picks, and a third starts over.** That is the calendar's\nbehaviour and a reader who has met one has met both. The alternative, a\nseparate \"from\" and \"to\" control, is two answers to what a product asks as\none, and it makes the between part impossible to show.\n\n**Neither works on wheels and the appearance falls back.** A range on\nwheels is two sets of wheels, which is two controls; a multiple is a set,\nand a wheel has exactly one value by construction. Rather than draw\nsomething that cannot say what it holds, `wheels` renders as a list\nwhenever a mode is set.",
               "fieldName": "mode",
               "inheritedFrom": {
                 "name": "HelixBaseTime",
@@ -42676,10 +42676,10 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'list' | 'spinner'"
+                "text": "'list' | 'wheels'"
               },
               "default": "'list'",
-              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `spinner` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a spinner cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `spinner` where any time is allowed\nand the range is a whole day.",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.",
               "fieldName": "appearance",
               "inheritedFrom": {
                 "name": "HelixBaseTime",
@@ -42723,7 +42723,7 @@
               }
             },
             {
-              "description": "The row of columns, in `spinner`.",
+              "description": "The row of columns, in `wheels`.",
               "name": "columns",
               "inheritedFrom": {
                 "name": "HelixBaseTime",

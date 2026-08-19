@@ -73,10 +73,10 @@ const isTwelveHour = (locale?: string): boolean =>
  * @summary Picks a time, from a list of them.
  *
  * @description
- * **A list rather than three spinners**, and the reason is what a list already
+ * **A list rather than three wheels**, and the reason is what a list already
  * is. `helix-listbox` brings the keyboard, the typeahead, the scroll into view
  * and the announcement of a set of options, and a time at a step is a set of
- * options. Three little spinners for hours, minutes and a meridiem are three
+ * options. Three little wheels for hours, minutes and a meridiem are three
  * controls to build, three to test, and a tab stop each for something a reader
  * answers once.
  *
@@ -100,7 +100,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * @event {HelixChangeEvent} helix-change - Fired when the time changes.
  *
  * @csspart list - The listbox holding the times, in `list`.
- * @csspart columns - The row of columns, in `spinner`.
+ * @csspart columns - The row of columns, in `wheels`.
  * @csspart column - One of them.
  * @csspart items - The scrolling column inside it, forwarded from the listbox.
  * @csspart empty - What it says when nothing matches, forwarded from the listbox.
@@ -147,10 +147,10 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
-   * **Neither works as a spinner and the appearance falls back.** A range on
+   * **Neither works on wheels and the appearance falls back.** A range on
    * wheels is two sets of wheels, which is two controls; a multiple is a set,
    * and a wheel has exactly one value by construction. Rather than draw
-   * something that cannot say what it holds, `spinner` renders as a list
+   * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
    */
   @property({ reflect: true })
@@ -160,23 +160,23 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
    * Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
-   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * opening hours or slots actually has. `wheels` splits them into an hour, a
    * minute and, where the locale uses one, a meridiem: three short columns
    * instead of ninety-six rows, and the only way to reach `23:45` without
    * scrolling most of a day.
    *
-   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * The trade is that a wheel cannot say which *combinations* are on offer. A
    * list of half hours from nine to five is seventeen rows and every one of them
    * is a time the product has; the same thing as columns is an hour column and a
    * minute column, and nothing in either says the two are only valid together.
    * The bounds are still enforced, so a reader can be refused after the fact,
    * which is worse than not being offered it.
    *
-   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * So: `list` where the set is the point, `wheels` where any time is allowed
    * and the range is a whole day.
    */
   @property({ reflect: true })
-  appearance: 'list' | 'spinner' = 'list'
+  appearance: 'list' | 'wheels' = 'list'
 
   /**
    * Every time on offer, as minutes since midnight.
@@ -245,7 +245,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     return from !== undefined && to !== undefined && at > from && at < to
   }
 
-  /** The three readings a spinner shows, from the value or from `min`. */
+  /** The three readings a wheel shows, from the value or from `min`. */
   private get parts(): { hour: number; meridiem: 'AM' | 'PM'; minute: number } {
     const at = toMinutes(this.value) ?? toMinutes(this.min) ?? 0
     const hour = Math.floor(at / 60)
@@ -305,7 +305,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
    * rather than wrong, which is why it can be left in.
    */
   reveal(): void {
-    if (this.appearance !== 'spinner' || this.mode !== undefined) {
+    if (this.appearance !== 'wheels' || this.mode !== undefined) {
       return
     }
     for (const column of this.renderRoot?.querySelectorAll<HTMLElement & { reveal?: () => void }>(
@@ -325,7 +325,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
   }
 
-  /** One column of a spinner, which is a listbox like the whole list is. */
+  /** One wheel, which is a listbox like the whole list is. */
   private renderColumn(
     part: 'hour' | 'meridiem' | 'minute',
     label: string,
@@ -395,7 +395,7 @@ export class HelixBaseTime extends MixinControllerValue(HelixFormElement) {
     /* A mode falls back to the list, for the reason the property records: a
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
-    if (this.appearance === 'spinner' && this.mode === undefined) {
+    if (this.appearance === 'wheels' && this.mode === undefined) {
       return this.renderSpinner()
     }
     return html`<helix-listbox

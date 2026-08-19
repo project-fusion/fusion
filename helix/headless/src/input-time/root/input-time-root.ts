@@ -67,12 +67,12 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    * Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
    * scrolling most of a day. `helix-time` carries the longer note on the trade.
    */
   @property({ reflect: true })
-  appearance: 'list' | 'spinner' = 'list'
+  appearance: 'list' | 'wheels' = 'list'
 
   /**
    * How many times can be held at once.
@@ -80,7 +80,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
    * form submits. `helix-time` carries the longer note on the interaction and on
-   * why a spinner cannot do either.
+   * why a wheel cannot do either.
    */
   @property({ reflect: true })
   mode?: 'multiple' | 'range'
@@ -394,7 +394,7 @@ export class HelixBaseInputTime extends MixinControllerOpen(
        is what a scroll into view cannot work without. */
     if (this.open) {
       this.panel.show()
-      /* After the panel is shown, not before. A spinner centres each wheel on
+      /* After the panel is shown, not before. A set of wheels centres each on
          its own answer and cannot do it against a box of zero height, which is
          what everything in a `popover` measures until something shows it. The
          picker calls this on its own updates too; that one lands too early and

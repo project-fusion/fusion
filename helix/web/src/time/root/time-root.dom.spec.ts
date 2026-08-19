@@ -82,7 +82,7 @@ describe('time', () => {
 
 describe('time as a spinner', () => {
   const spinner = async (attrs = ''): Promise<Time> => {
-    const host = (await mount(`<helix-time appearance="spinner" ${attrs}></helix-time>`)) as Time
+    const host = (await mount(`<helix-time appearance="wheels" ${attrs}></helix-time>`)) as Time
     await host.updateComplete
     return host
   }
@@ -221,7 +221,7 @@ describe('time holds more than one', () => {
   test('a mode falls back to the list, because a wheel holds one value', async () => {
     // A range on wheels is two sets of wheels, which is two controls, and a
     // multiple is a set, which a wheel cannot hold by construction.
-    const host = await many('appearance="spinner" mode="range"')
+    const host = await many('appearance="wheels" mode="range"')
     expect(part(host, 'list')).not.toBeNull()
     expect(host.shadowRoot?.querySelector('[part="column"]')).toBeNull()
   })

@@ -74,8 +74,8 @@
   background-color: var(
     --time-range-color,
     light-dark(
-      color-mix(in oklab, var(--helix-color-foreground) 16%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 20%, transparent)
+      color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
     )
   );
 }
@@ -104,7 +104,7 @@
 
 /* Three columns, each scrolling on its own, read as a dial rather than a list.
  *
- * The shape of a spinner without pretending to be a wheel: a wheel drawn in
+ * The shape of a dial without pretending to be one: a wheel drawn in
  * perspective is a picture of a control, and the thing under it is three lists,
  * which is what these are. What makes it read as a dial is what a dial does:
  * rows snap to the middle, the ends fade away, and there is nothing marking a

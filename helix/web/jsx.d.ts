@@ -4324,7 +4324,7 @@ being four of a kind rather than four of three kinds. */
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
-hours has. `spinner` splits them into an hour, a minute and a meridiem where
+hours has. `wheels` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
 scrolling most of a day. `helix-time` carries the longer note on the trade. */
   appearance?: HelixInputTime["appearance"];
@@ -4333,7 +4333,7 @@ scrolling most of a day. `helix-time` carries the longer note on the trade. */
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
 form submits. `helix-time` carries the longer note on the interaction and on
-why a spinner cannot do either. */
+why a wheel cannot do either. */
   mode?: HelixInputTime["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
@@ -4482,7 +4482,7 @@ being four of a kind rather than four of three kinds. */
   /** Whether the panel is one list of times or a column each.
 
 `list` offers whole times, which is what a product with slots or opening
-hours has. `spinner` splits them into an hour, a minute and a meridiem where
+hours has. `wheels` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
 scrolling most of a day. `helix-time` carries the longer note on the trade. */
   "prop:appearance"?: HelixInputTime["appearance"];
@@ -4491,7 +4491,7 @@ scrolling most of a day. `helix-time` carries the longer note on the trade. */
 Absent is one. `range` holds a start and an end, `multiple` holds any
 number, and both are carried as one comma-separated value, which is what a
 form submits. `helix-time` carries the longer note on the interaction and on
-why a spinner cannot do either. */
+why a wheel cannot do either. */
   "prop:mode"?: HelixInputTime["mode"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
@@ -8162,28 +8162,28 @@ behaviour and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
-**Neither works as a spinner and the appearance falls back.** A range on
+**Neither works on wheels and the appearance falls back.** A range on
 wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
-something that cannot say what it holds, `spinner` renders as a list
+something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
   mode?: HelixTime["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
-opening hours or slots actually has. `spinner` splits them into an hour, a
+opening hours or slots actually has. `wheels` splits them into an hour, a
 minute and, where the locale uses one, a meridiem: three short columns
 instead of ninety-six rows, and the only way to reach `23:45` without
 scrolling most of a day.
 
-The trade is that a spinner cannot say which *combinations* are on offer. A
+The trade is that a wheel cannot say which *combinations* are on offer. A
 list of half hours from nine to five is seventeen rows and every one of them
 is a time the product has; the same thing as columns is an hour column and a
 minute column, and nothing in either says the two are only valid together.
 The bounds are still enforced, so a reader can be refused after the fact,
 which is worse than not being offered it.
 
-So: `list` where the set is the point, `spinner` where any time is allowed
+So: `list` where the set is the point, `wheels` where any time is allowed
 and the range is a whole day. */
   appearance?: HelixTime["appearance"];
   /** Whether the control is non-interactive.
@@ -8270,28 +8270,28 @@ behaviour and a reader who has met one has met both. The alternative, a
 separate "from" and "to" control, is two answers to what a product asks as
 one, and it makes the between part impossible to show.
 
-**Neither works as a spinner and the appearance falls back.** A range on
+**Neither works on wheels and the appearance falls back.** A range on
 wheels is two sets of wheels, which is two controls; a multiple is a set,
 and a wheel has exactly one value by construction. Rather than draw
-something that cannot say what it holds, `spinner` renders as a list
+something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
   "prop:mode"?: HelixTime["mode"];
   /** Whether the times are one list or a column each.
 
 `list` is the default and offers whole times, which is what a product with
-opening hours or slots actually has. `spinner` splits them into an hour, a
+opening hours or slots actually has. `wheels` splits them into an hour, a
 minute and, where the locale uses one, a meridiem: three short columns
 instead of ninety-six rows, and the only way to reach `23:45` without
 scrolling most of a day.
 
-The trade is that a spinner cannot say which *combinations* are on offer. A
+The trade is that a wheel cannot say which *combinations* are on offer. A
 list of half hours from nine to five is seventeen rows and every one of them
 is a time the product has; the same thing as columns is an hour column and a
 minute column, and nothing in either says the two are only valid together.
 The bounds are still enforced, so a reader can be refused after the fact,
 which is worse than not being offered it.
 
-So: `list` where the set is the point, `spinner` where any time is allowed
+So: `list` where the set is the point, `wheels` where any time is allowed
 and the range is a whole day. */
   "prop:appearance"?: HelixTime["appearance"];
   /** Whether the control is non-interactive.
@@ -12209,7 +12209,7 @@ export type CustomElements = {
    * - `appearance`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
    * scrolling most of a day. `helix-time` carries the longer note on the trade.
    * - `mode`: How many times can be held at once.
@@ -12217,7 +12217,7 @@ export type CustomElements = {
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
    * form submits. `helix-time` carries the longer note on the interaction and on
-   * why a spinner cannot do either.
+   * why a wheel cannot do either.
    * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
    *
    * `0` is all of them, and is the default, for the reason Input Date gives: how
@@ -15295,27 +15295,27 @@ export type CustomElements = {
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
-   * **Neither works as a spinner and the appearance falls back.** A range on
+   * **Neither works on wheels and the appearance falls back.** A range on
    * wheels is two sets of wheels, which is two controls; a multiple is a set,
    * and a wheel has exactly one value by construction. Rather than draw
-   * something that cannot say what it holds, `spinner` renders as a list
+   * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
    * - `appearance`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
-   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * opening hours or slots actually has. `wheels` splits them into an hour, a
    * minute and, where the locale uses one, a meridiem: three short columns
    * instead of ninety-six rows, and the only way to reach `23:45` without
    * scrolling most of a day.
    *
-   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * The trade is that a wheel cannot say which *combinations* are on offer. A
    * list of half hours from nine to five is seventeen rows and every one of them
    * is a time the product has; the same thing as columns is an hour column and a
    * minute column, and nothing in either says the two are only valid together.
    * The bounds are still enforced, so a reader can be refused after the fact,
    * which is worse than not being offered it.
    *
-   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * So: `list` where the set is the point, `wheels` where any time is allowed
    * and the range is a whole day.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -15408,8 +15408,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
-   * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
-   * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
+   * - `--time-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
+   * - `--time-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-range-color`: Wash behind the times inside a range. (default: `undefined`)
    *
    * ## CSS Parts
@@ -15417,7 +15417,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The listbox holding the times, in `list`.
-   * - `columns`: The row of columns, in `spinner`.
+   * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
@@ -19269,7 +19269,7 @@ export type CustomElementsSolidJs = {
    * - `appearance`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `spinner` splits them into an hour, a minute and a meridiem where
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
    * scrolling most of a day. `helix-time` carries the longer note on the trade.
    * - `mode`: How many times can be held at once.
@@ -19277,7 +19277,7 @@ export type CustomElementsSolidJs = {
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
    * form submits. `helix-time` carries the longer note on the interaction and on
-   * why a spinner cannot do either.
+   * why a wheel cannot do either.
    * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
    *
    * `0` is all of them, and is the default, for the reason Input Date gives: how
@@ -22475,27 +22475,27 @@ export type CustomElementsSolidJs = {
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
-   * **Neither works as a spinner and the appearance falls back.** A range on
+   * **Neither works on wheels and the appearance falls back.** A range on
    * wheels is two sets of wheels, which is two controls; a multiple is a set,
    * and a wheel has exactly one value by construction. Rather than draw
-   * something that cannot say what it holds, `spinner` renders as a list
+   * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
    * - `appearance`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
-   * opening hours or slots actually has. `spinner` splits them into an hour, a
+   * opening hours or slots actually has. `wheels` splits them into an hour, a
    * minute and, where the locale uses one, a meridiem: three short columns
    * instead of ninety-six rows, and the only way to reach `23:45` without
    * scrolling most of a day.
    *
-   * The trade is that a spinner cannot say which *combinations* are on offer. A
+   * The trade is that a wheel cannot say which *combinations* are on offer. A
    * list of half hours from nine to five is seventeen rows and every one of them
    * is a time the product has; the same thing as columns is an hour column and a
    * minute column, and nothing in either says the two are only valid together.
    * The bounds are still enforced, so a reader can be refused after the fact,
    * which is worse than not being offered it.
    *
-   * So: `list` where the set is the point, `spinner` where any time is allowed
+   * So: `list` where the set is the point, `wheels` where any time is allowed
    * and the range is a whole day.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -22588,8 +22588,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--time-list-height`: How tall the list is before it scrolls. (default: `undefined`)
-   * - `--time-wheel-height`: How tall a spinner column is. Five rows by default. (default: `undefined`)
-   * - `--time-row-size`: Height and least width of one row in a spinner. (default: `undefined`)
+   * - `--time-wheel-height`: How tall a wheel is. Five rows by default. (default: `undefined`)
+   * - `--time-row-size`: Height and least width of one row in a wheel. (default: `undefined`)
    * - `--time-range-color`: Wash behind the times inside a range. (default: `undefined`)
    *
    * ## CSS Parts
@@ -22597,7 +22597,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The listbox holding the times, in `list`.
-   * - `columns`: The row of columns, in `spinner`.
+   * - `columns`: The row of columns, in `wheels`.
    * - `column`: One of them.
    * - `items`: The scrolling column inside it, forwarded from the listbox.
    * - `empty`: What it says when nothing matches, forwarded from the listbox.
@@ -23606,9 +23606,9 @@ export type CustomCssProperties = {
   "--textarea-background-color"?: string;
   /** How tall the list is before it scrolls. */
   "--time-list-height"?: string;
-  /** How tall a spinner column is. Five rows by default. */
+  /** How tall a wheel is. Five rows by default. */
   "--time-wheel-height"?: string;
-  /** Height and least width of one row in a spinner. */
+  /** Height and least width of one row in a wheel. */
   "--time-row-size"?: string;
   /** Wash behind the times inside a range. */
   "--time-range-color"?: string;

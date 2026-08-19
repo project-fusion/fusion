@@ -28,8 +28,8 @@ import { styles } from './time-root.css.js'
  * @documentation https://helix.fusion.dev/components/time
  *
  * @cssproperty --time-list-height - How tall the list is before it scrolls.
- * @cssproperty --time-wheel-height - How tall a spinner column is. Five rows by default.
- * @cssproperty --time-row-size - Height and least width of one row in a spinner.
+ * @cssproperty --time-wheel-height - How tall a wheel is. Five rows by default.
+ * @cssproperty --time-row-size - Height and least width of one row in a wheel.
  * @cssproperty --time-range-color - Wash behind the times inside a range.
  */
 @customElement('helix-time')
