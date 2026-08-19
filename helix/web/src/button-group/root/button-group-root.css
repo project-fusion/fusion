@@ -21,11 +21,11 @@
  * `Button` publishes the two hooks and defaults them to `--button-radii`, so a
  * button outside a group is unaffected and a consumer setting `--button-radii`
  * still gets it on the ends. */
-::slotted(*:not(:first-child)) {
+:host(:not([appearance="spaced"])) ::slotted(*:not(:first-child)) {
   --button-radii-start: 0;
 }
 
-::slotted(*:not(:last-child)) {
+:host(:not([appearance="spaced"])) ::slotted(*:not(:last-child)) {
   --button-radii-end: 0;
 }
 
