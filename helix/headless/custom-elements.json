@@ -11624,6 +11624,10 @@
               "name": "date"
             },
             {
+              "description": "How many dates are held beyond the ones shown.",
+              "name": "rest"
+            },
+            {
               "description": "The control that opens the calendar.",
               "name": "trigger"
             },
@@ -11670,6 +11674,16 @@
               "default": "1",
               "description": "How many months the calendar shows, side by side.\n\nWorth more than one mainly for a range, where picking a start in March and\nan end in April otherwise means paging between them and losing sight of the\nfirst. The panel is sized by its content, so this widens it.",
               "attribute": "months"
+            },
+            {
+              "kind": "field",
+              "name": "maxTags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many dates are shown as tags before the rest are counted, in `multiple`.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\ndates would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. \"3 more\" is a fact a reader can\nact on, where a row that silently stops is a field that appears to have lost\nwhat was put in it, and the count is what tells them there is more to see.",
+              "attribute": "max-tags"
             },
             {
               "kind": "field",
@@ -11725,9 +11739,10 @@
               "kind": "field",
               "name": "dateStyle",
               "type": {
-                "text": "'full' | 'long' | 'medium' | 'short' | undefined"
+                "text": "'full' | 'iso' | 'long' | 'medium' | 'short'"
               },
-              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**Setting this makes the field read-only, and that is the whole design.**\nWhat the field shows is the value, everywhere else in this component, for\nthe reason the class gives: a document being edited must not be a rendering\nof something else. A range bends that and gets away with it, because the\ndash between its two dates is a separator this element understands, so what\nis shown is still what can be typed.\n\n`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,\nand writing a parser per locale is how a field ends up rejecting what it\njust displayed. So the choice is not \"which format\" but \"formatted\nor typeable\", and this element takes the honest half of it: with a style set\nthe calendar is the way in, and without one the field is a text box holding\nexactly what it means.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
+              "default": "'long'",
+              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**The field renders when it is idle and holds the value when it is being\nedited.** A written date is a rendering, and a document being edited must\nnot be a rendering of something else: `Intl.DateTimeFormat` formats and does\nnot parse, so `4 August 2026` cannot be typed back, and writing a parser per\nlocale is how a field ends up rejecting what it just displayed.\n\nThe way out is not to choose between the two but to separate them in time.\nIdle, the field shows `4 August 2026`, which is what a date is for reading.\nFocused, it shows `2026-08-04`, which is what a date is for typing, and it\ngoes back on the way out. Nothing parses a rendering, and nothing is\nread-only, which is what an earlier version of this settled for.\n\nA range is the exception that needs no swap: the dash between its two dates\nis a separator this element understands, so that much reads back either way.\n\n`iso` turns the rendering off, for a field whose reader is entering data\nrather than reading it, or where the ISO form is itself the point.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
               "attribute": "date-style"
             },
             {
@@ -11817,6 +11832,16 @@
             },
             {
               "kind": "field",
+              "name": "editing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the caret is in the field, which is when it holds the value."
+            },
+            {
+              "kind": "field",
               "name": "draft",
               "type": {
                 "text": "string"
@@ -11838,6 +11863,26 @@
               "privacy": "private",
               "readonly": true,
               "description": "Adds what was typed to the set, or takes the last one back out."
+            },
+            {
+              "kind": "field",
+              "name": "shownDates",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "description": "The dates that get a tag, which is all of them until `maxTags` says not.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "restCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How many are held beyond the ones shown.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -11883,10 +11928,16 @@
             },
             {
               "kind": "field",
-              "name": "handleFocus",
+              "name": "handleBlur",
               "privacy": "private",
               "readonly": true,
               "description": "Focusing the field opens the calendar.\n\nA reader who reaches this control is choosing a date, and making them find\nthe trigger afterwards is a second action for something they have already\nasked for. Typing still works with it up, because the calendar follows the\nfield rather than the other way round.\n\n**Only where focus arrived from outside this element**, which is the whole\nof the difficulty. Picking a date shuts the panel and puts the caret back in\nthe field, and the first version of this reopened it on the way: the reader\nchose a date and the calendar came straight back, which the existing spec\ncaught. `relatedTarget` is where focus came from, so a hand-off from the\ncalendar or the trigger is left alone and only a genuine arrival opens\nanything.\n\nOn the input rather than on the field, too. Focus does not bubble, so a\nlistener here covers the text and not the trigger, which is what keeps\npressing the trigger from opening the panel on focus and then shutting it\nagain on the click."
+            },
+            {
+              "kind": "field",
+              "name": "handleFocus",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -12669,6 +12720,15 @@
               "fieldName": "months"
             },
             {
+              "name": "max-tags",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "How many dates are shown as tags before the rest are counted, in `multiple`.\n\n`0` is all of them, and is the default: a cap that guesses is worse than no\ncap, because the number that fits depends on the width of the field and the\nlength of what is in it, neither of which this element knows. What a cap is\ngenuinely for is a field in a row or a table cell, where a set of twelve\ndates would push everything below it down a line at a time.\n\nThe remainder is counted rather than hidden. \"3 more\" is a fact a reader can\nact on, where a row that silently stops is a field that appears to have lost\nwhat was put in it, and the count is what tells them there is more to see.",
+              "fieldName": "maxTags"
+            },
+            {
               "name": "min",
               "type": {
                 "text": "string"
@@ -12716,9 +12776,10 @@
             {
               "name": "date-style",
               "type": {
-                "text": "'full' | 'long' | 'medium' | 'short' | undefined"
+                "text": "'full' | 'iso' | 'long' | 'medium' | 'short'"
               },
-              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**Setting this makes the field read-only, and that is the whole design.**\nWhat the field shows is the value, everywhere else in this component, for\nthe reason the class gives: a document being edited must not be a rendering\nof something else. A range bends that and gets away with it, because the\ndash between its two dates is a separator this element understands, so what\nis shown is still what can be typed.\n\n`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,\nand writing a parser per locale is how a field ends up rejecting what it\njust displayed. So the choice is not \"which format\" but \"formatted\nor typeable\", and this element takes the honest half of it: with a style set\nthe calendar is the way in, and without one the field is a text box holding\nexactly what it means.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
+              "default": "'long'",
+              "description": "How a date is written in the field: `short` through `full`, or ISO.\n\n**The field renders when it is idle and holds the value when it is being\nedited.** A written date is a rendering, and a document being edited must\nnot be a rendering of something else: `Intl.DateTimeFormat` formats and does\nnot parse, so `4 August 2026` cannot be typed back, and writing a parser per\nlocale is how a field ends up rejecting what it just displayed.\n\nThe way out is not to choose between the two but to separate them in time.\nIdle, the field shows `4 August 2026`, which is what a date is for reading.\nFocused, it shows `2026-08-04`, which is what a date is for typing, and it\ngoes back on the way out. Nothing parses a rendering, and nothing is\nread-only, which is what an earlier version of this settled for.\n\nA range is the exception that needs no swap: the dash between its two dates\nis a separator this element understands, so that much reads back either way.\n\n`iso` turns the rendering off, for a field whose reader is entering data\nrather than reading it, or where the ISO form is itself the point.\n\nThe value is always `YYYY-MM-DD` regardless, because that is what a form\nsubmits and what `min` and `max` compare against.",
               "fieldName": "dateStyle"
             },
             {

@@ -35,24 +35,6 @@
    * A track is a bar rather than a fill, so it takes a line's color: it is the
    * same weight of mark as the rules in a table, drawn thicker. */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
-  /* What the track is painted with, whole, so a slider can be a ramp.
-   *
-   * The fill and the track colour compose the default and cover every slider
-   * that reads as a proportion, which is nearly all of them. What they cannot
-   * express is a track whose colour is the value rather than a measure of it: a
-   * hue ramp has no filled half, and neither does an alpha bar. Input Color
-   * needs both, and the alternative was for it to reach through `::part(control)`
-   * into `::-webkit-slider-runnable-track` from outside, which is a consumer
-   * patching around a gap here and would have needed the Firefox pseudo-element
-   * too. One hook, used by both rules below. */
-  --_slider-track-image: var(
-    --slider-track-image,
-    linear-gradient(
-      to right,
-      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
-      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
-    )
-  );
 }
 
 [part="field"] {
@@ -85,6 +67,34 @@
 [part="field"][data-markers] [part="output"] {
   grid-column: 2;
   grid-row: 1;
+}
+
+/* What the track is painted with, whole, so a slider can be a ramp.
+ *
+ * The fill and the track colour compose the default and cover every slider that
+ * reads as a proportion, which is nearly all of them. What they cannot express
+ * is a track whose colour is the value rather than a measure of it: a hue ramp
+ * has no filled half, and neither does an alpha bar. Input Color needs both, and
+ * the alternative was for it to reach through `::part(control)` into
+ * `::-webkit-slider-runnable-track` from outside, which is a consumer patching
+ * around a gap here and would have needed the Firefox pseudo-element too.
+ *
+ * **On the control, not on the host, and that is not a tidiness question.** A
+ * custom property whose value contains `var()` is substituted where it is
+ * *declared*, not where it is used: declared on `:host`, the `--_slider-fraction`
+ * inside it resolved against the host, where nothing sets it, so the fallback
+ * won and both gradient stops landed at `0%`. Every slider painted its unfilled
+ * colour end to end and the fill was gone. The fraction is an inline style on
+ * the control, so the declaration has to be there too. */
+[part="control"] {
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      to right,
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
+      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
+    )
+  );
 }
 
 /* The native range, stripped to its track. The thumb is styled separately

@@ -80,6 +80,7 @@ const dates = (value: string): string[] =>
  * @csspart field - The box holding the text and the trigger.
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.
+ * @csspart rest - How many dates are held beyond the ones shown.
  * @csspart trigger - The control that opens the calendar.
  * @csspart surface - The floating panel.
  * @csspart calendar - The calendar inside it.
@@ -108,6 +109,22 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   @property({ type: Number })
   months = 1
 
+  /**
+   * How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. "3 more" is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   @property()
   min = ''
@@ -131,25 +148,29 @@ export class HelixBaseInputDate extends MixinControllerOpen(
   /**
    * How a date is written in the field: `short` through `full`, or ISO.
    *
-   * **Setting this makes the field read-only, and that is the whole design.**
-   * What the field shows is the value, everywhere else in this component, for
-   * the reason the class gives: a document being edited must not be a rendering
-   * of something else. A range bends that and gets away with it, because the
-   * dash between its two dates is a separator this element understands, so what
-   * is shown is still what can be typed.
+   * **The field renders when it is idle and holds the value when it is being
+   * edited.** A written date is a rendering, and a document being edited must
+   * not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+   * not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+   * locale is how a field ends up rejecting what it just displayed.
    *
-   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-   * and writing a parser per locale is how a field ends up rejecting what it
-   * just displayed. So the choice is not "which format" but "formatted
-   * or typeable", and this element takes the honest half of it: with a style set
-   * the calendar is the way in, and without one the field is a text box holding
-   * exactly what it means.
+   * The way out is not to choose between the two but to separate them in time.
+   * Idle, the field shows `4 August 2026`, which is what a date is for reading.
+   * Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+   * goes back on the way out. Nothing parses a rendering, and nothing is
+   * read-only, which is what an earlier version of this settled for.
+   *
+   * A range is the exception that needs no swap: the dash between its two dates
+   * is a separator this element understands, so that much reads back either way.
+   *
+   * `iso` turns the rendering off, for a field whose reader is entering data
+   * rather than reading it, or where the ISO form is itself the point.
    *
    * The value is always `YYYY-MM-DD` regardless, because that is what a form
    * submits and what `min` and `max` compare against.
    */
   @property({ attribute: 'date-style' })
-  dateStyle?: 'full' | 'long' | 'medium' | 'short'
+  dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
   /** Language tag the calendar names its months and days in. */
   @property()
@@ -218,7 +239,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    */
   /** One date, written the way `dateStyle` asks for. */
   private written(date: string): string {
-    if (!this.dateStyle || !isIso(date)) {
+    if (this.dateStyle === 'iso' || !isIso(date)) {
       return date
     }
     /* UTC, because the dates are UTC throughout: a date parsed in a zone behind
@@ -238,12 +259,19 @@ export class HelixBaseInputDate extends MixinControllerOpen(
       return this.draft
     }
     const held = dates(this.value)
-    if (this.dateStyle) {
-      const written = held.map((one) => this.written(one))
-      return this.mode === 'range' ? written.join(' – ') : written.join(', ')
+    /* Being edited, the field is the value. The rendering is what it shows when
+       nobody is in it, so there is never a moment where what is on screen is
+       something this element could not read back. */
+    if (this.editing || this.dateStyle === 'iso') {
+      return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
     }
-    return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
+    const written = held.map((one) => this.written(one))
+    return this.mode === 'range' ? written.join(' – ') : written.join(', ')
   }
+
+  /** Whether the caret is in the field, which is when it holds the value. */
+  @state()
+  private editing = false
 
   /**
    * What is being typed but not yet held, for `multiple` only.
@@ -295,6 +323,17 @@ export class HelixBaseInputDate extends MixinControllerOpen(
          small control. */
       this.requestValue(held.slice(0, -1).join(','))
     }
+  }
+
+  /** The dates that get a tag, which is all of them until `maxTags` says not. */
+  private get shownDates(): string[] {
+    const held = dates(this.value)
+    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+  }
+
+  /** How many are held beyond the ones shown. */
+  private get restCount(): number {
+    return Math.max(0, dates(this.value).length - this.shownDates.length)
   }
 
   /** Takes one date back out of the set. */
@@ -434,7 +473,12 @@ export class HelixBaseInputDate extends MixinControllerOpen(
    * pressing the trigger from opening the panel on focus and then shutting it
    * again on the click.
    */
+  private readonly handleBlur = (): void => {
+    this.editing = false
+  }
+
   private readonly handleFocus = (event: FocusEvent): void => {
+    this.editing = true
     const from = event.relatedTarget
     if (this.open || this.isDisabled) {
       return
@@ -455,7 +499,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
       <div part="field" @keydown=${this.handleKeydown}>
         ${
           this.mode === 'multiple'
-            ? dates(this.value).map(
+            ? this.shownDates.map(
                 (date) => html`<helix-tag
                   part="date"
                   dismissible
@@ -470,6 +514,7 @@ export class HelixBaseInputDate extends MixinControllerOpen(
               )
             : nothing
         }
+        ${this.restCount > 0 ? html`<span part="rest">${`${this.restCount} more`}</span>` : nothing}
         <input
           part="control"
           id="control"
@@ -481,8 +526,8 @@ export class HelixBaseInputDate extends MixinControllerOpen(
           inputmode="numeric"
           aria-describedby=${this.describedBy ?? nothing}
           ?disabled=${this.isDisabled}
-          ?readonly=${this.dateStyle !== undefined}
           ?required=${this.required}
+          @blur=${this.handleBlur}
           @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}

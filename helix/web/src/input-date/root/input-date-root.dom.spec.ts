@@ -25,7 +25,12 @@ const control = (host: InputDate): HTMLInputElement => part(host, 'control') as 
 const calendar = (host: InputDate): HTMLElement & { value: string } =>
   part(host, 'calendar') as HTMLElement & { value: string }
 
+/* Focus first, because typing into an unfocused field is not a thing that
+   happens and the two are not equivalent here: the field renders when it is
+   idle and holds the value while it is being edited, so a test that skips the
+   focus is asserting against a state a browser never reaches. */
 const type = async (host: InputDate, text: string): Promise<void> => {
+  control(host).dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
   control(host).value = text
   control(host).dispatchEvent(new Event('input', { bubbles: true }))
   await host.updateComplete
@@ -37,11 +42,14 @@ describe('input date', () => {
     expect(calendar(host).tagName).toBe('HELIX-CALENDAR')
   })
 
-  test('typing sets the value, so a reader who knows the date never opens it', async () => {
+  test('typing sets the value, so a reader who knows the date never uses the grid', async () => {
+    /* It used to assert the panel stayed shut, which stopped being true when
+       focus was made to open it: reaching the field opens the calendar now, and
+       the claim worth keeping is that a reader who types never has to touch it. */
     const host = await field()
     await type(host, '2026-08-18')
     expect(host.value).toBe('2026-08-18')
-    expect(host.open).toBe(false)
+    expect(calendar(host).value).toBe('2026-08-18')
   })
 
   test('a half-typed date is kept but not handed to the calendar', async () => {
@@ -270,12 +278,12 @@ describe('input date shows what it holds', () => {
   }
 
   test('a range reads with a dash, because it is a span rather than a list', async () => {
-    const host = await field('default-value="2026-08-04,2026-08-11" mode="range"')
+    const host = await field('date-style="iso" default-value="2026-08-04,2026-08-11" mode="range"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04 – 2026-08-11')
   })
 
   test('and the dash reads back, so what is shown can be typed', async () => {
-    const host = await field('mode="range"')
+    const host = await field('date-style="iso" mode="range"')
     const control = part(host, 'control') as HTMLInputElement
     for (const typed of ['2026-08-04 – 2026-08-11', '2026-08-04 - 2026-08-11']) {
       control.value = typed
@@ -286,7 +294,7 @@ describe('input date shows what it holds', () => {
   })
 
   test('a bare hyphen is not a separator, or a date comes apart into three numbers', async () => {
-    const host = await field('mode="range"')
+    const host = await field('date-style="iso" mode="range"')
     const control = part(host, 'control') as HTMLInputElement
     control.value = '2026-08-04'
     control.dispatchEvent(new Event('input', { bubbles: true }))
@@ -298,12 +306,14 @@ describe('input date shows what it holds', () => {
   })
 
   test('a single date is shown as itself, with no dash anywhere near it', async () => {
-    const host = await field('default-value="2026-08-04"')
+    const host = await field('date-style="iso" default-value="2026-08-04"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04')
   })
 
   test('multiple holds its dates as tags, and the input is a draft', async () => {
-    const host = await field('default-value="2026-08-04,2026-08-11" mode="multiple"')
+    const host = await field(
+      'date-style="iso" default-value="2026-08-04,2026-08-11" mode="multiple"',
+    )
     const tags = [...(host.shadowRoot?.querySelectorAll('[part="date"]') ?? [])]
     expect(tags.map((one) => one.textContent?.trim())).toEqual(['2026-08-04', '2026-08-11'])
     // The value is a set being added to, so the input holds what is not in it yet.
@@ -366,28 +376,37 @@ describe('input date can be written out', () => {
     return host
   }
 
-  test('a style writes the date out, and the value stays ISO', async () => {
-    const host = await field('date-style="long" default-value="2026-08-04" locale="en-GB"')
+  test('a date is written out by default, and the value stays ISO', async () => {
+    const host = await field('default-value="2026-08-04" locale="en-GB"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('4 August 2026')
     expect(host.value).toBe('2026-08-04')
   })
 
-  test('and the field goes read-only, which is the whole design', async () => {
-    /* `Intl.DateTimeFormat` formats and does not parse, so a written date cannot
-       be typed back. The choice is not which format but formatted or typeable,
-       and a field showing something it would reject is the dishonest half. */
-    const host = await field('date-style="long" default-value="2026-08-04"')
-    expect((part(host, 'control') as HTMLInputElement).readOnly).toBe(true)
+  test('focusing it hands back the value, and blurring writes it out again', async () => {
+    /* A rendering cannot be typed back, so the two are separated in time rather
+       than chosen between: idle it reads, focused it holds the value. Nothing
+       parses a rendering, and the field is never read-only. */
+    const host = await field('default-value="2026-08-04" locale="en-GB"')
+    const control = part(host, 'control') as HTMLInputElement
+    expect(control.value).toBe('4 August 2026')
+    expect(control.readOnly).toBe(false)
+
+    control.dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
+    await host.updateComplete
+    expect(control.value).toBe('2026-08-04')
+
+    control.dispatchEvent(new FocusEvent('blur'))
+    await host.updateComplete
+    expect(control.value).toBe('4 August 2026')
   })
 
-  test('without one it is a text box holding exactly what it means', async () => {
-    const host = await field('default-value="2026-08-04"')
+  test('`iso` turns the rendering off, for a reader entering data', async () => {
+    const host = await field('date-style="iso" default-value="2026-08-04"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('2026-08-04')
-    expect((part(host, 'control') as HTMLInputElement).readOnly).toBe(false)
   })
 
   test('the locale is the calendar its months are named in', async () => {
-    const host = await field('date-style="long" default-value="2026-08-04" locale="fr-FR"')
+    const host = await field('default-value="2026-08-04" locale="fr-FR"')
     expect((part(host, 'control') as HTMLInputElement).value).toBe('4 août 2026')
   })
 
@@ -412,5 +431,48 @@ describe('input date can be written out', () => {
     )
     const tags = [...(host.shadowRoot?.querySelectorAll('[part="date"]') ?? [])]
     expect(tags.map((one) => one.textContent?.trim())).toEqual(['4 Aug 2026', '11 Aug 2026'])
+  })
+})
+
+describe('input date can cap its tags', () => {
+  const field = async (
+    attrs: string,
+  ): Promise<HTMLElement & { updateComplete: Promise<unknown>; value: string }> => {
+    const host = (await mount(
+      `<helix-input-date label="Dates" mode="multiple" ${attrs}></helix-input-date>`,
+    )) as HTMLElement & {
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    await host.updateComplete
+    return host
+  }
+
+  test('every date gets a tag by default, because a cap that guesses is worse', async () => {
+    // How many fit depends on the width of the field and the length of what is
+    // in it, and this element knows neither.
+    const host = await field('default-value="2026-08-04,2026-08-11,2026-08-18"')
+    expect(host.shadowRoot?.querySelectorAll('[part="date"]')).toHaveLength(3)
+    expect(host.shadowRoot?.querySelector('[part="rest"]')).toBeNull()
+  })
+
+  test('a cap shows that many and counts the rest', async () => {
+    const host = await field(
+      'default-value="2026-08-04,2026-08-11,2026-08-18,2026-08-25" max-tags="2"',
+    )
+    expect(host.shadowRoot?.querySelectorAll('[part="date"]')).toHaveLength(2)
+    expect(part(host, 'rest')?.textContent?.trim()).toBe('2 more')
+  })
+
+  test('and counts nothing when the cap is not reached', async () => {
+    // A row that silently stops is a field that appears to have lost what was
+    // put in it, so the count is the point; a count of zero is not.
+    const host = await field('default-value="2026-08-04" max-tags="3"')
+    expect(host.shadowRoot?.querySelector('[part="rest"]')).toBeNull()
+  })
+
+  test('the value keeps every date, whatever is shown', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11,2026-08-18" max-tags="1"')
+    expect(host.value).toBe('2026-08-04,2026-08-11,2026-08-18')
   })
 })

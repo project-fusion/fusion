@@ -1744,7 +1744,7 @@ whatever holds it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `dateStyle` | `date-style` | `'full' \| 'long' \| 'medium' \| 'short' \| undefined` | - | `HelixBaseInputDate` | How a date is written in the field: `short` through `full`, or ISO. |
+| `dateStyle` | `date-style` | `'full' \| 'iso' \| 'long' \| 'medium' \| 'short'` | `'long'` | `HelixBaseInputDate` | How a date is written in the field: `short` through `full`, or ISO. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -1761,6 +1761,7 @@ whatever holds it.
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `locale` | `locale` | `string` | `''` | `HelixBaseInputDate` | Language tag the calendar names its months and days in. |
 | `max` | `max` | `string` | `''` | `HelixBaseInputDate` | Latest date that can be chosen, as `YYYY-MM-DD`. |
+| `maxTags` | `max-tags` | `number` | `0` | `HelixBaseInputDate` | How many dates are shown as tags before the rest are counted, in `multiple`. |
 | `min` | `min` | `string` | `''` | `HelixBaseInputDate` | Earliest date that can be chosen, as `YYYY-MM-DD`. |
 | `mode` | `mode` | `'range' \| 'multiple' \| undefined` | - | `HelixBaseInputDate` | How many dates can be held at once. |
 | `months` | `months` | `number` | `1` | `HelixBaseInputDate` | How many months the calendar shows, side by side. |
@@ -1809,6 +1810,7 @@ whatever holds it.
 | `field` | The box holding the text and the trigger. |
 | `control` | The text input. |
 | `date` | One held date, as a tag, in `multiple`. |
+| `rest` | How many dates are held beyond the ones shown. |
 | `trigger` | The control that opens the calendar. |
 | `surface` | The floating panel. |
 | `calendar` | The calendar inside it. |

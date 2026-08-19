@@ -3349,6 +3349,30 @@ Worth more than one mainly for a range, where picking a start in March and
 an end in April otherwise means paging between them and losing sight of the
 first. The panel is sized by its content, so this widens it. */
   months?: HelixInputDate["months"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. "3 more" is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "max-tags"?: HelixInputDate["maxTags"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. "3 more" is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  maxTags?: HelixInputDate["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   min?: HelixInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -3367,38 +3391,46 @@ first. The panel is sized by its content, so this widens it. */
   firstDayOfWeek?: HelixInputDate["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
-**Setting this makes the field read-only, and that is the whole design.**
-What the field shows is the value, everywhere else in this component, for
-the reason the class gives: a document being edited must not be a rendering
-of something else. A range bends that and gets away with it, because the
-dash between its two dates is a separator this element understands, so what
-is shown is still what can be typed.
+**The field renders when it is idle and holds the value when it is being
+edited.** A written date is a rendering, and a document being edited must
+not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+locale is how a field ends up rejecting what it just displayed.
 
-`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-and writing a parser per locale is how a field ends up rejecting what it
-just displayed. So the choice is not "which format" but "formatted
-or typeable", and this element takes the honest half of it: with a style set
-the calendar is the way in, and without one the field is a text box holding
-exactly what it means.
+The way out is not to choose between the two but to separate them in time.
+Idle, the field shows `4 August 2026`, which is what a date is for reading.
+Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+goes back on the way out. Nothing parses a rendering, and nothing is
+read-only, which is what an earlier version of this settled for.
+
+A range is the exception that needs no swap: the dash between its two dates
+is a separator this element understands, so that much reads back either way.
+
+`iso` turns the rendering off, for a field whose reader is entering data
+rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
   "date-style"?: HelixInputDate["dateStyle"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
-**Setting this makes the field read-only, and that is the whole design.**
-What the field shows is the value, everywhere else in this component, for
-the reason the class gives: a document being edited must not be a rendering
-of something else. A range bends that and gets away with it, because the
-dash between its two dates is a separator this element understands, so what
-is shown is still what can be typed.
+**The field renders when it is idle and holds the value when it is being
+edited.** A written date is a rendering, and a document being edited must
+not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+locale is how a field ends up rejecting what it just displayed.
 
-`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-and writing a parser per locale is how a field ends up rejecting what it
-just displayed. So the choice is not "which format" but "formatted
-or typeable", and this element takes the honest half of it: with a style set
-the calendar is the way in, and without one the field is a text box holding
-exactly what it means.
+The way out is not to choose between the two but to separate them in time.
+Idle, the field shows `4 August 2026`, which is what a date is for reading.
+Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+goes back on the way out. Nothing parses a rendering, and nothing is
+read-only, which is what an earlier version of this settled for.
+
+A range is the exception that needs no swap: the dash between its two dates
+is a separator this element understands, so that much reads back either way.
+
+`iso` turns the rendering off, for a field whose reader is entering data
+rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
@@ -3527,6 +3559,30 @@ Worth more than one mainly for a range, where picking a start in March and
 an end in April otherwise means paging between them and losing sight of the
 first. The panel is sized by its content, so this widens it. */
   "prop:months"?: HelixInputDate["months"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. "3 more" is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "attr:max-tags"?: HelixInputDate["maxTags"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. "3 more" is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "prop:maxTags"?: HelixInputDate["maxTags"];
   /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
   "prop:min"?: HelixInputDate["min"];
   /** Latest date that can be chosen, as `YYYY-MM-DD`. */
@@ -3545,38 +3601,46 @@ first. The panel is sized by its content, so this widens it. */
   "prop:firstDayOfWeek"?: HelixInputDate["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
-**Setting this makes the field read-only, and that is the whole design.**
-What the field shows is the value, everywhere else in this component, for
-the reason the class gives: a document being edited must not be a rendering
-of something else. A range bends that and gets away with it, because the
-dash between its two dates is a separator this element understands, so what
-is shown is still what can be typed.
+**The field renders when it is idle and holds the value when it is being
+edited.** A written date is a rendering, and a document being edited must
+not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+locale is how a field ends up rejecting what it just displayed.
 
-`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-and writing a parser per locale is how a field ends up rejecting what it
-just displayed. So the choice is not "which format" but "formatted
-or typeable", and this element takes the honest half of it: with a style set
-the calendar is the way in, and without one the field is a text box holding
-exactly what it means.
+The way out is not to choose between the two but to separate them in time.
+Idle, the field shows `4 August 2026`, which is what a date is for reading.
+Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+goes back on the way out. Nothing parses a rendering, and nothing is
+read-only, which is what an earlier version of this settled for.
+
+A range is the exception that needs no swap: the dash between its two dates
+is a separator this element understands, so that much reads back either way.
+
+`iso` turns the rendering off, for a field whose reader is entering data
+rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
   "attr:date-style"?: HelixInputDate["dateStyle"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
-**Setting this makes the field read-only, and that is the whole design.**
-What the field shows is the value, everywhere else in this component, for
-the reason the class gives: a document being edited must not be a rendering
-of something else. A range bends that and gets away with it, because the
-dash between its two dates is a separator this element understands, so what
-is shown is still what can be typed.
+**The field renders when it is idle and holds the value when it is being
+edited.** A written date is a rendering, and a document being edited must
+not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+locale is how a field ends up rejecting what it just displayed.
 
-`4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-and writing a parser per locale is how a field ends up rejecting what it
-just displayed. So the choice is not "which format" but "formatted
-or typeable", and this element takes the honest half of it: with a style set
-the calendar is the way in, and without one the field is a text box holding
-exactly what it means.
+The way out is not to choose between the two but to separate them in time.
+Idle, the field shows `4 August 2026`, which is what a date is for reading.
+Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+goes back on the way out. Nothing parses a rendering, and nothing is
+read-only, which is what an earlier version of this settled for.
+
+A range is the exception that needs no swap: the dash between its two dates
+is a separator this element understands, so that much reads back either way.
+
+`iso` turns the rendering off, for a field whose reader is entering data
+rather than reading it, or where the ISO form is itself the point.
 
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
@@ -10854,6 +10918,17 @@ export type CustomElements = {
    * Worth more than one mainly for a range, where picking a start in March and
    * an end in April otherwise means paging between them and losing sight of the
    * first. The panel is sized by its content, so this widens it.
+   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. "3 more" is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
@@ -10861,19 +10936,23 @@ export type CustomElements = {
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
    *
-   * **Setting this makes the field read-only, and that is the whole design.**
-   * What the field shows is the value, everywhere else in this component, for
-   * the reason the class gives: a document being edited must not be a rendering
-   * of something else. A range bends that and gets away with it, because the
-   * dash between its two dates is a separator this element understands, so what
-   * is shown is still what can be typed.
+   * **The field renders when it is idle and holds the value when it is being
+   * edited.** A written date is a rendering, and a document being edited must
+   * not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+   * not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+   * locale is how a field ends up rejecting what it just displayed.
    *
-   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-   * and writing a parser per locale is how a field ends up rejecting what it
-   * just displayed. So the choice is not "which format" but "formatted
-   * or typeable", and this element takes the honest half of it: with a style set
-   * the calendar is the way in, and without one the field is a text box holding
-   * exactly what it means.
+   * The way out is not to choose between the two but to separate them in time.
+   * Idle, the field shows `4 August 2026`, which is what a date is for reading.
+   * Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+   * goes back on the way out. Nothing parses a rendering, and nothing is
+   * read-only, which is what an earlier version of this settled for.
+   *
+   * A range is the exception that needs no swap: the dash between its two dates
+   * is a separator this element understands, so that much reads back either way.
+   *
+   * `iso` turns the rendering off, for a field whose reader is entering data
+   * rather than reading it, or where the ISO form is itself the point.
    *
    * The value is always `YYYY-MM-DD` regardless, because that is what a form
    * submits and what `min` and `max` compare against.
@@ -10992,6 +11071,7 @@ export type CustomElements = {
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
    * - `date`: One held date, as a tag, in `multiple`.
+   * - `rest`: How many dates are held beyond the ones shown.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.
@@ -17444,6 +17524,17 @@ export type CustomElementsSolidJs = {
    * Worth more than one mainly for a range, where picking a start in March and
    * an end in April otherwise means paging between them and losing sight of the
    * first. The panel is sized by its content, so this widens it.
+   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. "3 more" is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
    * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
    * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
@@ -17451,19 +17542,23 @@ export type CustomElementsSolidJs = {
    * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
    *
-   * **Setting this makes the field read-only, and that is the whole design.**
-   * What the field shows is the value, everywhere else in this component, for
-   * the reason the class gives: a document being edited must not be a rendering
-   * of something else. A range bends that and gets away with it, because the
-   * dash between its two dates is a separator this element understands, so what
-   * is shown is still what can be typed.
+   * **The field renders when it is idle and holds the value when it is being
+   * edited.** A written date is a rendering, and a document being edited must
+   * not be a rendering of something else: `Intl.DateTimeFormat` formats and does
+   * not parse, so `4 August 2026` cannot be typed back, and writing a parser per
+   * locale is how a field ends up rejecting what it just displayed.
    *
-   * `4 August 2026` is not. `Intl.DateTimeFormat` formats and does not parse,
-   * and writing a parser per locale is how a field ends up rejecting what it
-   * just displayed. So the choice is not "which format" but "formatted
-   * or typeable", and this element takes the honest half of it: with a style set
-   * the calendar is the way in, and without one the field is a text box holding
-   * exactly what it means.
+   * The way out is not to choose between the two but to separate them in time.
+   * Idle, the field shows `4 August 2026`, which is what a date is for reading.
+   * Focused, it shows `2026-08-04`, which is what a date is for typing, and it
+   * goes back on the way out. Nothing parses a rendering, and nothing is
+   * read-only, which is what an earlier version of this settled for.
+   *
+   * A range is the exception that needs no swap: the dash between its two dates
+   * is a separator this element understands, so that much reads back either way.
+   *
+   * `iso` turns the rendering off, for a field whose reader is entering data
+   * rather than reading it, or where the ISO form is itself the point.
    *
    * The value is always `YYYY-MM-DD` regardless, because that is what a form
    * submits and what `min` and `max` compare against.
@@ -17582,6 +17677,7 @@ export type CustomElementsSolidJs = {
    * - `field`: The box holding the text and the trigger.
    * - `control`: The text input.
    * - `date`: One held date, as a tag, in `multiple`.
+   * - `rest`: How many dates are held beyond the ones shown.
    * - `trigger`: The control that opens the calendar.
    * - `surface`: The floating panel.
    * - `calendar`: The calendar inside it.

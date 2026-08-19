@@ -200,3 +200,15 @@
 :host([mode="multiple"]) [part="control"] {
   min-inline-size: var(--helix-size-icon-lg);
 }
+
+/* The count of what is not shown. Reads as a note rather than as another tag,
+   which it must: a reader who cannot tell them apart has been told there are
+   fourteen dates and shown thirteen. */
+[part="rest"] {
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  white-space: nowrap;
+}
