@@ -329,6 +329,28 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
     this.announce()
   }
 
+  /*
+   * The hint goes under the field, and the list after both.
+   *
+   * It was under the list, on the reading that the field and its files are one
+   * block and the hint describes the block. Three things say otherwise.
+   *
+   * A hint is instruction for the next action rather than a note about the
+   * result: "up to 10MB each" is a rule for what may be added, and a rule read
+   * after the outcome is a rule read too late.
+   *
+   * Its position has to be stable, and this is the one that decides it. Under
+   * the list the hint travels down the page as files are added, a card's height
+   * at a time, so the one piece of guidance the control carries is never twice
+   * in the same place. Every other field here puts it immediately under the
+   * control, and a reader who has learned where to look should not have to
+   * relearn it for this one.
+   *
+   * And feedback stands in place of the hint rather than beside it, so wherever
+   * the hint is, an error is. An error about a file that was refused belongs
+   * against the control that refused it, not below a list of the ones that were
+   * not.
+   */
   protected override render(): TemplateResult {
     const files = this.files
     return html`${this.renderLabel()}
@@ -356,6 +378,10 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
           <slot name="trigger">${this.triggerLabel}</slot>
         </label>
       </div>
+      <!-- The hint sits under the field and the list goes last, which is the
+           one ordering decision this component makes differently from the way it
+           reads. Reasoning below the template. -->
+      ${this.renderHint()}${this.renderFeedback()}
       ${
         files.length === 0
           ? nothing
@@ -379,8 +405,7 @@ export class HelixBaseInputFile extends MixinField(HelixFormElement) {
                 </li>`,
               )}
             </ul>`
-      }
-      ${this.renderHint()}${this.renderFeedback()}`
+      }`
   }
 }
 

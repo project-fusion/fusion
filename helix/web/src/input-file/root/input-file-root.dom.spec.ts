@@ -158,6 +158,21 @@ describe('input file', () => {
     expect(host.shadowRoot?.querySelector('[part="list"]')).toBeNull()
   })
 
+  test('the hint sits under the field, and the list after it', async () => {
+    /* A hint is instruction for the next action rather than a note about the
+       result, and under the list its position moves down a card at a time as
+       files are added: the one piece of guidance the control carries would
+       never be twice in the same place. Feedback stands in place of the hint,
+       so an error about a refused file lands against the control that refused
+       it rather than below the ones that were not. */
+    const host = await field('hint="Up to 10MB" multiple')
+    await choose(host, 'one.txt', 'two.txt')
+    const nodes = [...(host.shadowRoot?.children ?? [])]
+    const at = (name: string) => nodes.findIndex((one) => one.getAttribute('part') === name)
+    expect(at('field')).toBeLessThan(at('hint'))
+    expect(at('hint')).toBeLessThan(at('list'))
+  })
+
   test('there is no list before anything is chosen', async () => {
     // A bare slot's worth of nothing, rather than an empty box under the field.
     const host = await field()
