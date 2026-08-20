@@ -40,6 +40,7 @@ import type {
   HelixDrilldown,
   HelixDrilldownItem,
   HelixEmpty,
+  HelixErrorEvent,
   HelixFileInput,
   HelixFilterEvent,
   HelixFlex,
@@ -53,6 +54,7 @@ import type {
   HelixList,
   HelixListItem,
   HelixListbox,
+  HelixLoadEvent,
   HelixLoader,
   HelixMegamenu,
   HelixMenu,
@@ -4731,6 +4733,15 @@ export type HelixIconSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixImage` component event */
+export type HelixImageElementEvent<E = Event> = TypedEvent<HelixImage, E>;
+/** `helix-load` event type */
+export type HelixImageHelixLoadElementEvent =
+  HelixImageElementEvent<HelixLoadEvent>;
+/** `helix-error` event type */
+export type HelixImageHelixErrorElementEvent =
+  HelixImageElementEvent<HelixErrorEvent>;
+
 export type HelixImageProps = {
   /** Whether the corners are cut.
 
@@ -4756,11 +4767,32 @@ that is not is the exception worth writing down. */
   srcset?: HelixImage["srcset"];
   /** How much of the line it will take, passed through to the picture. */
   sizes?: HelixImage["sizes"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  "fetch-priority"?: HelixImage["fetchPriority"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  fetchPriority?: HelixImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
 Reflected, so a stylesheet can answer all three without a rule per part,
 and read-only to a consumer: it is a report rather than a setting. */
   status?: HelixImage["status"];
+
+  /** The picture arrived. */
+  "onhelix-load"?: (e: HelixImageHelixLoadElementEvent) => void;
+  /** It is not coming. */
+  "onhelix-error"?: (e: HelixImageHelixErrorElementEvent) => void;
 };
 
 export type HelixImageSolidJsProps = {
@@ -4788,11 +4820,31 @@ that is not is the exception worth writing down. */
   "prop:srcset"?: HelixImage["srcset"];
   /** How much of the line it will take, passed through to the picture. */
   "prop:sizes"?: HelixImage["sizes"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  "attr:fetch-priority"?: HelixImage["fetchPriority"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  "prop:fetchPriority"?: HelixImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
 Reflected, so a stylesheet can answer all three without a rule per part,
 and read-only to a consumer: it is a report rather than a setting. */
   "prop:status"?: HelixImage["status"];
+  /** The picture arrived. */
+  "on:helix-load"?: (e: HelixImageHelixLoadElementEvent) => void;
+  /** It is not coming. */
+  "on:helix-error"?: (e: HelixImageHelixErrorElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15403,10 +15455,24 @@ export type CustomElements = {
    * that is not is the exception worth writing down.
    * - `srcset`: The candidate widths, passed through to the picture.
    * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `fetch-priority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
+   *
+   * The hero of a page is usually its largest contentful paint, and the fix is
+   * two attributes rather than one: `loading="eager"` stops it waiting for the
+   * viewport, and this stops it queueing behind everything else the parser
+   * found first. Left alone the browser decides, which is right for the other
+   * ninety-nine pictures.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Reflected, so a stylesheet can answer all three without a rule per part,
    * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-load`: The picture arrived.
+   * - `helix-error`: It is not coming.
    *
    * ## Slots
    *
@@ -24602,10 +24668,24 @@ export type CustomElementsSolidJs = {
    * that is not is the exception worth writing down.
    * - `srcset`: The candidate widths, passed through to the picture.
    * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `fetch-priority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
+   *
+   * The hero of a page is usually its largest contentful paint, and the fix is
+   * two attributes rather than one: `loading="eager"` stops it waiting for the
+   * viewport, and this stops it queueing behind everything else the parser
+   * found first. Left alone the browser decides, which is right for the other
+   * ninety-nine pictures.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Reflected, so a stylesheet can answer all three without a rule per part,
    * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-load`: The picture arrived.
+   * - `helix-error`: It is not coming.
    *
    * ## Slots
    *

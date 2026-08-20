@@ -110,6 +110,8 @@ import type {
   HelixCopyEvent,
   HelixCreateEvent,
   HelixNavigateEvent,
+  HelixLoadEvent,
+  HelixErrorEvent,
   HelixInputEvent,
   HelixFilterEvent,
   HelixCompleteEvent,
@@ -2068,6 +2070,18 @@ export type HelixBaseIconVueProps = {
 
 export type HelixBaseIconVueEvents = {};
 
+/** `HelixBaseImage` component event */
+export type HelixBaseImageElementEvent<E = Event> = TypedEvent<
+  HelixBaseImage,
+  E
+>;
+/** `helix-load` event type */
+export type HelixBaseImageHelixLoadElementEvent =
+  HelixBaseImageElementEvent<HelixLoadEvent>;
+/** `helix-error` event type */
+export type HelixBaseImageHelixErrorElementEvent =
+  HelixBaseImageElementEvent<HelixErrorEvent>;
+
 export type HelixBaseImageVueProps = {
   /** Where the picture is. */
   src?: HelixBaseImage["src"];
@@ -2086,6 +2100,22 @@ that is not is the exception worth writing down. */
   srcset?: HelixBaseImage["srcset"];
   /** How much of the line it will take, passed through to the picture. */
   sizes?: HelixBaseImage["sizes"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  "fetch-priority"?: HelixBaseImage["fetchPriority"];
+  /** How urgently to fetch it, for the one picture that is the page.
+
+The hero of a page is usually its largest contentful paint, and the fix is
+two attributes rather than one: `loading="eager"` stops it waiting for the
+viewport, and this stops it queueing behind everything else the parser
+found first. Left alone the browser decides, which is right for the other
+ninety-nine pictures. */
+  fetchPriority?: HelixBaseImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
 Reflected, so a stylesheet can answer all three without a rule per part,
@@ -2093,7 +2123,12 @@ and read-only to a consumer: it is a report rather than a setting. */
   status?: HelixBaseImage["status"];
 };
 
-export type HelixBaseImageVueEvents = {};
+export type HelixBaseImageVueEvents = {
+  /** The picture arrived. */
+  "helix-load": HelixBaseImageHelixLoadElementEvent;
+  /** It is not coming. */
+  "helix-error": HelixBaseImageHelixErrorElementEvent;
+};
 
 /** `HelixBaseInput` component event */
 export type HelixBaseInputElementEvent<E = Event> = TypedEvent<

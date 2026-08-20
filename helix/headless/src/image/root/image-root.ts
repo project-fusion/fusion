@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, HelixElement, HelixErrorEvent, HelixLoadEvent } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -42,6 +42,9 @@ import { property, state } from 'lit/decorators.js'
  * @slot placeholder - Shown until the picture arrives.
  * @slot fallback - Shown instead of it, if it never does.
  *
+ * @event {HelixLoadEvent} helix-load - The picture arrived.
+ * @event {HelixErrorEvent} helix-error - It is not coming.
+ *
  * @csspart image - The picture itself.
  * @csspart placeholder - What stands in until it arrives.
  * @csspart fallback - What stands in when it fails.
@@ -80,6 +83,18 @@ export class HelixBaseImage extends HelixElement {
   sizes = ''
 
   /**
+   * How urgently to fetch it, for the one picture that is the page.
+   *
+   * The hero of a page is usually its largest contentful paint, and the fix is
+   * two attributes rather than one: `loading="eager"` stops it waiting for the
+   * viewport, and this stops it queueing behind everything else the parser
+   * found first. Left alone the browser decides, which is right for the other
+   * ninety-nine pictures.
+   */
+  @property({ attribute: 'fetch-priority' })
+  fetchPriority: 'auto' | 'high' | 'low' = 'auto'
+
+  /**
    * Whether the picture is on its way, here, or never coming.
    *
    * Reflected, so a stylesheet can answer all three without a rule per part,
@@ -92,12 +107,28 @@ export class HelixBaseImage extends HelixElement {
   @state()
   private answered = ''
 
+  /**
+   * Says so, because the platform's own saying of it cannot be heard.
+   *
+   * `load` and `error` on an `<img>` neither bubble nor compose, so the ones
+   * fired inside this shadow root reach nobody outside it. A consumer had a
+   * reflected attribute and a `MutationObserver` and nothing else.
+   */
+  private announce(status: 'error' | 'loaded'): void {
+    this.status = status
+    const event =
+      status === 'loaded'
+        ? new HelixLoadEvent({ src: this.src })
+        : new HelixErrorEvent({ src: this.src })
+    this.dispatchEvent(event)
+  }
+
   private readonly handleLoad = (): void => {
-    this.status = 'loaded'
+    this.announce('loaded')
   }
 
   private readonly handleError = (): void => {
-    this.status = 'error'
+    this.announce('error')
   }
 
   /**
@@ -121,7 +152,7 @@ export class HelixBaseImage extends HelixElement {
     if (this.src === '' || !image?.complete || image.naturalWidth === 0) {
       return
     }
-    this.status = 'loaded'
+    this.announce('loaded')
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -153,6 +184,7 @@ export class HelixBaseImage extends HelixElement {
         alt=${this.alt}
         loading=${this.loading}
         decoding="async"
+        fetchpriority=${this.fetchPriority}
         src=${this.src || nothing}
         srcset=${this.srcset || nothing}
         sizes=${this.sizes || nothing}

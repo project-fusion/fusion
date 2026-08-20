@@ -2159,12 +2159,20 @@ base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `alt` | `alt` | `string` | `''` | `HelixBaseImage` | What it shows, for a reader who cannot see it. |
+| `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixBaseImage` | How urgently to fetch it, for the one picture that is the page. |
 | `loading` | `loading` | `'eager' \| 'lazy'` | `'lazy'` | `HelixBaseImage` | Whether to wait until it is nearly on screen. |
 | `rounded` | `rounded` | `boolean` | `false` | - | Whether the corners are cut. |
 | `sizes` | `sizes` | `string` | `''` | `HelixBaseImage` | How much of the line it will take, passed through to the picture. |
 | `src` | `src` | `string` | `''` | `HelixBaseImage` | Where the picture is. |
 | `srcset` | `srcset` | `string` | `''` | `HelixBaseImage` | The candidate widths, passed through to the picture. |
 | `status` | `status` | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixBaseImage` | Whether the picture is on its way, here, or never coming. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-load` | `HelixLoadEvent` | The picture arrived. |
+| `helix-error` | `HelixErrorEvent` | It is not coming. |
 
 #### Slots
 

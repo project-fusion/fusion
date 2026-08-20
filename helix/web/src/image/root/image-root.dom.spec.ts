@@ -80,6 +80,48 @@ describe('an image', () => {
     )
   })
 
+  test('says it arrived, because the platform says it where nobody can hear', async () => {
+    /* `load` and `error` on an `<img>` neither bubble nor compose, so the ones
+       fired inside this shadow root reach nobody outside it. Without these a
+       consumer had a reflected attribute and a `MutationObserver`. */
+    const host = await image('src="/pier.jpg"')
+    const heard: string[] = []
+    host.addEventListener('helix-load', (event) => {
+      heard.push(`load:${(event as CustomEvent<{ src: string }>).detail.src}`)
+    })
+    img(host).dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(heard).toEqual(['load:/pier.jpg'])
+  })
+
+  test('and says when it is not coming, which is the more useful of the two', async () => {
+    const host = await image('src="/gone.jpg"')
+    const heard: string[] = []
+    host.addEventListener('helix-error', (event) => {
+      heard.push(`error:${(event as CustomEvent<{ src: string }>).detail.src}`)
+    })
+    img(host).dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(heard).toEqual(['error:/gone.jpg'])
+  })
+
+  test('the report leaves the element, so a gallery can count without binding each', async () => {
+    // Bubbling and composed, unlike `helix-close`: delegation is the point.
+    const host = await image('src="/pier.jpg"')
+    const heard: string[] = []
+    host.parentElement?.addEventListener('helix-load', () => heard.push('heard'))
+    img(host).dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(heard).toEqual(['heard'])
+  })
+
+  test('asks for the picture urgently only when told to', async () => {
+    expect(img(await image('src="/a.jpg"')).getAttribute('fetchpriority')).toBe('auto')
+    expect(
+      img(await image('src="/a.jpg" fetch-priority="high"')).getAttribute('fetchpriority'),
+    ).toBe('high')
+  })
+
   test('with no source, waits rather than resolving to an empty box', async () => {
     /* A source that arrives with the data is the common case for anything drawn
        from a fetch, and the useful answer is the same as for one still on the

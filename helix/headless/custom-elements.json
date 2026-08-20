@@ -17032,6 +17032,16 @@
             },
             {
               "kind": "field",
+              "name": "fetchPriority",
+              "type": {
+                "text": "'auto' | 'high' | 'low'"
+              },
+              "default": "'auto'",
+              "description": "How urgently to fetch it, for the one picture that is the page.\n\nThe hero of a page is usually its largest contentful paint, and the fix is\ntwo attributes rather than one: `loading=\"eager\"` stops it waiting for the\nviewport, and this stops it queueing behind everything else the parser\nfound first. Left alone the browser decides, which is right for the other\nninety-nine pictures.",
+              "attribute": "fetch-priority"
+            },
+            {
+              "kind": "field",
               "name": "status",
               "type": {
                 "text": "'error' | 'loaded' | 'loading'"
@@ -17050,6 +17060,25 @@
               "privacy": "private",
               "default": "''",
               "description": "Which `src` the current status belongs to, so a new one starts over."
+            },
+            {
+              "kind": "method",
+              "name": "announce",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "status",
+                  "type": {
+                    "text": "'error' | 'loaded'"
+                  }
+                }
+              ],
+              "description": "Says so, because the platform's own saying of it cannot be heard.\n\n`load` and `error` on an `<img>` neither bubble nor compose, so the ones\nfired inside this shadow root reach nobody outside it. A consumer had a\nreflected attribute and a `MutationObserver` and nothing else."
             },
             {
               "kind": "field",
@@ -17144,6 +17173,24 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixLoadEvent"
+              },
+              "description": "The picture arrived.",
+              "name": "helix-load",
+              "reactProp": "onhelix-load"
+            },
+            {
+              "type": {
+                "text": "HelixErrorEvent"
+              },
+              "description": "It is not coming.",
+              "name": "helix-error",
+              "reactProp": "onhelix-error"
+            }
+          ],
           "attributes": [
             {
               "name": "src",
@@ -17189,6 +17236,15 @@
               "default": "''",
               "description": "How much of the line it will take, passed through to the picture.",
               "fieldName": "sizes"
+            },
+            {
+              "name": "fetch-priority",
+              "type": {
+                "text": "'auto' | 'high' | 'low'"
+              },
+              "default": "'auto'",
+              "description": "How urgently to fetch it, for the one picture that is the page.\n\nThe hero of a page is usually its largest contentful paint, and the fix is\ntwo attributes rather than one: `loading=\"eager\"` stops it waiting for the\nviewport, and this stops it queueing behind everything else the parser\nfound first. Left alone the browser decides, which is right for the other\nninety-nine pictures.",
+              "fieldName": "fetchPriority"
             },
             {
               "name": "status",
