@@ -85,7 +85,7 @@ export default async function Page({
        * either to say something about Helix would change four places to fix
        * one. The eyebrow names the vertical, and the heading and the line under
        * it are this page's, written for the front of a gallery. */
-      lede="The components every Fusion interface is built from, and yours to build on."
+      lede="The DNA every Fusion interface is built from, and yours to build on."
       order={order}
       sorts={Object.keys(SORTS)}
       stage={vertical.stage}

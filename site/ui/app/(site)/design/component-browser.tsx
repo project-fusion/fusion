@@ -350,10 +350,16 @@ export function ComponentBrowser({
                 hero around it to say what `Explore` would have meant. `Sandbox`
                 survives that because it names the place it goes. */}
             <helix-button-group>
+              {/* An icon each, and neither of them an arrow. An arrow says
+                  "onward" and nothing else, which is what the button's own
+                  position already says; put one on a hero button and it is
+                  decoration that happens to point right. */}
               <Link data-button data-button-fill="standard" href="/design/components/button">
+                <helix-icon name="flag-banner-fold"></helix-icon>
                 Start
               </Link>
               <Link data-button data-button-fill="standard" href="/design/sandbox">
+                <helix-icon name="layout"></helix-icon>
                 Sandbox
               </Link>
             </helix-button-group>

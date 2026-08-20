@@ -86,18 +86,36 @@ export const contentArt: Record<string, ReactNode> = {
   ),
   /* Two lines and a caret. A block of code drawn as real glyphs would be
      unreadable at this size and would be a different language per card. */
+  /* `</>`, which is what a fragment of code looks like when it is small enough
+     to be a mark. The first drawing was a single caret beside a rule, which
+     read as a list item pointing the wrong way: it was a caret and a line, not
+     a picture of anything. */
   code: (
     <>
       <g className="artMotion artLift">
         <path
           className="artOn"
-          d="M150 92l-10 8 10 8"
+          d="M138 92l-12 8 12 8"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth="2"
+          strokeWidth="2.5"
         />
-        <rect className="artLine" height="3" rx="1.5" width="34" x="158" y="98" />
+        <path
+          className="artLine"
+          d="M154 86l12 28"
+          fill="none"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+        />
+        <path
+          className="artOn"
+          d="M182 92l12 8-12 8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2.5"
+        />
       </g>
     </>
   ),

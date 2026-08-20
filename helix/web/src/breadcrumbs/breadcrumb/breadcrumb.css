@@ -95,3 +95,28 @@
 :host(:dir(rtl)) [part="separator"] svg {
   scale: -1 1;
 }
+
+/* The crumb itself, whether it is a link or the current page.
+ *
+ * A row of destinations underlined in brand blue is a trail nobody can scan, so
+ * this takes the muted colour the slotted-anchor rule above already uses and
+ * answers on hover instead. `inline-flex` so `start` and `end` sit on the
+ * label's line rather than above it. */
+[part="link"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-decoration: none;
+}
+
+a[part="link"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+/* The page the reader is on reads as where they are, not as somewhere to go. */
+:host([current]) [part="link"] {
+  color: var(--helix-color-foreground);
+}

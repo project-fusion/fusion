@@ -24,7 +24,12 @@
    property the item writes onto this row, so every depth works rather than the
    handful an enumerated rule set covers. */
 [part="row"] {
-  align-items: center;
+  /* `stretch`, so a child can be as tall as the row rather than as tall as its
+     own text. The row has a `min-block-size` for the sake of a target, and with
+     `center` a slotted link was 18px inside a 37px row: the bands above and
+     below it belonged to the row, which selects rather than navigates. Anything
+     that should stay its own height says so with `align-self`. */
+  align-items: stretch;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
@@ -293,6 +298,9 @@ slot[name="start"]::slotted(*) {
  * what actually pushes it to the far end; without it `order` alone only puts it
  * after the label, hard against the text. */
 [part="toggle"] {
+  /* The chevron is a mark, not a region: it keeps its own size against a row
+     that now stretches its children. */
+  align-self: center;
   margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));
   order: var(--tree-chevron-order, 0);
 }

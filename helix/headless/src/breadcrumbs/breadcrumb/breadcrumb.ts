@@ -1,6 +1,6 @@
 import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { caretRight } from '@helix-io/icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -8,10 +8,24 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One step in a breadcrumb trail.
  *
  * @description
- * Contributes the separator and the list-item role. The link is the consumer's
- * own, slotted in, because an anchor rendered into this element's shadow root
- * is unreachable to the framework that owns the route: a router renders its own
- * `<a>`, and one written here would be a full page load instead.
+ * Contributes the separator, the list-item role, and the link itself where one
+ * is wanted.
+ *
+ * **`href` makes the crumb the link.** *Added 19 Aug 2026, reversing the note
+ * that said an anchor could not be rendered here.* That note was right that a
+ * router cannot reach an anchor inside a shadow root, and wrong that this
+ * settles it: the consumer restores the soft navigation by intercepting the
+ * click on the way out, which is what `Tree.Item` and `List.Item` both do.
+ * What the anchor buys is the whole crumb as a target, Enter, middle click, the
+ * status bar, and a trail that works before any JavaScript runs.
+ *
+ * **And the parent needs it.** A trail that collapses has to rebuild its hidden
+ * crumbs somewhere else, which means reading each one's destination. From a
+ * property that is a read; from a consumer's slotted markup it is a hunt for an
+ * anchor and a guess about which element is the link.
+ *
+ * A crumb with no `href` is unchanged: the consumer slots whatever they like,
+ * including their own anchor, and this renders a plain `<span>` around it.
  *
  * Each item renders its own separator and hides it with `:host(:first-child)`,
  * so the trail needs no index and no coordination from the parent. `:host()`
@@ -26,18 +40,39 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Crumb
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
- * @slot - The step: a link, or the text of the current page. A link is styled
- * with `data-link="quiet"`, since a slotted anchor belongs to the outer tree
- * and cannot be reached from this component's styles.
+ * @slot - The step's label. Without an `href` this may be the consumer's own
+ * anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the
+ * outer tree and cannot be reached from this component's styles.
+ * @slot start - Before the label, for an icon.
+ * @slot end - After it, for a count or a mark.
  * @slot separator - Replaces the chevron shown before this item.
  *
  * @csspart separator - The separator preceding the item.
+ * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  */
 @customElement('helix-base-breadcrumb')
 export class HelixBaseBreadcrumb extends HelixElement {
   /** Whether this item is the page the reader is on. */
   @property({ reflect: true, type: Boolean })
   current = false
+
+  /**
+   * Where the crumb goes, and nothing where it is the current page.
+   *
+   * Empty rather than optional and unreflected: an `href` written onto every
+   * host would be a link to the current page on every crumb nobody asked to be
+   * one, and nothing selects on it.
+   */
+  @property()
+  href = ''
+
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  @property()
+  target = ''
+
+  /** What the link declares about where it goes. The consumer's decision. */
+  @property()
+  rel = ''
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -49,6 +84,16 @@ export class HelixBaseBreadcrumb extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    /* The label and whatever flanks it, which is the same content whether or
+       not it is a link. Built once so the two branches below cannot drift. */
+    const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
+
+    /* The current page is text, not a link, whatever it was given: linking a
+       page to itself is a known screen-reader annoyance and `aria-current` is
+       what conveys position. So `current` wins over `href` rather than the two
+       contradicting each other in the markup. */
+    const linked = this.href !== '' && !this.current
+
     // The chevron is the slot's own fallback, so replacing it is a matter of
     // filling the slot and costs the consumer no way to opt out of the default.
     return html`<span part="separator" aria-hidden="true"
@@ -57,7 +102,17 @@ export class HelixBaseBreadcrumb extends HelixElement {
             ${unsafeSVG(caretRight.content)}
           </svg></slot
         ></span
-      ><slot></slot>`
+      >${
+        linked
+          ? html`<a
+              part="link"
+              href=${this.href}
+              target=${this.target || nothing}
+              rel=${this.rel || nothing}
+              >${label}</a
+            >`
+          : html`<span part="link">${label}</span>`
+      }`
   }
 }
 

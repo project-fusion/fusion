@@ -38,6 +38,7 @@ envelope
 eye
 eye-slash
 eyedropper
+flag-banner-fold
 flask
 folder-open
 funnel-simple
@@ -50,6 +51,7 @@ html5
 info
 info-fill
 laptop
+layout
 lightbulb
 link
 list

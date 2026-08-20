@@ -99,3 +99,12 @@ slot[name="end"]::slotted(*) {
   grid-column: 3;
   grid-row: 1 / span 2;
 }
+
+/* The row is an `<a>` when the item has somewhere to go, and must not look like
+   one: a list of links underlined in brand blue is a list nobody can read. It
+   takes the row's own colour and keeps its box, which is what makes the whole
+   row the target rather than the words in it. */
+a[part="row"] {
+  color: inherit;
+  text-decoration: none;
+}
