@@ -71,6 +71,22 @@
   background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
 }
 
+/* A slotted placeholder fills the box rather than sitting in the middle of it.
+ *
+ * Measured: a slotted `Skeleton` came out 200 wide and nothing high. It has no
+ * height of its own, being sized by whatever holds it, and what held it was a
+ * centring flex box that gave it its content height of zero. So the stand-in
+ * was a plain grey rectangle and the skeleton was never visible at all.
+ *
+ * Filling is the right default here and centring is not, because everything
+ * anybody stands in for a picture with is picture-shaped: a skeleton, a blurred
+ * thumbnail, a solid colour, a dominant-colour swatch. The fallback below keeps
+ * centring, because what stands in for a picture that failed is a mark. */
+[part="placeholder"] ::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
 [part="fallback"] {
   background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
   color: var(--helix-color-foreground-subtle);

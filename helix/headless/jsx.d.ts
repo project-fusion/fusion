@@ -13803,6 +13803,13 @@ export type CustomElements = {
    * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
    * it.
    *
+   * **No source is a loading state, not a fourth one.** A picture whose `src` has
+   * not arrived yet is the common case for anything drawn from data, and the
+   * useful answer there is the same as for one still on the wire: stand something
+   * in its place and keep the ground reserved. So an element with no `src` shows
+   * its placeholder and waits, rather than resolving to an empty box that has to
+   * be laid out twice.
+   *
    * **`alt` is a property and not an afterthought.** An empty string is a real
    * answer, meaning the picture is decoration and a screen reader should skip it,
    * which is why the attribute is always written even when it is empty: omitting
@@ -22791,6 +22798,13 @@ export type CustomElementsSolidJs = {
    * styled one. The styled tier draws the resting placeholder instead, and a
    * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
    * it.
+   *
+   * **No source is a loading state, not a fourth one.** A picture whose `src` has
+   * not arrived yet is the common case for anything drawn from data, and the
+   * useful answer there is the same as for one still on the wire: stand something
+   * in its place and keep the ground reserved. So an element with no `src` shows
+   * its placeholder and waits, rather than resolving to an empty box that has to
+   * be laid out twice.
    *
    * **`alt` is a property and not an afterthought.** An empty string is a real
    * answer, meaning the picture is decoration and a screen reader should skip it,

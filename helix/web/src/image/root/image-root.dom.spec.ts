@@ -80,6 +80,16 @@ describe('an image', () => {
     )
   })
 
+  test('with no source, waits rather than resolving to an empty box', async () => {
+    /* A source that arrives with the data is the common case for anything drawn
+       from a fetch, and the useful answer is the same as for one still on the
+       wire: hold the ground. Resolving to empty would lay the page out twice. */
+    const host = await image()
+    expect(host.status).toBe('loading')
+    expect(part(host, 'placeholder')?.hasAttribute('hidden')).toBe(false)
+    expect(img(host).hasAttribute('src')).toBe(false)
+  })
+
   test('neither stand-in is read out, the picture having a name of its own', async () => {
     const host = await image('src="/pier.jpg"')
     expect(part(host, 'placeholder')?.getAttribute('aria-hidden')).toBe('true')
@@ -116,6 +126,24 @@ if (hasLayout()) {
       await host.updateComplete
       expect(boxOf(host, 'placeholder').height).toBe(0)
       expect(boxOf(host, 'fallback').height).toBe(0)
+    })
+
+    test('a slotted placeholder fills the box rather than centring in it', async () => {
+      /* Measured before this rule existed: a slotted `Skeleton` came out 200
+         wide and nothing high. It has no height of its own, and what held it
+         was a centring flex box, which gave it its content height of zero. The
+         stand-in was a plain rectangle and the skeleton was never visible. */
+      const host = (await mount(
+        `<helix-image alt="Waiting" style="inline-size:120px;--image-aspect:1/1"><i slot="placeholder"></i></helix-image>`,
+      )) as Picture
+      await host.updateComplete
+      const stand = boxOf(host, 'placeholder')
+      const slotted = (
+        host.querySelector('[slot="placeholder"]') as HTMLElement
+      ).getBoundingClientRect()
+      expect(stand.height).toBeGreaterThan(0)
+      expect(slotted.height).toBe(stand.height)
+      expect(slotted.width).toBe(stand.width)
     })
 
     test('and the fallback takes none until it is wanted', async () => {
