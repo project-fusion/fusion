@@ -82,7 +82,7 @@ export const SERVICES: Service[] = [
       'Two weeks to find out what is worth building. Short enough to fit around your roadmap, cheap enough to be a real question rather than a commitment.',
   },
   {
-    duration: 'Six to ten weeks',
+    duration: 'Four weeks',
     icon: 'cube',
     includes: [
       'A token layer that derives an accessible palette from your brand color',
