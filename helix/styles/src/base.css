@@ -989,6 +989,23 @@ helix-toggle[disabled]::part(item) {
  * `auto`, so with nothing in it there is nothing to indent past. */
 [data-megamenu-item] {
   align-items: start;
+  /* Said, for the same reason `white-space` is said below: the panel sits
+     inside the nav, so these anchors match `helix-navigation a` up there, and
+     that rule is `block-size: 100%` because a destination in a horizontal bar
+     fills the bar's height. A row in a stacked panel is not in a bar.
+   
+     Left at 100%, a row is sized by flex-shrink against its column instead of
+     by its content, so how tall a row is depends on how many rows are beside
+     it. Measured in Chrome at 1440: a column of two came out 88 each and a
+     column of one came out 184, and because the row is a grid of two auto rows
+     the extra 96 was split between them, putting the sentence 76 pixels below
+     the name it belongs to. It looks correct whenever every column happens to
+     hold the same number of rows, which is why it survived the example.
+   
+     The plain-link rule at the end of this file already resets this and
+     excludes `[data-megamenu-item]`, on the reading that a marked row wants the
+     grid it was given. It does, and it also wants its own height. */
+  block-size: auto;
   /* Said, because the panel sits inside the nav and these anchors match the nav
      bar's own rule, which sets `nowrap` so a word in a horizontal strip does not
      break in half. A sentence that cannot wrap does not shrink either: it runs
