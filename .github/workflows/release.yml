@@ -1,0 +1,182 @@
+# Merge to main, publish to staging, prove it, promote it.
+#
+# **Staging is a dist-tag, not a version string.** Packages publish at their
+# real version under `next`; the template tests then install *that*, from the
+# registry, from outside the workspace; and promotion is
+# `npm dist-tag add pkg@1.4.0 latest`, which moves a pointer and builds nothing.
+#
+# The alternative keeps being proposed and is worth writing down as refused:
+# publish `0.0.1-staging`, test it, then publish `0.0.1`. That second publish is
+# a second build, so the bytes users install are bytes no smoke test ever ran,
+# and it cannot be undone, because a version is permanent while a tag moves back.
+#
+# **Nothing here pushes to `main`.** The version is not committed: every
+# manifest holds `0.0.0-dev`, the tag is the record, and the real number is
+# stamped in this job seconds before packing. A release bot with write access
+# that outranks branch protection would be a standing hole in the same place the
+# governance gate is meant to be strongest, and it would buy a number `git tag`
+# already holds. Tags are pushed. Branches are not.
+#
+# Domains release independently, which is what per-domain lockstep means: a
+# Cortex fix must not bump the Helix docs to a version in which nothing about
+# Helix changed.
+#
+# **Two tag prefixes, and they mean different things.** `helix-attempt-v1.4.0`
+# is pushed before publishing and says a number was spent. `helix-v1.4.0` is
+# pushed after promotion and says a release happened. Version computation reads
+# both, so a number is never handed out twice; everything else reads only the
+# second.
+name: release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # Which domains this merge releases, and by how much, read off the labels the
+  # pull request carried. `release-intent` proposed them while it was open, so
+  # by here they are decided rather than guessed.
+  intent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      domains: ${{ steps.resolve.outputs.domains }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - id: resolve
+        run: |
+          set -euo pipefail
+          labels=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" \
+            --jq '.[0].labels[].name' 2>/dev/null || true)
+
+          if grep -qx 'no-release' <<<"$labels"; then
+            echo 'domains=[]' >> "$GITHUB_OUTPUT"
+            echo "Opted out with \`no-release\`." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          resolved='[]'
+          for domain in helix cortex; do
+            level=$(grep -x "$domain:\(patch\|minor\|major\)" <<<"$labels" | head -1 | cut -d: -f2 || true)
+            [ -n "$level" ] || continue
+            resolved=$(jq -c --arg d "$domain" --arg l "$level" '. + [{domain:$d, level:$l}]' <<<"$resolved")
+            echo "- \`$domain\`: $level" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+          echo "domains=$resolved" >> "$GITHUB_OUTPUT"
+          [ "$resolved" = '[]' ] && echo "No domain carries a bump label." >> "$GITHUB_STEP_SUMMARY" || true
+
+  release:
+    needs: intent
+    if: needs.intent.outputs.domains != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      # One domain must not take the other down with it, and two domains must
+      # not race to move the same tag.
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        target: ${{ fromJson(needs.intent.outputs.domains) }}
+    environment: production
+    permissions:
+      # `id-token` is the whole authentication story: npm trusted publishing
+      # exchanges a short-lived OIDC token for publish rights, so there is no
+      # npm credential in this repository at all. `contents` is for the tag.
+      contents: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The version is computed from tags, and a checkout that has none reports
+      # every release as the first one.
+      - run: git fetch --tags --force
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      # bun runs the repo; npm does the publishing, and trusted publishing needs
+      # npm 11.5.1 or later on Node 22.14 or later. The runner's default npm is
+      # older than that, and the failure it gives is an authentication error
+      # rather than a version one.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: bun install --frozen-lockfile
+
+      - id: version
+        run: |
+          node tooling/scripts/version.mjs \
+            --domain "${{ matrix.target.domain }}" --bump "${{ matrix.target.level }}" --write
+
+      # Before anything is published, and deliberately so. A version that has
+      # been handed out must never be handed out again, whatever happens next:
+      # npm refuses to publish over a version that exists, so a run that
+      # publishes to `next` and then fails its template tests would otherwise
+      # leave the same number to be computed again by the following merge, and
+      # by every merge after that, until someone unpublished it by hand.
+      #
+      # Resuming onto the existing version instead would be worse. It would
+      # promote the artifact that failed its tests, which is the single outcome
+      # the tests exist to prevent.
+      #
+      # So the number is burned here and the release moves on to the next one.
+      # `attempt` and not `v`: this tag says a number was used, while
+      # `<domain>-v<version>` still means a release that actually promoted, and
+      # only the second is what a changelog or a consumer should read.
+      - name: Allocate the version before spending it
+        run: |
+          set -euo pipefail
+          tag="${{ matrix.target.domain }}-attempt-v${{ steps.version.outputs.version }}"
+          git tag "$tag" "${{ github.sha }}"
+          git push origin "$tag"
+
+      # Not `--frozen-lockfile`, and not optional. `bun pm pack` reads a
+      # sibling's version from `bun.lock` rather than from that sibling's
+      # manifest, so packing straight after stamping ships every package pinned
+      # to the previous release. `publish.mjs` refuses when it sees it; this is
+      # what stops it happening.
+      - run: bun install
+
+      - run: bun run build
+
+      - name: Publish to staging
+        run: node tooling/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
+
+      # The smoke test, against what was actually published rather than against
+      # a rebuild of it: installed from the registry, from outside the
+      # workspace, the way a consumer gets it.
+      - name: Prove the staged release installs
+        run: bun run test:template --domain "${{ matrix.target.domain }}" --registry-tag next
+
+      - name: Promote to production
+        run: |
+          node tooling/scripts/publish.mjs \
+            --domain "${{ matrix.target.domain }}" \
+            --promote latest \
+            --version "${{ steps.version.outputs.version }}"
+
+      # Last, because the tag is the record of a release that happened. Written
+      # before promotion it would name one that might not have.
+      - name: Record the release
+        run: |
+          set -euo pipefail
+          tag="${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}"
+          git tag "$tag" "${{ github.sha }}"
+          git push origin "$tag"
+          gh release create "$tag" --title "$tag" --generate-notes

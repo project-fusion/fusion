@@ -1,9 +1,13 @@
 {
   "name": "@cortex-io/docs",
   "description": "Versioned documentation content and registry for Cortex.",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0-dev",
   "license": "UNLICENSED",
+  "repository": {
+    "directory": "cortex/docs",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,6 +29,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

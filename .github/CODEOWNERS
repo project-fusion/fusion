@@ -1,0 +1,28 @@
+# Who the governance gate actually asks.
+#
+# The release workflows talk about approval by governance, and until this file
+# existed that was a description of an intention rather than a rule anything
+# enforced. A required review from a code owner is what turns it into one.
+#
+# Two things still have to be set in the GitHub UI, because a file in the repo
+# cannot grant itself authority:
+#
+#   Settings > Branches > main: require a pull request, require review from
+#   Code Owners, require the `verify` and `browser-specs` checks, and do not
+#   allow bypassing. Nothing in CI pushes to `main`, by design, so there is no
+#   bot that needs an exemption.
+#
+#   Settings > Environments > experimental: required reviewers. That is the
+#   gate on publishing from a pull request, and it is the one that works for
+#   forks, where a workflow gets no secrets and a label proves nothing.
+#
+# Today this is one person, and naming that plainly is better than a team that
+# does not exist yet. Replace with @former-org/governance when there is
+# someone else in it.
+
+* @irontitan76
+
+# The release path itself. A change here changes what is published and under
+# whose authority, so it is worth its own line even when the owner is the same.
+/.github/           @irontitan76
+/tooling/scripts/   @irontitan76

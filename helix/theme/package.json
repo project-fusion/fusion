@@ -1,9 +1,13 @@
 {
   "name": "@helix-io/theme",
   "description": "Theme derivation engine. Computes a complete, contrast-guaranteed token set from intent inputs.",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0-dev",
   "license": "MIT",
+  "repository": {
+    "directory": "helix/theme",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -23,6 +27,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

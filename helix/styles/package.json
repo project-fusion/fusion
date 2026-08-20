@@ -1,9 +1,13 @@
 {
   "name": "@helix-io/styles",
   "description": "Design tokens and base layer. Pure CSS, no JavaScript.",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0-dev",
   "license": "MIT",
+  "repository": {
+    "directory": "helix/styles",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "exports": {
     "./base.css": "./src/base.css",
@@ -16,6 +20,6 @@
   "sideEffects": true,
   "scripts": {},
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

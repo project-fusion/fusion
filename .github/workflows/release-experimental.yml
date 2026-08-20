@@ -1,0 +1,144 @@
+# An installable build of a pull request, published when governance says so.
+#
+# Label a pull request `release:experimental` and this waits for a reviewer on
+# the `experimental` environment before it publishes anything. The pause is the
+# gate: GitHub records who approved which deployment, which is what "opened or
+# approved by the governance team" has to mean if it is to mean anything. A
+# governance member who opened the pull request approves their own in one click,
+# so both halves of the rule are the same mechanism.
+#
+# **Approving this runs the pull request's code with a publish token.** The job
+# builds and packs the branch, so an approval is a statement about the diff and
+# not only about whether a preview would be useful. That is the residual risk
+# and there is no configuration that removes it.
+#
+# `pull_request`, not `pull_request_target`: a fork gets no secrets on this
+# event, so a fork's build simply cannot publish, which is the safe failure.
+# This repository is private and takes branches rather than forks, so nothing is
+# lost today. If that changes, the fix is `pull_request_target` with an explicit
+# checkout of the head, and that combination is only defensible behind the
+# environment gate below.
+#
+# Versions are `1.4.0-exp.42.ga1b2c3d`: the version this would release if it
+# merged, marked as not being it, carrying the pull request that produced it and
+# the exact commit, so it is unique per push and a re-run never collides.
+#
+# **The `g` is not decoration.** A pre-release identifier made only of digits is
+# numeric, and a numeric identifier may not carry a leading zero, so a short SHA
+# that happens to be all digits and starts with one (`0123456`) is not a valid
+# semver at all and npm refuses it. That is about one commit in 270, which is
+# often enough to happen and rare enough to look like something else entirely
+# when it does. `g` is what `git describe` prefixes for the same reason.
+#
+# The dist-tag is `pr-42` and never `next` or `latest`. A pre-release also sorts
+# below its own release and satisfies no caret range, so `^1.4.0` can never
+# resolve to one even by accident.
+name: release-experimental
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Trusted publishing authenticates by OIDC, so no npm credential is stored.
+  id-token: write
+  pull-requests: write
+
+jobs:
+  publish:
+    if: contains(github.event.pull_request.labels.*.name, 'release:experimental')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: experimental
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      # `fetch-depth: 0` and the tags, because the version is computed from
+      # them. A shallow clone reports no tags and every release looks like the
+      # first one.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: git fetch --tags --force
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      # Trusted publishing needs npm 11.5.1+ on Node 22.14+, which is newer than
+      # the runner default.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: bun install --frozen-lockfile
+
+      - name: Stamp the experimental version into every domain this touches
+        run: |
+          set -euo pipefail
+          short=$(git rev-parse --short=7 HEAD)
+          : > /tmp/released
+          for domain in helix cortex; do
+            level=$(gh api "repos/${{ github.repository }}/issues/$NUMBER/labels" \
+              --jq ".[].name | select(startswith(\"$domain:\"))" | head -1 | cut -d: -f2)
+            [ -n "$level" ] || continue
+            version=$(node tooling/scripts/version.mjs \
+              --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
+            printf '%s %s\n' "$domain" "$version" >> /tmp/released
+          done
+          if [ ! -s /tmp/released ]; then
+            echo "No domain carries a bump label, so there is nothing to publish." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Not `--frozen-lockfile`: the versions just changed, and `bun pm pack`
+      # reads a sibling's version from `bun.lock` rather than from its manifest.
+      # Packing without this pins every sibling at the previous release.
+      - run: bun install
+
+      - run: bun run build
+
+      # Against the tarballs, from outside the workspace, before anything is
+      # published. A version can be deprecated but never taken back.
+      - run: bun run test:template
+
+      - name: Publish under the pull request's own tag
+        run: |
+          set -euo pipefail
+          [ -s /tmp/released ] || exit 0
+          while read -r domain version; do
+            node tooling/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
+          done < /tmp/released
+
+      - name: Say how to install it
+        run: |
+          set -euo pipefail
+          [ -s /tmp/released ] || exit 0
+
+          # One line per domain, because a pull request can release both and
+          # they carry different versions.
+          {
+            echo "Experimental build published from \`$(git rev-parse --short=7 HEAD)\`."
+            echo
+            while read -r domain version; do
+              echo "- \`$domain\` at \`$version\`"
+            done < /tmp/released
+            echo
+            echo '```bash'
+            echo "bun add @helix-io/web@pr-$NUMBER"
+            echo '```'
+            echo
+            echo "Tagged \`pr-$NUMBER\`. Nothing resolves to this by asking for" \
+              "\`next\` or \`latest\`, and the tag stops being updated when this" \
+              "pull request closes."
+          } > /tmp/comment.md
+
+          gh pr comment "$NUMBER" --edit-last --create-if-none --body-file /tmp/comment.md

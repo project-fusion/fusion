@@ -1,0 +1,247 @@
+#!/usr/bin/env node
+/**
+ * What may leave the repository, and what a package must be to do it.
+ *
+ * **Two questions, two answers.** The scope says which domain a package belongs
+ * to; `private` says whether it ships. `@helix-io/cem` is Helix's analyzer
+ * configuration, so it is Helix, and it is also a build tool of no use to
+ * anyone outside this repository. Both of those are true at once, and a rule
+ * that read publication off the scope could only express one of them: it would
+ * have forced a rename to `@fusion-io/cem`, filing Helix-specific tooling
+ * beside the company-wide test helpers and claiming it is general Fusion
+ * tooling, which is exactly what it is not.
+ *
+ * `private` is still not an allowlist. It lives in the manifest of the package
+ * it describes, which anyone changing that package already has open, rather
+ * than in a central list nothing makes you read.
+ *
+ * `@fusion-io/*` is company-internal and is always private. That much the scope
+ * does decide, because there is no reading under which it ships.
+ *
+ * **A published package may not depend on an unpublished one.** This is the
+ * failure this file exists for. Inside the workspace every dependency resolves,
+ * because bun links them from disk, so the mistake is invisible in every test,
+ * every build, and every example. It surfaces only on someone else's machine,
+ * at install, as a 404 for a package that was never meant to leave. `files`,
+ * `exports` and the rest are checkable by reading one manifest. This one is not
+ * visible from inside any single package, which is why it is worth a script.
+ *
+ * `devDependencies` are exempt, because a consumer never installs them.
+ * `@fusion-io/testing` is a devDependency of three published packages and that
+ * is correct.
+ *
+ * **`types` before `default`.** Conditions match top to bottom, so a `types`
+ * written after `default` is never reached and TypeScript reports the package
+ * as untyped. This is why `useSortedKeys` is off for package.json, and turning
+ * an ordering rule off is only half the job: nothing then checks the order is
+ * right, it only stops being made wrong automatically.
+ *
+ * **`files`, `description`, `license`, `repository`.** A package with no `files`
+ * ships its `src`, its specs and its `.examples`, which is both larger and more
+ * than was meant. `repository` is what links a published tarball back to the
+ * commit that built it, and provenance attestation has nothing to attest
+ * without it.
+ *
+ * **One version per domain.** Lockstep is the versioning policy, and the
+ * property it exists to hold is that `@helix-io/headless@x` works with
+ * `@helix-io/web@x`. A manifest carrying a different string from its neighbours
+ * is that promise already broken, and the release stamps whatever it finds.
+ *
+ * Run with `bun run check:publishable` (also part of `bun run verify`).
+ */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import { DOMAINS, domainOf, INTERNAL, manifests, publishes, root } from './workspace.mjs'
+
+/** Every `types`/`default` pair in an exports tree, in the order written. */
+function conditions(node, trail = []) {
+  const found = []
+  if (node === null || typeof node !== 'object' || Array.isArray(node)) {
+    return found
+  }
+  const keys = Object.keys(node)
+  if (keys.includes('types')) {
+    found.push({ keys, trail })
+  }
+  for (const key of keys) {
+    found.push(...conditions(node[key], [...trail, key]))
+  }
+  return found
+}
+
+const problems = []
+const versions = new Map()
+const shipping = new Set()
+let publishable = 0
+let internal = 0
+
+for (const [name, { manifest }] of manifests()) {
+  if (domainOf(name) !== undefined && publishes(manifest)) {
+    shipping.add(name)
+  }
+}
+
+for (const [name, { directory, manifest }] of manifests()) {
+  const domain = domainOf(name)
+
+  if (domain === undefined) {
+    if (!name.startsWith(INTERNAL)) {
+      problems.push(
+        `${directory}: \`${name}\` is in no known scope. A package is published or it is not, ` +
+          `and the scope is what says which: ${Object.values(DOMAINS).join(' and ')} leave the ` +
+          `repo, ${INTERNAL} does not.`,
+      )
+      continue
+    }
+    internal += 1
+    if (manifest.private !== true) {
+      problems.push(
+        `${directory}: \`${name}\` is internal by its scope but is not \`private\`. ` +
+          'One publish away from being public under a name chosen on the assumption ' +
+          'that it never would be.',
+      )
+    }
+    continue
+  }
+
+  /* Lockstep is a property of the domain, so an internal member versions with
+     its siblings too: a Helix byproduct is still Helix. */
+  versions.set(name, { directory, domain, version: manifest.version })
+
+  if (!publishes(manifest)) {
+    internal += 1
+    if (manifest.publishConfig !== undefined) {
+      problems.push(
+        `${directory}: \`${name}\` is \`private\` and still carries \`publishConfig\`, which ` +
+          'describes how it would be published. One of the two is out of date.',
+      )
+    }
+    continue
+  }
+
+  publishable += 1
+
+  for (const field of ['description', 'files', 'license', 'repository', 'version']) {
+    if (manifest[field] === undefined) {
+      problems.push(
+        `${directory}: \`${name}\` has no \`${field}\`, which a published package needs.`,
+      )
+    }
+  }
+
+  if (manifest.publishConfig?.access === undefined) {
+    problems.push(
+      `${directory}: \`${name}\` declares no \`publishConfig.access\`, so publication depends on ` +
+        'whatever the registry defaults to for the scope that day.',
+    )
+  }
+
+  if (manifest.repository?.directory !== undefined && manifest.repository.directory !== directory) {
+    problems.push(
+      `${directory}: \`${name}\` points \`repository.directory\` at ` +
+        `\`${manifest.repository.directory}\`. A published tarball links back to source that is ` +
+        'not its own.',
+    )
+  }
+
+  for (const { keys, trail } of conditions(manifest.exports ?? {})) {
+    if (keys.indexOf('types') !== 0) {
+      problems.push(
+        `${directory}: \`${name}\` orders \`exports${trail.map((k) => `[${k}]`).join('')}\` as ` +
+          `${keys.join(', ')}. Conditions match top to bottom, so \`types\` after \`${keys[0]}\` ` +
+          'is never read and the package reports as untyped.',
+      )
+    }
+  }
+
+  /* The one that cannot be seen from inside the package. */
+  for (const field of ['dependencies', 'peerDependencies']) {
+    for (const dependency of Object.keys(manifest[field] ?? {})) {
+      if (!manifests().has(dependency) || shipping.has(dependency)) {
+        continue
+      }
+      problems.push(
+        `${directory}: \`${name}\` is published and takes \`${dependency}\` as a ` +
+          `${field === 'dependencies' ? 'runtime' : 'peer'} dependency, which is not. ` +
+          'Resolves here because bun links it from disk; 404s on install anywhere else.',
+      )
+    }
+  }
+}
+
+/* One visibility for everything, because a release is all of it or none. A
+   domain half public and half restricted installs for nobody: a consumer who
+   can reach `@helix-io/web` gets a 404 on the `@helix-io/core` it depends on,
+   and the failure names the dependency rather than the setting that caused it.
+   npm also decides visibility at first publish, so a package that goes out
+   wrong is not corrected by editing this field afterwards. */
+const access = new Set(
+  [...manifests().values()]
+    .filter(({ manifest }) => shipping.has(manifest.name))
+    .map(({ manifest }) => manifest.publishConfig?.access),
+)
+if (access.size > 1) {
+  problems.push(
+    `publishConfig.access disagrees across the published packages (${[...access].sort().join(', ')}). ` +
+      'Visibility is one decision for all of them, and npm fixes it at first publish.',
+  )
+}
+
+/* Lockstep, per domain. */
+for (const domain of Object.keys(DOMAINS)) {
+  const inDomain = [...versions.values()].filter((entry) => entry.domain === domain)
+  const distinct = new Set(inDomain.map((entry) => entry.version))
+  if (distinct.size > 1) {
+    problems.push(
+      `${domain}: versions disagree across the domain (${[...distinct].sort().join(', ')}). ` +
+        'Lockstep is what makes `@helix-io/headless@x` work with `@helix-io/web@x`, and the ' +
+        'release stamps whatever it finds: ' +
+        inDomain.map((entry) => `${entry.directory} is ${entry.version}`).join(', '),
+    )
+  }
+}
+
+/* The Rust half, which fails in the one direction nothing else watches.
+   `cortex` spans two package managers: `@cortex-io/docs` on npm and the crates
+   on Cargo, sharing one version through `[workspace.package]`. The release
+   stamps that version and pushes a `cortex-v*` tag whether or not a crate ever
+   leaves, so the day someone turns `publish` on is the day the tag starts
+   claiming a crate release that no workflow performs. Silent, and discovered by
+   whoever tries to depend on it.
+
+   Note that crates.io is public-only. A private Cargo release needs an
+   alternate registry, which is what `publish = ["name"]` is for; until there is
+   one, `publish = false` is the honest setting and a consumer takes the crates
+   as a git dependency pinned to the very tag the release already pushes. */
+const cargo = readFileSync(join(root, 'Cargo.toml'), 'utf8')
+const section = cargo.slice(cargo.indexOf('[workspace.package]'))
+const declared = /^publish = (.+)$/m.exec(section)?.[1]?.trim()
+const workflow = readFileSync(join(root, '.github/workflows/release.yml'), 'utf8')
+const releases = /cargo\s+publish/.test(workflow)
+
+if (declared !== 'false' && !releases) {
+  problems.push(
+    `Cargo.toml: \`[workspace.package] publish\` is ${declared}, so the crates are meant to be ` +
+      'published, and `release.yml` runs no `cargo publish`. A `cortex-v*` tag would name a ' +
+      'release of cortex-core, cortex-engram and cortex-trace that never happened.',
+  )
+}
+if (declared === 'false' && releases) {
+  problems.push(
+    'Cargo.toml: `[workspace.package] publish` is false while `release.yml` runs `cargo publish`. ' +
+      'The release will fail at the last step, after npm has already published.',
+  )
+}
+
+if (problems.length > 0) {
+  console.error(`Packages that cannot be published as they stand (${problems.length}):\n`)
+  for (const problem of problems) {
+    console.error(`  ${problem}\n`)
+  }
+  process.exit(1)
+}
+console.log(
+  `publishable: ${publishable} packages publish, ${internal} stay in, one version per domain, ` +
+    'no published package depends on one that does not',
+)

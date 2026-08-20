@@ -2778,6 +2778,21 @@
           "members": [
             {
               "kind": "field",
+              "name": "overflow",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this crumb is the trail's overflow control rather than a step.\n\nA crumb, not a box the root renders around a slot. It sits in the same\n`<ol>`, so it needs the same `listitem` role and the same separator before\nit, and all of that already exists here.\n\n**And it is written where the gap belongs.** A named slot renders where the\nslot element sits, which was the end of the list, so the ellipsis came out\nafter the current page rather than between the root and the tail. Nobody\nreads that as a collapsed middle. In source order the consumer puts it\nexactly where the crumbs it stands for were.",
+              "attribute": "overflow",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "current",
               "type": {
                 "text": "boolean"
@@ -2923,6 +2938,19 @@
           "customElement": true,
           "attributes": [
             {
+              "name": "overflow",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this crumb is the trail's overflow control rather than a step.\n\nA crumb, not a box the root renders around a slot. It sits in the same\n`<ol>`, so it needs the same `listitem` role and the same separator before\nit, and all of that already exists here.\n\n**And it is written where the gap belongs.** A named slot renders where the\nslot element sits, which was the end of the list, so the ellipsis came out\nafter the current page rather than between the root and the tail. Nobody\nreads that as a collapsed middle. In source order the consumer puts it\nexactly where the crumbs it stands for were.",
+              "fieldName": "overflow",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
               "name": "current",
               "type": {
                 "text": "boolean"
@@ -3063,28 +3091,12 @@
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
               }
-            },
-            {
-              "description": "The box holding the overflow control.",
-              "name": "overflow",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
             }
           ],
           "slots": [
             {
               "description": "The trail's items, in order from root to current page.",
               "name": "",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "description": "Shown when crumbs are hidden, usually a menu of them.",
-              "name": "overflow",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
@@ -3109,12 +3121,40 @@
             },
             {
               "kind": "field",
+              "name": "assigned",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "privacy": "private",
+              "description": "Everything slotted in, in reading order.",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "crumbs",
               "type": {
                 "text": "HTMLElement[]"
               },
               "privacy": "private",
-              "description": "The crumbs, in reading order.",
+              "description": "The steps, which is everything except the overflow control.\n\nSplit here rather than asking the consumer to keep two lists in step: the\ntrigger is a crumb so that it looks and reads like one, and it is not a\nstep, so it must not be measured as one or hidden as one.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "trigger",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "The overflow crumb, where the consumer wrote one.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
@@ -3139,7 +3179,7 @@
               "name": "fit",
               "privacy": "private",
               "readonly": true,
-              "default": "new CollapseController(this, { container: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"list\"]'), items: () => this.crumbs ?? [], trigger: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"overflow\"]'), })",
+              "default": "new CollapseController(this, { container: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"list\"]'), items: () => this.crumbs ?? [], trigger: () => this.trigger, })",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"

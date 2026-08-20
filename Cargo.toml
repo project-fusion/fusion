@@ -30,7 +30,7 @@ edition = "2021"
 license = "UNLICENSED"
 publish = false
 rust-version = "1.90"
-version = "0.0.1"
+version = "0.0.0-dev"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
