@@ -43,6 +43,15 @@ const text = (comment: unknown): string => {
  * because opening and closing are separate events, and a consumer who owns the
  * state has to hear both.
  *
+ * **That both are asked for was checked rather than assumed.** Every component
+ * with a controlled `open` can genuinely ask in both directions: dialog,
+ * drawer, popover, menu, select, combobox, tooltip, megamenu, speed dial and
+ * command all call `requestOpen(true)`, `toggleOpen()` or
+ * `requestOpen(!this.open)` somewhere, so neither handler is one that never
+ * fires. Toast is the exception that shows the filter working: it hardcodes
+ * `next: false`, never calls `requestOpen(true)`, and answers `helix-dismiss`,
+ * so a consumer controlling it is asked for that one event and no other.
+ *
  * Written onto the member rather than the declaration so it survives
  * inheritance: a component's `checked` is a copy of the mixin's, and a list
  * kept beside the members would have to be merged by hand at every tier.

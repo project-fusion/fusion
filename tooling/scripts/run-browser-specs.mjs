@@ -79,10 +79,24 @@ if (families.length === 0) {
 }
 
 const browser = await chromium.launch()
-const page = await browser.newPage()
 const crashes = []
-page.on('pageerror', (error) => crashes.push(String(error)))
-await page.goto(origin, { waitUntil: 'load' })
+
+/**
+ * A blank page at the origin, ready to import a bundle.
+ *
+ * Made again after a family destroys the one before it, which is what a
+ * navigation or a renderer crash does: the context a spec was evaluating in is
+ * gone, and every family after it would fail against a page that no longer
+ * exists.
+ */
+const freshPage = async () => {
+  const made = await browser.newPage()
+  made.on('pageerror', (error) => crashes.push(String(error)))
+  await made.goto(origin, { waitUntil: 'load' })
+  return made
+}
+
+let page = await freshPage()
 
 let passed = 0
 const failures = []
@@ -93,17 +107,38 @@ for (const family of families) {
      family reported as broken rather than the run ending with no results at
      all. A bundle that cannot even be imported is the failure most worth
      seeing, since it means the component does not load in a browser. */
-  const results = await page.evaluate(async (url) => {
-    try {
-      const module = await import(url)
-      if (typeof module.run !== 'function') {
-        return [{ error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' }]
+  let results
+  try {
+    results = await page.evaluate(async (url) => {
+      try {
+        const module = await import(url)
+        if (typeof module.run !== 'function') {
+          return [{ error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' }]
+        }
+        return await module.run()
+      } catch (error) {
+        return [{ error: String(error), name: 'load', passed: false, suite: '' }]
       }
-      return await module.run()
-    } catch (error) {
-      return [{ error: String(error), name: 'load', passed: false, suite: '' }]
-    }
-  }, `${origin}/${family}`)
+    }, `${origin}/${family}`)
+  } catch (error) {
+    /* The `try` inside the page cannot catch this one: the context it would
+       have run in is gone. A family navigates the page, or crashes the
+       renderer, and everything after it would then be evaluated against a page
+       that no longer exists, so the whole run ended with no results at all.
+       That is the opposite of what the comment above intends, and it is how
+       this runner spent a day reporting nothing while thirty-six specs in one
+       family were the only thing wrong. */
+    results = [
+      {
+        error: `it destroyed the page: ${String(error).split('\n')[0]}. A spec that navigates, submits a form for real, or crashes the renderer will do this, and none of them show up under happy-dom.`,
+        name: 'the page',
+        passed: false,
+        suite: '',
+      },
+    ]
+    await page.close().catch(() => {})
+    page = await freshPage()
+  }
 
   for (const result of results) {
     if (result.passed) {

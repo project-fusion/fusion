@@ -164,6 +164,14 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
         this.requestUpdate('open', previous)
       },
       controlled: this.openIsControlled,
+      /* `helix-dismiss` answers a controlled `open`, which reads oddly and is
+         exact. A toast is not an overlay that opens and closes: `next` below is
+         `false` and nothing here ever calls `requestOpen(true)`, so it only
+         ever asks in one direction, and the verb for that direction is
+         `dismiss`. `HelixDismissEvent` already carries it for a tag leaving a
+         list and an announcement closing itself, which is the same act from the
+         element's side. A consumer controlling `open` therefore answers
+         `onhelix-dismiss`, and the generated types ask for exactly that. */
       event: () => this.dismissEvent(),
       host: this,
       label: 'open',
