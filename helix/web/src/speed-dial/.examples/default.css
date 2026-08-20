@@ -11,3 +11,28 @@
 helix-icon-button[slot="trigger"] {
   --icon-button-size: var(--helix-size-control-lg);
 }
+
+/* The plus turns into a cross while the dial is open.
+ *
+ * **Written here rather than built into the component**, because the trigger's
+ * mark is the consumer's: the dial cannot know it was given a plus, and turning
+ * an arbitrary glyph by any angle is a wonky camera. It costs one rule because
+ * `helix-speed-dial` writes `aria-expanded` onto whatever was slotted, so the
+ * state is already on the element the rule needs it on.
+ *
+ * **45 degrees, not 90.** A plus has four-fold symmetry, so a quarter turn ends
+ * exactly where it started and the only thing anyone sees is the spin. An eighth
+ * turn is what makes it a cross, which is the mark for the thing that closes. */
+helix-icon-button[slot="trigger"] helix-icon {
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+helix-icon-button[slot="trigger"][aria-expanded="true"] helix-icon {
+  rotate: 45deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-icon-button[slot="trigger"] helix-icon {
+    transition: none;
+  }
+}

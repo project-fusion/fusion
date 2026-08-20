@@ -39,3 +39,100 @@
 [part="actions"][hidden] {
   display: none;
 }
+
+/* The actions arrive from the button, one after another.
+ *
+ * **Motion here says where they came from**, which is the one thing a fan can
+ * say that a list cannot: three controls appearing at once beside a button is
+ * three controls, and three climbing out of it is a button that opened. The
+ * trigger is left alone, and the note in the example says why.
+ *
+ * `data-placed` rather than `@starting-style`, which `Tooltip` records at
+ * length: the controller places the panel a microtask after it first renders,
+ * so a starting style fires a frame early and the entrance runs from wherever
+ * the stylesheet last had it. The floating controller writes this once the
+ * panel is measured.
+ *
+ * Toward the trigger, so a dial that fanned upward starts below itself and one
+ * that had to flip starts above. `--_dial-from` is the only thing the two
+ * directions disagree about. */
+[part="actions"] {
+  --_dial-from: var(--helix-space-md);
+}
+
+[part="actions"][data-placement^="bottom"] {
+  --_dial-from: calc(var(--helix-space-md) * -1);
+}
+
+/* Scoped to the actions' own slot, and it has to be said: `::slotted(*)` on its
+   own matches everything this element has slotted into it, and one of those is
+   the trigger. Unscoped, the button was hidden with the actions and never let
+   back in, because what lets them in is a rule about the panel: a dial that
+   opened onto three actions and no button to close them with. */
+[part="actions"] ::slotted(*) {
+  opacity: 0;
+  scale: 0.8;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    translate var(--helix-duration-fast) var(--helix-easing-emphasized);
+  translate: 0 var(--_dial-from);
+}
+
+[part="actions"][data-placed] ::slotted(*) {
+  opacity: 1;
+  scale: 1;
+  translate: 0 0;
+}
+
+/* Nearest the button first, which is the order they would leave it in. A dial
+   fanning upward has its nearest action last in the column, so the count runs
+   from the end; flipped, it runs from the start.
+
+   Five steps, and the sixth action onwards shares the last one. That is not a
+   shrug: a dial holding more than a handful is a menu, and the stagger stopping
+   is a smaller problem than the component being wrong. */
+[part="actions"][data-placed] ::slotted(:nth-last-child(2)) {
+  transition-delay: 40ms;
+}
+
+[part="actions"][data-placed] ::slotted(:nth-last-child(3)) {
+  transition-delay: 80ms;
+}
+
+[part="actions"][data-placed] ::slotted(:nth-last-child(4)) {
+  transition-delay: 120ms;
+}
+
+[part="actions"][data-placed] ::slotted(:nth-last-child(n + 5)) {
+  transition-delay: 160ms;
+}
+
+[part="actions"][data-placement^="bottom"][data-placed] ::slotted(:nth-child(2)) {
+  transition-delay: 40ms;
+}
+
+[part="actions"][data-placement^="bottom"][data-placed] ::slotted(:nth-child(3)) {
+  transition-delay: 80ms;
+}
+
+[part="actions"][data-placement^="bottom"][data-placed] ::slotted(:nth-child(4)) {
+  transition-delay: 120ms;
+}
+
+[part="actions"][data-placement^="bottom"][data-placed] ::slotted(:nth-child(n + 5)) {
+  transition-delay: 160ms;
+}
+
+/* Put down where they belong, rather than moved there. The resting state is
+   written out rather than the transition merely removed, or the actions would
+   keep the state they start from and never be seen at all. */
+@media (prefers-reduced-motion: reduce) {
+  [part="actions"] ::slotted(*) {
+    opacity: 1;
+    scale: 1;
+    transition: none;
+    transition-delay: 0s;
+    translate: 0 0;
+  }
+}
