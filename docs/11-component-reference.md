@@ -2469,6 +2469,7 @@ Everything about what opens it and what closes it is the base class.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'full' \| undefined` | - | `HelixBaseMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `fullBelow` | `full-below` | `number` | `640` | `HelixBaseMegamenu` | The width, in pixels, under which a card becomes a band. Zero never does. |
 | `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `openOn` | `open-on` | `'click' \| 'hover'` | `'hover'` | `HelixBaseMegamenu` | Whether hovering the trigger opens the panel, or only a press does. |

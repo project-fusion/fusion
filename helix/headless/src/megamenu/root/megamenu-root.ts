@@ -6,7 +6,7 @@ import {
   PopoverController,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * The panel showing now, so opening one closes the last.
@@ -120,6 +120,54 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'open-on' })
   openOn: 'click' | 'hover' = 'hover'
 
+  /**
+   * The width, in pixels, under which a card becomes a band. Zero never does.
+   *
+   * A card is a panel hung off one word, and there is no room to hang anything
+   * off a word on a phone: the columns do not shrink past
+   * `--megamenu-column-size`, so four of them stay four of them and the panel
+   * runs off the side of the screen rather than reflowing. Below this it takes
+   * the whole width and its columns stack, which is the only arrangement that
+   * fits.
+   *
+   * **In script rather than a media query, and only once.** Whether the panel is
+   * a band is not a question of paint: a band is not placed against the trigger,
+   * so the controller has to be told not to measure, and that decision is here
+   * whatever the stylesheet says. Writing the width in both places would be one
+   * number in two languages, drifting the first time either moved. This sets
+   * `data-narrow` on the host and the stylesheet arranges itself off that.
+   */
+  @property({ attribute: 'full-below', type: Number })
+  fullBelow = 640
+
+  @state()
+  private narrow = false
+
+  private query: MediaQueryList | undefined
+
+  /** A band, whether because it was asked for or because there is no room. */
+  private get banded(): boolean {
+    return this.appearance === 'full' || this.narrow
+  }
+
+  private readonly handleWidth = (event: MediaQueryListEvent | MediaQueryList): void => {
+    this.narrow = event.matches
+  }
+
+  /* Rebuilt rather than kept, because the width is a property and a query
+     cannot be edited once it is made. */
+  private watchWidth(): void {
+    this.query?.removeEventListener('change', this.handleWidth)
+    this.query = undefined
+    if (!(this.fullBelow > 0) || typeof matchMedia !== 'function') {
+      this.narrow = false
+      return
+    }
+    this.query = matchMedia(`(max-width: ${this.fullBelow - 0.02}px)`)
+    this.query.addEventListener('change', this.handleWidth)
+    this.handleWidth(this.query)
+  }
+
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     /* The host, not the panel. A press on the trigger is a press on this
@@ -127,7 +175,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
        the click that toggles it. `Menu` says the same about its own. */
     boundary: () => this,
     onDismiss: () => this.close(),
-    place: () => this.appearance !== 'full',
+    place: () => !this.banded,
     placement: () => 'bottom-start',
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="panel"]'),
   })
@@ -162,7 +210,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
    * make. Nothing to do for the card, which the controller places.
    */
   private band(): void {
-    if (this.appearance !== 'full') {
+    if (!this.banded) {
       return
     }
     const under = this.trigger.getBoundingClientRect().bottom
@@ -249,6 +297,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
      constructor: the server runs that and has no events. */
   override connectedCallback(): void {
     super.connectedCallback()
+    this.watchWidth()
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
@@ -256,6 +305,8 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.query?.removeEventListener('change', this.handleWidth)
+    this.query = undefined
     this.removeEventListener('pointerdown', this.handlePointerDown)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
@@ -267,6 +318,12 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
+    if (changed.has('fullBelow')) {
+      this.watchWidth()
+    }
+    /* The one thing the stylesheet cannot work out for itself, since the
+       breakpoint is declared up here. */
+    this.toggleAttribute('data-narrow', this.narrow)
     if (this.open) {
       /* Before showing this one, so the two are never both up for a frame. The
          other closes through `requestOpen`, so a consumer holding it open is

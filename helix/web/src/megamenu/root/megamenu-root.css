@@ -109,8 +109,13 @@
  * The corners go, because an edge-to-edge band has no outside corner to round.
  * What is left is the page's own surface and a shadow, which is what a band
  * under a header is: it is not a card, so it is not outlined like one. */
-:host([appearance="full"]) [part="panel"] {
-  background-color: var(--helix-color-surface);
+:host([appearance="full"]) [part="panel"],
+:host([data-narrow]) [part="panel"] {
+  /* The same surface the card takes, which is the page's own white and a grey
+     in the dark. It was `surface`, one step off the background, and against a
+     header painted `background` that read as a slightly dirty white rather than
+     as a panel over the page. */
+  background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
   grid-auto-flow: column;
@@ -123,8 +128,32 @@
      running the whole width of a wide screen is a row nobody reads across. Held
      with padding rather than a width, so the band stays edge to edge and only
      what is in it is centred. `100%` for the same reason as above. */
-  padding-inline: max(var(--helix-space-xl), calc((100% - var(--megamenu-full-size, 72rem)) / 2));
+  /* 80rem, not 72. Four columns and the gaps between them leave 264 each at 72,
+     and a row spends 16 on its own padding and 36 on the mark, so a sentence
+     gets 212: which is, to the pixel, the width of the sentences in the example
+     beside this file. They fitted only because they were forbidden to wrap and
+     were quietly overhanging into the gap. Now that they wrap, the measure has
+     to be one a sentence actually fits in. */
+  padding-inline: max(var(--helix-space-xl), calc((100% - var(--megamenu-full-size, 80rem)) / 2));
   position: fixed;
+}
+
+/* Stacked, because a column does not shrink past `--megamenu-column-size` and
+ * four of them are four of them however narrow the screen is: laid across, the
+ * panel simply ran off the side. One column per row is the only arrangement
+ * that fits, and a stack tall enough to leave the screen scrolls inside the
+ * panel rather than taking the page with it.
+ *
+ * `data-narrow` comes from the element, which owns the width it happens at:
+ * see `full-below`. */
+:host([data-narrow]) [part="panel"] {
+  grid-auto-flow: row;
+  /* Down to the bottom of the screen, less the height it starts at and a margin
+     to show it ends. */
+  max-block-size: calc(100dvh - var(--_megamenu-top, 0px) - var(--helix-space-xl));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline: var(--helix-space-md);
 }
 
 [part="panel"][hidden] {

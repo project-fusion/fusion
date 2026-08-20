@@ -26440,10 +26440,87 @@
             },
             {
               "kind": "field",
+              "name": "fullBelow",
+              "type": {
+                "text": "number"
+              },
+              "default": "640",
+              "description": "The width, in pixels, under which a card becomes a band. Zero never does.\n\nA card is a panel hung off one word, and there is no room to hang anything\noff a word on a phone: the columns do not shrink past\n`--megamenu-column-size`, so four of them stay four of them and the panel\nruns off the side of the screen rather than reflowing. Below this it takes\nthe whole width and its columns stack, which is the only arrangement that\nfits.\n\n**In script rather than a media query, and only once.** Whether the panel is\na band is not a question of paint: a band is not placed against the trigger,\nso the controller has to be told not to measure, and that decision is here\nwhatever the stylesheet says. Writing the width in both places would be one\nnumber in two languages, drifting the first time either moved. This sets\n`data-narrow` on the host and the stylesheet arranges itself off that.",
+              "attribute": "full-below",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "narrow",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "query",
+              "type": {
+                "text": "MediaQueryList | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "banded",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "A band, whether because it was asked for or because there is no room.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleWidth",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watchWidth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "panel",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. A press on the trigger is a press on this element, and counting it as outside would close the panel on the way to the click that toggles it. `Menu` says the same about its own. */ boundary: () => this, onDismiss: () => this.close(), place: () => this.appearance !== 'full', placement: () => 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"panel\"]'), })",
+              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, not the panel. A press on the trigger is a press on this element, and counting it as outside would close the panel on the way to the click that toggles it. `Menu` says the same about its own. */ boundary: () => this, onDismiss: () => this.close(), place: () => !this.banded, placement: () => 'bottom-start', surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"panel\"]'), })",
               "inheritedFrom": {
                 "name": "HelixBaseMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
@@ -26790,6 +26867,19 @@
               "default": "'hover'",
               "description": "Whether hovering the trigger opens the panel, or only a press does.\n\nA press always works. This says whether a mouse also opens it by resting on\nthe trigger, and it is the default because that is what a navigation bar\ndoes. `click` is for a trigger that does something else as well, or a panel\nheavy enough that opening it on the way past is rude.",
               "fieldName": "openOn",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "name": "full-below",
+              "type": {
+                "text": "number"
+              },
+              "default": "640",
+              "description": "The width, in pixels, under which a card becomes a band. Zero never does.\n\nA card is a panel hung off one word, and there is no room to hang anything\noff a word on a phone: the columns do not shrink past\n`--megamenu-column-size`, so four of them stay four of them and the panel\nruns off the side of the screen rather than reflowing. Below this it takes\nthe whole width and its columns stack, which is the only arrangement that\nfits.\n\n**In script rather than a media query, and only once.** Whether the panel is\na band is not a question of paint: a band is not placed against the trigger,\nso the controller has to be told not to measure, and that decision is here\nwhatever the stylesheet says. Writing the width in both places would be one\nnumber in two languages, drifting the first time either moved. This sets\n`data-narrow` on the host and the stylesheet arranges itself off that.",
+              "fieldName": "fullBelow",
               "inheritedFrom": {
                 "name": "HelixBaseMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"

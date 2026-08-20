@@ -908,6 +908,11 @@ helix-toggle[disabled]::part(item) {
  * `auto`, so with nothing in it there is nothing to indent past. */
 [data-megamenu-item] {
   align-items: start;
+  /* Said, because the panel sits inside the nav and these anchors match the nav
+     bar's own rule, which sets `nowrap` so a word in a horizontal strip does not
+     break in half. A sentence that cannot wrap does not shrink either: it runs
+     out of its column and out from under its own hover. */
+  white-space: normal;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground);
   column-gap: var(--helix-space-sm);

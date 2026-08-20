@@ -338,6 +338,117 @@ if (hasLayout()) {
       expect(links[0].textContent).not.toBe(links[1].textContent)
     })
 
+    test('a screen too narrow for columns gets the band, and they stack', async () => {
+      /* Driven by `full-below` rather than by the viewport, because the runner
+         gives every spec in a file the same window: a threshold above any
+         plausible width is the same question asked in a way a spec can answer,
+         and it is the property a consumer would move anyway. */
+      const bar = (await mount(
+        `<nav style="padding:40px">
+          <helix-megamenu full-below="99999" label="Products">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
+            </div>
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/two"><strong>Two</strong><span>Second.</span></a>
+            </div>
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/three"><strong>Three</strong><span>Third.</span></a>
+            </div>
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/four"><strong>Four</strong><span>Fourth.</span></a>
+            </div>
+          </helix-megamenu>
+        </nav>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      expect(host.hasAttribute('data-narrow')).toBe(true)
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      await new Promise((done) => requestAnimationFrame(() => done(null)))
+
+      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      expect(Math.round(panel.width)).toBe(document.documentElement.clientWidth)
+
+      /* Stacked, which is one column: every group starts on the same edge, and
+         four tracks of a fixed minimum laid across would not have fitted. */
+      const groups = [...host.querySelectorAll('[data-megamenu-group]')]
+      const edges = new Set(groups.map((g) => Math.round(g.getBoundingClientRect().left)))
+      expect(edges.size).toBe(1)
+      expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
+        document.documentElement.clientWidth,
+      )
+    })
+
+    test('and a threshold of zero leaves the card a card', async () => {
+      const bar = (await mount(
+        `<nav style="padding:40px">
+          <helix-megamenu full-below="0" label="Products">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
+            </div>
+          </helix-megamenu>
+        </nav>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      expect(host.hasAttribute('data-narrow')).toBe(false)
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      expect(Math.round(panel.width)).toBeLessThan(document.documentElement.clientWidth)
+    })
+
+    test('a sentence too long for its column wraps inside it', async () => {
+      /* The panel is in the nav, so these anchors match the nav bar's rule and
+         arrived `nowrap`. A sentence that cannot wrap does not shrink either: it
+         ran out of its column and out from under its own hover.
+         The panel is held to 18rem, because a card is `max-content` and would
+         otherwise answer a long sentence by getting wider, which is right and is
+         not what is being asked here. */
+      /* Inside a `helix-navigation`, which is the whole point: the rule that sets
+         `nowrap` is `helix-navigation a`, so in a plain `<nav>` it never matches
+         and the sentence wraps whatever this stylesheet says. The first version
+         of this spec used a plain `<nav>` and passed with the fix reverted. */
+      const bar = (await mount(
+        `<helix-navigation label="Main" style="padding:40px">
+          <helix-megamenu label="Products" style="--megamenu-size: 18rem">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/one"><strong>One</strong>
+                <span>A description long enough that no column of this width could
+                hold it on a single line, which is the point of the exercise.</span>
+              </a>
+            </div>
+          </helix-megamenu>
+        </helix-navigation>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+
+      const row = host.querySelector('[data-megamenu-item]') as HTMLElement
+      const sentence = row.querySelector('span') as HTMLElement
+      expect(sentence.getBoundingClientRect().right).toBeLessThanOrEqual(
+        row.getBoundingClientRect().right + 1,
+      )
+      /* More than one line, or it was never asked to wrap in the first place.
+         By height against the line height, not by counting client rects: the
+         sentence is a grid item and so blockified, and a block returns one rect
+         however many lines are inside it. The first version of this counted
+         rects, got 1, and read it as "did not wrap" on a sentence that was
+         sitting there in four lines. */
+      const line = Number.parseFloat(getComputedStyle(sentence).lineHeight)
+      expect(sentence.getBoundingClientRect().height).toBeGreaterThan(line * 1.5)
+    })
+
     test('the host takes a box, so a nav can measure its marker against it', async () => {
       /* `Navigation` measures against every element assigned to its slot, and
          `display: contents` generates none: a section holding the current page

@@ -5295,6 +5295,38 @@ the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
   openOn?: HelixMegamenu["openOn"];
+  /** The width, in pixels, under which a card becomes a band. Zero never does.
+
+A card is a panel hung off one word, and there is no room to hang anything
+off a word on a phone: the columns do not shrink past
+`--megamenu-column-size`, so four of them stay four of them and the panel
+runs off the side of the screen rather than reflowing. Below this it takes
+the whole width and its columns stack, which is the only arrangement that
+fits.
+
+**In script rather than a media query, and only once.** Whether the panel is
+a band is not a question of paint: a band is not placed against the trigger,
+so the controller has to be told not to measure, and that decision is here
+whatever the stylesheet says. Writing the width in both places would be one
+number in two languages, drifting the first time either moved. This sets
+`data-narrow` on the host and the stylesheet arranges itself off that. */
+  "full-below"?: HelixMegamenu["fullBelow"];
+  /** The width, in pixels, under which a card becomes a band. Zero never does.
+
+A card is a panel hung off one word, and there is no room to hang anything
+off a word on a phone: the columns do not shrink past
+`--megamenu-column-size`, so four of them stay four of them and the panel
+runs off the side of the screen rather than reflowing. Below this it takes
+the whole width and its columns stack, which is the only arrangement that
+fits.
+
+**In script rather than a media query, and only once.** Whether the panel is
+a band is not a question of paint: a band is not placed against the trigger,
+so the controller has to be told not to measure, and that decision is here
+whatever the stylesheet says. Writing the width in both places would be one
+number in two languages, drifting the first time either moved. This sets
+`data-narrow` on the host and the stylesheet arranges itself off that. */
+  fullBelow?: HelixMegamenu["fullBelow"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
@@ -5360,6 +5392,38 @@ the trigger, and it is the default because that is what a navigation bar
 does. `click` is for a trigger that does something else as well, or a panel
 heavy enough that opening it on the way past is rude. */
   "prop:openOn"?: HelixMegamenu["openOn"];
+  /** The width, in pixels, under which a card becomes a band. Zero never does.
+
+A card is a panel hung off one word, and there is no room to hang anything
+off a word on a phone: the columns do not shrink past
+`--megamenu-column-size`, so four of them stay four of them and the panel
+runs off the side of the screen rather than reflowing. Below this it takes
+the whole width and its columns stack, which is the only arrangement that
+fits.
+
+**In script rather than a media query, and only once.** Whether the panel is
+a band is not a question of paint: a band is not placed against the trigger,
+so the controller has to be told not to measure, and that decision is here
+whatever the stylesheet says. Writing the width in both places would be one
+number in two languages, drifting the first time either moved. This sets
+`data-narrow` on the host and the stylesheet arranges itself off that. */
+  "attr:full-below"?: HelixMegamenu["fullBelow"];
+  /** The width, in pixels, under which a card becomes a band. Zero never does.
+
+A card is a panel hung off one word, and there is no room to hang anything
+off a word on a phone: the columns do not shrink past
+`--megamenu-column-size`, so four of them stay four of them and the panel
+runs off the side of the screen rather than reflowing. Below this it takes
+the whole width and its columns stack, which is the only arrangement that
+fits.
+
+**In script rather than a media query, and only once.** Whether the panel is
+a band is not a question of paint: a band is not placed against the trigger,
+so the controller has to be told not to measure, and that decision is here
+whatever the stylesheet says. Writing the width in both places would be one
+number in two languages, drifting the first time either moved. This sets
+`data-narrow` on the host and the stylesheet arranges itself off that. */
+  "prop:fullBelow"?: HelixMegamenu["fullBelow"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -15186,6 +15250,21 @@ export type CustomElements = {
    * the trigger, and it is the default because that is what a navigation bar
    * does. `click` is for a trigger that does something else as well, or a panel
    * heavy enough that opening it on the way past is rude.
+   * - `full-below`/`fullBelow`: The width, in pixels, under which a card becomes a band. Zero never does.
+   *
+   * A card is a panel hung off one word, and there is no room to hang anything
+   * off a word on a phone: the columns do not shrink past
+   * `--megamenu-column-size`, so four of them stay four of them and the panel
+   * runs off the side of the screen rather than reflowing. Below this it takes
+   * the whole width and its columns stack, which is the only arrangement that
+   * fits.
+   *
+   * **In script rather than a media query, and only once.** Whether the panel is
+   * a band is not a question of paint: a band is not placed against the trigger,
+   * so the controller has to be told not to measure, and that decision is here
+   * whatever the stylesheet says. Writing the width in both places would be one
+   * number in two languages, drifting the first time either moved. This sets
+   * `data-narrow` on the host and the stylesheet arranges itself off that.
    *
    * ## Events
    *
@@ -23866,6 +23945,21 @@ export type CustomElementsSolidJs = {
    * the trigger, and it is the default because that is what a navigation bar
    * does. `click` is for a trigger that does something else as well, or a panel
    * heavy enough that opening it on the way past is rude.
+   * - `full-below`/`fullBelow`: The width, in pixels, under which a card becomes a band. Zero never does.
+   *
+   * A card is a panel hung off one word, and there is no room to hang anything
+   * off a word on a phone: the columns do not shrink past
+   * `--megamenu-column-size`, so four of them stay four of them and the panel
+   * runs off the side of the screen rather than reflowing. Below this it takes
+   * the whole width and its columns stack, which is the only arrangement that
+   * fits.
+   *
+   * **In script rather than a media query, and only once.** Whether the panel is
+   * a band is not a question of paint: a band is not placed against the trigger,
+   * so the controller has to be told not to measure, and that decision is here
+   * whatever the stylesheet says. Writing the width in both places would be one
+   * number in two languages, drifting the first time either moved. This sets
+   * `data-narrow` on the host and the stylesheet arranges itself off that.
    *
    * ## Events
    *
