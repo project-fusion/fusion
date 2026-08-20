@@ -497,6 +497,53 @@ if (hasLayout()) {
       expect(nameToSentence).toBeLessThan(rowToRow)
     })
 
+    test('a band too narrow for its columns wraps them rather than overflowing', async () => {
+      /* `grid-auto-flow: column` put every group on one row and kept it there:
+         the tracks were as wide as the groups needed whatever the band was, so
+         it did not reflow, it overflowed. Measured on four groups: 1120 pixels
+         of columns at every viewport from 1400 down, so from 1100 the band ran
+         over and by 780 two groups were past its edge, with the breakpoint that
+         stacks it still 140 pixels away.
+
+         Driven by the column width rather than the window, because the runner
+         gives every spec the same viewport: a column too wide to fit four of is
+         the same question asked in a way a spec can answer. */
+      const bar = (await mount(
+        `<helix-navigation label="Main" style="padding:0">
+          <helix-megamenu appearance="full" label="Products" style="--megamenu-column-size: 26rem">
+            ${['One', 'Two', 'Three', 'Four']
+              .map(
+                (name) =>
+                  `<div data-megamenu-group>
+                     <h3 data-megamenu-heading>${name}</h3>
+                     <a data-megamenu-item href="#${name}"><strong>${name}</strong><span>A thing.</span></a>
+                   </div>`,
+              )
+              .join('')}
+          </helix-megamenu>
+        </helix-navigation>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      await new Promise((done) => requestAnimationFrame(() => done(null)))
+
+      const panel = part(host, 'panel') as HTMLElement
+      expect(panel.scrollWidth).toBeLessThanOrEqual(Math.ceil(panel.getBoundingClientRect().width))
+
+      /* On more than one row, and in the same tracks: a group left alone on a
+         row must not grow to the width of the band, or the hover wash on one of
+         its links is a bar the width of the window. */
+      const groups = [...host.querySelectorAll('[data-megamenu-group]')] as HTMLElement[]
+      const rows = new Set(groups.map((one) => Math.round(one.getBoundingClientRect().top)))
+      expect(rows.size).toBeGreaterThan(1)
+      const widths = new Set(groups.map((one) => Math.round(one.getBoundingClientRect().width)))
+      expect(widths.size).toBe(1)
+    })
+
     test('the host takes a box, so a nav can measure its marker against it', async () => {
       /* `Navigation` measures against every element assigned to its slot, and
          `display: contents` generates none: a section holding the current page

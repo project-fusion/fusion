@@ -76,6 +76,12 @@
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
+  /* One row of tracks, sized to what is in them, which is what a card is: it
+     has no width of its own to wrap against. Flex was tried here and takes the
+     card back to a single column, because a wrapping flex container's
+     max-content width is one item's, not the row's: measured at 219 pixels
+     against the 653 the tracks give. Wrapping is the band's problem, and the
+     band has a width to solve it with. */
   display: grid;
   gap: var(--helix-space-xl);
   grid-auto-columns: minmax(var(--megamenu-column-size, 15rem), 1fr);
@@ -120,7 +126,18 @@
   background-color: var(--helix-color-background);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
-  grid-auto-flow: column;
+  /* Tracks, where the card has flex.
+   *
+   * A band knows how wide it is, so `auto-fit` can work out how many columns
+   * fit and put the rest on the next row *in the same tracks*. Flex wraps but
+   * does not line rows up: the last group, alone on its row, grew to the full
+   * width, and a group is where a row's hover wash comes from, so pointing at
+   * one link lit a bar the width of the window. The card cannot use this, since
+   * it is as wide as its own contents and `auto-fit` against a width that is
+   * not yet known resolves to one column. */
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fit, minmax(var(--megamenu-column-size, 15rem), 1fr));
   inline-size: auto;
   inset-block-start: var(--_megamenu-top, 100%);
   inset-inline: 0;
@@ -150,6 +167,7 @@
  * see `full-below`. */
 :host([data-narrow]) [part="panel"] {
   grid-auto-flow: row;
+  grid-template-columns: 1fr;
   /* Down to the bottom of the screen, less the height it starts at and a margin
      to show it ends. */
   max-block-size: calc(100dvh - var(--_megamenu-top, 0px) - var(--helix-space-xl));
