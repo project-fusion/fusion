@@ -716,6 +716,18 @@ export type HelixBaseBlockquoteSolidJsProps = {
 };
 
 export type HelixBaseBreadcrumbProps = {
+  /** Whether this crumb is the trail's overflow control rather than a step.
+
+A crumb, not a box the root renders around a slot. It sits in the same
+`<ol>`, so it needs the same `listitem` role and the same separator before
+it, and all of that already exists here.
+
+**And it is written where the gap belongs.** A named slot renders where the
+slot element sits, which was the end of the list, so the ellipsis came out
+after the current page rather than between the root and the tail. Nobody
+reads that as a collapsed middle. In source order the consumer puts it
+exactly where the crumbs it stands for were. */
+  overflow?: HelixBaseBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   current?: HelixBaseBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -731,6 +743,18 @@ one, and nothing selects on it. */
 };
 
 export type HelixBaseBreadcrumbSolidJsProps = {
+  /** Whether this crumb is the trail's overflow control rather than a step.
+
+A crumb, not a box the root renders around a slot. It sits in the same
+`<ol>`, so it needs the same `listitem` role and the same separator before
+it, and all of that already exists here.
+
+**And it is written where the gap belongs.** A named slot renders where the
+slot element sits, which was the end of the list, so the ellipsis came out
+after the current page rather than between the root and the tail. Nobody
+reads that as a collapsed middle. In source order the consumer puts it
+exactly where the crumbs it stands for were. */
+  "prop:overflow"?: HelixBaseBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   "prop:current"?: HelixBaseBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -10843,6 +10867,17 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
+   *
+   * A crumb, not a box the root renders around a slot. It sits in the same
+   * `<ol>`, so it needs the same `listitem` role and the same separator before
+   * it, and all of that already exists here.
+   *
+   * **And it is written where the gap belongs.** A named slot renders where the
+   * slot element sits, which was the end of the list, so the ellipsis came out
+   * after the current page rather than between the root and the tail. Nobody
+   * reads that as a collapsed middle. In source order the consumer puts it
+   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -10895,7 +10930,7 @@ export type CustomElements = {
    * crumb. That is the right answer rather than a fallback, and this arrangement
    * cannot leave them with less.
    *
-   * **The overflow control is the consumer's, slotted in.** Rendering a menu here
+   * **The overflow control is the consumer's, and it is a crumb.** Rendering a menu here
    * would put `Menu`, and the popover machinery under it, into anything that
    * imports a breadcrumb trail, which is a lot to carry for a trail that usually
    * fits. So the trail hides crumbs and reports which, and whatever is slotted as
@@ -10917,15 +10952,13 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The trail's items, in order from root to current page.
-   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
+   * - `(default)`: The trail's items, in order from root to current page, with an `overflow` crumb wherever the gap should appear.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
-   * - `overflow`: The box holding the overflow control.
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
@@ -19529,6 +19562,17 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
+   *
+   * A crumb, not a box the root renders around a slot. It sits in the same
+   * `<ol>`, so it needs the same `listitem` role and the same separator before
+   * it, and all of that already exists here.
+   *
+   * **And it is written where the gap belongs.** A named slot renders where the
+   * slot element sits, which was the end of the list, so the ellipsis came out
+   * after the current page rather than between the root and the tail. Nobody
+   * reads that as a collapsed middle. In source order the consumer puts it
+   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -19584,7 +19628,7 @@ export type CustomElementsSolidJs = {
    * crumb. That is the right answer rather than a fallback, and this arrangement
    * cannot leave them with less.
    *
-   * **The overflow control is the consumer's, slotted in.** Rendering a menu here
+   * **The overflow control is the consumer's, and it is a crumb.** Rendering a menu here
    * would put `Menu`, and the popover machinery under it, into anything that
    * imports a breadcrumb trail, which is a lot to carry for a trail that usually
    * fits. So the trail hides crumbs and reports which, and whatever is slotted as
@@ -19606,15 +19650,13 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The trail's items, in order from root to current page.
-   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
+   * - `(default)`: The trail's items, in order from root to current page, with an `overflow` crumb wherever the gap should appear.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
-   * - `overflow`: The box holding the overflow control.
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps &

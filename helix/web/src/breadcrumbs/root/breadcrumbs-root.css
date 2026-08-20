@@ -14,15 +14,3 @@
   margin: var(--helix-space-none);
   padding: var(--helix-space-none);
 }
-
-/* The overflow trigger sits in the flow as a list item, so it lands where the
-   gap it stands for is. `display: contents` on the box, since what the consumer
-   slotted is the control and this is only a hook for the controller to measure. */
-[part="overflow"] {
-  align-items: center;
-  display: flex;
-}
-
-[part="overflow"][hidden] {
-  display: none;
-}

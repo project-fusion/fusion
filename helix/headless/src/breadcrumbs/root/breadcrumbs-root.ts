@@ -31,7 +31,7 @@ const KEEP_LEADING = 1
  * crumb. That is the right answer rather than a fallback, and this arrangement
  * cannot leave them with less.
  *
- * **The overflow control is the consumer's, slotted in.** Rendering a menu here
+ * **The overflow control is the consumer's, and it is a crumb.** Rendering a menu here
  * would put `Menu`, and the popover machinery under it, into anything that
  * imports a breadcrumb trail, which is a lot to carry for a trail that usually
  * fits. So the trail hides crumbs and reports which, and whatever is slotted as
@@ -44,11 +44,10 @@ const KEEP_LEADING = 1
  * @aliases Breadcrumb, Crumbs
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
- * @slot - The trail's items, in order from root to current page.
- * @slot overflow - Shown when crumbs are hidden, usually a menu of them.
+ * @slot - The trail's items, in order from root to current page, with an
+ * `overflow` crumb wherever the gap should appear.
  *
  * @csspart list - The ordered list.
- * @csspart overflow - The box holding the overflow control.
  */
 @customElement('helix-base-breadcrumbs')
 export class HelixBaseBreadcrumbs extends HelixElement {
@@ -56,9 +55,25 @@ export class HelixBaseBreadcrumbs extends HelixElement {
   @property({ reflect: true, type: Boolean })
   collapse = false
 
-  /** The crumbs, in reading order. */
+  /** Everything slotted in, in reading order. */
   @queryAssignedElements({ flatten: true })
-  private crumbs!: HTMLElement[]
+  private assigned!: HTMLElement[]
+
+  /**
+   * The steps, which is everything except the overflow control.
+   *
+   * Split here rather than asking the consumer to keep two lists in step: the
+   * trigger is a crumb so that it looks and reads like one, and it is not a
+   * step, so it must not be measured as one or hidden as one.
+   */
+  private get crumbs(): HTMLElement[] {
+    return (this.assigned ?? []).filter((el) => !el.hasAttribute('overflow'))
+  }
+
+  /** The overflow crumb, where the consumer wrote one. */
+  private get trigger(): HTMLElement | undefined {
+    return (this.assigned ?? []).find((el) => el.hasAttribute('overflow'))
+  }
 
   /**
    * Which crumbs are hidden, by index.
@@ -76,7 +91,7 @@ export class HelixBaseBreadcrumbs extends HelixElement {
   private readonly fit = new CollapseController(this, {
     container: () => this.renderRoot?.querySelector<HTMLElement>('[part="list"]'),
     items: () => this.crumbs ?? [],
-    trigger: () => this.renderRoot?.querySelector<HTMLElement>('[part="overflow"]'),
+    trigger: () => this.trigger,
   })
 
   /**
@@ -139,6 +154,10 @@ export class HelixBaseBreadcrumbs extends HelixElement {
     crumbs.forEach((crumb, index) => {
       crumb.toggleAttribute('hidden', next.includes(index))
     })
+
+    /* The trigger shows only while something is behind it. Toggled the same way
+       as the crumbs, because it is one. */
+    this.trigger?.toggleAttribute('hidden', next.length === 0)
   }
 
   /**
@@ -160,13 +179,11 @@ export class HelixBaseBreadcrumbs extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The trigger sits after the crumbs that were kept at the front, which is
-       where the gap it stands for actually is. */
+    /* One slot. The trigger is a crumb the consumer placed in source order, so
+       there is nothing here to position it: the list renders what it was given,
+       in the order it was given. */
     return html`<ol part="list" role="list">
       <slot @slotchange=${this.handleSlotChange}></slot>
-      <li part="overflow" ?hidden=${this.hiddenAt.length === 0}>
-        <slot name="overflow"></slot>
-      </li>
     </ol>`
   }
 }

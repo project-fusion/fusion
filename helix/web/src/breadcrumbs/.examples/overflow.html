@@ -5,22 +5,23 @@
   collapse
 >
   <helix-breadcrumb href="/">Home</helix-breadcrumb>
+
+  <!-- Written where the gap belongs, because that is where it renders. The
+       trail shows it only while something is behind it. -->
+  <helix-breadcrumb overflow>
+    <helix-menu label="Hidden steps">
+      <helix-icon-button
+        appearance="ghost"
+        label="Show hidden steps"
+        slot="trigger"
+      >
+        <helix-icon name="dots-three"></helix-icon>
+      </helix-icon-button>
+    </helix-menu>
+  </helix-breadcrumb>
+
   <helix-breadcrumb href="/design">Design</helix-breadcrumb>
   <helix-breadcrumb href="/design/components">Components</helix-breadcrumb>
   <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
   <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
-
-  <!-- Yours, so a trail never carries a menu it usually does not open. -->
-  <helix-menu
-    label="Hidden steps"
-    slot="overflow"
-  >
-    <helix-icon-button
-      appearance="ghost"
-      label="Show hidden steps"
-      slot="trigger"
-    >
-      <helix-icon name="dots-three-vertical"></helix-icon>
-    </helix-icon-button>
-  </helix-menu>
 </helix-breadcrumbs>

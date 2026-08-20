@@ -412,14 +412,12 @@ because a truncated path tells the reader less than a two-line one.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The trail's items, in order from root to current page. |
-| `overflow` | Shown when crumbs are hidden, usually a menu of them. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `list` | The ordered list. |
-| `overflow` | The box holding the overflow control. |
 
 #### Custom properties
 
@@ -448,6 +446,7 @@ and leaves box and background to `::slotted`.
 | --- | --- | --- | --- | --- | --- |
 | `current` | `current` | `boolean` | `false` | `HelixBaseBreadcrumb` | Whether this item is the page the reader is on. |
 | `href` | `href` | `string` | `''` | `HelixBaseBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
+| `overflow` | `overflow` | `boolean` | `false` | `HelixBaseBreadcrumb` | Whether this crumb is the trail's overflow control rather than a step. |
 | `rel` | `rel` | `string` | `''` | `HelixBaseBreadcrumb` | What the link declares about where it goes. The consumer's decision. |
 | `target` | `target` | `string` | `''` | `HelixBaseBreadcrumb` | Where the link opens, for the rare crumb that leaves the site. |
 
