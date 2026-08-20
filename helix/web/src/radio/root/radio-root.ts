@@ -28,6 +28,7 @@ import { styles } from './radio-root.css.js'
  * @cssproperty --radio-background-color - Fill of an unselected circle.
  * @cssproperty --radio-border-color - Edge of the circle, in every state.
  * @cssproperty --radio-card-padding - Inset of the card appearance.
+ * @cssproperty --radio-chip-size - Diameter of the chip appearance.
  * @cssproperty --radio-card-background-color - Fill behind a card-shaped choice.
  * @cssproperty --radio-card-border-color - Edge around one.
  */
@@ -50,10 +51,13 @@ export class HelixRadio extends HelixBaseRadio {
    * leave nothing for a high-contrast display.
    */
   @property({ reflect: true })
-  appearance?: 'plain' | 'card'
+  appearance?: 'chip' | 'plain' | 'card'
 
   /**
    * Takes the circle away, leaving the card as the whole control.
+   *
+   * Unnecessary under `chip`, which has no room for a circle beside its mark
+   * and hides it already.
    *
    * `card` only, and it is a graphic that goes rather than a radio: the control
    * in the shadow root is untouched, so the row is still focusable, still

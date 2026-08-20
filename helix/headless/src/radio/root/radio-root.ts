@@ -28,6 +28,11 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/radio
  *
  * @slot - The words naming this choice.
+ * @slot icon - A mark shown beside them, or instead of them under
+ * `appearance="chip"`, where the words become the accessible name and the mark
+ * is what a reader picks between. Separate from the default slot because the
+ * chip has to hide one and show the other, and they are both in the same place
+ * otherwise.
  *
  * @event {HelixSelectEvent} helix-select - Fired when this choice is made.
  *
@@ -77,6 +82,7 @@ export class HelixBaseRadio extends HelixElement {
       @click=${() => this.select()}
     >
       <span part="box"><span part="mark" aria-hidden="true"></span></span>
+      <slot name="icon"></slot>
       <span part="label"><slot></slot></span>
     </button>`
   }

@@ -236,3 +236,90 @@
     transition: none;
   }
 }
+
+/* A chip is a card that gave up its words.
+ *
+ * The shape a rating scale wants: a round target holding one mark, in a row of
+ * them, where the answer is which mark rather than which sentence. A satisfaction
+ * scale is the case, and it is a set of choices rather than a quantity, which is
+ * why it lives here and not in `Rating`: five faces are five drawings and no
+ * fraction of one means anything, where five stars are one drawing five times
+ * and three and a half of them is a real answer.
+ *
+ * **The circle goes, unasked.** `hide-control` is a decision on a card, which
+ * has room for both and loses nothing by keeping the circle. A chip is the size
+ * of a control and holds a mark: a radio circle beside the mark would not fit,
+ * and there is nowhere to put it that is not on top of the thing it is meant to
+ * annotate. What carries the answer instead is weight and height, which the
+ * selected rule below draws. */
+:host([appearance="chip"]) [part="box"] {
+  display: none;
+}
+
+:host([appearance="chip"]) [part="item"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--radio-chip-size, var(--helix-size-control-md));
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--radio-chip-size, var(--helix-size-control-md));
+  justify-content: center;
+  padding: 0;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard),
+    translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Weight and height carry the choice, not a wash of colour.
+ *
+ * A chosen chip goes solid and comes forward, which is what a pressed key does
+ * and reads at a glance across a row of five. Tinting the background instead
+ * says "this one is a slightly different colour", a hue a reader has to
+ * interpret rather than a state they can see. */
+:host([appearance="chip"][selected]) [part="item"] {
+  background-color: var(--helix-color-surface-inverse);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--helix-color-foreground-inverse);
+  translate: 0 -2px;
+}
+
+:host(:not([disabled])[appearance="chip"]) [part="item"]:hover {
+  translate: 0 -1px;
+}
+
+:host([appearance="chip"]) [part="item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The words name the choice without taking room in it.
+ *
+ * A face scale slots both: the mark is what a reader picks between, and the
+ * sentence is what a screen reader reads instead of "graphic". They cannot share
+ * the default slot, because this rule would hide the mark with the words, which
+ * is why `Radio` grew an `icon` slot. A chip with no mark slotted is an empty
+ * circle, and that is the consumer having asked for one. */
+:host([appearance="chip"]) [part="label"] {
+  clip-path: inset(50%);
+  block-size: 1px;
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Repeating the selector exactly, because a looser one loses on specificity and
+   answers nothing. */
+@media (prefers-reduced-motion: reduce) {
+  :host([appearance="chip"]) [part="item"] {
+    transition: none;
+  }
+
+  :host([appearance="chip"][selected]) [part="item"],
+  :host(:not([disabled])[appearance="chip"]) [part="item"]:hover {
+    translate: none;
+  }
+}

@@ -3445,7 +3445,7 @@ and being chosen is an answer rather than a state.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
+| `appearance` | `appearance` | `'chip' \| 'plain' \| 'card' \| undefined` | - | - | How the choice presents itself. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseRadio` | Whether this choice can be made. |
 | `hideControl` | `hide-control` | `boolean` | `false` | - | Takes the circle away, leaving the card as the whole control. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseRadio` | Whether this is the current choice. Written by the group. |
@@ -3469,6 +3469,7 @@ and being chosen is an answer rather than a state.
 | Slot | Description |
 | --- | --- |
 | *(default)* | The words naming this choice. |
+| `icon` | A mark shown beside them, or instead of them under `appearance="chip"`, where the words become the accessible name and the mark is what a reader picks between. Separate from the default slot because the chip has to hide one and show the other, and they are both in the same place otherwise. |
 
 #### Parts
 
@@ -3488,6 +3489,7 @@ and being chosen is an answer rather than a state.
 | `--radio-background-color` | Fill of an unselected circle. |
 | `--radio-border-color` | Edge of the circle, in every state. |
 | `--radio-card-padding` | Inset of the card appearance. |
+| `--radio-chip-size` | Diameter of the chip appearance. |
 | `--radio-card-background-color` | Fill behind a card-shaped choice. |
 | `--radio-card-border-color` | Edge around one. |
 
@@ -3576,7 +3578,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'chips' \| 'dots' \| 'marks'` | `'marks'` | `HelixBaseRating` | Which mark the row is drawn with. |
+| `appearance` | `appearance` | `'dots' \| 'marks'` | `'marks'` | - | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -3611,7 +3613,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Slot | Description |
 | --- | --- |
-| `mark` | The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it. |
+| `mark` | The shape of a mark, cloned into every position. Left empty, the stylesheet draws its own and `--rating-mark` swaps it. |
 
 #### Parts
 
@@ -3633,7 +3635,6 @@ Everything about what the score is and how it is chosen is the base class.
 | `--rating-gap` | Space between marks. |
 | `--rating-color` | The colour of a filled mark. |
 | `--rating-empty-color` | And of an unfilled one. |
-| `--rating-chip-size` | How big one chip is, under `appearance="chips"`. |
 
 ## Sandbox
 

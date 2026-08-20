@@ -38178,6 +38178,10 @@
               "name": "--radio-card-padding"
             },
             {
+              "description": "Diameter of the chip appearance.",
+              "name": "--radio-chip-size"
+            },
+            {
               "description": "Fill behind a card-shaped choice.",
               "name": "--radio-card-background-color"
             },
@@ -38191,7 +38195,7 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'plain' | 'card' | undefined"
+                "text": "'chip' | 'plain' | 'card' | undefined"
               },
               "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
               "attribute": "appearance",
@@ -38204,7 +38208,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Takes the circle away, leaving the card as the whole control.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
+              "description": "Takes the circle away, leaving the card as the whole control.\n\nUnnecessary under `chip`, which has no room for a circle beside its mark\nand hides it already.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
               "attribute": "hide-control",
               "reflects": true
             },
@@ -38360,7 +38364,7 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'plain' | 'card' | undefined"
+                "text": "'chip' | 'plain' | 'card' | undefined"
               },
               "description": "How the choice presents itself.\n\n- `plain` is the default and is never written: a circle beside its words,\n  which is what a list of choices should be almost always.\n- `card` puts it in a bounded surface, for options that need room to\n  explain themselves: a description, an icon, a price. It is the half a\n  `data-card` link cannot do, because a link reports no value and belongs\n  to no group, so a card that is genuinely an answer has to be this.\n\nThe circle stays in both. A card whose only marker was its own border would\nask a reader to compare surfaces across a row to find the answer, and would\nleave nothing for a high-contrast display.",
               "fieldName": "appearance"
@@ -38371,7 +38375,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Takes the circle away, leaving the card as the whole control.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
+              "description": "Takes the circle away, leaving the card as the whole control.\n\nUnnecessary under `chip`, which has no room for a circle beside its mark\nand hides it already.\n\n`card` only, and it is a graphic that goes rather than a radio: the control\nin the shadow root is untouched, so the row is still focusable, still\nreported to a screen reader, and still the thing a form submits.\n\nSafe because the card already carries the answer in its surface, a raised\nfill inside a primary edge and a three-pixel ring of it. That ring is\nrecent, and before it there was nothing left saying which card was chosen,\nwhich is why this is a property now and could not have been one then.\n\nNot on `Checkbox`, deliberately. A radio card with no circle is still\nunmistakably one-of-many because its siblings behave that way; a checkbox\ncard with no box loses the only thing that says you may pick several.",
               "fieldName": "hideControl"
             },
             {
@@ -38439,6 +38443,10 @@
                 "slug": "cards"
               },
               {
+                "description": "A satisfaction scale: five marks, five values, five names.",
+                "slug": "chips"
+              },
+              {
                 "slug": "disabled"
               },
               {
@@ -38459,6 +38467,14 @@
             {
               "description": "The words naming this choice.",
               "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseRadio",
+                "module": "src/radio/root/radio-root.ts"
+              }
+            },
+            {
+              "description": "A mark shown beside them, or instead of them under `appearance=\"chip\"`, where the words become the accessible name and the mark is what a reader picks between. Separate from the default slot because the chip has to hide one and show the other, and they are both in the same place otherwise.",
+              "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseRadio",
                 "module": "src/radio/root/radio-root.ts"
@@ -38599,19 +38615,26 @@
             {
               "description": "And of an unfilled one.",
               "name": "--rating-empty-color"
-            },
-            {
-              "description": "How big one chip is, under `appearance=\"chips\"`.",
-              "name": "--rating-chip-size"
             }
           ],
           "slots": [
             {
-              "description": "The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it.",
+              "description": "The shape of a mark, cloned into every position. Left empty, the stylesheet draws its own and `--rating-mark` swaps it.",
               "name": "mark"
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.",
+              "attribute": "appearance",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "defaultValue",
@@ -39092,28 +39115,13 @@
             },
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "markSource",
               "type": {
-                "text": "'chips' | 'dots' | 'marks'"
-              },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
-              "attribute": "appearance",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseRating",
-                "module": "src/rating/root/rating-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "markSources",
-              "type": {
-                "text": "Element[]"
+                "text": "Element | undefined"
               },
               "privacy": "private",
-              "default": "[]",
-              "description": "The shapes a consumer slotted, if they slotted any.\n\nRead rather than projected. A `<slot>` shows its content once and a rating\nneeds the shape as many times as there are marks, twice over while there\nare two layers, so the slot here is a way of being handed the shape rather\nthan a place the shape is drawn. The element it is handed gets cloned into\neach position.",
+              "default": "undefined",
+              "description": "The shape a consumer slotted, if they slotted one.\n\nRead rather than projected. A `<slot>` shows its content once and a rating\nneeds the shape as many times as there are marks, twice over because there\nare two layers, so the slot here is a way of being handed the shape rather\nthan a place the shape is drawn. What is handed over gets cloned into every\nposition.\n\n**One shape, not one per position.** A rating is a quantity of identical\nmarks and the fill is a clip across all of them, so a row whose third mark\nis a different drawing from its first is not a rating: it is a set of\nchoices, which is `Radio.Group` and already carries a value and a name on\neach of its own options. Anything past the first slotted element is\nignored.",
               "inheritedFrom": {
                 "name": "HelixBaseRating",
                 "module": "src/rating/root/rating-root.ts"
@@ -39234,7 +39242,7 @@
                   }
                 }
               ],
-              "description": "The shape for one position, or nothing when the stylesheet is drawing it.\n\n**One slotted element is the shape for every mark; several are the shapes\nin order.** Those are the two things a consumer can mean. A star is one\ndrawing repeated, and a face scale is five drawings, and the count says\nwhich without an attribute to set wrong. Past the end of a short list the\nlast one repeats, so four marks and two shapes is a decision rather than a\ncrash.",
+              "description": "The shape for one place, or nothing when the stylesheet is drawing it.",
               "inheritedFrom": {
                 "name": "HelixBaseRating",
                 "module": "src/rating/root/rating-root.ts"
@@ -39552,62 +39560,16 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseRating",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A score out of a few marks, given or shown.",
-          "helix": {
-            "category": "forms",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/rating",
-            "aliases": [
-              "Stars",
-              "Score",
-              "Review score"
-            ],
-            "tier": "styled",
-            "group": "Rating",
-            "part": "Root",
-            "examples": [
-              {
-                "slug": "default"
-              },
-              {
-                "description": "A level rather than a judgement, which is what a plain circle says.",
-                "slug": "dots"
-              },
-              {
-                "description": "Five marks that are five drawings, which is what a face scale is.",
-                "slug": "faces"
-              },
-              {
-                "description": "Half marks, which is the case the value is a number for.",
-                "slug": "halves"
-              },
-              {
-                "description": "A score being shown rather than asked for, which is not a control.",
-                "slug": "readonly"
-              },
-              {
-                "description": "One shape, cloned into every position, halves and all.",
-                "slug": "slotted"
-              },
-              {
-                "description": "A review summary: the average as a readout, the spread as meters.",
-                "slug": "summary"
-              },
-              {
-                "description": "Marks say roughly and a number says exactly, so most ratings print both.",
-                "slug": "value"
-              }
-            ],
-            "source": "helix/web/src/rating"
-          },
-          "tagName": "helix-rating",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.",
+              "fieldName": "appearance"
+            },
             {
               "name": "default-value",
               "type": {
@@ -39751,19 +39713,6 @@
               }
             },
             {
-              "name": "appearance",
-              "type": {
-                "text": "'chips' | 'dots' | 'marks'"
-              },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
-              "fieldName": "appearance",
-              "inheritedFrom": {
-                "name": "HelixBaseRating",
-                "module": "src/rating/root/rating-root.ts"
-              }
-            },
-            {
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -39790,6 +39739,57 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseRating",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A score out of a few marks, given or shown.",
+          "helix": {
+            "category": "forms",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/rating",
+            "aliases": [
+              "Stars",
+              "Score",
+              "Review score"
+            ],
+            "tier": "styled",
+            "group": "Rating",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "description": "A level rather than a judgement, which is what a plain circle says.",
+                "slug": "dots"
+              },
+              {
+                "description": "Half marks, which is the case the value is a number for.",
+                "slug": "halves"
+              },
+              {
+                "description": "A score being shown rather than asked for, which is not a control.",
+                "slug": "readonly"
+              },
+              {
+                "description": "One shape, cloned into every position, halves and all.",
+                "slug": "slotted"
+              },
+              {
+                "description": "A review summary: the average as a readout, the spread as meters.",
+                "slug": "summary"
+              },
+              {
+                "description": "Marks say roughly and a number says exactly, so most ratings print both.",
+                "slug": "value"
+              }
+            ],
+            "source": "helix/web/src/rating"
+          },
+          "tagName": "helix-rating",
+          "customElement": true,
           "cssParts": [
             {
               "description": "The row of marks.",

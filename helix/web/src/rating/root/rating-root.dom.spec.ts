@@ -183,43 +183,6 @@ describe('rating', () => {
   })
 })
 
-describe('a rating drawn as chips', () => {
-  const chips = async (attrs = ''): Promise<HTMLElement> =>
-    mount(`<helix-rating appearance="chips" label="Rate" ${attrs}></helix-rating>`)
-
-  test('has no fill layer, because nothing is being clipped', async () => {
-    /* Each position is its own drawing and the fifth is not a longer version of
-       the third. There is no partial mark to draw. */
-    const host = await chips('value="2"')
-    expect(part(host, 'fill')).toBe(null)
-    expect(part(host, 'track')).toBe(null)
-  })
-
-  test('is one target per mark, whatever step says', async () => {
-    // Half of a face is not a rating anybody has ever given.
-    const host = await chips('step="0.5" value="2"')
-    expect(host.shadowRoot!.querySelectorAll('[part="option"]').length).toBe(5)
-  })
-
-  test('puts the mark inside the target rather than under it', async () => {
-    const host = await chips('value="2"')
-    const option = host.shadowRoot!.querySelector('[part="option"]')
-    expect(option?.querySelector('[part="mark"]')).not.toBe(null)
-  })
-
-  test('a readout draws the marks itself and says which one it is', async () => {
-    // No targets to put them in, so the mark carries the chip.
-    const host = await chips('readonly value="2" max="3"')
-    const marks = [...host.shadowRoot!.querySelectorAll('[part="mark"]')]
-    expect(marks.length).toBe(3)
-    expect(marks.map((one) => one.hasAttribute('data-chosen'))).toEqual([false, true, false])
-  })
-
-  test('is still a radio group, the marks having changed and not the meaning', async () => {
-    expect(part(await chips('value="2"'), 'marks')?.getAttribute('role')).toBe('radiogroup')
-  })
-})
-
 if (hasLayout()) {
   /* In a browser only. happy-dom does not assign slotted content, so
      `assignedElements` comes back empty there and `slotchange` never fires:
@@ -249,15 +212,13 @@ if (hasLayout()) {
       expect(shapes(host)).toEqual(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0'])
     })
 
-    test('and several as the shapes in order, which is what a face scale is', async () => {
-      const host = await withMarks('appearance="chips" value="2"', 5)
-      expect(shapes(host)).toEqual(['0', '1', '2', '3', '4'])
-    })
-
-    test('the last one repeats past the end of a short list', async () => {
-      // Two shapes for four marks is a decision rather than a crash.
-      const host = await withMarks('appearance="chips" max="4" value="1"', 2)
-      expect(shapes(host)).toEqual(['0', '1', '1', '1'])
+    test('and ignores anything past the first, a rating being one shape repeated', async () => {
+      /* A row whose third mark is a different drawing from its first is not a
+         rating, it is a set of choices: `Radio.Group`, whose options carry a
+         value and a name each. This element is a quantity, and the fill is a
+         clip across marks that are all the same. */
+      const host = await withMarks('value="2"', 3)
+      expect(new Set(shapes(host))).toEqual(new Set(['0']))
     })
 
     test('says it was given one, so the stylesheet stops drawing its own', async () => {

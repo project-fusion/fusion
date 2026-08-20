@@ -7446,6 +7446,9 @@ leave nothing for a high-contrast display. */
   appearance?: HelixRadio["appearance"];
   /** Takes the circle away, leaving the card as the whole control.
 
+Unnecessary under `chip`, which has no room for a circle beside its mark
+and hides it already.
+
 `card` only, and it is a graphic that goes rather than a radio: the control
 in the shadow root is untouched, so the row is still focusable, still
 reported to a screen reader, and still the thing a form submits.
@@ -7460,6 +7463,9 @@ unmistakably one-of-many because its siblings behave that way; a checkbox
 card with no box loses the only thing that says you may pick several. */
   "hide-control"?: HelixRadio["hideControl"];
   /** Takes the circle away, leaving the card as the whole control.
+
+Unnecessary under `chip`, which has no room for a circle beside its mark
+and hides it already.
 
 `card` only, and it is a graphic that goes rather than a radio: the control
 in the shadow root is untouched, so the row is still focusable, still
@@ -7501,6 +7507,9 @@ leave nothing for a high-contrast display. */
   "prop:appearance"?: HelixRadio["appearance"];
   /** Takes the circle away, leaving the card as the whole control.
 
+Unnecessary under `chip`, which has no room for a circle beside its mark
+and hides it already.
+
 `card` only, and it is a graphic that goes rather than a radio: the control
 in the shadow root is untouched, so the row is still focusable, still
 reported to a screen reader, and still the thing a form submits.
@@ -7515,6 +7524,9 @@ unmistakably one-of-many because its siblings behave that way; a checkbox
 card with no box loses the only thing that says you may pick several. */
   "bool:hide-control"?: HelixRadio["hideControl"];
   /** Takes the circle away, leaving the card as the whole control.
+
+Unnecessary under `chip`, which has no room for a circle beside its mark
+and hides it already.
 
 `card` only, and it is a graphic that goes rather than a radio: the control
 in the shadow root is untouched, so the row is still focusable, still
@@ -7545,6 +7557,18 @@ card with no box loses the only thing that says you may pick several. */
 };
 
 export type HelixRatingProps = {
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned.
+
+Both are one shape repeated and clipped to the score, so halves work in
+either, and both are only a choice of drawing. A scale whose marks are
+*different* drawings is a set of choices rather than a quantity: that is
+`Radio.Group`, whose options already carry a value and a name each. */
+  appearance?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7622,27 +7646,6 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   showValue?: HelixRating["showValue"];
-  /** Which mark the row is drawn with.
-
-`marks` is the star, and is what a rating means to most readers. `dots`
-drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
-confidence has not earned. Both are one shape repeated and clipped, so
-halves work in either.
-
-**`chips` is a different thing wearing the same name.** Each position is
-its own drawing rather than a copy of the first, which is what a face scale
-is: the third mark is a flat mouth and the fifth is a grin, and neither is
-a fraction of the other. There is nothing to clip, so there is no fill
-layer and no half of anything, and `step` is one whatever it says.
-
-**Here rather than on the styled element**, where a presentation property
-belongs, because `chips` changes the structure: the marks move inside the
-targets and two layers become one. The element that draws that has to know.
-`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
-along because splitting one property across two tiers would be worse than
-one property in the tier that needs it. */
-  appearance?: HelixRating["appearance"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7675,6 +7678,18 @@ reflected none of them. */
 };
 
 export type HelixRatingSolidJsProps = {
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned.
+
+Both are one shape repeated and clipped to the score, so halves work in
+either, and both are only a choice of drawing. A scale whose marks are
+*different* drawings is a set of choices rather than a quantity: that is
+`Radio.Group`, whose options already carry a value and a name each. */
+  "prop:appearance"?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7752,27 +7767,6 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   "prop:showValue"?: HelixRating["showValue"];
-  /** Which mark the row is drawn with.
-
-`marks` is the star, and is what a rating means to most readers. `dots`
-drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
-confidence has not earned. Both are one shape repeated and clipped, so
-halves work in either.
-
-**`chips` is a different thing wearing the same name.** Each position is
-its own drawing rather than a copy of the first, which is what a face scale
-is: the third mark is a flat mouth and the fifth is a grin, and neither is
-a fraction of the other. There is nothing to clip, so there is no fill
-layer and no half of anything, and `step` is one whatever it says.
-
-**Here rather than on the styled element**, where a presentation property
-belongs, because `chips` changes the structure: the marks move inside the
-targets and two layers become one. The element that draws that has to know.
-`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
-along because splitting one property across two tiers would be worse than
-one property in the tier that needs it. */
-  "prop:appearance"?: HelixRating["appearance"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -17433,6 +17427,9 @@ export type CustomElements = {
    * leave nothing for a high-contrast display.
    * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
    *
+   * Unnecessary under `chip`, which has no room for a circle beside its mark
+   * and hides it already.
+   *
    * `card` only, and it is a graphic that goes rather than a radio: the control
    * in the shadow root is untouched, so the row is still focusable, still
    * reported to a screen reader, and still the thing a form submits.
@@ -17460,6 +17457,7 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this choice.
+   * - `icon`: A mark shown beside them, or instead of them under `appearance="chip"`, where the words become the accessible name and the mark is what a reader picks between. Separate from the default slot because the chip has to hide one and show the other, and they are both in the same place otherwise.
    *
    * ## Methods
    *
@@ -17477,6 +17475,7 @@ export type CustomElements = {
    * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
    * - `--radio-border-color`: Edge of the circle, in every state. (default: `undefined`)
    * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--radio-chip-size`: Diameter of the chip appearance. (default: `undefined`)
    * - `--radio-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
    * - `--radio-card-border-color`: Edge around one. (default: `undefined`)
    *
@@ -17499,6 +17498,17 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned.
+   *
+   * Both are one shape repeated and clipped to the score, so halves work in
+   * either, and both are only a choice of drawing. A scale whose marks are
+   * *different* drawings is a set of choices rather than a quantity: that is
+   * `Radio.Group`, whose options already carry a value and a name each.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -17540,26 +17550,6 @@ export type CustomElements = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
-   * - `appearance`: Which mark the row is drawn with.
-   *
-   * `marks` is the star, and is what a rating means to most readers. `dots`
-   * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgement that a level of spice, a difficulty or a
-   * confidence has not earned. Both are one shape repeated and clipped, so
-   * halves work in either.
-   *
-   * **`chips` is a different thing wearing the same name.** Each position is
-   * its own drawing rather than a copy of the first, which is what a face scale
-   * is: the third mark is a flat mouth and the fifth is a grin, and neither is
-   * a fraction of the other. There is nothing to clip, so there is no fill
-   * layer and no half of anything, and `step` is one whatever it says.
-   *
-   * **Here rather than on the styled element**, where a presentation property
-   * belongs, because `chips` changes the structure: the marks move inside the
-   * targets and two layers become one. The element that draws that has to know.
-   * `Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
-   * along because splitting one property across two tiers would be worse than
-   * one property in the tier that needs it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -17605,7 +17595,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `mark`: The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it.
+   * - `mark`: The shape of a mark, cloned into every position. Left empty, the stylesheet draws its own and `--rating-mark` swaps it.
    *
    * ## Methods
    *
@@ -17638,7 +17628,6 @@ export type CustomElements = {
    * - `--rating-gap`: Space between marks. (default: `undefined`)
    * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
-   * - `--rating-chip-size`: How big one chip is, under `appearance="chips"`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -26653,6 +26642,9 @@ export type CustomElementsSolidJs = {
    * leave nothing for a high-contrast display.
    * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
    *
+   * Unnecessary under `chip`, which has no room for a circle beside its mark
+   * and hides it already.
+   *
    * `card` only, and it is a graphic that goes rather than a radio: the control
    * in the shadow root is untouched, so the row is still focusable, still
    * reported to a screen reader, and still the thing a form submits.
@@ -26680,6 +26672,7 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The words naming this choice.
+   * - `icon`: A mark shown beside them, or instead of them under `appearance="chip"`, where the words become the accessible name and the mark is what a reader picks between. Separate from the default slot because the chip has to hide one and show the other, and they are both in the same place otherwise.
    *
    * ## Methods
    *
@@ -26697,6 +26690,7 @@ export type CustomElementsSolidJs = {
    * - `--radio-background-color`: Fill of an unselected circle. (default: `undefined`)
    * - `--radio-border-color`: Edge of the circle, in every state. (default: `undefined`)
    * - `--radio-card-padding`: Inset of the card appearance. (default: `undefined`)
+   * - `--radio-chip-size`: Diameter of the chip appearance. (default: `undefined`)
    * - `--radio-card-background-color`: Fill behind a card-shaped choice. (default: `undefined`)
    * - `--radio-card-border-color`: Edge around one. (default: `undefined`)
    *
@@ -26724,6 +26718,17 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned.
+   *
+   * Both are one shape repeated and clipped to the score, so halves work in
+   * either, and both are only a choice of drawing. A scale whose marks are
+   * *different* drawings is a set of choices rather than a quantity: that is
+   * `Radio.Group`, whose options already carry a value and a name each.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -26765,26 +26770,6 @@ export type CustomElementsSolidJs = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
-   * - `appearance`: Which mark the row is drawn with.
-   *
-   * `marks` is the star, and is what a rating means to most readers. `dots`
-   * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgement that a level of spice, a difficulty or a
-   * confidence has not earned. Both are one shape repeated and clipped, so
-   * halves work in either.
-   *
-   * **`chips` is a different thing wearing the same name.** Each position is
-   * its own drawing rather than a copy of the first, which is what a face scale
-   * is: the third mark is a flat mouth and the fifth is a grin, and neither is
-   * a fraction of the other. There is nothing to clip, so there is no fill
-   * layer and no half of anything, and `step` is one whatever it says.
-   *
-   * **Here rather than on the styled element**, where a presentation property
-   * belongs, because `chips` changes the structure: the marks move inside the
-   * targets and two layers become one. The element that draws that has to know.
-   * `Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
-   * along because splitting one property across two tiers would be worse than
-   * one property in the tier that needs it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -26830,7 +26815,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `mark`: The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it.
+   * - `mark`: The shape of a mark, cloned into every position. Left empty, the stylesheet draws its own and `--rating-mark` swaps it.
    *
    * ## Methods
    *
@@ -26863,7 +26848,6 @@ export type CustomElementsSolidJs = {
    * - `--rating-gap`: Space between marks. (default: `undefined`)
    * - `--rating-color`: The colour of a filled mark. (default: `undefined`)
    * - `--rating-empty-color`: And of an unfilled one. (default: `undefined`)
-   * - `--rating-chip-size`: How big one chip is, under `appearance="chips"`. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30703,6 +30687,8 @@ export type CustomCssProperties = {
   "--radio-border-color"?: string;
   /** Inset of the card appearance. */
   "--radio-card-padding"?: string;
+  /** Diameter of the chip appearance. */
+  "--radio-chip-size"?: string;
   /** Fill behind a card-shaped choice. */
   "--radio-card-background-color"?: string;
   /** Edge around one. */
@@ -30717,8 +30703,6 @@ export type CustomCssProperties = {
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
-  /** How big one chip is, under `appearance="chips"`. */
-  "--rating-chip-size"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** The invisible width of a divider's drag target. */
