@@ -187,14 +187,8 @@ export function SiteNav() {
               </button>
               {PRODUCTS.map((product) => (
                 <div data-megamenu-group key={product.name}>
-                  {/* The mark identifies the product; the rows below it carry
-                      none, so there is one thing in each column saying what
-                      column it is. */}
                   <h3 data-megamenu-heading>
-                    <helix-flex align="center" gap="xs" inline>
-                      <helix-icon className="productMark" name={product.mark}></helix-icon>
-                      {product.name}. {product.role}
-                    </helix-flex>
+                    {product.name}. {product.role}
                   </h3>
                   {product.destinations.map((destination) => (
                     <Link
@@ -203,6 +197,7 @@ export function SiteNav() {
                       href={destination.href}
                       key={destination.href}
                     >
+                      <helix-icon name={destination.icon}></helix-icon>
                       <strong>{destination.title}</strong>
                       <span>{destination.summary}</span>
                     </Link>

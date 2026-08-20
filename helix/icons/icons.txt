@@ -31,7 +31,6 @@ compass
 copy
 corners-in
 corners-out
-cortex
 cube
 dots-three-vertical
 download
@@ -47,7 +46,6 @@ fusion
 gauge
 gear
 github-logo
-helix
 house
 html5
 info
