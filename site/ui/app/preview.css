@@ -170,3 +170,38 @@
 .dvStepNote {
   min-block-size: 2lh;
 }
+
+/* ================================== candidate: A's type, B's rail ======== */
+
+/* A row of the stack, and its real state.
+ *
+ * This replaces the derivation ramp, which failed for a reason worth writing
+ * down: a colour gradient says "these are shades of one value" and the labels
+ * on it said "these are consequences of one principle". The device and the
+ * content were arguing in different dimensions, so a reader saw a palette and
+ * found product names sitting on it.
+ *
+ * What answers the question a first time reader actually has is not a metaphor
+ * at all. It is a list of what exists, what it costs, and what is not built,
+ * with the stage against each one. */
+.tdRow {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-xl);
+}
+
+.tdName {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 3vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+}
+
+/* The reader's own question, at the size a question deserves. */
+.tdAsk {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 5vw, 4rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
