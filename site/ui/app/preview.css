@@ -215,3 +215,91 @@
 .tdBody {
   flex: 1 1 32rem;
 }
+
+/* ==================================== candidate: scale (cinematic) ======= */
+
+/* Atmosphere without photography.
+ *
+ * The reference this is drawn from carries full-bleed film of factories and
+ * orbit. There is no such footage here and buying stock would be a picture of
+ * someone else's work standing in for ours, so the atmosphere is generated: a
+ * brand-coloured glow sitting low behind the type, and the lattice this site
+ * already uses, opened out to a much larger pitch so it reads as a field rather
+ * than as texture.
+ */
+.scBand {
+  align-items: center;
+  display: flex;
+  isolation: isolate;
+  min-block-size: 88svh;
+  overflow: clip;
+  padding-block: var(--helix-space-3xl);
+  position: relative;
+}
+
+/* The glow. Low, wide and weak, so it lights the floor of the band and never
+   competes with the words sitting on it. */
+.scBand::before {
+  background-image: radial-gradient(
+    ellipse 80% 60% at 50% 108%,
+    color-mix(in oklab, var(--helix-color-primary) 34%, transparent) 0%,
+    transparent 70%
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* The lattice, at four times the spacing pitch, masked to the same floor. */
+.scBand::after {
+  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
+  background-position: center;
+  background-size: calc(var(--site-lattice-pitch) * 4) calc(var(--site-lattice-pitch) * 4);
+  content: "";
+  inset: 0;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 100%, #000 0%, transparent 72%);
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+.scInner {
+  inline-size: 100%;
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+/* The rung, set at the size the claim deserves and no smaller. */
+.scTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 9vw, 8rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.scRung {
+  color: var(--helix-color-primary);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.scLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-xl));
+  max-inline-size: 44ch;
+}
+
+/* The counted row. Real quantities only: this page has no eight million
+   vehicles to report and will not imply that it does. */
+.scFigure {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1;
+}
