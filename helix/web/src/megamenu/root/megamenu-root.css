@@ -126,6 +126,12 @@
   background-color: var(--helix-color-background);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
+  /* Shadow on the bottom edge and nowhere else. A blurred shadow spills every
+     way, including up: offset four and blurred twelve reaches eight pixels above
+     the box, which lands on the header the band is flush against and draws a
+     smudge along the edge it is supposed to continue. Clipped to the box on
+     three sides and let out only below. */
+  clip-path: inset(0 0 -100vmax 0);
   /* Tracks, where the card has flex.
    *
    * A band knows how wide it is, so `auto-fit` can work out how many columns

@@ -274,7 +274,7 @@ if (hasLayout()) {
       }
     })
 
-    test('and the band spans the page and starts under the trigger', async () => {
+    test('and the band spans the page and starts under the bar, not the trigger', async () => {
       const bar = (await mount(
         `<nav style="padding:40px">
           <helix-megamenu appearance="full" label="Products">
@@ -296,7 +296,14 @@ if (hasLayout()) {
       const trigger = (part(host, 'trigger') as HTMLElement).getBoundingClientRect()
       expect(Math.round(panel.left)).toBe(0)
       expect(Math.round(panel.width)).toBe(document.documentElement.clientWidth)
-      expect(Math.round(panel.top)).toBe(Math.round(trigger.bottom))
+
+      /* The bar's bottom edge, not the trigger's. A bar is taller than the word
+         in it, so a band starting at the word starts partway up the bar and is
+         drawn across its own padding and its border: measured on a header,
+         trigger bottom 44 against header bottom 57. The bar here is the `nav`,
+         which is the first ancestor as wide as the window. */
+      expect(Math.round(panel.top)).toBe(Math.round(bar.getBoundingClientRect().bottom))
+      expect(Math.round(panel.top)).toBeGreaterThan(Math.round(trigger.bottom))
     })
 
     test('a plain link in a group starts where its heading does', async () => {

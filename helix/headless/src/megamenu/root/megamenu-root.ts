@@ -213,8 +213,41 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     if (!this.banded) {
       return
     }
-    const under = this.trigger.getBoundingClientRect().bottom
-    this.style.setProperty('--_megamenu-top', `${Math.round(under)}px`)
+    this.style.setProperty('--_megamenu-top', `${Math.round(this.bar())}px`)
+  }
+
+  /**
+   * The bottom edge of the bar this hangs from.
+   *
+   * The trigger's own bottom is the obvious answer and is the wrong one: a
+   * header is taller than the word inside it, so a band starting at the word
+   * starts partway up the header, over its lower padding and its border.
+   * Measured: trigger bottom 44, header bottom 57, thirteen pixels of header
+   * with a band drawn across it.
+   *
+   * **The first ancestor as wide as the window, which is a fact and not a tag
+   * name.** A band spans the viewport, so what it should hang from is whatever
+   * else does: that is what makes something a bar. Asking for `helix-app-header`
+   * by name would make this element know about that one, which is the coupling
+   * `Menu` is careful not to have with `Drilldown`, and would leave a consumer
+   * who wrote their own header with a band across it.
+   *
+   * `body` ends the walk. It is as wide as the window and is not a bar, and its
+   * bottom is the foot of the page: without the guard a megamenu on a plain page
+   * would put its band down there. Nothing found means nothing to hang from, and
+   * the trigger is the honest answer again.
+   */
+  private bar(): number {
+    const wide = document.documentElement.clientWidth
+    let node = this.parentElement
+    while (node && node !== document.body) {
+      const box = node.getBoundingClientRect()
+      if (Math.round(box.width) >= wide) {
+        return box.bottom
+      }
+      node = node.parentElement
+    }
+    return this.trigger.getBoundingClientRect().bottom
   }
 
   /**
