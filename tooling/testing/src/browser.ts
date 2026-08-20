@@ -64,10 +64,51 @@ export const describe = (name: string, body: () => void): void => {
   suite = suite.slice(0, -1)
 }
 
-/** Registers one test. */
-export const test = (name: string, body: () => unknown): void => {
+const register = (name: string, body: () => unknown): void => {
   cases.push({ body, name, suite: [...suite] })
 }
+
+/**
+ * What a spec file gets when it imports `test` from `bun:test`.
+ *
+ * **The methods matter as much as the call.** This stands in for Bun's `test`,
+ * and a spec written against Bun that reaches for one this does not have throws
+ * where it is written, which is module scope: the bundle never finishes
+ * importing, so the runner reports one `family > load` failure and counts every
+ * spec in that family as failed. Six uses of `skipIf` took `tree` and
+ * `breadcrumbs` down entirely, and hid the three real failures underneath.
+ *
+ * A skip here is an absence. `SpecResult` has no skipped state, so a test that
+ * is skipped is one that was never registered, which is exactly what the
+ * `if (hasLayout())` guard already produced and reports the same way: it is not
+ * in the run. Giving the runner a third outcome is a bigger change than making
+ * the two harnesses agree on their API, and it is the change worth having next
+ * if a skip should ever be visible rather than merely absent.
+ *
+ * `only` is deliberately absent. It does not mean "register this", it means
+ * "and drop the rest", and a shim that accepted it while running everything
+ * would answer a spec author's question with a lie. Better it throws.
+ */
+interface TestApi {
+  (name: string, body: () => unknown): void
+  /** Registers nothing. */
+  skip(name: string, body: () => unknown): void
+  /** Registers nothing when the condition holds, and normally when it does not. */
+  skipIf(condition: boolean): (name: string, body: () => unknown) => void
+}
+
+/** Registers one test. */
+export const test: TestApi = Object.assign(register, {
+  skip: (): void => {},
+  skipIf:
+    (condition: boolean) =>
+    (name: string, body: () => unknown): void => {
+      if (condition) {
+        return
+      }
+      register(name, body)
+    },
+})
 
 /** `it` and `test` are the same thing, and the specs use both. */
 export const it = test
