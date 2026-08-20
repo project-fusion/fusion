@@ -24,6 +24,11 @@ export type Kind = 'Decision' | 'Essay' | 'Note'
  */
 export interface Insight {
   /**
+   * Who wrote it. `Avatar` derives the initials, so nothing else is needed for
+   * the byline to render.
+   */
+  author: string
+  /**
    * Publication date, ISO `YYYY-MM-DD`, which is what sorts and what displays.
    */
   date: string
@@ -70,6 +75,7 @@ export interface Insight {
  */
 export const INSIGHTS: Insight[] = [
   {
+    author: 'Ross Sheppard',
     date: '2026-08-18',
     kind: 'Decision',
     minutes: 4,
@@ -80,6 +86,7 @@ export const INSIGHTS: Insight[] = [
     topic: 'Design systems',
   },
   {
+    author: 'Ross Sheppard',
     date: '2026-08-11',
     kind: 'Essay',
     minutes: 5,
@@ -90,6 +97,7 @@ export const INSIGHTS: Insight[] = [
     topic: 'Design systems',
   },
   {
+    author: 'Ross Sheppard',
     date: '2026-07-29',
     kind: 'Note',
     minutes: 3,
@@ -100,6 +108,7 @@ export const INSIGHTS: Insight[] = [
     topic: 'Company',
   },
   {
+    author: 'Ross Sheppard',
     date: '2026-07-14',
     kind: 'Decision',
     minutes: 4,
@@ -110,6 +119,7 @@ export const INSIGHTS: Insight[] = [
     topic: 'Engineering',
   },
   {
+    author: 'Ross Sheppard',
     date: '2026-06-30',
     kind: 'Essay',
     minutes: 6,
@@ -120,6 +130,7 @@ export const INSIGHTS: Insight[] = [
     topic: 'Sovereignty',
   },
   {
+    author: 'Ross Sheppard',
     date: '2026-06-16',
     kind: 'Essay',
     minutes: 7,

@@ -2122,9 +2122,53 @@ helix-drawer helix-tree {
   align-content: space-between;
 }
 
-/* A post is prose, so it takes the prose column rather than the page's. */
+/* A post is a centered column, and the column is the page's measure rather than
+   the shell's full width. */
 .insightShell {
+  margin-inline: auto;
+  max-inline-size: 44rem;
   padding-block: var(--site-band);
+  padding-inline: var(--site-inset);
+}
+
+/* Only the head is centered text. Past two lines, centered prose moves its own
+   left edge every line, so the body keeps a fixed edge to return to. */
+.insightHead {
+  text-align: center;
+}
+
+.insightBack {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+.insightLede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 34rem;
+  text-wrap: balance;
+}
+
+/* The dividers in the byline are hairlines between three facts, so they take
+   the height of the text rather than the row. */
+.insightByline helix-divider {
+  block-size: 1em;
+}
+
+/* A row that is a link, ruled from the next one. Cards were tried here and are
+   wrong at the foot of an article: three boxes after a column of prose read as
+   a different page starting, where rows read as the same page continuing. */
+.insightNext {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  color: inherit;
+  display: block;
+  padding-block: var(--helix-space-lg);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
 }
 
 /* Larger than a section title and smaller than the hero's, which is the whole
@@ -2176,4 +2220,15 @@ helix-drawer helix-tree {
  * it carries a little more weight than the words do. */
 .productMark {
   --icon-size: 1.125rem;
+}
+
+/* The arrow holds the end of the row rather than wrapping under it. Without a
+   floor of zero the text column refuses to shrink, so `justify: between` has
+   nothing to distribute and the icon drops to a line of its own. */
+.insightNextRow > helix-flex:first-child {
+  min-inline-size: 0;
+}
+
+.insightNextRow > helix-icon {
+  flex: none;
 }

@@ -4,11 +4,6 @@ import { notFound } from 'next/navigation'
 import { findInsight, formatDate, INSIGHTS } from '../../../../lib/insights'
 import { BODIES } from '../../../../lib/insights/bodies'
 
-/**
- * Every post, rendered at build. The set is a static registry, so there is
- * nothing to discover at request time and no reason for any of these to be
- * dynamic.
- */
 export function generateStaticParams(): { slug: string }[] {
   return INSIGHTS.map((insight) => ({ slug: insight.slug }))
 }
@@ -27,19 +22,19 @@ export async function generateMetadata({
 }
 
 /**
- * One post.
+ * One post, set as a centered column.
  *
- * A column of prose, held to a measure, with the metadata above it and the
- * neighbouring posts below. No hero: this page is the writing, and a band of
- * chrome over it would be the site talking about itself on top of the thing a
- * reader came to read.
+ * **The head is three tiers and they are ordered by what a reader needs first.**
+ * The way out, then what the piece is, then who wrote it and how long it takes.
+ * It used to be one undifferentiated row of four chips: topic, kind, date and
+ * minutes all at the same weight, so nothing in it was answering a question
+ * anyone had. Filing labels belong above the title, the byline belongs under it
+ * with the title between them, and the way back belongs at the very top where a
+ * reader's hand already is.
  *
- * **The body is looked up rather than imported by name**, so `bodies.tsx` is
- * the only file that has to change when a post is added, and `notFound` covers
- * both halves: a slug with no registry entry and a registry entry with no
- * prose. The second is the one worth guarding, because it is what a
- * half-finished commit looks like and it would otherwise render a title over
- * nothing.
+ * Centered, and the prose is not. A measure centered in the page is a column a
+ * reader's eye can find; centered *text* past two lines is a column whose left
+ * edge moves every line, which is why only the head is set that way.
  */
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -53,65 +48,81 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const others = INSIGHTS.filter((entry) => entry.slug !== insight.slug).slice(0, 3)
 
   return (
-    <helix-flex class="shell insightShell" direction="column" gap="2xl">
-      <helix-flex class="measure" direction="column" gap="md">
-        <helix-flex align="center" data-density="sm" gap="sm" wrap>
-          <helix-tag>{insight.topic}</helix-tag>
-          <helix-text appearance="caption" tone="subtle">
-            {insight.kind}
-          </helix-text>
-          <helix-text appearance="caption" tone="subtle">
-            <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-          </helix-text>
-          <helix-text appearance="caption" tone="subtle">
-            {insight.minutes} min
-          </helix-text>
+    <helix-flex class="insightShell" direction="column" gap="2xl">
+      <helix-flex align="center" class="insightHead" direction="column" gap="lg">
+        {/* The way out, above everything. A reader who opened this from the
+            gallery wants it before they want the filing labels. */}
+        <Link className="insightBack" data-link="quiet" href="/insights">
+          <helix-icon name="arrow-left"></helix-icon>
+          All insights
+        </Link>
+
+        <helix-flex align="center" data-density="sm" gap="xs" wrap>
+          <helix-tag tone="primary">{insight.topic}</helix-tag>
+          <helix-tag>{insight.kind}</helix-tag>
         </helix-flex>
+
         <helix-text as="h1" class="insightTitle">
           {insight.title}
         </helix-text>
-        <helix-text as="p" class="lede" tone="muted">
+
+        <helix-text as="p" class="insightLede" tone="muted">
           {insight.summary}
         </helix-text>
+
+        {/* The byline under the title rather than beside the topic. Who wrote a
+            thing and how long it takes are the two questions a reader has once
+            they have decided the subject is theirs. */}
+        <helix-flex align="center" class="insightByline" data-density="sm" gap="sm">
+          <helix-avatar name={insight.author} size="sm"></helix-avatar>
+          <helix-text appearance="body-strong">{insight.author}</helix-text>
+          <helix-divider orientation="vertical"></helix-divider>
+          <helix-text tone="muted">
+            <time dateTime={insight.date}>{formatDate(insight.date)}</time>
+          </helix-text>
+          <helix-divider orientation="vertical"></helix-divider>
+          <helix-text tone="muted">{insight.minutes} min read</helix-text>
+        </helix-flex>
       </helix-flex>
 
       {/* `data-prose` because this is the one place on the site rendering prose
-          the design system did not lay out: the base layer themes headings,
-          paragraphs and anchors only under this attribute, which is what keeps
-          it off every component that happens to slot a `<p>`. */}
-      <article className="insightBody measure" data-prose>
+          the design system did not lay out. */}
+      <article className="insightBody" data-prose>
         <Body />
       </article>
 
-      <helix-divider></helix-divider>
+      <helix-flex class="insightMore" direction="column" gap="lg">
+        <helix-divider></helix-divider>
+        <helix-flex align="center" gap="md" justify="between" wrap>
+          <helix-text appearance="title" as="h2">
+            Keep reading
+          </helix-text>
+          <Link data-link href="/insights">
+            All insights
+          </Link>
+        </helix-flex>
 
-      <helix-flex direction="column" gap="lg">
-        <helix-text appearance="label" tone="subtle">
-          More insights
-        </helix-text>
-        <helix-grid gap="xl" min="18rem">
+        <helix-flex direction="column" gap="none">
           {others.map((other) => (
-            <Link
-              aria-label={other.title}
-              className="insightCard"
-              data-card
-              href={`/insights/${other.slug}`}
-              key={other.slug}
-            >
-              <helix-card appearance="outlined">
-                <helix-tag slot="header">{other.topic}</helix-tag>
-                <helix-flex direction="column" gap="xs">
-                  <helix-text appearance="title" as="h3">
-                    {other.title}
-                  </helix-text>
-                  <helix-text appearance="caption" tone="muted">
+            <Link className="insightNext" href={`/insights/${other.slug}`} key={other.slug}>
+              <helix-flex align="center" class="insightNextRow" gap="md" justify="between">
+                <helix-flex direction="column" gap="2xs">
+                  <helix-flex align="center" data-density="sm" gap="xs">
+                    <helix-tag>{other.topic}</helix-tag>
+                    <helix-text appearance="caption" tone="subtle">
+                      {other.minutes} min
+                    </helix-text>
+                  </helix-flex>
+                  <helix-text appearance="title">{other.title}</helix-text>
+                  <helix-text appearance="caption" class="measure" tone="muted">
                     {other.summary}
                   </helix-text>
                 </helix-flex>
-              </helix-card>
+                <helix-icon name="arrow-right"></helix-icon>
+              </helix-flex>
             </Link>
           ))}
-        </helix-grid>
+        </helix-flex>
       </helix-flex>
     </helix-flex>
   )
