@@ -56,7 +56,17 @@ const COUNTED = [
 
 export default function Page() {
   return (
-    <>
+    /* One stage, so the sky behind it is continuous. Every band used to paint
+       its own glow, which put a seam at every section boundary. */
+    <div className="scStage">
+      {/* Painted, not laid out, which is why these are plain elements: there is
+          no Helix component for a surface that draws light, and `Flex` would be
+          claiming this is a layout. */}
+      <div aria-hidden="true" className="scSky">
+        <div className="scField" />
+        <div className="scSun" />
+      </div>
+
       <section className="scBand">
         <helix-flex class="scInner shell" direction="column" gap="xl">
           <helix-text appearance="label" class="scRung">
@@ -144,6 +154,6 @@ export default function Page() {
           </helix-flex>
         </helix-flex>
       </section>
-    </>
+    </div>
   )
 }

@@ -98,7 +98,6 @@
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 /* =========================================== direction B: provenance ===== */
@@ -218,57 +217,118 @@
 
 /* ==================================== candidate: scale (cinematic) ======= */
 
-/* Atmosphere without photography.
+/* The reference is carried by six 4K videos. There is no WebGL in it and no
+ * three.js: the look is a production asset rather than a technique, and
+ * matching it means commissioning footage rather than adding a library.
  *
- * The reference this is drawn from carries full-bleed film of factories and
- * orbit. There is no such footage here and buying stock would be a picture of
- * someone else's work standing in for ours, so the atmosphere is generated: a
- * brand-coloured glow sitting low behind the type, and the lattice this site
- * already uses, opened out to a much larger pitch so it reads as a field rather
- * than as texture.
+ * So the atmosphere here is generated, and it is generated from the two things
+ * the company actually is. The light is a sun, because cheap energy is half the
+ * thesis and Fusion Energy is the literal one. The field it rises over is the
+ * lattice this site already draws, opened to four times its pitch.
+ *
+ * **One backdrop for the whole page, and that is the point of it.** Each band
+ * used to paint its own glow, so every section boundary was a seam where the
+ * light restarted. Fixed to the viewport, there is nothing to break: the sun
+ * sits behind the entire document and the bands scroll over it.
  */
-.scBand {
-  align-items: center;
-  display: flex;
+.scStage {
   isolation: isolate;
-  min-block-size: 88svh;
-  overflow: clip;
-  padding-block: var(--helix-space-3xl);
   position: relative;
 }
 
-/* The glow. Low, wide and weak, so it lights the floor of the band and never
-   competes with the words sitting on it. */
-.scBand::before {
-  background-image: radial-gradient(
-    ellipse 80% 60% at 50% 108%,
-    color-mix(in oklab, var(--helix-color-primary) 34%, transparent) 0%,
-    transparent 70%
-  );
-  content: "";
-  inset: 0;
+/* Decorative and painted rather than laid out, which is why this is a plain
+   element: there is no Helix component for a surface that draws light, and
+   `Flex` would be claiming it is a layout. */
+/* Sticky rather than fixed, and the difference is what makes the sun move.
+ *
+ * A `position: fixed` element is not scrolled by the root scroller, so a scroll
+ * timeline naming that scroller is inactive for anything inside it: measured,
+ * the animation was attached to a `ScrollTimeline`, reported `running`, and had
+ * a `currentTime` of null at the top, the middle and the bottom of the page. It
+ * looked wired up and was not.
+ *
+ * Sticky is in flow, pinned to the top of the viewport, and its descendants do
+ * participate. The negative end margin pulls the bands back over it so the sky
+ * occupies no height of its own. */
+.scSky {
+  block-size: 100svh;
+  inset-block-start: 0;
+  margin-block-end: -100svh;
+  overflow: clip;
   pointer-events: none;
-  position: absolute;
+  position: sticky;
   z-index: var(--helix-layer-base);
 }
 
-/* The lattice, at four times the spacing pitch, masked to the same floor. */
-.scBand::after {
+/* The sun rises through the ladder.
+ *
+ * It starts low and small under the hero and ends high and wide by the last
+ * rung, which is the argument the page is making rendered as light: the same
+ * stack at a larger scale each time. Driven by the document's own scroll, so it
+ * costs no JavaScript and cannot fall out of step with the reading position.
+ *
+ * `translate` and `scale` rather than the gradient's own stops, so the movement
+ * is composited and needs no `@property` registration to be animatable. */
+.scSun {
+  background-image: radial-gradient(
+    ellipse at 50% 50%,
+    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 0%,
+    color-mix(in oklab, var(--helix-color-primary) 12%, transparent) 38%,
+    transparent 68%
+  );
+  block-size: 120%;
+  inset-block-start: 62%;
+  inset-inline: -25%;
+  position: absolute;
+}
+
+/* The field it rises over. */
+.scField {
   background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
   background-position: center;
   background-size: calc(var(--site-lattice-pitch) * 4) calc(var(--site-lattice-pitch) * 4);
-  content: "";
   inset: 0;
-  mask-image: radial-gradient(ellipse 70% 70% at 50% 100%, #000 0%, transparent 72%);
-  pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 92%, #000 0%, transparent 74%);
   position: absolute;
-  z-index: var(--helix-layer-base);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scSun {
+      animation: scSunRise linear both;
+      /* `root`, named rather than left to default.
+       
+         `scroll()` alone means the nearest scroll container in the block axis,
+         and this element sits inside a `position: fixed` parent, which the
+         document scroller does not scroll. The timeline resolved to something
+         that never advances: the animation was attached, which looks like
+         success, and the computed `scale` and `translate` were identical at the
+         top, the middle and the bottom of the page. */
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Interior-free: one move, from where it rests to where it ends, so a reader
+   who never scrolls sees the resting state rather than a frame of a loop. */
+@keyframes scSunRise {
+  to {
+    scale: 1.45;
+    translate: 0 -24%;
+  }
+}
+
+.scBand {
+  align-items: center;
+  display: flex;
+  min-block-size: 88svh;
+  padding-block: var(--helix-space-3xl);
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
 .scInner {
   inline-size: 100%;
-  position: relative;
-  z-index: var(--helix-layer-raised);
 }
 
 /* The rung, set at the size the claim deserves and no smaller. */
@@ -281,12 +341,13 @@
   text-wrap: balance;
 }
 
+/* Sentence case. An eyebrow in capitals is shouting a word the reader has not
+   agreed to hear loudly, and the tracking already says it is a label. */
 .scRung {
   color: var(--helix-color-primary);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-sm);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }
 
 .scLede {
@@ -302,4 +363,11 @@
   font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
   letter-spacing: var(--helix-tracking-tight);
   line-height: 1;
+}
+
+/* The bands over the sky, which have to sit above it and carry no ground of
+   their own or the light behind them is hidden. */
+.scStage > .band {
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
