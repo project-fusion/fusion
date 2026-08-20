@@ -38,6 +38,88 @@ const settle = (ms: number): Promise<void> =>
     setTimeout(done, ms)
   })
 
+describe('a megamenu taking a destination', () => {
+  const opened = async (): Promise<Section> => {
+    /* Its own row, at a fragment rather than a path. These dispatch a real
+       click on it, and a real browser follows that and destroys the page the
+       rest of the suite is running in. Under happy-dom nothing navigates and
+       the difference never shows up. The handler under test cannot tell the
+       two apart, so the fragment costs the spec nothing. */
+    const host = (await mount(
+      `<helix-megamenu label="Products"><a href="#one">One</a></helix-megamenu>`,
+    )) as Section
+    await host.updateComplete
+    /* Detail 0, which is a keyboard press: a mouse click on the trigger is
+       hover's business in the default mode and deliberately does not toggle. */
+    press(host, 'none', 0)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    return host
+  }
+
+  const clickItem = async (host: Section, init: MouseEventInit = {}): Promise<void> => {
+    const item = host.querySelector('a') as HTMLElement
+    /* `composed`, because the listener is on the panel inside the shadow root
+       and the row is slotted light DOM: an uncomposed event stops at the host
+       and never reaches it. A real click is composed, so leaving it off makes
+       every case here pass by never running the handler under test. */
+    item.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, ...init }),
+    )
+    await host.updateComplete
+  }
+
+  test('shuts, rather than following the reader onto the page they chose', async () => {
+    /* Nothing closed it before. With a router that navigates in place the panel
+       stayed up, covering the page it had just been asked to go to. */
+    const host = await opened()
+    await clickItem(host)
+    expect(host.open).toBe(false)
+  })
+
+  test('and does not pull focus back to the trigger on the way out', async () => {
+    // The reader is going somewhere. `close()` would scroll them back to the bar.
+    const host = await opened()
+    const focused = host.ownerDocument.activeElement
+    await clickItem(host)
+    expect(host.ownerDocument.activeElement).toBe(focused)
+  })
+
+  for (const key of ['altKey', 'ctrlKey', 'metaKey', 'shiftKey']) {
+    test(`stays open under ${key}, because that click opened a tab behind this page`, async () => {
+      /* The same position this element already takes on a middle click: the
+         reader is still standing in the menu and collecting from it. */
+      const host = await opened()
+      await clickItem(host, { [key]: true })
+      expect(host.open).toBe(true)
+    })
+  }
+
+  test('stays open on a click that chose nothing', async () => {
+    // A heading, a gap between rows, the panel's own padding.
+    const host = await opened()
+    const heading = host.ownerDocument.createElement('h3')
+    host.append(heading)
+    heading.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('stays open when something already answered the click', async () => {
+    /* A consumer calling `preventDefault()` has said the click was theirs, and
+       a row that opens a submenu rather than navigating is the case. */
+    const host = await opened()
+    const item = host.querySelector('a') as HTMLElement
+    item.addEventListener('click', (event) => {
+      event.preventDefault()
+    })
+    await clickItem(host)
+    expect(host.open).toBe(true)
+  })
+})
+
 describe('a megamenu opening on hover', () => {
   test('waits for the pointer to mean it, then opens', async () => {
     /* Without the wait, a pointer crossing the bar on its way somewhere else
@@ -211,6 +293,43 @@ describe('a megamenu', () => {
 })
 
 if (hasLayout()) {
+  describe('a megamenu panel that has been closed', () => {
+    /* Asserting on `open` alone is what let this ship. The state was closing
+       correctly on every path, and the band stayed painted over the page
+       anyway, because a stylesheet gave a hidden panel a display. A box is the
+       only thing that answers "did it close" from the reader's side. */
+    const banded = async (appearance: string): Promise<Section> => {
+      const host = (await mount(
+        `<helix-megamenu appearance="${appearance}" label="Products">
+          <div data-megamenu-group><a href="#one">One</a></div>
+        </helix-megamenu>`,
+      )) as Section
+      await host.updateComplete
+      return host
+    }
+
+    const panelBox = (host: Section): DOMRect =>
+      (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+
+    for (const appearance of ['card', 'full']) {
+      test(`takes no box when it is ${appearance}`, async () => {
+        const host = await banded(appearance)
+        press(host, 'none', 0)
+        await host.updateComplete
+        expect(panelBox(host).height).toBeGreaterThan(0)
+
+        press(host, 'none', 0)
+        await host.updateComplete
+        expect(host.open).toBe(false)
+        /* The band was 1280 by 267 here, and `open` was already false.
+           `:host([appearance="full"]) [part="panel"]` is (0,3,0) and the guard
+           was a bare `[part="panel"][hidden]` at (0,2,0), so it lost. */
+        expect(panelBox(host).height).toBe(0)
+        expect(panelBox(host).width).toBe(0)
+      })
+    }
+  })
+
   describe('a megamenu panel, once there is a page under it', () => {
     const opened = async (): Promise<HTMLElement> => {
       const bar = (await mount(

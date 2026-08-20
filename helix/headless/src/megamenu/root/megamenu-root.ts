@@ -356,6 +356,51 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * Shuts the panel when a reader takes one of the destinations in it.
+   *
+   * Nothing closed it before, so a click navigated and left the panel hanging
+   * over wherever the reader landed. With a router that navigates in place, and
+   * this is one, that is a panel covering the page it was asked to go to.
+   *
+   * **A modified click leaves it open**, which is the same position this
+   * element already takes on middle clicks and the status bar: `cmd` on a link
+   * opens a tab behind this page rather than navigating it, so the reader is
+   * still standing in the menu and collecting, and shutting it under them would
+   * make the second choice cost a second open.
+   *
+   * `requestOpen(false)` rather than `close()`, for the reason `pointerleave`
+   * gives: the trigger is not where the reader is going, and pulling focus back
+   * to a nav bar they have just left is a scroll they did not ask for.
+   *
+   * **On the host rather than on the panel**, which is the same reason the
+   * pointer handlers give and one more. A row is slotted light DOM and the
+   * panel is in the shadow root, so a click only reaches the panel through the
+   * flattened tree: real ones do, and a DOM that does not implement slot
+   * propagation never delivers it, which makes every case here pass by never
+   * running this at all. The host is the row's own ancestor in both.
+   */
+  private readonly handleContentClick = (event: MouseEvent): void => {
+    if (!this.open || event.defaultPrevented || event.button !== 0) {
+      return
+    }
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return
+    }
+    /* Asking for the destination rather than for any click, so the headings,
+       the gaps between rows and a reader's stray click on the panel's own
+       padding leave it where it is. */
+    const target = event.target as Element | null
+    const chosen = target?.closest?.('a[href], button:not([disabled]), [role="menuitem"]')
+    /* Inside this element and not the trigger. A press on the trigger is the
+       trigger's to answer, and a shadow-rendered one retargets to the host, so
+       `closest` there climbs past this element entirely. */
+    if (!chosen || !this.contains(chosen) || chosen.closest('[slot="trigger"]')) {
+      return
+    }
+    this.requestOpen(false)
+  }
+
   /* On the host, and here rather than in the template, because Lit templates
      bind inside a shadow root and these have to hear the panel too. Not the
      constructor: the server runs that and has no events. */
@@ -367,6 +412,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
        never prevents. */
     addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
     this.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('click', this.handleContentClick)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
   }
@@ -377,6 +423,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     this.query?.removeEventListener('change', this.handleWidth)
     this.query = undefined
     this.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('click', this.handleContentClick)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.stop()

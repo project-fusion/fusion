@@ -21101,6 +21101,13 @@
             },
             {
               "kind": "field",
+              "name": "handleContentClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both."
+            },
+            {
+              "kind": "field",
               "name": "defaultOpen",
               "type": {
                 "text": "boolean"
