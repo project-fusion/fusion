@@ -874,6 +874,14 @@ one client component.
   at the package boundary. The spec runner imports and runs this repository's
   own spec files, so it is internal by definition rather than by weight.
 
+  **And `@helix-io/sandbox` is `private` while Helix is pre-release**, so today
+  the cost is not opt-in, it is unavailable: a consumer gets the published shell
+  from `@helix-io/web` and brings their own source pane. The shell is slot-based
+  and the root hands its value to whatever is slotted in, so this degrades
+  rather than breaks. The scope still says Helix, because the package is Helix;
+  `private` is what says it does not ship, and flipping it is a one-line change
+  when there is a consumer outside this repository to flip it for.
+
 - **Which pane leads is a property, not a slot order.** `lead="preview"` puts the
   preview first. Two consumers legitimately disagree: a workbench is a place to
   write, so the source leads and the preview answers it; a reference page is a

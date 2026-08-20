@@ -1,9 +1,13 @@
 {
   "name": "@helix-io/icons",
   "description": "Helix icon set.",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0-dev",
   "license": "MIT",
+  "repository": {
+    "directory": "helix/icons",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -27,6 +31,6 @@
     "@phosphor-icons/core": "^2.1.1"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

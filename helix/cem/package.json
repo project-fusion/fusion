@@ -1,9 +1,14 @@
 {
   "name": "@helix-io/cem",
   "description": "Shared custom-elements-manifest analyzer configuration and Helix plugins.",
-  "version": "0.0.1",
+  "version": "0.0.0-dev",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "directory": "helix/cem",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,8 +35,5 @@
   },
   "peerDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

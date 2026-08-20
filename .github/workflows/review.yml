@@ -1,0 +1,106 @@
+# An adversarial reader on every pull request.
+#
+# **Two passes, because one pass posts everything it thought of.** The first
+# looks for problems; the second tries to refute each one and only survivors are
+# posted. A reviewer that comments on everything is muted within a week, and on
+# a repository with one maintainer a muted reviewer is worse than no reviewer,
+# because it looks like coverage.
+#
+# **Advisory, never required.** `continue-on-error`, and it must stay off the
+# list of checks branch protection requires. A non-deterministic gate that can
+# block a merge at two in the morning is a liability, and the deterministic
+# gates already exist: `verify` runs twenty-odd `check:*` scripts.
+#
+# **Which is where its findings are supposed to end up.** This repository's
+# invariants live in scripts, one per invariant, each with the incident that
+# caused it written at the top. So the prompt below asks for a `check:*` script
+# whenever a finding could have been caught by one. The proper output of an AI
+# reviewer here is not a comment, it is the next check.
+#
+# Vercel Agent covers `site/**` and is configured in the Vercel dashboard rather
+# than here, so the two do not both review the same diff. Nothing in this file
+# turns it on or off.
+#
+# Forks are skipped rather than failed: a `pull_request` run from a fork gets no
+# secrets, so the action would error on a missing key and report as a broken
+# review instead of an absent one.
+name: review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  adversarial:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          track_progress: true
+          use_sticky_comment: true
+          claude_args: --model claude-opus-5
+          prompt: |
+            Review this pull request against the standards this repository has
+            written down for itself. Read CLAUDE.md and every file in
+            .claude/rules/ first. Those are the standard. Your own taste is not.
+
+            Work in two passes.
+
+            Pass one, find. Look for problems, and weight your attention toward
+            what a script cannot see, because twenty-odd `check:*` scripts
+            already run on this diff and there is no value in you repeating
+            them. In particular:
+
+            - A fix applied at the consumer level when the cause is deeper.
+              CLAUDE.md calls this out: a patch at the consumer masks an
+              architectural gap, and the fix goes where the cause is.
+            - A raw value where a semantic token exists, or a token invented
+              rather than used.
+            - A stage label softened. Active ships with users, Building is real
+              work with nothing shipped, Declared is committed direction with no
+              work started. These are honest by policy.
+            - Prose that no longer matches the code it describes. This repo's
+              comments carry measurements and incidents; a comment asserting
+              something the diff just made false is a real defect here.
+            - A claim stated rather than measured, where measuring was possible.
+            - Anything that would only fail on a consumer's machine: packaging,
+              exports, registration, a dependency on something unpublished.
+
+            Pass two, refute. For each candidate, argue against yourself as hard
+            as you can. Is it actually wrong, or merely different from how you
+            would have written it? Would it really fail, and under exactly what
+            input or state? Does a rule in CLAUDE.md or .claude/rules/ genuinely
+            say this, or are you paraphrasing something adjacent? Is it already
+            caught by an existing `check:*` script? Drop everything that does not
+            survive. Default to dropping.
+
+            Then post. At most five findings, most serious first. Every one must
+            name a file and line, and give either the rule it breaks or the
+            concrete way it fails: inputs, state, and what goes wrong. No
+            summary of the pull request, no praise, no restating the diff.
+
+            If a finding could have been caught deterministically, say so and
+            propose the `check:*` script that would catch it, including the
+            invariant in one sentence. That is worth more than the finding.
+
+            If nothing survives pass two, reply with exactly one line saying so.
+            Silence is the correct output most of the time and is not a failure
+            to be useful.

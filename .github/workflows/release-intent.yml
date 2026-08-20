@@ -1,0 +1,75 @@
+# What a merge of this pull request would release, decided while it is open.
+#
+# The bump is a label, not a commit message. Conventional Commits would read the
+# bump straight off the subject line and cost this repository the thing its
+# history is actually good at: `A crumb that renders its own link gets the hover
+# the slotted one has` is a changelog entry already, and `feat(crumb):` is not.
+# So the titles stay prose and the machine-readable part is a label, which is
+# also the thing a reviewer can change without rewriting history.
+#
+# Auto by default. Touching `helix/**` proposes `helix:patch` on its own, so the
+# common case needs nobody to do anything, and raising it to `minor` or `major`
+# is one click by whoever reviews. `no-release` opts a pull request out.
+#
+# `pull_request_target`, deliberately, and with no checkout. A `pull_request`
+# run from a fork gets a read-only token and cannot label anything, so this
+# would silently do nothing on exactly the contributions that most need a
+# reviewer to set the bump. `pull_request_target` runs the workflow from the
+# base branch with a writable token, which is only safe because nothing here
+# checks out or executes the pull request's code: it reads the changed paths
+# from the API and writes labels.
+name: release-intent
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUMBER: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Propose a bump for every domain this touches
+        run: |
+          set -euo pipefail
+
+          labels=$(gh api "repos/$REPO/issues/$NUMBER/labels" --jq '.[].name')
+          if grep -qx 'no-release' <<<"$labels"; then
+            echo "Opted out with \`no-release\`. Nothing will publish." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          files=$(gh api "repos/$REPO/pulls/$NUMBER/files" --paginate --jq '.[].filename')
+
+          released=0
+          for domain in helix cortex; do
+            grep -q "^$domain/" <<<"$files" || continue
+            released=1
+
+            # A bump already chosen for this domain is left alone: the proposal
+            # is a default, and re-applying it would undo a reviewer raising it.
+            if grep -qx "$domain:\(patch\|minor\|major\)" <<<"$labels"; then
+              chosen=$(grep -x "$domain:\(patch\|minor\|major\)" <<<"$labels")
+              echo "- \`$domain\`: $chosen (set on the pull request)" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+
+            gh api --method POST "repos/$REPO/issues/$NUMBER/labels" -f "labels[]=$domain:patch" >/dev/null
+            echo "- \`$domain\`: patch (proposed; raise the label to change it)" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+          if [ "$released" -eq 0 ]; then
+            echo "Touches no released domain. Nothing will publish." >> "$GITHUB_STEP_SUMMARY"
+          fi

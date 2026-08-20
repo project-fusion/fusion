@@ -22,11 +22,11 @@
     },
     "cortex/docs": {
       "name": "@cortex-io/docs",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
     },
     "helix/cem": {
       "name": "@helix-io/cem",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "dependencies": {
         "@wc-toolkit/jsx-types": "^1.7.1",
       },
@@ -39,7 +39,7 @@
     },
     "helix/core": {
       "name": "@helix-io/core",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@helix-io/icons": "helix/icons",
@@ -56,11 +56,11 @@
     },
     "helix/docs": {
       "name": "@helix-io/docs",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
     },
     "helix/headless": {
       "name": "@helix-io/headless",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "dependencies": {
         "@helix-io/core": "helix/core",
         "@helix-io/icons": "helix/icons",
@@ -77,14 +77,14 @@
     },
     "helix/icons": {
       "name": "@helix-io/icons",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "devDependencies": {
         "@phosphor-icons/core": "^2.1.1",
       },
     },
     "helix/sandbox": {
       "name": "@helix-io/sandbox",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "dependencies": {
         "@codemirror/lang-css": "^6.3.1",
         "@codemirror/lang-html": "^6.4.12",
@@ -111,15 +111,15 @@
     },
     "helix/styles": {
       "name": "@helix-io/styles",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
     },
     "helix/theme": {
       "name": "@helix-io/theme",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
     },
     "helix/web": {
       "name": "@helix-io/web",
-      "version": "0.0.1",
+      "version": "0.0.0-dev",
       "dependencies": {
         "@helix-io/core": "helix/core",
         "@helix-io/headless": "helix/headless",

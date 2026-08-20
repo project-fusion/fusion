@@ -86,8 +86,24 @@ The Rust workspace holds only Cortex crates today, so `[workspace.package]
 version` *is* the Cortex version. **When Helix gains a Rust crate, split it** or
 the two domains are silently back in full lockstep.
 
-Nothing is published: every package is `private: true`, every crate
-`publish = false`.
+**The version lives in the tag, not in the manifest.** Every manifest holds
+`0.0.0-dev` and the release stamps the real number in CI seconds before packing.
+Committing it back would need a bot whose push access outranks branch
+protection, to record something `git tag` already holds. `helix-v1.4.0` means a
+release that promoted; `helix-attempt-v1.4.0` means a number that was spent, and
+version computation reads both so a failed release burns a number rather than
+poisoning the next one.
+
+Eight packages publish and the Rust crates do not yet (`publish = false`), so a
+Cortex release currently ships `@cortex-io/docs` alone.
+
+**The crates are meant to publish, and crates.io cannot hold them privately.**
+There is no private mode: a private Cargo release needs an alternate registry,
+declared as `publish = ["name"]`. Until there is a consumer worth standing one
+up for, `publish = false` is the honest setting, and anything needing a crate
+takes it as a git dependency pinned to the `cortex-v*` tag the release already
+pushes. `check:publishable` holds `publish` and `release.yml` to each other in
+both directions, so the day the flag changes is the day the workflow has to.
 
 ## Naming
 
@@ -96,9 +112,19 @@ Nothing is published: every package is `private: true`, every crate
 - **Products get evocative names**: Helix, Cortex. A module earns one only when
   it carries a differentiated idea: inside Cortex that is exactly three, Engram
   (memory), Trace (provenance), Recall (context). The rest stay descriptive.
-- **npm scopes**: `@helix-io/*` and `@cortex-io/*` for outside adoption,
-  `@fusion-io/*` for company-internal. Package names drop the product prefix:
-  `@helix-io/web`, not `@helix-io/helix-web`.
+- **npm scopes name the domain, not the audience**: `@helix-io/*` and
+  `@cortex-io/*` for anything belonging to that product, `@fusion-io/*` for what
+  spans the company. Package names drop the product prefix: `@helix-io/web`, not
+  `@helix-io/helix-web`.
+- **`private` decides what ships, and the scope does not.** A package can belong
+  to Helix and still never leave: `@helix-io/cem` is the analyzer configuration
+  and `@helix-io/sandbox` the editor and spec runner, both Helix byproducts and
+  both build tooling for this repository. Naming them `@fusion-io/*` to say
+  "does not publish" would file Helix-specific tooling beside the company-wide
+  test helpers and claim they are general Fusion tooling, which is the one thing
+  they are not. `bun run check:publishable` enforces the rest: `@fusion-io/*` is
+  always private, a published package may never depend on an unpublished one,
+  and every published package agrees on visibility.
 - **CLI binaries drop `-cli`**: the crate `cortex-cli` ships `cortex`.
 
 ## Code style

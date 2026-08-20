@@ -1,9 +1,13 @@
 {
   "name": "@helix-io/headless",
   "description": "Headless component tier. Structure, accessibility, state, and form participation. No styling.",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0-dev",
   "license": "MIT",
+  "repository": {
+    "directory": "helix/headless",
+    "type": "git",
+    "url": "git+https://github.com/former-org/former-repo.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -46,6 +50,6 @@
     "lit": "^3.2.1"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   }
 }

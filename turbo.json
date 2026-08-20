@@ -1,5 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  // Read by `tooling/scripts/version.mjs`, which hands the resolved release
+  // version back to the workflow that asked for it. Declared so the lint that
+  // watches for undeclared environment access stays meaningful.
+  "globalPassThroughEnv": ["GITHUB_OUTPUT", "NODE_AUTH_TOKEN"],
   "tasks": {
     "analyze": {
       "dependsOn": ["^build", "build"],
