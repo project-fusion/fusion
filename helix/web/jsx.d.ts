@@ -106,6 +106,8 @@ import type {
   HelixTextarea,
   HelixTimeInput,
   HelixTimePicker,
+  HelixTimeline,
+  HelixTimelineItem,
   HelixToast,
   HelixToastItem,
   HelixToggle,
@@ -822,11 +824,31 @@ export type HelixBlockquoteSolidJsProps = {
 export type HelixBreadcrumbProps = {
   /** Whether this item is the page the reader is on. */
   current?: HelixBreadcrumb["current"];
+  /** Where the crumb goes, and nothing where it is the current page.
+
+Empty rather than optional and unreflected: an `href` written onto every
+host would be a link to the current page on every crumb nobody asked to be
+one, and nothing selects on it. */
+  href?: HelixBreadcrumb["href"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  target?: HelixBreadcrumb["target"];
+  /** What the link declares about where it goes. The consumer's decision. */
+  rel?: HelixBreadcrumb["rel"];
 };
 
 export type HelixBreadcrumbSolidJsProps = {
   /** Whether this item is the page the reader is on. */
   "prop:current"?: HelixBreadcrumb["current"];
+  /** Where the crumb goes, and nothing where it is the current page.
+
+Empty rather than optional and unreflected: an `href` written onto every
+host would be a link to the current page on every crumb nobody asked to be
+one, and nothing selects on it. */
+  "prop:href"?: HelixBreadcrumb["href"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  "prop:target"?: HelixBreadcrumb["target"];
+  /** What the link declares about where it goes. The consumer's decision. */
+  "prop:rel"?: HelixBreadcrumb["rel"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4942,9 +4964,33 @@ export type HelixKbdSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixListItemProps = {};
+export type HelixListItemProps = {
+  /** Where the row goes, and nothing when it goes nowhere.
+
+Empty rather than optional, and unset by default: a list is not always a
+list of links, and an empty `href` written onto every row would be a link
+to the current page on every row a consumer never asked to be one. */
+  href?: HelixListItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixListItem["target"];
+  /** What the link declares about where it goes. The consumer's decision rather
+than one derived from `target`, for the reason `Tree.Item` gives. */
+  rel?: HelixListItem["rel"];
+};
 
 export type HelixListItemSolidJsProps = {
+  /** Where the row goes, and nothing when it goes nowhere.
+
+Empty rather than optional, and unset by default: a list is not always a
+list of links, and an empty `href` written onto every row would be a link
+to the current page on every row a consumer never asked to be one. */
+  "prop:href"?: HelixListItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixListItem["target"];
+  /** What the link declares about where it goes. The consumer's decision rather
+than one derived from `target`, for the reason `Tree.Item` gives. */
+  "prop:rel"?: HelixListItem["rel"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -10223,6 +10269,62 @@ reflected none of them. */
   textContent?: string | number;
 };
 
+export type HelixTimelineItemProps = {
+  /** When it happened, machine-readable.
+
+Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+week. Unset, the label is written as it was given and nothing claims to
+know what instant it names. */
+  datetime?: HelixTimelineItem["datetime"];
+  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  tone?: HelixTimelineItem["tone"];
+};
+
+export type HelixTimelineItemSolidJsProps = {
+  /** When it happened, machine-readable.
+
+Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+week. Unset, the label is written as it was given and nothing claims to
+know what instant it names. */
+  "prop:datetime"?: HelixTimelineItem["datetime"];
+  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  "prop:tone"?: HelixTimelineItem["tone"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTimelineProps = {
+  /** Which way time runs. Down the page, or along it.
+
+Reflected, because the entries read it: an entry draws its own connector and
+has to know which edge that line arrives on, and a property on this element
+is not something its light-DOM children can select against. The attribute
+is, through `:host-context`. */
+  orientation?: HelixTimeline["orientation"];
+  /** Names the record, for a reader arriving at it out of context. */
+  label?: HelixTimeline["label"];
+};
+
+export type HelixTimelineSolidJsProps = {
+  /** Which way time runs. Down the page, or along it.
+
+Reflected, because the entries read it: an entry draws its own connector and
+has to know which edge that line arrives on, and a property on this element
+is not something its light-DOM children can select against. The attribute
+is, through `:host-context`. */
+  "prop:orientation"?: HelixTimeline["orientation"];
+  /** Names the record, for a reader arriving at it out of context. */
+  "prop:label"?: HelixTimeline["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixToastItem` component event */
 export type HelixToastItemElementEvent<E = Event> = TypedEvent<
   HelixToastItem,
@@ -12116,6 +12218,13 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `current`: Whether this item is the page the reader is on.
+   * - `href`: Where the crumb goes, and nothing where it is the current page.
+   *
+   * Empty rather than optional and unreflected: an `href` written onto every
+   * host would be a link to the current page on every crumb nobody asked to be
+   * one, and nothing selects on it.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision.
    *
    * ## Slots
    *
@@ -12123,6 +12232,8 @@ export type CustomElements = {
    *
    * - `(default)`: The step: a link, or the text of the current page.
    * - `separator`: Replaces the chevron shown before this item.
+   * - `start`: Before the label, for an icon.
+   * - `end`: After it, for a count or a mark.
    *
    * ## CSS Custom Properties
    *
@@ -12136,6 +12247,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `separator`: The separator preceding the item.
+   * - `link`: The crumb itself, which is an `<a>` where `href` is set.
    */
   "helix-breadcrumb": Partial<
     HelixBreadcrumbProps & BaseProps<HelixBreadcrumb> & BaseEvents
@@ -15084,6 +15196,19 @@ export type CustomElements = {
    * A grid rather than a flex row, so the supporting text lines up under the
    * label rather than under the leading icon. The leading and trailing regions
    * hold their own width and the middle takes the rest.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the row goes, and nothing when it goes nowhere.
+   *
+   * Empty rather than optional, and unset by default: a list is not always a
+   * list of links, and an empty `href` written onto every row would be a link
+   * to the current page on every row a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision rather
+   * than one derived from `target`, for the reason `Tree.Item` gives.
    *
    * ## Slots
    *
@@ -19369,6 +19494,82 @@ export type CustomElements = {
   > & HelixTimePickerControlled;
 
   /**
+   * Presentation only: the rail down the side, the mark on it, and the line that
+   * arrives at this entry from the one before.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `datetime`: When it happened, machine-readable.
+   *
+   * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+   * week. Unset, the label is written as it was given and nothing claims to
+   * know what instant it names.
+   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened.
+   * - `marker`: The mark on the line. Falls back to a dot.
+   * - `time`: When it happened, as a reader should see it written.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--timeline-marker-size`: Diameter of the mark. (default: `undefined`)
+   * - `--timeline-rail-size`: Width of the line. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `connector`: The line arriving at this entry.
+   * - `content`: What happened, and the time above it.
+   * - `marker`: The mark on the line.
+   * - `rail`: The column holding the mark and the line.
+   * - `time`: When it happened.
+   */
+  "helix-timeline-item": Partial<
+    HelixTimelineItemProps & BaseProps<HelixTimelineItem> & BaseEvents
+  >;
+
+  /**
+   * Presentation only: the direction time runs in, and the spacing between one
+   * event and the next. Every entry draws its own mark and its own line.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way time runs. Down the page, or along it.
+   *
+   * Reflected, because the entries read it: an entry draws its own connector and
+   * has to know which edge that line arrives on, and a property on this element
+   * is not something its light-DOM children can select against. The attribute
+   * is, through `:host-context`.
+   * - `label`: Names the record, for a reader arriving at it out of context.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--timeline-gap`: Space between one entry and the next. (default: `undefined`)
+   */
+  "helix-timeline": Partial<
+    HelixTimelineProps & BaseProps<HelixTimeline> & BaseEvents
+  >;
+
+  /**
    * A surface with a shadow, because a toast sits over whatever the reader was
    * looking at rather than in it. The severity is a bar down the leading edge and
    * not a fill: a message is text to be read, and a colored panel behind it
@@ -20891,6 +21092,13 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `current`: Whether this item is the page the reader is on.
+   * - `href`: Where the crumb goes, and nothing where it is the current page.
+   *
+   * Empty rather than optional and unreflected: an `href` written onto every
+   * host would be a link to the current page on every crumb nobody asked to be
+   * one, and nothing selects on it.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision.
    *
    * ## Slots
    *
@@ -20898,6 +21106,8 @@ export type CustomElementsSolidJs = {
    *
    * - `(default)`: The step: a link, or the text of the current page.
    * - `separator`: Replaces the chevron shown before this item.
+   * - `start`: Before the label, for an icon.
+   * - `end`: After it, for a count or a mark.
    *
    * ## CSS Custom Properties
    *
@@ -20911,6 +21121,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `separator`: The separator preceding the item.
+   * - `link`: The crumb itself, which is an `<a>` where `href` is set.
    */
   "helix-breadcrumb": Partial<
     HelixBreadcrumbProps &
@@ -23950,6 +24161,19 @@ export type CustomElementsSolidJs = {
    * A grid rather than a flex row, so the supporting text lines up under the
    * label rather than under the leading icon. The leading and trailing regions
    * hold their own width and the middle takes the rest.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the row goes, and nothing when it goes nowhere.
+   *
+   * Empty rather than optional, and unset by default: a list is not always a
+   * list of links, and an empty `href` written onto every row would be a link
+   * to the current page on every row a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision rather
+   * than one derived from `target`, for the reason `Tree.Item` gives.
    *
    * ## Slots
    *
@@ -28394,6 +28618,88 @@ export type CustomElementsSolidJs = {
   > & HelixTimePickerControlledSolidJs;
 
   /**
+   * Presentation only: the rail down the side, the mark on it, and the line that
+   * arrives at this entry from the one before.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `datetime`: When it happened, machine-readable.
+   *
+   * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+   * week. Unset, the label is written as it was given and nothing claims to
+   * know what instant it names.
+   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened.
+   * - `marker`: The mark on the line. Falls back to a dot.
+   * - `time`: When it happened, as a reader should see it written.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--timeline-marker-size`: Diameter of the mark. (default: `undefined`)
+   * - `--timeline-rail-size`: Width of the line. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `connector`: The line arriving at this entry.
+   * - `content`: What happened, and the time above it.
+   * - `marker`: The mark on the line.
+   * - `rail`: The column holding the mark and the line.
+   * - `time`: When it happened.
+   */
+  "helix-timeline-item": Partial<
+    HelixTimelineItemProps &
+      HelixTimelineItemSolidJsProps &
+      BaseProps<HelixTimelineItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Presentation only: the direction time runs in, and the spacing between one
+   * event and the next. Every entry draws its own mark and its own line.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way time runs. Down the page, or along it.
+   *
+   * Reflected, because the entries read it: an entry draws its own connector and
+   * has to know which edge that line arrives on, and a property on this element
+   * is not something its light-DOM children can select against. The attribute
+   * is, through `:host-context`.
+   * - `label`: Names the record, for a reader arriving at it out of context.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--timeline-gap`: Space between one entry and the next. (default: `undefined`)
+   */
+  "helix-timeline": Partial<
+    HelixTimelineProps &
+      HelixTimelineSolidJsProps &
+      BaseProps<HelixTimeline> &
+      BaseEvents
+  >;
+
+  /**
    * A surface with a shadow, because a toast sits over whatever the reader was
    * looking at rather than in it. The severity is a bar down the leading edge and
    * not a fill: a message is text to be read, and a colored panel behind it
@@ -29820,6 +30126,12 @@ export type CustomCssProperties = {
   "--time-picker-range-color"?: string;
   /** Fill on the chosen row of a wheel. */
   "--time-picker-selected-color"?: string;
+  /** Diameter of the mark. */
+  "--timeline-marker-size"?: string;
+  /** Width of the line. */
+  "--timeline-rail-size"?: string;
+  /** Space between one entry and the next. */
+  "--timeline-gap"?: string;
   /** Space between the message's edge and its contents. */
   "--toast-item-inset"?: string;
   /** Distance from the edges of the window. */

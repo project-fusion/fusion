@@ -1,0 +1,39 @@
+<helix-timeline label="Deployment history">
+  <helix-timeline-item
+    datetime="2026-08-19T09:12"
+    tone="success"
+  >
+    <helix-icon
+      name="check"
+      slot="marker"
+    ></helix-icon>
+    <span slot="time">09:12</span>
+    <strong>Deployed to production</strong>
+    <span>Version 4.2.0, by the release job.</span>
+  </helix-timeline-item>
+  <helix-timeline-item
+    datetime="2026-08-19T08:47"
+    tone="danger"
+  >
+    <helix-icon
+      name="x"
+      slot="marker"
+    ></helix-icon>
+    <span slot="time">08:47</span>
+    <strong>Rolled back</strong>
+    <span>Error rate above the threshold for four minutes.</span>
+  </helix-timeline-item>
+  <helix-timeline-item
+    datetime="2026-08-19T08:30"
+    tone="primary"
+  >
+    <span slot="time">08:30</span>
+    <strong>Build passed</strong>
+    <span>1,076 specs across 74 families.</span>
+  </helix-timeline-item>
+  <helix-timeline-item datetime="2026-08-19T08:04">
+    <span slot="time">08:04</span>
+    <strong>Opened</strong>
+    <span>A branch, and the first commit on it.</span>
+  </helix-timeline-item>
+</helix-timeline>

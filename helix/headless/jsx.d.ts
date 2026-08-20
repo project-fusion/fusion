@@ -82,6 +82,8 @@ import type {
   HelixBaseTextarea,
   HelixBaseTimeInput,
   HelixBaseTimePicker,
+  HelixBaseTimeline,
+  HelixBaseTimelineItem,
   HelixBaseToast,
   HelixBaseToastItem,
   HelixBaseToggle,
@@ -716,11 +718,31 @@ export type HelixBaseBlockquoteSolidJsProps = {
 export type HelixBaseBreadcrumbProps = {
   /** Whether this item is the page the reader is on. */
   current?: HelixBaseBreadcrumb["current"];
+  /** Where the crumb goes, and nothing where it is the current page.
+
+Empty rather than optional and unreflected: an `href` written onto every
+host would be a link to the current page on every crumb nobody asked to be
+one, and nothing selects on it. */
+  href?: HelixBaseBreadcrumb["href"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  target?: HelixBaseBreadcrumb["target"];
+  /** What the link declares about where it goes. The consumer's decision. */
+  rel?: HelixBaseBreadcrumb["rel"];
 };
 
 export type HelixBaseBreadcrumbSolidJsProps = {
   /** Whether this item is the page the reader is on. */
   "prop:current"?: HelixBaseBreadcrumb["current"];
+  /** Where the crumb goes, and nothing where it is the current page.
+
+Empty rather than optional and unreflected: an `href` written onto every
+host would be a link to the current page on every crumb nobody asked to be
+one, and nothing selects on it. */
+  "prop:href"?: HelixBaseBreadcrumb["href"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  "prop:target"?: HelixBaseBreadcrumb["target"];
+  /** What the link declares about where it goes. The consumer's decision. */
+  "prop:rel"?: HelixBaseBreadcrumb["rel"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4181,9 +4203,33 @@ export type HelixBaseKbdSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseListItemProps = {};
+export type HelixBaseListItemProps = {
+  /** Where the row goes, and nothing when it goes nowhere.
+
+Empty rather than optional, and unset by default: a list is not always a
+list of links, and an empty `href` written onto every row would be a link
+to the current page on every row a consumer never asked to be one. */
+  href?: HelixBaseListItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixBaseListItem["target"];
+  /** What the link declares about where it goes. The consumer's decision rather
+than one derived from `target`, for the reason `Tree.Item` gives. */
+  rel?: HelixBaseListItem["rel"];
+};
 
 export type HelixBaseListItemSolidJsProps = {
+  /** Where the row goes, and nothing when it goes nowhere.
+
+Empty rather than optional, and unset by default: a list is not always a
+list of links, and an empty `href` written onto every row would be a link
+to the current page on every row a consumer never asked to be one. */
+  "prop:href"?: HelixBaseListItem["href"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixBaseListItem["target"];
+  /** What the link declares about where it goes. The consumer's decision rather
+than one derived from `target`, for the reason `Tree.Item` gives. */
+  "prop:rel"?: HelixBaseListItem["rel"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -8944,6 +8990,62 @@ reflected none of them. */
   textContent?: string | number;
 };
 
+export type HelixBaseTimelineItemProps = {
+  /** When it happened, machine-readable.
+
+Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+week. Unset, the label is written as it was given and nothing claims to
+know what instant it names. */
+  datetime?: HelixBaseTimelineItem["datetime"];
+  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  tone?: HelixBaseTimelineItem["tone"];
+};
+
+export type HelixBaseTimelineItemSolidJsProps = {
+  /** When it happened, machine-readable.
+
+Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+week. Unset, the label is written as it was given and nothing claims to
+know what instant it names. */
+  "prop:datetime"?: HelixBaseTimelineItem["datetime"];
+  /** What kind of event it was, which decides the mark's colour and nothing else. */
+  "prop:tone"?: HelixBaseTimelineItem["tone"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseTimelineProps = {
+  /** Which way time runs. Down the page, or along it.
+
+Reflected, because the entries read it: an entry draws its own connector and
+has to know which edge that line arrives on, and a property on this element
+is not something its light-DOM children can select against. The attribute
+is, through `:host-context`. */
+  orientation?: HelixBaseTimeline["orientation"];
+  /** Names the record, for a reader arriving at it out of context. */
+  label?: HelixBaseTimeline["label"];
+};
+
+export type HelixBaseTimelineSolidJsProps = {
+  /** Which way time runs. Down the page, or along it.
+
+Reflected, because the entries read it: an entry draws its own connector and
+has to know which edge that line arrives on, and a property on this element
+is not something its light-DOM children can select against. The attribute
+is, through `:host-context`. */
+  "prop:orientation"?: HelixBaseTimeline["orientation"];
+  /** Names the record, for a reader arriving at it out of context. */
+  "prop:label"?: HelixBaseTimeline["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseToastItem` component event */
 export type HelixBaseToastItemElementEvent<E = Event> = TypedEvent<
   HelixBaseToastItem,
@@ -10702,10 +10804,24 @@ export type CustomElements = {
   >;
 
   /**
-   * Contributes the separator and the list-item role. The link is the consumer's
-   * own, slotted in, because an anchor rendered into this element's shadow root
-   * is unreachable to the framework that owns the route: a router renders its own
-   * `<a>`, and one written here would be a full page load instead.
+   * Contributes the separator, the list-item role, and the link itself where one
+   * is wanted.
+   *
+   * **`href` makes the crumb the link.** *Added 19 Aug 2026, reversing the note
+   * that said an anchor could not be rendered here.* That note was right that a
+   * router cannot reach an anchor inside a shadow root, and wrong that this
+   * settles it: the consumer restores the soft navigation by intercepting the
+   * click on the way out, which is what `Tree.Item` and `List.Item` both do.
+   * What the anchor buys is the whole crumb as a target, Enter, middle click, the
+   * status bar, and a trail that works before any JavaScript runs.
+   *
+   * **And the parent needs it.** A trail that collapses has to rebuild its hidden
+   * crumbs somewhere else, which means reading each one's destination. From a
+   * property that is a read; from a consumer's slotted markup it is a hunt for an
+   * anchor and a guess about which element is the link.
+   *
+   * A crumb with no `href` is unchanged: the consumer slots whatever they like,
+   * including their own anchor, and this renders a plain `<span>` around it.
    *
    * Each item renders its own separator and hides it with `:host(:first-child)`,
    * so the trail needs no index and no coordination from the parent. `:host()`
@@ -10720,12 +10836,21 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `current`: Whether this item is the page the reader is on.
+   * - `href`: Where the crumb goes, and nothing where it is the current page.
+   *
+   * Empty rather than optional and unreflected: an `href` written onto every
+   * host would be a link to the current page on every crumb nobody asked to be
+   * one, and nothing selects on it.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
+   * - `(default)`: The step's label. Without an `href` this may be the consumer's own anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
+   * - `start`: Before the label, for an icon.
+   * - `end`: After it, for a count or a mark.
    * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Parts
@@ -10733,6 +10858,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `separator`: The separator preceding the item.
+   * - `link`: The crumb itself, which is an `<a>` where `href` is set.
    */
   "helix-base-breadcrumb": Partial<
     HelixBaseBreadcrumbProps & BaseProps<HelixBaseBreadcrumb> & BaseEvents
@@ -13517,17 +13643,40 @@ export type CustomElements = {
   /**
    * Layout and semantics, and deliberately not a target.
    *
-   * **It does not become a link.** The reference renders an `<a>` when given an
-   * `href`, which is the thing Button and Toggle both stopped doing: a router
-   * renders its own anchor and cannot render it inside this shadow root, so a row
-   * that navigates would force a full page load. A row whose label is a
-   * destination slots the consumer's own link as that label, and the link is the
-   * target rather than the row around it.
+   * **`href` makes the row itself the link.** *Corrected 19 Aug 2026.* This said a
+   * row could not become one, on the grounds that "a whole-row target needs the
+   * anchor to wrap the layout, and the layout is what this component is." That is
+   * true of the *consumer's* anchor, which cannot wrap slots it does not own, and
+   * it is not true of the component's: an `<a part="row">` wraps this component's
+   * own layout perfectly well. `Tree.Item` does exactly that, and the two were
+   * refusing and accepting `href` on the same argument.
    *
-   * That is a real constraint rather than an oversight: a whole-row target needs
-   * the anchor to wrap the layout, and the layout is what this component is. When
-   * something needs it, it wants a `data-list-item` recipe styling the consumer's
-   * anchor, the way `data-button` and `data-navigation-item` do.
+   * What the anchor buys is what the row could not fake: the whole row is a
+   * target, Enter follows it, middle click opens a tab, the status bar shows the
+   * destination, and it all works before any JavaScript runs.
+   *
+   * What it costs is client-side routing, and that is the consumer's to restore.
+   * A router renders its own anchor and cannot render one inside this shadow
+   * root, so a framework wanting a soft navigation intercepts the click on the
+   * way out: the anchor is in `composedPath()`, and taking only a plain primary
+   * press leaves every native gesture alone.
+   *
+   * **`data-list-item` is still the answer for a row that is not a destination.**
+   * A list row is often a container of controls rather than a place to go, and a
+   * row with `href` unset behaves exactly as it always did.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the row goes, and nothing when it goes nowhere.
+   *
+   * Empty rather than optional, and unset by default: a list is not always a
+   * list of links, and an empty `href` written onto every row would be a link
+   * to the current page on every row a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision rather
+   * than one derived from `target`, for the reason `Tree.Item` gives.
    *
    * ## Slots
    *
@@ -17654,6 +17803,95 @@ export type CustomElements = {
   > & HelixBaseTimePickerControlled;
 
   /**
+   * **The time is a `<time>`, and only when there is a time to put in it.** Given
+   * `datetime`, the label a consumer wrote is wrapped in the element the platform
+   * has for exactly this, so the machine-readable instant travels with the human
+   * one: a crawler, a reader's own tooling and a copy-paste all get "2026-08-19",
+   * where "yesterday" on its own is a word. Given no `datetime`, it stays a span,
+   * because a `<time>` with nothing to be precise about is markup pretending.
+   *
+   * **The connector is this element's, not the list's.** Each entry draws the line
+   * that arrives at it and hides it when it is first, which `:host(:first-child)`
+   * settles with no index, no counting parent and no script. `Steps` and
+   * `Breadcrumbs` both do it this way and for the same reason.
+   *
+   * `tone` says what kind of event it was, and it is the only thing that colours
+   * the mark. It takes `Announcement`'s vocabulary rather than a second one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `datetime`: When it happened, machine-readable.
+   *
+   * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+   * week. Unset, the label is written as it was given and nothing claims to
+   * know what instant it names.
+   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened.
+   * - `marker`: The mark on the line. Falls back to a dot.
+   * - `time`: When it happened, as a reader should see it written.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `connector`: The line arriving at this entry.
+   * - `content`: What happened, and the time above it.
+   * - `marker`: The mark on the line.
+   * - `rail`: The column holding the mark and the line.
+   * - `time`: When it happened.
+   */
+  "helix-base-timeline-item": Partial<
+    HelixBaseTimelineItemProps & BaseProps<HelixBaseTimelineItem> & BaseEvents
+  >;
+
+  /**
+   * **Not `Steps`, and the difference is what the thing is for.** A stepper is a
+   * process a reader is moving through: it has a stage they are on, stages they
+   * have finished, and stages ahead, so it carries `active` and `complete` and
+   * numbers itself. A timeline is a record of events that already happened, or are
+   * scheduled to. Nothing is current, nothing is complete, and what each entry
+   * carries instead is a time. Building this as an appearance of `Steps` would
+   * have meant a stepper with no step you are on.
+   *
+   * What it does take from `Steps` is the connector. Each entry draws the line
+   * that arrives at it and hides it when it is first, which needs neither an index
+   * nor a parent that counts: `:host(:first-child)` is the whole of it, resolved
+   * at layout with no script, so a server's markup is right before anything runs.
+   *
+   * `role="list"` on the host rather than an `<ol>` in the shadow root, for the
+   * reason `Steps` gives: the entries are the consumer's elements in the light
+   * DOM, so a list element here would be a list whose items are somewhere else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way time runs. Down the page, or along it.
+   *
+   * Reflected, because the entries read it: an entry draws its own connector and
+   * has to know which edge that line arrives on, and a property on this element
+   * is not something its light-DOM children can select against. The attribute
+   * is, through `:host-context`.
+   * - `label`: Names the record, for a reader arriving at it out of context.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   */
+  "helix-base-timeline": Partial<
+    HelixBaseTimelineProps & BaseProps<HelixBaseTimeline> & BaseEvents
+  >;
+
+  /**
    * An element rather than a slot, because it carries a timeout, a severity, a
    * dismiss control and a lifetime that pauses: behavior, state and API, which
    * is the test for whether a region becomes an element in this library.
@@ -19213,10 +19451,24 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
-   * Contributes the separator and the list-item role. The link is the consumer's
-   * own, slotted in, because an anchor rendered into this element's shadow root
-   * is unreachable to the framework that owns the route: a router renders its own
-   * `<a>`, and one written here would be a full page load instead.
+   * Contributes the separator, the list-item role, and the link itself where one
+   * is wanted.
+   *
+   * **`href` makes the crumb the link.** *Added 19 Aug 2026, reversing the note
+   * that said an anchor could not be rendered here.* That note was right that a
+   * router cannot reach an anchor inside a shadow root, and wrong that this
+   * settles it: the consumer restores the soft navigation by intercepting the
+   * click on the way out, which is what `Tree.Item` and `List.Item` both do.
+   * What the anchor buys is the whole crumb as a target, Enter, middle click, the
+   * status bar, and a trail that works before any JavaScript runs.
+   *
+   * **And the parent needs it.** A trail that collapses has to rebuild its hidden
+   * crumbs somewhere else, which means reading each one's destination. From a
+   * property that is a read; from a consumer's slotted markup it is a hunt for an
+   * anchor and a guess about which element is the link.
+   *
+   * A crumb with no `href` is unchanged: the consumer slots whatever they like,
+   * including their own anchor, and this renders a plain `<span>` around it.
    *
    * Each item renders its own separator and hides it with `:host(:first-child)`,
    * so the trail needs no index and no coordination from the parent. `:host()`
@@ -19231,12 +19483,21 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `current`: Whether this item is the page the reader is on.
+   * - `href`: Where the crumb goes, and nothing where it is the current page.
+   *
+   * Empty rather than optional and unreflected: an `href` written onto every
+   * host would be a link to the current page on every crumb nobody asked to be
+   * one, and nothing selects on it.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The step: a link, or the text of the current page. A link is styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
+   * - `(default)`: The step's label. Without an `href` this may be the consumer's own anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.
+   * - `start`: Before the label, for an icon.
+   * - `end`: After it, for a count or a mark.
    * - `separator`: Replaces the chevron shown before this item.
    *
    * ## CSS Parts
@@ -19244,6 +19505,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `separator`: The separator preceding the item.
+   * - `link`: The crumb itself, which is an `<a>` where `href` is set.
    */
   "helix-base-breadcrumb": Partial<
     HelixBaseBreadcrumbProps &
@@ -22115,17 +22377,40 @@ export type CustomElementsSolidJs = {
   /**
    * Layout and semantics, and deliberately not a target.
    *
-   * **It does not become a link.** The reference renders an `<a>` when given an
-   * `href`, which is the thing Button and Toggle both stopped doing: a router
-   * renders its own anchor and cannot render it inside this shadow root, so a row
-   * that navigates would force a full page load. A row whose label is a
-   * destination slots the consumer's own link as that label, and the link is the
-   * target rather than the row around it.
+   * **`href` makes the row itself the link.** *Corrected 19 Aug 2026.* This said a
+   * row could not become one, on the grounds that "a whole-row target needs the
+   * anchor to wrap the layout, and the layout is what this component is." That is
+   * true of the *consumer's* anchor, which cannot wrap slots it does not own, and
+   * it is not true of the component's: an `<a part="row">` wraps this component's
+   * own layout perfectly well. `Tree.Item` does exactly that, and the two were
+   * refusing and accepting `href` on the same argument.
    *
-   * That is a real constraint rather than an oversight: a whole-row target needs
-   * the anchor to wrap the layout, and the layout is what this component is. When
-   * something needs it, it wants a `data-list-item` recipe styling the consumer's
-   * anchor, the way `data-button` and `data-navigation-item` do.
+   * What the anchor buys is what the row could not fake: the whole row is a
+   * target, Enter follows it, middle click opens a tab, the status bar shows the
+   * destination, and it all works before any JavaScript runs.
+   *
+   * What it costs is client-side routing, and that is the consumer's to restore.
+   * A router renders its own anchor and cannot render one inside this shadow
+   * root, so a framework wanting a soft navigation intercepts the click on the
+   * way out: the anchor is in `composedPath()`, and taking only a plain primary
+   * press leaves every native gesture alone.
+   *
+   * **`data-list-item` is still the answer for a row that is not a destination.**
+   * A list row is often a container of controls rather than a place to go, and a
+   * row with `href` unset behaves exactly as it always did.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `href`: Where the row goes, and nothing when it goes nowhere.
+   *
+   * Empty rather than optional, and unset by default: a list is not always a
+   * list of links, and an empty `href` written onto every row would be a link
+   * to the current page on every row a consumer never asked to be one.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `rel`: What the link declares about where it goes. The consumer's decision rather
+   * than one derived from `target`, for the reason `Tree.Item` gives.
    *
    * ## Slots
    *
@@ -26381,6 +26666,101 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixBaseTimePicker> &
       BaseEvents
   > & HelixBaseTimePickerControlledSolidJs;
+
+  /**
+   * **The time is a `<time>`, and only when there is a time to put in it.** Given
+   * `datetime`, the label a consumer wrote is wrapped in the element the platform
+   * has for exactly this, so the machine-readable instant travels with the human
+   * one: a crawler, a reader's own tooling and a copy-paste all get "2026-08-19",
+   * where "yesterday" on its own is a word. Given no `datetime`, it stays a span,
+   * because a `<time>` with nothing to be precise about is markup pretending.
+   *
+   * **The connector is this element's, not the list's.** Each entry draws the line
+   * that arrives at it and hides it when it is first, which `:host(:first-child)`
+   * settles with no index, no counting parent and no script. `Steps` and
+   * `Breadcrumbs` both do it this way and for the same reason.
+   *
+   * `tone` says what kind of event it was, and it is the only thing that colours
+   * the mark. It takes `Announcement`'s vocabulary rather than a second one.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `datetime`: When it happened, machine-readable.
+   *
+   * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
+   * week. Unset, the label is written as it was given and nothing claims to
+   * know what instant it names.
+   * - `tone`: What kind of event it was, which decides the mark's colour and nothing else.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What happened.
+   * - `marker`: The mark on the line. Falls back to a dot.
+   * - `time`: When it happened, as a reader should see it written.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `connector`: The line arriving at this entry.
+   * - `content`: What happened, and the time above it.
+   * - `marker`: The mark on the line.
+   * - `rail`: The column holding the mark and the line.
+   * - `time`: When it happened.
+   */
+  "helix-base-timeline-item": Partial<
+    HelixBaseTimelineItemProps &
+      HelixBaseTimelineItemSolidJsProps &
+      BaseProps<HelixBaseTimelineItem> &
+      BaseEvents
+  >;
+
+  /**
+   * **Not `Steps`, and the difference is what the thing is for.** A stepper is a
+   * process a reader is moving through: it has a stage they are on, stages they
+   * have finished, and stages ahead, so it carries `active` and `complete` and
+   * numbers itself. A timeline is a record of events that already happened, or are
+   * scheduled to. Nothing is current, nothing is complete, and what each entry
+   * carries instead is a time. Building this as an appearance of `Steps` would
+   * have meant a stepper with no step you are on.
+   *
+   * What it does take from `Steps` is the connector. Each entry draws the line
+   * that arrives at it and hides it when it is first, which needs neither an index
+   * nor a parent that counts: `:host(:first-child)` is the whole of it, resolved
+   * at layout with no script, so a server's markup is right before anything runs.
+   *
+   * `role="list"` on the host rather than an `<ol>` in the shadow root, for the
+   * reason `Steps` gives: the entries are the consumer's elements in the light
+   * DOM, so a list element here would be a list whose items are somewhere else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `orientation`: Which way time runs. Down the page, or along it.
+   *
+   * Reflected, because the entries read it: an entry draws its own connector and
+   * has to know which edge that line arrives on, and a property on this element
+   * is not something its light-DOM children can select against. The attribute
+   * is, through `:host-context`.
+   * - `label`: Names the record, for a reader arriving at it out of context.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The entries.
+   */
+  "helix-base-timeline": Partial<
+    HelixBaseTimelineProps &
+      HelixBaseTimelineSolidJsProps &
+      BaseProps<HelixBaseTimeline> &
+      BaseEvents
+  >;
 
   /**
    * An element rather than a slot, because it carries a timeout, a severity, a

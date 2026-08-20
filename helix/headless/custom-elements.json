@@ -1960,18 +1960,30 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Contributes the separator and the list-item role. The link is the consumer's\nown, slotted in, because an anchor rendered into this element's shadow root\nis unreachable to the framework that owns the route: a router renders its own\n`<a>`, and one written here would be a full page load instead.\n\nEach item renders its own separator and hides it with `:host(:first-child)`,\nso the trail needs no index and no coordination from the parent. `:host()`\ntakes a structural pseudo-class, unlike `:has()`, which it rejects.\n\nThe current page is text, not a link. Linking a page to itself is a known\nscreen-reader annoyance, and `aria-current=\"page\"` on the host is what\nconveys position.",
+          "description": "Contributes the separator, the list-item role, and the link itself where one\nis wanted.\n\n**`href` makes the crumb the link.** *Added 19 Aug 2026, reversing the note\nthat said an anchor could not be rendered here.* That note was right that a\nrouter cannot reach an anchor inside a shadow root, and wrong that this\nsettles it: the consumer restores the soft navigation by intercepting the\nclick on the way out, which is what `Tree.Item` and `List.Item` both do.\nWhat the anchor buys is the whole crumb as a target, Enter, middle click, the\nstatus bar, and a trail that works before any JavaScript runs.\n\n**And the parent needs it.** A trail that collapses has to rebuild its hidden\ncrumbs somewhere else, which means reading each one's destination. From a\nproperty that is a read; from a consumer's slotted markup it is a hunt for an\nanchor and a guess about which element is the link.\n\nA crumb with no `href` is unchanged: the consumer slots whatever they like,\nincluding their own anchor, and this renders a plain `<span>` around it.\n\nEach item renders its own separator and hides it with `:host(:first-child)`,\nso the trail needs no index and no coordination from the parent. `:host()`\ntakes a structural pseudo-class, unlike `:has()`, which it rejects.\n\nThe current page is text, not a link. Linking a page to itself is a known\nscreen-reader annoyance, and `aria-current=\"page\"` on the host is what\nconveys position.",
           "name": "HelixBaseBreadcrumb",
           "cssParts": [
             {
               "description": "The separator preceding the item.",
               "name": "separator"
+            },
+            {
+              "description": "The crumb itself, which is an `<a>` where `href` is set.",
+              "name": "link"
             }
           ],
           "slots": [
             {
-              "description": "The step: a link, or the text of the current page. A link is styled with `data-link=\"quiet\"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.",
+              "description": "The step's label. Without an `href` this may be the consumer's own anchor, styled with `data-link=\"quiet\"`, since a slotted anchor belongs to the outer tree and cannot be reached from this component's styles.",
               "name": ""
+            },
+            {
+              "description": "Before the label, for an icon.",
+              "name": "start"
+            },
+            {
+              "description": "After it, for a count or a mark.",
+              "name": "end"
             },
             {
               "description": "Replaces the chevron shown before this item.",
@@ -1989,6 +2001,36 @@
               "description": "Whether this item is the page the reader is on.",
               "attribute": "current",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the crumb goes, and nothing where it is the current page.\n\nEmpty rather than optional and unreflected: an `href` written onto every\nhost would be a link to the current page on every crumb nobody asked to be\none, and nothing selects on it.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare crumb that leaves the site.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision.",
+              "attribute": "rel"
             },
             {
               "kind": "field",
@@ -2069,6 +2111,33 @@
               "default": "false",
               "description": "Whether this item is the page the reader is on.",
               "fieldName": "current"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the crumb goes, and nothing where it is the current page.\n\nEmpty rather than optional and unreflected: an `href` written onto every\nhost would be a link to the current page on every crumb nobody asked to be\none, and nothing selects on it.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare crumb that leaves the site.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision.",
+              "fieldName": "rel"
             }
           ],
           "superclass": {
@@ -17277,6 +17346,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/timeline/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/toast/index.js"
           }
         },
@@ -18651,7 +18728,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Layout and semantics, and deliberately not a target.\n\n**It does not become a link.** The reference renders an `<a>` when given an\n`href`, which is the thing Button and Toggle both stopped doing: a router\nrenders its own anchor and cannot render it inside this shadow root, so a row\nthat navigates would force a full page load. A row whose label is a\ndestination slots the consumer's own link as that label, and the link is the\ntarget rather than the row around it.\n\nThat is a real constraint rather than an oversight: a whole-row target needs\nthe anchor to wrap the layout, and the layout is what this component is. When\nsomething needs it, it wants a `data-list-item` recipe styling the consumer's\nanchor, the way `data-button` and `data-navigation-item` do.",
+          "description": "Layout and semantics, and deliberately not a target.\n\n**`href` makes the row itself the link.** *Corrected 19 Aug 2026.* This said a\nrow could not become one, on the grounds that \"a whole-row target needs the\nanchor to wrap the layout, and the layout is what this component is.\" That is\ntrue of the *consumer's* anchor, which cannot wrap slots it does not own, and\nit is not true of the component's: an `<a part=\"row\">` wraps this component's\nown layout perfectly well. `Tree.Item` does exactly that, and the two were\nrefusing and accepting `href` on the same argument.\n\nWhat the anchor buys is what the row could not fake: the whole row is a\ntarget, Enter follows it, middle click opens a tab, the status bar shows the\ndestination, and it all works before any JavaScript runs.\n\nWhat it costs is client-side routing, and that is the consumer's to restore.\nA router renders its own anchor and cannot render one inside this shadow\nroot, so a framework wanting a soft navigation intercepts the click on the\nway out: the anchor is in `composedPath()`, and taking only a plain primary\npress leaves every native gesture alone.\n\n**`data-list-item` is still the answer for a row that is not a destination.**\nA list row is often a container of controls rather than a place to go, and a\nrow with `href` unset behaves exactly as it always did.",
           "name": "HelixBaseListItem",
           "cssParts": [
             {
@@ -18678,6 +18755,36 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, and nothing when it goes nowhere.\n\nEmpty rather than optional, and unset by default: a list is not always a\nlist of links, and an empty `href` written onto every row would be a link\nto the current page on every row a consumer never asked to be one.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "attribute": "target"
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision rather\nthan one derived from `target`, for the reason `Tree.Item` gives.",
+              "attribute": "rel"
+            },
             {
               "kind": "field",
               "name": "internals",
@@ -18746,6 +18853,35 @@
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
               }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, and nothing when it goes nowhere.\n\nEmpty rather than optional, and unset by default: a list is not always a\nlist of links, and an empty `href` written onto every row would be a link\nto the current page on every row a consumer never asked to be one.",
+              "fieldName": "href"
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "fieldName": "target"
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision rather\nthan one derived from `target`, for the reason `Tree.Item` gives.",
+              "fieldName": "rel"
             }
           ],
           "superclass": {
@@ -41120,6 +41256,397 @@
           "declaration": {
             "name": "HelixBaseTimePicker",
             "module": "src/time-picker/root/time-picker-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/timeline/item/timeline-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/timeline/root/timeline-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/item/timeline-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**The time is a `<time>`, and only when there is a time to put in it.** Given\n`datetime`, the label a consumer wrote is wrapped in the element the platform\nhas for exactly this, so the machine-readable instant travels with the human\none: a crawler, a reader's own tooling and a copy-paste all get \"2026-08-19\",\nwhere \"yesterday\" on its own is a word. Given no `datetime`, it stays a span,\nbecause a `<time>` with nothing to be precise about is markup pretending.\n\n**The connector is this element's, not the list's.** Each entry draws the line\nthat arrives at it and hides it when it is first, which `:host(:first-child)`\nsettles with no index, no counting parent and no script. `Steps` and\n`Breadcrumbs` both do it this way and for the same reason.\n\n`tone` says what kind of event it was, and it is the only thing that colours\nthe mark. It takes `Announcement`'s vocabulary rather than a second one.",
+          "name": "HelixBaseTimelineItem",
+          "cssParts": [
+            {
+              "description": "The line arriving at this entry.",
+              "name": "connector"
+            },
+            {
+              "description": "What happened, and the time above it.",
+              "name": "content"
+            },
+            {
+              "description": "The mark on the line.",
+              "name": "marker"
+            },
+            {
+              "description": "The column holding the mark and the line.",
+              "name": "rail"
+            },
+            {
+              "description": "When it happened.",
+              "name": "time"
+            }
+          ],
+          "slots": [
+            {
+              "description": "What happened.",
+              "name": ""
+            },
+            {
+              "description": "The mark on the line. Falls back to a dot.",
+              "name": "marker"
+            },
+            {
+              "description": "When it happened, as a reader should see it written.",
+              "name": "time"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "datetime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, machine-readable.\n\nWhatever `<time>` accepts, which is a date, a time, both, a duration or a\nweek. Unset, the label is written as it was given and nothing claims to\nknow what instant it names.",
+              "attribute": "datetime"
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of event it was, which decides the mark's colour and nothing else.",
+              "attribute": "tone",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "datetime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, machine-readable.\n\nWhatever `<time>` accepts, which is a date, a time, both, a duration or a\nweek. Unset, the label is written as it was given and nothing claims to\nknow what instant it names.",
+              "fieldName": "datetime"
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of event it was, which decides the mark's colour and nothing else.",
+              "fieldName": "tone"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One event on a timeline: when it happened, and what it was.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/timeline",
+            "aliases": [
+              "Activity item",
+              "History entry",
+              "Event"
+            ],
+            "tier": "headless",
+            "group": "BaseTimeline",
+            "part": "Item"
+          },
+          "tagName": "helix-base-timeline-item",
+          "customElement": true,
+          "modulePath": "src/timeline/item/timeline-item.ts",
+          "definitionPath": "src/timeline/item/timeline-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTimelineItem",
+          "declaration": {
+            "name": "HelixBaseTimelineItem",
+            "module": "src/timeline/item/timeline-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-timeline-item",
+          "declaration": {
+            "name": "HelixBaseTimelineItem",
+            "module": "src/timeline/item/timeline-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/root/timeline-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**Not `Steps`, and the difference is what the thing is for.** A stepper is a\nprocess a reader is moving through: it has a stage they are on, stages they\nhave finished, and stages ahead, so it carries `active` and `complete` and\nnumbers itself. A timeline is a record of events that already happened, or are\nscheduled to. Nothing is current, nothing is complete, and what each entry\ncarries instead is a time. Building this as an appearance of `Steps` would\nhave meant a stepper with no step you are on.\n\nWhat it does take from `Steps` is the connector. Each entry draws the line\nthat arrives at it and hides it when it is first, which needs neither an index\nnor a parent that counts: `:host(:first-child)` is the whole of it, resolved\nat layout with no script, so a server's markup is right before anything runs.\n\n`role=\"list\"` on the host rather than an `<ol>` in the shadow root, for the\nreason `Steps` gives: the entries are the consumer's elements in the light\nDOM, so a list element here would be a list whose items are somewhere else.",
+          "name": "HelixBaseTimeline",
+          "slots": [
+            {
+              "description": "The entries.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the record, for a reader arriving at it out of context.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the record, for a reader arriving at it out of context.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A record of what happened, in the order it happened.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/timeline",
+            "aliases": [
+              "Activity feed",
+              "History",
+              "Changelog",
+              "Audit trail"
+            ],
+            "tier": "headless",
+            "group": "BaseTimeline",
+            "part": "Root",
+            "source": "helix/headless/src/timeline"
+          },
+          "tagName": "helix-base-timeline",
+          "customElement": true,
+          "modulePath": "src/timeline/root/timeline-root.ts",
+          "definitionPath": "src/timeline/root/timeline-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTimeline",
+          "declaration": {
+            "name": "HelixBaseTimeline",
+            "module": "src/timeline/root/timeline-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-timeline",
+          "declaration": {
+            "name": "HelixBaseTimeline",
+            "module": "src/timeline/root/timeline-root.ts"
           }
         }
       ]

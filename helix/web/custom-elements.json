@@ -2731,6 +2731,14 @@
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
               }
+            },
+            {
+              "description": "The crumb itself, which is an `<a>` where `href` is set.",
+              "name": "link",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
             }
           ],
           "slots": [
@@ -2749,6 +2757,22 @@
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
               }
+            },
+            {
+              "description": "Before the label, for an icon.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "description": "After it, for a count or a mark.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
             }
           ],
           "members": [
@@ -2762,6 +2786,48 @@
               "description": "Whether this item is the page the reader is on.",
               "attribute": "current",
               "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the crumb goes, and nothing where it is the current page.\n\nEmpty rather than optional and unreflected: an `href` written onto every\nhost would be a link to the current page on every crumb nobody asked to be\none, and nothing selects on it.",
+              "attribute": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare crumb that leaves the site.",
+              "attribute": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision.",
+              "attribute": "rel",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
@@ -2864,6 +2930,45 @@
               "default": "false",
               "description": "Whether this item is the page the reader is on.",
               "fieldName": "current",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the crumb goes, and nothing where it is the current page.\n\nEmpty rather than optional and unreflected: an `href` written onto every\nhost would be a link to the current page on every crumb nobody asked to be\none, and nothing selects on it.",
+              "fieldName": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare crumb that leaves the site.",
+              "fieldName": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision.",
+              "fieldName": "rel",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
@@ -3061,6 +3166,10 @@
             "examples": [
               {
                 "slug": "default"
+              },
+              {
+                "description": "A trail whose crumbs are the links, with an icon on the first.",
+                "slug": "links"
               }
             ],
             "source": "helix/web/src/breadcrumbs"
@@ -22296,6 +22405,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/timeline/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/toast/index.js"
           }
         },
@@ -23951,6 +24068,48 @@
           "members": [
             {
               "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, and nothing when it goes nowhere.\n\nEmpty rather than optional, and unset by default: a list is not always a\nlist of links, and an empty `href` written onto every row would be a link\nto the current page on every row a consumer never asked to be one.",
+              "attribute": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "attribute": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision rather\nthan one derived from `target`, for the reason `Tree.Item` gives.",
+              "attribute": "rel",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -24076,6 +24235,47 @@
             {
               "description": "The layout, held off the host so the host can carry a marker.",
               "name": "row",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the row goes, and nothing when it goes nowhere.\n\nEmpty rather than optional, and unset by default: a list is not always a\nlist of links, and an empty `href` written onto every row would be a link\nto the current page on every row a consumer never asked to be one.",
+              "fieldName": "href",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
+              "name": "target",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the link opens, for the rare row that leaves the site.",
+              "fieldName": "target",
+              "inheritedFrom": {
+                "name": "HelixBaseListItem",
+                "module": "src/list/item/list-item.ts"
+              }
+            },
+            {
+              "name": "rel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the link declares about where it goes. The consumer's decision rather\nthan one derived from `target`, for the reason `Tree.Item` gives.",
+              "fieldName": "rel",
               "inheritedFrom": {
                 "name": "HelixBaseListItem",
                 "module": "src/list/item/list-item.ts"
@@ -53977,6 +54177,530 @@
           "declaration": {
             "name": "HelixTimePicker",
             "module": "src/time-picker/root/time-picker-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/timeline/item/timeline-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/timeline/root/timeline-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/item/timeline-item.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/timeline/item/timeline-item.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/item/timeline-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the rail down the side, the mark on it, and the line that\narrives at this entry from the one before.",
+          "name": "HelixTimelineItem",
+          "cssProperties": [
+            {
+              "description": "Diameter of the mark.",
+              "name": "--timeline-marker-size"
+            },
+            {
+              "description": "Width of the line.",
+              "name": "--timeline-rail-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "datetime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, machine-readable.\n\nWhatever `<time>` accepts, which is a date, a time, both, a duration or a\nweek. Unset, the label is written as it was given and nothing claims to\nknow what instant it names.",
+              "attribute": "datetime",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of event it was, which decides the mark's colour and nothing else.",
+              "attribute": "tone",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTimelineItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One event on a timeline: when it happened, and what it was.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/timeline",
+            "aliases": [
+              "Activity item",
+              "History entry",
+              "Event"
+            ],
+            "tier": "styled",
+            "group": "Timeline",
+            "part": "Item"
+          },
+          "tagName": "helix-timeline-item",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "What happened.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "The mark on the line. Falls back to a dot.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "When it happened, as a reader should see it written.",
+              "name": "time",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The line arriving at this entry.",
+              "name": "connector",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "What happened, and the time above it.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "The mark on the line.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "The column holding the mark and the line.",
+              "name": "rail",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "When it happened.",
+              "name": "time",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "datetime",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "When it happened, machine-readable.\n\nWhatever `<time>` accepts, which is a date, a time, both, a duration or a\nweek. Unset, the label is written as it was given and nothing claims to\nknow what instant it names.",
+              "fieldName": "datetime",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "name": "tone",
+              "type": {
+                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+              },
+              "description": "What kind of event it was, which decides the mark's colour and nothing else.",
+              "fieldName": "tone",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            }
+          ],
+          "modulePath": "src/timeline/item/timeline-item.ts",
+          "definitionPath": "src/timeline/item/timeline-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTimelineItem",
+          "declaration": {
+            "name": "HelixTimelineItem",
+            "module": "src/timeline/item/timeline-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-timeline-item",
+          "declaration": {
+            "name": "HelixTimelineItem",
+            "module": "src/timeline/item/timeline-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/root/timeline-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/timeline/root/timeline-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/timeline/root/timeline-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the direction time runs in, and the spacing between one\nevent and the next. Every entry draws its own mark and its own line.",
+          "name": "HelixTimeline",
+          "cssProperties": [
+            {
+              "description": "Space between one entry and the next.",
+              "name": "--timeline-gap"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
+              "attribute": "orientation",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseTimeline",
+                "module": "src/timeline/root/timeline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the record, for a reader arriving at it out of context.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeline",
+                "module": "src/timeline/root/timeline-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseTimeline",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A record of what happened, in the order it happened.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/timeline",
+            "aliases": [
+              "Activity feed",
+              "History",
+              "Changelog",
+              "Audit trail"
+            ],
+            "tier": "styled",
+            "group": "Timeline",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "description": "Along the page rather than down it, for a record with few entries.",
+                "slug": "horizontal"
+              }
+            ],
+            "source": "helix/web/src/timeline"
+          },
+          "tagName": "helix-timeline",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The entries.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeline",
+                "module": "src/timeline/root/timeline-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
+              "fieldName": "orientation",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeline",
+                "module": "src/timeline/root/timeline-root.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the record, for a reader arriving at it out of context.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeline",
+                "module": "src/timeline/root/timeline-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/timeline/root/timeline-root.ts",
+          "definitionPath": "src/timeline/root/timeline-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTimeline",
+          "declaration": {
+            "name": "HelixTimeline",
+            "module": "src/timeline/root/timeline-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-timeline",
+          "declaration": {
+            "name": "HelixTimeline",
+            "module": "src/timeline/root/timeline-root.ts"
           }
         }
       ]

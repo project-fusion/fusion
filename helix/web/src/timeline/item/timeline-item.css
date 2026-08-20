@@ -1,0 +1,141 @@
+/* The rail beside the content, and the two rows the rail is measured against.
+ *
+ * `min-block-size` on the rail rather than a height on the host: the entry is as
+ * tall as what is in it, and the line has to run the whole of that however much
+ * that is. */
+:host {
+  display: flex;
+  gap: var(--helix-space-md);
+}
+
+[part="rail"] {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Above the mark, because it is the line arriving from the entry before. The
+   first entry has nothing before it, and `:host(:first-child)` is the whole of
+   knowing that: no index, no counting parent, no script, and true in the
+   server's own markup. Hidden rather than removed, so the mark stays on the same
+   line as every other one. */
+[part="connector"] {
+  background-color: var(--helix-color-border);
+  block-size: var(--helix-space-md);
+  flex: 0 0 auto;
+  inline-size: var(--timeline-rail-size, var(--helix-border-thick));
+}
+
+:host(:first-child) [part="connector"] {
+  visibility: hidden;
+}
+
+/* And the rest of the line, which runs from the mark to the bottom of whatever
+   this entry holds. `flex: 1` rather than a second fixed length, so a long entry
+   is joined to the next one and a short one does not overshoot it. */
+[part="rail"]::after {
+  background-color: var(--helix-color-border);
+  content: "";
+  flex: 1 1 auto;
+  inline-size: var(--timeline-rail-size, var(--helix-border-thick));
+}
+
+:host(:last-child) [part="rail"]::after {
+  visibility: hidden;
+}
+
+/* A dot, and a box for whatever is slotted instead. Sized from the mark rather
+   than from the text, so a row with an icon and a row with a dot keep their
+   marks on one line down the page. */
+[part="marker"] {
+  --icon-size: var(--helix-size-icon-sm);
+
+  align-items: center;
+  aspect-ratio: 1;
+  background-color: var(--_timeline-tone, var(--helix-color-border));
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-background);
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: var(--timeline-marker-size, var(--helix-size-icon-md));
+  justify-content: center;
+}
+
+:host([tone="danger"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-danger);
+}
+
+:host([tone="info"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-info);
+}
+
+:host([tone="neutral"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-foreground-muted);
+}
+
+:host([tone="primary"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-primary);
+}
+
+:host([tone="success"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-success);
+}
+
+:host([tone="warning"]) [part="marker"] {
+  --_timeline-tone: var(--helix-color-warning);
+}
+
+[part="content"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+  padding-block-end: var(--timeline-gap, var(--helix-space-lg));
+}
+
+:host(:last-child) [part="content"] {
+  padding-block-end: var(--helix-space-none);
+}
+
+[part="time"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* Along the page instead of down it. The rail turns, the line becomes the row
+   above the content, and the entry is as wide as what is in it. */
+:host-context([orientation="horizontal"]) {
+  flex-direction: column;
+  flex: 1 1 0;
+  gap: var(--helix-space-sm);
+}
+
+:host-context([orientation="horizontal"]) [part="rail"] {
+  align-items: center;
+  flex-direction: row;
+}
+
+:host-context([orientation="horizontal"]) [part="connector"],
+:host-context([orientation="horizontal"]) [part="rail"]::after {
+  block-size: var(--timeline-rail-size, var(--helix-border-thick));
+}
+
+/* The same arrangement as the column, turned: a fixed run of line before the
+   mark and the rest of it after. Letting the leading half grow instead put every
+   mark at the far end of its own entry, so "Alpha" was labelled by the dot above
+   the entry after it. The screenshot is what said so. */
+:host-context([orientation="horizontal"]) [part="connector"] {
+  flex: 0 0 auto;
+  inline-size: var(--helix-space-md);
+}
+
+:host-context([orientation="horizontal"]) [part="rail"]::after {
+  inline-size: auto;
+}
+
+:host-context([orientation="horizontal"]) [part="content"] {
+  padding-block-end: var(--helix-space-none);
+  padding-inline-end: var(--timeline-gap, var(--helix-space-md));
+}

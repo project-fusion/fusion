@@ -438,6 +438,9 @@ and leaves box and background to `::slotted`.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `current` | `current` | `boolean` | `false` | `HelixBaseBreadcrumb` | Whether this item is the page the reader is on. |
+| `href` | `href` | `string` | `''` | `HelixBaseBreadcrumb` | Where the crumb goes, and nothing where it is the current page. |
+| `rel` | `rel` | `string` | `''` | `HelixBaseBreadcrumb` | What the link declares about where it goes. The consumer's decision. |
+| `target` | `target` | `string` | `''` | `HelixBaseBreadcrumb` | Where the link opens, for the rare crumb that leaves the site. |
 
 #### Slots
 
@@ -445,12 +448,15 @@ and leaves box and background to `::slotted`.
 | --- | --- |
 | *(default)* | The step: a link, or the text of the current page. |
 | `separator` | Replaces the chevron shown before this item. |
+| `start` | Before the label, for an icon. |
+| `end` | After it, for a count or a mark. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `separator` | The separator preceding the item. |
+| `link` | The crumb itself, which is an `<a>` where `href` is set. |
 
 #### Custom properties
 
@@ -2296,6 +2302,14 @@ Extends `HelixBaseListItem`.
 A grid rather than a flex row, so the supporting text lines up under the
 label rather than under the leading icon. The leading and trailing regions
 hold their own width and the middle takes the rest.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `href` | `href` | `string` | `''` | `HelixBaseListItem` | Where the row goes, and nothing when it goes nowhere. |
+| `rel` | `rel` | `string` | `''` | `HelixBaseListItem` | What the link declares about where it goes. The consumer's decision rather than one derived from `target`, for the reason `Tree.Item` gives. |
+| `target` | `target` | `string` | `''` | `HelixBaseListItem` | Where the link opens, for the rare row that leaves the site. |
 
 #### Slots
 
@@ -5141,6 +5155,77 @@ card would be a card inside a card there.
 | `--time-picker-row-size` | Height and least width of one row in a wheel. |
 | `--time-picker-range-color` | Wash behind the times inside a range. |
 | `--time-picker-selected-color` | Fill on the chosen row of a wheel. |
+
+## Timeline
+
+### Root — `helix-timeline`
+
+A record of what happened, in the order it happened.
+
+Extends `HelixBaseTimeline`.
+
+Presentation only: the direction time runs in, and the spacing between one
+event and the next. Every entry draws its own mark and its own line.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `''` | `HelixBaseTimeline` | Names the record, for a reader arriving at it out of context. |
+| `orientation` | `orientation` | `'horizontal' \| undefined` | - | `HelixBaseTimeline` | Which way time runs. Down the page, or along it. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The entries. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--timeline-gap` | Space between one entry and the next. |
+
+### Item — `helix-timeline-item`
+
+One event on a timeline: when it happened, and what it was.
+
+Extends `HelixBaseTimelineItem`.
+
+Presentation only: the rail down the side, the mark on it, and the line that
+arrives at this entry from the one before.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `datetime` | `datetime` | `string` | `''` | `HelixBaseTimelineItem` | When it happened, machine-readable. |
+| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | `HelixBaseTimelineItem` | What kind of event it was, which decides the mark's colour and nothing else. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | What happened. |
+| `marker` | The mark on the line. Falls back to a dot. |
+| `time` | When it happened, as a reader should see it written. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `connector` | The line arriving at this entry. |
+| `content` | What happened, and the time above it. |
+| `marker` | The mark on the line. |
+| `rail` | The column holding the mark and the line. |
+| `time` | When it happened. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--timeline-marker-size` | Diameter of the mark. |
+| `--timeline-rail-size` | Width of the line. |
 
 ## Toast
 

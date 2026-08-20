@@ -1,0 +1,14 @@
+/* A column of entries, and each one draws the line that reaches it.
+ *
+ * No gap. The line has to be continuous, and a flex gap is empty space between
+ * the boxes drawing it: every entry would arrive with a break above its mark.
+ * The spacing is the entry's own padding instead, which the line runs through.
+ * `Toast` records the same about a stack whose members collapse. */
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+:host([orientation="horizontal"]) {
+  flex-direction: row;
+}
