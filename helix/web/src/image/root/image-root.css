@@ -43,6 +43,24 @@
   position: absolute;
 }
 
+/* And stop covering it when they are told to.
+ *
+ * **`hidden` does not hide a thing an author gave a display to.** The rule
+ * above is an author rule and `[hidden] { display: none }` is the user agent's,
+ * and an author rule beats a user agent rule at any specificity, so the
+ * attribute did nothing at all. Measured: a photograph that had loaded, at
+ * opacity 1, under a 384 by 216 stand-in painted over the whole of it. Every
+ * image in the gallery was a grey rectangle.
+ *
+ * `Megamenu` carries the same rule for the same reason and says so at greater
+ * length. `:host` prefixes this one so it also outranks any later
+ * `:host([...]) [part="fallback"]`, which is how the megamenu's version lost the
+ * first time. Do not lower it. */
+:host [part="placeholder"][hidden],
+:host [part="fallback"][hidden] {
+  display: none;
+}
+
 /* The resting placeholder, drawn here rather than slotted, so an image with
  * nothing slotted still reserves a surface instead of a hole.
  *

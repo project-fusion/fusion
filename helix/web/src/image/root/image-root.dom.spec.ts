@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -86,3 +86,46 @@ describe('an image', () => {
     expect(part(host, 'fallback')?.getAttribute('aria-hidden')).toBe('true')
   })
 })
+
+if (hasLayout()) {
+  describe('an image whose stand-in has been put away', () => {
+    /* Asserting on the `hidden` attribute is what let this ship. The attribute
+       was set correctly on every path and the stand-in stayed painted over the
+       picture anyway, because `display: flex` is an author rule and
+       `[hidden] { display: none }` is the user agent's, and an author rule wins
+       at any specificity. Every image in the gallery was a grey rectangle under
+       a photograph that had loaded. A box is the only thing that answers
+       "is it out of the way" from the reader's side. `Megamenu` learned this
+       first and its own layout spec says the same. */
+    const shown = async (attrs: string): Promise<Picture> => {
+      const host = (await mount(
+        `<helix-image alt="A pier" style="inline-size:120px;--image-aspect:1/1" ${attrs}></helix-image>`,
+      )) as Picture
+      await host.updateComplete
+      return host
+    }
+
+    const boxOf = (host: Picture, name: string): DOMRect =>
+      (part(host, name) as HTMLElement).getBoundingClientRect()
+
+    test('takes no box once the picture has arrived', async () => {
+      const host = await shown('src="/pier.jpg"')
+      expect(boxOf(host, 'placeholder').height).toBeGreaterThan(0)
+
+      img(host).dispatchEvent(new Event('load'))
+      await host.updateComplete
+      expect(boxOf(host, 'placeholder').height).toBe(0)
+      expect(boxOf(host, 'fallback').height).toBe(0)
+    })
+
+    test('and the fallback takes none until it is wanted', async () => {
+      const host = await shown('src="/gone.jpg"')
+      expect(boxOf(host, 'fallback').height).toBe(0)
+
+      img(host).dispatchEvent(new Event('error'))
+      await host.updateComplete
+      expect(boxOf(host, 'fallback').height).toBeGreaterThan(0)
+      expect(boxOf(host, 'placeholder').height).toBe(0)
+    })
+  })
+}
