@@ -3,6 +3,7 @@
 // The editor is on its own path: it carries CodeMirror, and the site's
 // element registration runs on every page.
 import '@helix-io/sandbox/editor'
+import { scrollItemIntoView } from '@helix-io/core'
 import { htmlToJsx, jsxToHtml } from '@helix-io/sandbox'
 import type { HelixSandboxEditor } from '@helix-io/sandbox/editor'
 import type {
@@ -123,6 +124,7 @@ export function SandboxWorkbench({ families }: Props) {
   /* Held as state, not as a ref: an effect observes the splitter's width and a
      memo reads the tree's rows, and both have to run when the element arrives,
      which a `RefObject` cannot announce. */
+  const scroller = useRef<HTMLDivElement>(null)
   const [tree, setTree] = useElementRef<HelixTree>()
   const [railSplitter, setRailSplitter] = useElementRef<HelixSplitter>()
 
@@ -737,6 +739,65 @@ export function SandboxWorkbench({ families }: Props) {
     }
   }, [branches, family.slug])
 
+  const chosen = example ? `${family.slug}/${example.slug}` : undefined
+
+  /* And then show the reader where they are.
+   *
+   * Arriving with a component already chosen, which is what every link into the
+   * sandbox does, opened the right branch and marked the right row and left
+   * both below the fold. The list is long enough that a family late in the
+   * alphabet sat 2277 pixels down, so the panel looked like it had ignored the
+   * address.
+   *
+   * **Here and not in `Tree`, which was tried first.** Teaching `active` to
+   * reveal itself meant opening the branches above the row, and opening is a
+   * write: a later sync ran it again and reopened a branch the reader had just
+   * clicked shut, which one of `Tree`'s own specs caught. Revealing is this
+   * panel's intent about its own address rather than something every tree
+   * should do to its consumer.
+   *
+   * `scrollItemIntoView` rather than `scrollIntoView`, for the reason `Tree`
+   * gives where the keyboard uses it: the platform's own scrolls every
+   * scrollable ancestor including the document, and a reader following a link
+   * into a sidebar did not ask the page to move. Its default scroller is the
+   * item's `offsetParent`, which is the nearest *positioned* ancestor and has
+   * nothing to do with overflow, so the panel is passed explicitly: measured
+   * without it, the row 3228 pixels down and the scroller still at zero.
+   *
+   * Waiting for the tree rather than for a frame. Opening a branch is itself a
+   * render, so the rows above this one had not been laid out when a lone
+   * `requestAnimationFrame` fired and they pushed it down afterwards: the panel
+   * scrolled 2277 and left one pixel of the row showing. */
+  useEffect(() => {
+    const panel = scroller.current
+    if (!tree || !panel || chosen === undefined) {
+      return
+    }
+    let cancelled = false
+    const show = async (): Promise<void> => {
+      await tree.updateComplete
+      const row = [...tree.querySelectorAll<HelixTreeItem>('helix-tree-item')].find(
+        (one) => one.value === chosen,
+      )
+      if (!row) {
+        return
+      }
+      await row.updateComplete
+      await new Promise((settled) => {
+        requestAnimationFrame(() => {
+          settled(undefined)
+        })
+      })
+      if (!cancelled) {
+        scrollItemIntoView(row, { padding: 8, scroller: panel })
+      }
+    }
+    void show()
+    return () => {
+      cancelled = true
+    }
+  }, [chosen, tree])
+
   /* Every hook is above this, and has to be: an early return past one changes
      how many run, which is the rule React has no way to recover from. The tree
      effect in particular reads nothing this branch decides. */
@@ -748,7 +809,7 @@ export function SandboxWorkbench({ families }: Props) {
     )
   }
 
-  const activeValue = `${family.slug}/${example.slug}`
+  const activeValue = chosen ?? `${family.slug}/${example.slug}`
 
   /* A family matching by name keeps all of its examples, because the reader
      asked for the component and not for a particular one of its pages. A family
@@ -809,7 +870,7 @@ export function SandboxWorkbench({ families }: Props) {
         </helix-tooltip>
       </helix-flex>
 
-      <div className="examplesScroll">
+      <div className="examplesScroll" ref={scroller}>
         {shown.length === 0 ? (
           <helix-text appearance="caption" tone="subtle">
             Nothing matches {filter}.
