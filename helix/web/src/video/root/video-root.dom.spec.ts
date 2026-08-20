@@ -15,6 +15,36 @@ const player = async (markup = '<helix-video label="A clip" src="/clip.mp4"></he
 }
 
 describe('the mark that starts it', () => {
+  test('comes back when the source changes under a playing video', async () => {
+    /* Assigning `src` runs the media load algorithm, which stops playback and
+       sets `paused` **without firing `pause`**: the events are `emptied` and
+       `loadstart`. Listening for `play` and `pause` alone, this element went on
+       believing it was playing after a playlist pointed it at the next entry,
+       so the mark it draws only when paused stayed hidden and there was nothing
+       to press. Measured in a browser: `paused` true, `playing` true, and no
+       `pause` anywhere in the event log.
+
+       `paused` is defined here rather than played for real, because it is the
+       platform's half of the exchange and a spec cannot make a browser decode a
+       file. What is under test is which events this element listens to. */
+    const host = await player()
+    const video = host.shadowRoot?.querySelector('video') as HTMLVideoElement
+    const paused = (value: boolean) => {
+      Object.defineProperty(video, 'paused', { configurable: true, value })
+    }
+
+    paused(false)
+    video.dispatchEvent(new Event('play'))
+    await host.updateComplete
+    expect(part(host, 'start')).toBeNull()
+
+    /* The source changes. Only `emptied` arrives. */
+    paused(true)
+    video.dispatchEvent(new Event('emptied'))
+    await host.updateComplete
+    expect(part(host, 'start')).not.toBeNull()
+  })
+
   test('a stopped video has one, because nothing else in it invites a press', async () => {
     /* Measured on the bar before this existed: the play glyph is 16 by 16 in a
        24 by 24 target, 0.12% of a 528 by 396 picture. What a reader meets is a

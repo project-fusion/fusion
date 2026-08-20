@@ -5542,6 +5542,8 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Method | From | Description |
 | --- | --- | --- |
+| `pause()` | `HelixBaseVideo` | Stops, leaving the frame up. |
+| `play()` | `HelixBaseVideo` | Starts playing, where the platform allows it. |
 | `seek()` | `HelixBaseVideo` | Moves to a point in seconds, clamped to what exists. |
 | `toggle()` | `HelixBaseVideo` | Toggles playback, which is what every key and the button both come to. |
 

@@ -423,6 +423,23 @@ export class HelixBaseVideo extends HelixElement {
     return this.renderRoot?.querySelector<HTMLVideoElement>('[part="video"]') ?? null
   }
 
+  /**
+   * Starts playing, where the platform allows it.
+   *
+   * The rejection is swallowed on purpose: a browser refuses `play()` when
+   * nothing the reader did asked for it, and that is a policy answer rather than
+   * a fault. What follows a refused play is a paused player showing its start
+   * control, which is the correct thing to be looking at.
+   */
+  play(): void {
+    void this.video?.play().catch(() => {})
+  }
+
+  /** Stops, leaving the frame up. */
+  pause(): void {
+    this.video?.pause()
+  }
+
   /** Toggles playback, which is what every key and the button both come to. */
   toggle(): void {
     const video = this.video
@@ -430,9 +447,9 @@ export class HelixBaseVideo extends HelixElement {
       return
     }
     if (video.paused) {
-      void video.play()
+      this.play()
     } else {
-      video.pause()
+      this.pause()
     }
   }
 
@@ -529,6 +546,13 @@ export class HelixBaseVideo extends HelixElement {
    * the element they wrote hears nothing at all without this. Input relays
    * `change` for the same reason.
    */
+  /* `emptied` is in the list for a reason worth keeping. Assigning `src` runs
+     the media load algorithm, which stops playback and sets `paused` without
+     firing `pause`: the only events are `emptied` and `loadstart`. Listening for
+     `play` and `pause` alone, this element went on believing it was playing
+     after a playlist pointed it at the next entry, so the start control it draws
+     only when paused stayed hidden and there was nothing at all to press.
+     Measured: `paused` true, `playing` true, no `pause` event in the log. */
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
@@ -1181,6 +1205,7 @@ export class HelixBaseVideo extends HelixElement {
         @play=${this.handleState}
         @pause=${this.handleState}
         @ended=${this.handleState}
+        @emptied=${this.handleState}
       >
         ${this.media.map((one) =>
           one.tag === 'track'

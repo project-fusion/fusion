@@ -449,6 +449,54 @@ if (hasLayout()) {
       expect(sentence.getBoundingClientRect().height).toBeGreaterThan(line * 1.5)
     })
 
+    test('a heading sits off its rows by the same gap the rows sit off each other', async () => {
+      /* One number gave three spacings. The gap was `2xs` between every child of
+         a group, which sounds even until you notice a row carries its own
+         padding and a heading does not: it came out as 12 between the heading
+         and the first row, 20 between one row and the next, and 4 between a name
+         and its sentence. Measured between the text, which is where the eye
+         reads it, not between the boxes. */
+      const bar = (await mount(
+        `<helix-navigation label="Main" style="padding:40px">
+          <helix-megamenu label="Products">
+            <div data-megamenu-group>
+              <h3 data-megamenu-heading>Design</h3>
+              <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
+              <a data-megamenu-item href="/two"><strong>Two</strong><span>Second.</span></a>
+            </div>
+          </helix-megamenu>
+        </helix-navigation>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      const group = host.querySelector('[data-megamenu-group]') as HTMLElement
+      const heading = group.querySelector('[data-megamenu-heading]') as HTMLElement
+      const rows = [...group.querySelectorAll('[data-megamenu-item]')] as HTMLElement[]
+      const top = (element: Element) => element.getBoundingClientRect().top
+      const bottom = (element: Element) => element.getBoundingClientRect().bottom
+
+      const headingToFirst = Math.round(
+        top(rows[0].querySelector('strong') as Element) - bottom(heading),
+      )
+      const rowToRow = Math.round(
+        top(rows[1].querySelector('strong') as Element) -
+          bottom(rows[0].querySelector('span') as Element),
+      )
+      expect(headingToFirst).toBe(rowToRow)
+
+      /* And a name and its sentence stay tighter than that, because they are one
+         thing and a reader should see them as one. */
+      const nameToSentence = Math.round(
+        top(rows[0].querySelector('span') as Element) -
+          bottom(rows[0].querySelector('strong') as Element),
+      )
+      expect(nameToSentence).toBeLessThan(rowToRow)
+    })
+
     test('the host takes a box, so a nav can measure its marker against it', async () => {
       /* `Navigation` measures against every element assigned to its slot, and
          `display: contents` generates none: a section holding the current page

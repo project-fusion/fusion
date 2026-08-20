@@ -19956,6 +19956,13 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `play() => void`: Starts playing, where the platform allows it.
+   *
+   * The rejection is swallowed on purpose: a browser refuses `play()` when
+   * nothing the reader did asked for it, and that is a policy answer rather than
+   * a fault. What follows a refused play is a paused player showing its start
+   * control, which is the correct thing to be looking at.
+   * - `pause() => void`: Stops, leaving the frame up.
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
    *
@@ -28824,6 +28831,13 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `play() => void`: Starts playing, where the platform allows it.
+   *
+   * The rejection is swallowed on purpose: a browser refuses `play()` when
+   * nothing the reader did asked for it, and that is a policy answer rather than
+   * a fault. What follows a refused play is a paused player showing its start
+   * control, which is the correct thing to be looking at.
+   * - `pause() => void`: Stops, leaving the frame up.
    * - `toggle() => void`: Toggles playback, which is what every key and the button both come to.
    * - `seek(seconds: number) => void`: Moves to a point in seconds, clamped to what exists.
    *

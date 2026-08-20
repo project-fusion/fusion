@@ -877,10 +877,22 @@ helix-toggle[disabled]::part(item) {
  * room to explain itself. Nothing here is required: a panel of plain
  * `data-navigation-item` links is a smaller megamenu and works.
  */
+/* One gap, and the rhythm it makes has to be the same one everywhere.
+ *
+ * It was `2xs` between every child, which sounds even and is not: a row carries
+ * its own padding and a heading does not, so the same 4 pixels came out as 12
+ * between the heading and the first row, 20 between one row and the next, and 4
+ * between a name and the sentence under it. Three spacings from one number, and
+ * the panel read as unevenly set. Reported.
+ *
+ * `xs` here plus the row's own `xs` block padding is 24 either side of a row,
+ * and the heading takes the same 8 as a bottom margin so it sits 24 off its
+ * first row too. What stays tight is the name and its sentence, which are one
+ * thing and should look like one. */
 [data-megamenu-group] {
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-2xs);
+  gap: var(--helix-space-xs);
 }
 
 /* Quiet and small, because it labels a column rather than starting a section of
@@ -895,8 +907,8 @@ helix-toggle[disabled]::part(item) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  margin: var(--helix-space-none);
-  padding-inline: var(--helix-space-xs);
+  margin: var(--helix-space-none) var(--helix-space-none) var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
 }
 
 /* A destination with a name and a sentence about it.
@@ -918,7 +930,7 @@ helix-toggle[disabled]::part(item) {
   column-gap: var(--helix-space-sm);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  padding: var(--helix-space-xs);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
   row-gap: var(--helix-space-2xs);
   text-decoration: none;
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -976,7 +988,7 @@ helix-toggle[disabled]::part(item) {
 [data-megamenu-group] > :where([data-navigation-item], a):not([data-megamenu-item]) {
   block-size: auto;
   justify-content: start;
-  padding: var(--helix-space-xs);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
   white-space: normal;
 }
 

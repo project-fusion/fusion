@@ -13,7 +13,22 @@ type Playlist = HTMLElement & {
   updateComplete: Promise<boolean>
 }
 type Entry = HTMLElement & { current: boolean; disabled: boolean; value: string }
-type Player = HTMLElement & { label: string; poster: string; src: string }
+type Player = HTMLElement & {
+  label: string
+  play: () => void
+  poster: string
+  src: string
+  updateComplete: Promise<boolean>
+}
+
+/** Counts plays without needing a browser to decode anything. */
+const watchPlays = (one: Player): (() => number) => {
+  let count = 0
+  one.play = () => {
+    count += 1
+  }
+  return () => count
+}
 
 const list = async (extra = '') =>
   (await mount(`<helix-video-playlist default-active="one" label="Episodes"${extra}>
@@ -129,5 +144,46 @@ describe('a video playlist', () => {
     expect(role(part(host, 'items') as HTMLElement)).toBe('list')
     expect((part(host, 'items') as HTMLElement).getAttribute('aria-label')).toBe('Episodes')
     expect((part(entries(host)[0] as HTMLElement, 'item') as HTMLElement).tagName).toBe('BUTTON')
+  })
+})
+
+describe('choosing an entry', () => {
+  test('plays it, which is the whole point of pressing it', async () => {
+    const host = await list()
+    await host.updateComplete
+    const plays = watchPlays(player(host))
+
+    /* Nothing yet: pointing the player at the opening entry is not somebody
+       asking for it. */
+    expect(plays()).toBe(0)
+
+    /* Pressed, not assigned. Only the three ways a reader moves through a
+       playlist ask for playback: a press, next or previous, and one clip ending
+       into the next. A consumer setting `active` is not one of them. */
+    ;(part(entries(host)[1] as HTMLElement, 'item') as HTMLElement).click()
+    await host.updateComplete
+    await player(host).updateComplete
+    await Promise.resolve()
+    expect(plays()).toBe(1)
+  })
+
+  test('and the play waits for the player to have the new source', async () => {
+    /* `src` on the player is a property, and the `<video>` inside it only takes
+       the new source on its next render. Playing before that plays the outgoing
+       clip for an instant, and the load that follows stops it: measured as a
+       player left paused on the entry that had just been chosen. */
+    const host = await list()
+    await host.updateComplete
+    const one = player(host)
+    const seen: string[] = []
+    one.play = () => {
+      seen.push(one.src)
+    }
+
+    ;(part(entries(host)[1] as HTMLElement, 'item') as HTMLElement).click()
+    await host.updateComplete
+    await one.updateComplete
+    await Promise.resolve()
+    expect(seen).toEqual(['/two.mp4'])
   })
 })

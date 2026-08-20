@@ -17,7 +17,11 @@
   display: flex;
   gap: var(--helix-space-sm);
   inline-size: 100%;
-  padding: var(--helix-space-2xs);
+  /* Room down the leading edge for the mark below, so it has a margin to sit in
+     rather than being pressed against the thumbnail. */
+  padding: var(--helix-space-2xs) var(--helix-space-2xs) var(--helix-space-2xs)
+    var(--helix-space-sm);
+  position: relative;
   text-align: start;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -45,11 +49,27 @@
  *
  * The bar rather than a fill of the whole row. A playlist is scanned down its
  * leading edge, and a filled row a reader has to compare against ten others is
- * slower to find than a mark in the margin. */
+ * slower to find than a mark in the margin.
+ *
+ * **Drawn, not shadowed.** It was an inset `box-shadow` offset sideways, which
+ * on a rounded rectangle is not a bar: the shadow is the padding box moved over,
+ * so what shows through is the leading edge plus a hook of it curling around
+ * each corner, and at any size worth looking at it reads as a border that has
+ * been clipped wrong. Reported, and the picture was of the curl. A box with its
+ * own radius, inset from the row's ends, is the shape that was wanted. */
 [part="item"][aria-current="true"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
-  box-shadow: inset var(--helix-border-thick) 0 0 0 var(--helix-color-primary);
   color: var(--helix-color-foreground);
+}
+
+[part="item"][aria-current="true"]::before {
+  background-color: var(--helix-color-primary);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  inline-size: var(--helix-border-thick);
+  inset-block: var(--helix-space-2xs);
+  inset-inline-start: var(--helix-space-2xs);
+  position: absolute;
 }
 
 :host([disabled]) [part="item"] {

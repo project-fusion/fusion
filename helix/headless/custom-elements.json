@@ -44544,12 +44544,21 @@
             },
             {
               "kind": "field",
-              "name": "player",
+              "name": "chased",
               "type": {
-                "text": "(HTMLElement & { label: string; poster: string; src: string }) | null"
+                "text": "boolean"
               },
               "privacy": "private",
-              "description": "The player, whichever tag the consumer slotted.\n\nAsked of the slot rather than matched by tag name: the headless tier's\nplayer is `helix-base-video` and the styled tier's is `helix-video`, and a\nconsumer bringing a third under either name should still be driven. What is\nneeded of it is `src`, which is the whole of the contract.",
+              "default": "false",
+              "description": "Whether the entry changed because somebody moved through the playlist.\n\nAll three ways it moves are the reader going somewhere: pressing an entry,\npressing next or previous, or a clip ending and the next one following it.\nEvery one of those means play, and the one case that does not is the first\nrender, where the playlist is simply pointing the player at its opening\nentry and nobody has asked for anything yet.\n\nA press is also what makes the play legal. Autoplay is refused when nothing\nthe reader did asked for it, so starting here works because this is inside\nthe gesture that chose the entry, and where it is refused anyway the player\nshows its start control and waits."
+            },
+            {
+              "kind": "field",
+              "name": "player",
+              "type": {
+                "text": "| (HTMLElement & {\n        label: string\n        play: () => void\n        poster: string\n        src: string\n        updateComplete?: Promise<unknown>\n      })\n    | null"
+              },
+              "privacy": "private",
               "readonly": true
             },
             {
@@ -45362,6 +45371,32 @@
               },
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "play",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts playing, where the platform allows it.\n\nThe rejection is swallowed on purpose: a browser refuses `play()` when\nnothing the reader did asked for it, and that is a policy answer rather than\na fault. What follows a refused play is a paused player showing its start\ncontrol, which is the correct thing to be looking at.",
+              "type": {
+                "text": "play() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "pause",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stops, leaving the frame up.",
+              "type": {
+                "text": "pause() => void"
+              }
             },
             {
               "kind": "method",

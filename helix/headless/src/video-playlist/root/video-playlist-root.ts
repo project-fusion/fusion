@@ -65,11 +65,43 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
    * consumer bringing a third under either name should still be driven. What is
    * needed of it is `src`, which is the whole of the contract.
    */
-  private get player(): (HTMLElement & { label: string; poster: string; src: string }) | null {
+  /**
+   * Whether the entry changed because somebody moved through the playlist.
+   *
+   * All three ways it moves are the reader going somewhere: pressing an entry,
+   * pressing next or previous, or a clip ending and the next one following it.
+   * Every one of those means play, and the one case that does not is the first
+   * render, where the playlist is simply pointing the player at its opening
+   * entry and nobody has asked for anything yet.
+   *
+   * A press is also what makes the play legal. Autoplay is refused when nothing
+   * the reader did asked for it, so starting here works because this is inside
+   * the gesture that chose the entry, and where it is refused anyway the player
+   * shows its start control and waits.
+   */
+  private chased = false
+
+  private get player():
+    | (HTMLElement & {
+        label: string
+        play: () => void
+        poster: string
+        src: string
+        updateComplete?: Promise<unknown>
+      })
+    | null {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="player"]')
     const first = slot?.assignedElements()[0]
     return (
-      (first as (HTMLElement & { label: string; poster: string; src: string }) | undefined) ?? null
+      (first as
+        | (HTMLElement & {
+            label: string
+            play: () => void
+            poster: string
+            src: string
+            updateComplete?: Promise<unknown>
+          })
+        | undefined) ?? null
     )
   }
 
@@ -94,18 +126,22 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
      * entry's selection reached them anyway. Command carries the longer note,
      * and the spec below is what caught this one. */
     event.stopImmediatePropagation()
+    this.chased = true
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
   private readonly handleNext = (): void => {
+    this.chased = true
     this.step(1)
   }
 
   private readonly handlePrevious = (): void => {
+    this.chased = true
     this.step(-1)
   }
 
   private readonly handleEnded = (): void => {
+    this.chased = true
     this.step(1)
   }
 
@@ -155,7 +191,22 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
       player.src = current.src
       player.poster = current.poster
       player.label = current.text
+      if (this.chased) {
+        /* After the player has rendered, not now. `src` here is the element's
+           property, and the `<video>` inside it only takes the new source on
+           its next render: playing at this point plays the outgoing clip for an
+           instant and the load that follows stops it again. Measured, and the
+           reading was a player left paused on the entry that had just been
+           chosen.
+
+           A microtask later is still inside the press that got us here, so the
+           platform still counts it as asked for. */
+        void player.updateComplete?.then(() => {
+          player.play()
+        })
+      }
     }
+    this.chased = false
   }
 
   protected override render(): TemplateResult {
