@@ -12,3 +12,21 @@
 :host([orientation="horizontal"]) {
   flex-direction: row;
 }
+
+/* The last entry is as wide as what is in it, and the ones before it share what
+ * is left.
+ *
+ * Every entry taking an equal share puts each mark at the start of its own
+ * share, which leaves the final share empty: the last mark landed a whole track
+ * short of the end and the line stopped three quarters of the way across, with a
+ * label sitting on its own in the gap. Measured at 900 wide: 193 pixels of
+ * nothing after the last mark. Sized to its content instead, the entries before
+ * it spread into that space and the line runs the width of the record.
+ *
+ * Said here rather than in the entry, which is where it was tried first: the
+ * entry would have to ask about an attribute on its parent *and* about its own
+ * position, and `:host-context(...):last-child` matched nothing. This element is
+ * the flex container and already knows both. */
+:host([orientation="horizontal"]) ::slotted(:last-child) {
+  flex: 0 0 auto;
+}

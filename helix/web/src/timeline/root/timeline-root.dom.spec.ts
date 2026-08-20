@@ -126,6 +126,21 @@ describe('a timeline', () => {
       expect(getComputedStyle(part(entry, 'rail') as HTMLElement).flexDirection).toBe('row')
     })
 
+    test('and the line reaches the end of the record', async () => {
+      /* Every entry taking an equal share of the width puts each mark at the
+         start of its own share, which leaves the last share empty: the line
+         stopped a whole track short of the end with a label sitting on its own
+         in the gap. Measured at 900 wide, 193 pixels of nothing after the last
+         mark. The test is that what is left after the last mark is smaller than
+         the space between two marks, which a dead track never is. */
+      const host = await timeline(three, ' orientation="horizontal"')
+      const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
+      const at = (one: Entry) => (part(one, 'marker') as HTMLElement).getBoundingClientRect()
+      const spacing = at(entries[1]).left - at(entries[0]).left
+      const after = host.getBoundingClientRect().right - at(entries.at(-1) as Entry).right
+      expect(after).toBeLessThan(spacing)
+    })
+
     test('and each mark stays over the entry it belongs to', async () => {
       /* The leading run of line is a fixed length in both directions. Letting it
          grow instead, which the first version of this did, pushed every mark to
