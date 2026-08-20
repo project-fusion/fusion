@@ -69,7 +69,13 @@ void main() {
   p.x *= uResolution.x / uResolution.y;
 
   float horizon = -0.13;
-  float height = mix(0.030, 0.20, uScroll);
+  /* Geometric, not linear. Depth is proportional to camera height, and what an
+     eye reads as speed is the *relative* change: from 0.030 a linear ramp gains
+     seventeen percent in the first step and under three percent in the last, so
+     the rise bolts away at the top of the page and crawls at the bottom.
+     Interpolated as a ratio, every unit of scroll changes the height by the
+     same factor, which is what makes the climb read as one move. */
+  float height = 0.030 * pow(0.20 / 0.030, uScroll);
 
   /* The disc sits mostly under the line and climbs a little as the camera
      does, so the ladder is also a dawn. 1.45 is the refraction squash. */
@@ -227,8 +233,13 @@ export function ShaderSky() {
     }
 
     let frame = 0
-    let eased = 0
-    const start = performance.now()
+    /* Undefined until the first frame reads the real position, because the page
+       can load already scrolled: starting this at zero makes the camera sweep
+       up from the ground to wherever the reader actually is, which is a jump
+       nobody asked for and the most visible one on the page. */
+    let eased: number | undefined
+    let last = performance.now()
+    const start = last
 
     const draw = () => {
       size()
@@ -238,7 +249,13 @@ export function ShaderSky() {
          one to one with the wheel steps as fast as the wheel does, which is
          what made the climb feel like jumps rather than a move. */
       const target = max > 0 ? Math.min(window.scrollY / max, 1) : 0
-      eased += (target - eased) * 0.06
+      const now = performance.now()
+      /* Frame-rate independent: a fixed fraction per frame runs twice as fast
+         on a 120 Hz panel as on a 60 Hz one. This is a time constant instead,
+         so the camera takes the same quarter second everywhere. */
+      const dt = Math.min((now - last) / 1000, 0.1)
+      last = now
+      eased = eased === undefined ? target : eased + (target - eased) * (1 - Math.exp(-dt / 0.25))
       gl.uniform1f(uScroll, eased)
       /* Time stops for a reader who asked not to be moved. The sun still
          responds to scrolling, because that is their own gesture rather than
