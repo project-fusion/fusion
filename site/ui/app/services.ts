@@ -58,7 +58,12 @@ export interface Service {
  * sprint was published at six to ten weeks when it runs four, and
  * the build was published with no number at all although it has one.
  * `the internal plan` is the reconciliation and is the authority where
- * the two disagree.
+ * the two disagree. Settled 20 Aug 2026: the sprint is four weeks, and the price does not move.
+ *
+ * **The sprint states the commitment and not only the elapsed time**, which is
+ * section 5.2 of that document and the highest-value line in it. Four weeks with
+ * no shape given invites a full-time reading, and the price then reads as something it is not. Four weeks at two days a week is what it is costed against, and that is what it is. The
+ * number was never the problem: what it was divided by was.
  *
  * **Finance is deliberately absent.** The old site sold it and the plan drops
  * it: advising on securities for compensation implicates investment-adviser
@@ -82,7 +87,7 @@ export const SERVICES: Service[] = [
       'Two weeks to find out what is worth building. Short enough to fit around your roadmap, cheap enough to be a real question rather than a commitment.',
   },
   {
-    duration: 'Four weeks',
+    duration: 'Four weeks, two days a week',
     icon: 'cube',
     includes: [
       'A token layer that derives an accessible palette from your brand color',
