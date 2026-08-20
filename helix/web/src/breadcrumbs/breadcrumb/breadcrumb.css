@@ -107,15 +107,25 @@
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  /* `xs`, the next rung. A mark and the word it belongs to were 4px apart,
-     which reads as the icon being part of the word rather than beside it. The
-     scale offers 4, 8, 12, so there is no smaller step to take. */
-  gap: var(--helix-space-xs);
+  gap: var(--helix-space-2xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   text-decoration: none;
 }
 
+/* The same hover the slotted path has, because `::slotted(a:hover)` cannot
+   reach this one.
+ *
+ * That rule matches *assigned* nodes, and a crumb with `href` renders its own
+ * anchor in this shadow root, where nothing assigned it. So a trail written the
+ * new way lit up on hover in colour and stayed flat, while a trail written the
+ * old way took a background: two ways to write the same trail, behaving
+ * differently, with no error anywhere. Same shape as `CopyButton`'s fallback
+ * icons, which rendered at the right colour and no size at all.
+ *
+ * Reading the same hook as the slotted rule, so a consumer overriding one
+ * overrides both. */
 a[part="link"]:hover {
+  background-color: var(--breadcrumb-hover-color, var(--helix-color-surface-sunken));
   color: var(--helix-color-foreground);
 }
 

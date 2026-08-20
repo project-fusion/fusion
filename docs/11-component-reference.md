@@ -5216,7 +5216,7 @@ arrives at this entry from the one before.
 | Slot | Description |
 | --- | --- |
 | *(default)* | What happened. |
-| `marker` | The mark on the line. Falls back to a dot. |
+| `marker` | The mark on the line. Falls back to a dot, which is the slot's own fallback content rather than anything this element works out: whether a consumer slotted a mark is a question only the platform can answer, and it answers it by rendering what is inside the slot when nothing replaced it. |
 | `time` | When it happened, as a reader should see it written. |
 
 #### Parts
@@ -5224,6 +5224,7 @@ arrives at this entry from the one before.
 | Part | Description |
 | --- | --- |
 | `connector` | The line arriving at this entry. |
+| `dot` | The mark drawn where nothing was slotted for one. |
 | `content` | What happened, and the time above it. |
 | `marker` | The mark on the line. |
 | `rail` | The column holding the mark and the line. |

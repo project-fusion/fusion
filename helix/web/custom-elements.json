@@ -54488,7 +54488,7 @@
               }
             },
             {
-              "description": "The mark on the line. Falls back to a dot.",
+              "description": "The mark on the line. Falls back to a dot, which is the slot's own fallback content rather than anything this element works out: whether a consumer slotted a mark is a question only the platform can answer, and it answers it by rendering what is inside the slot when nothing replaced it.",
               "name": "marker",
               "inheritedFrom": {
                 "name": "HelixBaseTimelineItem",
@@ -54508,6 +54508,14 @@
             {
               "description": "The line arriving at this entry.",
               "name": "connector",
+              "inheritedFrom": {
+                "name": "HelixBaseTimelineItem",
+                "module": "src/timeline/item/timeline-item.ts"
+              }
+            },
+            {
+              "description": "The mark drawn where nothing was slotted for one.",
+              "name": "dot",
               "inheritedFrom": {
                 "name": "HelixBaseTimelineItem",
                 "module": "src/timeline/item/timeline-item.ts"
