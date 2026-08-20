@@ -40,31 +40,76 @@ uniform float uScroll;
 uniform vec3 uColor;
 out vec4 outColor;
 
+/* A ground plane running to a horizon, and a camera that climbs.
+ *
+ * The page argues that the same stack holds from one person to one country, so
+ * the picture behind it pulls back: near the top the camera is low and a
+ * handful of lit points sit close by, and by the last rung it is high enough
+ * that the same field runs to the horizon. The zoom out is the ladder. A field
+ * of dots with a gradient over it was atmosphere; this is the argument.
+ *
+ * Analytic rather than marched. For a pixel below the horizon the distance
+ * along the ground is height / (horizon - y), which is one divide, and the
+ * lattice is read straight out of that. No stepping, no loop. */
 void main() {
-  vec2 px = gl_FragCoord.xy;
-  vec2 uv = px / uResolution;
+  vec2 uv = gl_FragCoord.xy / uResolution;
+  vec2 p = uv - 0.5;
+  p.x *= uResolution.x / uResolution.y;
 
-  /* Where the light is. Low at rest, rising and widening as the page moves. */
-  vec2 sun = vec2(0.5, -0.14 + uScroll * 0.62);
-  float spread = mix(0.52, 0.88, uScroll);
+  /* Low, because gl_FragCoord counts from the bottom: a positive value here
+     puts the horizon above centre and the plane runs up behind the headline,
+     which is where it was. The ground gets the lower third and the type keeps
+     clear sky. No backticks in here, either: this whole shader is a template
+     literal and one would end it. */
+  float horizon = -0.13;
+  float height = mix(0.035, 0.22, uScroll);   // the camera climbs through the rungs
+  float drift = uTime * 0.35;
 
-  /* Aspect-corrected so the glow is a circle on a wide screen rather than an
-     ellipse stretched with the window. */
-  vec2 d = (uv - sun) * vec2(uResolution.x / uResolution.y, 1.0);
-  float r = length(d) / spread;
-  float glow = exp(-r * r * 1.55);
+  vec3 col = vec3(0.0);
+  float alpha = 0.0;
 
-  /* The lattice, at four times the spacing pitch, drifting slowly. */
-  float pitch = 64.0;
-  vec2 cell = fract((px + vec2(uTime * 4.0, uTime * -2.0)) / pitch) - 0.5;
-  float dot = 1.0 - smoothstep(0.035, 0.075, length(cell));
+  if (p.y < horizon - 0.0015) {
+    float depth = height / (horizon - p.y);
+    /* Square cells in world space: across scales with depth alone. Dividing
+       by the camera height, as this did, stretches every cell sideways as the
+       camera climbs, and the near rows draw as long dashes rather than dots. */
+    float across = p.x * depth * 1.7;
 
-  /* A dot is lit by how close it is to the sun, so the field reads as one
-     light source rather than as a texture with a gradient laid over it. */
-  float lit = dot * (0.16 + glow * 2.0);
+    /* Cells shrink into the distance on their own, so a dot only needs a
+       constant radius in cell space to taper correctly. */
+    /* Many cells across the view, not one. Unscaled, a world unit covers the
+       whole screen at this camera height and the near field sits inside a
+       single cell, so nothing reads as a field at all. */
+    const float GRID = 9.0;
+    vec2 cell = fract(vec2(across, depth - drift) * GRID) - 0.5;
+    float d = length(cell);
 
-  float alpha = clamp(glow * 0.8 + lit, 0.0, 1.0);
-  outColor = vec4(uColor * (0.42 + glow * 0.85), alpha);
+    /* Sub-pixel aware: the dot is never allowed to grow past the footprint of
+       the pixel drawing it, which is what stops the near rows blooming into
+       blobs the way a fixed radius does. */
+    float px = fwidth(depth * GRID) + 0.004;
+    float dot = 1.0 - smoothstep(0.020, 0.020 + px * 1.5, d);
+
+    float fog = exp(-depth * 1.05);
+    float lit = dot * fog;
+
+    /* Light pooled at the horizon, so the plane is read as lit from away
+       rather than as a pattern with a vignette. */
+    float toSun = length(vec2(p.x * 0.5, p.y - horizon));
+    float pool = exp(-toSun * toSun * 14.0);
+
+    col = uColor * (0.55 + pool * 1.1);
+    alpha = clamp(lit * (0.5 + pool * 3.0), 0.0, 1.0);
+  }
+
+  /* The sun itself, sitting on the horizon and rising a little as we climb. */
+  float sunY = horizon - 0.012 + uScroll * 0.02;
+  float sd = length(vec2(p.x * 0.7, p.y - sunY));
+  float sun = exp(-sd * sd * mix(60.0, 26.0, uScroll));
+  col = mix(col, uColor * 1.25, clamp(sun, 0.0, 1.0));
+  alpha = clamp(alpha + sun * 0.62, 0.0, 1.0);
+
+  outColor = vec4(col, alpha);
 }`
 
 /** Any CSS colour to linear-ish sRGB, by asking the 2D canvas to convert it. */
