@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -100,5 +100,76 @@ describe('breadcrumb items', () => {
     const second = [...crumbs.querySelectorAll('helix-breadcrumb')][1] as HTMLElement
     const slot = second.shadowRoot?.querySelector('slot[name="separator"]') as HTMLSlotElement
     expect(slot.assignedElements()).toHaveLength(1)
+  })
+})
+
+/**
+ * Collapse, which is `CollapseController` and is the whole reason it exists.
+ *
+ * Every one of these is a bug that shipped. The trail rendered whole inside a
+ * container half its width; watching the items to catch that hung the browser,
+ * twice, because hiding an item changes its size and the observer that saw it
+ * was what hid it; and once the container was the only thing watched, a
+ * collapsed trail could not expand again, because a hidden item measures zero
+ * and the arithmetic had nothing to add back.
+ *
+ * None of it was reachable from `bun test`. Three specs passed for as long as
+ * the feature did nothing, because every `offsetWidth` there is zero, which is
+ * exactly what the bug looked like.
+ */
+const collapsing = (width: number) => `
+  <div style="inline-size: ${width}px">
+    <helix-breadcrumbs collapse>
+      <helix-breadcrumb href="/">Home</helix-breadcrumb>
+      <helix-breadcrumb overflow>More</helix-breadcrumb>
+      <helix-breadcrumb href="/a">Design</helix-breadcrumb>
+      <helix-breadcrumb href="/b">Components</helix-breadcrumb>
+      <helix-breadcrumb href="/c">Navigation</helix-breadcrumb>
+      <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
+    </helix-breadcrumbs>
+  </div>`
+
+const crumbs = (host: HTMLElement): HTMLElement[] => [
+  ...host.querySelectorAll<HTMLElement>('helix-breadcrumb:not([overflow])'),
+]
+
+const trigger = (host: HTMLElement): HTMLElement =>
+  host.querySelector<HTMLElement>('helix-breadcrumb[overflow]') as HTMLElement
+
+const shown = (host: HTMLElement): string[] =>
+  crumbs(host)
+    .filter((c) => !c.hasAttribute('hidden'))
+    .map((c) => c.textContent?.trim() ?? '')
+
+describe('breadcrumbs collapse', () => {
+  test.skipIf(!hasLayout())('keeps both ends and hides only the middle', async () => {
+    const host = await mount(collapsing(320))
+    expect(shown(host)).toEqual(['Home', 'Navigation', 'Breadcrumbs'])
+  })
+
+  test.skipIf(!hasLayout())('shows the trigger only while something is behind it', async () => {
+    const narrow = await mount(collapsing(320))
+    const wide = await mount(collapsing(1200))
+    expect([trigger(narrow).hasAttribute('hidden'), trigger(wide).hasAttribute('hidden')]).toEqual([
+      false,
+      true,
+    ])
+  })
+
+  /* The one the width cache exists for. A hidden crumb measures zero, so a
+     trail that recomputed from the live tree would decide it now fits, show
+     everything, decide it does not, and oscillate. */
+  test.skipIf(!hasLayout())('expands again when there is room', async () => {
+    const host = await mount(collapsing(320))
+    const box = host as HTMLElement
+    expect(shown(host).length).toBeLessThan(5)
+    box.style.inlineSize = '1200px'
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    expect(shown(host)).toEqual(['Home', 'Design', 'Components', 'Navigation', 'Breadcrumbs'])
+  })
+
+  test.skipIf(!hasLayout())('hides nothing without `collapse`', async () => {
+    const host = await mount(collapsing(320).replace(' collapse', ''))
+    expect(shown(host).length).toBe(5)
   })
 })
