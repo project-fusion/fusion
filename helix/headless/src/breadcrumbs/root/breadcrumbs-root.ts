@@ -141,11 +141,29 @@ export class HelixBaseBreadcrumbs extends HelixElement {
     })
   }
 
+  /**
+   * The crumbs arrived, so measure them now that they are real.
+   *
+   * The host renders and measures before its crumbs have upgraded, so every
+   * width is zero and the arithmetic concludes that five crumbs fit in a
+   * container half their size. Measured: `updated` ran once with
+   * `widths: [0,0,0,0,0]`. `Tabs` carries the same paragraph for the same
+   * reason, and its answer is this one, because a slot change is the moment
+   * the children are real.
+   *
+   * No `requestUpdate` here. `measure` asks for one when the answer moves,
+   * which is the only time an update is owed.
+   */
+  private readonly handleSlotChange = (): void => {
+    this.fit.measure()
+    this.apply()
+  }
+
   protected override render(): TemplateResult {
     /* The trigger sits after the crumbs that were kept at the front, which is
        where the gap it stands for actually is. */
     return html`<ol part="list" role="list">
-      <slot></slot>
+      <slot @slotchange=${this.handleSlotChange}></slot>
       <li part="overflow" ?hidden=${this.hiddenAt.length === 0}>
         <slot name="overflow"></slot>
       </li>

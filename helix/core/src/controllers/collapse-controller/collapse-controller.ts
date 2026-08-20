@@ -48,8 +48,21 @@ export interface CollapseOptions {
 export class CollapseController implements ReactiveController {
   private observer: ResizeObserver | undefined
 
-  /** What is currently observed, so re-observing can be skipped when it has not changed. */
-  private watched: readonly HTMLElement[] = []
+  /**
+   * Each item's width, taken while every item was showing.
+   *
+   * Cached because a hidden item measures zero, and the arithmetic needs the
+   * width it *would* have. Recomputing from the live tree after anything is
+   * hidden is how a collapsed container decides it now fits, un-hides
+   * everything, decides it does not, and oscillates.
+   *
+   * Keyed by element, so an item leaving takes its entry with it and an item
+   * arriving has none until it is seen at full width.
+   */
+  private widths = new WeakMap<HTMLElement, number>()
+
+  /** A pending retry, so a run of updates schedules one frame and not twelve. */
+  private retry: number | undefined
 
   /**
    * How many items fit, counted from the *end*.
@@ -75,54 +88,19 @@ export class CollapseController implements ReactiveController {
       return
     }
     this.observer = new ResizeObserver(() => this.measure())
-    this.watch()
-  }
-
-  /**
-   * Observes the container *and* every item.
-   *
-   * The container alone is not enough, and this is the bug that made the whole
-   * thing look like it worked. A container is laid out before the children
-   * slotted into it, so the first measurement read five crumbs at zero, decided
-   * 0px fits inside 320px, and stopped: the observer only fires again when the
-   * container resizes, and it never did. Measured, 495px of crumbs sat in a
-   * 320px list with nothing hidden.
-   *
-   * Watching the items means the measurement re-runs the moment any of them
-   * gains a size, and again whenever their content changes width, which is the
-   * other thing a container-only observer cannot see.
-   */
-  private watch(): void {
-    const observer = this.observer
-    if (!observer) {
-      return
-    }
-
     const box = this.options.container()
-    const next = [...(box ? [box] : []), ...this.options.items()]
-
-    /* Only when the set has actually changed, and this guard is the whole
-       difference between working and hanging the tab. `observe()` delivers an
-       initial observation, so re-observing from inside the callback calls the
-       callback, which re-observes: measured as a browser that stopped
-       responding. Comparing first means a steady set costs nothing. */
-    const same =
-      next.length === this.watched.length && next.every((el, at) => el === this.watched[at])
-    if (same) {
-      return
+    if (box) {
+      this.observer.observe(box)
     }
-
-    observer.disconnect()
-    for (const el of next) {
-      observer.observe(el)
-    }
-    this.watched = next
   }
 
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
-    this.watched = []
+    if (this.retry !== undefined) {
+      cancelAnimationFrame(this.retry)
+      this.retry = undefined
+    }
   }
 
   /**
@@ -138,19 +116,36 @@ export class CollapseController implements ReactiveController {
       return
     }
 
-    /* Re-observed here rather than only on connect, because the item list is
-       the consumer's and can change after it. */
-    this.watch()
-
     const available = box.clientWidth
-    const widths = items.map((item) => item.offsetWidth)
+
+    /* Remembered while showing, read back while hidden.
+     *
+     * **The container only is observed, and this cache is why.** Watching the
+     * items as well looks like the fix for measuring before they have upgraded,
+     * and it closes a loop instead: hiding an item changes its size, the
+     * observer sees it, the measurement runs, and the measurement is what
+     * hides. Measured as a browser that stopped responding.
+     *
+     * So a width is recorded the first time an item is seen with one and reused
+     * forever after. A hidden item reports zero and its remembered width is
+     * what the arithmetic uses, which is also what makes expanding possible: a
+     * container that grows still knows what its hidden items cost. */
+    const widths = items.map((item) => {
+      const live = item.offsetWidth
+      if (live > 0) {
+        this.widths.set(item, live)
+        return live
+      }
+      return this.widths.get(item) ?? 0
+    })
     const total = widths.reduce((sum, width) => sum + width, 0)
 
     /* Nothing has a width yet, which is not the same as everything fitting.
        Concluding "it fits" from an unlaid-out tree is how this reported a full
-       trail inside a container half its width. Say nothing and wait to be
-       measured again, which watching the items guarantees. */
+       trail inside a container half its width. Say nothing and ask again next
+       frame, by which time layout has happened. */
     if (total === 0) {
+      this.schedule()
       return
     }
 
@@ -181,6 +176,24 @@ export class CollapseController implements ReactiveController {
        that item and overflows, which is a visible truth; showing none of them
        and only a trigger is a control with nothing to say. */
     this.set(Math.max(1, count))
+  }
+
+  /**
+   * One retry per frame, however many updates asked for it.
+   *
+   * The host measures from `updated`, which runs inside Lit's update and so
+   * before layout: on the first pass every child is zero wide, and with only
+   * the container observed nothing else will ever fire. A frame is exactly the
+   * wait, because layout has happened by the time one is delivered.
+   */
+  private schedule(): void {
+    if (this.retry !== undefined || typeof requestAnimationFrame === 'undefined') {
+      return
+    }
+    this.retry = requestAnimationFrame(() => {
+      this.retry = undefined
+      this.measure()
+    })
   }
 
   private set(next: number): void {

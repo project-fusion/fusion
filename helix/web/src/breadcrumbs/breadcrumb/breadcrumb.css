@@ -48,7 +48,21 @@
 }
 
 ::slotted(a:hover) {
-  background-color: var(--breadcrumb-hover-color, var(--helix-color-surface-sunken));
+  /* A wash of the foreground, not a sunken surface.
+   *
+   * `surface-sunken` means recessed, and a dark page is already at the floor:
+   * measured, the page is pure black and the token is `oklch(0.15)`, so the
+   * hover had to climb to be seen at all and barely was, while the same token
+   * against white gave a clear step. One declaration, two very different
+   * answers.
+   *
+   * A percentage of the foreground steps away from whatever it sits on in
+   * either mode, which is the argument the base layer already makes for
+   * `data-button`, and it is the same wash the tree and list rows hover with. */
+  background-color: var(
+    --breadcrumb-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
 }
 
 ::slotted(a:focus-visible) {
@@ -125,7 +139,10 @@
  * Reading the same hook as the slotted rule, so a consumer overriding one
  * overrides both. */
 a[part="link"]:hover {
-  background-color: var(--breadcrumb-hover-color, var(--helix-color-surface-sunken));
+  background-color: var(
+    --breadcrumb-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
   color: var(--helix-color-foreground);
 }
 
