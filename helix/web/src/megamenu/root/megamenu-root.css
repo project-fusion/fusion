@@ -148,7 +148,14 @@
   inset-block-start: var(--_megamenu-top, 100%);
   inset-inline: 0;
   max-inline-size: none;
-  padding-block: var(--helix-space-xl);
+  /* Less above than below, because the bar has already given some.
+   *
+   * Equal padding stacks on the header's own: measured, 13 pixels of header
+   * under the trigger and then 32 of band before the first heading, so 45
+   * before the panel says anything and it read as a gap rather than as the
+   * header continuing. Nothing sits below the band, so the bottom keeps the
+   * fuller measure. */
+  padding-block: var(--helix-space-md) var(--helix-space-xl);
   /* The contents on the page's measure rather than the band's: a row of links
      running the whole width of a wide screen is a row nobody reads across. Held
      with padding rather than a width, so the band stays edge to edge and only
