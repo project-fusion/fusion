@@ -340,7 +340,24 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                   <helix-icon-button appearance="outlined" label="More" slot="trigger">
                     <helix-icon name="dots-three-vertical"></helix-icon>
                   </helix-icon-button>
-                  <helix-menu-item value="view-sandbox">View in Sandbox</helix-menu-item>
+                  {/* A link, not a handler. `Menu.Item` renders an `<a>` when
+                      given an `href`, so this needs no client component, no
+                      listener, and no router: middle click and open-in-new-tab
+                      work, and it is the only one of these five that is not
+                      still a stub.
+
+                      "Edit" rather than "View", because the reference page
+                      already shows the example running. What the sandbox adds
+                      is that changes are kept, which is the whole reason to go
+                      there. */}
+                  {headline && (
+                    <helix-menu-item
+                      href={`/design/sandbox?e=${family.slug}.${headline.slug}`}
+                      value="edit-sandbox"
+                    >
+                      Edit in Sandbox
+                    </helix-menu-item>
+                  )}
                   <helix-menu-item value="view-markdown">View Markdown</helix-menu-item>
                   <helix-menu-item value="copy-markdown">Copy Markdown</helix-menu-item>
                   <helix-menu-item value="open-cursor">Open in Cursor</helix-menu-item>

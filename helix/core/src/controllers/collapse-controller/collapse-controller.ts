@@ -48,6 +48,9 @@ export interface CollapseOptions {
 export class CollapseController implements ReactiveController {
   private observer: ResizeObserver | undefined
 
+  /** What is currently observed, so re-observing can be skipped when it has not changed. */
+  private watched: readonly HTMLElement[] = []
+
   /**
    * How many items fit, counted from the *end*.
    *
@@ -72,15 +75,54 @@ export class CollapseController implements ReactiveController {
       return
     }
     this.observer = new ResizeObserver(() => this.measure())
-    const box = this.options.container()
-    if (box) {
-      this.observer.observe(box)
+    this.watch()
+  }
+
+  /**
+   * Observes the container *and* every item.
+   *
+   * The container alone is not enough, and this is the bug that made the whole
+   * thing look like it worked. A container is laid out before the children
+   * slotted into it, so the first measurement read five crumbs at zero, decided
+   * 0px fits inside 320px, and stopped: the observer only fires again when the
+   * container resizes, and it never did. Measured, 495px of crumbs sat in a
+   * 320px list with nothing hidden.
+   *
+   * Watching the items means the measurement re-runs the moment any of them
+   * gains a size, and again whenever their content changes width, which is the
+   * other thing a container-only observer cannot see.
+   */
+  private watch(): void {
+    const observer = this.observer
+    if (!observer) {
+      return
     }
+
+    const box = this.options.container()
+    const next = [...(box ? [box] : []), ...this.options.items()]
+
+    /* Only when the set has actually changed, and this guard is the whole
+       difference between working and hanging the tab. `observe()` delivers an
+       initial observation, so re-observing from inside the callback calls the
+       callback, which re-observes: measured as a browser that stopped
+       responding. Comparing first means a steady set costs nothing. */
+    const same =
+      next.length === this.watched.length && next.every((el, at) => el === this.watched[at])
+    if (same) {
+      return
+    }
+
+    observer.disconnect()
+    for (const el of next) {
+      observer.observe(el)
+    }
+    this.watched = next
   }
 
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
+    this.watched = []
   }
 
   /**
@@ -96,9 +138,21 @@ export class CollapseController implements ReactiveController {
       return
     }
 
+    /* Re-observed here rather than only on connect, because the item list is
+       the consumer's and can change after it. */
+    this.watch()
+
     const available = box.clientWidth
     const widths = items.map((item) => item.offsetWidth)
     const total = widths.reduce((sum, width) => sum + width, 0)
+
+    /* Nothing has a width yet, which is not the same as everything fitting.
+       Concluding "it fits" from an unlaid-out tree is how this reported a full
+       trail inside a container half its width. Say nothing and wait to be
+       measured again, which watching the items guarantees. */
+    if (total === 0) {
+      return
+    }
 
     /* Everything fits, so nothing is hidden and the trigger costs nothing. A
        container that has just grown passes through here and restores itself,

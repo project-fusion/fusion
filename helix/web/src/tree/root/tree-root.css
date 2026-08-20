@@ -46,6 +46,11 @@
      rides behind it at the far end. */
   --tree-chevron-order: 2;
   --tree-chevron-gap: var(--helix-space-none);
+
+  /* And a leaf reserves nothing at the start, because nothing is there. A
+     branch's label is not pushed by a chevron on this side, so branches and
+     leaves already begin at the same inset. */
+  --_tree-reserve: var(--helix-space-none);
 }
 
 /* What a collection says instead of rows: the same two lines everywhere, in the

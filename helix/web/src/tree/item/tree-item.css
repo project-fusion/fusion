@@ -65,6 +65,41 @@
   user-select: none;
 }
 
+/* A leaf holds the space a chevron would take, so siblings share a column.
+ *
+ * **Only where there is a chevron on that side.** With `chevron-placement="end"`
+ * nothing pushes a branch's label, so a branch and a leaf both start at the
+ * row's own inset and already share a column: reserving a gutter there is space
+ * held for a mark that is at the other end of the row. Written unconditionally
+ * it put every child of the documentation sidebar two gutters in, which is what
+ * surfaced it. The tree zeroes `--_tree-reserve` when it moves its chevrons.
+ *
+ * **Siblings line up, and children indent.** The rule above aligned each child
+ * with its *parent* instead, by letting a branch's chevron be the indent: real,
+ * and it costs the alignment a reader actually looks for. A top-level branch put
+ * its label at 28 and a top-level leaf beside it at 8, so two items at the same
+ * depth started in different columns and the tree read as though the leaf were
+ * shallower than its sibling. Measured on `Item One` and `Item Four`, which is
+ * what surfaced it.
+ *
+ * The two cannot both hold with one gutter: aligning a child under its parent
+ * and aligning siblings with each other are different columns. Siblings win,
+ * because depth is read down a list of things at the same level far more often
+ * than up from a child to its parent, and because every tree a reader has used
+ * behaves this way.
+ *
+ * The reservation is the chevron's own width plus the gap after it, which is the
+ * gutter a drawn chevron actually occupies in this flex row. Written from the
+ * same two tokens the chevron uses, so the two cannot drift. */
+[part="row"]:not(:has([part="toggle"])) {
+  padding-inline-start: calc(
+    var(--helix-space-xs) +
+    (var(--_tree-level, 1) - 1) *
+    var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs))) +
+    var(--_tree-reserve, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
+  );
+}
+
 /* A parent reads as a parent, and a leaf as a leaf.
  
    Both keyed on whether the row drew a chevron, rather than on an attribute:
