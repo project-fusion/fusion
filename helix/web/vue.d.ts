@@ -61,6 +61,7 @@ import type {
   HelixQuote,
   HelixRadioGroup,
   HelixRadio,
+  HelixRating,
   HelixSandboxPreview,
   HelixSandbox,
   HelixSandboxSource,
@@ -3900,6 +3901,95 @@ export type HelixRadioVueEvents = {
   "helix-select": HelixRadioHelixSelectElementEvent;
 };
 
+export type HelixRatingVueProps = {
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixRating["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixRating["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixRating["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixRating["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixRating["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixRating["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixRating["required"];
+  /** How many marks there are. */
+  max?: HelixRating["max"];
+  /** The smallest part of a mark that can be chosen.
+
+`0.5` is the half star, and it is the reason the value is a number rather
+than an index: with halves, five marks are ten answers. */
+  step?: HelixRating["step"];
+  /** Whether this shows a score rather than asks for one.
+
+A readout is not a control that has been switched off. It takes no focus,
+answers no keys, and reads as one thing: see the note on the class. */
+  readonly?: HelixRating["readOnly"];
+  /** Whether this shows a score rather than asks for one.
+
+A readout is not a control that has been switched off. It takes no focus,
+answers no keys, and reads as one thing: see the note on the class. */
+  readOnly?: HelixRating["readOnly"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  "value-text"?: HelixRating["valueText"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  valueText?: HelixRating["valueText"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixRating["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixRating["name"];
+};
+
+export type HelixRatingVueEvents = {};
+
 /** `HelixSandboxPreview` component event */
 export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<
   HelixSandboxPreview,
@@ -6405,6 +6495,16 @@ export type CustomCssProperties = {
   "--radio-card-background-color"?: string;
   /** Edge around one. */
   "--radio-card-border-color"?: string;
+  /** The shape of one mark, as a mask image. */
+  "--rating-mark"?: string;
+  /** How big one mark is. */
+  "--rating-size"?: string;
+  /** Space between marks. */
+  "--rating-gap"?: string;
+  /** The colour of a filled mark. */
+  "--rating-color"?: string;
+  /** And of an unfilled one. */
+  "--rating-empty-color"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** The invisible width of a divider's drag target. */
@@ -6932,6 +7032,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixRadio,
     HelixRadioVueProps,
     HelixRadioVueEvents
+  >;
+  /** Presentation only: the marks, and the clip that fills them partway. Everything about what the score is and how it is chosen is the base class. */
+  "helix-rating": DefineCustomElement<
+    HelixRating,
+    HelixRatingVueProps,
+    HelixRatingVueEvents
   >;
   /** A sandboxed '<iframe>' pointed at 'src', which is a document the consumer provides. That document imports whatever the examples need, listens for a render message, and writes the markup into itself.  **A frame rather than the page.** Rendering into the page meant an example was styled by whatever surrounded it, which flatters the preview and lies about it: an example that restyles 'helix-card' restyled the sandbox too, a script in an example ran against the real document, and a stray 'position: fixed' escaped the pane. It also left nothing to capture console output from, and the terminal has to come from somewhere.  The cost is that the frame starts empty. Styles and element definitions do not cross into it, because a document has its own stylesheets and a window has its own custom element registry, so 'src' has to load them. That is the consumer's document rather than something guessed at here.  **The source is not trusted, and the frame is what makes that safe.** 'fullscreen' is granted for the same reason and found the same way: a video in the preview offered a fullscreen button that did nothing at all, because the policy default is 'self', this frame is not 'self', and a denied request rejects a promise nobody was watching. Two capabilities now, both explicit, both starred.  'allow="clipboard-write *"' is granted explicitly, and the star matters: the policy defaults to 'self' and this frame has an opaque origin, so it is not 'self' and the default denies it. A component inside the preview that copies to the clipboard is otherwise a control that silently does nothing, which is how this was found. Nothing else is granted, and a copy still needs the reader's own gesture.  'sandbox="allow-scripts"' and no 'allow-same-origin', so the document runs on an opaque origin: script in an example cannot reach this page, its storage, its cookies, or the editor the source was typed into. Without it they could, measured, through an 'onerror' handler on an image that fails to load, which 'innerHTML' does not strip the way it refuses a '<script>' tag.  That is what lets a sandbox hold markup a reader pasted from somewhere, or one day arrived in a shared link, rather than only what its owner typed.  'allow-forms' is granted because examples have forms in them and a submit that silently does nothing is a worse lie than one that navigates a frame nobody is looking at. Top-level navigation, popups and modals are not. */
   "helix-sandbox-preview": DefineCustomElement<

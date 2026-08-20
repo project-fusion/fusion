@@ -69,6 +69,7 @@ declare module 'svelte/elements' {
     'helix-quote': CustomElements['helix-quote']
     'helix-radio-group': CustomElements['helix-radio-group']
     'helix-radio': CustomElements['helix-radio']
+    'helix-rating': CustomElements['helix-rating']
     'helix-sandbox-preview': CustomElements['helix-sandbox-preview']
     'helix-sandbox': CustomElements['helix-sandbox']
     'helix-sandbox-source': CustomElements['helix-sandbox-source']

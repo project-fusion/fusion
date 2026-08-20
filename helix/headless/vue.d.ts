@@ -60,6 +60,7 @@ import type {
   HelixBaseQuote,
   HelixBaseRadioGroup,
   HelixBaseRadio,
+  HelixBaseRating,
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
@@ -3488,6 +3489,95 @@ export type HelixBaseRadioVueEvents = {
   "helix-select": HelixBaseRadioHelixSelectElementEvent;
 };
 
+export type HelixBaseRatingVueProps = {
+  /** How many marks there are. */
+  max?: HelixBaseRating["max"];
+  /** The smallest part of a mark that can be chosen.
+
+`0.5` is the half star, and it is the reason the value is a number rather
+than an index: with halves, five marks are ten answers. */
+  step?: HelixBaseRating["step"];
+  /** Whether this shows a score rather than asks for one.
+
+A readout is not a control that has been switched off. It takes no focus,
+answers no keys, and reads as one thing: see the note on the class. */
+  readonly?: HelixBaseRating["readOnly"];
+  /** Whether this shows a score rather than asks for one.
+
+A readout is not a control that has been switched off. It takes no focus,
+answers no keys, and reads as one thing: see the note on the class. */
+  readOnly?: HelixBaseRating["readOnly"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  "value-text"?: HelixBaseRating["valueText"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  valueText?: HelixBaseRating["valueText"];
+  /** The value the markup declared, which is where a reset returns to. */
+  "default-value"?: HelixBaseRating["defaultValue"];
+  /** The value the markup declared, which is where a reset returns to. */
+  defaultValue?: HelixBaseRating["defaultValue"];
+  /** What the control holds now, and what its form submits.
+
+One property, not two. Reading gives the real value whichever mode the
+control is in, so `input.value` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what
+`<helix-input value="x">` says too, and matches what a controlled input
+means in React: the value is theirs and the control waits to be told.
+`default-value` is how markup seeds one it does not want to own.
+
+The same shape as the other three mixins, which is the point of them
+being four of a kind rather than four of three kinds. */
+  value?: HelixBaseRating["value"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixBaseRating["hint"];
+  /** What is wrong, in the reader's words rather than the browser's. */
+  feedback?: HelixBaseRating["feedback"];
+  /** The accessible name, and the fallback for the `label` slot. */
+  label?: HelixBaseRating["label"];
+  /** Whether the form refuses to submit without it. */
+  required?: HelixBaseRating["required"];
+  /** Whether the control is non-interactive.
+
+Reflected, because the styled tier selects on it, and mirrored to
+`aria-disabled` rather than removing the element from the accessibility
+tree, so a screen reader can still announce that the control exists.
+
+The mirror is below and was for a while only a sentence: this paragraph
+described it, four components had their own copies of it, and the class
+itself did nothing. Here is where it belongs, because here is where
+`disabled` is. */
+  disabled?: HelixBaseRating["disabled"];
+  /** Name submitted with the form.
+
+**Reflected, and it is the exception to "reflect only what CSS selects
+on".** The platform builds a form's entry list from the `name` *content
+attribute*, not from the property, so a control named through the property
+submitted under no name at all and was silently dropped. Measured: two
+inputs in one form, one named by attribute and one by property, and the
+form carried a single entry.
+
+Safe for a React consumer, which is what the rule is protecting: React
+renders a custom element's props as attributes on the server, so the name
+is already in the markup being hydrated and reflecting it writes what is
+there. It is only a change to the markup when a consumer assigns it
+imperatively later, and nothing is hydrating by then.
+
+Here rather than on each control, where it was declared eight times and
+reflected none of them. */
+  name?: HelixBaseRating["name"];
+};
+
+export type HelixBaseRatingVueEvents = {};
+
 /** `HelixBaseSelect` component event */
 export type HelixBaseSelectElementEvent<E = Event> = TypedEvent<
   HelixBaseSelect,
@@ -5805,6 +5895,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseRadio,
     HelixBaseRadioVueProps,
     HelixBaseRadioVueEvents
+  >;
+  /** **Half marks decide the shape, so they are decided first.** Supporting them means the value is not an integer and the targets are not the marks: five stars at a half step is ten places to press, and a mark that is filled to the middle. Everything else follows from that, which is why 'step' is here rather than added later, when the pointer handling would have to be rewritten around it.  **A partial mark is the whole mark, clipped.** Not a second glyph filled to the middle: that needs a matching pair drawn for every mark anybody uses, and the moment a consumer wants a heart or a circle they need to draw one too. The fill is the same marks over the same marks, cut off partway, so any mark works and any fraction does.  **Read-only is not this control greyed out, it is a different thing.** The commoner use is showing a score nobody is being asked for, a product's average, and that is not a control at all: it takes no focus, answers no keys, has no options to choose between, and reads as one thing rather than as five. So 'readonly' is 'role="img"' with the score in its name, where the control is a radio group. A disabled control is still a control and still says so; this is not one.  **Moving is choosing here**, which is the radio group's reading and the opposite of 'Menu''s: arriving at four stars *is* rating it four, because nothing else follows and there is nothing to confirm. That is what 'KeyboardNavigationController' takes 'selects' for, and why this can use it where a menu cannot. */
+  "helix-base-rating": DefineCustomElement<
+    HelixBaseRating,
+    HelixBaseRatingVueProps,
+    HelixBaseRatingVueEvents
   >;
   /** **A trigger and a 'Listbox', not a listbox reimplemented behind a button.** The list this opens is the same element a consumer can use on its own, with the same keyboard, the same filtering and the same multi-select rules. What Select adds is the closing: a trigger that says what is chosen, a surface that floats, and somewhere for focus to go back to.  The options are the consumer's, in the consumer's light DOM, slotted through into the listbox. That is why the listbox walks through slots to find them: from its point of view the options belong to something else.  **What it does not do is duplicate the value.** 'Select' owns it, hands it down, and takes changes back; the listbox is the thing being operated and not a second place the answer lives. */
   "helix-base-select": DefineCustomElement<

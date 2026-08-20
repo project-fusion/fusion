@@ -1,0 +1,135 @@
+:host {
+  /* One source for the two numbers the row is built from, because the fill has
+   * to do arithmetic with the same mark size and gap the marks are drawn at.
+   * Read the hooks once here rather than at each use, so a consumer overriding
+   * `--rating-size` moves the fill and the hit areas with the marks. */
+  --_rating-mark-size: var(--rating-size, var(--helix-size-icon-md));
+  --_rating-mark-gap: var(--rating-gap, var(--helix-space-2xs));
+
+  display: inline-flex;
+}
+
+/* Two rows of the same marks, one over the other, and the top one cut off
+ * partway. That is the whole mechanism: a mark filled to the middle is the
+ * ordinary mark with half of it showing, so a half score needs no second glyph
+ * and any mark a consumer supplies gets halves for nothing.
+ *
+ * `position: relative` because the fill is laid over the track rather than
+ * beside it, and the track is what gives the pair its size. */
+[part="marks"] {
+  display: inline-flex;
+  position: relative;
+}
+
+[part="track"],
+[part="fill"] {
+  display: inline-flex;
+  gap: var(--_rating-mark-gap);
+}
+
+/* The unfilled marks, which are also the ones that give the row its size. */
+[part="track"] {
+  color: var(--rating-empty-color, var(--helix-color-border));
+}
+
+/* And the filled ones, clipped to the score.
+ *
+ * `overflow: hidden` on a box narrower than the row, with the marks inside
+ * refusing to shrink: cutting the row rather than scaling it is what makes the
+ * exposed part of a mark its left part rather than a squashed whole.
+ * `inset-block: 0` rather than a height, so it matches the track whatever the
+ * mark size is.
+ *
+ * The width is not a share of the row, because the row is marks and the gaps
+ * between them, and a score is only ever a count of marks. Measured: 4.2 of 5
+ * is 84% of a 116px row, which is 97px, which lands in the gap after the
+ * fourth mark and draws exactly like a 4. So take whole marks at the full
+ * pitch and the remainder across the mark itself, which puts a fifth of a mark
+ * where a fifth of a mark belongs. */
+[part="fill"] {
+  color: var(--rating-color, var(--helix-color-warning));
+  inline-size: calc(
+    var(--_rating-full, 0) *
+    (var(--_rating-mark-size) + var(--_rating-mark-gap)) +
+    var(--_rating-part, 0) *
+    var(--_rating-mark-size)
+  );
+  inset-block: 0;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* A shape, masked, so the colour above paints it and any mark works.
+ *
+ * The default is a star because that is what a rating is, and because the icon
+ * set has none: `--rating-mark` takes any mask image, which is the seam a
+ * consumer swaps a heart or a circle through without this stylesheet knowing
+ * what it drew. */
+[part="mark"] {
+  --_rating-star: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>');
+
+  background-color: currentcolor;
+  block-size: var(--_rating-mark-size);
+  flex: 0 0 auto;
+  inline-size: var(--_rating-mark-size);
+  mask-image: var(--rating-mark, var(--_rating-star));
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+/* The places a reader presses, laid over the marks rather than beside them, so
+   the target is the mark and the half is half the mark. Transparent: what the
+   reader sees is the row underneath, and what they press is this. */
+[part="option"] {
+  all: unset;
+  box-sizing: border-box;
+
+  cursor: pointer;
+  inset-block: 0;
+  position: absolute;
+}
+
+/* Each step takes a mark's worth of the row, in order.
+ *
+ * The element hands over two numbers, how many steps there are and which one
+ * this is, because those are facts about the set and it is the one that knows
+ * them. Where the share lands is arithmetic, and arithmetic is this file's.
+ * `Megamenu` splits the same way over where a band starts.
+ *
+ * The pitch counts one gap per mark, hence `100% + gap` for a row that holds
+ * one fewer gap than it holds marks, and each target then starts half a gap
+ * early so it is centred on its mark rather than drifting right along the row.
+ * The two half-gaps hanging off the ends are deliberate: the alternative is
+ * dead pixels between the marks, and a rating that ignores a press. */
+[part="option"] {
+  --_rating-pitch: calc((100% + var(--_rating-mark-gap)) / var(--_rating-steps, 1));
+
+  inline-size: var(--_rating-pitch);
+  inset-inline-start: calc(
+    (var(--_rating-step, 1) - 1) *
+    var(--_rating-pitch) -
+    var(--_rating-mark-gap) /
+    2
+  );
+}
+
+[part="option"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host(:disabled) [part="option"] {
+  cursor: not-allowed;
+}
+
+:host(:disabled) [part="marks"] {
+  opacity: 0.5;
+}
+
+/* A readout is not a control: nothing to press, so nothing that looks pressable. */
+:host([readonly]) [part="marks"] {
+  cursor: default;
+}

@@ -3561,6 +3561,70 @@ group keeps its question above the row rather than beside the first choice.
 | --- | --- |
 | `--radio-group-gap` | Space between the choices. |
 
+## Rating
+
+### Root — `helix-rating`
+
+A score out of a few marks, given or shown.
+
+Extends `HelixBaseRating`.
+
+Presentation only: the marks, and the clip that fills them partway.
+Everything about what the score is and how it is chosen is the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
+| `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
+| `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
+| `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
+| `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
+| `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
+| `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
+| `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
+| `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
+| `max` | `max` | `number` | `5` | `HelixBaseRating` | How many marks there are. |
+| `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `readOnly` | `readonly` | `boolean` | `false` | `HelixBaseRating` | Whether this shows a score rather than asks for one. |
+| `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
+| `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `score` | - | `number` | - | `HelixBaseRating` | The score, as a number, clamped to what the marks can show. |
+| `step` | `step` | `number` | `1` | `HelixBaseRating` | The smallest part of a mark that can be chosen. |
+| `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
+| `valueText` | `value-text` | `string` | `''` | `HelixBaseRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `formDisabledCallback()` | `HelixFormElement` | The platform's notice that an ancestor fieldset changed. |
+| `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
+| `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
+| `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `marks` | The row of marks. |
+| `track` | The unfilled marks. |
+| `fill` | The filled marks, clipped to the score. |
+| `mark` | One mark, in either layer. |
+| `option` | One place a reader can press, which is one step. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--rating-mark` | The shape of one mark, as a mask image. |
+| `--rating-size` | How big one mark is. |
+| `--rating-gap` | Space between marks. |
+| `--rating-color` | The colour of a filled mark. |
+| `--rating-empty-color` | And of an unfilled one. |
+
 ## Sandbox
 
 ### Root — `helix-sandbox`
