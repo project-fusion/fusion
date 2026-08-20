@@ -551,6 +551,46 @@ if (hasLayout()) {
       expect(widths.size).toBe(1)
     })
 
+    test('a band whose bar scrolls away goes with it', async () => {
+      /* The band is fixed and its offset is measured once, when it opens, so a
+         header that scrolls off leaves it pinned where the header used to be:
+         open, mid-page, with nothing above it. Measured at a scroll of 300,
+         header bottom -243 and the band still at 57. The card never had this,
+         because the floating controller follows its anchor; turning that off for
+         a band that has nothing to be placed against took the scroll handling
+         with it. */
+      const bar = (await mount(
+        `<nav style="padding:20px">
+          <helix-megamenu appearance="full" label="Products">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="#one"><strong>One</strong><span>First.</span></a>
+            </div>
+          </helix-megamenu>
+        </nav>
+        <div style="block-size:200vh"></div>`,
+      )) as HTMLElement
+      const host = (bar.querySelector('helix-megamenu') ??
+        document.querySelector('helix-megamenu')) as HTMLElement & {
+        open: boolean
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      expect(host.open).toBe(true)
+
+      try {
+        window.scrollTo(0, 400)
+        await new Promise((done) => setTimeout(done, 120))
+        await host.updateComplete
+        expect(host.open).toBe(false)
+      } finally {
+        /* Put the page back, or every layout spec after this one measures
+           against a document that is scrolled. */
+        window.scrollTo(0, 0)
+      }
+    })
+
     test('the host takes a box, so a nav can measure its marker against it', async () => {
       /* `Navigation` measures against every element assigned to its slot, and
          `display: contents` generates none: a section holding the current page

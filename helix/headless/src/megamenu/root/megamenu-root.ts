@@ -279,6 +279,37 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * Keeps a band under its bar while the page moves, and closes it when the bar
+   * goes.
+   *
+   * The band is fixed and its offset is measured once, when it opens. That is
+   * fine until the page scrolls: a header that scrolls away leaves the band
+   * pinned where the header used to be, open, in the middle of the page with
+   * nothing above it. Measured at a scroll of 300: header bottom at -243 and the
+   * band still sitting at 57.
+   *
+   * The card has none of this, because the floating controller follows its
+   * anchor. Turning that off for the band, which has nothing to be placed
+   * against, took the scroll handling with it, and this is the half that was
+   * still wanted.
+   *
+   * A sticky bar does not move, so re-measuring returns the same number and the
+   * band stays where it is. `requestOpen` rather than `close`, because closing
+   * puts focus back on the trigger and a reader who has scrolled away should not
+   * be dragged back up to it.
+   */
+  private readonly handleScroll = (): void => {
+    if (!this.open || !this.banded) {
+      return
+    }
+    if (this.bar() <= 0) {
+      this.requestOpen(false)
+      return
+    }
+    this.band()
+  }
+
   private readonly handlePointerDown = (event: PointerEvent): void => {
     this.pointer = event.pointerType
   }
@@ -331,6 +362,10 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchWidth()
+    /* On the window and capturing, so a band over a scrolling panel hears that
+       too rather than only the page's own scrolling. Passive: this measures and
+       never prevents. */
+    addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
@@ -338,6 +373,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    removeEventListener('scroll', this.handleScroll, { capture: true })
     this.query?.removeEventListener('change', this.handleWidth)
     this.query = undefined
     this.removeEventListener('pointerdown', this.handlePointerDown)
