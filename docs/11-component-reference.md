@@ -5234,7 +5234,8 @@ arrives at this entry from the one before.
 
 | Property | Description |
 | --- | --- |
-| `--timeline-marker-size` | Diameter of the mark. |
+| `--timeline-marker-radius` | How round the mark is. Zero is a square, and half its size is a disc. |
+| `--timeline-marker-size` | Edge length of the mark. |
 | `--timeline-rail-size` | Width of the line. |
 
 ## Toast

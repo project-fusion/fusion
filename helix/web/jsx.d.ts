@@ -19539,7 +19539,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--timeline-marker-size`: Diameter of the mark. (default: `undefined`)
+   * - `--timeline-marker-radius`: How round the mark is. Zero is a square, and half its size is a disc. (default: `undefined`)
+   * - `--timeline-marker-size`: Edge length of the mark. (default: `undefined`)
    * - `--timeline-rail-size`: Width of the line. (default: `undefined`)
    *
    * ## CSS Parts
@@ -28677,7 +28678,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--timeline-marker-size`: Diameter of the mark. (default: `undefined`)
+   * - `--timeline-marker-radius`: How round the mark is. Zero is a square, and half its size is a disc. (default: `undefined`)
+   * - `--timeline-marker-size`: Edge length of the mark. (default: `undefined`)
    * - `--timeline-rail-size`: Width of the line. (default: `undefined`)
    *
    * ## CSS Parts
@@ -30160,7 +30162,9 @@ export type CustomCssProperties = {
   "--time-picker-range-color"?: string;
   /** Fill on the chosen row of a wheel. */
   "--time-picker-selected-color"?: string;
-  /** Diameter of the mark. */
+  /** How round the mark is. Zero is a square, and half its size is a disc. */
+  "--timeline-marker-radius"?: string;
+  /** Edge length of the mark. */
   "--timeline-marker-size"?: string;
   /** Width of the line. */
   "--timeline-rail-size"?: string;

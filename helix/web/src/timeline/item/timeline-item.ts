@@ -16,7 +16,8 @@ import { styles } from './timeline-item.css.js'
  * @aliases Activity item, History entry, Event
  * @documentation https://helix.fusion.dev/components/timeline
  *
- * @cssproperty --timeline-marker-size - Diameter of the mark.
+ * @cssproperty --timeline-marker-radius - How round the mark is. Zero is a square, and half its size is a disc.
+ * @cssproperty --timeline-marker-size - Edge length of the mark.
  * @cssproperty --timeline-rail-size - Width of the line.
  */
 @customElement('helix-timeline-item')

@@ -83,10 +83,10 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 60 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 194 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 196 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 9 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
-| `--helix-radii-full` | `9999px` | 63 |
+| `--helix-radii-full` | `9999px` | 61 |
 
 ## font
 
@@ -149,8 +149,8 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 168 |
-| `--helix-border-thick` | `2px` | 55 |
+| `--helix-border-thin` | `1px` | 170 |
+| `--helix-border-thick` | `2px` | 53 |
 
 ## shadow
 

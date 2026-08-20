@@ -54350,7 +54350,11 @@
           "name": "HelixTimelineItem",
           "cssProperties": [
             {
-              "description": "Diameter of the mark.",
+              "description": "How round the mark is. Zero is a square, and half its size is a disc.",
+              "name": "--timeline-marker-radius"
+            },
+            {
+              "description": "Edge length of the mark.",
               "name": "--timeline-marker-size"
             },
             {

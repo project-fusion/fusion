@@ -73,8 +73,17 @@
   align-self: start;
   aspect-ratio: 1;
   background-color: var(--helix-color-background);
-  border-radius: var(--helix-radii-full);
-  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--_timeline-tone, var(--helix-color-border));
+  /* A rounded square rather than a circle. `sm` is 4px, and the hook is here so
+     a record that wants the disc back can say so without rewriting the rest. */
+  border-radius: var(--timeline-marker-radius, var(--helix-radii-sm));
+  /* The border stays neutral whatever the entry was.
+   *
+   * Toned, it made every mark a coloured box and the column read as a stack of
+   * badges: the ring is the same shape on every entry, so colouring it says
+   * nothing that the thing inside it is not already saying, and it says it
+   * loudly. Neutral, the marks are one set of boxes down the line and the colour
+   * is carried by the mark itself, which is the part that differs. */
+  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
   color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
   display: inline-flex;
   grid-column: 1;
