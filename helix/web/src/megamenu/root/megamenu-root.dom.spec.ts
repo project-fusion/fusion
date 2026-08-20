@@ -721,3 +721,57 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a megamenu whose trigger the consumer slotted', () => {
+  const slotted = async (): Promise<Section> => {
+    const host = (await mount(
+      `<helix-megamenu label="Products"><button slot="trigger" type="button">Products</button><a href="/one">One</a></helix-megamenu>`,
+    )) as Section
+    await host.updateComplete
+    return host
+  }
+
+  const own = (host: Section) => host.querySelector('button[slot="trigger"]') as HTMLButtonElement
+
+  /* The reason the slot exists at all in this codebase: no declarative shadow
+     DOM ships, so the default trigger's label lives only in the shadow root and
+     a server-rendered page has no word in the bar until the element upgrades.
+     Slotted content is light DOM and arrives with the HTML. */
+  test('the trigger is light DOM, which is the reason to slot one at all', async () => {
+    /* Not asserted by looking for the default button's absence: slot fallback
+       content lives in the shadow root whether or not the slot is filled, and
+       the platform simply stops rendering it.
+     
+       What matters is that the word is in the consumer's own tree. No
+       declarative shadow DOM ships here, so a `label` on the host renders
+       nothing until the element upgrades, and a server-rendered navigation had
+       a hole where its first item should be. A slotted trigger arrives with the
+       HTML.
+     
+       That the click reaches the panel is not asserted here and cannot be:
+       happy-dom does not retarget events through a slot, so a press on this
+       button never reaches the `@click` on the slot in the shadow root. It does
+       in a browser, which is where that half was measured. */
+    const host = await slotted()
+    expect(own(host).textContent).toBe('Products')
+    expect(own(host).isConnected).toBe(true)
+  })
+
+  test('the disclosure state reaches it, which is the whole contract', async () => {
+    /* `render` writes `aria-expanded` onto the button it renders itself, and a
+       slotted trigger replaces that button. Without this the panel opened and
+       closed and nothing announced it: a reader was told the control was a
+       plain button forever, and the failure was audible only. */
+    const host = await slotted()
+    expect(own(host).getAttribute('aria-controls')).toBe('panel')
+    expect(own(host).getAttribute('aria-expanded')).toBe('false')
+
+    host.open = true
+    await host.updateComplete
+    expect(own(host).getAttribute('aria-expanded')).toBe('true')
+
+    host.open = false
+    await host.updateComplete
+    expect(own(host).getAttribute('aria-expanded')).toBe('false')
+  })
+})

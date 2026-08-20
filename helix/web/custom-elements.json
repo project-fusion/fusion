@@ -26953,6 +26953,20 @@
             },
             {
               "kind": "field",
+              "name": "slotted",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "What the consumer slotted, if they slotted anything.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "trigger",
               "type": {
                 "text": "HTMLElement"

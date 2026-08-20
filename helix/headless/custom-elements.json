@@ -20935,6 +20935,16 @@
             },
             {
               "kind": "field",
+              "name": "slotted",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private",
+              "description": "What the consumer slotted, if they slotted anything.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "trigger",
               "type": {
                 "text": "HTMLElement"

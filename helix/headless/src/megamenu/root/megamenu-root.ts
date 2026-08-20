@@ -180,6 +180,12 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="panel"]'),
   })
 
+  /** What the consumer slotted, if they slotted anything. */
+  private get slotted(): HTMLElement | undefined {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    return slot?.assignedElements({ flatten: false })[0] as HTMLElement | undefined
+  }
+
   /** Whatever the consumer slotted, or the button rendered in its place. */
   private get trigger(): HTMLElement {
     return anchorElement(
@@ -440,6 +446,24 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     /* The one thing the stylesheet cannot work out for itself, since the
        breakpoint is declared up here. */
     this.toggleAttribute('data-narrow', this.narrow)
+    /* A slotted trigger gets the disclosure state too.
+     
+       `render` writes `aria-expanded` and `aria-controls` onto the button it
+       renders itself, and a consumer who takes the documented `trigger` slot
+       replaces that button and got neither: the panel opened and closed and
+       nothing announced it, so a screen reader was told the control was a plain
+       button forever. Silent, because the slot works perfectly in every other
+       respect and the failure is only audible.
+     
+       Written here rather than in the template because the element belongs to
+       the consumer's tree, which a Lit binding cannot reach. Client only, which
+       is where it belongs: `updated` does not run on the server, and the slotted
+       button carries no expanded state until there is something to expand. */
+    const slotted = this.slotted
+    if (slotted) {
+      slotted.setAttribute('aria-controls', 'panel')
+      slotted.setAttribute('aria-expanded', this.open ? 'true' : 'false')
+    }
     if (this.open) {
       /* Before showing this one, so the two are never both up for a frame. The
          other closes through `requestOpen`, so a consumer holding it open is
