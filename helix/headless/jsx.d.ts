@@ -13934,6 +13934,14 @@ export type CustomElements = {
    * server cannot know whether a submenu was slotted, and a row that served a
    * `aria-haspopup` it might not have would be a promise made to a screen
    * reader on the strength of a guess. (property only) (readonly)
+   * - `selected`: Whether this is the row the set is on, which in a menu is where focus is.
+   *
+   * A radio group's selection is an answer it holds; a menu has no answer, only
+   * a row the reader has walked to, so focus is the whole of what "the current
+   * one" can mean here. Read from the shadow root rather than kept as state,
+   * because focus moves for reasons this element is not told about: a press, a
+   * Tab, the drilldown putting the reader on the first row of a page it has
+   * just opened. (property only) (readonly)
    *
    * ## Events
    *
@@ -13957,6 +13965,11 @@ export type CustomElements = {
    *
    * The host is not focusable: what takes focus is the row inside this shadow
    * root, and a menu moving between rows with the arrow keys has to reach it.
+   * - `focusItem() => void`: `NavigableItem`, so the arrow keys can be the shared controller's business.
+   *
+   * `focus()` above already puts focus on the control inside the row rather than
+   * on the row, which is the whole of what moving here means.
+   * - `select() => void`: Chooses the row, which is the same act as pressing it.
    *
    * ## CSS Parts
    *
@@ -22380,6 +22393,14 @@ export type CustomElementsSolidJs = {
    * server cannot know whether a submenu was slotted, and a row that served a
    * `aria-haspopup` it might not have would be a promise made to a screen
    * reader on the strength of a guess. (property only) (readonly)
+   * - `selected`: Whether this is the row the set is on, which in a menu is where focus is.
+   *
+   * A radio group's selection is an answer it holds; a menu has no answer, only
+   * a row the reader has walked to, so focus is the whole of what "the current
+   * one" can mean here. Read from the shadow root rather than kept as state,
+   * because focus moves for reasons this element is not told about: a press, a
+   * Tab, the drilldown putting the reader on the first row of a page it has
+   * just opened. (property only) (readonly)
    *
    * ## Events
    *
@@ -22403,6 +22424,11 @@ export type CustomElementsSolidJs = {
    *
    * The host is not focusable: what takes focus is the row inside this shadow
    * root, and a menu moving between rows with the arrow keys has to reach it.
+   * - `focusItem() => void`: `NavigableItem`, so the arrow keys can be the shared controller's business.
+   *
+   * `focus()` above already puts focus on the control inside the row rather than
+   * on the row, which is the whole of what moving here means.
+   * - `select() => void`: Chooses the row, which is the same act as pressing it.
    *
    * ## CSS Parts
    *

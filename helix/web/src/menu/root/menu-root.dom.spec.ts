@@ -23,6 +23,112 @@ const menu = async (rows = '<helix-menu-item value="copy">Copy</helix-menu-item>
     `<helix-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-menu>`,
   )) as Menu
 
+describe('moving through a menu with the keyboard', () => {
+  /* There were no specs for this at all, which is how a rewiring of it came to
+     be proposed on the strength of a suite that could not have noticed. The
+     arrow keys are a shared controller's business now, and these say what the
+     menu asks of it. */
+  const opened = async (): Promise<{ host: Menu; rows: Item[] }> => {
+    const host = await menu(
+      `<helix-menu-item value="cut">Cut</helix-menu-item>
+       <helix-menu-item value="copy">Copy</helix-menu-item>
+       <helix-menu-item value="paste">Paste</helix-menu-item>`,
+    )
+    host.open = true
+    await host.updateComplete
+    const rows = [...host.querySelectorAll('helix-menu-item')] as Item[]
+    for (const one of rows) {
+      await (one as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    }
+    return { host, rows }
+  }
+
+  const press = (host: Menu, key: string) => {
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+  }
+
+  /* Focus lands on a control inside the row, and the platform retargets it: from
+     the document, `activeElement` is the row itself. Asked of the row's own
+     document rather than the global one, which several spec files replace. */
+  const focused = (row: Item) => row.ownerDocument.activeElement
+
+  test('Down and Up walk the rows, and the ends join up', async () => {
+    const { host, rows } = await opened()
+    press(host, 'ArrowDown')
+    expect(focused(rows[0])).toBe(rows[0])
+
+    press(host, 'ArrowDown')
+    expect(focused(rows[0])).toBe(rows[1])
+
+    press(host, 'ArrowUp')
+    expect(focused(rows[0])).toBe(rows[0])
+
+    /* Back off the top lands on the bottom. */
+    press(host, 'ArrowUp')
+    expect(focused(rows[0])).toBe(rows[2])
+  })
+
+  test('Home and End go to the ends', async () => {
+    const { host, rows } = await opened()
+    press(host, 'End')
+    expect(focused(rows[0])).toBe(rows[2])
+
+    press(host, 'Home')
+    expect(focused(rows[0])).toBe(rows[0])
+  })
+
+  test('and arriving at a row does not choose it', async () => {
+    /* The difference between a menu and a radio group, and the reason the
+       controller takes `selects`. A reader arrowing past Delete has not asked
+       for Delete. */
+    const { host } = await opened()
+    const chosen: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    press(host, 'ArrowDown')
+    press(host, 'ArrowDown')
+    press(host, 'End')
+    expect(chosen).toEqual([])
+  })
+
+  test('the horizontal pair is the submenu, not another way to move', async () => {
+    /* Reserved rather than released: right goes in and left comes back, which
+       are the platform's bindings for a menu that drills. Were the shared
+       controller to take them first, a submenu could not be opened from the
+       keyboard at all. */
+    const host = await menu(
+      `<helix-menu-item value="share">Share
+         <helix-menu-item slot="submenu" value="link">Copy link</helix-menu-item>
+       </helix-menu-item>
+       <helix-menu-item value="rename">Rename</helix-menu-item>`,
+    )
+    host.open = true
+    await host.updateComplete
+    /* By value, not by index. `querySelectorAll` returns the submenu's own row
+       too, nested inside the row that opens it, so the second element in
+       document order is the child rather than the next row along: an assertion
+       written against `rows[1]` is asking about the wrong element and reads a
+       correct submenu entry as a failure. It did. */
+    const share = host.querySelector('helix-menu-item[value="share"]') as Item
+    const link = host.querySelector('helix-menu-item[value="link"]') as Item
+    await (share as unknown as { updateComplete: Promise<boolean> }).updateComplete
+
+    press(host, 'ArrowDown')
+    expect(focused(share)).toBe(share)
+
+    press(host, 'ArrowRight')
+    await host.updateComplete
+    /* Inside, and on the first row of the page just opened. */
+    expect(focused(link)).toBe(link)
+
+    /* And back out again, which is the other half of the pair. */
+    press(host, 'ArrowLeft')
+    await host.updateComplete
+    expect(focused(share)).toBe(share)
+  })
+})
+
 describe('a menu row that navigates', () => {
   const row = async (attrs: string) => {
     const host = await menu(`<helix-menu-item ${attrs}>Docs</helix-menu-item>`)

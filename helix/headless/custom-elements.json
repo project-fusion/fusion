@@ -21323,6 +21323,51 @@
               }
             },
             {
+              "kind": "method",
+              "name": "focusItem",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "`NavigableItem`, so the arrow keys can be the shared controller's business.\n\n`focus()` above already puts focus on the control inside the row rather than\non the row, which is the whole of what moving here means.",
+              "type": {
+                "text": "focusItem() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Chooses the row, which is the same act as pressing it.",
+              "type": {
+                "text": "select() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether this is the row the set is on, which in a menu is where focus is.\n\nA radio group's selection is an answer it holds; a menu has no answer, only\na row the reader has walked to, so focus is the whole of what \"the current\none\" can mean here. Read from the shadow root rather than kept as state,\nbecause focus moves for reasons this element is not told about: a press, a\nTab, the drilldown putting the reader on the first row of a page it has\njust opened.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "choose",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
               "kind": "field",
               "name": "handleClick",
               "privacy": "private",
@@ -21622,6 +21667,14 @@
             },
             {
               "kind": "field",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.items, reserved: () => ['ArrowLeft', 'ArrowRight'], selects: () => false, })",
+              "description": "Moving between rows, which is not this element's own business any more.\n\n`selects` false, because arriving at Delete must not delete: moving and\nchoosing are one act in a radio group and two acts here, which is the\ndistinction the controller was already drawing for `Tabs`.\n\nThe origin is the selection, which took a wrong turn first and is worth\nrecording. `focus` looks like the right reading, since a menu's current row\nis the focused one, but that origin also carries a rule a menu must not\nfollow: a press that did not come from the set moves nothing. That rule is\nthere for a tab panel, which is a tab stop beside the tabs; a menu's panel\nholds the rows and nothing else, and Down on a menu that has just opened is\nhow a reader gets to the first row at all. It moved nothing, and the specs\nwritten alongside this are what said so.\n\nThe horizontal pair is reserved rather than released. Right opens a\nsubmenu and left comes back, which are the platform's own bindings for a\nmenu that drills, so those keys are spoken for here rather than unhandled."
+            },
+            {
+              "kind": "field",
               "name": "panel",
               "privacy": "private",
               "readonly": true,
@@ -21710,23 +21763,11 @@
               "readonly": true
             },
             {
-              "kind": "method",
-              "name": "reveal",
+              "kind": "field",
+              "name": "handleFocusIn",
               "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "HelixBaseMenuItem | undefined"
-                  }
-                }
-              ],
-              "description": "Focuses an item and brings it into the surface, which is not the same act.\n\nA menu long enough to scroll had the tree's problem: the arrow keys moved\nfocus past the bottom of the panel and the panel stayed where it was.\nScrolled here rather than by the browser, because `scrollIntoView` would\ntake the page behind the menu with it."
+              "readonly": true,
+              "description": "Keeps whatever has focus in sight, however it got there.\n\nThis was done in the arrow branches, which meant it was true of the arrow\nkeys and of nothing else: a row reached by Tab, or focused by the drilldown\non the way into a page, could sit below the fold of a scrolled panel. On\n`focusin` it is one rule about focus rather than a line repeated in every\nbranch that moves it, and it survived the arrow keys moving out to a shared\ncontroller that knows nothing about this panel."
             },
             {
               "kind": "field",

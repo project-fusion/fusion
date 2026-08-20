@@ -210,11 +210,51 @@ export class HelixBaseMenuItem extends HelixElement {
     this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
   }
 
-  private readonly handleClick = (): void => {
+  /**
+   * `NavigableItem`, so the arrow keys can be the shared controller's business.
+   *
+   * `focus()` above already puts focus on the control inside the row rather than
+   * on the row, which is the whole of what moving here means.
+   */
+  focusItem(): void {
+    this.focus()
+  }
+
+  /** Chooses the row, which is the same act as pressing it. */
+  select(): void {
+    this.choose()
+  }
+
+  /**
+   * Whether this is the row the set is on, which in a menu is where focus is.
+   *
+   * A radio group's selection is an answer it holds; a menu has no answer, only
+   * a row the reader has walked to, so focus is the whole of what "the current
+   * one" can mean here. Read from the shadow root rather than kept as state,
+   * because focus moves for reasons this element is not told about: a press, a
+   * Tab, the drilldown putting the reader on the first row of a page it has
+   * just opened.
+   */
+  get selected(): boolean {
+    /* Asked of the document, not of the shadow root. Focus lands on the control
+       inside this row, and the platform retargets it: from outside a shadow
+       tree, `activeElement` is the host, which is this element. So the document
+       already answers the question and nothing has to walk a tree to do it.
+       `ShadowRoot.activeElement` is also the reading that does not survive
+       happy-dom, which climbs `getRootNode()` to the top and then dereferences
+       what it ran out of. */
+    return this.ownerDocument.activeElement === this
+  }
+
+  private choose(): void {
     if (this.disabled) {
       return
     }
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+  }
+
+  private readonly handleClick = (): void => {
+    this.choose()
   }
 
   /**

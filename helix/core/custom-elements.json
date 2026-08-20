@@ -997,6 +997,16 @@
             },
             {
               "kind": "field",
+              "name": "reserved",
+              "type": {
+                "text": "() => string[]"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "reserved"
+            },
+            {
+              "kind": "field",
               "name": "wrap",
               "type": {
                 "text": "boolean"

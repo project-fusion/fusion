@@ -48,6 +48,23 @@ export interface KeyboardNavigationOptions {
    */
   selects?: () => boolean
   /**
+   * Keys this component binds to something else, which this must not take.
+   *
+   * **A claim, not a preference.** "Both axes, always" is argued below and the
+   * argument holds: a reader who guesses the wrong axis and gets nothing is a
+   * reader who concludes the set does not answer the keyboard. So this is not a
+   * way to support fewer keys. It is a way to say that a key already means
+   * something here, and a component that names one owes that key a binding of
+   * its own.
+   *
+   * `Menu` is the case it was written for. Its rows can open a submenu, and the
+   * platform's own bindings for that are the horizontal pair: right goes in,
+   * left comes back. Those keys are not unhandled in a menu, they are spoken
+   * for, and without this the controller would take them first and a submenu
+   * could not be opened from the keyboard at all.
+   */
+  reserved?: () => string[]
+  /**
    * Whether the ends join up. Radio groups wrap; a list of commands does not.
    */
   wrap?: boolean
@@ -97,22 +114,31 @@ export class KeyboardNavigationController implements ReactiveController {
 
   private readonly selects: () => boolean
 
+  private readonly reserved: () => string[]
+
   private readonly wrap: boolean
 
   constructor(
     host: ReactiveControllerHost & HTMLElement,
-    { items, origin = 'selection', selects = () => true, wrap = true }: KeyboardNavigationOptions,
+    {
+      items,
+      origin = 'selection',
+      reserved = () => [],
+      selects = () => true,
+      wrap = true,
+    }: KeyboardNavigationOptions,
   ) {
     this.host = host
     this.items = items
     this.origin = origin
+    this.reserved = reserved
     this.selects = selects
     this.wrap = wrap
     host.addController(this)
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key)) {
+    if (!KEYS.has(event.key) || this.reserved().includes(event.key)) {
       return
     }
     const items = this.items().filter((item) => !item.disabled)

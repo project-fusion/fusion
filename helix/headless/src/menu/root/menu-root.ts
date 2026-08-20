@@ -3,6 +3,7 @@ import {
   customElement,
   DrilldownController,
   HelixElement,
+  KeyboardNavigationController,
   MixinCollection,
   MixinControllerOpen,
   type Placement,
@@ -93,6 +94,32 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
      them. It is the same three things in the same order; what it is not is a
      third copy of them, and the second copy is how `Select` ended up never
      reaching the top layer at all. */
+  /**
+   * Moving between rows, which is not this element's own business any more.
+   *
+   * `selects` false, because arriving at Delete must not delete: moving and
+   * choosing are one act in a radio group and two acts here, which is the
+   * distinction the controller was already drawing for `Tabs`.
+   *
+   * The origin is the selection, which took a wrong turn first and is worth
+   * recording. `focus` looks like the right reading, since a menu's current row
+   * is the focused one, but that origin also carries a rule a menu must not
+   * follow: a press that did not come from the set moves nothing. That rule is
+   * there for a tab panel, which is a tab stop beside the tabs; a menu's panel
+   * holds the rows and nothing else, and Down on a menu that has just opened is
+   * how a reader gets to the first row at all. It moved nothing, and the specs
+   * written alongside this are what said so.
+   *
+   * The horizontal pair is reserved rather than released. Right opens a
+   * submenu and left comes back, which are the platform's own bindings for a
+   * menu that drills, so those keys are spoken for here rather than unhandled.
+   */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.items,
+    reserved: () => ['ArrowLeft', 'ArrowRight'],
+    selects: () => false,
+  })
+
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     // The host is `display: contents`, so it has no box a press can land in.
@@ -158,7 +185,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
     if (!this.drilldown.enter(item)) {
       return
     }
-    this.updateComplete.then(() => this.items[0]?.focus())
+    this.updateComplete.then(() => this.items[0]?.focusItem())
   }
 
   /** Returns to the page above, or closes when there is none. */
@@ -208,11 +235,21 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
    * Scrolled here rather than by the browser, because `scrollIntoView` would
    * take the page behind the menu with it.
    */
-  private reveal(item: HelixBaseMenuItem | undefined): void {
+  /**
+   * Keeps whatever has focus in sight, however it got there.
+   *
+   * This was done in the arrow branches, which meant it was true of the arrow
+   * keys and of nothing else: a row reached by Tab, or focused by the drilldown
+   * on the way into a page, could sit below the fold of a scrolled panel. On
+   * `focusin` it is one rule about focus rather than a line repeated in every
+   * branch that moves it, and it survived the arrow keys moving out to a shared
+   * controller that knows nothing about this panel.
+   */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const item = this.items.find((row) => row.contains(event.target as Node))
     if (!item) {
       return
     }
-    item.focus()
     const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
@@ -224,14 +261,6 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
     if (event.key === 'Escape') {
       event.stopPropagation()
       this.leave()
-    } else if (event.key === 'ArrowDown') {
-      this.reveal(items[(at + 1) % items.length])
-    } else if (event.key === 'ArrowUp') {
-      this.reveal(items[(at - 1 + items.length) % items.length])
-    } else if (event.key === 'Home') {
-      items[0]?.focus()
-    } else if (event.key === 'End') {
-      items.at(-1)?.focus()
     } else if (event.key === 'ArrowRight' && items[at]?.hasSubmenu) {
       this.enter(items[at] as HelixBaseMenuItem)
     } else if (event.key === 'ArrowLeft') {
@@ -269,12 +298,14 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
        here. `Drilldown` learned this already. */
     this.addEventListener('helix-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('focusin', this.handleFocusIn)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('focusin', this.handleFocusIn)
   }
 
   protected override updated(changed: PropertyValues): void {

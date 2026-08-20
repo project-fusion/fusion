@@ -2603,6 +2603,7 @@ than as a ragged list.
 | `isMenuItem` | - | `boolean` | `true` | `HelixBaseMenuItem` | Marks this as a row a menu should count. Cheaper than an instanceof. |
 | `onPage` | - | `boolean` | `true` | `HelixBaseMenuItem` | Whether this row is on the page currently showing. |
 | `rel` | `rel` | `string` | `''` | `HelixBaseMenuItem` | The relationship, which `target="_blank"` should always set. |
+| `selected` | - | `boolean` | - | `HelixBaseMenuItem` | Whether this is the row the set is on, which in a menu is where focus is. |
 | `showingSubmenu` | - | `boolean` | `false` | `HelixBaseMenuItem` | Whether this row's submenu is the page showing. |
 | `target` | `target` | `string` | `''` | `HelixBaseMenuItem` | Where the link opens, for the rows that should leave the page. |
 | `value` | `value` | `string` | `''` | `HelixBaseMenuItem` | What this row stands for, carried in the event when it is chosen. |
@@ -2612,6 +2613,8 @@ than as a ragged list.
 | Method | From | Description |
 | --- | --- | --- |
 | `focus()` | `HelixBaseMenuItem` | Moves focus onto the row itself. |
+| `focusItem()` | `HelixBaseMenuItem` | `NavigableItem`, so the arrow keys can be the shared controller's business. |
+| `select()` | `HelixBaseMenuItem` | Chooses the row, which is the same act as pressing it. |
 
 #### Events
 
