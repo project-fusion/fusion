@@ -94,7 +94,7 @@ The three families.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-font-sans` | `var(--_helix-family-sans)` | 136 |
+| `--helix-font-sans` | `var(--_helix-family-sans)` | 138 |
 | `--helix-font-mono` | `var(--_helix-family-mono)` | 27 |
 | `--helix-font-display` | `var(--_helix-family-display, var(--_helix-family-sans))` | 10 |
 

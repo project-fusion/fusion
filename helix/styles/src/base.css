@@ -843,7 +843,40 @@ helix-toggle[disabled]::part(item) {
    bar. */
 :where([data-navigation-item], helix-navigation a) {
   align-items: center;
+  /* The four a `<button>` needs and an `<a>` never did.
+   
+     A nav item that opens a panel is a button, not a link: that is the APG's
+     disclosure pattern and what `Megamenu` renders for its own trigger. Wearing
+     this recipe, one came out with the UA's grey fill, its border, its
+     centre-aligned system font and an arrow cursor, sitting in a row of
+     anchors. The recipe had only ever been asked to dress an anchor, which has
+     none of those to undo.
+   
+     `:where()` is zero specificity and a UA rule loses to any author rule, so
+     these land without needing weight of their own. */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
   block-size: 100%;
+  /* A floor as well as the percentage, because the percentage only resolves for
+     a direct child of the bar.
+   
+     `Navigation` is a fixed-height flex row that centres its items, so an
+     anchor sitting straight in it takes the full 32 from `block-size: 100%`.
+     Nest one, and there is nothing to be a percentage of: a `Megamenu` slots
+     its trigger inside its own auto-height host, so the height resolved to
+     `auto` and the item came out at its content height of 21.5 against 32 for
+     the anchors beside it, sitting visibly short in the row.
+   
+     `Megamenu`'s own trigger never had this, because it is styled by hand
+     inside the shadow root and its author reached for exactly this token rather
+     than for the percentage. This is that decision moved into the recipe, so a
+     consumer's trigger and the default one are the same height by construction.
+   
+     Additive on purpose: for a direct child both resolve to the same 32, and in
+     a taller bar the percentage still wins, so nothing that worked changes. */
+  min-block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
@@ -1052,12 +1085,97 @@ helix-toggle[disabled]::part(item) {
   margin: var(--helix-space-none);
 }
 
-[data-megamenu-item]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+/* The bar's own hover reaches in here, and the panel does not want it.
+ *
+ * These rows are anchors inside `helix-navigation`, so they match the strip's
+ * rule up there, which washes 5% of the foreground behind a hovered item. That
+ * is right for a word in a bar and wrong for a column of destinations, and it
+ * was invisible until the panel's own wash was removed, because the panel's was
+ * simply painting over it.
+ *
+ * Scoped to the group so the plain links in a verticals column are covered too:
+ * a panel where the marked rows do not wash and the plain ones do would read as
+ * two kinds of list. What is left for those is the colour lift the same bar
+ * rule gives them, muted to full, which is emphasis enough for a bare name. */
+[data-megamenu-group] :where([data-navigation-item], a):hover {
+  background-color: transparent;
 }
 
-[data-megamenu-item][aria-current="page"] {
-  background-color: color-mix(in oklab, var(--helix-color-primary) 10%, transparent);
+/* Pointing at a row darkens it, and paints nothing.
+ *
+ * A wash is what `Option` uses and it is right there, where a row is one of
+ * twenty in a scrolling list and the whole strip has to light up so the eye can
+ * track it. A panel is six destinations laid out in columns, and a filled bar
+ * sliding around inside it is heavier than the thing it is reporting.
+ *
+ * Contrast rather than colour, because colour is spoken for: the mark beside
+ * each row deliberately has none so that the accent means "where you are" and
+ * nothing else, and a hover tint would put the accent on every row in turn.
+ *
+ * It is the sentence that moves, because the sentence is the only part with
+ * anywhere to go: the name and the mark are already at full strength, so the
+ * row lifts from two tones to one and reads as coming forward. */
+[data-megamenu-item]:hover > :where(span, p) {
+  color: var(--helix-color-foreground);
+}
+
+/* Where you are, marked rather than filled.
+ *
+ * The bar above says this already for its own items: "no surface of its own,
+ * the marker travelling behind it is the one surface, and a fill here as well
+ * would mean two things saying the same thing." A panel has no travelling
+ * marker, so the row said it with a tinted fill instead, which is the heaviest
+ * mark in the panel spent on the one row a reader is least likely to click.
+ *
+ * Weight cannot carry it here the way it does in the bar, because a row's name
+ * is already semibold at rest. So a dot, at the size `Badge` collapses to,
+ * which is the only other dot in the system.
+ *
+ * Decorative and empty, so nothing is announced twice: `aria-current="page"` is
+ * on the anchor and is what a reader is told. */
+/* The name becomes the row that carries the mark, so the mark can be centred
+   against it rather than sat on a baseline.
+ 
+   `vertical-align: middle` was the first try and is the reason this rule
+   exists: it aligns a box to the middle of the *x-height*, not of the line, so
+   the dot rode high against a semibold cap-height name. A flex line has a real
+   centre. Scoped to the current row, so no other name changes its display type
+   for a mark it does not have, and `gap` is what sets the distance, which is
+   one step wider than the margin it replaces. */
+[data-megamenu-item][aria-current="page"] > :where(strong, b) {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+}
+
+[data-megamenu-item][aria-current="page"] > :where(strong, b)::after {
+  animation: helix-current-dot 4s var(--helix-easing-standard) infinite;
+  background-color: var(--helix-color-primary);
+  block-size: var(--helix-space-xs);
+  border-radius: var(--helix-radii-full);
+  content: "";
+  flex: none;
+  inline-size: var(--helix-space-xs);
+}
+
+/* Interior-only, so 0% and 100% resolve to the resting dot.
+ *
+ * A `from` that differed from rest would make the mark jump the instant the
+ * panel opened, which is the one moment a reader is looking straight at it. The
+ * hero's lattice breathes the same way and for the same reason.
+ *
+ * Held well short of disappearing. This is the answer to "which of these am I
+ * on", so it has to be readable at every point in the cycle: it softens rather
+ * than blinks, and a reader who never notices it moving has still been told
+ * where they are.
+ *
+ * No reduced-motion block of its own. This is light DOM, so the global cap at
+ * the end of this file reaches it and settles it on the resting value. */
+@keyframes helix-current-dot {
+  50% {
+    opacity: 0.45;
+    scale: 0.78;
+  }
 }
 
 /* A plain link in a group, which the comment above promised would work.
