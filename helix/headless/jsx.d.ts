@@ -4527,6 +4527,20 @@ to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
   appearance?: HelixBaseMegamenu["appearance"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "open-on"?: HelixBaseMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  openOn?: HelixBaseMegamenu["openOn"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -4578,6 +4592,20 @@ to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
   "prop:appearance"?: HelixBaseMegamenu["appearance"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "attr:open-on"?: HelixBaseMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "prop:openOn"?: HelixBaseMegamenu["openOn"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -13628,12 +13656,29 @@ export type CustomElements = {
    * its own anchor and cannot render one inside this shadow root. The panel is a
    * slot, and what goes in it is lists and headings the consumer wrote.
    *
-   * **It opens on a press and never on hover.** A panel that opens under a
-   * passing pointer is a panel that opens when nobody asked, and on a touch
-   * screen there is no hover to open it with at all: the first tap would have to
-   * mean something else, which is the thing that makes hover menus unusable on a
-   * phone. Focus opens nothing either, for the same reason a tab through a nav
-   * bar should not unfold it.
+   * **It opens on hover, and a press is always the fallback.** `open-on` says
+   * which, and hover is the resting value because a nav bar is the one place a
+   * reader expects to sweep along a row and see each section: making them click,
+   * read, click again to compare two is the interaction hover exists to save.
+   *
+   * Hover is not the only way in, and the code is mostly about that. There is no
+   * hover on a touch screen, so a tap opens the panel there whatever `open-on`
+   * says, which is why the pointer type is checked rather than assumed. Focus
+   * still opens nothing, for the same reason a tab through a nav bar should not
+   * unfold it, but Enter on the trigger does, and a keyboard press arrives as a
+   * click with no pointer behind it.
+   *
+   * A mouse click on a trigger the pointer is already sitting on is the case
+   * worth naming: toggling there would close the panel and the pointer, still on
+   * the trigger, would open it again, so the trigger would flicker and never
+   * close. In hover mode the mouse's own clicks are left alone and hover governs
+   * on its own. Escape and a click away still close it.
+   *
+   * The delays are intent, not decoration. Opening waits, so a pointer crossing
+   * the bar on its way somewhere else opens nothing; closing waits longer, so the
+   * diagonal from the trigger down into the panel does not pass through a gap and
+   * shut it. Moving along a bar where a panel is already down opens the next one
+   * at once, because at that point the reader is reading the bar, not crossing it.
    *
    * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
    * trigger and the panel follows in the tab order, which is what the markup
@@ -13659,6 +13704,12 @@ export type CustomElements = {
    * to measure it against and nothing to flip or shift to, and the placing pass
    * is told not to run. Everything else the popover gives, the top layer and
    * the dismissal, is exactly what such a band needs.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -22026,12 +22077,29 @@ export type CustomElementsSolidJs = {
    * its own anchor and cannot render one inside this shadow root. The panel is a
    * slot, and what goes in it is lists and headings the consumer wrote.
    *
-   * **It opens on a press and never on hover.** A panel that opens under a
-   * passing pointer is a panel that opens when nobody asked, and on a touch
-   * screen there is no hover to open it with at all: the first tap would have to
-   * mean something else, which is the thing that makes hover menus unusable on a
-   * phone. Focus opens nothing either, for the same reason a tab through a nav
-   * bar should not unfold it.
+   * **It opens on hover, and a press is always the fallback.** `open-on` says
+   * which, and hover is the resting value because a nav bar is the one place a
+   * reader expects to sweep along a row and see each section: making them click,
+   * read, click again to compare two is the interaction hover exists to save.
+   *
+   * Hover is not the only way in, and the code is mostly about that. There is no
+   * hover on a touch screen, so a tap opens the panel there whatever `open-on`
+   * says, which is why the pointer type is checked rather than assumed. Focus
+   * still opens nothing, for the same reason a tab through a nav bar should not
+   * unfold it, but Enter on the trigger does, and a keyboard press arrives as a
+   * click with no pointer behind it.
+   *
+   * A mouse click on a trigger the pointer is already sitting on is the case
+   * worth naming: toggling there would close the panel and the pointer, still on
+   * the trigger, would open it again, so the trigger would flicker and never
+   * close. In hover mode the mouse's own clicks are left alone and hover governs
+   * on its own. Escape and a click away still close it.
+   *
+   * The delays are intent, not decoration. Opening waits, so a pointer crossing
+   * the bar on its way somewhere else opens nothing; closing waits longer, so the
+   * diagonal from the trigger down into the panel does not pass through a gap and
+   * shut it. Moving along a bar where a panel is already down opens the next one
+   * at once, because at that point the reader is reading the bar, not crossing it.
    *
    * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
    * trigger and the panel follows in the tab order, which is what the markup
@@ -22057,6 +22125,12 @@ export type CustomElementsSolidJs = {
    * to measure it against and nothing to flip or shift to, and the placing pass
    * is told not to run. Everything else the popover gives, the top layer and
    * the dismissal, is exactly what such a band needs.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the

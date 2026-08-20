@@ -5281,6 +5281,20 @@ to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
   appearance?: HelixMegamenu["appearance"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "open-on"?: HelixMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  openOn?: HelixMegamenu["openOn"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
@@ -5332,6 +5346,20 @@ to measure it against and nothing to flip or shift to, and the placing pass
 is told not to run. Everything else the popover gives, the top layer and
 the dismissal, is exactly what such a band needs. */
   "prop:appearance"?: HelixMegamenu["appearance"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "attr:open-on"?: HelixMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "prop:openOn"?: HelixMegamenu["openOn"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -7405,10 +7433,42 @@ the same thing in both directions: thirty percent to whatever comes first. */
   lead?: HelixSandbox["lead"];
   /** Percentage of the sandbox given to the source pane. */
   split?: HelixSandbox["split"];
+  /** Where a reset puts the divider, where nothing declared it.
+
+Separate from `split` for the reason `Splitter` keeps `default-position`
+separate from `position`, and the bug is worth recording because this
+element had it after that one was fixed. A double click reset to whatever
+`split` held on the first render, which is the declared arrangement only
+when nobody owns the property. The workbench owns it, restores it from the
+address bar and from storage, so the first value it ever held was the
+reader's last session: double clicking reset the sandbox to the size it
+already was, which is to say it did nothing at all.
+
+Declared rather than captured, so it is a number a consumer states and can
+change, and it needs no first frame to be read on. */
+  "default-split"?: HelixSandbox["defaultSplit"];
+  /** Where a reset puts the divider, where nothing declared it.
+
+Separate from `split` for the reason `Splitter` keeps `default-position`
+separate from `position`, and the bug is worth recording because this
+element had it after that one was fixed. A double click reset to whatever
+`split` held on the first render, which is the declared arrangement only
+when nobody owns the property. The workbench owns it, restores it from the
+address bar and from storage, so the first value it ever held was the
+reader's last session: double clicking reset the sandbox to the size it
+already was, which is to say it did nothing at all.
+
+Declared rather than captured, so it is a number a consumer states and can
+change, and it needs no first frame to be read on. */
+  defaultSplit?: HelixSandbox["defaultSplit"];
   /** Height of the panel, in pixels. */
   "panel-size"?: HelixSandbox["panelSize"];
   /** Height of the panel, in pixels. */
   panelSize?: HelixSandbox["panelSize"];
+  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  "default-panel-size"?: HelixSandbox["defaultPanelSize"];
+  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  defaultPanelSize?: HelixSandbox["defaultPanelSize"];
   /** What the panel's height becomes when it is closed.
 
 Zero closes it outright. A panel whose contents include the control that
@@ -7459,10 +7519,42 @@ the same thing in both directions: thirty percent to whatever comes first. */
   "prop:lead"?: HelixSandbox["lead"];
   /** Percentage of the sandbox given to the source pane. */
   "prop:split"?: HelixSandbox["split"];
+  /** Where a reset puts the divider, where nothing declared it.
+
+Separate from `split` for the reason `Splitter` keeps `default-position`
+separate from `position`, and the bug is worth recording because this
+element had it after that one was fixed. A double click reset to whatever
+`split` held on the first render, which is the declared arrangement only
+when nobody owns the property. The workbench owns it, restores it from the
+address bar and from storage, so the first value it ever held was the
+reader's last session: double clicking reset the sandbox to the size it
+already was, which is to say it did nothing at all.
+
+Declared rather than captured, so it is a number a consumer states and can
+change, and it needs no first frame to be read on. */
+  "attr:default-split"?: HelixSandbox["defaultSplit"];
+  /** Where a reset puts the divider, where nothing declared it.
+
+Separate from `split` for the reason `Splitter` keeps `default-position`
+separate from `position`, and the bug is worth recording because this
+element had it after that one was fixed. A double click reset to whatever
+`split` held on the first render, which is the declared arrangement only
+when nobody owns the property. The workbench owns it, restores it from the
+address bar and from storage, so the first value it ever held was the
+reader's last session: double clicking reset the sandbox to the size it
+already was, which is to say it did nothing at all.
+
+Declared rather than captured, so it is a number a consumer states and can
+change, and it needs no first frame to be read on. */
+  "prop:defaultSplit"?: HelixSandbox["defaultSplit"];
   /** Height of the panel, in pixels. */
   "attr:panel-size"?: HelixSandbox["panelSize"];
   /** Height of the panel, in pixels. */
   "prop:panelSize"?: HelixSandbox["panelSize"];
+  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  "attr:default-panel-size"?: HelixSandbox["defaultPanelSize"];
+  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  "prop:defaultPanelSize"?: HelixSandbox["defaultPanelSize"];
   /** What the panel's height becomes when it is closed.
 
 Zero closes it outright. A panel whose contents include the control that
@@ -15088,6 +15180,12 @@ export type CustomElements = {
    * to measure it against and nothing to flip or shift to, and the placing pass
    * is told not to run. Everything else the popover gives, the top layer and
    * the dismissal, is exactly what such a band needs.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
    *
    * ## Events
    *
@@ -16801,7 +16899,21 @@ export type CustomElements = {
    * `split` follows the lead pane rather than the source, so `split="30"` means
    * the same thing in both directions: thirty percent to whatever comes first.
    * - `split`: Percentage of the sandbox given to the source pane.
+   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`, and the bug is worth recording because this
+   * element had it after that one was fixed. A double click reset to whatever
+   * `split` held on the first render, which is the declared arrangement only
+   * when nobody owns the property. The workbench owns it, restores it from the
+   * address bar and from storage, so the first value it ever held was the
+   * reader's last session: double clicking reset the sandbox to the size it
+   * already was, which is to say it did nothing at all.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
    * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels. The pair to `panel-size`.
    * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
    *
    * Zero closes it outright. A panel whose contents include the control that
@@ -23748,6 +23860,12 @@ export type CustomElementsSolidJs = {
    * to measure it against and nothing to flip or shift to, and the placing pass
    * is told not to run. Everything else the popover gives, the top layer and
    * the dismissal, is exactly what such a band needs.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
    *
    * ## Events
    *
@@ -25526,7 +25644,21 @@ export type CustomElementsSolidJs = {
    * `split` follows the lead pane rather than the source, so `split="30"` means
    * the same thing in both directions: thirty percent to whatever comes first.
    * - `split`: Percentage of the sandbox given to the source pane.
+   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`, and the bug is worth recording because this
+   * element had it after that one was fixed. A double click reset to whatever
+   * `split` held on the first render, which is the declared arrangement only
+   * when nobody owns the property. The workbench owns it, restores it from the
+   * address bar and from storage, so the first value it ever held was the
+   * reader's last session: double clicking reset the sandbox to the size it
+   * already was, which is to say it did nothing at all.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
    * - `panel-size`/`panelSize`: Height of the panel, in pixels.
+   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels. The pair to `panel-size`.
    * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
    *
    * Zero closes it outright. A panel whose contents include the control that

@@ -36,12 +36,29 @@ let showing: HelixBaseMegamenu | undefined
  * its own anchor and cannot render one inside this shadow root. The panel is a
  * slot, and what goes in it is lists and headings the consumer wrote.
  *
- * **It opens on a press and never on hover.** A panel that opens under a
- * passing pointer is a panel that opens when nobody asked, and on a touch
- * screen there is no hover to open it with at all: the first tap would have to
- * mean something else, which is the thing that makes hover menus unusable on a
- * phone. Focus opens nothing either, for the same reason a tab through a nav
- * bar should not unfold it.
+ * **It opens on hover, and a press is always the fallback.** `open-on` says
+ * which, and hover is the resting value because a nav bar is the one place a
+ * reader expects to sweep along a row and see each section: making them click,
+ * read, click again to compare two is the interaction hover exists to save.
+ *
+ * Hover is not the only way in, and the code is mostly about that. There is no
+ * hover on a touch screen, so a tap opens the panel there whatever `open-on`
+ * says, which is why the pointer type is checked rather than assumed. Focus
+ * still opens nothing, for the same reason a tab through a nav bar should not
+ * unfold it, but Enter on the trigger does, and a keyboard press arrives as a
+ * click with no pointer behind it.
+ *
+ * A mouse click on a trigger the pointer is already sitting on is the case
+ * worth naming: toggling there would close the panel and the pointer, still on
+ * the trigger, would open it again, so the trigger would flicker and never
+ * close. In hover mode the mouse's own clicks are left alone and hover governs
+ * on its own. Escape and a click away still close it.
+ *
+ * The delays are intent, not decoration. Opening waits, so a pointer crossing
+ * the bar on its way somewhere else opens nothing; closing waits longer, so the
+ * diagonal from the trigger down into the panel does not pass through a gap and
+ * shut it. Moving along a bar where a panel is already down opens the next one
+ * at once, because at that point the reader is reading the bar, not crossing it.
  *
  * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
  * trigger and the panel follows in the tab order, which is what the markup
@@ -87,6 +104,21 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
    */
   @property({ reflect: true })
   appearance?: 'full'
+
+  /**
+   * Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
+   */
+  /* Read, never written back. It has a default, and a reflected default puts an
+     attribute on the host that the consumer did not write, which the server
+     then ships: the SSR spec for this element checks exactly that and caught
+     it. Nothing selects on it, so there is nothing to reflect for. */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'hover' = 'hover'
 
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
@@ -137,12 +169,97 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
     this.style.setProperty('--_megamenu-top', `${Math.round(under)}px`)
   }
 
-  private readonly handleTriggerClick = (): void => {
-    this.requestOpen(!this.open)
+  /**
+   * How long a pointer has to mean it, in milliseconds.
+   *
+   * Opening is the shorter wait: too long and the panel feels stuck, too short
+   * and crossing the bar opens things. Closing is longer because the pointer
+   * has to get from the trigger to the panel, and the straight line between
+   * them is not the line anybody moves along.
+   */
+  private static readonly OPEN_DELAY = 120
+  private static readonly CLOSE_DELAY = 220
+
+  private timer: ReturnType<typeof setTimeout> | undefined
+
+  /* What pressed last, so a click can be told apart from a tap. A click event
+     carries no pointer type of its own. */
+  private pointer: string | undefined
+
+  private schedule(delay: number, then: () => void): void {
+    this.stop()
+    this.timer = setTimeout(then, delay)
+  }
+
+  private stop(): void {
+    if (this.timer !== undefined) {
+      clearTimeout(this.timer)
+      this.timer = undefined
+    }
+  }
+
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    this.pointer = event.pointerType
+  }
+
+  private readonly handlePointerEnter = (event: PointerEvent): void => {
+    /* Mouse only. A touch screen synthesises an enter on tap, and acting on it
+       would open the panel and then let the click that follows close it again,
+       so a tap would do nothing at all. */
+    if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
+      return
+    }
+    /* No wait when a panel is already down: the bar is open, and the reader
+       moving along it is choosing, not passing through. */
+    this.schedule(showing && showing !== this ? 0 : HelixBaseMegamenu.OPEN_DELAY, () => {
+      this.requestOpen(true)
+    })
+  }
+
+  private readonly handlePointerLeave = (event: PointerEvent): void => {
+    if (this.openOn !== 'hover' || event.pointerType !== 'mouse') {
+      return
+    }
+    this.schedule(HelixBaseMegamenu.CLOSE_DELAY, () => {
+      /* Not `close()`: leaving with the pointer should not pull focus back to
+         the trigger, which would scroll the page to a nav bar the reader has
+         moved on from. Escape is the one that returns them. */
+      this.requestOpen(false)
+    })
+  }
+
+  private readonly handleTriggerClick = (event: MouseEvent): void => {
+    this.stop()
+    if (this.openOn !== 'hover') {
+      this.requestOpen(!this.open)
+      return
+    }
+    /* In hover mode the mouse's own clicks are hover's business. Toggling here
+       would close a panel the pointer is still standing on, and the pointer
+       would reopen it. A keyboard press arrives with no clicks behind it, and a
+       tap arrives with a pointer that is not a mouse: both are the only way in
+       for the people making them, so both toggle. */
+    if (event.detail === 0 || (this.pointer !== undefined && this.pointer !== 'mouse')) {
+      this.requestOpen(!this.open)
+    }
+  }
+
+  /* On the host, and here rather than in the template, because Lit templates
+     bind inside a shadow root and these have to hear the panel too. Not the
+     constructor: the server runs that and has no events. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('pointerenter', this.handlePointerEnter)
+    this.addEventListener('pointerleave', this.handlePointerLeave)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('pointerenter', this.handlePointerEnter)
+    this.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.stop()
     if (showing === this) {
       showing = undefined
     }
@@ -169,6 +286,10 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
   }
 
   protected override render(): TemplateResult {
+    /* The listeners sit on the host rather than the trigger, so the panel counts
+       as inside it: the top layer changes where the panel is painted and not
+       where it is in the tree, so a pointer moving off the trigger and onto the
+       panel has not left this element and fires no leave. */
     return html`<slot name="trigger" @click=${this.handleTriggerClick}>
         <button
           part="trigger"

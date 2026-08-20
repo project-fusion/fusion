@@ -18,6 +18,116 @@ const section = async (label = 'Products'): Promise<Section> => {
 
 const trigger = (host: Section) => part(host, 'trigger') as HTMLElement
 
+/* `PointerEvent` is not in every DOM this runs in, and a plain `Event` carries
+   no `pointerType`, which is the whole thing under test. */
+const pointer = (type: string, pointerType: string): Event => {
+  const event = new Event(type, { bubbles: false, cancelable: true })
+  Object.defineProperty(event, 'pointerType', { value: pointerType })
+  return event
+}
+
+const press = (host: Section, pointerType: string, detail = 1): void => {
+  if (pointerType !== 'none') {
+    host.dispatchEvent(pointer('pointerdown', pointerType))
+  }
+  trigger(host).dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+}
+
+const settle = (ms: number): Promise<void> =>
+  new Promise((done) => {
+    setTimeout(done, ms)
+  })
+
+describe('a megamenu opening on hover', () => {
+  test('waits for the pointer to mean it, then opens', async () => {
+    /* Without the wait, a pointer crossing the bar on its way somewhere else
+       opens every panel it passes. */
+    const host = await section()
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    expect(host.open).toBe(false)
+
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('and a touch does not open it, because a tap has to', async () => {
+    /* A touch screen synthesises an enter on tap. Acting on it would open the
+       panel and let the click behind it close the panel again, so a tap would
+       do nothing at all: the commonest way a hover nav is unusable on a phone. */
+    const host = await section()
+    host.dispatchEvent(pointer('pointerenter', 'touch'))
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+
+    press(host, 'touch')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('a keyboard press opens it, having no pointer to hover with', async () => {
+    const host = await section()
+    press(host, 'none', 0)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('and the mouse cannot click a hovered panel shut', async () => {
+    /* Toggling on a mouse click would close the panel while the pointer is
+       still on the trigger, and the pointer would open it again: a trigger that
+       flickers and never closes. Hover governs on its own. */
+    const host = await section()
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    press(host, 'mouse')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+  })
+
+  test('leaving closes it, and later than entering opened it', async () => {
+    /* The pointer has to get from the trigger down to the panel, and the line
+       it takes is not the straight one. */
+    const host = await section()
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    host.dispatchEvent(pointer('pointerleave', 'mouse'))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    await settle(300)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('open-on="click" hears no pointer at all', async () => {
+    const host = (await mount(
+      `<helix-megamenu open-on="click" label="Products"><a href="/one">One</a></helix-megamenu>`,
+    )) as Section
+    await host.updateComplete
+
+    host.dispatchEvent(pointer('pointerenter', 'mouse'))
+    await settle(200)
+    await host.updateComplete
+    expect(host.open).toBe(false)
+
+    press(host, 'mouse')
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    /* And there it toggles, because nothing else is going to close it. */
+    press(host, 'mouse')
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+})
+
 describe('a megamenu', () => {
   test('is a disclosure, not a menu, because its contents are destinations', async () => {
     /* `role="menu"` and `menuitem` are for an application's commands: they take

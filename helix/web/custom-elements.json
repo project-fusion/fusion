@@ -26426,6 +26426,20 @@
             },
             {
               "kind": "field",
+              "name": "openOn",
+              "type": {
+                "text": "'click' | 'hover'"
+              },
+              "default": "'hover'",
+              "description": "Whether hovering the trigger opens the panel, or only a press does.\n\nA press always works. This says whether a mouse also opens it by resting on\nthe trigger, and it is the default because that is what a navigation bar\ndoes. `click` is for a trigger that does something else as well, or a panel\nheavy enough that opening it on the way past is rude.",
+              "attribute": "open-on",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "panel",
               "privacy": "private",
               "readonly": true,
@@ -26474,6 +26488,133 @@
                 }
               },
               "description": "Where a full-bleed band starts, which is the only number it needs.\n\nThe placing pass is off for that appearance, so nothing else is measuring:\na band spans the viewport and has only one degree of freedom, how far down\nit sits, and that is the bottom of the trigger in viewport coordinates\nbecause the panel is fixed. A header that scrolls takes the band with it,\nwhich is what a panel hanging off a header should do.\n\nWritten as a custom property rather than an inline `top`, so the stylesheet\nkeeps the arrangement and this contributes the one measurement it cannot\nmake. Nothing to do for the card, which the controller places.",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "OPEN_DELAY",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "120",
+              "description": "How long a pointer has to mean it, in milliseconds.\n\nOpening is the shorter wait: too long and the panel feels stuck, too short\nand crossing the bar opens things. Closing is longer because the pointer\nhas to get from the trigger to the panel, and the straight line between\nthem is not the line anybody moves along.",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "CLOSE_DELAY",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "220",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "schedule",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "delay",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "then",
+                  "type": {
+                    "text": "() => void"
+                  }
+                }
+              ],
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerDown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerEnter",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointerLeave",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
@@ -26636,6 +26777,19 @@
               },
               "description": "Whether the panel is a card under the trigger or a band across the page.\n\nThe resting one is the card, hanging off the trigger and as wide as it\nneeds to be. `full` is the other shape navigations use: a band from edge to\nedge under the header, with its contents held to the page's own measure, so\na set of destinations too wide to sit under one word gets the whole width\nto lay out in.\n\nIt changes where the panel goes as well as how it looks, which is why this\ntier knows about it at all: a band spans the viewport, so there is nothing\nto measure it against and nothing to flip or shift to, and the placing pass\nis told not to run. Everything else the popover gives, the top layer and\nthe dismissal, is exactly what such a band needs.",
               "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "name": "open-on",
+              "type": {
+                "text": "'click' | 'hover'"
+              },
+              "default": "'hover'",
+              "description": "Whether hovering the trigger opens the panel, or only a press does.\n\nA press always works. This says whether a mouse also opens it by resting on\nthe trigger, and it is the default because that is what a navigation bar\ndoes. `click` is for a trigger that does something else as well, or a panel\nheavy enough that opening it on the way past is rude.",
+              "fieldName": "openOn",
               "inheritedFrom": {
                 "name": "HelixBaseMegamenu",
                 "module": "src/megamenu/root/megamenu-root.ts"
@@ -38275,10 +38429,30 @@
             },
             {
               "kind": "field",
+              "name": "defaultSplit",
+              "default": "50",
+              "description": "Where a reset puts the divider, where nothing declared it.\n\nSeparate from `split` for the reason `Splitter` keeps `default-position`\nseparate from `position`, and the bug is worth recording because this\nelement had it after that one was fixed. A double click reset to whatever\n`split` held on the first render, which is the declared arrangement only\nwhen nobody owns the property. The workbench owns it, restores it from the\naddress bar and from storage, so the first value it ever held was the\nreader's last session: double clicking reset the sandbox to the size it\nalready was, which is to say it did nothing at all.\n\nDeclared rather than captured, so it is a number a consumer states and can\nchange, and it needs no first frame to be read on.",
+              "attribute": "default-split",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
               "name": "panelSize",
               "default": "160",
               "description": "Height of the panel, in pixels.",
               "attribute": "panel-size",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultPanelSize",
+              "default": "160",
+              "description": "What a reset makes the panel, in pixels. The pair to `panel-size`.",
+              "attribute": "default-panel-size",
               "type": {
                 "text": "number"
               }
@@ -38369,16 +38543,6 @@
               "privacy": "private",
               "description": "Where the outer divider goes: everything the panel is not.\n\nA hundred with no panel, which puts the divider on the floor of the sandbox\nwith the panes filling it. The line itself is hidden by the stylesheet in\nthat case, because a boundary needs two sides.",
               "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "home",
-              "type": {
-                "text": "{ panel: number; split: number } | null"
-              },
-              "privacy": "private",
-              "default": "null",
-              "description": "The arrangement the sandbox was given, which a double click returns it to.\n\nWhat the consumer wrote, not the property defaults. A sandbox opened at\n`split=\"30\"` was arranged that way on purpose, and a reset that ignored it\nwould be resetting to somebody else's idea of the arrangement."
             },
             {
               "kind": "field",
@@ -38640,10 +38804,22 @@
               "fieldName": "split"
             },
             {
+              "name": "default-split",
+              "default": "DEFAULT_SPLIT",
+              "description": "Where a reset puts the divider, where nothing declared it.\n\nSeparate from `split` for the reason `Splitter` keeps `default-position`\nseparate from `position`, and the bug is worth recording because this\nelement had it after that one was fixed. A double click reset to whatever\n`split` held on the first render, which is the declared arrangement only\nwhen nobody owns the property. The workbench owns it, restores it from the\naddress bar and from storage, so the first value it ever held was the\nreader's last session: double clicking reset the sandbox to the size it\nalready was, which is to say it did nothing at all.\n\nDeclared rather than captured, so it is a number a consumer states and can\nchange, and it needs no first frame to be read on.",
+              "fieldName": "defaultSplit"
+            },
+            {
               "name": "panel-size",
               "default": "DEFAULT_PANEL",
               "description": "Height of the panel, in pixels.",
               "fieldName": "panelSize"
+            },
+            {
+              "name": "default-panel-size",
+              "default": "DEFAULT_PANEL",
+              "description": "What a reset makes the panel, in pixels. The pair to `panel-size`.",
+              "fieldName": "defaultPanelSize"
             },
             {
               "name": "panel-collapsed-size",

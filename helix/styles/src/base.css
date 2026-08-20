@@ -885,16 +885,18 @@ helix-toggle[disabled]::part(item) {
 
 /* Quiet and small, because it labels a column rather than starting a section of
    a document. Not a heading level: what makes it one is the `<h3>` the consumer
-   wrote, and this only says how it looks. */
+   wrote, and this only says how it looks.
+   Left in the case it was written in. Uppercasing it here would have been this
+   stylesheet shouting a word the consumer typed quietly, and it also throws away
+   the shape of a name: `API` and `Api` come out the same, and a product with a
+   capital in the middle loses it. Small and subtle already say "label". */
 [data-megamenu-heading] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-wide);
   margin: var(--helix-space-none);
   padding-inline: var(--helix-space-xs);
-  text-transform: uppercase;
 }
 
 /* A destination with a name and a sentence about it.
@@ -917,12 +919,16 @@ helix-toggle[disabled]::part(item) {
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* No colour of its own. A mark beside every row in the panel, accented, is a
+   panel of accents: the colour stops meaning anything the moment it is on all
+   of them, and it competes with the one thing in a navigation that should be
+   accented, which is where you are. It inherits, so a consumer who wants one
+   row marked can still say so on that row. */
 [data-megamenu-item] > :where(helix-icon, img, svg) {
   --icon-size: var(--helix-size-icon-lg);
 
   grid-column: 1;
   grid-row: 1 / span 2;
-  color: var(--helix-color-primary);
 }
 
 [data-megamenu-item] > :where(strong, b) {
@@ -931,10 +937,15 @@ helix-toggle[disabled]::part(item) {
   font-weight: var(--helix-weight-semibold);
 }
 
+/* Regular, and said here rather than left to inherit: the panel sits inside the
+   nav, so these rows match the nav bar's own rule and the sentence arrived at
+   the medium weight that rule gives a word in a strip. A sentence at the same
+   weight as the name above it reads as a second name. */
 [data-megamenu-item] > :where(span, p) {
   grid-column: 2;
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-regular);
   margin: var(--helix-space-none);
 }
 

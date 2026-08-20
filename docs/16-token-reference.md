@@ -40,8 +40,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 4 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 2 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 151 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 139 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 149 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 137 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 4 |
@@ -119,7 +119,7 @@ The three weights.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-weight-regular` | `400` | 18 |
+| `--helix-weight-regular` | `400` | 20 |
 | `--helix-weight-medium` | `500` | 114 |
 | `--helix-weight-semibold` | `600` | 49 |
 
@@ -141,7 +141,7 @@ Letter spacing.
 |---|---|---|
 | `--helix-tracking-tight` | `-0.01em` | 35 |
 | `--helix-tracking-normal` | `0` | 26 |
-| `--helix-tracking-wide` | `0.02em` | 10 |
+| `--helix-tracking-wide` | `0.02em` | 8 |
 
 ## border
 
@@ -149,7 +149,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 170 |
+| `--helix-border-thin` | `1px` | 168 |
 | `--helix-border-thick` | `2px` | 47 |
 
 ## shadow

@@ -2471,6 +2471,7 @@ Everything about what opens it and what closes it is the base class.
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `openOn` | `open-on` | `'click' \| 'hover'` | `'hover'` | `HelixBaseMegamenu` | Whether hovering the trigger opens the panel, or only a press does. |
 
 #### Methods
 
@@ -3583,6 +3584,8 @@ what it meant when it was written.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `cornerLabel` | `corner-label` | `string` | `'Resize panes and panel'` | - | Accessible name for the divider that moves both at once. |
+| `defaultPanelSize` | `default-panel-size` | `number` | `160` | - | What a reset makes the panel, in pixels. The pair to `panel-size`. |
+| `defaultSplit` | `default-split` | `number` | `50` | - | Where a reset puts the divider, where nothing declared it. |
 | `lead` | `lead` | `'source' \| 'preview'` | `'source'` | - | Which pane comes first, before the divider. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | - | Whether the panes sit side by side or stacked. |
 | `panelCollapsedSize` | `panel-collapsed-size` | `number` | `0` | - | What the panel's height becomes when it is closed. |

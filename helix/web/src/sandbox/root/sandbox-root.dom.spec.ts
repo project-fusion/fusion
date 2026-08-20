@@ -225,7 +225,11 @@ describe('sandbox coordination', () => {
   })
 })
 
-type Splitter = HTMLElement & { position: number; updateComplete: Promise<unknown> }
+type Splitter = HTMLElement & {
+  defaultPosition: number
+  position: number
+  updateComplete: Promise<unknown>
+}
 
 /** The two splitters the sandbox arranges: the panes inside the panel. */
 const panes = (host: HTMLElement): Splitter => part(host, 'panes') as Splitter
@@ -308,6 +312,40 @@ describe('sandbox dividers', () => {
     sandbox.split = 30
     await sandbox.updateComplete
     expect(panes(sandbox).position).toBe(30)
+  })
+
+  test('a reset goes to the declared home, not to wherever it opened', async () => {
+    /* The bug this guards was in the sandbox after `Splitter` had already fixed
+       it one level down. Home was captured from `split` on the first render,
+       which is the arrangement the consumer declared only when nobody owns the
+       property. The workbench owns it and restores it from storage, so home was
+       the reader's last session and a double click reset the sandbox to the
+       size it already had. */
+    /* Opened at 30, which is what restoring a session looks like from in here:
+       the value is there on the first render, and it is not a declaration. */
+    const sandbox = (await mount(`
+      <helix-sandbox split="30">
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)) as Updatable & { split: number }
+    await sandbox.updateComplete
+    expect(panes(sandbox).position).toBe(30)
+    expect(panes(sandbox).defaultPosition).toBe(50)
+
+    /* And still, after the property it is not has moved again. */
+    sandbox.split = 72
+    await sandbox.updateComplete
+    expect(panes(sandbox).defaultPosition).toBe(50)
+  })
+
+  test('and the consumer can say where home is', async () => {
+    const sandbox = (await mount(`
+      <helix-sandbox default-split="30">
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+      </helix-sandbox>`)) as Updatable & { split: number }
+    await sandbox.updateComplete
+    expect(panes(sandbox).defaultPosition).toBe(30)
   })
 
   test('the panel divider is only there when there is a panel to size', async () => {

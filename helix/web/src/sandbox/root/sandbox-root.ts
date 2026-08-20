@@ -126,9 +126,31 @@ export class HelixSandbox extends HelixElement {
   @property({ attribute: 'split', type: Number })
   split = DEFAULT_SPLIT
 
+  /**
+   * Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`, and the bug is worth recording because this
+   * element had it after that one was fixed. A double click reset to whatever
+   * `split` held on the first render, which is the declared arrangement only
+   * when nobody owns the property. The workbench owns it, restores it from the
+   * address bar and from storage, so the first value it ever held was the
+   * reader's last session: double clicking reset the sandbox to the size it
+   * already was, which is to say it did nothing at all.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
+   */
+  @property({ attribute: 'default-split', type: Number })
+  defaultSplit = DEFAULT_SPLIT
+
   /** Height of the panel, in pixels. */
   @property({ attribute: 'panel-size', type: Number })
   panelSize = DEFAULT_PANEL
+
+  /** What a reset makes the panel, in pixels. The pair to `panel-size`. */
+  @property({ attribute: 'default-panel-size', type: Number })
+  defaultPanelSize = DEFAULT_PANEL
 
   /**
    * What the panel's height becomes when it is closed.
@@ -219,19 +241,10 @@ export class HelixSandbox extends HelixElement {
     return this.hasPanel ? 100 - this.panelShare : 100
   }
 
-  /**
-   * The arrangement the sandbox was given, which a double click returns it to.
-   *
-   * What the consumer wrote, not the property defaults. A sandbox opened at
-   * `split="30"` was arranged that way on purpose, and a reset that ignored it
-   * would be resetting to somebody else's idea of the arrangement.
-   */
-  private home: { panel: number; split: number } | null = null
-
   /** Where the panel divider goes on a reset, in the splitter's own units. */
   private get homePanelPosition(): number {
-    const panel = this.home?.panel
-    if (!this.hasPanel || panel === undefined || this.bodyHeight <= 0) {
+    const panel = Number.isFinite(this.defaultPanelSize) ? this.defaultPanelSize : DEFAULT_PANEL
+    if (!this.hasPanel || this.bodyHeight <= 0) {
       return 100
     }
     return 100 - Math.min(PANEL_MAX * 100, Math.max(0, (panel / this.bodyHeight) * 100))
@@ -465,10 +478,6 @@ export class HelixSandbox extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.readPanel()
-    this.home = {
-      panel: Number.isFinite(this.panelSize) ? this.panelSize : DEFAULT_PANEL,
-      split: Number.isFinite(this.split) ? this.split : DEFAULT_SPLIT,
-    }
     const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
     if (body) {
       this.bodyHeight = body.getBoundingClientRect().height
@@ -522,7 +531,7 @@ export class HelixSandbox extends HelixElement {
           slot="start"
           part="panes"
           exportparts="separator"
-          default-position=${this.home?.split ?? split}
+          default-position=${Number.isFinite(this.defaultSplit) ? this.defaultSplit : DEFAULT_SPLIT}
           label=${this.separatorLabel}
           orientation=${vertical ? 'vertical' : 'horizontal'}
           .position=${split}
