@@ -182,6 +182,17 @@
  * The row stops being two layers over a strip of invisible buttons and becomes
  * a row of buttons with a mark in each, so the pitch arithmetic above is undone
  * here: nothing is being positioned over anything. */
+/* A step up from the row's own mark, because a chip is not a row.
+ *
+ * A mark in a row of stars is the whole drawing and sits at the icon size. A
+ * mark in a chip is cargo, and at `icon-md` it was half the chip's 40 and read
+ * as a small thing in a large circle. `icon-lg` puts it at 24 in 40, which is
+ * the proportion a glyph in a round button usually takes. `--rating-size` is
+ * still the way past it in either direction. */
+:host([appearance="chips"]) {
+  --_rating-mark-size: var(--rating-size, var(--helix-size-icon-lg));
+}
+
 :host([appearance="chips"]) [part="marks"] {
   gap: var(--rating-gap, var(--helix-space-sm));
 }
@@ -226,7 +237,12 @@
   inline-size: var(--_rating-mark-size);
 }
 
-/* A readout has no target to sit in, so the mark carries the chip itself. */
+/* A readout has no target to sit in, so the mark carries the chip itself.
+ *
+ * Which leaves the shape inside it with nothing sized to it. Measured: the
+ * slotted drawing came out at the chip's own 40 while the same drawing beside a
+ * pressable chip came out at 20, so a readout drew its faces at twice the
+ * weight of the control's and the two did not look like the same component. */
 :host([appearance="chips"][readonly]) [part="mark"] {
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
@@ -237,6 +253,11 @@
   inline-size: var(--rating-chip-size, var(--helix-size-control-md));
   justify-content: center;
   mask-image: none;
+}
+
+:host([appearance="chips"][readonly]) [part="mark"] > * {
+  block-size: var(--_rating-mark-size);
+  inline-size: var(--_rating-mark-size);
 }
 
 :host([appearance="chips"][readonly]) [part="mark"][data-chosen] {
