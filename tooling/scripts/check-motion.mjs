@@ -92,9 +92,11 @@ const rules = (css) => {
       const head = stack[depth] ?? ''
       if (!head.startsWith('@')) {
         found.push({
+          at: start,
           body: css.slice(start, at),
           reduced: stack.slice(0, depth).some((outer) => REDUCE.test(outer ?? '')),
           selector: head.replace(/\s+/g, ' '),
+          starting: stack.slice(0, depth).some((outer) => STARTING.test(outer ?? '')),
         })
       }
       start = at + 1
@@ -104,6 +106,8 @@ const rules = (css) => {
 }
 
 const REDUCE = /@media[^{]*prefers-reduced-motion:\s*reduce/
+
+const STARTING = /@starting-style/
 
 /** One selector per comma, normalized so the two sides compare. */
 const parts = (selector) =>
@@ -168,12 +172,84 @@ for (const tier of TIERS) {
   }
 }
 
+/**
+ * A `@starting-style` rule needs an ordinary rule of its own selector, above it.
+ *
+ * This is the shape of a transition that only works one way, and it has now been
+ * written twice. `Drawer` had its starting style first in the file and records
+ * what that looked like: a starting style and an ordinary rule of the same
+ * specificity are separated by source order, so the ordinary one wins even on
+ * the opening frame and the element arrives already open. The exit still ran,
+ * because closing is an ordinary change between two rendered states, which is
+ * exactly what makes this hard to see. `Megamenu` hit the same thing later.
+ *
+ * What is flagged is one thing only: **an ordinary rule with the same selector,
+ * below the starting style.** Identical selectors carry identical specificity,
+ * so source order is the whole of the decision and the starting value loses.
+ *
+ * A starting style with no ordinary twin is **not** flagged, because winning on
+ * specificity is the other legitimate way to do this and `Tree` does it:
+ * `@starting-style { [part="group"]:not([hidden]) }` is (0,2,0) against a
+ * settled `[part="group"]` at (0,1,0), so it wins wherever it sits and needs no
+ * counterpart. An earlier draft of this check required the twin and condemned
+ * it.
+ *
+ * **What this deliberately does not check** is whether a component that
+ * transitions `display` with `allow-discrete` has a starting style at all. That
+ * looks like the same bug and is not: `Popover`, `Menu`, `Select` and `Combobox`
+ * rest closed and open on `[data-placed]`, an attribute the floating controller
+ * writes after the element is rendered, so the opening change happens between
+ * two rendered states and needs no starting value. Requiring one would condemn
+ * four correct components. Which of the two shapes a component wants is its own
+ * call; that it does not half-write the shape it picked is what this catches.
+ */
+for (const tier of TIERS) {
+  for (const sheet of sheets(tier)) {
+    const css = readFileSync(sheet, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const parsed = rules(css)
+    if (!parsed.some((rule) => rule.starting)) {
+      continue
+    }
+    /* Earliest ordinary appearance per selector, which is the one a starting
+       style has to sit below. */
+    const ordinary = new Map()
+    for (const rule of parsed) {
+      if (rule.starting || rule.reduced) {
+        continue
+      }
+      for (const one of parts(rule.selector)) {
+        if (!ordinary.has(one)) {
+          ordinary.set(one, rule.at)
+        }
+      }
+    }
+    for (const rule of parsed) {
+      if (!rule.starting) {
+        continue
+      }
+      for (const one of parts(rule.selector)) {
+        const settled = ordinary.get(one)
+        if (settled !== undefined && settled > rule.at) {
+          problems.push(
+            `${sheet}: the \`@starting-style\` for \`${one}\` sits above the ordinary rule of ` +
+              'the same selector. Equal specificity, so source order decides and the starting ' +
+              'value loses the one frame it exists for: the element arrives already open and only ' +
+              'the exit animates. Move it below.',
+          )
+        }
+      }
+    }
+  }
+}
+
 if (problems.length > 0) {
-  console.error(`Components that move without answering the preference (${problems.length}):\n`)
+  console.error(`Motion rules a stylesheet does not answer (${problems.length}):\n`)
   for (const problem of problems) {
     console.error(`  ${problem}\n`)
   }
   process.exit(1)
 }
 
-console.log('motion: every stylesheet that moves answers prefers-reduced-motion')
+console.log(
+  'motion: every stylesheet that moves answers prefers-reduced-motion, and no starting style is outranked by its own settled rule',
+)
