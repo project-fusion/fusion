@@ -40,74 +40,87 @@ uniform float uScroll;
 uniform vec3 uColor;
 out vec4 outColor;
 
-/* A ground plane running to a horizon, and a camera that climbs.
+/* A plain at dusk, and the light is the subject.
  *
- * The page argues that the same stack holds from one person to one country, so
- * the picture behind it pulls back: near the top the camera is low and a
- * handful of lit points sit close by, and by the last rung it is high enough
- * that the same field runs to the horizon. The zoom out is the ladder. A field
- * of dots with a gradient over it was atmosphere; this is the argument.
+ * The focal point is the sun on the horizon and everything is built to point at
+ * it: the ground lines converge on it, the fog clears toward it, and the forms
+ * standing on the plain are lit from it. The earlier version had light pooled
+ * vaguely at a vanishing point, which is a gradient rather than a source.
  *
- * Analytic rather than marched. For a pixel below the horizon the distance
- * along the ground is height / (horizon - y), which is one divide, and the
- * lattice is read straight out of that. No stepping, no loop. */
+ * The story is the ladder. The camera climbs and the light reaches further, so
+ * one reader looking at a small lit patch becomes a reader looking at a plain
+ * with structures on it. Personal, organizational, national, told as distance.
+ */
+
+float hash(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
+
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
   vec2 p = uv - 0.5;
   p.x *= uResolution.x / uResolution.y;
 
-  /* Low, because gl_FragCoord counts from the bottom: a positive value here
-     puts the horizon above centre and the plane runs up behind the headline,
-     which is where it was. The ground gets the lower third and the type keeps
-     clear sky. No backticks in here, either: this whole shader is a template
-     literal and one would end it. */
   float horizon = -0.13;
-  float height = mix(0.035, 0.22, uScroll);   // the camera climbs through the rungs
-  float drift = uTime * 0.35;
-
+  float height = mix(0.030, 0.20, uScroll);
   vec3 col = vec3(0.0);
   float alpha = 0.0;
 
-  if (p.y < horizon - 0.0015) {
+  /* The source, given an actual shape rather than a wash: a small disc sitting
+     on the horizon with a bloom around it, so there is somewhere the light is
+     coming from. */
+  /* Round, not squashed, and sitting on the line rather than hovering over it.
+     The bloom is two falloffs: a tight core so the source has an edge, and a
+     wide haze so the sky around it is not simply black. */
+  vec2 toSun = vec2(p.x, p.y - horizon);
+  float sd = length(toSun);
+  float disc = 1.0 - smoothstep(0.016, 0.026, sd);
+  float core = exp(-sd * sd * 420.0);
+  float haze = exp(-sd * sd * mix(34.0, 14.0, uScroll));
+  float bloom = core * 0.7 + haze * 0.5;
+
+  if (p.y < horizon - 0.001) {
     float depth = height / (horizon - p.y);
-    /* Square cells in world space: across scales with depth alone. Dividing
-       by the camera height, as this did, stretches every cell sideways as the
-       camera climbs, and the near rows draw as long dashes rather than dots. */
     float across = p.x * depth * 1.7;
 
-    /* Cells shrink into the distance on their own, so a dot only needs a
-       constant radius in cell space to taper correctly. */
-    /* Many cells across the view, not one. Unscaled, a world unit covers the
-       whole screen at this camera height and the near field sits inside a
-       single cell, so nothing reads as a field at all. */
     const float GRID = 9.0;
-    vec2 cell = fract(vec2(across, depth - drift) * GRID) - 0.5;
-    float d = length(cell);
+    float lane = across * GRID;
+    float row = (depth - uTime * 0.16) * GRID;
 
-    /* Sub-pixel aware: the dot is never allowed to grow past the footprint of
-       the pixel drawing it, which is what stops the near rows blooming into
-       blobs the way a fixed radius does. */
-    float px = fwidth(depth * GRID) + 0.004;
-    float dot = 1.0 - smoothstep(0.020, 0.020 + px * 1.5, d);
+    /* Lines running to the vanishing point, each breathing on its own phase.
+       A field where everything pulses together reads as a flicker; given
+       separate phases from a hash of the lane index, it reads as a place. */
+    float id = floor(lane);
+    float own = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 0.5 + hash(id) * 6.2831));
+    float lineW = fwidth(lane) * 1.2 + 0.012;
+    float lineX = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
 
-    float fog = exp(-depth * 1.05);
-    float lit = dot * fog;
+    /* Cross rows, quieter, so the plain has a floor rather than only rails. */
+    float rowW = fwidth(row) * 1.2 + 0.02;
+    float lineZ = 1.0 - smoothstep(0.0, rowW, abs(fract(row) - 0.5));
 
-    /* Light pooled at the horizon, so the plane is read as lit from away
-       rather than as a pattern with a vignette. */
-    float toSun = length(vec2(p.x * 0.5, p.y - horizon));
-    float pool = exp(-toSun * toSun * 14.0);
+    /* Points where they meet, and they are the quietest thing here now. */
+    float node = lineX * lineZ;
 
-    col = uColor * (0.55 + pool * 1.1);
-    alpha = clamp(lit * (0.5 + pool * 3.0), 0.0, 1.0);
+    float fog = exp(-depth * 1.15);
+    /* Clearer toward the light, which is what makes the sun the subject rather
+       than a bright spot that happens to be there. */
+    /* Wide enough to be a plain rather than a corridor. Steeper than this and
+       the rails only exist in a cone down the middle, which reads as a road. */
+    float toward = exp(-abs(p.x) * 1.05);
+
+    /* Rails carry the picture, rows give it a floor, nodes are the quietest
+       thing on it. The dots were the loudest before and are barely a mark now. */
+    float ink = (lineX * 0.5 * own + lineZ * 0.16 + node * 0.26) * fog * (0.5 + toward * 0.85);
+    col = uColor * (0.62 + toward * 0.45);
+    alpha = clamp(ink, 0.0, 1.0);
   }
 
-  /* The sun itself, sitting on the horizon and rising a little as we climb. */
-  float sunY = horizon - 0.012 + uScroll * 0.02;
-  float sd = length(vec2(p.x * 0.7, p.y - sunY));
-  float sun = exp(-sd * sd * mix(60.0, 26.0, uScroll));
-  col = mix(col, uColor * 1.25, clamp(sun, 0.0, 1.0));
-  alpha = clamp(alpha + sun * 0.62, 0.0, 1.0);
+  /* The sun over everything, so nothing on the plain occludes the source. */
+  /* Held off pure white: a disc at full white reads as a lens flare rather
+     than as a body with a colour. */
+  vec3 lit = mix(uColor * 1.2, vec3(1.0), disc * 0.4);
+  float sunA = clamp(disc + bloom * 0.55, 0.0, 1.0);
+  col = mix(col, lit, sunA);
+  alpha = clamp(alpha + sunA, 0.0, 1.0);
 
   outColor = vec4(col, alpha);
 }`
@@ -209,13 +222,19 @@ export function ShaderSky() {
     }
 
     let frame = 0
+    let eased = 0
     const start = performance.now()
 
     const draw = () => {
       size()
       const doc = document.documentElement
       const max = doc.scrollHeight - window.innerHeight
-      gl.uniform1f(uScroll, max > 0 ? Math.min(window.scrollY / max, 1) : 0)
+      /* Eased toward the scroll rather than pinned to it. A camera driven
+         one to one with the wheel steps as fast as the wheel does, which is
+         what made the climb feel like jumps rather than a move. */
+      const target = max > 0 ? Math.min(window.scrollY / max, 1) : 0
+      eased += (target - eased) * 0.06
+      gl.uniform1f(uScroll, eased)
       /* Time stops for a reader who asked not to be moved. The sun still
          responds to scrolling, because that is their own gesture rather than
          something happening at them. */
