@@ -261,11 +261,26 @@ export const contentArt: Record<string, ReactNode> = {
    */
   image: (
     <>
+      <defs>
+        {/* The frame is a window and the picture is behind it, so the picture is
+            clipped to it. Not decoration: the ridges are flush with the frame on
+            three sides at rest, so the hover scale pushed them straight out and
+            the card grew a grey wedge hanging off its own edge. */}
+        <clipPath id="helixArtImageFrame">
+          <rect height="112" rx="8" width="224" x="48" y="44" />
+        </clipPath>
+      </defs>
       <rect className="artSunken" height="112" rx="8" width="224" x="48" y="44" />
-      <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
-        <circle className="artInk" cx="96" cy="80" fillOpacity="0.28" r="12" />
-        <path className="artInk" d="M48 156v-24l40-32 34 28 30-24 48 52z" fillOpacity="0.28" />
-        <path className="artInk" d="M136 156l40-36 96 36z" fillOpacity="0.55" />
+      {/* The clip is on a group of its own, outside the one that moves. A
+          `clip-path` on the moving group would resolve in that group's own
+          space, which is the space the scale just changed, so it would grow
+          with the thing it is supposed to be holding in. */}
+      <g clipPath="url(#helixArtImageFrame)">
+        <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
+          <circle className="artInk" cx="96" cy="80" fillOpacity="0.28" r="12" />
+          <path className="artInk" d="M48 156v-24l40-32 34 28 30-24 48 52z" fillOpacity="0.28" />
+          <path className="artInk" d="M136 156l40-36 96 36z" fillOpacity="0.55" />
+        </g>
       </g>
       <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
     </>
