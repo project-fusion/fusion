@@ -750,9 +750,15 @@ one, and nothing selects on it. */
   textContent?: string | number;
 };
 
-export type HelixBaseBreadcrumbsProps = {};
+export type HelixBaseBreadcrumbsProps = {
+  /** Whether a trail that does not fit hides its middle. */
+  collapse?: HelixBaseBreadcrumbs["collapse"];
+};
 
 export type HelixBaseBreadcrumbsSolidJsProps = {
+  /** Whether a trail that does not fit hides its middle. */
+  "prop:collapse"?: HelixBaseBreadcrumbs["collapse"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -10876,17 +10882,48 @@ export type CustomElements = {
    * Items are slotted rather than wrapped, so they are `<ol>` children in the flat
    * tree and each carries `role="listitem"` itself.
    *
+   * **`collapse` hides the middle, and only ever the middle.** A trail that does
+   * not fit keeps its root and its current page, because those are the two a
+   * reader is orienting by: the first says where the tree begins and the last says
+   * where they are. Everything between them goes behind one trigger.
+   *
+   * **The server sends the whole trail, and the client only ever removes.** There
+   * is no width to measure without a DOM, so nothing is hidden until
+   * `CollapseController` has measured, and a reader with no JavaScript keeps every
+   * crumb. That is the right answer rather than a fallback, and this arrangement
+   * cannot leave them with less.
+   *
+   * **The overflow control is the consumer's, slotted in.** Rendering a menu here
+   * would put `Menu`, and the popover machinery under it, into anything that
+   * imports a breadcrumb trail, which is a lot to carry for a trail that usually
+   * fits. So the trail hides crumbs and reports which, and whatever is slotted as
+   * `overflow` decides how to show them. It appears only while something is
+   * actually hidden.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `collapse`: Whether a trail that does not fit hides its middle.
+   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
+   *
+   * Elements rather than data, so a consumer reads `href` and text off the same
+   * objects they wrote. Handing over a copy would be a second version of the
+   * trail to keep in step. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
+   * - `overflow`: The box holding the overflow control.
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps & BaseProps<HelixBaseBreadcrumbs> & BaseEvents
@@ -19526,17 +19563,48 @@ export type CustomElementsSolidJs = {
    * Items are slotted rather than wrapped, so they are `<ol>` children in the flat
    * tree and each carries `role="listitem"` itself.
    *
+   * **`collapse` hides the middle, and only ever the middle.** A trail that does
+   * not fit keeps its root and its current page, because those are the two a
+   * reader is orienting by: the first says where the tree begins and the last says
+   * where they are. Everything between them goes behind one trigger.
+   *
+   * **The server sends the whole trail, and the client only ever removes.** There
+   * is no width to measure without a DOM, so nothing is hidden until
+   * `CollapseController` has measured, and a reader with no JavaScript keeps every
+   * crumb. That is the right answer rather than a fallback, and this arrangement
+   * cannot leave them with less.
+   *
+   * **The overflow control is the consumer's, slotted in.** Rendering a menu here
+   * would put `Menu`, and the popover machinery under it, into anything that
+   * imports a breadcrumb trail, which is a lot to carry for a trail that usually
+   * fits. So the trail hides crumbs and reports which, and whatever is slotted as
+   * `overflow` decides how to show them. It appears only while something is
+   * actually hidden.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `collapse`: Whether a trail that does not fit hides its middle.
+   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
+   *
+   * Elements rather than data, so a consumer reads `href` and text off the same
+   * objects they wrote. Handing over a copy would be a second version of the
+   * trail to keep in step. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
+   * - `overflow`: The box holding the overflow control.
    */
   "helix-base-breadcrumbs": Partial<
     HelixBaseBreadcrumbsProps &

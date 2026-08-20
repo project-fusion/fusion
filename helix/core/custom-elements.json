@@ -92,6 +92,89 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/collapse-controller/collapse-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Decides which children do not fit, so a container can collapse the rest.\n\n**Deliberately not a `<helix-resize-observer>`.** It reacts to lifecycle and\nintroduces no property or method a consumer sets, which is the line this\nlibrary draws between a controller and a component. An element that draws\nnothing and holds nothing would be a tag whose only purpose is to give a\ntemplate language an API that JSX already has.\n\n**It reports, and never writes.** The host decides what hiding means: a\nbreadcrumb trail hides the middle and keeps the ends, a toolbar might hide\nfrom one end, and a tab bar might scroll instead. Writing `hidden` from here\nwould settle that for everyone, and settle it wrong for two of the three.\n\n**Always measures the full set.** The obvious build hides an item, remeasures\nand hides another until it fits, which is a loop over a layout that changes\nunder it and which cannot ever expand again: once an item is hidden it no\nlonger contributes a width, so the container looks like it fits and nothing\nis ever restored. So every item's width is taken while all of them are shown,\nand what fits is arithmetic on numbers that do not move.\n\n**Client only, and that is the contract rather than a limitation.** There is\nno width on a server, so the host renders every item and this only ever takes\nsome away. A reader with no JavaScript gets the whole set, which is the right\nanswer, and the enhancement is unable to leave them with less than that.",
+          "name": "CollapseController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "fits",
+              "description": "How many items fit, counted from the *end*.\n\nThe end rather than the start, because what collapses keeps its outermost\nitems: a trail keeps where you are, and a path keeps its root. The host\npairs this with however many it keeps at the front."
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Recomputes what fits, from widths taken while everything is shown.\n\nThe host calls this after its own update as well, because an item arriving\nor leaving changes the answer and no resize accompanies it."
+            },
+            {
+              "kind": "method",
+              "name": "set",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CollapseController",
+          "declaration": {
+            "name": "CollapseController",
+            "module": "src/controllers/collapse-controller/collapse-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/command-controller/command-controller.ts",
       "declarations": [
         {
@@ -2006,6 +2089,22 @@
           "declaration": {
             "name": "AriaForwardOptions",
             "module": "./controllers/aria-forward-controller/aria-forward-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CollapseController",
+          "declaration": {
+            "name": "CollapseController",
+            "module": "./controllers/collapse-controller/collapse-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CollapseOptions",
+          "declaration": {
+            "name": "CollapseOptions",
+            "module": "./controllers/collapse-controller/collapse-controller.js"
           }
         },
         {

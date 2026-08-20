@@ -856,9 +856,15 @@ one, and nothing selects on it. */
   textContent?: string | number;
 };
 
-export type HelixBreadcrumbsProps = {};
+export type HelixBreadcrumbsProps = {
+  /** Whether a trail that does not fit hides its middle. */
+  collapse?: HelixBreadcrumbs["collapse"];
+};
 
 export type HelixBreadcrumbsSolidJsProps = {
+  /** Whether a trail that does not fit hides its middle. */
+  "prop:collapse"?: HelixBreadcrumbs["collapse"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -12257,11 +12263,23 @@ export type CustomElements = {
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `collapse`: Whether a trail that does not fit hides its middle.
+   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
+   *
+   * Elements rather than data, so a consumer reads `href` and text off the same
+   * objects they wrote. Handing over a copy would be a second version of the
+   * trail to keep in step. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
    *
    * ## CSS Custom Properties
    *
@@ -12274,6 +12292,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
+   * - `overflow`: The box holding the overflow control.
    */
   "helix-breadcrumbs": Partial<
     HelixBreadcrumbsProps & BaseProps<HelixBreadcrumbs> & BaseEvents
@@ -21134,11 +21153,23 @@ export type CustomElementsSolidJs = {
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `collapse`: Whether a trail that does not fit hides its middle.
+   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
+   *
+   * Elements rather than data, so a consumer reads `href` and text off the same
+   * objects they wrote. Handing over a copy would be a second version of the
+   * trail to keep in step. (property only) (readonly)
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
    * - `(default)`: The trail's items, in order from root to current page.
+   * - `overflow`: Shown when crumbs are hidden, usually a menu of them.
    *
    * ## CSS Custom Properties
    *
@@ -21151,6 +21182,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `list`: The ordered list.
+   * - `overflow`: The box holding the overflow control.
    */
   "helix-breadcrumbs": Partial<
     HelixBreadcrumbsProps &

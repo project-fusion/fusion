@@ -3063,6 +3063,14 @@
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
               }
+            },
+            {
+              "description": "The box holding the overflow control.",
+              "name": "overflow",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
             }
           ],
           "slots": [
@@ -3073,9 +3081,98 @@
                 "name": "HelixBaseBreadcrumbs",
                 "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
               }
+            },
+            {
+              "description": "Shown when crumbs are hidden, usually a menu of them.",
+              "name": "overflow",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "collapse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a trail that does not fit hides its middle.",
+              "attribute": "collapse",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "crumbs",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "privacy": "private",
+              "description": "The crumbs, in reading order.",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "hiddenAt",
+              "type": {
+                "text": "readonly number[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "Which crumbs are hidden, by index.\n\n`@state`, because it is measured rather than declared: a consumer setting\nit would be claiming a width the element can see for itself.\n\nNamed `hiddenAt` and not `hidden`, which is `HTMLElement`'s own property:\nshadowing it with an array made the element's own visibility a list of\nnumbers, and TypeScript caught it only because the base class declares it.",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "fit",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new CollapseController(this, { container: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"list\"]'), items: () => this.crumbs ?? [], trigger: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"overflow\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "overflowed",
+              "type": {
+                "text": "readonly HTMLElement[]"
+              },
+              "description": "The crumbs behind the trigger, in order, for whoever is showing them.\n\nElements rather than data, so a consumer reads `href` and text off the same\nobjects they wrote. Handing over a copy would be a second version of the\ntrail to keep in step.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "apply",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Turns a count of what fits into a set of hidden indices.\n\nThe first crumb and the last `fits` crumbs stay; the rest go. Written as\nindices rather than by writing `hidden` onto the elements, because the\nelements are the consumer's and this has to be able to give them back.",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            },
             {
               "kind": "field",
               "name": "internals",
@@ -3170,12 +3267,31 @@
               {
                 "description": "A trail whose crumbs are the links, with an icon on the first.",
                 "slug": "links"
+              },
+              {
+                "description": "A trail that hides its middle when it will not fit, behind a menu you supply.",
+                "slug": "overflow"
               }
             ],
             "source": "helix/web/src/breadcrumbs"
           },
           "tagName": "helix-breadcrumbs",
           "customElement": true,
+          "attributes": [
+            {
+              "name": "collapse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a trail that does not fit hides its middle.",
+              "fieldName": "collapse",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            }
+          ],
           "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
           "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
         }

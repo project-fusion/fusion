@@ -33,3 +33,31 @@ describe('breadcrumbs server output', () => {
     expect(partTag(ssr(trail), 'separator')).toContain('aria-hidden="true"')
   })
 })
+
+/* The contract that matters most, and the one only a server can prove: the
+   trail arrives whole. Collapse needs a width, a server has none, so a reader
+   with no JavaScript keeps every crumb and the enhancement can only remove. */
+describe('breadcrumbs collapse, server rendered', () => {
+  const wide = html`<helix-breadcrumbs collapse>
+    <helix-breadcrumb href="/">Home</helix-breadcrumb>
+    <helix-breadcrumb href="/a">A</helix-breadcrumb>
+    <helix-breadcrumb href="/b">B</helix-breadcrumb>
+    <helix-breadcrumb current>C</helix-breadcrumb>
+  </helix-breadcrumbs>`
+
+  test('hides no crumb, whatever collapse says', () => {
+    const markup = withoutStyles(ssr(wide))
+    /* The crumbs' own opening tags, not the string `hidden` anywhere in the
+       markup: that also matches `aria-hidden` on every separator and the
+       trigger's own `hidden`, which is correct because nothing overflowed. A
+       bare `toContain` here passes and fails for reasons unrelated to what is
+       being asked. */
+    const crumbs = markup.match(/<helix-breadcrumb\s[^>]*>/g) ?? []
+    expect(crumbs.filter((tag) => tag.includes('hidden'))).toEqual([])
+  })
+
+  test('renders every crumb', () => {
+    const markup = withoutStyles(ssr(wide))
+    expect(markup.match(/<helix-breadcrumb[\s>]/g)?.length).toBe(4)
+  })
+})

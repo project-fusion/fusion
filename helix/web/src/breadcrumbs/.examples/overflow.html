@@ -1,0 +1,26 @@
+<!-- @summary A trail that hides its middle when it will not fit, behind a menu you supply. -->
+
+<helix-breadcrumbs
+  aria-label="Breadcrumb"
+  collapse
+>
+  <helix-breadcrumb href="/">Home</helix-breadcrumb>
+  <helix-breadcrumb href="/design">Design</helix-breadcrumb>
+  <helix-breadcrumb href="/design/components">Components</helix-breadcrumb>
+  <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
+  <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
+
+  <!-- Yours, so a trail never carries a menu it usually does not open. -->
+  <helix-menu
+    label="Hidden steps"
+    slot="overflow"
+  >
+    <helix-icon-button
+      appearance="ghost"
+      label="Show hidden steps"
+      slot="trigger"
+    >
+      <helix-icon name="dots-three-vertical"></helix-icon>
+    </helix-icon-button>
+  </helix-menu>
+</helix-breadcrumbs>

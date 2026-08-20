@@ -107,7 +107,10 @@
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  gap: var(--helix-space-2xs);
+  /* `xs`, the next rung. A mark and the word it belongs to were 4px apart,
+     which reads as the icon being part of the word rather than beside it. The
+     scale offers 4, 8, 12, so there is no smaller step to take. */
+  gap: var(--helix-space-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   text-decoration: none;
 }
@@ -119,4 +122,11 @@ a[part="link"]:hover {
 /* The page the reader is on reads as where they are, not as somewhere to go. */
 :host([current]) [part="link"] {
   color: var(--helix-color-foreground);
+}
+
+/* A hidden crumb takes no room. `[hidden]` is `display: none` in the UA sheet
+   only for elements that have not been given another display, and the host is
+   `inline-flex` here, so the attribute would otherwise do nothing at all. */
+:host([hidden]) {
+  display: none;
 }
