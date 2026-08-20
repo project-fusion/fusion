@@ -20919,6 +20919,17 @@
               "description": "Where a full-bleed band starts, which is the only number it needs.\n\nThe placing pass is off for that appearance, so nothing else is measuring:\na band spans the viewport and has only one degree of freedom, how far down\nit sits, and that is the bottom of the trigger in viewport coordinates\nbecause the panel is fixed. A header that scrolls takes the band with it,\nwhich is what a panel hanging off a header should do.\n\nWritten as a custom property rather than an inline `top`, so the stylesheet\nkeeps the arrangement and this contributes the one measurement it cannot\nmake. Nothing to do for the card, which the controller places."
             },
             {
+              "kind": "method",
+              "name": "bar",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "description": "The bottom edge of the bar this hangs from.\n\nThe trigger's own bottom is the obvious answer and is the wrong one: a\nheader is taller than the word inside it, so a band starting at the word\nstarts partway up the header, over its lower padding and its border.\nMeasured: trigger bottom 44, header bottom 57, thirteen pixels of header\nwith a band drawn across it.\n\n**The first ancestor as wide as the window, which is a fact and not a tag\nname.** A band spans the viewport, so what it should hang from is whatever\nelse does: that is what makes something a bar. Asking for `helix-app-header`\nby name would make this element know about that one, which is the coupling\n`Menu` is careful not to have with `Drilldown`, and would leave a consumer\nwho wrote their own header with a band across it.\n\n`body` ends the walk. It is as wide as the window and is not a bar, and its\nbottom is the foot of the page: without the guard a megamenu on a plain page\nwould put its band down there. Nothing found means nothing to hang from, and\nthe trigger is the honest answer again."
+            },
+            {
               "kind": "field",
               "name": "OPEN_DELAY",
               "type": {
@@ -20990,6 +21001,13 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Keeps a band under its bar while the page moves, and closes it when the bar\ngoes.\n\nThe band is fixed and its offset is measured once, when it opens. That is\nfine until the page scrolls: a header that scrolls away leaves the band\npinned where the header used to be, open, in the middle of the page with\nnothing above it. Measured at a scroll of 300: header bottom at -243 and the\nband still sitting at 57.\n\nThe card has none of this, because the floating controller follows its\nanchor. Turning that off for the band, which has nothing to be placed\nagainst, took the scroll handling with it, and this is the half that was\nstill wanted.\n\nA sticky bar does not move, so re-measuring returns the same number and the\nband stays where it is. `requestOpen` rather than `close`, because closing\nputs focus back on the trigger and a reader who has scrolled away should not\nbe dragged back up to it."
             },
             {
               "kind": "field",
@@ -41567,7 +41585,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "**Not `Steps`, and the difference is what the thing is for.** A stepper is a\nprocess a reader is moving through: it has a stage they are on, stages they\nhave finished, and stages ahead, so it carries `active` and `complete` and\nnumbers itself. A timeline is a record of events that already happened, or are\nscheduled to. Nothing is current, nothing is complete, and what each entry\ncarries instead is a time. Building this as an appearance of `Steps` would\nhave meant a stepper with no step you are on.\n\nWhat it does take from `Steps` is the connector. Each entry draws the line\nthat arrives at it and hides it when it is first, which needs neither an index\nnor a parent that counts: `:host(:first-child)` is the whole of it, resolved\nat layout with no script, so a server's markup is right before anything runs.\n\n`role=\"list\"` on the host rather than an `<ol>` in the shadow root, for the\nreason `Steps` gives: the entries are the consumer's elements in the light\nDOM, so a list element here would be a list whose items are somewhere else.",
+          "description": "**Not `Steps`, and the difference is what the thing is for.** A stepper is a\nprocess a reader is moving through: it has a stage they are on, stages they\nhave finished, and stages ahead, so it carries `active` and `complete` and\nnumbers itself. A timeline is a record of events that already happened, or are\nscheduled to. Nothing is current, nothing is complete, and what each entry\ncarries instead is a time. Building this as an appearance of `Steps` would\nhave meant a stepper with no step you are on.\n\nWhat it does take from `Steps` is the connector. Each entry draws the line\nthat arrives at it and hides it when it is first, which needs neither an index\nnor a parent that counts: `:host(:first-child)` is the whole of it, resolved\nat layout with no script, so a server's markup is right before anything runs.\n\n`role=\"list\"` on the host rather than an `<ol>` in the shadow root, for the\nreason `Steps` gives: the entries are the consumer's elements in the light\nDOM, so a list element here would be a list whose items are somewhere else.\n\n**It runs down the page and has no horizontal form.** There was one, and it\nwas removed rather than tuned: laid along a line there is no room for the\ntime or the sentence that are the whole reason to reach for a timeline, so\nwhat survives is a mark and a short label, and that is a stepper. `Steps` is\nalready horizontal by default and already draws it, so the horizontal version\nof this was a second component rendering the same picture from thinner data.\nA run of stages along a page is `Steps`.",
           "name": "HelixBaseTimeline",
           "slots": [
             {
@@ -41576,16 +41594,6 @@
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | undefined"
-              },
-              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
-              "attribute": "orientation",
-              "reflects": true
-            },
             {
               "kind": "field",
               "name": "label",
@@ -41667,14 +41675,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'horizontal' | undefined"
-              },
-              "description": "Which way time runs. Down the page, or along it.\n\nReflected, because the entries read it: an entry draws its own connector and\nhas to know which edge that line arrives on, and a property on this element\nis not something its light-DOM children can select against. The attribute\nis, through `:host-context`.",
-              "fieldName": "orientation"
-            },
             {
               "name": "label",
               "type": {

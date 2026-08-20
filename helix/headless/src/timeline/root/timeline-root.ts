@@ -23,6 +23,14 @@ import { property } from 'lit/decorators.js'
  * reason `Steps` gives: the entries are the consumer's elements in the light
  * DOM, so a list element here would be a list whose items are somewhere else.
  *
+ * **It runs down the page and has no horizontal form.** There was one, and it
+ * was removed rather than tuned: laid along a line there is no room for the
+ * time or the sentence that are the whole reason to reach for a timeline, so
+ * what survives is a mark and a short label, and that is a stepper. `Steps` is
+ * already horizontal by default and already draws it, so the horizontal version
+ * of this was a second component rendering the same picture from thinner data.
+ * A run of stages along a page is `Steps`.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -33,17 +41,6 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-base-timeline')
 export class HelixBaseTimeline extends HelixElement {
-  /**
-   * Which way time runs. Down the page, or along it.
-   *
-   * Reflected, because the entries read it: an entry draws its own connector and
-   * has to know which edge that line arrives on, and a property on this element
-   * is not something its light-DOM children can select against. The attribute
-   * is, through `:host-context`.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal'
-
   /** Names the record, for a reader arriving at it out of context. */
   @property()
   label = ''

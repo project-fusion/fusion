@@ -8,9 +8,9 @@ beforeAll(async () => {
 
 type Entry = HTMLElement & { datetime: string; updateComplete: Promise<boolean> }
 
-const timeline = async (entries: string, attrs = ''): Promise<HTMLElement> => {
+const timeline = async (entries: string): Promise<HTMLElement> => {
   const host = (await mount(
-    `<helix-timeline label="History"${attrs}>${entries}</helix-timeline>`,
+    `<helix-timeline label="History">${entries}</helix-timeline>`,
   )) as HTMLElement & { updateComplete: Promise<boolean> }
   await host.updateComplete
   for (const one of host.querySelectorAll('helix-timeline-item')) {
@@ -117,63 +117,6 @@ describe('a timeline', () => {
         return Math.round(box.left + box.width / 2)
       })
       expect(new Set(centres).size).toBe(1)
-    })
-
-    test('turned along the page, the rail turns with it', async () => {
-      const host = await timeline(three, ' orientation="horizontal"')
-      const entry = host.querySelector('helix-timeline-item') as Entry
-      expect(getComputedStyle(host).flexDirection).toBe('row')
-      expect(getComputedStyle(part(entry, 'rail') as HTMLElement).flexDirection).toBe('row')
-    })
-
-    test('and the line reaches the end of the record', async () => {
-      /* Every entry taking an equal share of the width puts each mark at the
-         start of its own share, which leaves the last share empty: the line
-         stopped a whole track short of the end with a label sitting on its own
-         in the gap. Measured at 900 wide, 193 pixels of nothing after the last
-         mark. The test is that what is left after the last mark is smaller than
-         the space between two marks, which a dead track never is. */
-      const host = await timeline(three, ' orientation="horizontal"')
-      const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-      const at = (one: Entry) => (part(one, 'marker') as HTMLElement).getBoundingClientRect()
-      const spacing = at(entries[1]).left - at(entries[0]).left
-      const after = host.getBoundingClientRect().right - at(entries.at(-1) as Entry).right
-      expect(after).toBeLessThan(spacing)
-    })
-
-    test('and each mark is centred over the entry it belongs to', async () => {
-      /* `Steps` lays a horizontal run out this way and it is the arrangement
-         that works: the mark centred in its track with half a line either side.
-         The first version put the mark at the start of its track with only a
-         trailing line, so it sat in the corner of a wide box with its label
-         stretching away to the right and nothing saying which belonged to which. */
-      const host = await timeline(three, ' orientation="horizontal"')
-      const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-      for (const one of entries) {
-        const item = one.getBoundingClientRect()
-        const mark = (part(one, 'marker') as HTMLElement).getBoundingClientRect()
-        expect(Math.round(mark.left + mark.width / 2)).toBe(Math.round(item.left + item.width / 2))
-      }
-    })
-
-    test('and the rule runs level from one mark to the next', async () => {
-      /* Every segment on one line. The column stretches the trailing half down
-         the rail, and stretch with a definite thickness is not stretch, it is
-         flex-start: turned into a row it put the trail at the top of the rail
-         while the lead stayed on the middle, and the rule stepped nine pixels at
-         every mark. It measured as continuous the whole time, because the boxes
-         abutted horizontally; only the heights differed. */
-      const host = await timeline(three, ' orientation="horizontal"')
-      const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-      const middles = new Set<number>()
-      for (const one of entries) {
-        const lead = (part(one, 'connector') as HTMLElement).getBoundingClientRect()
-        middles.add(Math.round(lead.top + lead.height / 2))
-        const rail = part(one, 'rail') as HTMLElement
-        const trail = getComputedStyle(rail, '::after')
-        expect(trail.alignSelf).toBe('center')
-      }
-      expect(middles.size).toBe(1)
     })
   }
 })

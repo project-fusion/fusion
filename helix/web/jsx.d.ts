@@ -10303,25 +10303,11 @@ know what instant it names. */
 };
 
 export type HelixTimelineProps = {
-  /** Which way time runs. Down the page, or along it.
-
-Reflected, because the entries read it: an entry draws its own connector and
-has to know which edge that line arrives on, and a property on this element
-is not something its light-DOM children can select against. The attribute
-is, through `:host-context`. */
-  orientation?: HelixTimeline["orientation"];
   /** Names the record, for a reader arriving at it out of context. */
   label?: HelixTimeline["label"];
 };
 
 export type HelixTimelineSolidJsProps = {
-  /** Which way time runs. Down the page, or along it.
-
-Reflected, because the entries read it: an entry draws its own connector and
-has to know which edge that line arrives on, and a property on this element
-is not something its light-DOM children can select against. The attribute
-is, through `:host-context`. */
-  "prop:orientation"?: HelixTimeline["orientation"];
   /** Names the record, for a reader arriving at it out of context. */
   "prop:label"?: HelixTimeline["label"];
 
@@ -19582,12 +19568,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way time runs. Down the page, or along it.
-   *
-   * Reflected, because the entries read it: an entry draws its own connector and
-   * has to know which edge that line arrives on, and a property on this element
-   * is not something its light-DOM children can select against. The attribute
-   * is, through `:host-context`.
    * - `label`: Names the record, for a reader arriving at it out of context.
    *
    * ## Slots
@@ -28729,12 +28709,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way time runs. Down the page, or along it.
-   *
-   * Reflected, because the entries read it: an entry draws its own connector and
-   * has to know which edge that line arrives on, and a property on this element
-   * is not something its light-DOM children can select against. The attribute
-   * is, through `:host-context`.
    * - `label`: Names the record, for a reader arriving at it out of context.
    *
    * ## Slots

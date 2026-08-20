@@ -65,9 +65,9 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 214 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 208 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 256 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 221 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 219 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 209 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 110 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 68 |
@@ -150,7 +150,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 174 |
-| `--helix-border-thick` | `2px` | 55 |
+| `--helix-border-thick` | `2px` | 53 |
 
 ## shadow
 

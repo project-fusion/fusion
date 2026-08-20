@@ -9024,25 +9024,11 @@ know what instant it names. */
 };
 
 export type HelixBaseTimelineProps = {
-  /** Which way time runs. Down the page, or along it.
-
-Reflected, because the entries read it: an entry draws its own connector and
-has to know which edge that line arrives on, and a property on this element
-is not something its light-DOM children can select against. The attribute
-is, through `:host-context`. */
-  orientation?: HelixBaseTimeline["orientation"];
   /** Names the record, for a reader arriving at it out of context. */
   label?: HelixBaseTimeline["label"];
 };
 
 export type HelixBaseTimelineSolidJsProps = {
-  /** Which way time runs. Down the page, or along it.
-
-Reflected, because the entries read it: an entry draws its own connector and
-has to know which edge that line arrives on, and a property on this element
-is not something its light-DOM children can select against. The attribute
-is, through `:host-context`. */
-  "prop:orientation"?: HelixBaseTimeline["orientation"];
   /** Names the record, for a reader arriving at it out of context. */
   "prop:label"?: HelixBaseTimeline["label"];
 
@@ -17923,16 +17909,18 @@ export type CustomElements = {
    * reason `Steps` gives: the entries are the consumer's elements in the light
    * DOM, so a list element here would be a list whose items are somewhere else.
    *
+   * **It runs down the page and has no horizontal form.** There was one, and it
+   * was removed rather than tuned: laid along a line there is no room for the
+   * time or the sentence that are the whole reason to reach for a timeline, so
+   * what survives is a mark and a short label, and that is a stepper. `Steps` is
+   * already horizontal by default and already draws it, so the horizontal version
+   * of this was a second component rendering the same picture from thinner data.
+   * A run of stages along a page is `Steps`.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way time runs. Down the page, or along it.
-   *
-   * Reflected, because the entries read it: an entry draws its own connector and
-   * has to know which edge that line arrives on, and a property on this element
-   * is not something its light-DOM children can select against. The attribute
-   * is, through `:host-context`.
    * - `label`: Names the record, for a reader arriving at it out of context.
    *
    * ## Slots
@@ -26828,16 +26816,18 @@ export type CustomElementsSolidJs = {
    * reason `Steps` gives: the entries are the consumer's elements in the light
    * DOM, so a list element here would be a list whose items are somewhere else.
    *
+   * **It runs down the page and has no horizontal form.** There was one, and it
+   * was removed rather than tuned: laid along a line there is no room for the
+   * time or the sentence that are the whole reason to reach for a timeline, so
+   * what survives is a mark and a short label, and that is a stepper. `Steps` is
+   * already horizontal by default and already draws it, so the horizontal version
+   * of this was a second component rendering the same picture from thinner data.
+   * A run of stages along a page is `Steps`.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way time runs. Down the page, or along it.
-   *
-   * Reflected, because the entries read it: an entry draws its own connector and
-   * has to know which edge that line arrives on, and a property on this element
-   * is not something its light-DOM children can select against. The attribute
-   * is, through `:host-context`.
    * - `label`: Names the record, for a reader arriving at it out of context.
    *
    * ## Slots

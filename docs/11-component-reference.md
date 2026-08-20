@@ -5181,7 +5181,6 @@ event and the next. Every entry draws its own mark and its own line.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | `label` | `string` | `''` | `HelixBaseTimeline` | Names the record, for a reader arriving at it out of context. |
-| `orientation` | `orientation` | `'horizontal' \| undefined` | - | `HelixBaseTimeline` | Which way time runs. Down the page, or along it. |
 
 #### Slots
 
