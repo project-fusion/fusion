@@ -13,10 +13,6 @@ export interface Destination {
    */
   href: string
   /**
-   * The mark down the side of the row, from the curated set in `helix/icons`.
-   */
-  icon: string
-  /**
    * The sentence under the name, which is what the panel is for.
    */
   summary: string
@@ -51,6 +47,17 @@ export interface Product {
    * Its page, which is also its vertical's page where the two collapse.
    */
   href: string
+  /**
+   * The product's own mark, drawn for it rather than borrowed from the utility
+   * set. `helix/icons/raw` is where the marks that are not Phosphor live.
+   *
+   * **Only products carry one.** A destination inside a product is navigation,
+   * and a generic utility glyph is the right weight for that: giving every row
+   * a drawing of its own would put four marks in a column and leave nothing to
+   * say which of them is the product. The rows carry no mark at all now, which
+   * the panel's grid already allows for.
+   */
+  mark: string
   /**
    * The evocative name, which is what the masthead says.
    */
@@ -92,18 +99,17 @@ export const PRODUCTS: Product[] = [
     destinations: [
       {
         href: '/helix',
-        icon: 'cube',
         summary: 'Sixty-five families, each with its API and a running example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
-        icon: 'layout',
         summary: 'Edit an example and watch it render, with the source beside it.',
         title: 'Sandbox',
       },
     ],
     href: '/helix',
+    mark: 'helix',
     name: 'Helix',
     role: 'The DNA',
     stage: 'Building',
@@ -115,12 +121,12 @@ export const PRODUCTS: Product[] = [
     destinations: [
       {
         href: '/cortex',
-        icon: 'pulse',
         summary: 'What a system knows, where it learned it, and how far to trust it.',
         title: 'Overview',
       },
     ],
     href: '/cortex',
+    mark: 'cortex',
     name: 'Cortex',
     role: 'The mind',
     stage: 'Building',

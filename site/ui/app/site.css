@@ -2167,3 +2167,13 @@ helix-drawer helix-tree {
 .serviceBody {
   inline-size: 100%;
 }
+
+/* The product mark in a megamenu column head.
+ *
+ * A shade larger than the label it sits beside. The heading is `text-xs` and an
+ * icon sized to match it comes out at sixteen, which is a utility glyph's size:
+ * this is the one thing in the column that says which product the column is, so
+ * it carries a little more weight than the words do. */
+.productMark {
+  --icon-size: 1.125rem;
+}
