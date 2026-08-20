@@ -11525,6 +11525,14 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "pause-label"?: HelixVideo["pauseLabel"];
   /** And while it would stop it. */
   pauseLabel?: HelixVideo["pauseLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "loading-label"?: HelixVideo["loadingLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  loadingLabel?: HelixVideo["loadingLabel"];
+  /** And what they are told when it will not play at all. */
+  "error-label"?: HelixVideo["errorLabel"];
+  /** And what they are told when it will not play at all. */
+  errorLabel?: HelixVideo["errorLabel"];
 
   /** Fired when the reader asks for the next item. */
   "onhelix-next"?: (e: HelixVideoHelixNextElementEvent) => void;
@@ -11708,6 +11716,14 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "attr:pause-label"?: HelixVideo["pauseLabel"];
   /** And while it would stop it. */
   "prop:pauseLabel"?: HelixVideo["pauseLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "attr:loading-label"?: HelixVideo["loadingLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "prop:loadingLabel"?: HelixVideo["loadingLabel"];
+  /** And what they are told when it will not play at all. */
+  "attr:error-label"?: HelixVideo["errorLabel"];
+  /** And what they are told when it will not play at all. */
+  "prop:errorLabel"?: HelixVideo["errorLabel"];
   /** Fired when the reader asks for the next item. */
   "on:helix-next"?: (e: HelixVideoHelixNextElementEvent) => void;
   /** Fired when they ask for the previous one. */
@@ -20514,6 +20530,8 @@ export type CustomElements = {
    * regardless, because a reader who stopped it is deciding what to do next.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
+   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
+   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    *
    * ## Events
    *
@@ -20565,6 +20583,9 @@ export type CustomElements = {
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
+   * - `failure`: What is said when the source will not play.
+   * - `loading`: What is said while the picture waits for more of itself.
+   * - `loading-mark`: The part of that which spins.
    * - `cue`: The caption on screen now, drawn by this element.
    * - `controls`: The bar along the bottom.
    * - `play`: Play and pause.
@@ -29690,6 +29711,8 @@ export type CustomElementsSolidJs = {
    * regardless, because a reader who stopped it is deciding what to do next.
    * - `play-label`/`playLabel`: What the play control is called while it would start the video.
    * - `pause-label`/`pauseLabel`: And while it would stop it.
+   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
+   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    *
    * ## Events
    *
@@ -29741,6 +29764,9 @@ export type CustomElementsSolidJs = {
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
+   * - `failure`: What is said when the source will not play.
+   * - `loading`: What is said while the picture waits for more of itself.
+   * - `loading-mark`: The part of that which spins.
    * - `cue`: The caption on screen now, drawn by this element.
    * - `controls`: The bar along the bottom.
    * - `play`: Play and pause.

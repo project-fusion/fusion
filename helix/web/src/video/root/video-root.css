@@ -624,3 +624,57 @@
 [part="remote"][aria-pressed="true"] {
   color: var(--helix-color-primary);
 }
+
+/* Waiting, and saying so over the picture.
+ *
+ * Centred on the stage rather than in a corner, because it is standing in for
+ * the frame that has not arrived and that is where a reader is already looking.
+ * On the media surface tokens, so it reads on a picture rather than on the page:
+ * whatever is behind it is a photograph, and a panel in page colours over a
+ * photograph is a panel nobody can read. */
+[part="loading"],
+[part="failure"] {
+  align-items: center;
+  background-color: color-mix(in oklab, var(--helix-color-surface-media) 72%, transparent);
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground-media);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The ring that turns. Drawn here rather than by slotting `Loader`, because the
+   headless tier renders this and cannot reach for a styled element without
+   depending on the tier above it. */
+[part="loading-mark"] {
+  /* The same 0.8s `Loader` turns at, so two spinners on one page agree. */
+  animation: video-spin 0.8s linear infinite;
+  block-size: var(--helix-size-icon-sm);
+  border: var(--helix-border-thick) solid
+    color-mix(in oklab, var(--helix-color-foreground-media) 30%, transparent);
+  border-block-start-color: var(--helix-color-foreground-media);
+  border-radius: var(--helix-radii-full);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-sm);
+}
+
+@keyframes video-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Still says it, and stops turning. A reader who asked for less motion still
+   needs to know the picture is waiting, so the words stay and the ring holds
+   still: the message was never the spinning. */
+@media (prefers-reduced-motion: reduce) {
+  [part="loading-mark"] {
+    animation: none;
+  }
+}

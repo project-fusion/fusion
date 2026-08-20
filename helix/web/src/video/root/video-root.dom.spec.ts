@@ -14,6 +14,86 @@ const player = async (markup = '<helix-video label="A clip" src="/clip.mp4"></he
   return host
 }
 
+describe('waiting for the picture', () => {
+  /* `paused` is defined rather than played for real, because whether a browser
+     decodes a file is not what is under test: which events this element listens
+     to is. */
+  const media = async (): Promise<{ host: Player; video: HTMLVideoElement }> => {
+    const host = await player()
+    const video = host.shadowRoot?.querySelector('video') as HTMLVideoElement
+    return { host, video }
+  }
+
+  test('a stall says so, and the start mark gets out of its way', async () => {
+    /* The case this covers is the one that looks like a bug: a picture frozen
+       mid-play with the scrubber stopped and nothing on screen saying why. */
+    const { host, video } = await media()
+    Object.defineProperty(video, 'paused', { configurable: true, value: false })
+    video.dispatchEvent(new Event('play'))
+    await host.updateComplete
+
+    video.dispatchEvent(new Event('waiting'))
+    await host.updateComplete
+    expect(part(host, 'loading')).not.toBeNull()
+    expect(part(host, 'start')).toBeNull()
+  })
+
+  test('and it is a live region, for the reader who cannot see it spin', async () => {
+    const { host, video } = await media()
+    video.dispatchEvent(new Event('waiting'))
+    await host.updateComplete
+    const said = part(host, 'loading') as HTMLElement
+    expect(said.getAttribute('role')).toBe('status')
+    expect(said.getAttribute('aria-live')).toBe('polite')
+    expect(said.textContent?.trim()).toContain('Loading')
+  })
+
+  test('the frame moving again takes it away', async () => {
+    const { host, video } = await media()
+    video.dispatchEvent(new Event('waiting'))
+    await host.updateComplete
+    expect(part(host, 'loading')).not.toBeNull()
+
+    video.dispatchEvent(new Event('playing'))
+    await host.updateComplete
+    expect(part(host, 'loading')).toBeNull()
+  })
+
+  test('a source that will not play says that instead, and says it loudly', async () => {
+    /* `alert` rather than `status`: nothing further is going to happen, and a
+       reader waiting politely for a video that will never load waits forever. */
+    const { host, video } = await media()
+    video.dispatchEvent(new Event('error'))
+    await host.updateComplete
+    const said = part(host, 'failure') as HTMLElement
+    expect(said).not.toBeNull()
+    expect(said.getAttribute('role')).toBe('alert')
+    expect(part(host, 'loading')).toBeNull()
+  })
+
+  test('and a new source clears the last one that failed', async () => {
+    /* A playlist pointing the player somewhere else must not go on showing the
+       error belonging to the entry before it. */
+    const { host, video } = await media()
+    video.dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(part(host, 'failure')).not.toBeNull()
+
+    video.dispatchEvent(new Event('loadstart'))
+    await host.updateComplete
+    expect(part(host, 'failure')).toBeNull()
+  })
+
+  test('nothing spins before anybody asks for playback', async () => {
+    /* A video that has loaded nothing is a poster with a play control over it,
+       which looks deliberate and is. A spinner there would say something is
+       happening when nothing is, on every video on a page. */
+    const host = await player()
+    expect(part(host, 'loading')).toBeNull()
+    expect(part(host, 'start')).not.toBeNull()
+  })
+})
+
 describe('the mark that starts it', () => {
   test('comes back when the source changes under a playing video', async () => {
     /* Assigning `src` runs the media load algorithm, which stops playback and

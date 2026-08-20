@@ -5735,9 +5735,11 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'plain' \| 'shadow' \| 'solid'` | `'shadow'` | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
+| `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixBaseVideo` | And what they are told when it will not play at all. |
 | `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |
 | `idleDelay` | `idle-delay` | `number` | `2500` | `HelixBaseVideo` | How long the bar waits after the pointer stops before it goes, in ms. |
 | `label` | `label` | `string` | `''` | `HelixBaseVideo` | Accessible name, since a video is not described by its filename. |
+| `loadingLabel` | `loading-label` | `string` | `'Loading'` | `HelixBaseVideo` | What a reader is told while the picture is waiting for more of itself. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts again at the end. |
 | `muted` | `muted` | `boolean` | `false` | `HelixBaseVideo` | Whether it starts silent, which is what an autoplaying video must do. |
 | `overflowControls` | `overflow-controls` | `string` | `''` | `HelixBaseVideo` | Controls that go behind one button instead of onto the bar, named the same way. |
@@ -5783,6 +5785,9 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
 | `video` | The video itself. |
 | `poster` | What covers it before it plays. |
+| `failure` | What is said when the source will not play. |
+| `loading` | What is said while the picture waits for more of itself. |
+| `loading-mark` | The part of that which spins. |
 | `cue` | The caption on screen now, drawn by this element. |
 | `controls` | The bar along the bottom. |
 | `play` | Play and pause. |

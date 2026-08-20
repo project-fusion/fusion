@@ -116,6 +116,9 @@ let owner: HTMLElement | undefined
  * target the keys are bound to.
  * @csspart video - The video itself.
  * @csspart poster - What covers it before it plays.
+ * @csspart failure - What is said when the source will not play.
+ * @csspart loading - What is said while the picture waits for more of itself.
+ * @csspart loading-mark - The part of that which spins.
  * @csspart cue - The caption on screen now, drawn by this element.
  * @csspart controls - The bar along the bottom.
  * @csspart play - Play and pause.
@@ -302,6 +305,33 @@ export class HelixBaseVideo extends HelixElement {
   /** And while it would stop it. */
   @property({ attribute: 'pause-label' })
   pauseLabel = 'Pause'
+
+  /** What a reader is told while the picture is waiting for more of itself. */
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading'
+
+  /** And what they are told when it will not play at all. */
+  @property({ attribute: 'error-label' })
+  errorLabel = 'This video could not be played'
+
+  /**
+   * Whether playback has stopped to wait for data.
+   *
+   * **Only ever after somebody asked for playback**, which is what `waiting`
+   * means: the element wanted the next frame and did not have it. Before that,
+   * a video that has loaded nothing is a poster with a play control over it,
+   * which looks deliberate and is. A spinner there would say something is
+   * happening when nothing is, on every video on the page.
+   *
+   * The case this covers is the one that looks like a bug: a picture frozen
+   * mid-play, the scrubber stopped, and nothing on screen saying why.
+   */
+  @state()
+  private buffering = false
+
+  /** Whether the source failed, which is the other thing a frozen frame can mean. */
+  @state()
+  private failed = false
 
   @state()
   private playing = false
@@ -553,9 +583,32 @@ export class HelixBaseVideo extends HelixElement {
      after a playlist pointed it at the next entry, so the start control it draws
      only when paused stayed hidden and there was nothing at all to press.
      Measured: `paused` true, `playing` true, no `pause` event in the log. */
+  private readonly handleWaiting = (): void => {
+    this.buffering = true
+  }
+
+  /* Anything that means the picture can move again. `loadstart` is in the list
+     because a new source clears the last one's failure: a playlist pointing the
+     player somewhere else must not keep showing the error from the entry
+     before. */
+  private readonly handleReady = (event: Event): void => {
+    this.buffering = false
+    if (event.type === 'loadstart') {
+      this.failed = false
+    }
+  }
+
+  private readonly handleError = (): void => {
+    this.buffering = false
+    this.failed = true
+  }
+
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
+    if (event.type === 'emptied' || event.type === 'pause') {
+      this.buffering = false
+    }
     if (event.type === 'play') {
       this.claimSession()
     }
@@ -1206,6 +1259,11 @@ export class HelixBaseVideo extends HelixElement {
         @pause=${this.handleState}
         @ended=${this.handleState}
         @emptied=${this.handleState}
+        @waiting=${this.handleWaiting}
+        @playing=${this.handleReady}
+        @canplay=${this.handleReady}
+        @loadstart=${this.handleReady}
+        @error=${this.handleError}
       >
         ${this.media.map((one) =>
           one.tag === 'track'
@@ -1234,6 +1292,35 @@ export class HelixBaseVideo extends HelixElement {
       ${this.cue === undefined ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
       <slot name="poster" part="poster"></slot>
       ${
+        /* A live region rather than a spinning box, because the reader who most
+           needs to be told the picture is waiting is the one who cannot see it
+           spin. `polite`, so it waits its turn, and it goes when the frame moves
+           again. */
+        this.buffering && !this.failed
+          ? html`<div
+              part="loading"
+              role="status"
+              aria-live="polite"
+            >
+              <span part="loading-mark" aria-hidden="true"></span>
+              ${this.loadingLabel}
+            </div>`
+          : nothing
+      }
+      ${
+        /* And the other thing a frozen frame can mean. `alert`, because nothing
+           further is going to happen and a reader waiting politely for a video
+           that will never load is waiting forever. */
+        this.failed
+          ? html`<div
+              part="failure"
+              role="alert"
+            >
+              ${this.errorLabel}
+            </div>`
+          : nothing
+      }
+      ${
         /* Whenever it is not playing, which is what the mark means: press this
            to play. It said that only before the first play, on the reasoning
            that a paused video keeps its bar so the small control is already
@@ -1244,7 +1331,11 @@ export class HelixBaseVideo extends HelixElement {
 
            Not drawn at all where the browser draws its own controls, since that
            bar has a play button and two would be two. */
-        this.controls || this.playing || this.startControl === 'none'
+        this.controls ||
+        this.playing ||
+        this.buffering ||
+        this.failed ||
+        this.startControl === 'none'
           ? nothing
           : html`<button
               part="start"

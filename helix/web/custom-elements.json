@@ -60872,6 +60872,62 @@
             },
             {
               "kind": "field",
+              "name": "loadingLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What a reader is told while the picture is waiting for more of itself.",
+              "attribute": "loading-label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "errorLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'This video could not be played'",
+              "description": "And what they are told when it will not play at all.",
+              "attribute": "error-label",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "buffering",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether playback has stopped to wait for data.\n\n**Only ever after somebody asked for playback**, which is what `waiting`\nmeans: the element wanted the next frame and did not have it. Before that,\na video that has loaded nothing is a poster with a play control over it,\nwhich looks deliberate and is. A spinner there would say something is\nhappening when nothing is, on every video on the page.\n\nThe case this covers is the one that looks like a bug: a picture frozen\nmid-play, the scrubber stopped, and nothing on screen saying why.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "failed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the source failed, which is the other thing a frozen frame can mean.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "playing",
               "type": {
                 "text": "boolean"
@@ -61253,10 +61309,40 @@
             },
             {
               "kind": "field",
-              "name": "handleState",
+              "name": "handleWaiting",
               "privacy": "private",
               "readonly": true,
               "description": "Relayed, because none of these cross a shadow boundary on their own.\n\nThe video is inside this element's shadow root, so a consumer listening on\nthe element they wrote hears nothing at all without this. Input relays\n`change` for the same reason.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleReady",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleError",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleState",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
@@ -61785,6 +61871,32 @@
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
               }
+            },
+            {
+              "name": "loading-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Loading'",
+              "description": "What a reader is told while the picture is waiting for more of itself.",
+              "fieldName": "loadingLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "name": "error-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'This video could not be played'",
+              "description": "And what they are told when it will not play at all.",
+              "fieldName": "errorLabel",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
             }
           ],
           "superclass": {
@@ -61836,6 +61948,10 @@
               {
                 "description": "The mark over the picture, and the video that does without one.",
                 "slug": "start-control"
+              },
+              {
+                "description": "A source that will not play, which is the other thing a still frame can mean.",
+                "slug": "unavailable"
               }
             ],
             "source": "helix/web/src/video"
@@ -61880,6 +61996,30 @@
             {
               "description": "What covers it before it plays.",
               "name": "poster",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "What is said when the source will not play.",
+              "name": "failure",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "What is said while the picture waits for more of itself.",
+              "name": "loading",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "description": "The part of that which spins.",
+              "name": "loading-mark",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
