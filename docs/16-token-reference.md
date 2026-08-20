@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 6 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 157 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 161 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 139 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -65,7 +65,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 210 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 212 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 256 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 221 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 209 |
@@ -149,7 +149,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 170 |
+| `--helix-border-thin` | `1px` | 174 |
 | `--helix-border-thick` | `2px` | 55 |
 
 ## shadow

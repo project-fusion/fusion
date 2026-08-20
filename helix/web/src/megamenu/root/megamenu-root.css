@@ -68,11 +68,24 @@
      the dark: a navigation panel is the site continuing, and `surface-overlay`
      put a grey card in front of a black page as though the nav were a dialog. */
   background-color: var(--helix-color-background);
-  /* Said, not omitted. The user agent gives `[popover]` a border of its own,
-     and it is `solid` with no width or colour named, which computes to a medium
-     black rule: dropping the outline this had by deleting the declaration drew
-     a three pixel black box round the panel instead of no box at all. */
-  border: none;
+  /* A hairline in the dark, and nothing in the light.
+   *
+   * A shadow is a light-mode device. It works by darkening what is behind it,
+   * and in the dark what is behind it is already the darkest value the theme
+   * has: the panel is `oklch(0 0 0)` on a page of `oklch(0 0 0)`, and at four
+   * times zoom the corner of the card is not visible at all. Only the heading
+   * inside says a panel is there. So the edge the shadow draws in the light is
+   * drawn by a line in the dark, rather than by a second shadow that cannot
+   * work or by lifting the panel off the black that was asked for.
+   *
+   * `light-dark()` rather than a media query, so it follows the theme a
+   * consumer sets rather than only the one the system reports.
+   *
+   * Written out in full, not omitted: the user agent gives `[popover]` a border
+   * of its own, `solid` with no width or colour, which computes to a medium
+   * black rule. Deleting the declaration once drew a three pixel black box
+   * around the panel instead of no box at all. */
+  border: var(--helix-border-thin) solid light-dark(transparent, var(--helix-color-border));
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
@@ -124,6 +137,12 @@
      painted with, so the band reads as the header continuing downward rather
      than as a card laid over it. */
   background-color: var(--helix-color-background);
+  /* One edge, and it is the bottom one. A band is flush with the bar above it
+     and runs to both sides, so the only boundary it has is where it meets the
+     page underneath. In both modes: in the light it firms up what the shadow is
+     already saying, and in the dark it is the only thing saying it. */
+  border: none;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
   /* Shadow on the bottom edge and nowhere else. A blurred shadow spills every
