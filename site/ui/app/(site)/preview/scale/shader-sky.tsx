@@ -40,16 +40,25 @@ uniform float uScroll;
 uniform vec3 uColor;
 out vec4 outColor;
 
-/* A plain at dusk, and the light is the subject.
+/* Blue hour over a plain, and the optics are the reason it looks like this.
  *
- * The focal point is the sun on the horizon and everything is built to point at
- * it: the ground lines converge on it, the fog clears toward it, and the forms
- * standing on the plain are lit from it. The earlier version had light pooled
- * vaguely at a vanishing point, which is a gradient rather than a source.
+ * **Why the light is blue and not orange.** A sunset is warm because a low sun
+ * sends its beam through a long slant of atmosphere, Rayleigh scattering strips
+ * the short wavelengths, and red is what survives. A blue sun would be wrong.
+ * But blue hour is a real condition and the opposite case: once the sun is a few
+ * degrees under the horizon the direct beam is gone entirely, what is left is
+ * high-atmosphere scattered light, and that light is overwhelmingly blue. It is
+ * the one time of day when this palette is the physically honest one, so that is
+ * the moment this draws.
  *
- * The story is the ladder. The camera climbs and the light reaches further, so
- * one reader looking at a small lit patch becomes a reader looking at a plain
- * with structures on it. Personal, organizational, national, told as distance.
+ * **Why the disc is flattened and cut.** Refraction near the horizon lifts the
+ * lower limb more than the upper one, so a rising sun is visibly wider than it
+ * is tall. And the ground is in front of it: it rises from behind the horizon
+ * rather than floating over the plain, which is what it did before.
+ *
+ * **Why the far ground is not black.** Aerial perspective. Distance fades
+ * toward the colour of the air, not toward nothing, so the plain washes into
+ * the horizon instead of stopping at it.
  */
 
 float hash(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
@@ -61,23 +70,32 @@ void main() {
 
   float horizon = -0.13;
   float height = mix(0.030, 0.20, uScroll);
+
+  /* The disc sits mostly under the line and climbs a little as the camera
+     does, so the ladder is also a dawn. 1.45 is the refraction squash. */
+  /* Placed so a real cap clears the line at rest and more of it does by the
+     last rung. Squashed by 1.45, so the visible half height is the radius over
+     that: buried any deeper and there is no sun in the picture at all, which is
+     where this sat before. */
+  float sunY = horizon - mix(0.030, 0.004, uScroll);
+  vec2 toSun = vec2(p.x, (p.y - sunY) * 1.45);
+  float sd = length(toSun);
+
+  float disc = 1.0 - smoothstep(0.075, 0.081, sd);
+  float halo = exp(-sd * sd * 18.0);
+  float sky = exp(-max(p.y - horizon, 0.0) * 7.0);
+
   vec3 col = vec3(0.0);
   float alpha = 0.0;
 
-  /* The source, given an actual shape rather than a wash: a small disc sitting
-     on the horizon with a bloom around it, so there is somewhere the light is
-     coming from. */
-  /* Round, not squashed, and sitting on the line rather than hovering over it.
-     The bloom is two falloffs: a tight core so the source has an edge, and a
-     wide haze so the sky around it is not simply black. */
-  vec2 toSun = vec2(p.x, p.y - horizon);
-  float sd = length(toSun);
-  float disc = 1.0 - smoothstep(0.016, 0.026, sd);
-  float core = exp(-sd * sd * 420.0);
-  float haze = exp(-sd * sd * mix(34.0, 14.0, uScroll));
-  float bloom = core * 0.7 + haze * 0.5;
-
-  if (p.y < horizon - 0.001) {
+  if (p.y > horizon) {
+    /* Sky: the glow above the line, strongest where the light is under it. */
+    float lift = halo * 0.85 + sky * 0.16;
+    /* Warm only in the last of it, and toward white rather than to a new hue:
+       the heat is at the limb, and everything above it stays the brand. */
+    col = mix(uColor, vec3(1.0, 0.94, 0.86), disc * 0.55 + halo * halo * 0.25);
+    alpha = clamp(lift + disc, 0.0, 1.0);
+  } else {
     float depth = height / (horizon - p.y);
     float across = p.x * depth * 1.7;
 
@@ -85,42 +103,26 @@ void main() {
     float lane = across * GRID;
     float row = (depth - uTime * 0.16) * GRID;
 
-    /* Lines running to the vanishing point, each breathing on its own phase.
-       A field where everything pulses together reads as a flicker; given
-       separate phases from a hash of the lane index, it reads as a place. */
     float id = floor(lane);
     float own = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 0.5 + hash(id) * 6.2831));
     float lineW = fwidth(lane) * 1.2 + 0.012;
     float lineX = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
-
-    /* Cross rows, quieter, so the plain has a floor rather than only rails. */
     float rowW = fwidth(row) * 1.2 + 0.02;
     float lineZ = 1.0 - smoothstep(0.0, rowW, abs(fract(row) - 0.5));
-
-    /* Points where they meet, and they are the quietest thing here now. */
     float node = lineX * lineZ;
 
     float fog = exp(-depth * 1.15);
-    /* Clearer toward the light, which is what makes the sun the subject rather
-       than a bright spot that happens to be there. */
-    /* Wide enough to be a plain rather than a corridor. Steeper than this and
-       the rails only exist in a cone down the middle, which reads as a road. */
     float toward = exp(-abs(p.x) * 1.05);
 
-    /* Rails carry the picture, rows give it a floor, nodes are the quietest
-       thing on it. The dots were the loudest before and are barely a mark now. */
     float ink = (lineX * 0.5 * own + lineZ * 0.16 + node * 0.26) * fog * (0.5 + toward * 0.85);
-    col = uColor * (0.62 + toward * 0.45);
-    alpha = clamp(ink, 0.0, 1.0);
-  }
 
-  /* The sun over everything, so nothing on the plain occludes the source. */
-  /* Held off pure white: a disc at full white reads as a lens flare rather
-     than as a body with a colour. */
-  vec3 lit = mix(uColor * 1.2, vec3(1.0), disc * 0.4);
-  float sunA = clamp(disc + bloom * 0.55, 0.0, 1.0);
-  col = mix(col, lit, sunA);
-  alpha = clamp(alpha + sunA, 0.0, 1.0);
+    /* Aerial perspective: the last of the plain is the air rather than the
+       dark, so the two meet instead of one stopping against the other. */
+    float air = (1.0 - fog) * (halo * 0.5 + 0.05) * toward;
+
+    col = uColor * (0.62 + toward * 0.45);
+    alpha = clamp(ink + air, 0.0, 1.0);
+  }
 
   outColor = vec4(col, alpha);
 }`
