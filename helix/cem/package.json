@@ -26,7 +26,8 @@
     "@wc-toolkit/jsx-types": "^1.7.1"
   },
   "devDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0"
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@wc-toolkit/vuejs-types": "^1.0.1"
   },
   "peerDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0"

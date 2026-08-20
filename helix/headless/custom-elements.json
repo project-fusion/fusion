@@ -2292,6 +2292,13 @@
             },
             {
               "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "description": "The crumbs arrived, so measure them now that they are real.\n\nThe host renders and measures before its crumbs have upgraded, so every\nwidth is zero and the arithmetic concludes that five crumbs fit in a\ncontainer half their size. Measured: `updated` ran once with\n`widths: [0,0,0,0,0]`. `Tabs` carries the same paragraph for the same\nreason, and its answer is this one, because a slot change is the moment\nthe children are real.\n\nNo `requestUpdate` here. `measure` asks for one when the answer moves,\nwhich is the only time an update is owed."
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"

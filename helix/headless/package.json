@@ -16,12 +16,16 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
-    "./jsx": "./jsx.d.ts"
+    "./jsx": "./jsx.d.ts",
+    "./svelte": "./svelte.d.ts",
+    "./vue": "./vue.d.ts"
   },
   "files": [
     "custom-elements.json",
     "dist",
-    "jsx.d.ts"
+    "jsx.d.ts",
+    "svelte.d.ts",
+    "vue.d.ts"
   ],
   "customElements": "custom-elements.json",
   "sideEffects": [
