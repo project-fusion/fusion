@@ -1,0 +1,172 @@
+/* Two candidate visual directions for the landing page, side by side.
+ *
+ * Throwaway by construction: both are namespaced (`dv` for Derivation, `pv` for
+ * Provenance) and the whole file goes when one is chosen. Nothing else imports
+ * it.
+ *
+ * **Layout belongs to the components, so almost none of it is here.** The ramp
+ * is a `Grid`, the seed and the verify block are `Card`s, every row is a `Flex`
+ * and every word is a `Text`. What is left in this file is the two things a
+ * component cannot know: the display type treatment a landing page wants, and
+ * the derived wash that is the whole of direction A's argument.
+ *
+ * Every value is a Helix token, the same as `site.css`. A direction that only
+ * works on raw numbers is not one this company can ship, since the point of the
+ * exercise is a language the design system itself can carry.
+ */
+
+/* ============================================ direction A: derivation ==== */
+
+/* One value, and everything visible follows from it.
+ *
+ * The claim Helix makes about colour is that a palette derived from a single
+ * seed is consistent because there was nothing else to choose. The same shape
+ * holds one level up: Fusion derives every product from one sentence. So the
+ * page is built as a derivation, and the seed is the constraint rather than the
+ * hex.
+ */
+.dvHero {
+  align-items: center;
+  display: flex;
+  min-block-size: 82svh;
+  padding-block: var(--helix-space-3xl);
+}
+
+/* The thesis, at the largest optical size the face is comfortable at. Funnel
+   Display is the one place on this site where type is the design rather than
+   the delivery, and a landing page is that place. */
+.dvTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 8.5vw, 7rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.dvTitle em {
+  color: var(--helix-color-primary);
+  font-style: normal;
+}
+
+.dvSeedText {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 3vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* The signature, and the only thing in this file doing real work.
+ *
+ * Each cell asks for the same primary at the strength its own index sets, so
+ * the ramp is computed rather than listed: nine cells, one declaration, and
+ * adding a tenth needs no new colour. That is the token layer's argument
+ * restated as a layout. What each cell is labelled with is what actually
+ * derives from the constraint, so the device carries the argument rather than
+ * decorating it. */
+.dvStep {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary) calc(var(--dv-depth) * 1%),
+    var(--helix-color-surface)
+  );
+  min-block-size: 12rem;
+  padding: var(--helix-space-md);
+  transition: background-color var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.dvStep:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary) calc((var(--dv-depth) + 7) * 1%),
+    var(--helix-color-surface)
+  );
+}
+
+/* Hairlines between cells rather than a gap, so the ramp reads as one object
+   being stepped through instead of nine tiles. */
+.dvRamp {
+  border-block: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.dvRamp > .dvStep + .dvStep {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.dvMono {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* =========================================== direction B: provenance ===== */
+
+/* Every claim carries where it came from.
+ *
+ * Cortex's argument is that an output you cannot trace is one you cannot trust,
+ * and `why()` is the method. This applies it to the one surface that never does
+ * it. The rail is not a motif: the references are real files in this
+ * repository, and a reader can open every one of them.
+ */
+.pvHero {
+  padding-block: calc(var(--helix-space-3xl) * 1.3) var(--helix-space-3xl);
+}
+
+.pvTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 7vw, 5.5rem);
+  font-weight: var(--helix-weight-regular);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.pvStatement {
+  font-size: clamp(var(--helix-text-lg), 2.2vw, var(--helix-text-2xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  max-inline-size: 30ch;
+  text-wrap: balance;
+}
+
+/* The rail is a fixed measure and the statement takes the rest, which is the
+   one arrangement `Grid` cannot express: it offers equal columns or a reflowing
+   minimum, and this is neither. `Flex` plus a basis is the component answer. */
+.pvRail {
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 1 15rem;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+}
+
+.pvRailKey {
+  color: var(--helix-color-foreground-muted);
+}
+
+.pvClaimText {
+  flex: 1 1 26rem;
+}
+
+.pvRule {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block-start: var(--helix-space-xl);
+}
+
+/* The name sits on the floor of its cell, and the note under it is held to two
+   lines whether or not it needs them.
+ *
+ * Without the floor the block is bottom aligned and a one line note starts
+ * twenty pixels lower than a two line one, so the names came out staggered
+ * across the ramp. Measured: 943, 943, 963, 943, 943, 963. Reserving the second
+ * line makes every block the same height, which is what puts the names on one
+ * baseline no matter what the copy does later. */
+.dvStepName {
+  margin-block-start: auto;
+}
+
+.dvStepNote {
+  min-block-size: 2lh;
+}
