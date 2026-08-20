@@ -107,45 +107,57 @@ if (hasLayout()) {
        resolved through two shadow boundaries and multiplied by a depth the tree
        writes on the row, so anything short of laying it out and measuring would
        be asserting the same arithmetic that produced it. */
-    test('a child starts where its parent does, when the chevron is on the left', async () => {
-      /* The chevron column is the indent. A branch's own chevron pushes its
-         label right by exactly one gutter and its children are one level
-         deeper, so the two land on the same column. */
-      const items = await laidOut()
-      expect(labelX(named(items, 'helix'))).toBeGreaterThan(0)
-      expect(labelX(named(items, 'web'))).toBe(labelX(named(items, 'helix')))
+    test('a child is one gutter in from its parent, wherever the chevron sits', async () => {
+      /* Depth is the thing being read, and it reads the same on both sides.
+         Measured: 28 and 48 with the chevron on the left, 8 and 28 with it at
+         the end. */
+      for (const attrs of ['', 'chevron-placement="end"']) {
+        const items = await laidOut(attrs)
+        const parent = labelX(named(items, 'helix'))
+        const child = labelX(named(items, 'web'))
+        expect(parent).toBeGreaterThan(0)
+        expect(child).toBeGreaterThan(parent)
+      }
     })
 
-    test('and is indented from it when there is no chevron on the left', async () => {
-      // Nothing pushes the branch's label there, so it sits at its row's own
-      // inset and its child stays one gutter in.
-      const items = await laidOut('chevron-placement="end"')
-      expect(labelX(named(items, 'web'))).toBeGreaterThan(labelX(named(items, 'helix')))
+    test('and a leaf beside a branch shares its column', async () => {
+      /* This used to be a trade, and the spec here pinned it as one: lining a
+         leaf up with the branch next to it and lining a child up with its
+         parent could not both be had, because a branch's label was one gutter
+         into its own row and a leaf's was not. A leaf reserves nothing it does
+         not have now, so both are true at once and the trade is gone. */
+      for (const attrs of ['', 'chevron-placement="end"']) {
+        const items = await laidOut(attrs)
+        expect(labelX(named(items, 'cortex'))).toBe(labelX(named(items, 'helix')))
+      }
     })
 
-    test('the child does not move when the chevron does, only the parent', async () => {
-      /* Which is the point of reserving nothing on a leaf: depth is a fact about
-         the tree and does not change because a control moved sides.
+    test('moving the chevron moves the whole tree, and nothing within it', async () => {
+      /* The chevron on the left is a column before the first level, so taking it
+         away shifts every row by that one column and leaves every relationship
+         inside the tree where it was. It used to be the parent alone that moved,
+         which is what made a leaf and a branch disagree.
 
          Each tree is measured before the next is mounted. `mount` writes the
          body, so holding on to the first one's elements and reading them after
          the second arrives measures nodes that are no longer in a document, and
          every rect comes back zero. */
       const first = await laidOut()
-      const before = { helix: labelX(named(first, 'helix')), web: labelX(named(first, 'web')) }
+      const before = {
+        cortex: labelX(named(first, 'cortex')),
+        helix: labelX(named(first, 'helix')),
+        web: labelX(named(first, 'web')),
+      }
       const second = await laidOut('chevron-placement="end"')
-      const after = { helix: labelX(named(second, 'helix')), web: labelX(named(second, 'web')) }
-      expect(after.web).toBe(before.web)
-      expect(after.helix).toBeLessThan(before.helix)
-    })
-
-    test('a leaf beside a branch sits where that branch keeps its chevron', async () => {
-      /* The trade, pinned so it is a decision rather than a surprise. Lining a
-         leaf up with the branch next to it and lining a child up with its
-         parent cannot both be had: a branch's label is one gutter into its own
-         row and a leaf's is not. Depth is the thing being read. */
-      const items = await laidOut()
-      expect(labelX(named(items, 'cortex'))).toBeLessThan(labelX(named(items, 'helix')))
+      const after = {
+        cortex: labelX(named(second, 'cortex')),
+        helix: labelX(named(second, 'helix')),
+        web: labelX(named(second, 'web')),
+      }
+      const shift = before.helix - after.helix
+      expect(shift).toBeGreaterThan(0)
+      expect(before.web - after.web).toBe(shift)
+      expect(before.cortex - after.cortex).toBe(shift)
     })
   })
 }
