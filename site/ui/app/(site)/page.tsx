@@ -301,12 +301,12 @@ export default function Home() {
       <section className="band closing reveal">
         <helix-flex align="center" class="shell" direction="column" gap="lg">
           <helix-text as="h2" class="sectionTitle">
-            Solo, and shipping
+            Take on the work
           </helix-text>
           <helix-text as="p" class="measure" tone="muted">
             We take on interface and intelligence work the substrates make faster to do well. If
             that is what you need, say so plainly and we will tell you whether we are the right
-            people.
+            people for it.
           </helix-text>
           <a
             data-button="solid"

@@ -205,3 +205,13 @@
   line-height: 1.02;
   text-wrap: balance;
 }
+
+/* The state column is a fixed measure and the row takes the rest, the one
+   arrangement `Grid` cannot express. */
+.tdLede {
+  flex: 0 0 8rem;
+}
+
+.tdBody {
+  flex: 1 1 32rem;
+}

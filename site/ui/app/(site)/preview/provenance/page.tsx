@@ -53,7 +53,7 @@ export default function Page() {
       <section className="pvHero">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-text appearance="label" class="pvRail" tone="subtle">
-            FUSION DEVELOPMENT GROUP / EST 2026 / SOLO
+            FUSION DEVELOPMENT GROUP
           </helix-text>
 
           <helix-text as="h1" class="pvTitle">
