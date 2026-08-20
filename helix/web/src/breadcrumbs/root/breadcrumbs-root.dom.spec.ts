@@ -117,6 +117,20 @@ describe('breadcrumb items', () => {
  * the feature did nothing, because every `offsetWidth` there is zero, which is
  * exactly what the bug looked like.
  */
+/**
+ * Registers a test only where there is layout to measure.
+ *
+ * Not `test.skipIf`, which the browser harness does not have: it exports `test`
+ * as a plain function with no skip of any kind, so `skipIf` threw and took the
+ * whole family's specs down with it. Measured in the spec frame, which is the
+ * only place that could have said so.
+ *
+ * Registration-time, so a geometry block is honestly *absent* under `bun test`
+ * rather than passing without checking anything, which is what `hasLayout` asks
+ * for in its own comment.
+ */
+const geometry = hasLayout() ? test : (): void => {}
+
 const collapsing = (width: number) => `
   <div style="inline-size: ${width}px">
     <helix-breadcrumbs collapse>
@@ -142,12 +156,12 @@ const shown = (host: HTMLElement): string[] =>
     .map((c) => c.textContent?.trim() ?? '')
 
 describe('breadcrumbs collapse', () => {
-  test.skipIf(!hasLayout())('keeps both ends and hides only the middle', async () => {
+  geometry('keeps both ends and hides only the middle', async () => {
     const host = await mount(collapsing(320))
     expect(shown(host)).toEqual(['Home', 'Navigation', 'Breadcrumbs'])
   })
 
-  test.skipIf(!hasLayout())('shows the trigger only while something is behind it', async () => {
+  geometry('shows the trigger only while something is behind it', async () => {
     const narrow = await mount(collapsing(320))
     const wide = await mount(collapsing(1200))
     expect([trigger(narrow).hasAttribute('hidden'), trigger(wide).hasAttribute('hidden')]).toEqual([
@@ -159,7 +173,7 @@ describe('breadcrumbs collapse', () => {
   /* The one the width cache exists for. A hidden crumb measures zero, so a
      trail that recomputed from the live tree would decide it now fits, show
      everything, decide it does not, and oscillate. */
-  test.skipIf(!hasLayout())('expands again when there is room', async () => {
+  geometry('expands again when there is room', async () => {
     const host = await mount(collapsing(320))
     const box = host as HTMLElement
     expect(shown(host).length).toBeLessThan(5)
@@ -168,7 +182,7 @@ describe('breadcrumbs collapse', () => {
     expect(shown(host)).toEqual(['Home', 'Design', 'Components', 'Navigation', 'Breadcrumbs'])
   })
 
-  test.skipIf(!hasLayout())('hides nothing without `collapse`', async () => {
+  geometry('hides nothing without `collapse`', async () => {
     const host = await mount(collapsing(320).replace(' collapse', ''))
     expect(shown(host).length).toBe(5)
   })

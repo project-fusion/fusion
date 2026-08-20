@@ -22,6 +22,20 @@ const items = (host: HTMLElement): HTMLElement[] => [
 const labelLeft = (item: HTMLElement): number =>
   (part(item, 'label') as HTMLElement).getBoundingClientRect().left
 
+/**
+ * Registers a test only where there is layout to measure.
+ *
+ * Not `test.skipIf`, which the browser harness does not have: it exports `test`
+ * as a plain function with no skip of any kind, so `skipIf` threw and took the
+ * whole family's specs down with it. Measured in the spec frame, which is the
+ * only place that could have said so.
+ *
+ * Registration-time, so a geometry block is honestly *absent* under `bun test`
+ * rather than passing without checking anything, which is what `hasLayout` asks
+ * for in its own comment.
+ */
+const geometry = hasLayout() ? test : (): void => {}
+
 describe('tree item structure', () => {
   test('a branch draws a chevron and a leaf does not', async () => {
     const tree = await mount(mixed)
@@ -73,13 +87,13 @@ describe('tree item structure', () => {
  * harnesses.
  */
 describe('tree item geometry', () => {
-  test.skipIf(!hasLayout())('siblings share a column, whatever they are', async () => {
+  geometry('siblings share a column, whatever they are', async () => {
     const tree = await mount(mixed)
     const [branch, , leaf] = items(tree)
     expect(labelLeft(leaf as HTMLElement)).toBe(labelLeft(branch as HTMLElement))
   })
 
-  test.skipIf(!hasLayout())('a child is one gutter in from its parent', async () => {
+  geometry('a child is one gutter in from its parent', async () => {
     const tree = await mount(mixed)
     const [branch, child] = items(tree)
     expect(labelLeft(child as HTMLElement)).toBeGreaterThan(labelLeft(branch as HTMLElement))
@@ -88,7 +102,7 @@ describe('tree item geometry', () => {
   /* With the chevron at the end nothing pushes a branch's label, so a leaf must
      reserve nothing: written unconditionally it put every child of a navigation
      two gutters in. */
-  test.skipIf(!hasLayout())('a leaf reserves nothing when the chevron is at the end', async () => {
+  geometry('a leaf reserves nothing when the chevron is at the end', async () => {
     const tree = await mount(
       mixed.replace('label="Files"', 'label="Files" chevron-placement="end"'),
     )
@@ -98,7 +112,7 @@ describe('tree item geometry', () => {
 
   /* A row advertises itself as a target with a pointer and a full-width hover,
      so a link inside one has to be the whole row or the advertisement lies. */
-  test.skipIf(!hasLayout())('a slotted link fills its row', async () => {
+  geometry('a slotted link fills its row', async () => {
     const tree = await mount(
       `<helix-tree label="Nav">
         <helix-tree-item value="a"><a href="/a" data-link="quiet">A</a></helix-tree-item>
