@@ -104,17 +104,20 @@ void main() {
     float row = (depth - uTime * 0.16) * GRID;
 
     float id = floor(lane);
-    float own = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 0.5 + hash(id) * 6.2831));
+    /* The floor is what the plain is worth when a rail is at its dimmest, so
+       it sets how present the ground is at all. At 0.35 the field spent most of
+       its time nearly gone. */
+    float own = 0.55 + 0.45 * (0.5 + 0.5 * sin(uTime * 0.5 + hash(id) * 6.2831));
     float lineW = fwidth(lane) * 1.2 + 0.012;
     float lineX = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
     float rowW = fwidth(row) * 1.2 + 0.02;
     float lineZ = 1.0 - smoothstep(0.0, rowW, abs(fract(row) - 0.5));
     float node = lineX * lineZ;
 
-    float fog = exp(-depth * 1.15);
+    float fog = exp(-depth * 0.78);
     float toward = exp(-abs(p.x) * 1.05);
 
-    float ink = (lineX * 0.5 * own + lineZ * 0.16 + node * 0.26) * fog * (0.5 + toward * 0.85);
+    float ink = (lineX * 0.92 * own + lineZ * 0.30 + node * 0.38) * fog * (0.62 + toward * 0.7);
 
     /* Aerial perspective: the last of the plain is the air rather than the
        dark, so the two meet instead of one stopping against the other. */
