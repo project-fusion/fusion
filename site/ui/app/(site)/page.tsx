@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { formatDate, INSIGHTS } from '../../lib/insights'
+import { PRODUCTS } from '../products'
+import { SERVICES } from '../services'
 import { stageAppearance, VERTICALS } from '../verticals'
 
 /**
@@ -15,21 +18,6 @@ import { stageAppearance, VERTICALS } from '../verticals'
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
  */
-
-const substrates = [
-  {
-    body: 'The design system. Web components with a token layer that derives an accessible palette from one brand color, so an interface is consistent because there was nothing else to choose. Components ship as custom elements, which keeps the framework above them a choice rather than a commitment.',
-    href: '/design',
-    name: 'Helix',
-    role: 'The DNA',
-  },
-  {
-    body: 'Memory and provenance. What a system knows, where it learned it, and how much of it to trust. Not a model wrapper: the part that remains true when the model underneath is replaced.',
-    href: '/mind',
-    name: 'Cortex',
-    role: 'The mind',
-  },
-]
 
 const questions = [
   {
@@ -71,7 +59,7 @@ export default function Home() {
             that makes that practical.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <Link data-button="solid" data-button-tone="primary" href="/design">
+            <Link data-button="solid" data-button-tone="primary" href="/helix">
               See what is shipping
             </Link>
             <a data-button href="mailto:hello@fusion.dev">
@@ -125,18 +113,21 @@ export default function Home() {
           </helix-flex>
 
           <helix-grid gap="xl" min="22rem">
-            {substrates.map((substrate) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={substrate.name}>
-                <helix-text appearance="label" tone="subtle">
-                  {substrate.role}
-                </helix-text>
+            {PRODUCTS.map((product) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={product.name}>
+                <helix-flex align="center" data-density="sm" gap="sm">
+                  <helix-text appearance="label" tone="subtle">
+                    {product.role}
+                  </helix-text>
+                  <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
+                </helix-flex>
                 <helix-text as="h3" class="substrateName">
-                  {substrate.name}
+                  {product.name}
                 </helix-text>
                 <helix-text as="p" tone="muted">
-                  {substrate.body}
+                  {product.body}
                 </helix-text>
-                <a data-link href={substrate.href}>
+                <a data-link href={product.href}>
                   Read more
                 </a>
               </helix-flex>
@@ -189,6 +180,46 @@ export default function Home() {
         </helix-flex>
       </section>
 
+      {/* Services sits directly after the map, which is a prominence decision
+          rather than an ordering accident. Everything above this band is being
+          built; this is the only part of it anyone can buy today, and it should
+          not be harder to find than the things that cannot yet be bought. */}
+      <section className="band reveal">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" tone="subtle">
+              Services
+            </helix-text>
+            <helix-text as="h2" class="sectionTitle measure">
+              The part you can buy today
+            </helix-text>
+            <helix-text as="p" class="measure" tone="muted">
+              Interface and intelligence work the substrates make faster to do well. Prices are on
+              the page, because an offer you cannot compare is not an offer.
+            </helix-text>
+          </helix-flex>
+
+          <helix-grid gap="xl" min="18rem">
+            {SERVICES.map((service) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={service.name}>
+                <helix-icon name={service.icon}></helix-icon>
+                <helix-text as="h3" class="substrateName">
+                  {service.name}
+                </helix-text>
+                <helix-text appearance="body-strong">{service.price}</helix-text>
+                <helix-text as="p" tone="muted">
+                  {service.summary}
+                </helix-text>
+              </helix-flex>
+            ))}
+          </helix-grid>
+
+          <Link data-link href="/services">
+            See what each one includes
+          </Link>
+        </helix-flex>
+      </section>
+
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-text as="h2" class="sectionTitle measure">
@@ -207,6 +238,54 @@ export default function Home() {
               </helix-accordion-item>
             ))}
           </helix-accordion>
+        </helix-flex>
+      </section>
+
+      <section className="band reveal">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex align="center" gap="md" justify="between" wrap>
+            <helix-flex direction="column" gap="sm">
+              <helix-text appearance="label" tone="subtle">
+                Insights
+              </helix-text>
+              <helix-text as="h2" class="sectionTitle measure">
+                The arguments, written down
+              </helix-text>
+            </helix-flex>
+            <Link data-link href="/insights">
+              Read all
+            </Link>
+          </helix-flex>
+
+          {/* Three, and the registry is already newest-first, so this is a
+              slice rather than a sort: the landing page should not hold a
+              second opinion about what recent means. */}
+          <helix-grid gap="xl" min="18rem">
+            {INSIGHTS.slice(0, 3).map((insight) => (
+              <Link
+                aria-label={insight.title}
+                className="insightCard"
+                data-card
+                href={`/insights/${insight.slug}`}
+                key={insight.slug}
+              >
+                <helix-card appearance="outlined">
+                  <helix-tag slot="header">{insight.topic}</helix-tag>
+                  <helix-flex direction="column" gap="xs">
+                    <helix-text appearance="title" as="h3">
+                      {insight.title}
+                    </helix-text>
+                    <helix-text appearance="caption" tone="muted">
+                      {insight.summary}
+                    </helix-text>
+                  </helix-flex>
+                  <helix-text appearance="caption" slot="footer" tone="subtle">
+                    <time dateTime={insight.date}>{formatDate(insight.date)}</time>
+                  </helix-text>
+                </helix-card>
+              </Link>
+            ))}
+          </helix-grid>
         </helix-flex>
       </section>
 

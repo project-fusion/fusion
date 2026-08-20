@@ -374,11 +374,11 @@ helix-drawer {
  * is the same declaration the header makes rather than a number copied from it.
  *
  * Set as the variable rather than as `padding-inline`, because `.shell` and
- * `.designHeroInner` already read it. Overriding the input leaves one rule
+ * `.pageHeroInner` already read it. Overriding the input leaves one rule
  * deciding the inset instead of three restating it. */
-.designHero,
-.designFilters,
-.designGridBand {
+.pageHero,
+.filterBar,
+.gridBand {
   --site-inset: var(--helix-space-2xl);
 }
 
@@ -395,11 +395,19 @@ helix-drawer {
  * pixels, which is most of a laptop screen spent on a heading and a text box
  * before a single component is visible. 28rem is 448.
  *
- * It replaces the shared `VerticalPage` header on this route only. The other
- * three verticals keep the left-aligned title, because they are pages of prose
- * and this is the front of a gallery: the search is the reason to center it,
- * and a centered column with nothing to type into is just a wide heading. */
-.designHero {
+ * It replaces the shared `VerticalPage` header on the two gallery routes. The
+ * three prose verticals keep the left-aligned title, because they are pages of
+ * text and this is the front of a gallery: the search is the reason to center
+ * it, and a centered column with nothing to type into is just a wide heading.
+ *
+ * **Shared, because two galleries now wear it.** `/helix` and `/insights` are
+ * the same page shape, a hero over a filter bar over a grid, and the part that
+ * makes the hero run up behind the sticky masthead is structure rather than
+ * decoration. What stays Design's is the lattice and the shines in the rule
+ * below, which are a fact about a page whose cards are drawn on that same
+ * field. Insights has no drawings, so it takes the structure and none of the
+ * texture. */
+.pageHero {
   align-items: center;
   background-color: var(--helix-color-background);
   display: flex;
@@ -542,7 +550,7 @@ helix-drawer {
   }
 }
 
-.designHeroInner {
+.pageHeroInner {
   inline-size: 100%;
   position: relative;
   z-index: var(--helix-layer-raised);
@@ -553,7 +561,7 @@ helix-drawer {
 }
 
 /* Held off full strength, the way the lede is everywhere else on the site. */
-.designHeroLede {
+.pageHeroLede {
   color: var(--helix-color-foreground-muted);
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
   text-wrap: balance;
@@ -570,7 +578,7 @@ helix-drawer {
  * inherits straight through the shadow boundary into the field: the placeholder
  * and anything typed came out centered, which is not how a search box behaves
  * anywhere. Centring is a property of the layout here, not of the control. */
-.designSearch {
+.heroSearch {
   inline-size: 100%;
   max-inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
   text-align: start;
@@ -611,11 +619,11 @@ helix-drawer {
  * The count is `aria-live="polite"`, because filtering is a change nothing else
  * announces: a reader who cannot see the grid shrink otherwise has no
  * confirmation that typing did anything. */
-.designFilters {
+.filterBar {
   border-block: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-.designFiltersInner {
+.filterBarInner {
   margin-inline: auto;
   padding-block: var(--helix-space-sm);
 }
@@ -623,7 +631,7 @@ helix-drawer {
 /* Wide enough for the longest option and no wider. Left to size themselves the
    two selects came out at different widths, which reads as two unrelated
    controls rather than as a pair. */
-.designFilter {
+.filterControl {
   inline-size: 12rem;
 }
 
@@ -648,7 +656,7 @@ helix-drawer {
  * nothing under it. `space-2xl` is the same 48 the grid uses between its own
  * cards, which is what makes the band read as one field of cards rather than as
  * a grid that happens to start somewhere. */
-.designGridBand {
+.gridBand {
   padding-block: var(--helix-space-2xl);
 }
 
@@ -2061,4 +2069,101 @@ helix-drawer helix-tree {
    environment converts what was written, it does not throw it away. */
 .dialogWarning {
   color: var(--helix-color-warning);
+}
+
+/* ======================================================== insights ======= */
+
+/* Three across, stepping down as the window narrows.
+ *
+ * Three rather than the gallery's five, because these cards carry a title and
+ * two sentences instead of a drawing and a name: a text card at a fifth of a
+ * wide window is a column of broken lines. The steps below fall where a
+ * sentence stops fitting rather than at a list of device widths. */
+.insightGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (width < 70rem) {
+  .insightGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 44rem) {
+  .insightGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The same pair the gallery's cards need, for the same reason.
+ *
+ * The anchor stretches because `helix-grid` stretches its items, and the card
+ * then has to be told to fill the anchor, because a card sizes to its content
+ * and would otherwise leave the link standing empty below it. Neither
+ * declaration does anything outside a stretched context, which is why this is
+ * safe to state unconditionally rather than only in the grid. */
+.insightCard,
+.insightCard helix-card {
+  block-size: 100%;
+}
+
+/* The card's regions pushed apart, so the date sits on the bottom edge whatever
+   the title above it wrapped to. Without it a two-line title and a three-line
+   title put their footers at two different heights, and a row of cards reads as
+   a row of slightly different objects.
+ *
+ * `align-content` on the host, which works because the card is a grid of bare
+ * slots: a `<slot>` is `display: contents`, so the slotted header, body and
+ * footer are grid items of this element rather than of anything inside the
+ * shadow root. There is no custom property for this and inventing one in the
+ * site's stylesheet would name a token the component never reads, which is the
+ * failure mode that resolves to nothing and reports no error. */
+.insightCard helix-card {
+  align-content: space-between;
+}
+
+/* A post is prose, so it takes the prose column rather than the page's. */
+.insightShell {
+  padding-block: var(--site-band);
+}
+
+/* Larger than a section title and smaller than the hero's, which is the whole
+   scale a post needs: it is the only heading on the page at this level and
+   everything under it is an `h2` the base layer already sizes. */
+.insightTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* Air between the blocks of a post, said once here rather than on every
+   element: the base layer resets the UA margins and themes prose under
+   `[data-prose]`, and what it cannot know is how far apart this particular
+   page wants its paragraphs. */
+.insightBody > * + * {
+  margin-block-start: var(--helix-space-lg);
+}
+
+/* A heading needs more above it than a paragraph does, or a new section starts
+   at the same distance as the next sentence. */
+.insightBody > * + :where(h2, h3) {
+  margin-block-start: var(--helix-space-2xl);
+}
+
+/* ======================================================== services ======= */
+
+/* The two columns of an offer, side by side while there is room and stacked
+   when there is not. A floor rather than a count: there are exactly two, so
+   `wrap` plus a minimum says the whole rule. */
+.serviceColumn {
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+
+/* The body sits under a header that already spans the card, so it takes the
+   full width and lets its own columns do the dividing. */
+.serviceBody {
+  inline-size: 100%;
 }

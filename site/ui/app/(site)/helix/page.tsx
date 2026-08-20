@@ -4,9 +4,13 @@ import { ComponentArt } from '../../../lib/component-art'
 import { findVertical, stageAppearance } from '../../verticals'
 import { ComponentBrowser } from './component-browser'
 
-const vertical = findVertical('/design')
+const vertical = findVertical('/helix')
 
-export const metadata = { title: vertical?.name }
+/* `Helix`, not `Fusion Design`. The page's own heading has always said Helix
+   and worn the vertical as an eyebrow; the document title was the last place
+   still announcing the division, which is the tab a reader scans and the string
+   a search result shows. */
+export const metadata = { title: 'Helix' }
 
 /**
  * Fusion Design.
@@ -99,7 +103,7 @@ export default async function Page({
             className="familyCard"
             data-card
             data-slug={family.slug}
-            href={`/design/components/${family.slug}`}
+            href={`/helix/components/${family.slug}`}
             key={family.slug}
           >
             <helix-card appearance="outlined">

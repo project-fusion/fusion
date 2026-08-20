@@ -53,6 +53,29 @@ const config: NextConfig = {
   },
 
   reactStrictMode: true,
+
+  /**
+   * The old vertical routes, kept alive.
+   *
+   * `/design` and `/mind` were the verticals' routes, and the pages under them
+   * were always the products: the gallery has titled itself Helix since it was
+   * written, wearing Fusion Design as an eyebrow. The masthead now says
+   * `Products` and names Helix and Cortex, so the URL says so too.
+   *
+   * Permanent, because these are the addresses of the two pages worth linking
+   * to and a 308 is what tells a search engine the move is the new truth. The
+   * wildcards carry the gallery's children with them, so a bookmarked
+   * `/design/components/card` and a shared `/design/sandbox?e=card.default`
+   * both land where they used to, query string intact.
+   */
+  async redirects() {
+    return [
+      { destination: '/helix', permanent: true, source: '/design' },
+      { destination: '/helix/:path*', permanent: true, source: '/design/:path*' },
+      { destination: '/cortex', permanent: true, source: '/mind' },
+    ]
+  },
+
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS. Production resolves `dist` through
   // package `exports`, which is what a consumer installs.

@@ -352,7 +352,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                       there. */}
                   {headline && (
                     <helix-menu-item
-                      href={`/design/sandbox?e=${family.slug}.${headline.slug}`}
+                      href={`/helix/sandbox?e=${family.slug}.${headline.slug}`}
                       value="edit-sandbox"
                     >
                       Edit in Sandbox
@@ -422,7 +422,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
               <ComponentPreview
                 css={headline.css}
                 html={headline.html}
-                sandboxHref={`/design/sandbox?e=${family.slug}.${headline.slug}`}
+                sandboxHref={`/helix/sandbox?e=${family.slug}.${headline.slug}`}
               />
             ) : (
               <helix-empty>
@@ -463,7 +463,7 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
                           foreground on hover. */}
                       <Link
                         data-link="quiet"
-                        href={`/design/sandbox?e=${family.slug}.${example.slug}`}
+                        href={`/helix/sandbox?e=${family.slug}.${example.slug}`}
                       >
                         {example.label}
                       </Link>

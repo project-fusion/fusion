@@ -110,7 +110,7 @@ export function DocsNav({ active, entries }: { active: string; entries: readonly
           Components
           {entries.map((entry) => (
             <helix-tree-item
-              href={`/design/components/${entry.slug}`}
+              href={`/helix/components/${entry.slug}`}
               key={entry.slug}
               slot="children"
               value={entry.slug}

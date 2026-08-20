@@ -260,7 +260,7 @@ export function ComponentBrowser({
 
   return (
     <>
-      <section className="designHero">
+      <section className="pageHero designHero">
         {/* One masked field, not twenty-four loose elements.
             
             The mask is the lattice's own, shared through a custom property, so
@@ -288,7 +288,7 @@ export function ComponentBrowser({
             />
           ))}
         </div>
-        <helix-flex align="center" className="designHeroInner" direction="column" gap="lg">
+        <helix-flex align="center" className="pageHeroInner" direction="column" gap="lg">
           {/* Eyebrow, title and lede are one block, and the lede was not in it.
            *
            * It sat as a sibling of the block in a column gapped `lg`, so the
@@ -315,12 +315,12 @@ export function ComponentBrowser({
               <helix-tag tone={stageTone}>{stage}</helix-tag>
             </helix-flex>
             <helix-text as="h1">{title}</helix-text>
-            <helix-text as="p" className="designHeroLede">
+            <helix-text as="p" className="pageHeroLede">
               {lede}
             </helix-text>
           </helix-flex>
           <helix-input
-            className="designSearch chromeControl"
+            className="heroSearch chromeControl"
             default-value={initialQuery}
             label="Search components"
             onhelix-input={(event) => {
@@ -333,7 +333,7 @@ export function ComponentBrowser({
           >
             <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           </helix-input>
-          <helix-flex align="center" className="designHeroActions" direction="column" gap="lg">
+          <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">
             {/* One control, not two buttons next to each other. The group
                 flattens the inner corners and pulls the pair together by the
                 border width, so they read as a single thing with two halves.
@@ -354,11 +354,11 @@ export function ComponentBrowser({
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is
                   decoration that happens to point right. */}
-              <Link data-button data-button-fill="standard" href="/design/components/button">
+              <Link data-button data-button-fill="standard" href="/helix/components/button">
                 <helix-icon name="flag-banner-fold"></helix-icon>
                 Start
               </Link>
-              <Link data-button data-button-fill="standard" href="/design/sandbox">
+              <Link data-button data-button-fill="standard" href="/helix/sandbox">
                 <helix-icon name="layout"></helix-icon>
                 Sandbox
               </Link>
@@ -367,13 +367,13 @@ export function ComponentBrowser({
         </helix-flex>
       </section>
 
-      <div className="designFilters">
+      <div className="filterBar">
         {/* Dense by nature, which is the rule app header and toolbar already
             follow: a bar of filters over a grid is chrome, and a control in it
             takes its height from the region rather than asking for one. */}
         <helix-flex
           align="center"
-          className="designFiltersInner shell"
+          className="filterBarInner shell"
           data-density="sm"
           gap="md"
           justify="between"
@@ -381,7 +381,7 @@ export function ComponentBrowser({
         >
           <helix-flex gap="sm" wrap>
             <helix-select
-              className="chromeControl designFilter"
+              className="chromeControl filterControl"
               default-value={category}
               label="Category"
               onhelix-change={(event) => {
@@ -410,7 +410,7 @@ export function ComponentBrowser({
             </helix-select>
             {statuses.length > 1 && (
               <helix-select
-                className="chromeControl designFilter"
+                className="chromeControl filterControl"
                 default-value={status}
                 label="Status"
                 onhelix-change={(event) => {
@@ -441,7 +441,7 @@ export function ComponentBrowser({
               {shown} of {index.length} components
             </helix-text>
             <helix-select
-              className="chromeControl designFilter"
+              className="chromeControl filterControl"
               default-value={order}
               label="Sort"
               onhelix-change={(event) => sortBy(event.detail.value)}
@@ -470,7 +470,7 @@ export function ComponentBrowser({
         </style>
       )}
 
-      <div className="designGridBand shell">
+      <div className="gridBand shell">
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">

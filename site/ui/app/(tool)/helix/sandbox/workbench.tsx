@@ -867,7 +867,7 @@ export function SandboxWorkbench({ families }: Props) {
 
             The name is the accessible one, so the mark beside it is decoration
             rather than a second reading of the same word. */}
-        <a data-link="quiet" href="/design" slot="start">
+        <a data-link="quiet" href="/helix" slot="start">
           <Wordmark />
         </a>
 
@@ -1125,7 +1125,7 @@ export function SandboxWorkbench({ families }: Props) {
                   every example of it runs the same ones. */}
                   <helix-sandbox-specs
                     family={family.slug}
-                    src="/design/sandbox/specs"
+                    src="/helix/sandbox/specs"
                   ></helix-sandbox-specs>
                 </helix-tabs-panel>
               </helix-tabs>
