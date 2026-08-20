@@ -89,6 +89,49 @@
   border-radius: var(--helix-radii-md);
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
+  /* The panel expands downward rather than appearing, and the clip is what does
+     it: the box is laid out at its full size from the first frame and revealed
+     top to bottom, so nothing inside moves, reflows or scales. A height
+     animation would squash the columns on the way open and a scale would
+     stretch the type.
+   
+     Negative on three sides, which is not padding for its own sake: `clip-path`
+     clips the shadow too, and a card's shadow spills outside the box on every
+     side. Only the bottom is a real edge, and it is the one that travels. The
+     top is clipped at zero, so the shadow's upward spill goes: the card hangs
+     below its trigger and that spill lands on the bar, which is the same reason
+     the band below clips it.
+   
+     The corners survive. An `inset()` with no `round` clips to a rectangle, and
+     the outside of a rounded corner is already transparent, so the radius is
+     still the element's to draw.
+   
+     **The overshoot is one space step, and it used to be `100vmax`, which is
+     what made the reveal look like a snap.** The clip travels from `100%` of
+     the panel's height to the overshoot, and the panel is fully revealed the
+     moment the bottom inset reaches zero. At `-100vmax` on a 267 pixel band
+     that is 267 of 1547 pixels of travel: the reveal finished in the first 17%
+     of the duration and the remaining 83% moved a clip edge that was already
+     past the shadow. Lengthening the duration only lengthened the part nobody
+     can see. One step clears the shadow and nothing more, so nearly all of the
+     travel is the part that shows.
+   
+     **Collapsed is the resting value and open is the departure, keyed on
+     `:popover-open`.** Written the other way round, with the closed value on
+     `[hidden]`, the panel opened in one jump: `hidden` is removed by the
+     template while the popover is still closed, so the clip changed on a style
+     recalc where the element was still `display: none`, and the transition it
+     started was cancelled a frame later when `showPopover` ran. Measured: a
+     transition existed on the frame the panel opened and was gone twenty
+     milliseconds later with the clip already at rest.
+   
+     Keyed here, the only change that carries the clip is the one that puts the
+     panel in the top layer, which is a single recalc that `@starting-style` can
+     supply a before-value for. The exit was never affected, because closing is
+     an ordinary change between two rendered states, which is what made this
+     look like a transition that only worked one way rather than one that never
+     started. `Drawer` has the same note against the same symptom. */
+  clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
   /* One row of tracks, sized to what is in them, which is what a card is: it
      has no width of its own to wrap against. Flex was tried here and takes the
      card back to a single column, because a wrapping flex container's
@@ -111,6 +154,51 @@
      gutter as usable and hands back a maximum wider than the window. */
   max-inline-size: min(var(--megamenu-size, 52rem), calc(100% - var(--helix-space-xl) * 2));
   padding: var(--helix-space-md);
+  /* `display` and `overlay` ride along with `allow-discrete`, or only the
+     opening animates.
+   
+     Both are discrete properties and both flip the instant the panel closes:
+     `display` because the closed panel is `display: none`, and `overlay`
+     because leaving the top layer is what actually removes a popover from the
+     screen. Transitioned discretely they hold their open value until the clip
+     has finished travelling, which is what gives the panel an exit at all.
+     Without them it vanishes on the frame it is told to.
+   
+     `decelerate` opening: the panel arrives and settles rather than braking
+     into place, which is the shape of something being pulled down. */
+  transition:
+    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
+    display var(--helix-duration-slow) allow-discrete,
+    overlay var(--helix-duration-slow) allow-discrete;
+}
+
+/* Where the reveal starts, and where it goes back to.
+ *
+ * `@starting-style` is the opening half: a transition does not run on an
+ * element arriving from `display: none` unless its first style is declared
+ * separately, which is exactly what a panel does every time it opens. The
+ * `[hidden]` rule is the closing half, and the two carry the same value so the
+ * panel leaves the way it came.
+ *
+ * The bottom inset is `100%`, so the clip sits on the panel's own top edge
+ * whatever height the content gave it. */
+[part="panel"]:popover-open {
+  clip-path: inset(
+    0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
+      calc(var(--helix-space-xl) * -1)
+  );
+}
+
+/* After the rule it opens from, never before it.
+ *
+ * A starting style and an ordinary rule of the same specificity are separated
+ * by source order, so written first this loses on the opening frame and the
+ * panel arrives already open. `Drawer` records the same bug, found the same way
+ * and fixed by the same move. */
+@starting-style {
+  [part="panel"]:popover-open {
+    clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
+  }
 }
 
 /* A band from edge to edge, which is the other shape a navigation panel takes.
@@ -149,8 +237,10 @@
      way, including up: offset four and blurred twelve reaches eight pixels above
      the box, which lands on the header the band is flush against and draws a
      smudge along the edge it is supposed to continue. Clipped to the box on
-     three sides and let out only below. */
-  clip-path: inset(0 0 -100vmax 0);
+     three sides and let out only below, and only once it is open: see the
+     card's note above for why the closed value rests here rather than on
+     `[hidden]`. */
+  clip-path: inset(0 0 100% 0);
   /* Tracks, where the card has flex.
    *
    * A band knows how wide it is, so `auto-fit` can work out how many columns
@@ -187,6 +277,24 @@
      to be one a sentence actually fits in. */
   padding-inline: max(var(--helix-space-xl), calc((100% - var(--megamenu-full-size, 80rem)) / 2));
   position: fixed;
+}
+
+/* The band travels the same way, from its own resting clip.
+ *
+ * Stated separately because the band's is not the card's: it is flush to both
+ * sides and its only shadow is below, so the sides are clipped at zero rather
+ * than let out. Sharing one starting value would have let the band's shadow out
+ * sideways for the length of the animation and pulled it back at the end. */
+:host([appearance="full"]) [part="panel"]:popover-open,
+:host([data-narrow]) [part="panel"]:popover-open {
+  clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
+}
+
+@starting-style {
+  :host([appearance="full"]) [part="panel"]:popover-open,
+  :host([data-narrow]) [part="panel"]:popover-open {
+    clip-path: inset(0 0 100% 0);
+  }
 }
 
 /* Stacked, because a column does not shrink past `--megamenu-column-size` and
@@ -234,5 +342,20 @@
 @media (prefers-reduced-motion: reduce) {
   [part="trigger"] {
     transition: none;
+  }
+
+  /* The clip goes and the discrete pair stay.
+   
+     Answered here rather than left to the base layer's global cap, because `*`
+     does not cross a shadow boundary. Dropping the whole declaration would take
+     `display` and `overlay` with it, and those are not motion: without them the
+     panel would still be in the top layer with nothing drawn, which is a worse
+     answer to the preference than an instant one. So the clip is removed and
+     the panel opens and closes at once. */
+  [part="panel"] {
+    clip-path: none;
+    transition:
+      display var(--helix-duration-instant) allow-discrete,
+      overlay var(--helix-duration-instant) allow-discrete;
   }
 }
