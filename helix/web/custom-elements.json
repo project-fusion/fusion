@@ -27160,6 +27160,17 @@
             },
             {
               "kind": "field",
+              "name": "handleContentClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both.",
+              "inheritedFrom": {
+                "name": "HelixBaseMegamenu",
+                "module": "src/megamenu/root/megamenu-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -27170,17 +27181,6 @@
               "inheritedFrom": {
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleContentClick",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both.",
-              "inheritedFrom": {
-                "name": "HelixBaseMegamenu",
-                "module": "src/megamenu/root/megamenu-root.ts"
               }
             },
             {
@@ -38590,6 +38590,17 @@
           "members": [
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are the same mechanism underneath, one shape repeated and clipped to\nthe score, so halves work in either.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "defaultValue",
               "type": {
                 "text": "string"
@@ -39053,6 +39064,21 @@
             },
             {
               "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the score is written out beside the marks.\n\nMarks say roughly, and a number says exactly. Four and a bit stars is not a\nreading anyone can repeat, which is why a product's average is nearly always\nprinted next to them. `Meter` spells its reading the same way and under the\nsame attribute.\n\nIt follows the pointer, because it labels what the marks are showing rather\nthan what the form holds: a label that disagreed with the marks under the\nreader's own cursor would be worse than no label.",
+              "attribute": "show-value",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "previewing",
               "type": {
                 "text": "number | undefined"
@@ -39111,6 +39137,84 @@
               },
               "privacy": "private",
               "description": "The options, as the shared controller wants them.\n\nAdapters rather than elements, because these are buttons this element drew\nrather than a consumer's custom elements: the interface asks for five\nthings and a `<button>` in a shadow root can answer all five without being\ndressed up as a component to do it.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dragging",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The pointer drawing a score, while one is.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "scoreAt",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "clientX",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The step under a point on the row, or the nearest one to it.\n\nAsked of the boxes rather than worked out from `max` and `step`, because\nwhere a step sits is the stylesheet's arithmetic and this would be a second\ncopy of it that could disagree. The browser has already laid the targets\nout; this reads them back.\n\nNearest rather than only a hit, so a drag that runs off the end of the row\npins to the last mark instead of stopping at whatever it last touched, and\na pointer in the half-gap outside the first mark still answers.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDragStart",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Dragging across the marks draws a score, and letting go chooses it.\n\nOne press and a slide is how a rating is given on a phone, and on a desktop\nit is how somebody who overshoots corrects without lifting. Pointer capture\nis what makes it one gesture: without it the events go to whichever target\nthe pointer crossed into, and a drag that leaves the row stops reporting.\n\nNothing is chosen until release, so a drag that ends back where it started,\nor off the element entirely, has asked for nothing.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDragMove",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDragEnd",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleDragCancel",
+              "privacy": "private",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseRating",
@@ -39355,42 +39459,16 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseRating",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A score out of a few marks, given or shown.",
-          "helix": {
-            "category": "forms",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/rating",
-            "aliases": [
-              "Stars",
-              "Score",
-              "Review score"
-            ],
-            "tier": "styled",
-            "group": "Rating",
-            "part": "Root",
-            "examples": [
-              {
-                "slug": "default"
-              },
-              {
-                "description": "Half marks, which is the case the value is a number for.",
-                "slug": "halves"
-              },
-              {
-                "description": "A score being shown rather than asked for, which is not a control.",
-                "slug": "readonly"
-              }
-            ],
-            "source": "helix/web/src/rating"
-          },
-          "tagName": "helix-rating",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are the same mechanism underneath, one shape repeated and clipped to\nthe score, so halves work in either.",
+              "fieldName": "appearance"
+            },
             {
               "name": "default-value",
               "type": {
@@ -39521,6 +39599,19 @@
               }
             },
             {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the score is written out beside the marks.\n\nMarks say roughly, and a number says exactly. Four and a bit stars is not a\nreading anyone can repeat, which is why a product's average is nearly always\nprinted next to them. `Meter` spells its reading the same way and under the\nsame attribute.\n\nIt follows the pointer, because it labels what the marks are showing rather\nthan what the form holds: a label that disagreed with the marks under the\nreader's own cursor would be worse than no label.",
+              "fieldName": "showValue",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -39547,6 +39638,53 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseRating",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A score out of a few marks, given or shown.",
+          "helix": {
+            "category": "forms",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/rating",
+            "aliases": [
+              "Stars",
+              "Score",
+              "Review score"
+            ],
+            "tier": "styled",
+            "group": "Rating",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              },
+              {
+                "description": "A level rather than a judgement, which is what a plain circle says.",
+                "slug": "dots"
+              },
+              {
+                "description": "Half marks, which is the case the value is a number for.",
+                "slug": "halves"
+              },
+              {
+                "description": "A score being shown rather than asked for, which is not a control.",
+                "slug": "readonly"
+              },
+              {
+                "description": "A review summary: the average as a readout, the spread as meters.",
+                "slug": "summary"
+              },
+              {
+                "description": "Marks say roughly and a number says exactly, so most ratings print both.",
+                "slug": "value"
+              }
+            ],
+            "source": "helix/web/src/rating"
+          },
+          "tagName": "helix-rating",
+          "customElement": true,
           "cssParts": [
             {
               "description": "The row of marks.",
@@ -39583,6 +39721,14 @@
             {
               "description": "One place a reader can press, which is one step.",
               "name": "option",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "description": "The score written out, under `show-value`.",
+              "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseRating",
                 "module": "src/rating/root/rating-root.ts"

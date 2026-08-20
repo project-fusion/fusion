@@ -3576,6 +3576,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'dots' \| 'marks'` | `'marks'` | - | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -3592,6 +3593,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `score` | - | `number` | - | `HelixBaseRating` | The score, as a number, clamped to what the marks can show. |
+| `showValue` | `show-value` | `boolean` | `false` | `HelixBaseRating` | Whether the score is written out beside the marks. |
 | `step` | `step` | `number` | `1` | `HelixBaseRating` | The smallest part of a mark that can be chosen. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
 | `valueText` | `value-text` | `string` | `''` | `HelixBaseRating` | How the score is read out, where "3.5 out of 5" is not what it should say. |
@@ -3614,6 +3616,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `fill` | The filled marks, clipped to the score. |
 | `mark` | One mark, in either layer. |
 | `option` | One place a reader can press, which is one step. |
+| `value` | The score written out, under `show-value`. |
 
 #### Custom properties
 

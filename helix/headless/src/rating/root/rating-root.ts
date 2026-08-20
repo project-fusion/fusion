@@ -57,11 +57,22 @@ import { property, state } from 'lit/decorators.js'
  * @csspart fill - The filled marks, clipped to the score.
  * @csspart mark - One mark, in either layer.
  * @csspart option - One place a reader can press, which is one step.
+ * @csspart value - The score written out, under `show-value`.
  */
 @customElement('helix-base-rating')
 export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /** Pressed or arrowed, so every change is announced. See `announcesInput`. */
-  protected override readonly announcesInput = true
+  /*
+   * Discrete, which is the default and is said here only because it was wrong.
+   *
+   * `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all announce
+   * input, and every one of them is edited continuously: a value passes through
+   * every keystroke or pixel on its way to the one meant. A rating does not. A
+   * press picks a score, an arrow picks the next one, and the drag deliberately
+   * asks for nothing until it is let go, so there is exactly one value and it
+   * is the chosen one. That is `helix-change`, the same as the radio group this
+   * announces itself as.
+   */
+  protected override readonly announcesInput = false
 
   /** How many marks there are. */
   @property({ type: Number })
@@ -95,6 +106,21 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
    */
   @property({ attribute: 'value-text' })
   valueText = ''
+
+  /**
+   * Whether the score is written out beside the marks.
+   *
+   * Marks say roughly, and a number says exactly. Four and a bit stars is not a
+   * reading anyone can repeat, which is why a product's average is nearly always
+   * printed next to them. `Meter` spells its reading the same way and under the
+   * same attribute.
+   *
+   * It follows the pointer, because it labels what the marks are showing rather
+   * than what the form holds: a label that disagreed with the marks under the
+   * reader's own cursor would be worse than no label.
+   */
+  @property({ attribute: 'show-value', reflect: true, type: Boolean })
+  showValue = false
 
   /** What the pointer is over, which is shown instead of the score while it is. */
   @state()
@@ -144,6 +170,100 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
       },
       selected: element.getAttribute('aria-checked') === 'true',
     }))
+  }
+
+  /** The pointer drawing a score, while one is. */
+  private dragging: number | undefined = undefined
+
+  /**
+   * The step under a point on the row, or the nearest one to it.
+   *
+   * Asked of the boxes rather than worked out from `max` and `step`, because
+   * where a step sits is the stylesheet's arithmetic and this would be a second
+   * copy of it that could disagree. The browser has already laid the targets
+   * out; this reads them back.
+   *
+   * Nearest rather than only a hit, so a drag that runs off the end of the row
+   * pins to the last mark instead of stopping at whatever it last touched, and
+   * a pointer in the half-gap outside the first mark still answers.
+   */
+  private scoreAt(clientX: number): string | undefined {
+    let nearest: string | undefined
+    let best = Number.POSITIVE_INFINITY
+    for (const option of this.renderRoot?.querySelectorAll<HTMLElement>('[part="option"]') ?? []) {
+      const box = option.getBoundingClientRect()
+      if (clientX >= box.left && clientX < box.right) {
+        return option.dataset.score
+      }
+      const away = clientX < box.left ? box.left - clientX : clientX - box.right
+      if (away < best) {
+        best = away
+        nearest = option.dataset.score
+      }
+    }
+    return nearest
+  }
+
+  /**
+   * Dragging across the marks draws a score, and letting go chooses it.
+   *
+   * One press and a slide is how a rating is given on a phone, and on a desktop
+   * it is how somebody who overshoots corrects without lifting. Pointer capture
+   * is what makes it one gesture: without it the events go to whichever target
+   * the pointer crossed into, and a drag that leaves the row stops reporting.
+   *
+   * Nothing is chosen until release, so a drag that ends back where it started,
+   * or off the element entirely, has asked for nothing.
+   */
+  private readonly handleDragStart = (event: PointerEvent): void => {
+    if (this.isDisabled || this.readOnly || event.button !== 0) {
+      return
+    }
+    const score = this.scoreAt(event.clientX)
+    if (score === undefined) {
+      return
+    }
+    try {
+      ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+    } catch {
+      /* A synthesised pointer has no capture to take, and the drag works
+         without it right up until the pointer leaves the row. Worth having the
+         gesture testable rather than making the specs drive a real device. */
+    }
+    this.dragging = event.pointerId
+    this.previewing = Number.parseFloat(score)
+  }
+
+  private readonly handleDragMove = (event: PointerEvent): void => {
+    if (this.dragging !== event.pointerId) {
+      return
+    }
+    const score = this.scoreAt(event.clientX)
+    if (score !== undefined) {
+      this.previewing = Number.parseFloat(score)
+    }
+  }
+
+  private readonly handleDragEnd = (event: PointerEvent): void => {
+    if (this.dragging !== event.pointerId) {
+      return
+    }
+    this.dragging = undefined
+    this.previewing = undefined
+    const score = this.scoreAt(event.clientX)
+    if (score !== undefined) {
+      this.requestValue(score)
+    }
+  }
+
+  /* A cancelled pointer is the system taking the gesture away, which is not the
+     reader choosing. Put the marks back to the value they already held. */
+  private readonly handleDragCancel = (event: PointerEvent): void => {
+    if (this.dragging !== event.pointerId) {
+      return
+    }
+    this.dragging = undefined
+    this.previewing = undefined
   }
 
   /** Reports the value. */
@@ -202,6 +322,10 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
       role=${this.readOnly ? 'img' : 'radiogroup'}
       aria-label=${this.readOnly ? said : this.label || nothing}
       style=${`--_rating-full: ${Math.floor(showing)}; --_rating-part: ${showing - Math.floor(showing)}; --_rating-steps: ${this.steps.length}`}
+      @pointercancel=${this.handleDragCancel}
+      @pointerdown=${this.handleDragStart}
+      @pointermove=${this.handleDragMove}
+      @pointerup=${this.handleDragEnd}
     >
       <span
         part="track"
@@ -234,7 +358,16 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
               ></button>`,
             )
       }
-    </div>`
+    </div>
+    ${
+      this.showValue
+        ? html`<span
+          part="value"
+          aria-hidden="true"
+          >${showing}</span
+        >`
+        : nothing
+    }`
   }
 }
 

@@ -3521,6 +3521,28 @@ answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
   valueText?: HelixBaseRating["valueText"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  "show-value"?: HelixBaseRating["showValue"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  showValue?: HelixBaseRating["showValue"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */

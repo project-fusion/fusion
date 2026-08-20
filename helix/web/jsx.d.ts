@@ -7545,6 +7545,16 @@ card with no box loses the only thing that says you may pick several. */
 };
 
 export type HelixRatingProps = {
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned.
+
+Both are the same mechanism underneath, one shape repeated and clipped to
+the score, so halves work in either. */
+  appearance?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7600,6 +7610,28 @@ answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
   valueText?: HelixRating["valueText"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  "show-value"?: HelixRating["showValue"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  showValue?: HelixRating["showValue"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7632,6 +7664,16 @@ reflected none of them. */
 };
 
 export type HelixRatingSolidJsProps = {
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned.
+
+Both are the same mechanism underneath, one shape repeated and clipped to
+the score, so halves work in either. */
+  "prop:appearance"?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -7687,6 +7729,28 @@ answer from the value than from a sentence: "3.5" alone is a number without
 a subject. This names the readout, where a control is named by its `label`
 and each of its options by the score that option is. */
   "prop:valueText"?: HelixRating["valueText"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  "bool:show-value"?: HelixRating["showValue"];
+  /** Whether the score is written out beside the marks.
+
+Marks say roughly, and a number says exactly. Four and a bit stars is not a
+reading anyone can repeat, which is why a product's average is nearly always
+printed next to them. `Meter` spells its reading the same way and under the
+same attribute.
+
+It follows the pointer, because it labels what the marks are showing rather
+than what the form holds: a label that disagreed with the marks under the
+reader's own cursor would be worse than no label. */
+  "prop:showValue"?: HelixRating["showValue"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -17413,6 +17477,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned.
+   *
+   * Both are the same mechanism underneath, one shape repeated and clipped to
+   * the score, so halves work in either.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -17444,6 +17517,16 @@ export type CustomElements = {
    * answer from the value than from a sentence: "3.5" alone is a number without
    * a subject. This names the readout, where a control is named by its `label`
    * and each of its options by the score that option is.
+   * - `show-value`/`showValue`: Whether the score is written out beside the marks.
+   *
+   * Marks say roughly, and a number says exactly. Four and a bit stars is not a
+   * reading anyone can repeat, which is why a product's average is nearly always
+   * printed next to them. `Meter` spells its reading the same way and under the
+   * same attribute.
+   *
+   * It follows the pointer, because it labels what the marks are showing rather
+   * than what the form holds: a label that disagreed with the marks under the
+   * reader's own cursor would be worse than no label.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -17526,6 +17609,7 @@ export type CustomElements = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-rating": Partial<
     HelixRatingProps & BaseProps<HelixRating> & BaseEvents
@@ -26600,6 +26684,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned.
+   *
+   * Both are the same mechanism underneath, one shape repeated and clipped to
+   * the score, so halves work in either.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -26631,6 +26724,16 @@ export type CustomElementsSolidJs = {
    * answer from the value than from a sentence: "3.5" alone is a number without
    * a subject. This names the readout, where a control is named by its `label`
    * and each of its options by the score that option is.
+   * - `show-value`/`showValue`: Whether the score is written out beside the marks.
+   *
+   * Marks say roughly, and a number says exactly. Four and a bit stars is not a
+   * reading anyone can repeat, which is why a product's average is nearly always
+   * printed next to them. `Meter` spells its reading the same way and under the
+   * same attribute.
+   *
+   * It follows the pointer, because it labels what the marks are showing rather
+   * than what the form holds: a label that disagreed with the marks under the
+   * reader's own cursor would be worse than no label.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -26713,6 +26816,7 @@ export type CustomElementsSolidJs = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-rating": Partial<
     HelixRatingProps &

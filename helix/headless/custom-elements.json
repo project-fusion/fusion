@@ -21082,6 +21082,13 @@
             },
             {
               "kind": "field",
+              "name": "handleContentClick",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both."
+            },
+            {
+              "kind": "field",
               "name": "open",
               "type": {
                 "text": "boolean"
@@ -21098,13 +21105,6 @@
                 "name": "MixinControllerOpen",
                 "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
               }
-            },
-            {
-              "kind": "field",
-              "name": "handleContentClick",
-              "privacy": "private",
-              "readonly": true,
-              "description": "Shuts the panel when a reader takes one of the destinations in it.\n\nNothing closed it before, so a click navigated and left the panel hanging\nover wherever the reader landed. With a router that navigates in place, and\nthis is one, that is a panel covering the page it was asked to go to.\n\n**A modified click leaves it open**, which is the same position this\nelement already takes on middle clicks and the status bar: `cmd` on a link\nopens a tab behind this page rather than navigating it, so the reader is\nstill standing in the menu and collecting, and shutting it under them would\nmake the second choice cost a second open.\n\n`requestOpen(false)` rather than `close()`, for the reason `pointerleave`\ngives: the trigger is not where the reader is going, and pulling focus back\nto a nav bar they have just left is a scroll they did not ask for.\n\n**On the host rather than on the panel**, which is the same reason the\npointer handlers give and one more. A row is slotted light DOM and the\npanel is in the shadow root, so a click only reaches the panel through the\nflattened tree: real ones do, and a DOM that does not implement slot\npropagation never delivers it, which makes every case here pass by never\nrunning this at all. The host is the row's own ancestor in both."
             },
             {
               "kind": "field",
@@ -30109,6 +30109,10 @@
             {
               "description": "One place a reader can press, which is one step.",
               "name": "option"
+            },
+            {
+              "description": "The score written out, under `show-value`.",
+              "name": "value"
             }
           ],
           "members": [
@@ -30120,8 +30124,8 @@
               },
               "privacy": "protected",
               "readonly": true,
-              "default": "true",
-              "description": "Pressed or arrowed, so every change is announced. See `announcesInput`.",
+              "default": "false",
+              "description": "Discrete by default: only a control the reader edits continuously says otherwise.",
               "inheritedFrom": {
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
@@ -30170,6 +30174,17 @@
             },
             {
               "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the score is written out beside the marks.\n\nMarks say roughly, and a number says exactly. Four and a bit stars is not a\nreading anyone can repeat, which is why a product's average is nearly always\nprinted next to them. `Meter` spells its reading the same way and under the\nsame attribute.\n\nIt follows the pointer, because it labels what the marks are showing rather\nthan what the form holds: a label that disagreed with the marks under the\nreader's own cursor would be worse than no label.",
+              "attribute": "show-value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "previewing",
               "type": {
                 "text": "number | undefined"
@@ -30212,6 +30227,60 @@
               },
               "privacy": "private",
               "description": "The options, as the shared controller wants them.\n\nAdapters rather than elements, because these are buttons this element drew\nrather than a consumer's custom elements: the interface asks for five\nthings and a `<button>` in a shadow root can answer all five without being\ndressed up as a component to do it.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "dragging",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The pointer drawing a score, while one is."
+            },
+            {
+              "kind": "method",
+              "name": "scoreAt",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "clientX",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The step under a point on the row, or the nearest one to it.\n\nAsked of the boxes rather than worked out from `max` and `step`, because\nwhere a step sits is the stylesheet's arithmetic and this would be a second\ncopy of it that could disagree. The browser has already laid the targets\nout; this reads them back.\n\nNearest rather than only a hit, so a drag that runs off the end of the row\npins to the last mark instead of stopping at whatever it last touched, and\na pointer in the half-gap outside the first mark still answers."
+            },
+            {
+              "kind": "field",
+              "name": "handleDragStart",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Dragging across the marks draws a score, and letting go chooses it.\n\nOne press and a slide is how a rating is given on a phone, and on a desktop\nit is how somebody who overshoots corrects without lifting. Pointer capture\nis what makes it one gesture: without it the events go to whichever target\nthe pointer crossed into, and a drag that leaves the row stops reporting.\n\nNothing is chosen until release, so a drag that ends back where it started,\nor off the element entirely, has asked for nothing."
+            },
+            {
+              "kind": "field",
+              "name": "handleDragMove",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleDragEnd",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleDragCancel",
+              "privacy": "private",
               "readonly": true
             },
             {
@@ -30863,6 +30932,15 @@
               "default": "''",
               "description": "How the score is read out, where \"3.5 out of 5\" is not what it should say.\n\nA rating out of five is one of the few places a screen reader gets a worse\nanswer from the value than from a sentence: \"3.5\" alone is a number without\na subject. This names the readout, where a control is named by its `label`\nand each of its options by the score that option is.",
               "fieldName": "valueText"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the score is written out beside the marks.\n\nMarks say roughly, and a number says exactly. Four and a bit stars is not a\nreading anyone can repeat, which is why a product's average is nearly always\nprinted next to them. `Meter` spells its reading the same way and under the\nsame attribute.\n\nIt follows the pointer, because it labels what the marks are showing rather\nthan what the form holds: a label that disagreed with the marks under the\nreader's own cursor would be worse than no label.",
+              "fieldName": "showValue"
             },
             {
               "name": "default-value",

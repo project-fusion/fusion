@@ -6,7 +6,9 @@
   --_rating-mark-size: var(--rating-size, var(--helix-size-icon-md));
   --_rating-mark-gap: var(--rating-gap, var(--helix-space-2xs));
 
+  align-items: center;
   display: inline-flex;
+  gap: var(--rating-gap, var(--helix-space-xs));
 }
 
 /* Two rows of the same marks, one over the other, and the top one cut off
@@ -19,6 +21,10 @@
 [part="marks"] {
   display: inline-flex;
   position: relative;
+  /* Vertical scrolling still belongs to the page, and the horizontal axis is
+     this element's: a drag along the row draws a score, and a swipe down the
+     page past a rating should not be caught by it. `none` would take both. */
+  touch-action: pan-y;
 }
 
 [part="track"],
@@ -113,6 +119,33 @@
     var(--_rating-mark-gap) /
     2
   );
+}
+
+/* The score in words, beside the marks that show it roughly.
+ *
+ * Tabular figures because it changes under the pointer, and proportional ones
+ * make the row twitch as 1 gives way to 4. `aria-hidden` on the element: the
+ * radio group already announces the checked option and a readout already
+ * carries the score in its name, so this would be the third saying of it. */
+[part="value"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* A circle rather than a glyph, for a level rather than a judgement.
+ *
+ * The mask goes instead of being swapped for a round one: the mark is already
+ * a box painted in `currentcolor`, so a full radius is the whole shape and a
+ * circular mask over a square would only be the same circle drawn twice. */
+:host([appearance="dots"]) {
+  --_rating-mark-size: var(--rating-size, var(--helix-size-icon-sm));
+}
+
+:host([appearance="dots"]) [part="mark"] {
+  border-radius: var(--helix-radii-full);
+  mask-image: none;
 }
 
 [part="option"]:focus-visible {

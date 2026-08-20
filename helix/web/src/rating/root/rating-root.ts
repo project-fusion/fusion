@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseRating } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './rating-root.css.js'
 
 /**
@@ -25,6 +26,20 @@ import { styles } from './rating-root.css.js'
 @customElement('helix-rating')
 export class HelixRating extends HelixBaseRating {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned.
+   *
+   * Both are the same mechanism underneath, one shape repeated and clipped to
+   * the score, so halves work in either.
+   */
+  @property({ reflect: true })
+  appearance: 'dots' | 'marks' = 'marks'
 }
 
 declare global {

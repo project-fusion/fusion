@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, role } from '@fusion-io/testing/dom'
+import { formValue, hasLayout, mount, part, registerDom } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -126,6 +126,38 @@ describe('rating', () => {
     })
   })
 
+  describe('the score in words', () => {
+    test('is not written out unless it is asked for', async () => {
+      expect(part(await rating('value="3"'), 'value')).toBe(null)
+    })
+
+    test('says the score, because marks only say roughly', async () => {
+      const host = await rating('show-value value="3.5" step="0.5"')
+      expect(part(host, 'value')?.textContent).toBe('3.5')
+    })
+
+    test('is not read out, having been said twice already', async () => {
+      /* The group announces the checked option and a readout carries the score
+         in its own name. A third saying of it is noise. */
+      const host = await rating('show-value value="3"')
+      expect(part(host, 'value')?.getAttribute('aria-hidden')).toBe('true')
+    })
+
+    test('follows the marks rather than the form, since that is what it labels', async () => {
+      /* A label reading 3 under a row of marks showing 5, because the pointer is
+         over the fifth, is worse than no label. */
+      const host = await rating('show-value value="3"')
+      const previewed = host as HTMLElement & {
+        previewing: number | undefined
+        updateComplete: Promise<unknown>
+      }
+      previewed.previewing = 5
+      await previewed.updateComplete
+      expect(part(host, 'value')?.textContent).toBe('5')
+      expect((host as HTMLElement & { value: string }).value).toBe('3')
+    })
+  })
+
   describe('shape', () => {
     test('both layers hold every mark, since the fill is a clip of the whole row', async () => {
       const host = await rating('value="2"')
@@ -150,3 +182,99 @@ describe('rating', () => {
     })
   })
 })
+
+if (hasLayout()) {
+  describe('a rating being dragged', () => {
+    type Rating = HTMLElement & { value: string; updateComplete: Promise<unknown> }
+
+    const centre = (host: HTMLElement, step: number): number => {
+      const option = [...host.shadowRoot!.querySelectorAll<HTMLElement>('[part="option"]')][step]
+      const box = option!.getBoundingClientRect()
+      return box.left + box.width / 2
+    }
+
+    const send = async (host: Rating, type: string, clientX: number): Promise<void> => {
+      const marks = part(host, 'marks') as HTMLElement
+      marks.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, button: 0, clientX, pointerId: 7 }),
+      )
+      await host.updateComplete
+    }
+
+    test('draws a score while it moves, and chooses nothing until it is let go', async () => {
+      /* One press and a slide is how a rating is given on a phone, and how
+         somebody who overshoots corrects without lifting. Committing on the way
+         would rate it every mark the pointer crossed. */
+      /* `default-value`, not `value`. A rating told `value` is controlled: it
+         announces the change and waits to be given a new one, so it would sit
+         at 1 through every drag here and the specs would be measuring the
+         controlled contract rather than the gesture. */
+      const host = (await rating('default-value="1"')) as Rating
+      await send(host, 'pointerdown', centre(host, 1))
+      expect(host.value).toBe('1')
+
+      await send(host, 'pointermove', centre(host, 4))
+      expect(part(host, 'marks')?.getAttribute('style')).toContain('--_rating-full: 5')
+      expect(host.value).toBe('1')
+
+      await send(host, 'pointerup', centre(host, 4))
+      expect(host.value).toBe('5')
+    })
+
+    test('reads the boxes, so a drag lands on the mark it is over', async () => {
+      // Not recomputed from `max` and `step`, which would be a second copy of
+      // the stylesheet's arithmetic that could disagree with it.
+      const host = (await rating('default-value="1" step="0.5"')) as Rating
+      await send(host, 'pointerdown', centre(host, 2))
+      await send(host, 'pointerup', centre(host, 2))
+      expect(host.value).toBe('1.5')
+    })
+
+    test('a drag off the end pins to the last mark rather than stopping short', async () => {
+      const host = (await rating('default-value="1"')) as Rating
+      const past = host.getBoundingClientRect().right + 200
+      await send(host, 'pointerdown', centre(host, 0))
+      await send(host, 'pointermove', past)
+      await send(host, 'pointerup', past)
+      expect(host.value).toBe('5')
+    })
+
+    test('a gesture the system takes away chooses nothing', async () => {
+      const host = (await rating('value="2"')) as Rating
+      await send(host, 'pointerdown', centre(host, 4))
+      await send(host, 'pointercancel', centre(host, 4))
+      await send(host, 'pointerup', centre(host, 4))
+      expect(host.value).toBe('2')
+    })
+
+    test('a controlled rating announces the drag and waits to be told', async () => {
+      /* `value` is a claim of ownership, and the gesture does not override it:
+         the marks follow the pointer, the release asks, and nothing moves until
+         the consumer passes a new value back. */
+      const host = (await rating('value="1"')) as Rating
+      let asked: string | undefined
+      host.addEventListener('helix-change', (event) => {
+        asked = (event as CustomEvent<{ value: string }>).detail?.value
+      })
+      await send(host, 'pointerdown', centre(host, 4))
+      await send(host, 'pointerup', centre(host, 4))
+      expect(asked).toBe('5')
+      expect(host.value).toBe('1')
+    })
+
+    test('a readout cannot be dragged, having nothing to choose', async () => {
+      const host = (await rating('readonly value="2"')) as Rating
+      const box = host.getBoundingClientRect()
+      await send(host, 'pointerdown', box.left + box.width / 2)
+      await send(host, 'pointerup', box.right)
+      expect(host.value).toBe('2')
+    })
+
+    test('and neither can a disabled one', async () => {
+      const host = (await rating('disabled value="2"')) as Rating
+      await send(host, 'pointerdown', centre(host, 0))
+      await send(host, 'pointerup', centre(host, 4))
+      expect(host.value).toBe('2')
+    })
+  })
+}
