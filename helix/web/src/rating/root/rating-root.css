@@ -166,3 +166,87 @@
 :host([readonly]) [part="marks"] {
   cursor: default;
 }
+
+/* A shape the consumer handed us, drawn as itself.
+ *
+ * The mask and the paint are how this file draws a mark when it was given
+ * none. Handed a real element, both have to go, or the clone sits inside a
+ * filled box wearing a star-shaped hole. */
+[data-slotted] [part="mark"] {
+  background-color: transparent;
+  mask-image: none;
+}
+
+/* Chips: each position its own drawing, in its own target.
+ *
+ * The row stops being two layers over a strip of invisible buttons and becomes
+ * a row of buttons with a mark in each, so the pitch arithmetic above is undone
+ * here: nothing is being positioned over anything. */
+:host([appearance="chips"]) [part="marks"] {
+  gap: var(--rating-gap, var(--helix-space-sm));
+}
+
+:host([appearance="chips"]) [part="option"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--rating-chip-size, var(--helix-size-control-md));
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  inline-size: var(--rating-chip-size, var(--helix-size-control-md));
+  inset-inline-start: auto;
+  justify-content: center;
+  position: static;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard),
+    translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Weight and height carry the choice, not a wash of colour.
+ *
+ * A chosen chip goes solid and comes forward, which is the same thing a pressed
+ * key does and reads at a glance across a row of five. Tinting the background
+ * instead says "this one is a slightly different colour", which is a hue a
+ * reader has to interpret rather than a state they can see. */
+:host([appearance="chips"]) [part="option"][aria-checked="true"] {
+  background-color: var(--helix-color-surface-inverse);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--helix-color-foreground-inverse);
+  translate: 0 -2px;
+}
+
+:host([appearance="chips"]) [part="option"]:hover:not([disabled]) {
+  translate: 0 -1px;
+}
+
+/* The mark inside a chip is drawn at the icon size, not the chip's. */
+:host([appearance="chips"]) [part="mark"] {
+  block-size: var(--_rating-mark-size);
+  inline-size: var(--_rating-mark-size);
+}
+
+/* A readout has no target to sit in, so the mark carries the chip itself. */
+:host([appearance="chips"][readonly]) [part="mark"] {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--rating-chip-size, var(--helix-size-control-md));
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  inline-size: var(--rating-chip-size, var(--helix-size-control-md));
+  justify-content: center;
+  mask-image: none;
+}
+
+:host([appearance="chips"][readonly]) [part="mark"][data-chosen] {
+  background-color: var(--helix-color-surface-inverse);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--helix-color-foreground-inverse);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([appearance="chips"]) [part="option"] {
+    transition: none;
+  }
+}

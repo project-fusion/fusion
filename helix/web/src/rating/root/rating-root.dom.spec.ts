@@ -183,7 +183,97 @@ describe('rating', () => {
   })
 })
 
+describe('a rating drawn as chips', () => {
+  const chips = async (attrs = ''): Promise<HTMLElement> =>
+    mount(`<helix-rating appearance="chips" label="Rate" ${attrs}></helix-rating>`)
+
+  test('has no fill layer, because nothing is being clipped', async () => {
+    /* Each position is its own drawing and the fifth is not a longer version of
+       the third. There is no partial mark to draw. */
+    const host = await chips('value="2"')
+    expect(part(host, 'fill')).toBe(null)
+    expect(part(host, 'track')).toBe(null)
+  })
+
+  test('is one target per mark, whatever step says', async () => {
+    // Half of a face is not a rating anybody has ever given.
+    const host = await chips('step="0.5" value="2"')
+    expect(host.shadowRoot!.querySelectorAll('[part="option"]').length).toBe(5)
+  })
+
+  test('puts the mark inside the target rather than under it', async () => {
+    const host = await chips('value="2"')
+    const option = host.shadowRoot!.querySelector('[part="option"]')
+    expect(option?.querySelector('[part="mark"]')).not.toBe(null)
+  })
+
+  test('a readout draws the marks itself and says which one it is', async () => {
+    // No targets to put them in, so the mark carries the chip.
+    const host = await chips('readonly value="2" max="3"')
+    const marks = [...host.shadowRoot!.querySelectorAll('[part="mark"]')]
+    expect(marks.length).toBe(3)
+    expect(marks.map((one) => one.hasAttribute('data-chosen'))).toEqual([false, true, false])
+  })
+
+  test('is still a radio group, the marks having changed and not the meaning', async () => {
+    expect(part(await chips('value="2"'), 'marks')?.getAttribute('role')).toBe('radiogroup')
+  })
+})
+
 if (hasLayout()) {
+  /* In a browser only. happy-dom does not assign slotted content, so
+     `assignedElements` comes back empty there and `slotchange` never fires:
+     every case below would pass by finding no clones and expecting none.
+     `Megamenu`'s specs say the same about events crossing a slot. */
+  describe('a rating whose mark was slotted', () => {
+    const withMarks = async (attrs: string, shapes: number): Promise<HTMLElement> => {
+      const slotted = Array.from(
+        { length: shapes },
+        (_, index) => `<i data-shape="${index}" slot="mark"></i>`,
+      ).join('')
+      const host = await mount(`<helix-rating label="Rate" ${attrs}>${slotted}</helix-rating>`)
+      await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      return host
+    }
+
+    const shapes = (host: HTMLElement): (string | null)[] =>
+      [...host.shadowRoot!.querySelectorAll<HTMLElement>('[part="mark"] > i')].map(
+        (one) => one.dataset.shape ?? null,
+      )
+
+    test('takes one shape as the shape of every mark', async () => {
+      /* A slot shows its content once and a rating needs it as many times as
+       there are marks, twice over while there are two layers. So the slot is
+       where the shape arrives, and what a reader sees is the clones. */
+      const host = await withMarks('value="2"', 1)
+      expect(shapes(host)).toEqual(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0'])
+    })
+
+    test('and several as the shapes in order, which is what a face scale is', async () => {
+      const host = await withMarks('appearance="chips" value="2"', 5)
+      expect(shapes(host)).toEqual(['0', '1', '2', '3', '4'])
+    })
+
+    test('the last one repeats past the end of a short list', async () => {
+      // Two shapes for four marks is a decision rather than a crash.
+      const host = await withMarks('appearance="chips" max="4" value="1"', 2)
+      expect(shapes(host)).toEqual(['0', '1', '1', '1'])
+    })
+
+    test('says it was given one, so the stylesheet stops drawing its own', async () => {
+      expect(part(await withMarks('value="2"', 1), 'marks')?.hasAttribute('data-slotted')).toBe(
+        true,
+      )
+      expect(part(await rating('value="2"'), 'marks')?.hasAttribute('data-slotted')).toBe(false)
+    })
+
+    test('the slot itself is never seen, being where the shape arrives', async () => {
+      const host = await withMarks('value="2"', 1)
+      const slot = host.shadowRoot!.querySelector('slot[name="mark"]')
+      expect(slot?.hasAttribute('hidden')).toBe(true)
+    })
+  })
+
   describe('a rating being dragged', () => {
     type Rating = HTMLElement & { value: string; updateComplete: Promise<unknown> }
 

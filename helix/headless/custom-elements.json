@@ -30185,6 +30185,27 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'chips' | 'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
+              "attribute": "appearance",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "markSources",
+              "type": {
+                "text": "Element[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "The shapes a consumer slotted, if they slotted any.\n\nRead rather than projected. A `<slot>` shows its content once and a rating\nneeds the shape as many times as there are marks, twice over while there\nare two layers, so the slot here is a way of being handed the shape rather\nthan a place the shape is drawn. The element it is handed gets cloned into\neach position."
+            },
+            {
+              "kind": "field",
               "name": "previewing",
               "type": {
                 "text": "number | undefined"
@@ -30238,6 +30259,45 @@
               "privacy": "private",
               "default": "undefined",
               "description": "The pointer drawing a score, while one is."
+            },
+            {
+              "kind": "field",
+              "name": "clones",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map<string, Node>()",
+              "description": "One clone per place a mark goes, kept so a render does not remake them.\n\nA drag renders on every pointer move, and handing Lit a fresh node each\ntime would swap every mark in the row on every frame of a gesture whose\nwhole point is that only the fill moves."
+            },
+            {
+              "kind": "method",
+              "name": "markFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Node | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "layer",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The shape for one position, or nothing when the stylesheet is drawing it.\n\n**One slotted element is the shape for every mark; several are the shapes\nin order.** Those are the two things a consumer can mean. A star is one\ndrawing repeated, and a face scale is five drawings, and the count says\nwhich without an attribute to set wrong. Past the end of a short list the\nlast one repeats, so four marks and two shapes is a decision rather than a\ncrash."
+            },
+            {
+              "kind": "field",
+              "name": "handleMarkSlot",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -30941,6 +31001,15 @@
               "default": "false",
               "description": "Whether the score is written out beside the marks.\n\nMarks say roughly, and a number says exactly. Four and a bit stars is not a\nreading anyone can repeat, which is why a product's average is nearly always\nprinted next to them. `Meter` spells its reading the same way and under the\nsame attribute.\n\nIt follows the pointer, because it labels what the marks are showing rather\nthan what the form holds: a label that disagreed with the marks under the\nreader's own cursor would be worse than no label.",
               "fieldName": "showValue"
+            },
+            {
+              "name": "appearance",
+              "type": {
+                "text": "'chips' | 'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
+              "fieldName": "appearance"
             },
             {
               "name": "default-value",

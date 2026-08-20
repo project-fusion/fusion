@@ -6752,6 +6752,27 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   showValue?: HelixBaseRating["showValue"];
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned. Both are one shape repeated and clipped, so
+halves work in either.
+
+**`chips` is a different thing wearing the same name.** Each position is
+its own drawing rather than a copy of the first, which is what a face scale
+is: the third mark is a flat mouth and the fifth is a grin, and neither is
+a fraction of the other. There is nothing to clip, so there is no fill
+layer and no half of anything, and `step` is one whatever it says.
+
+**Here rather than on the styled element**, where a presentation property
+belongs, because `chips` changes the structure: the marks move inside the
+targets and two layers become one. The element that draws that has to know.
+`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+along because splitting one property across two tiers would be worse than
+one property in the tier that needs it. */
+  appearance?: HelixBaseRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -6861,6 +6882,27 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   "prop:showValue"?: HelixBaseRating["showValue"];
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned. Both are one shape repeated and clipped, so
+halves work in either.
+
+**`chips` is a different thing wearing the same name.** Each position is
+its own drawing rather than a copy of the first, which is what a face scale
+is: the third mark is a flat mouth and the fifth is a grin, and neither is
+a fraction of the other. There is nothing to clip, so there is no fill
+layer and no half of anything, and `step` is one whatever it says.
+
+**Here rather than on the styled element**, where a presentation property
+belongs, because `chips` changes the structure: the marks move inside the
+targets and two layers become one. The element that draws that has to know.
+`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+along because splitting one property across two tiers would be worse than
+one property in the tier that needs it. */
+  "prop:appearance"?: HelixBaseRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -16156,6 +16198,26 @@ export type CustomElements = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned. Both are one shape repeated and clipped, so
+   * halves work in either.
+   *
+   * **`chips` is a different thing wearing the same name.** Each position is
+   * its own drawing rather than a copy of the first, which is what a face scale
+   * is: the third mark is a flat mouth and the fifth is a grin, and neither is
+   * a fraction of the other. There is nothing to clip, so there is no fill
+   * layer and no half of anything, and `step` is one whatever it says.
+   *
+   * **Here rather than on the styled element**, where a presentation property
+   * belongs, because `chips` changes the structure: the marks move inside the
+   * targets and two layers become one. The element that draws that has to know.
+   * `Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+   * along because splitting one property across two tiers would be worse than
+   * one property in the tier that needs it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -25154,6 +25216,26 @@ export type CustomElementsSolidJs = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
+   * - `appearance`: Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned. Both are one shape repeated and clipped, so
+   * halves work in either.
+   *
+   * **`chips` is a different thing wearing the same name.** Each position is
+   * its own drawing rather than a copy of the first, which is what a face scale
+   * is: the third mark is a flat mouth and the fifth is a grin, and neither is
+   * a fraction of the other. There is nothing to clip, so there is no fill
+   * layer and no half of anything, and `step` is one whatever it says.
+   *
+   * **Here rather than on the styled element**, where a presentation property
+   * belongs, because `chips` changes the structure: the marks move inside the
+   * targets and two layers become one. The element that draws that has to know.
+   * `Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+   * along because splitting one property across two tiers would be worse than
+   * one property in the tier that needs it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *

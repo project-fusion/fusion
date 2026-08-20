@@ -38585,20 +38585,19 @@
             {
               "description": "And of an unfilled one.",
               "name": "--rating-empty-color"
+            },
+            {
+              "description": "How big one chip is, under `appearance=\"chips\"`.",
+              "name": "--rating-chip-size"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it.",
+              "name": "mark"
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "appearance",
-              "type": {
-                "text": "'dots' | 'marks'"
-              },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are the same mechanism underneath, one shape repeated and clipped to\nthe score, so halves work in either.",
-              "attribute": "appearance",
-              "reflects": true
-            },
             {
               "kind": "field",
               "name": "defaultValue",
@@ -39079,6 +39078,35 @@
             },
             {
               "kind": "field",
+              "name": "appearance",
+              "type": {
+                "text": "'chips' | 'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
+              "attribute": "appearance",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "markSources",
+              "type": {
+                "text": "Element[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "The shapes a consumer slotted, if they slotted any.\n\nRead rather than projected. A `<slot>` shows its content once and a rating\nneeds the shape as many times as there are marks, twice over while there\nare two layers, so the slot here is a way of being handed the shape rather\nthan a place the shape is drawn. The element it is handed gets cloned into\neach position.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "previewing",
               "type": {
                 "text": "number | undefined"
@@ -39152,6 +39180,57 @@
               "privacy": "private",
               "default": "undefined",
               "description": "The pointer drawing a score, while one is.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "clones",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new Map<string, Node>()",
+              "description": "One clone per place a mark goes, kept so a render does not remake them.\n\nA drag renders on every pointer move, and handing Lit a fresh node each\ntime would swap every mark in the row on every frame of a gesture whose\nwhole point is that only the fill moves.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "markFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Node | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "layer",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The shape for one position, or nothing when the stylesheet is drawing it.\n\n**One slotted element is the shape for every mark; several are the shapes\nin order.** Those are the two things a consumer can mean. A star is one\ndrawing repeated, and a face scale is five drawings, and the count says\nwhich without an attribute to set wrong. Past the end of a short list the\nlast one repeats, so four marks and two shapes is a decision rather than a\ncrash.",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleMarkSlot",
+              "privacy": "private",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseRating",
                 "module": "src/rating/root/rating-root.ts"
@@ -39459,16 +39538,62 @@
               }
             }
           ],
-          "attributes": [
-            {
-              "name": "appearance",
-              "type": {
-                "text": "'dots' | 'marks'"
+          "superclass": {
+            "name": "HelixBaseRating",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A score out of a few marks, given or shown.",
+          "helix": {
+            "category": "forms",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/rating",
+            "aliases": [
+              "Stars",
+              "Score",
+              "Review score"
+            ],
+            "tier": "styled",
+            "group": "Rating",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
               },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are the same mechanism underneath, one shape repeated and clipped to\nthe score, so halves work in either.",
-              "fieldName": "appearance"
-            },
+              {
+                "description": "A level rather than a judgement, which is what a plain circle says.",
+                "slug": "dots"
+              },
+              {
+                "description": "Five marks that are five drawings, which is what a face scale is.",
+                "slug": "faces"
+              },
+              {
+                "description": "Half marks, which is the case the value is a number for.",
+                "slug": "halves"
+              },
+              {
+                "description": "A score being shown rather than asked for, which is not a control.",
+                "slug": "readonly"
+              },
+              {
+                "description": "One shape, cloned into every position, halves and all.",
+                "slug": "slotted"
+              },
+              {
+                "description": "A review summary: the average as a readout, the spread as meters.",
+                "slug": "summary"
+              },
+              {
+                "description": "Marks say roughly and a number says exactly, so most ratings print both.",
+                "slug": "value"
+              }
+            ],
+            "source": "helix/web/src/rating"
+          },
+          "tagName": "helix-rating",
+          "customElement": true,
+          "attributes": [
             {
               "name": "default-value",
               "type": {
@@ -39612,6 +39737,19 @@
               }
             },
             {
+              "name": "appearance",
+              "type": {
+                "text": "'chips' | 'dots' | 'marks'"
+              },
+              "default": "'marks'",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned. Both are one shape repeated and clipped, so\nhalves work in either.\n\n**`chips` is a different thing wearing the same name.** Each position is\nits own drawing rather than a copy of the first, which is what a face scale\nis: the third mark is a flat mouth and the fifth is a grin, and neither is\na fraction of the other. There is nothing to clip, so there is no fill\nlayer and no half of anything, and `step` is one whatever it says.\n\n**Here rather than on the styled element**, where a presentation property\nbelongs, because `chips` changes the structure: the marks move inside the\ntargets and two layers become one. The element that draws that has to know.\n`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides\nalong because splitting one property across two tiers would be worse than\none property in the tier that needs it.",
+              "fieldName": "appearance",
+              "inheritedFrom": {
+                "name": "HelixBaseRating",
+                "module": "src/rating/root/rating-root.ts"
+              }
+            },
+            {
               "name": "disabled",
               "type": {
                 "text": "boolean"
@@ -39638,53 +39776,6 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseRating",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A score out of a few marks, given or shown.",
-          "helix": {
-            "category": "forms",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/rating",
-            "aliases": [
-              "Stars",
-              "Score",
-              "Review score"
-            ],
-            "tier": "styled",
-            "group": "Rating",
-            "part": "Root",
-            "examples": [
-              {
-                "slug": "default"
-              },
-              {
-                "description": "A level rather than a judgement, which is what a plain circle says.",
-                "slug": "dots"
-              },
-              {
-                "description": "Half marks, which is the case the value is a number for.",
-                "slug": "halves"
-              },
-              {
-                "description": "A score being shown rather than asked for, which is not a control.",
-                "slug": "readonly"
-              },
-              {
-                "description": "A review summary: the average as a readout, the spread as meters.",
-                "slug": "summary"
-              },
-              {
-                "description": "Marks say roughly and a number says exactly, so most ratings print both.",
-                "slug": "value"
-              }
-            ],
-            "source": "helix/web/src/rating"
-          },
-          "tagName": "helix-rating",
-          "customElement": true,
           "cssParts": [
             {
               "description": "The row of marks.",

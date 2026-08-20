@@ -3576,7 +3576,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'dots' \| 'marks'` | `'marks'` | - | Which mark the row is drawn with. |
+| `appearance` | `appearance` | `'chips' \| 'dots' \| 'marks'` | `'marks'` | `HelixBaseRating` | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
@@ -3607,6 +3607,12 @@ Everything about what the score is and how it is chosen is the base class.
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
 
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `mark` | The shape of a mark. One element is cloned into every position; several are used in order, which is what a face scale needs. Left empty, the stylesheet draws the mark and `--rating-mark` swaps it. |
+
 #### Parts
 
 | Part | Description |
@@ -3627,6 +3633,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `--rating-gap` | Space between marks. |
 | `--rating-color` | The colour of a filled mark. |
 | `--rating-empty-color` | And of an unfilled one. |
+| `--rating-chip-size` | How big one chip is, under `appearance="chips"`. |
 
 ## Sandbox
 

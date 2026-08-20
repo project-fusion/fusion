@@ -122,6 +122,43 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
 
+  /**
+   * Which mark the row is drawn with.
+   *
+   * `marks` is the star, and is what a rating means to most readers. `dots`
+   * drops the glyph for a plain circle, which says how much rather than how
+   * good: a star carries a judgement that a level of spice, a difficulty or a
+   * confidence has not earned. Both are one shape repeated and clipped, so
+   * halves work in either.
+   *
+   * **`chips` is a different thing wearing the same name.** Each position is
+   * its own drawing rather than a copy of the first, which is what a face scale
+   * is: the third mark is a flat mouth and the fifth is a grin, and neither is
+   * a fraction of the other. There is nothing to clip, so there is no fill
+   * layer and no half of anything, and `step` is one whatever it says.
+   *
+   * **Here rather than on the styled element**, where a presentation property
+   * belongs, because `chips` changes the structure: the marks move inside the
+   * targets and two layers become one. The element that draws that has to know.
+   * `Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+   * along because splitting one property across two tiers would be worse than
+   * one property in the tier that needs it.
+   */
+  @property({ reflect: true })
+  appearance: 'chips' | 'dots' | 'marks' = 'marks'
+
+  /**
+   * The shapes a consumer slotted, if they slotted any.
+   *
+   * Read rather than projected. A `<slot>` shows its content once and a rating
+   * needs the shape as many times as there are marks, twice over while there
+   * are two layers, so the slot here is a way of being handed the shape rather
+   * than a place the shape is drawn. The element it is handed gets cloned into
+   * each position.
+   */
+  @state()
+  private markSources: Element[] = []
+
   /** What the pointer is over, which is shown instead of the score while it is. */
   @state()
   private previewing: number | undefined = undefined
@@ -147,8 +184,11 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
 
   /** Every score a reader can choose, which is `max / step` of them. */
   private get steps(): number[] {
-    const count = Math.max(1, Math.round(this.max / this.step))
-    return Array.from({ length: count }, (_, index) => Number(((index + 1) * this.step).toFixed(2)))
+    /* One target per mark under `chips`, whatever `step` says. Half of a face
+       is not a rating anybody has ever given. */
+    const step = this.appearance === 'chips' ? 1 : this.step
+    const count = Math.max(1, Math.round(this.max / step))
+    return Array.from({ length: count }, (_, index) => Number(((index + 1) * step).toFixed(2)))
   }
 
   /**
@@ -174,6 +214,48 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
 
   /** The pointer drawing a score, while one is. */
   private dragging: number | undefined = undefined
+
+  /**
+   * One clone per place a mark goes, kept so a render does not remake them.
+   *
+   * A drag renders on every pointer move, and handing Lit a fresh node each
+   * time would swap every mark in the row on every frame of a gesture whose
+   * whole point is that only the fill moves.
+   */
+  private readonly clones = new Map<string, Node>()
+
+  /**
+   * The shape for one position, or nothing when the stylesheet is drawing it.
+   *
+   * **One slotted element is the shape for every mark; several are the shapes
+   * in order.** Those are the two things a consumer can mean. A star is one
+   * drawing repeated, and a face scale is five drawings, and the count says
+   * which without an attribute to set wrong. Past the end of a short list the
+   * last one repeats, so four marks and two shapes is a decision rather than a
+   * crash.
+   */
+  private markFor(layer: string, index: number): Node | undefined {
+    const sources = this.markSources
+    if (sources.length === 0) {
+      return undefined
+    }
+    const key = `${layer}:${index}`
+    const held = this.clones.get(key)
+    if (held) {
+      return held
+    }
+    const source = sources.length === 1 ? sources[0] : sources[Math.min(index, sources.length - 1)]
+    const clone = source?.cloneNode(true)
+    if (clone) {
+      this.clones.set(key, clone)
+    }
+    return clone
+  }
+
+  private readonly handleMarkSlot = (event: Event): void => {
+    this.clones.clear()
+    this.markSources = (event.target as HTMLSlotElement).assignedElements({ flatten: true })
+  }
 
   /**
    * The step under a point on the row, or the nearest one to it.
@@ -313,51 +395,88 @@ export class HelixBaseRating extends MixinControllerValue(MixinField(HelixFormEl
 
   protected override render(): TemplateResult {
     const showing = this.previewing ?? this.score
-    const marks = Array.from({ length: Math.max(0, Math.round(this.max)) })
     const said = this.valueText || `${this.score} out of ${this.max}`
-    const mark = html`<span part="mark"></span>`
+    const chips = this.appearance === 'chips'
+    const count = Math.max(0, Math.round(this.max))
+    const first = this.steps[0]
+
+    const mark = (layer: string, index: number): TemplateResult =>
+      html`<span part="mark">${this.markFor(layer, index)}</span>`
+
+    /* Both layers hold every mark, because the fill is a clip of the whole row
+       rather than a count of the filled ones. `chips` has neither.
+     
+       Written out twice rather than through one helper taking the part name:
+       `check:selectors` reads the literals to know what this renders, and a
+       `part=${name}` binding is invisible to it. It called the stylesheet's
+       `[part="track"]` and `[part="fill"]` dead. */
+    const marksIn = (layer: string): unknown =>
+      Array.from({ length: count }, (_, index) => mark(layer, index))
+
+    const option = (score: number, index: number): TemplateResult => html`<button
+        part="option"
+        role="radio"
+        type="button"
+        aria-checked=${this.score === score ? 'true' : 'false'}
+        aria-label=${`${score} out of ${this.max}`}
+        data-score=${String(score)}
+        style=${`--_rating-step: ${index + 1}`}
+        ?disabled=${this.isDisabled}
+        tabindex=${this.score === score || (this.score === 0 && score === first) ? '0' : '-1'}
+        @click=${this.handleOptionClick}
+        @pointerenter=${this.handleOptionEnter}
+        >${chips ? mark('chip', index) : nothing}</button
+      >`
+
+    /* A readout under `chips` has no targets to put the marks in, so it draws
+       them itself and says which one it is. */
+    const shown = (): unknown =>
+      Array.from(
+        { length: count },
+        (_, index) => html`<span
+            part="mark"
+            data-chosen=${index + 1 === Math.round(this.score) ? '' : nothing}
+            >${this.markFor('chip', index)}</span
+          >`,
+      )
 
     return html`<div
       part="marks"
       role=${this.readOnly ? 'img' : 'radiogroup'}
       aria-label=${this.readOnly ? said : this.label || nothing}
+      data-slotted=${this.markSources.length > 0 ? '' : nothing}
       style=${`--_rating-full: ${Math.floor(showing)}; --_rating-part: ${showing - Math.floor(showing)}; --_rating-steps: ${this.steps.length}`}
       @pointercancel=${this.handleDragCancel}
       @pointerdown=${this.handleDragStart}
       @pointermove=${this.handleDragMove}
       @pointerup=${this.handleDragEnd}
     >
-      <span
-        part="track"
-        aria-hidden="true"
-        >${marks.map(() => mark)}</span
-      >
-      <span
-        part="fill"
-        aria-hidden="true"
-        >${marks.map(() => mark)}</span
-      >
+      <!-- Hidden because this is where the shape arrives, not where it is drawn:
+           what a reader sees is the clones, one per position. -->
+      <slot
+        name="mark"
+        hidden
+        @slotchange=${this.handleMarkSlot}
+      ></slot>
       ${
-        this.readOnly
+        chips
           ? nothing
-          : this.steps.map(
-              (score, index) => html`<button
-                part="option"
-                role="radio"
-                type="button"
-                aria-checked=${this.score === score ? 'true' : 'false'}
-                aria-label=${`${score} out of ${this.max}`}
-                data-score=${String(score)}
-                style=${`--_rating-step: ${index + 1}`}
-                ?disabled=${this.isDisabled}
-                tabindex=${
-                  this.score === score || (this.score === 0 && score === this.step) ? '0' : '-1'
-                }
-                @click=${this.handleOptionClick}
-                @pointerenter=${this.handleOptionEnter}
-              ></button>`,
-            )
+          : html`<span
+              part="track"
+              aria-hidden="true"
+              >${marksIn('track')}</span
+            >`
       }
+      ${
+        chips
+          ? nothing
+          : html`<span
+              part="fill"
+              aria-hidden="true"
+              >${marksIn('fill')}</span
+            >`
+      }
+      ${this.readOnly ? (chips ? shown() : nothing) : this.steps.map(option)}
     </div>
     ${
       this.showValue

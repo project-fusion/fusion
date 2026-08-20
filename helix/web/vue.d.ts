@@ -3902,16 +3902,6 @@ export type HelixRadioVueEvents = {
 };
 
 export type HelixRatingVueProps = {
-  /** Which mark the row is drawn with.
-
-`marks` is the star, and is what a rating means to most readers. `dots`
-drops the glyph for a plain circle, which says how much rather than how
-good: a star carries a judgement that a level of spice, a difficulty or a
-confidence has not earned.
-
-Both are the same mechanism underneath, one shape repeated and clipped to
-the score, so halves work in either. */
-  appearance?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -3989,6 +3979,27 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   showValue?: HelixRating["showValue"];
+  /** Which mark the row is drawn with.
+
+`marks` is the star, and is what a rating means to most readers. `dots`
+drops the glyph for a plain circle, which says how much rather than how
+good: a star carries a judgement that a level of spice, a difficulty or a
+confidence has not earned. Both are one shape repeated and clipped, so
+halves work in either.
+
+**`chips` is a different thing wearing the same name.** Each position is
+its own drawing rather than a copy of the first, which is what a face scale
+is: the third mark is a flat mouth and the fifth is a grin, and neither is
+a fraction of the other. There is nothing to clip, so there is no fill
+layer and no half of anything, and `step` is one whatever it says.
+
+**Here rather than on the styled element**, where a presentation property
+belongs, because `chips` changes the structure: the marks move inside the
+targets and two layers become one. The element that draws that has to know.
+`Megamenu` puts `appearance` in this tier for the same reason. `dots` rides
+along because splitting one property across two tiers would be worse than
+one property in the tier that needs it. */
+  appearance?: HelixRating["appearance"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6537,6 +6548,8 @@ export type CustomCssProperties = {
   "--rating-color"?: string;
   /** And of an unfilled one. */
   "--rating-empty-color"?: string;
+  /** How big one chip is, under `appearance="chips"`. */
+  "--rating-chip-size"?: string;
   /** Minimum height of the sandbox. */
   "--sandbox-min-block-size"?: string;
   /** The invisible width of a divider's drag target. */
