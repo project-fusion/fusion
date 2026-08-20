@@ -1,0 +1,13 @@
+/* A box for the dial to be docked inside, since a page in a preview pane is not
+   the window. `data-dock-within` measures against the nearest positioned
+   ancestor, and this is it. */
+.page {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: 20rem;
+  border-radius: var(--helix-radii-md);
+  position: relative;
+}
+
+helix-icon-button[slot="trigger"] {
+  --icon-button-size: var(--helix-size-control-lg);
+}

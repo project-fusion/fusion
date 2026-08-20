@@ -1,0 +1,41 @@
+/* The trigger's own box, so a dial can be docked by the same recipe anything
+   else is: `data-dock` positions this element and the actions follow it. */
+:host {
+  display: inline-flex;
+}
+
+/* A column, and in the top layer, so a dial floating over a page is over the
+   page rather than over whatever its own stacking context contains.
+ *
+ * No surface of its own. Every action carries its own mark and its own chip,
+ * and a panel behind them would be a second box round a set of boxes: what a
+ * dial is, is the actions, spread out from the button that holds them. */
+[part="actions"] {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--speed-dial-gap, var(--helix-space-sm));
+  margin: var(--helix-space-none);
+  overflow: visible;
+  padding: var(--helix-space-none);
+}
+
+/* Lined up on the end the trigger is on, which is what makes the marks sit in a
+   column under it rather than wandering by the length of each name.
+ *
+ * Keyed on the placement the controller resolved rather than on the one that was
+ * asked for: a dial docked bottom-right that has to flip is still a dial whose
+ * marks line up under its button, and `data-placement` is what says where it
+ * actually went. */
+[part="actions"] {
+  align-items: flex-end;
+}
+
+[part="actions"][data-placement$="-start"] {
+  align-items: flex-start;
+}
+
+[part="actions"][hidden] {
+  display: none;
+}

@@ -863,6 +863,75 @@ helix-toggle[disabled]::part(item) {
   color: var(--helix-color-foreground);
 }
 
+/* Pinned to a corner, which is a fact about the page and not about the control.
+ *
+ * **A recipe rather than a component, and `Toast` is the contrast that makes the
+ * line clear.** Toast owns its own placement, because a stack of messages has no
+ * other home: there is nowhere else on a page for it to be. A floating action
+ * button has plenty. It sits in a card, a panel, a table row, a map, or docked
+ * to the window, and an element that fixes itself to the viewport can only ever
+ * do the last of those. So the shape is a control's own (`shape="circle"` on
+ * `IconButton`) and where it goes is written here, where anything can use it.
+ *
+ * Fixed to the window rather than to a container, which is what a reader means
+ * by a control that stays put while a page scrolls under it. A consumer who
+ * wants it held inside a box instead has `position: relative` on that box and
+ * `data-dock-within` below.
+ *
+ * `--helix-layer-sticky` rather than the top of the stack: this outranks the
+ * page and is outranked by anything the reader opened, so a dialog or a toast
+ * covers it rather than being covered by a button they cannot reach past.
+ *
+ * No hook for the inset, and that is deliberate rather than an omission. A hook
+ * is a component's published API and this is a recipe, with no component to
+ * publish it: `data-button` and `data-card` read `--button-*` and `--card-radii`
+ * because those elements exist and document them. Nothing has to be invented
+ * here, because the whole base layer is a cascade layer, so a consumer writing
+ * `inset-block-end` on their own control already wins without asking.
+ *
+ * The safe area is added, not substituted. `env()` is zero on every screen
+ * without a notch or a home indicator, so the inset is the spacing token there
+ * and the spacing token plus the hardware's own margin where there is one. This
+ * is the first thing in the layer to read `env()`, and it is the case that
+ * needs it: a control docked to the bottom edge of a phone is the control the
+ * home indicator sits on top of. */
+[data-dock] {
+  --_dock-inset: var(--helix-space-lg);
+
+  position: fixed;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* Held inside the nearest positioned ancestor instead of the window. Same
+   corners, same insets, and the consumer says which box by positioning it. */
+[data-dock-within] {
+  position: absolute;
+}
+
+[data-dock$="-end"] {
+  inset-inline-end: calc(var(--_dock-inset) + env(safe-area-inset-right));
+}
+
+[data-dock$="-start"] {
+  inset-inline-start: calc(var(--_dock-inset) + env(safe-area-inset-left));
+}
+
+[data-dock^="bottom"] {
+  inset-block-end: calc(var(--_dock-inset) + env(safe-area-inset-bottom));
+}
+
+[data-dock^="top"] {
+  inset-block-start: calc(var(--_dock-inset) + env(safe-area-inset-top));
+}
+
+/* Centred along the edge, which needs the axis it is centred on and not an
+   inset. `translate` rather than a margin, because the box's own width is the
+   only thing that can centre it and only the browser knows that. */
+[data-dock$="-center"] {
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
+
 /* What goes inside a megamenu panel.
  *
  * **Here rather than in the component, and not by preference.** The panel's

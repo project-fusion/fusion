@@ -2094,7 +2094,9 @@ common way a toolbar becomes unusable without sight.
 | `label` | `label` | `string` | `''` | `HelixBaseButton` | Accessible name, for a button whose content is not text. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `raised` | `raised` | `boolean` | `false` | - | Whether it is raised off the page it sits on. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
+| `shape` | `shape` | `'circle' \| undefined` | - | - | The outline it is cut to, which is a third axis and not a fourth appearance. |
 | `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 | `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings. See `Button` for the full note. |
@@ -2124,6 +2126,7 @@ common way a toolbar becomes unusable without sight.
 | Property | Description |
 | --- | --- |
 | `--icon-button-size` | Edge length of the control. |
+| `--icon-button-shadow` | What it casts, where it is raised off the page. |
 
 ## Input
 
@@ -4086,6 +4089,116 @@ the thumb being dragged.
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose color is the value. |
+
+## Speed Dial
+
+### Root — `helix-speed-dial`
+
+A button that fans out the few actions a screen is for.
+
+Extends `HelixBaseSpeedDial`.
+
+Presentation only: the column the actions fan into, and which end they line
+up on. Everything about what opens it, what closes it and how a keyboard
+moves through it is the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `label` | `label` | `string` | `'Actions'` | `HelixBaseSpeedDial` | Names the trigger and the set of actions it opens. |
+| `offset` | `offset` | `number` | `12` | `HelixBaseSpeedDial` | Space between the trigger and the actions, in pixels. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+| `placement` | `placement` | `Placement` | `'top-end'` | `HelixBaseSpeedDial` | Which way the actions fan out. They move if that side does not fit. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The actions. |
+| `trigger` | The control that opens it. Falls back to a button named by `label`. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `trigger` | The default trigger, where none was slotted. |
+| `actions` | The region the actions are drawn in. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--speed-dial-gap` | Space between the actions. |
+
+### Item — `helix-speed-dial-item`
+
+One action in a speed dial: a mark, and a name beside it.
+
+Extends `HelixBaseSpeedDialItem`.
+
+Presentation only: a round mark the size of a small control, and the name on
+a chip beside it so it can be read against whatever the dial is floating
+over. Everything about choosing it is the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `disabled` | `disabled` | `boolean` | `false` | `HelixBaseSpeedDialItem` | Whether the action can be chosen. |
+| `isSpeedDialItem` | - | `boolean` | `true` | `HelixBaseSpeedDialItem` | Tells the dial its own rows apart from anything else slotted in. |
+| `selected` | - | `boolean` | - | `HelixBaseSpeedDialItem` | Whether this is the row the set is on, which here is where focus is. |
+| `value` | `value` | `string` | `''` | `HelixBaseSpeedDialItem` | What this action stands for, carried in the event when it is chosen. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `focus()` | `HelixBaseSpeedDialItem` | Puts focus on the control inside, which is what a reader can reach. |
+| `focusItem()` | `HelixBaseSpeedDialItem` | `NavigableItem`, so the arrow keys are the shared controller's business. |
+| `select()` | `HelixBaseSpeedDialItem` | Chooses the action, which is the same act as pressing it. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired when the action is chosen. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The action's name. |
+| `icon` | The mark, which is what a dial is read by. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `item` | The control. |
+| `icon` | The mark's box. |
+| `label` | The name beside it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--speed-dial-item-size` | Edge length of the mark. |
 
 ## Splitter
 

@@ -28,6 +28,7 @@ import { styles } from './icon-button-root.css.js'
  * @csspart button - The inner button or anchor.
  *
  * @cssproperty --icon-button-size - Edge length of the control.
+ * @cssproperty --icon-button-shadow - What it casts, where it is raised off the page.
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends HelixBaseIconButton {
@@ -43,6 +44,36 @@ export class HelixIconButton extends HelixBaseIconButton {
   /** What the button means, which decides its colour and nothing else. */
   @property({ reflect: true })
   tone?: 'danger' | 'neutral' | 'primary'
+
+  /**
+   * The outline it is cut to, which is a third axis and not a fourth appearance.
+   *
+   * `appearance` says how filled it is and `tone` says what it means; neither of
+   * them says what shape it is, and folding a shape into either would put a
+   * control's outline in the same word as its colour. A rounded square is the
+   * resting one because that is what a control in a row of controls should be.
+   *
+   * `circle` is the floating action button, and it is the reason this exists: a
+   * round, raised, primary control holding the one action a screen is for. It is
+   * a shape rather than a component, because a component would re-declare
+   * `appearance`, `tone`, `label` and the size around a control that already has
+   * them, and because the same shape is wanted by an avatar's overlay, a media
+   * control and a map's own buttons. Where it sits is the page's business: see
+   * `data-dock` in the base layer.
+   */
+  @property({ reflect: true })
+  shape?: 'circle'
+
+  /**
+   * Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
+   */
+  @property({ reflect: true, type: Boolean })
+  raised = false
 
   /**
    * One word for the four pairings. See `Button` for the full note.

@@ -20886,6 +20886,10 @@
             {
               "description": "Edge length of the control.",
               "name": "--icon-button-size"
+            },
+            {
+              "description": "What it casts, where it is raised off the page.",
+              "name": "--icon-button-shadow"
             }
           ],
           "cssParts": [
@@ -20943,6 +20947,27 @@
               },
               "description": "What the button means, which decides its colour and nothing else.",
               "attribute": "tone",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'circle' | undefined"
+              },
+              "description": "The outline it is cut to, which is a third axis and not a fourth appearance.\n\n`appearance` says how filled it is and `tone` says what it means; neither of\nthem says what shape it is, and folding a shape into either would put a\ncontrol's outline in the same word as its colour. A rounded square is the\nresting one because that is what a control in a row of controls should be.\n\n`circle` is the floating action button, and it is the reason this exists: a\nround, raised, primary control holding the one action a screen is for. It is\na shape rather than a component, because a component would re-declare\n`appearance`, `tone`, `label` and the size around a control that already has\nthem, and because the same shape is wanted by an avatar's overlay, a media\ncontrol and a map's own buttons. Where it sits is the page's business: see\n`data-dock` in the base layer.",
+              "attribute": "shape",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "raised",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it is raised off the page it sits on.\n\nSeparate from `shape`, because they are separate facts: a docked control is\nraised whatever its outline, and a circle inside a toolbar is not raised at\nall. Shadow rather than a border, since what is under a floating control is\nthe page and a line drawn on the page is not the same as being above it.",
+              "attribute": "raised",
               "reflects": true
             },
             {
@@ -21313,6 +21338,23 @@
               },
               "description": "What the button means, which decides its colour and nothing else.",
               "fieldName": "tone"
+            },
+            {
+              "name": "shape",
+              "type": {
+                "text": "'circle' | undefined"
+              },
+              "description": "The outline it is cut to, which is a third axis and not a fourth appearance.\n\n`appearance` says how filled it is and `tone` says what it means; neither of\nthem says what shape it is, and folding a shape into either would put a\ncontrol's outline in the same word as its colour. A rounded square is the\nresting one because that is what a control in a row of controls should be.\n\n`circle` is the floating action button, and it is the reason this exists: a\nround, raised, primary control holding the one action a screen is for. It is\na shape rather than a component, because a component would re-declare\n`appearance`, `tone`, `label` and the size around a control that already has\nthem, and because the same shape is wanted by an avatar's overlay, a media\ncontrol and a map's own buttons. Where it sits is the page's business: see\n`data-dock` in the base layer.",
+              "fieldName": "shape"
+            },
+            {
+              "name": "raised",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether it is raised off the page it sits on.\n\nSeparate from `shape`, because they are separate facts: a docked control is\nraised whatever its outline, and a circle inside a toolbar is not raised at\nall. Shadow rather than a border, since what is under a floating control is\nthe page and a line drawn on the page is not the same as being above it.",
+              "fieldName": "raised"
             },
             {
               "name": "variant",
@@ -22151,6 +22193,14 @@
           "declaration": {
             "name": "*",
             "module": "src/slider/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/speed-dial/index.js"
           }
         },
         {
@@ -42742,6 +42792,948 @@
           "declaration": {
             "name": "HelixSlider",
             "module": "src/slider/root/slider-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/speed-dial/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/speed-dial/item/speed-dial-item.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/speed-dial/root/speed-dial-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/speed-dial/item/speed-dial-item.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/speed-dial/item/speed-dial-item.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/speed-dial/item/speed-dial-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: a round mark the size of a small control, and the name on\na chip beside it so it can be read against whatever the dial is floating\nover. Everything about choosing it is the base class.",
+          "name": "HelixSpeedDialItem",
+          "cssProperties": [
+            {
+              "description": "Edge length of the mark.",
+              "name": "--speed-dial-item-size"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this action stands for, carried in the event when it is chosen.",
+              "attribute": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the action can be chosen.",
+              "attribute": "disabled",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isSpeedDialItem",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true,
+              "default": "true",
+              "description": "Tells the dial its own rows apart from anything else slotted in.",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts focus on the control inside, which is what a reader can reach.",
+              "type": {
+                "text": "focus() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "focusItem",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "`NavigableItem`, so the arrow keys are the shared controller's business.",
+              "type": {
+                "text": "focusItem() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Chooses the action, which is the same act as pressing it.",
+              "type": {
+                "text": "select() => void"
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether this is the row the set is on, which here is where focus is.\n\nAsked of the document rather than of the shadow root: focus lands on the\ncontrol inside this element and the platform retargets it, so from outside\n`activeElement` already is this element. `Menu.Item` records the same, and\nthe reading it replaced is one that does not survive happy-dom.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "choose",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseSpeedDialItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One action in a speed dial: a mark, and a name beside it.",
+          "helix": {
+            "category": "actions",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/speed-dial",
+            "aliases": [
+              "Speed dial action",
+              "FAB action",
+              "Quick action"
+            ],
+            "tier": "styled",
+            "group": "SpeedDial",
+            "part": "Item"
+          },
+          "tagName": "helix-speed-dial-item",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "The action's name.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "description": "The mark, which is what a dial is read by.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The control.",
+              "name": "item",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "description": "The mark's box.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "description": "The name beside it.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What this action stands for, carried in the event when it is chosen.",
+              "fieldName": "value",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the action can be chosen.",
+              "fieldName": "disabled",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired when the action is chosen.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDialItem",
+                "module": "src/speed-dial/item/speed-dial-item.ts"
+              }
+            }
+          ],
+          "modulePath": "src/speed-dial/item/speed-dial-item.ts",
+          "definitionPath": "src/speed-dial/item/speed-dial-item.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSpeedDialItem",
+          "declaration": {
+            "name": "HelixSpeedDialItem",
+            "module": "src/speed-dial/item/speed-dial-item.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-speed-dial-item",
+          "declaration": {
+            "name": "HelixSpeedDialItem",
+            "module": "src/speed-dial/item/speed-dial-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/speed-dial/root/speed-dial-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/speed-dial/root/speed-dial-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/speed-dial/root/speed-dial-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the column the actions fan into, and which end they line\nup on. Everything about what opens it, what closes it and how a keyboard\nmoves through it is the base class.",
+          "name": "HelixSpeedDial",
+          "cssProperties": [
+            {
+              "description": "Space between the actions.",
+              "name": "--speed-dial-gap"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
+              "attribute": "open",
+              "helix": {
+                "controlled": [
+                  "helix-open",
+                  "helix-close"
+                ]
+              },
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
+              "attribute": "default-open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openState",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "The state, whoever set it, and `undefined` until somebody has.\n\nPrefixed, and it has to be. These mixins compose onto one prototype\nchain, `Select` takes this one and `MixinControllerValue` together, and\nTypeScript's `private` is a compile-time fiction: two mixins with a field\ncalled `state` share one property on the instance, and the second one\nsilently overwrites the first. Measured, as a select whose `value` came\nback holding its `open` boolean.\n\nOne field and not two. Writing always applies, which is what a native\ncontrol does when a script assigns to it, and is the behavior an\nimperative `element.open = true` should have whatever mode the element is\nin. What the write does *not* do is change which mode that is.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openMode",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "privacy": "private",
+              "default": "undefined",
+              "description": "Whether the consumer owns the state, decided once and then fixed.\n\nRead off whether anything had set `open` by the time of the first update,\nwhich is where markup, a hydrating server's attributes and a framework's\ninitial properties have all landed and nothing else has happened yet.\n\nDecided once, because the alternative is deciding continuously, and that\nwas tried: taking any write as a claim of ownership meant an uncontrolled\nelement became controlled the moment a script assigned to it, or the\nmoment the component set its own state, and then stopped responding. Both\nwere real and neither is anything a consumer asked for. A mode is a\ndeclaration, and a declaration is made once.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "openIsControlled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "requestOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "next",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Requests an open-state change, and reports whether it was applied.\n\nAnnounces before it acts, so `preventDefault()` on the `helix-open` or\n`helix-close` is a refusal and nothing moves. In uncontrolled mode the\nelement then updates itself; in controlled mode it applies nothing and\nwaits for the consumer to pass a new `open`, which is what \"controlled\"\nmeans.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "requestOpen(next: boolean) => boolean"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleOpen",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Requests the opposite of the current state.",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              },
+              "type": {
+                "text": "toggleOpen() => boolean"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Actions'",
+              "description": "Names the trigger and the set of actions it opens.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'top-end'",
+              "description": "Which way the actions fan out. They move if that side does not fit.\n\nUp by default, because the control this hangs off is usually docked to the\nbottom of the window and there is nothing below it to fan into.",
+              "attribute": "placement",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "12",
+              "description": "Space between the trigger and the actions, in pixels.",
+              "attribute": "offset",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "keys",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new KeyboardNavigationController(this, { items: () => this.items, selects: () => false, })",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "panel",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new PopoverController(this, { anchor: () => this.trigger, /* The host, so a press on the trigger is not counted as a press outside. `Menu` and `Megamenu` both say the same about their own. */ boundary: () => this, offset: () => this.offset, onDismiss: () => this.close(), placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"actions\"]'), })",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "trigger",
+              "type": {
+                "text": "HTMLElement"
+              },
+              "privacy": "private",
+              "description": "Whatever the consumer slotted, or the button rendered in its place.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "HelixBaseSpeedDialItem[]"
+              },
+              "privacy": "private",
+              "description": "The actions, which are this element's own rows and nothing else slotted.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Shuts it and puts the reader back on the trigger.",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleTriggerClick",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSelect",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "announce",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Tells a slotted trigger what it is doing, since it cannot know.\n\nThe fallback button is rendered by this element and says so in its own\ntemplate. A trigger the consumer slotted is their markup, and the state it\nneeds to announce is state only this element holds: without this, the\narrangement this component recommends, an icon button slotted as the\ntrigger, is a control that opens a menu and never says it has one.\n\nWritten onto their element rather than asked of them, because a consumer who\nhas to mirror `open` back onto their own trigger is a consumer who will\nforget, and the failure is silent to everyone who can see the screen.",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseSpeedDial",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A button that fans out the few actions a screen is for.",
+          "helix": {
+            "category": "actions",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/speed-dial",
+            "aliases": [
+              "FAB",
+              "Floating action button",
+              "Action button",
+              "Quick actions"
+            ],
+            "tier": "styled",
+            "group": "SpeedDial",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A floating action button, and the few actions it fans out.",
+                "slug": "default"
+              }
+            ],
+            "source": "helix/web/src/speed-dial"
+          },
+          "tagName": "helix-speed-dial",
+          "customElement": true,
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether the element is open.\n\nOne property, not two. Reading gives the real state whichever mode the\nelement is in, so `dialog.open` answers the question anyone asking it\nmeant. Writing hands ownership to the consumer, which is what the\nattribute in `<helix-dialog open>` does as well: from then on the element\nannounces changes and applies none of them.\n\nIt reads as an accessor pair rather than a field because those are two\ndifferent questions sharing one name, and the alternative was a second\nproperty answering the first. That worked for a boolean, where `isOpen`\nreads well; there is no such word for a value or an active item, so all\nfour of these mixins now have this shape instead of two shapes.\n\n**Not reflected, and that is required rather than tidy.** Reflection\nwrites the resolved state back as an attribute, and writing the attribute\nis how a consumer says they own it. So an uncontrolled element that\nopened itself would put `open` on its own host and, from the next thing\nthat read it, be indistinguishable from one the consumer controls:\ncloned, serialised for hydration, or diffed by a framework, it would come\nback controlled and stop responding. `data-open` carries the resolved\nstate for stylesheets, which is what it has always been for.",
+              "fieldName": "open",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state for uncontrolled use, where nothing declared one.",
+              "fieldName": "defaultOpen",
+              "inheritedFrom": {
+                "name": "MixinControllerOpen",
+                "module": "src/mixins/mixin-controller-open/mixin-controller-open.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Actions'",
+              "description": "Names the trigger and the set of actions it opens.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'top-end'",
+              "description": "Which way the actions fan out. They move if that side does not fit.\n\nUp by default, because the control this hangs off is usually docked to the\nbottom of the window and there is nothing below it to fan into.",
+              "fieldName": "placement",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "12",
+              "description": "Space between the trigger and the actions, in pixels.",
+              "fieldName": "offset",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            }
+          ],
+          "slots": [
+            {
+              "description": "The actions.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "description": "The control that opens it. Falls back to a button named by `label`.",
+              "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The default trigger, where none was slotted.",
+              "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "description": "The region the actions are drawn in.",
+              "name": "actions",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixOpenEvent"
+              },
+              "description": "Fired before it opens, and cancelable.",
+              "name": "helix-open",
+              "reactProp": "onhelix-open",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired before it closes, and cancelable.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/speed-dial/root/speed-dial-root.ts",
+          "definitionPath": "src/speed-dial/root/speed-dial-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSpeedDial",
+          "declaration": {
+            "name": "HelixSpeedDial",
+            "module": "src/speed-dial/root/speed-dial-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-speed-dial",
+          "declaration": {
+            "name": "HelixSpeedDial",
+            "module": "src/speed-dial/root/speed-dial-root.ts"
           }
         }
       ]

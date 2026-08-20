@@ -86,6 +86,8 @@ import type {
   HelixSelectEvent,
   HelixSkeleton,
   HelixSlider,
+  HelixSpeedDial,
+  HelixSpeedDialItem,
   HelixSplitter,
   HelixStat,
   HelixStatGroup,
@@ -4447,6 +4449,28 @@ written: a toolbar of framed squares is a toolbar of boxes. */
   appearance?: HelixIconButton["appearance"];
   /** What the button means, which decides its colour and nothing else. */
   tone?: HelixIconButton["tone"];
+  /** The outline it is cut to, which is a third axis and not a fourth appearance.
+
+`appearance` says how filled it is and `tone` says what it means; neither of
+them says what shape it is, and folding a shape into either would put a
+control's outline in the same word as its colour. A rounded square is the
+resting one because that is what a control in a row of controls should be.
+
+`circle` is the floating action button, and it is the reason this exists: a
+round, raised, primary control holding the one action a screen is for. It is
+a shape rather than a component, because a component would re-declare
+`appearance`, `tone`, `label` and the size around a control that already has
+them, and because the same shape is wanted by an avatar's overlay, a media
+control and a map's own buttons. Where it sits is the page's business: see
+`data-dock` in the base layer. */
+  shape?: HelixIconButton["shape"];
+  /** Whether it is raised off the page it sits on.
+
+Separate from `shape`, because they are separate facts: a docked control is
+raised whatever its outline, and a circle inside a toolbar is not raised at
+all. Shadow rather than a border, since what is under a floating control is
+the page and a line drawn on the page is not the same as being above it. */
+  raised?: HelixIconButton["raised"];
   /** One word for the four pairings. See `Button` for the full note.
 
 The mapping differs by one, because this control rests as a ghost:
@@ -4531,6 +4555,28 @@ written: a toolbar of framed squares is a toolbar of boxes. */
   "prop:appearance"?: HelixIconButton["appearance"];
   /** What the button means, which decides its colour and nothing else. */
   "prop:tone"?: HelixIconButton["tone"];
+  /** The outline it is cut to, which is a third axis and not a fourth appearance.
+
+`appearance` says how filled it is and `tone` says what it means; neither of
+them says what shape it is, and folding a shape into either would put a
+control's outline in the same word as its colour. A rounded square is the
+resting one because that is what a control in a row of controls should be.
+
+`circle` is the floating action button, and it is the reason this exists: a
+round, raised, primary control holding the one action a screen is for. It is
+a shape rather than a component, because a component would re-declare
+`appearance`, `tone`, `label` and the size around a control that already has
+them, and because the same shape is wanted by an avatar's overlay, a media
+control and a map's own buttons. Where it sits is the page's business: see
+`data-dock` in the base layer. */
+  "prop:shape"?: HelixIconButton["shape"];
+  /** Whether it is raised off the page it sits on.
+
+Separate from `shape`, because they are separate facts: a docked control is
+raised whatever its outline, and a circle inside a toolbar is not raised at
+all. Shadow rather than a border, since what is under a floating control is
+the page and a line drawn on the page is not the same as being above it. */
+  "prop:raised"?: HelixIconButton["raised"];
   /** One word for the four pairings. See `Button` for the full note.
 
 The mapping differs by one, because this control rests as a ghost:
@@ -8274,6 +8320,143 @@ reflected none of them. */
   "on:helix-input"?: (e: HelixSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixSliderElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSpeedDialItem` component event */
+export type HelixSpeedDialItemElementEvent<E = Event> = TypedEvent<
+  HelixSpeedDialItem,
+  E
+>;
+/** `helix-select` event type */
+export type HelixSpeedDialItemHelixSelectElementEvent =
+  HelixSpeedDialItemElementEvent<HelixSelectEvent>;
+
+export type HelixSpeedDialItemProps = {
+  /** What this action stands for, carried in the event when it is chosen. */
+  value?: HelixSpeedDialItem["value"];
+  /** Whether the action can be chosen. */
+  disabled?: HelixSpeedDialItem["disabled"];
+
+  /** Fired when the action is chosen. */
+  "onhelix-select"?: (e: HelixSpeedDialItemHelixSelectElementEvent) => void;
+};
+
+export type HelixSpeedDialItemSolidJsProps = {
+  /** What this action stands for, carried in the event when it is chosen. */
+  "prop:value"?: HelixSpeedDialItem["value"];
+  /** Whether the action can be chosen. */
+  "prop:disabled"?: HelixSpeedDialItem["disabled"];
+  /** Fired when the action is chosen. */
+  "on:helix-select"?: (e: HelixSpeedDialItemHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixSpeedDial` component event */
+export type HelixSpeedDialElementEvent<E = Event> = TypedEvent<
+  HelixSpeedDial,
+  E
+>;
+/** `helix-open` event type */
+export type HelixSpeedDialHelixOpenElementEvent =
+  HelixSpeedDialElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixSpeedDialHelixCloseElementEvent =
+  HelixSpeedDialElementEvent<HelixCloseEvent>;
+
+export type HelixSpeedDialProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixSpeedDial["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixSpeedDial["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixSpeedDial["defaultOpen"];
+  /** Names the trigger and the set of actions it opens. */
+  label?: HelixSpeedDial["label"];
+  /** Which way the actions fan out. They move if that side does not fit.
+
+Up by default, because the control this hangs off is usually docked to the
+bottom of the window and there is nothing below it to fan into. */
+  placement?: HelixSpeedDial["placement"];
+  /** Space between the trigger and the actions, in pixels. */
+  offset?: HelixSpeedDial["offset"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixSpeedDialHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixSpeedDialHelixCloseElementEvent) => void;
+};
+
+export type HelixSpeedDialSolidJsProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixSpeedDial["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixSpeedDial["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixSpeedDial["defaultOpen"];
+  /** Names the trigger and the set of actions it opens. */
+  "prop:label"?: HelixSpeedDial["label"];
+  /** Which way the actions fan out. They move if that side does not fit.
+
+Up by default, because the control this hangs off is usually docked to the
+bottom of the window and there is nothing below it to fan into. */
+  "prop:placement"?: HelixSpeedDial["placement"];
+  /** Space between the trigger and the actions, in pixels. */
+  "prop:offset"?: HelixSpeedDial["offset"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixSpeedDialHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixSpeedDialHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14548,6 +14731,26 @@ export type CustomElements = {
    * `ghost` is the resting state here rather than `outlined`, and is never
    * written: a toolbar of framed squares is a toolbar of boxes.
    * - `tone`: What the button means, which decides its colour and nothing else.
+   * - `shape`: The outline it is cut to, which is a third axis and not a fourth appearance.
+   *
+   * `appearance` says how filled it is and `tone` says what it means; neither of
+   * them says what shape it is, and folding a shape into either would put a
+   * control's outline in the same word as its colour. A rounded square is the
+   * resting one because that is what a control in a row of controls should be.
+   *
+   * `circle` is the floating action button, and it is the reason this exists: a
+   * round, raised, primary control holding the one action a screen is for. It is
+   * a shape rather than a component, because a component would re-declare
+   * `appearance`, `tone`, `label` and the size around a control that already has
+   * them, and because the same shape is wanted by an avatar's overlay, a media
+   * control and a map's own buttons. Where it sits is the page's business: see
+   * `data-dock` in the base layer.
+   * - `raised`: Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
    * - `variant`: One word for the four pairings. See `Button` for the full note.
    *
    * The mapping differs by one, because this control rests as a ghost:
@@ -14638,6 +14841,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
+   * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -17599,6 +17803,147 @@ export type CustomElements = {
   "helix-slider": Partial<
     HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
   > & HelixSliderControlled;
+
+  /**
+   * Presentation only: a round mark the size of a small control, and the name on
+   * a chip beside it so it can be read against whatever the dial is floating
+   * over. Everything about choosing it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What this action stands for, carried in the event when it is chosen.
+   * - `disabled`: Whether the action can be chosen.
+   * - `isSpeedDialItem`: Tells the dial its own rows apart from anything else slotted in. (property only) (readonly)
+   * - `selected`: Whether this is the row the set is on, which here is where focus is.
+   *
+   * Asked of the document rather than of the shadow root: focus lands on the
+   * control inside this element and the platform retargets it, so from outside
+   * `activeElement` already is this element. `Menu.Item` records the same, and
+   * the reading it replaced is one that does not survive happy-dom. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the action is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The action's name.
+   * - `icon`: The mark, which is what a dial is read by.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Puts focus on the control inside, which is what a reader can reach.
+   * - `focusItem() => void`: `NavigableItem`, so the arrow keys are the shared controller's business.
+   * - `select() => void`: Chooses the action, which is the same act as pressing it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--speed-dial-item-size`: Edge length of the mark. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The control.
+   * - `icon`: The mark's box.
+   * - `label`: The name beside it.
+   */
+  "helix-speed-dial-item": Partial<
+    HelixSpeedDialItemProps & BaseProps<HelixSpeedDialItem> & BaseEvents
+  >;
+
+  /**
+   * Presentation only: the column the actions fan into, and which end they line
+   * up on. Everything about what opens it, what closes it and how a keyboard
+   * moves through it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `label`: Names the trigger and the set of actions it opens.
+   * - `placement`: Which way the actions fan out. They move if that side does not fit.
+   *
+   * Up by default, because the control this hangs off is usually docked to the
+   * bottom of the window and there is nothing below it to fan into.
+   * - `offset`: Space between the trigger and the actions, in pixels.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The actions.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--speed-dial-gap`: Space between the actions. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `actions`: The region the actions are drawn in.
+   */
+  "helix-speed-dial": Partial<
+    HelixSpeedDialProps & BaseProps<HelixSpeedDial> & BaseEvents
+  > & HelixSpeedDialControlled;
 
   /**
    * The divider is a line to look at and a box to hit, and they are different
@@ -23240,6 +23585,26 @@ export type CustomElementsSolidJs = {
    * `ghost` is the resting state here rather than `outlined`, and is never
    * written: a toolbar of framed squares is a toolbar of boxes.
    * - `tone`: What the button means, which decides its colour and nothing else.
+   * - `shape`: The outline it is cut to, which is a third axis and not a fourth appearance.
+   *
+   * `appearance` says how filled it is and `tone` says what it means; neither of
+   * them says what shape it is, and folding a shape into either would put a
+   * control's outline in the same word as its colour. A rounded square is the
+   * resting one because that is what a control in a row of controls should be.
+   *
+   * `circle` is the floating action button, and it is the reason this exists: a
+   * round, raised, primary control holding the one action a screen is for. It is
+   * a shape rather than a component, because a component would re-declare
+   * `appearance`, `tone`, `label` and the size around a control that already has
+   * them, and because the same shape is wanted by an avatar's overlay, a media
+   * control and a map's own buttons. Where it sits is the page's business: see
+   * `data-dock` in the base layer.
+   * - `raised`: Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
    * - `variant`: One word for the four pairings. See `Button` for the full note.
    *
    * The mapping differs by one, because this control rests as a ghost:
@@ -23330,6 +23695,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--icon-button-size`: Edge length of the control. (default: `undefined`)
+   * - `--icon-button-shadow`: What it casts, where it is raised off the page. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -26405,6 +26771,153 @@ export type CustomElementsSolidJs = {
   > & HelixSliderControlledSolidJs;
 
   /**
+   * Presentation only: a round mark the size of a small control, and the name on
+   * a chip beside it so it can be read against whatever the dial is floating
+   * over. Everything about choosing it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `value`: What this action stands for, carried in the event when it is chosen.
+   * - `disabled`: Whether the action can be chosen.
+   * - `isSpeedDialItem`: Tells the dial its own rows apart from anything else slotted in. (property only) (readonly)
+   * - `selected`: Whether this is the row the set is on, which here is where focus is.
+   *
+   * Asked of the document rather than of the shadow root: focus lands on the
+   * control inside this element and the platform retargets it, so from outside
+   * `activeElement` already is this element. `Menu.Item` records the same, and
+   * the reading it replaced is one that does not survive happy-dom. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired when the action is chosen.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The action's name.
+   * - `icon`: The mark, which is what a dial is read by.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `focus() => void`: Puts focus on the control inside, which is what a reader can reach.
+   * - `focusItem() => void`: `NavigableItem`, so the arrow keys are the shared controller's business.
+   * - `select() => void`: Chooses the action, which is the same act as pressing it.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--speed-dial-item-size`: Edge length of the mark. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `item`: The control.
+   * - `icon`: The mark's box.
+   * - `label`: The name beside it.
+   */
+  "helix-speed-dial-item": Partial<
+    HelixSpeedDialItemProps &
+      HelixSpeedDialItemSolidJsProps &
+      BaseProps<HelixSpeedDialItem> &
+      BaseEvents
+  >;
+
+  /**
+   * Presentation only: the column the actions fan into, and which end they line
+   * up on. Everything about what opens it, what closes it and how a keyboard
+   * moves through it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `label`: Names the trigger and the set of actions it opens.
+   * - `placement`: Which way the actions fan out. They move if that side does not fit.
+   *
+   * Up by default, because the control this hangs off is usually docked to the
+   * bottom of the window and there is nothing below it to fan into.
+   * - `offset`: Space between the trigger and the actions, in pixels.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The actions.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--speed-dial-gap`: Space between the actions. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `actions`: The region the actions are drawn in.
+   */
+  "helix-speed-dial": Partial<
+    HelixSpeedDialProps &
+      HelixSpeedDialSolidJsProps &
+      BaseProps<HelixSpeedDial> &
+      BaseEvents
+  > & HelixSpeedDialControlledSolidJs;
+
+  /**
    * The divider is a line to look at and a box to hit, and they are different
    * sizes. Drawn at the border's own width it is a one pixel pointer target, which
    * is the fault every hand-rolled splitter has; the line is a border and the
@@ -29089,6 +29602,8 @@ export type CustomCssProperties = {
   "--file-input-inset"?: string;
   /** Edge length of the control. */
   "--icon-button-size"?: string;
+  /** What it casts, where it is raised off the page. */
+  "--icon-button-shadow"?: string;
   /** Edge length of the icon's box. */
   "--icon-size"?: string;
   /** Height of the field. */
@@ -29243,6 +29758,10 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** Edge length of the mark. */
+  "--speed-dial-item-size"?: string;
+  /** Space between the actions. */
+  "--speed-dial-gap"?: string;
   /** The line between the panes. */
   "--splitter-color"?: string;
   /** How wide the handle at a crossing is. */
@@ -30355,6 +30874,41 @@ type HelixSliderControlledSolidJs =
         ref: BaseProps<HelixSlider>["ref"];
       }
     | { value?: undefined }
+  );
+
+/**
+ * helix-speed-dial: a controlled `open` announces and waits, so the handler comes with it.
+ */
+type HelixSpeedDialControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixSpeedDial["open"];
+        "onhelix-open": (event: HelixSpeedDialHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixSpeedDialHelixCloseElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        open: HelixSpeedDial["open"];
+        ref: import('react').Ref<HelixSpeedDial>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-speed-dial, in Solid's dialect: `on:` and the event name. */
+type HelixSpeedDialControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixSpeedDial["open"];
+        "on:helix-open": (event: HelixSpeedDialHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixSpeedDialHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixSpeedDial["open"];
+        ref: BaseProps<HelixSpeedDial>["ref"];
+      }
+    | { open?: undefined }
   );
 
 /**

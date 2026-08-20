@@ -103,6 +103,28 @@
   color: var(--_icon-button-ink-hover);
 }
 
+:host([shape="circle"]) [part="button"] {
+  border-radius: var(--helix-radii-full);
+}
+
+/* Raised, which is a shadow and not a line: what is under a floating control is
+   the page, and a border drawn on the page says the control is part of it. */
+:host([raised]) [part="button"] {
+  box-shadow: var(--icon-button-shadow, var(--helix-shadow-md));
+}
+
+/* Lifted under the pointer and set back down on the press, which is the whole of
+   what a raised control has to say about being touched. The scale runs to `lg`,
+   so the lift is md to lg and the press is sm: three steps that exist rather
+   than a fourth invented for this. */
+:host([raised]:not(:disabled)) [part="button"]:hover {
+  box-shadow: var(--icon-button-shadow, var(--helix-shadow-lg));
+}
+
+:host([raised]:not(:disabled)) [part="button"]:active {
+  box-shadow: var(--icon-button-shadow, var(--helix-shadow-sm));
+}
+
 [part="button"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

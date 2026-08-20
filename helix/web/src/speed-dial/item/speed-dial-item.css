@@ -1,0 +1,89 @@
+:host {
+  display: block;
+}
+
+/* The name and the mark on one line, the name first so the marks line up on the
+   end the trigger is on. Reversed for a dial that opened to the start. */
+[part="item"] {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  font: inherit;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-none);
+}
+
+:host-context([data-placement$="-start"]) [part="item"] {
+  flex-direction: row;
+}
+
+[part="item"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Round, raised and the size of a small control: the same shape as the button
+   that opened it, one step down, which is what says these belong to it. */
+[part="icon"] {
+  --icon-size: var(--helix-size-icon-md);
+
+  align-items: center;
+  aspect-ratio: 1;
+  background-color: var(--helix-color-surface-overlay);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-md);
+  color: var(--helix-color-foreground);
+  display: inline-flex;
+  inline-size: var(--speed-dial-item-size, var(--helix-size-control-sm));
+  justify-content: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="item"]:not(:disabled):hover [part="icon"] {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 6%,
+    var(--helix-color-surface-overlay)
+  );
+  box-shadow: var(--helix-shadow-lg);
+}
+
+/* One ring, and on the mark. The control is the whole row, so the user agent
+   draws its ring around the name and the mark together, and the mark carries a
+   ring of its own: two indicators saying one thing, and the outer one boxes a
+   chip that is a label rather than a target. The round mark is what a reader
+   presses and what the ring should follow. */
+[part="item"]:focus-visible {
+  outline: none;
+}
+
+[part="item"]:focus-visible [part="icon"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* A chip, because a dial floats over a page and a bare word over a photograph
+   is a word nobody can read. Its own surface, the same one the mark takes. */
+[part="label"] {
+  background-color: var(--helix-color-surface-overlay);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-sm);
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="icon"] {
+    transition: none;
+  }
+}
