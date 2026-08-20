@@ -365,6 +365,18 @@ export type HelixBaseBlockquoteVueProps = {
 export type HelixBaseBlockquoteVueEvents = {};
 
 export type HelixBaseBreadcrumbVueProps = {
+  /** Whether this crumb is the trail's overflow control rather than a step.
+
+A crumb, not a box the root renders around a slot. It sits in the same
+`<ol>`, so it needs the same `listitem` role and the same separator before
+it, and all of that already exists here.
+
+**And it is written where the gap belongs.** A named slot renders where the
+slot element sits, which was the end of the list, so the ellipsis came out
+after the current page rather than between the root and the tail. Nobody
+reads that as a collapsed middle. In source order the consumer puts it
+exactly where the crumbs it stands for were. */
+  overflow?: HelixBaseBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   current?: HelixBaseBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -5488,7 +5500,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseBreadcrumbVueProps,
     HelixBaseBreadcrumbVueEvents
   >;
-  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **'collapse' hides the middle, and only ever the middle.** A trail that does not fit keeps its root and its current page, because those are the two a reader is orienting by: the first says where the tree begins and the last says where they are. Everything between them goes behind one trigger.  **The server sends the whole trail, and the client only ever removes.** There is no width to measure without a DOM, so nothing is hidden until 'CollapseController' has measured, and a reader with no JavaScript keeps every crumb. That is the right answer rather than a fallback, and this arrangement cannot leave them with less.  **The overflow control is the consumer's, slotted in.** Rendering a menu here would put 'Menu', and the popover machinery under it, into anything that imports a breadcrumb trail, which is a lot to carry for a trail that usually fits. So the trail hides crumbs and reports which, and whatever is slotted as 'overflow' decides how to show them. It appears only while something is actually hidden. */
+  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **'collapse' hides the middle, and only ever the middle.** A trail that does not fit keeps its root and its current page, because those are the two a reader is orienting by: the first says where the tree begins and the last says where they are. Everything between them goes behind one trigger.  **The server sends the whole trail, and the client only ever removes.** There is no width to measure without a DOM, so nothing is hidden until 'CollapseController' has measured, and a reader with no JavaScript keeps every crumb. That is the right answer rather than a fallback, and this arrangement cannot leave them with less.  **The overflow control is the consumer's, and it is a crumb.** Rendering a menu here would put 'Menu', and the popover machinery under it, into anything that imports a breadcrumb trail, which is a lot to carry for a trail that usually fits. So the trail hides crumbs and reports which, and whatever is slotted as 'overflow' decides how to show them. It appears only while something is actually hidden. */
   "helix-base-breadcrumbs": DefineCustomElement<
     HelixBaseBreadcrumbs,
     HelixBaseBreadcrumbsVueProps,
