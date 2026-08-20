@@ -141,20 +141,39 @@ describe('a timeline', () => {
       expect(after).toBeLessThan(spacing)
     })
 
-    test('and each mark stays over the entry it belongs to', async () => {
-      /* The leading run of line is a fixed length in both directions. Letting it
-         grow instead, which the first version of this did, pushed every mark to
-         the far end of its own entry, so the first entry's label sat under the
-         dot belonging to the second. Caught by looking at it, and this is what
-         would have caught it without looking. */
+    test('and each mark is centred over the entry it belongs to', async () => {
+      /* `Steps` lays a horizontal run out this way and it is the arrangement
+         that works: the mark centred in its track with half a line either side.
+         The first version put the mark at the start of its track with only a
+         trailing line, so it sat in the corner of a wide box with its label
+         stretching away to the right and nothing saying which belonged to which. */
       const host = await timeline(three, ' orientation="horizontal"')
       const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
       for (const one of entries) {
         const item = one.getBoundingClientRect()
         const mark = (part(one, 'marker') as HTMLElement).getBoundingClientRect()
-        const into = mark.left + mark.width / 2 - item.left
-        expect(into).toBeLessThan(item.width / 2)
+        expect(Math.round(mark.left + mark.width / 2)).toBe(Math.round(item.left + item.width / 2))
       }
+    })
+
+    test('and the rule runs level from one mark to the next', async () => {
+      /* Every segment on one line. The column stretches the trailing half down
+         the rail, and stretch with a definite thickness is not stretch, it is
+         flex-start: turned into a row it put the trail at the top of the rail
+         while the lead stayed on the middle, and the rule stepped nine pixels at
+         every mark. It measured as continuous the whole time, because the boxes
+         abutted horizontally; only the heights differed. */
+      const host = await timeline(three, ' orientation="horizontal"')
+      const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
+      const middles = new Set<number>()
+      for (const one of entries) {
+        const lead = (part(one, 'connector') as HTMLElement).getBoundingClientRect()
+        middles.add(Math.round(lead.top + lead.height / 2))
+        const rail = part(one, 'rail') as HTMLElement
+        const trail = getComputedStyle(rail, '::after')
+        expect(trail.alignSelf).toBe('center')
+      }
+      expect(middles.size).toBe(1)
     })
   }
 })

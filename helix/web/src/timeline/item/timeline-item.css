@@ -168,17 +168,26 @@
 
 /* Along the page instead of down it.
  *
- * The mark goes to the start of the entry rather than a fixed distance into it,
- * and the line runs from it to the next one. Turned with a leading run of line
- * still in place, every mark sat that far into its own entry while the label
- * below started at the edge, so the first entry's word was captioned by the
- * second entry's dot. */
+ * **The same two halves of line the column has, turned.** `Steps` lays a
+ * horizontal run out this way and it is the arrangement that works: a mark
+ * centred in its own track with half a line reaching out either side, each
+ * meeting the one coming back from the neighbour in the middle of the gap, so
+ * the rule reads as continuous without any entry knowing the size of the one
+ * beside it.
+ *
+ * The roles are already here. The line that arrives at an entry is its lead in
+ * a row exactly as it is above the mark in a column, and the one leaving is its
+ * trail; the first hides the one and the last hides the other, which is what
+ * ends the rule at the marks rather than at the edges of the record.
+ *
+ * The first version put the mark at the start of its track with only a trailing
+ * line, so the mark sat in the corner of a wide box with its label stretching
+ * away to the right, and nothing said which label belonged to which mark. */
 :host-context([orientation="horizontal"]) {
+  align-items: center;
   display: flex;
   flex-direction: column;
   flex: 1 1 0;
-  /* The same rhythm the column has between a mark, its time and its title,
-     rather than a looser one because the axis turned. */
   gap: var(--helix-space-xs);
 }
 
@@ -186,28 +195,39 @@
   align-items: center;
   display: flex;
   flex-direction: row;
+  inline-size: 100%;
 }
 
-:host-context([orientation="horizontal"]) [part="connector"] {
-  display: none;
-}
-
+:host-context([orientation="horizontal"]) [part="connector"],
 :host-context([orientation="horizontal"]) [part="rail"]::after {
+  /* `center`, and it has to be said: the column stretches the trailing line down
+     the rail, and stretch with a definite thickness is not stretch, it is
+     flex-start. Turned into a row it put the trail at the top of the rail while
+     the lead stayed on the middle, so the rule stepped up nine pixels at every
+     mark and read as a broken line. */
+  align-self: center;
   block-size: var(--timeline-rail-size, var(--helix-border-thick));
   flex: 1 1 auto;
   inline-size: auto;
   margin-block-start: var(--helix-space-none);
 }
 
-/* Centred on the line rather than raised onto a title, since along the page the
-   mark sits on the rule and the words are underneath it. The correction above is
-   about type, and there is no type beside it here. */
+/* Centred on the rule, and the correction that raises it onto a title in the
+   column has no title to sit beside here. */
 :host-context([orientation="horizontal"]) [part="marker"] {
   align-self: center;
   translate: none;
 }
 
+/* Under the mark rather than beside it, which is what makes a label belong to
+   one. */
 :host-context([orientation="horizontal"]) [part="content"] {
+  align-items: center;
   padding-block-end: var(--helix-space-none);
-  padding-inline-end: var(--timeline-gap, var(--helix-space-md));
+  text-align: center;
+}
+
+:host-context([orientation="horizontal"]) [part="time"] {
+  padding-block-end: var(--helix-space-none);
+  text-align: center;
 }
