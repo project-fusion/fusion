@@ -107,29 +107,43 @@ void main() {
 
     const float GRID = 9.0;
     float lane = across * GRID;
-    float row = (depth - uTime * 0.16) * GRID;
-
     float id = floor(lane);
-    /* The floor is what the plain is worth when a rail is at its dimmest, so
-       it sets how present the ground is at all. At 0.35 the field spent most of
-       its time nearly gone. */
-    float own = 0.55 + 0.45 * (0.5 + 0.5 * sin(uTime * 0.5 + hash(id) * 6.2831));
+
+    /* The rail itself, thin across and barely there: it is the track a streak
+       runs on rather than the picture. */
     float lineW = fwidth(lane) * 1.2 + 0.012;
-    float lineX = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
-    float rowW = fwidth(row) * 1.2 + 0.02;
-    float lineZ = 1.0 - smoothstep(0.0, rowW, abs(fract(row) - 0.5));
-    float node = lineX * lineZ;
+    float rail = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
+
+    /* A streak travelling away toward the light.
+     
+       The bright locus is where the phase wraps, and the phase advances with
+       time, so the head moves to greater depth and the tail trails behind it
+       on the viewer's side. Written the other way round, with brightness at
+       the start of the cycle, the tail leads and the whole field appears to
+       run backwards out of the horizon.
+     
+       Every lane gets its own phase and its own speed off a hash of its index,
+       so nothing arrives in step. A field where the streaks are synchronised
+       reads as a scanline sweeping. */
+    float phase = hash(id);
+    float speed = 0.55 + hash(id + 5.0) * 0.75;
+    /* Cycle length is in depth units, so a small coefficient puts one streak
+       per rail inside the range the fog leaves visible, and the plain reads as
+       empty. Shorter cycles and a softer falloff give a run of them with tails
+       long enough to read as motion rather than as dashes. */
+    float t = fract(depth * 1.15 - uTime * speed * 0.28 + phase);
+    float streak = pow(t, 3.5);
 
     float fog = exp(-depth * 0.78);
     float toward = exp(-abs(p.x) * 1.05);
 
-    float ink = (lineX * 0.92 * own + lineZ * 0.30 + node * 0.38) * fog * (0.62 + toward * 0.7);
+    float ink = rail * (0.14 + streak * 2.1) * fog * (0.7 + toward * 0.7);
 
     /* Aerial perspective: the last of the plain is the air rather than the
        dark, so the two meet instead of one stopping against the other. */
     float air = (1.0 - fog) * (halo * 0.5 + 0.05) * toward;
 
-    col = uColor * (0.62 + toward * 0.45);
+    col = uColor * (0.62 + toward * 0.45 + streak * 0.5);
     alpha = clamp(ink + air, 0.0, 1.0);
   }
 
