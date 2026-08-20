@@ -1,0 +1,7 @@
+/* The box is the consumer's to choose: an image has no size of its own until
+   something gives it one. */
+helix-image {
+  --image-aspect: 4 / 3;
+
+  inline-size: 20rem;
+}

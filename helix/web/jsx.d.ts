@@ -46,6 +46,7 @@ import type {
   HelixGrid,
   HelixIcon,
   HelixIconButton,
+  HelixImage,
   HelixInput,
   HelixInputEvent,
   HelixKbd,
@@ -4723,6 +4724,75 @@ export type HelixIconSolidJsProps = {
   "prop:name"?: HelixIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixImageProps = {
+  /** Whether the corners are cut.
+
+A boolean rather than a radius, because the radius is a token and the
+question a consumer is answering is whether this picture is a card's
+surface or a page's. `--image-radius` moves it for the case that is
+neither. */
+  rounded?: HelixImage["rounded"];
+  /** Where the picture is. */
+  src?: HelixImage["src"];
+  /** What it shows, for a reader who cannot see it.
+
+Empty is a real answer and means decoration. Omitting the attribute is not
+the same thing: a reader with nothing to read announces the file name. */
+  alt?: HelixImage["alt"];
+  /** Whether to wait until it is nearly on screen.
+
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  loading?: HelixImage["loading"];
+  /** The candidate widths, passed through to the picture. */
+  srcset?: HelixImage["srcset"];
+  /** How much of the line it will take, passed through to the picture. */
+  sizes?: HelixImage["sizes"];
+  /** Whether the picture is on its way, here, or never coming.
+
+Reflected, so a stylesheet can answer all three without a rule per part,
+and read-only to a consumer: it is a report rather than a setting. */
+  status?: HelixImage["status"];
+};
+
+export type HelixImageSolidJsProps = {
+  /** Whether the corners are cut.
+
+A boolean rather than a radius, because the radius is a token and the
+question a consumer is answering is whether this picture is a card's
+surface or a page's. `--image-radius` moves it for the case that is
+neither. */
+  "prop:rounded"?: HelixImage["rounded"];
+  /** Where the picture is. */
+  "prop:src"?: HelixImage["src"];
+  /** What it shows, for a reader who cannot see it.
+
+Empty is a real answer and means decoration. Omitting the attribute is not
+the same thing: a reader with nothing to read announces the file name. */
+  "prop:alt"?: HelixImage["alt"];
+  /** Whether to wait until it is nearly on screen.
+
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  "prop:loading"?: HelixImage["loading"];
+  /** The candidate widths, passed through to the picture. */
+  "prop:srcset"?: HelixImage["srcset"];
+  /** How much of the line it will take, passed through to the picture. */
+  "prop:sizes"?: HelixImage["sizes"];
+  /** Whether the picture is on its way, here, or never coming.
+
+Reflected, so a stylesheet can answer all three without a rule per part,
+and read-only to a consumer: it is a report rather than a setting. */
+  "prop:status"?: HelixImage["status"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -15307,6 +15377,65 @@ export type CustomElements = {
   "helix-icon": Partial<HelixIconProps & BaseProps<HelixIcon> & BaseEvents>;
 
   /**
+   * Presentation only: the box the picture is given, how it fills it, and the
+   * fade when it lands. What the three states are and when they change is the
+   * base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `rounded`: Whether the corners are cut.
+   *
+   * A boolean rather than a radius, because the radius is a token and the
+   * question a consumer is answering is whether this picture is a card's
+   * surface or a page's. `--image-radius` moves it for the case that is
+   * neither.
+   * - `src`: Where the picture is.
+   * - `alt`: What it shows, for a reader who cannot see it.
+   *
+   * Empty is a real answer and means decoration. Omitting the attribute is not
+   * the same thing: a reader with nothing to read announces the file name.
+   * - `loading`: Whether to wait until it is nearly on screen.
+   *
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
+   * - `srcset`: The candidate widths, passed through to the picture.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `status`: Whether the picture is on its way, here, or never coming.
+   *
+   * Reflected, so a stylesheet can answer all three without a rule per part,
+   * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `placeholder`: Shown until the picture arrives.
+   * - `fallback`: Shown instead of it, if it never does.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--image-aspect`: The ratio of the box, as `16 / 9`. (default: `undefined`)
+   * - `--image-fit`: How the picture fills it. (default: `undefined`)
+   * - `--image-position`: Which part survives a crop. (default: `undefined`)
+   * - `--image-radius`: Corner radius, under `rounded`. (default: `undefined`)
+   * - `--image-placeholder-color`: The resting surface behind both stand-ins. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `image`: The picture itself.
+   * - `placeholder`: What stands in until it arrives.
+   * - `fallback`: What stands in when it fails.
+   */
+  "helix-image": Partial<HelixImageProps & BaseProps<HelixImage> & BaseEvents>;
+
+  /**
    * The frame is the field rather than the input, so anything slotted at either
    * end sits inside the same box as the text and the focus ring is drawn once,
    * around the whole control, instead of around a smaller box within it.
@@ -24447,6 +24576,70 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Presentation only: the box the picture is given, how it fills it, and the
+   * fade when it lands. What the three states are and when they change is the
+   * base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `rounded`: Whether the corners are cut.
+   *
+   * A boolean rather than a radius, because the radius is a token and the
+   * question a consumer is answering is whether this picture is a card's
+   * surface or a page's. `--image-radius` moves it for the case that is
+   * neither.
+   * - `src`: Where the picture is.
+   * - `alt`: What it shows, for a reader who cannot see it.
+   *
+   * Empty is a real answer and means decoration. Omitting the attribute is not
+   * the same thing: a reader with nothing to read announces the file name.
+   * - `loading`: Whether to wait until it is nearly on screen.
+   *
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
+   * - `srcset`: The candidate widths, passed through to the picture.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `status`: Whether the picture is on its way, here, or never coming.
+   *
+   * Reflected, so a stylesheet can answer all three without a rule per part,
+   * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `placeholder`: Shown until the picture arrives.
+   * - `fallback`: Shown instead of it, if it never does.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--image-aspect`: The ratio of the box, as `16 / 9`. (default: `undefined`)
+   * - `--image-fit`: How the picture fills it. (default: `undefined`)
+   * - `--image-position`: Which part survives a crop. (default: `undefined`)
+   * - `--image-radius`: Corner radius, under `rounded`. (default: `undefined`)
+   * - `--image-placeholder-color`: The resting surface behind both stand-ins. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `image`: The picture itself.
+   * - `placeholder`: What stands in until it arrives.
+   * - `fallback`: What stands in when it fails.
+   */
+  "helix-image": Partial<
+    HelixImageProps &
+      HelixImageSolidJsProps &
+      BaseProps<HelixImage> &
+      BaseEvents
+  >;
+
+  /**
    * The frame is the field rather than the input, so anything slotted at either
    * end sits inside the same box as the text and the focus ring is drawn once,
    * around the whole control, instead of around a smaller box within it.
@@ -30571,6 +30764,16 @@ export type CustomCssProperties = {
   "--icon-button-shadow"?: string;
   /** Edge length of the icon's box. */
   "--icon-size"?: string;
+  /** The ratio of the box, as `16 / 9`. */
+  "--image-aspect"?: string;
+  /** How the picture fills it. */
+  "--image-fit"?: string;
+  /** Which part survives a crop. */
+  "--image-position"?: string;
+  /** Corner radius, under `rounded`. */
+  "--image-radius"?: string;
+  /** The resting surface behind both stand-ins. */
+  "--image-placeholder-color"?: string;
   /** Height of the field. */
   "--input-size"?: string;
   /** Fill behind the text. */

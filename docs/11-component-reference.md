@@ -2142,6 +2142,55 @@ common way a toolbar becomes unusable without sight.
 | `--icon-button-size` | Edge length of the control. |
 | `--icon-button-shadow` | What it casts, where it is raised off the page. |
 
+## Image
+
+### Root — `helix-image`
+
+A picture that says whether it arrived.
+
+Extends `HelixBaseImage`.
+
+Presentation only: the box the picture is given, how it fills it, and the
+fade when it lands. What the three states are and when they change is the
+base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `alt` | `alt` | `string` | `''` | `HelixBaseImage` | What it shows, for a reader who cannot see it. |
+| `loading` | `loading` | `'eager' \| 'lazy'` | `'lazy'` | `HelixBaseImage` | Whether to wait until it is nearly on screen. |
+| `rounded` | `rounded` | `boolean` | `false` | - | Whether the corners are cut. |
+| `sizes` | `sizes` | `string` | `''` | `HelixBaseImage` | How much of the line it will take, passed through to the picture. |
+| `src` | `src` | `string` | `''` | `HelixBaseImage` | Where the picture is. |
+| `srcset` | `srcset` | `string` | `''` | `HelixBaseImage` | The candidate widths, passed through to the picture. |
+| `status` | `status` | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixBaseImage` | Whether the picture is on its way, here, or never coming. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `placeholder` | Shown until the picture arrives. |
+| `fallback` | Shown instead of it, if it never does. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `image` | The picture itself. |
+| `placeholder` | What stands in until it arrives. |
+| `fallback` | What stands in when it fails. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--image-aspect` | The ratio of the box, as `16 / 9`. |
+| `--image-fit` | How the picture fills it. |
+| `--image-position` | Which part survives a crop. |
+| `--image-radius` | Corner radius, under `rounded`. |
+| `--image-placeholder-color` | The resting surface behind both stand-ins. |
+
 ## Input
 
 ### Root — `helix-input`

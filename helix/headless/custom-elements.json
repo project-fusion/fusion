@@ -16933,6 +16933,320 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/image/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/image/root/image-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/image/root/image-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "**An element rather than a recipe, because of the part CSS cannot do.**\nReserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and\nthe megamenu row are recipes in `base.css` for exactly that reason. What\ncannot be written as a rule is *when the picture arrived*: a stylesheet has no\nway to know, and no way to hear that it never will. So this owns three states\nand the two events that move between them, and leaves the box to the\nstylesheet.\n\n**The placeholder is a slot with nothing in it by default.** A default of\n`Skeleton` would be right and is not written here: this tier renders no other\ncomponent, and reaching for one would make the headless package depend on the\nstyled one. The styled tier draws the resting placeholder instead, and a\nconsumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots\nit.\n\n**`alt` is a property and not an afterthought.** An empty string is a real\nanswer, meaning the picture is decoration and a screen reader should skip it,\nwhich is why the attribute is always written even when it is empty: omitting\nit entirely makes a reader announce the file name instead.",
+          "name": "HelixBaseImage",
+          "cssParts": [
+            {
+              "description": "The picture itself.",
+              "name": "image"
+            },
+            {
+              "description": "What stands in until it arrives.",
+              "name": "placeholder"
+            },
+            {
+              "description": "What stands in when it fails.",
+              "name": "fallback"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Shown until the picture arrives.",
+              "name": "placeholder"
+            },
+            {
+              "description": "Shown instead of it, if it never does.",
+              "name": "fallback"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the picture is.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "alt",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What it shows, for a reader who cannot see it.\n\nEmpty is a real answer and means decoration. Omitting the attribute is not\nthe same thing: a reader with nothing to read announces the file name.",
+              "attribute": "alt"
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "'eager' | 'lazy'"
+              },
+              "default": "'lazy'",
+              "description": "Whether to wait until it is nearly on screen.\n\n`lazy` by default, which is the opposite of the platform's, because a\npicture worth putting in a component is usually below the fold and the one\nthat is not is the exception worth writing down.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "srcset",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The candidate widths, passed through to the picture.",
+              "attribute": "srcset"
+            },
+            {
+              "kind": "field",
+              "name": "sizes",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How much of the line it will take, passed through to the picture.",
+              "attribute": "sizes"
+            },
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "'error' | 'loaded' | 'loading'"
+              },
+              "default": "'loading'",
+              "description": "Whether the picture is on its way, here, or never coming.\n\nReflected, so a stylesheet can answer all three without a rule per part,\nand read-only to a consumer: it is a report rather than a setting.",
+              "attribute": "status",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "answered",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''",
+              "description": "Which `src` the current status belongs to, so a new one starts over."
+            },
+            {
+              "kind": "field",
+              "name": "handleLoad",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleError",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "settle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Catches the picture that was already there.\n\nA cached image can finish loading before this element has a listener on it,\nand then `load` never fires and the placeholder stays up over a picture that\nis sitting right behind it. `complete` is the platform's own answer to that\nquestion, and `naturalWidth` separates a decoded picture from one that\ncarries no pixels, which `complete` reports as finished either way.\n\n**It can only ever conclude success.** A picture that has not been attempted\nlooks exactly like one that failed: `complete` is true and `naturalWidth` is\nzero for both, and a DOM that never fetches anything reports that for every\nimage it has. Deciding `error` here called every picture broken the moment\nit rendered. Failure has an event of its own and that event is reliable, so\nthis is only here to catch the success that happened too early to hear."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Where the picture is.",
+              "fieldName": "src"
+            },
+            {
+              "name": "alt",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What it shows, for a reader who cannot see it.\n\nEmpty is a real answer and means decoration. Omitting the attribute is not\nthe same thing: a reader with nothing to read announces the file name.",
+              "fieldName": "alt"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "'eager' | 'lazy'"
+              },
+              "default": "'lazy'",
+              "description": "Whether to wait until it is nearly on screen.\n\n`lazy` by default, which is the opposite of the platform's, because a\npicture worth putting in a component is usually below the fold and the one\nthat is not is the exception worth writing down.",
+              "fieldName": "loading"
+            },
+            {
+              "name": "srcset",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The candidate widths, passed through to the picture.",
+              "fieldName": "srcset"
+            },
+            {
+              "name": "sizes",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "How much of the line it will take, passed through to the picture.",
+              "fieldName": "sizes"
+            },
+            {
+              "name": "status",
+              "type": {
+                "text": "'error' | 'loaded' | 'loading'"
+              },
+              "default": "'loading'",
+              "description": "Whether the picture is on its way, here, or never coming.\n\nReflected, so a stylesheet can answer all three without a rule per part,\nand read-only to a consumer: it is a report rather than a setting.",
+              "fieldName": "status"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A picture that says whether it arrived.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/image",
+            "aliases": [
+              "Picture",
+              "Img",
+              "Figure"
+            ],
+            "tier": "headless",
+            "group": "BaseImage",
+            "part": "Root",
+            "source": "helix/headless/src/image"
+          },
+          "tagName": "helix-base-image",
+          "customElement": true,
+          "modulePath": "src/image/root/image-root.ts",
+          "definitionPath": "src/image/root/image-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseImage",
+          "declaration": {
+            "name": "HelixBaseImage",
+            "module": "src/image/root/image-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-image",
+          "declaration": {
+            "name": "HelixBaseImage",
+            "module": "src/image/root/image-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/index.ts",
       "declarations": [],
       "exports": [
@@ -17190,6 +17504,14 @@
           "declaration": {
             "name": "*",
             "module": "src/icon-button/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/image/index.js"
           }
         },
         {

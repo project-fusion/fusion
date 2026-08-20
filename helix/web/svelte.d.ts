@@ -44,6 +44,7 @@ declare module 'svelte/elements' {
     'helix-grid': CustomElements['helix-grid']
     'helix-icon-button': CustomElements['helix-icon-button']
     'helix-icon': CustomElements['helix-icon']
+    'helix-image': CustomElements['helix-image']
     'helix-input': CustomElements['helix-input']
     'helix-kbd': CustomElements['helix-kbd']
     'helix-list-item': CustomElements['helix-list-item']

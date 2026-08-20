@@ -245,6 +245,32 @@ export const contentArt: Record<string, ReactNode> = {
   ),
 
   /** Rows read as a set, divided by a rule and nothing else. */
+  /**
+   * A picture in a bounded box, with a horizon, a sun and two ridges.
+   *
+   * The box is the subject rather than what is in it. What this component adds
+   * over an `<img>` is that it reserves its ground and says whether the picture
+   * arrived, so the drawing is a frame that is unmistakably a frame, holding a
+   * scene generic enough that nobody reads it as a photograph of something.
+   *
+   * `artOpen` on the scene alone, not the frame. The frame is the part that was
+   * there all along, and the picture is the part that arrives into it, which is
+   * the whole of what the element does. Scaling the frame with it would say the
+   * box turned up too, and the box turning up is the thing this component
+   * exists to prevent.
+   */
+  image: (
+    <>
+      <rect className="artSunken" height="112" rx="8" width="224" x="48" y="44" />
+      <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
+        <circle className="artInk" cx="96" cy="80" fillOpacity="0.28" r="12" />
+        <path className="artInk" d="M48 156v-24l40-32 34 28 30-24 48 52z" fillOpacity="0.28" />
+        <path className="artInk" d="M136 156l40-36 96 36z" fillOpacity="0.55" />
+      </g>
+      <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
+    </>
+  ),
+
   list: (
     <>
       {[

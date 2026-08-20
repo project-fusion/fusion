@@ -1,0 +1,88 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, part, registerDom } from '@fusion-io/testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+type Picture = HTMLElement & { status: string; updateComplete: Promise<unknown> }
+
+const image = async (attrs = ''): Promise<Picture> => {
+  /* The caller's `alt` wins rather than being written twice: a duplicate
+     attribute keeps the first, so a spec about an empty alt was reading the
+     helper's own. */
+  const alt = attrs.includes('alt=') ? '' : 'alt="A pier"'
+  const host = (await mount(`<helix-image ${alt} ${attrs}></helix-image>`)) as Picture
+  await host.updateComplete
+  return host
+}
+
+const img = (host: Picture): HTMLImageElement => part(host, 'image') as HTMLImageElement
+
+describe('an image', () => {
+  test('starts by saying it has not arrived', async () => {
+    const host = await image('src="/pier.jpg"')
+    expect(host.status).toBe('loading')
+    expect(part(host, 'placeholder')?.hasAttribute('hidden')).toBe(false)
+    expect(part(host, 'fallback')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('says so when it arrives, and puts the stand-in away', async () => {
+    const host = await image('src="/pier.jpg"')
+    img(host).dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(host.status).toBe('loaded')
+    expect(part(host, 'placeholder')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('and says so when it never will', async () => {
+    /* The reason this is an element rather than a rule. A stylesheet cannot
+       hear that a picture failed, so it cannot put anything in its place. */
+    const host = await image('src="/gone.jpg"')
+    img(host).dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(host.status).toBe('error')
+    expect(part(host, 'fallback')?.hasAttribute('hidden')).toBe(false)
+    expect(part(host, 'placeholder')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('a new picture is a new question', async () => {
+    /* Without resetting, the second `src` inherits the first one's answer and
+       never shows a placeholder of its own. */
+    const host = await image('src="/pier.jpg"')
+    img(host).dispatchEvent(new Event('load'))
+    await host.updateComplete
+    expect(host.status).toBe('loaded')
+
+    host.setAttribute('src', '/other.jpg')
+    await host.updateComplete
+    /* Asserted as "not the old answer" rather than as "loading". A DOM that
+       resolves a fetch immediately answers the new `src` in the same turn, so
+       the loading state is real and simply not observable from here. What has
+       to hold either way is that the first picture's `loaded` did not carry
+       over to the second. */
+    expect(host.status).not.toBe('loaded')
+  })
+
+  test('writes an empty alt rather than leaving it off', async () => {
+    /* Empty means decoration and is a real answer. Absent means a reader
+       announces the file name instead, which is the failure this prevents. */
+    const host = await image('alt="" src="/pier.jpg"')
+    expect(img(host).hasAttribute('alt')).toBe(true)
+    expect(img(host).getAttribute('alt')).toBe('')
+  })
+
+  test('waits until it is nearly needed, unless told otherwise', async () => {
+    expect(img(await image('src="/pier.jpg"')).getAttribute('loading')).toBe('lazy')
+    expect(img(await image('src="/pier.jpg" loading="eager"')).getAttribute('loading')).toBe(
+      'eager',
+    )
+  })
+
+  test('neither stand-in is read out, the picture having a name of its own', async () => {
+    const host = await image('src="/pier.jpg"')
+    expect(part(host, 'placeholder')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'fallback')?.getAttribute('aria-hidden')).toBe('true')
+  })
+})

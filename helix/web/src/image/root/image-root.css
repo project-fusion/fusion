@@ -1,0 +1,81 @@
+/* The box is the element's, and the picture fills it.
+ *
+ * `display: block` rather than inline, because an inline box carries a
+ * descender's worth of space under it that no consumer asked for and everyone
+ * ends up fighting with `display: block` on the image itself. */
+:host {
+  aspect-ratio: var(--image-aspect, auto);
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+:host([rounded]) {
+  border-radius: var(--image-radius, var(--helix-radii-md));
+}
+
+/* Filling the box on both axes, so `object-fit` has something to fit against.
+ *
+ * Without a size the picture takes its own, and `cover` then crops nothing
+ * because there is nothing to crop to. */
+[part="image"] {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  object-fit: var(--image-fit, cover);
+  object-position: var(--image-position, center);
+}
+
+/* Nothing to look at until there is something to look at. `visibility` rather
+   than `opacity`, so a picture that failed is not sitting invisible on top of
+   the fallback taking the pointer. */
+:host([status="error"]) [part="image"] {
+  visibility: hidden;
+}
+
+/* Both stand-ins cover the box exactly, because they are standing in for it. */
+[part="placeholder"],
+[part="fallback"] {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+/* The resting placeholder, drawn here rather than slotted, so an image with
+ * nothing slotted still reserves a surface instead of a hole.
+ *
+ * A consumer slotting their own gets this behind it, which is what they want:
+ * a blurred thumbnail with a transparent edge should still sit on a surface
+ * rather than on whatever is under the element. */
+[part="placeholder"] {
+  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
+}
+
+[part="fallback"] {
+  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* Arriving rather than appearing.
+ *
+ * The picture is what fades, not the placeholder: fading the placeholder out
+ * over an image that has not painted yet shows the page behind it for a frame.
+ * `loaded` is the only state that transitions, so a cached picture that is
+ * already `loaded` on the first render has nothing to animate and appears at
+ * once, which is correct. */
+[part="image"] {
+  opacity: 0;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host([status="loaded"]) [part="image"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="image"] {
+    transition: none;
+  }
+}

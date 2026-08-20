@@ -35,6 +35,7 @@ import type {
   HelixBaseFileInput,
   HelixBaseIconButton,
   HelixBaseIcon,
+  HelixBaseImage,
   HelixBaseInput,
   HelixBaseKbd,
   HelixBaseListItem,
@@ -2066,6 +2067,33 @@ export type HelixBaseIconVueProps = {
 };
 
 export type HelixBaseIconVueEvents = {};
+
+export type HelixBaseImageVueProps = {
+  /** Where the picture is. */
+  src?: HelixBaseImage["src"];
+  /** What it shows, for a reader who cannot see it.
+
+Empty is a real answer and means decoration. Omitting the attribute is not
+the same thing: a reader with nothing to read announces the file name. */
+  alt?: HelixBaseImage["alt"];
+  /** Whether to wait until it is nearly on screen.
+
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  loading?: HelixBaseImage["loading"];
+  /** The candidate widths, passed through to the picture. */
+  srcset?: HelixBaseImage["srcset"];
+  /** How much of the line it will take, passed through to the picture. */
+  sizes?: HelixBaseImage["sizes"];
+  /** Whether the picture is on its way, here, or never coming.
+
+Reflected, so a stylesheet can answer all three without a rule per part,
+and read-only to a consumer: it is a report rather than a setting. */
+  status?: HelixBaseImage["status"];
+};
+
+export type HelixBaseImageVueEvents = {};
 
 /** `HelixBaseInput` component event */
 export type HelixBaseInputElementEvent<E = Event> = TypedEvent<
@@ -5767,6 +5795,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseIcon,
     HelixBaseIconVueProps,
     HelixBaseIconVueEvents
+  >;
+  /** **An element rather than a recipe, because of the part CSS cannot do.** Reserving the box is 'aspect-ratio' and needs nothing from anybody; 'Link' and the megamenu row are recipes in 'base.css' for exactly that reason. What cannot be written as a rule is *when the picture arrived*: a stylesheet has no way to know, and no way to hear that it never will. So this owns three states and the two events that move between them, and leaves the box to the stylesheet.  **The placeholder is a slot with nothing in it by default.** A default of 'Skeleton' would be right and is not written here: this tier renders no other component, and reaching for one would make the headless package depend on the styled one. The styled tier draws the resting placeholder instead, and a consumer who wants a 'Skeleton', a blurred thumbnail or a solid colour slots it.  **'alt' is a property and not an afterthought.** An empty string is a real answer, meaning the picture is decoration and a screen reader should skip it, which is why the attribute is always written even when it is empty: omitting it entirely makes a reader announce the file name instead. */
+  "helix-base-image": DefineCustomElement<
+    HelixBaseImage,
+    HelixBaseImageVueProps,
+    HelixBaseImageVueEvents
   >;
   /** Renders a real '<input>', so the caret, selection, autofill, spellcheck, the password manager, and the on-screen keyboard a phone chooses all come from the platform. 'delegatesFocus' puts focus on it, and it serializes into the server's markup, so the field is usable before any script loads.  **The input inside a shadow root submits nothing**, because the form is on the other side of the boundary. The host is form-associated instead and reports its own value through 'ElementInternals', which is also what carries validity and what answers a form reset.  'value' and 'defaultValue' are separate for the reason 'checked' and 'defaultChecked' are: 'value' is what is in the field now and 'defaultValue' is what the markup asked for, which is where a reset returns to and is gone the moment anyone types.  **Validity is the platform's.** The 'type' and 'required' are set on the real input and its 'validity' is copied onto the host, so an email field rejects what the browser says is not an email rather than what a regular expression here guesses. What this adds is the anchor, so 'reportValidity' points the bubble at the input rather than at the host.  'pattern', 'minlength' and 'maxlength' are forwarded with them. They were promised by this paragraph and did not exist, so a consumer following the sentence wrote an attribute on the host that reached no input and constrained nothing: the field looked as though it were checked and was not. */
   "helix-base-input": DefineCustomElement<

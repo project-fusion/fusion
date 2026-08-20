@@ -35,6 +35,7 @@ import type {
   HelixBaseFileInput,
   HelixBaseIcon,
   HelixBaseIconButton,
+  HelixBaseImage,
   HelixBaseInput,
   HelixBaseKbd,
   HelixBaseList,
@@ -3959,6 +3960,61 @@ export type HelixBaseIconSolidJsProps = {
   "prop:name"?: HelixBaseIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixBaseIcon["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseImageProps = {
+  /** Where the picture is. */
+  src?: HelixBaseImage["src"];
+  /** What it shows, for a reader who cannot see it.
+
+Empty is a real answer and means decoration. Omitting the attribute is not
+the same thing: a reader with nothing to read announces the file name. */
+  alt?: HelixBaseImage["alt"];
+  /** Whether to wait until it is nearly on screen.
+
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  loading?: HelixBaseImage["loading"];
+  /** The candidate widths, passed through to the picture. */
+  srcset?: HelixBaseImage["srcset"];
+  /** How much of the line it will take, passed through to the picture. */
+  sizes?: HelixBaseImage["sizes"];
+  /** Whether the picture is on its way, here, or never coming.
+
+Reflected, so a stylesheet can answer all three without a rule per part,
+and read-only to a consumer: it is a report rather than a setting. */
+  status?: HelixBaseImage["status"];
+};
+
+export type HelixBaseImageSolidJsProps = {
+  /** Where the picture is. */
+  "prop:src"?: HelixBaseImage["src"];
+  /** What it shows, for a reader who cannot see it.
+
+Empty is a real answer and means decoration. Omitting the attribute is not
+the same thing: a reader with nothing to read announces the file name. */
+  "prop:alt"?: HelixBaseImage["alt"];
+  /** Whether to wait until it is nearly on screen.
+
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  "prop:loading"?: HelixBaseImage["loading"];
+  /** The candidate widths, passed through to the picture. */
+  "prop:srcset"?: HelixBaseImage["srcset"];
+  /** How much of the line it will take, passed through to the picture. */
+  "prop:sizes"?: HelixBaseImage["sizes"];
+  /** Whether the picture is on its way, here, or never coming.
+
+Reflected, so a stylesheet can answer all three without a rule per part,
+and read-only to a consumer: it is a report rather than a setting. */
+  "prop:status"?: HelixBaseImage["status"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13732,6 +13788,67 @@ export type CustomElements = {
   >;
 
   /**
+   * **An element rather than a recipe, because of the part CSS cannot do.**
+   * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
+   * the megamenu row are recipes in `base.css` for exactly that reason. What
+   * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
+   * way to know, and no way to hear that it never will. So this owns three states
+   * and the two events that move between them, and leaves the box to the
+   * stylesheet.
+   *
+   * **The placeholder is a slot with nothing in it by default.** A default of
+   * `Skeleton` would be right and is not written here: this tier renders no other
+   * component, and reaching for one would make the headless package depend on the
+   * styled one. The styled tier draws the resting placeholder instead, and a
+   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
+   * it.
+   *
+   * **`alt` is a property and not an afterthought.** An empty string is a real
+   * answer, meaning the picture is decoration and a screen reader should skip it,
+   * which is why the attribute is always written even when it is empty: omitting
+   * it entirely makes a reader announce the file name instead.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Where the picture is.
+   * - `alt`: What it shows, for a reader who cannot see it.
+   *
+   * Empty is a real answer and means decoration. Omitting the attribute is not
+   * the same thing: a reader with nothing to read announces the file name.
+   * - `loading`: Whether to wait until it is nearly on screen.
+   *
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
+   * - `srcset`: The candidate widths, passed through to the picture.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `status`: Whether the picture is on its way, here, or never coming.
+   *
+   * Reflected, so a stylesheet can answer all three without a rule per part,
+   * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `placeholder`: Shown until the picture arrives.
+   * - `fallback`: Shown instead of it, if it never does.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `image`: The picture itself.
+   * - `placeholder`: What stands in until it arrives.
+   * - `fallback`: What stands in when it fails.
+   */
+  "helix-base-image": Partial<
+    HelixBaseImageProps & BaseProps<HelixBaseImage> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
    * password manager, and the on-screen keyboard a phone chooses all come from the
    * platform. `delegatesFocus` puts focus on it, and it serializes into the
@@ -22656,6 +22773,70 @@ export type CustomElementsSolidJs = {
     HelixBaseIconProps &
       HelixBaseIconSolidJsProps &
       BaseProps<HelixBaseIcon> &
+      BaseEvents
+  >;
+
+  /**
+   * **An element rather than a recipe, because of the part CSS cannot do.**
+   * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
+   * the megamenu row are recipes in `base.css` for exactly that reason. What
+   * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
+   * way to know, and no way to hear that it never will. So this owns three states
+   * and the two events that move between them, and leaves the box to the
+   * stylesheet.
+   *
+   * **The placeholder is a slot with nothing in it by default.** A default of
+   * `Skeleton` would be right and is not written here: this tier renders no other
+   * component, and reaching for one would make the headless package depend on the
+   * styled one. The styled tier draws the resting placeholder instead, and a
+   * consumer who wants a `Skeleton`, a blurred thumbnail or a solid colour slots
+   * it.
+   *
+   * **`alt` is a property and not an afterthought.** An empty string is a real
+   * answer, meaning the picture is decoration and a screen reader should skip it,
+   * which is why the attribute is always written even when it is empty: omitting
+   * it entirely makes a reader announce the file name instead.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `src`: Where the picture is.
+   * - `alt`: What it shows, for a reader who cannot see it.
+   *
+   * Empty is a real answer and means decoration. Omitting the attribute is not
+   * the same thing: a reader with nothing to read announces the file name.
+   * - `loading`: Whether to wait until it is nearly on screen.
+   *
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
+   * - `srcset`: The candidate widths, passed through to the picture.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `status`: Whether the picture is on its way, here, or never coming.
+   *
+   * Reflected, so a stylesheet can answer all three without a rule per part,
+   * and read-only to a consumer: it is a report rather than a setting.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `placeholder`: Shown until the picture arrives.
+   * - `fallback`: Shown instead of it, if it never does.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `image`: The picture itself.
+   * - `placeholder`: What stands in until it arrives.
+   * - `fallback`: What stands in when it fails.
+   */
+  "helix-base-image": Partial<
+    HelixBaseImageProps &
+      HelixBaseImageSolidJsProps &
+      BaseProps<HelixBaseImage> &
       BaseEvents
   >;
 
