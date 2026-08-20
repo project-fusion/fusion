@@ -194,8 +194,9 @@ export default function Home() {
               The part you can buy today
             </helix-text>
             <helix-text as="p" class="measure" tone="muted">
-              Interface and intelligence work the substrates make faster to do well. Prices are on
-              the page, because an offer you cannot compare is not an offer.
+              Interface and intelligence work the substrates make faster to do well. It starts with
+              a two week audit, and every price is stated in full, because an offer you cannot
+              compare is not an offer.
             </helix-text>
           </helix-flex>
 
@@ -206,7 +207,15 @@ export default function Home() {
                 <helix-text as="h3" class="substrateName">
                   {service.name}
                 </helix-text>
-                <helix-text appearance="body-strong">{service.price}</helix-text>
+                {/* No number here, and the prices page is one line below.
+                    
+                    Three offers in a row with three five-figure sums beside
+                    them is a price list, and a landing band is not one: a
+                    reader meets the cost before they have been told what any of
+                    it is, which is the anchoring problem `docs/17` names for the
+                    sprint in particular. The figures are stated in full on
+                    `/services`, where the sentence explaining each one arrives
+                    first. */}
                 <helix-text as="p" tone="muted">
                   {service.summary}
                 </helix-text>
@@ -215,7 +224,7 @@ export default function Home() {
           </helix-grid>
 
           <Link data-link href="/services">
-            See what each one includes
+            See what each one includes, and what it costs
           </Link>
         </helix-flex>
       </section>

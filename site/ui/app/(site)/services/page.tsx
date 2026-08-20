@@ -15,8 +15,11 @@ export const metadata = {
  * company whose constraint forbids lock-in has a hard time explaining why its
  * pricing is the one thing a reader may not leave with.
  *
- * Copy lives in `services.ts` and is derived from `the internal plan`, so
- * the site and the plan cannot drift on what is actually sold.
+ * Copy lives in `services.ts`, derived from `the internal plan` and
+ * `the internal plan`, so the site and the plan cannot drift on what is
+ * actually sold. `the internal plan` is the reconciliation where the
+ * two disagree, and is also why the figure sits under the summary rather than
+ * beside the name.
  *
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
@@ -35,7 +38,8 @@ export default function Page() {
           <helix-text as="p" class="measure" tone="muted">
             Everything else on this site is being built. This is the work we take on now: interface
             and intelligence work the substrates make faster to do well. Three offers, in the order
-            they usually happen, with what they cost.
+            they usually happen. Most start with the audit, which is two weeks at a fixed price, and
+            the rest is scoped from what it finds.
           </helix-text>
         </helix-flex>
       </section>
@@ -51,19 +55,30 @@ export default function Page() {
                     {service.name}
                   </helix-text>
                 </helix-flex>
-                {/* The number, at the top, in the same row as the name. Put at
-                    the bottom it reads as a footnote to the description, which
-                    is exactly the shape that makes a reader hunt for it. */}
-                <helix-flex align="center" data-density="sm" gap="sm" wrap>
-                  <helix-tag>{service.duration}</helix-tag>
-                  <helix-text appearance="body-strong">{service.price}</helix-text>
-                </helix-flex>
               </helix-flex>
 
               <helix-flex direction="column" gap="lg">
                 <helix-text as="p" class="measure" tone="muted">
                   {service.summary}
                 </helix-text>
+
+                {/* The number comes after the sentence that says what this is,
+                    and it used to come before it.
+                    
+                    `the internal plan` is precise about the cost: a
+                    reader anchored on a component library in a design tool is
+                    comparing the sprint against a different kind of purchase and
+                    will not reach the second sentence. What is being sold is
+                    shipped software in their repository, and the price only
+                    reads correctly once that has landed. So the summary is
+                    first and the figure is under it, still in full and still
+                    the largest thing in this row. */}
+                <helix-flex align="baseline" gap="sm" wrap>
+                  <helix-text appearance="title">{service.price}</helix-text>
+                  <helix-text appearance="caption" tone="subtle">
+                    {service.duration}
+                  </helix-text>
+                </helix-flex>
 
                 <helix-flex class="serviceBody" gap="2xl" wrap>
                   <helix-flex class="serviceColumn" direction="column" gap="sm">
