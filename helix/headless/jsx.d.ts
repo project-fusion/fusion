@@ -41,6 +41,7 @@ import type {
   HelixBaseListItem,
   HelixBaseListbox,
   HelixBaseLoader,
+  HelixBaseMegamenu,
   HelixBaseMenu,
   HelixBaseMenuItem,
   HelixBaseMeter,
@@ -4490,6 +4491,96 @@ export type HelixBaseLoaderProps = {
 export type HelixBaseLoaderSolidJsProps = {
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixBaseLoader["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixBaseMegamenu` component event */
+export type HelixBaseMegamenuElementEvent<E = Event> = TypedEvent<
+  HelixBaseMegamenu,
+  E
+>;
+/** `helix-open` event type */
+export type HelixBaseMegamenuHelixOpenElementEvent =
+  HelixBaseMegamenuElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixBaseMegamenuHelixCloseElementEvent =
+  HelixBaseMegamenuElementEvent<HelixCloseEvent>;
+
+export type HelixBaseMegamenuProps = {
+  /** The section's name, which names the default trigger and the panel. */
+  label?: HelixBaseMegamenu["label"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixBaseMegamenu["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixBaseMegamenu["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixBaseMegamenu["defaultOpen"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
+};
+
+export type HelixBaseMegamenuSolidJsProps = {
+  /** The section's name, which names the default trigger and the panel. */
+  "prop:label"?: HelixBaseMegamenu["label"];
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixBaseMegamenu["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixBaseMegamenu["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixBaseMegamenu["defaultOpen"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13497,6 +13588,99 @@ export type CustomElements = {
   >;
 
   /**
+   * **A disclosure, not a menu, and that is the whole design.** `role="menu"` and
+   * `menuitem` are for an application's commands: they take over the arrow keys,
+   * announce "menu" to a reader who asked for navigation, and put every link
+   * inside a role that is not a link. What this is, is a button that shows and
+   * hides a region of the consumer's own anchors, which is the pattern the APG
+   * gives for site navigation and the one that leaves a middle click, a modified
+   * click and the status bar working. `Menu` remains right for a row of commands.
+   *
+   * **It renders no links**, for the reason `Navigation` gives: a router renders
+   * its own anchor and cannot render one inside this shadow root. The panel is a
+   * slot, and what goes in it is lists and headings the consumer wrote.
+   *
+   * **It opens on a press and never on hover.** A panel that opens under a
+   * passing pointer is a panel that opens when nobody asked, and on a touch
+   * screen there is no hover to open it with at all: the first tap would have to
+   * mean something else, which is the thing that makes hover menus unusable on a
+   * phone. Focus opens nothing either, for the same reason a tab through a nav
+   * bar should not unfold it.
+   *
+   * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
+   * trigger and the panel follows in the tab order, which is what the markup
+   * already says, so Tab walks into the links and out the far side without
+   * anything managing it. Escape closes and puts focus back, because Escape is
+   * the one key that has to return the reader to where they were.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The section's name, which names the default trigger and the panel.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's contents: the consumer's own lists and headings.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `panel`: The region that opens.
+   */
+  "helix-base-megamenu": Partial<
+    HelixBaseMegamenuProps & BaseProps<HelixBaseMegamenu> & BaseEvents
+  > & HelixBaseMegamenuControlled;
+
+  /**
    * Three shapes, one element, because a reader moving down a menu with the
    * arrow keys does not care which kind each row is and neither should the
    * markup. What it is follows from what it was given: something slotted into
@@ -21789,6 +21973,102 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * **A disclosure, not a menu, and that is the whole design.** `role="menu"` and
+   * `menuitem` are for an application's commands: they take over the arrow keys,
+   * announce "menu" to a reader who asked for navigation, and put every link
+   * inside a role that is not a link. What this is, is a button that shows and
+   * hides a region of the consumer's own anchors, which is the pattern the APG
+   * gives for site navigation and the one that leaves a middle click, a modified
+   * click and the status bar working. `Menu` remains right for a row of commands.
+   *
+   * **It renders no links**, for the reason `Navigation` gives: a router renders
+   * its own anchor and cannot render one inside this shadow root. The panel is a
+   * slot, and what goes in it is lists and headings the consumer wrote.
+   *
+   * **It opens on a press and never on hover.** A panel that opens under a
+   * passing pointer is a panel that opens when nobody asked, and on a touch
+   * screen there is no hover to open it with at all: the first tap would have to
+   * mean something else, which is the thing that makes hover menus unusable on a
+   * phone. Focus opens nothing either, for the same reason a tab through a nav
+   * bar should not unfold it.
+   *
+   * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
+   * trigger and the panel follows in the tab order, which is what the markup
+   * already says, so Tab walks into the links and out the far side without
+   * anything managing it. Escape closes and puts focus back, because Escape is
+   * the one key that has to return the reader to where they were.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The section's name, which names the default trigger and the panel.
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's contents: the consumer's own lists and headings.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `panel`: The region that opens.
+   */
+  "helix-base-megamenu": Partial<
+    HelixBaseMegamenuProps &
+      HelixBaseMegamenuSolidJsProps &
+      BaseProps<HelixBaseMegamenu> &
+      BaseEvents
+  > & HelixBaseMegamenuControlledSolidJs;
+
+  /**
    * Three shapes, one element, because a reader moving down a menu with the
    * arrow keys does not care which kind each row is and neither should the
    * markup. What it is follows from what it was given: something slotted into
@@ -27146,6 +27426,41 @@ type HelixBaseListboxControlledSolidJs =
         ref: BaseProps<HelixBaseListbox>["ref"];
       }
     | { value?: undefined }
+  );
+
+/**
+ * helix-base-megamenu: a controlled `open` announces and waits, so the handler comes with it.
+ */
+type HelixBaseMegamenuControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixBaseMegamenu["open"];
+        "onhelix-open": (event: HelixBaseMegamenuHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixBaseMegamenuHelixCloseElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        open: HelixBaseMegamenu["open"];
+        ref: import('react').Ref<HelixBaseMegamenu>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-base-megamenu, in Solid's dialect: `on:` and the event name. */
+type HelixBaseMegamenuControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixBaseMegamenu["open"];
+        "on:helix-open": (event: HelixBaseMegamenuHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixBaseMegamenuHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixBaseMegamenu["open"];
+        ref: BaseProps<HelixBaseMegamenu>["ref"];
+      }
+    | { open?: undefined }
   );
 
 /**

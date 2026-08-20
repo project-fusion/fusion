@@ -1,0 +1,86 @@
+/* A box, unlike `Menu`, which is `display: contents` because it is a wrapper
+   around somebody else's trigger and has nothing of its own in the row.
+ *
+ * This is an item in that row. `Navigation` measures its marker against every
+ * element assigned to its slot, and an element with `display: contents`
+ * generates no box at all, so a section holding the current page would have had
+ * the marker measured against a zero rect. The panel is in the top layer and
+ * takes no space either way. */
+:host {
+  display: inline-flex;
+}
+
+/* The default trigger, which reads as one of the navigation's own items rather
+   than as a button dropped among them. The recipe in the base layer is what
+   every link beside it wears, so this asks for the same shape by hand: a
+   `::part` from the document reaches exactly one boundary and this is inside
+   one, which is the wall `Button` records at length. */
+[part="trigger"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  min-block-size: var(--helix-size-control-sm);
+  padding-inline: var(--helix-space-xs);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="trigger"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="trigger"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Open reads like the current destination does, because while its panel is down
+   it is where the reader is. */
+[part="trigger"][aria-expanded="true"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+/* The panel is in the top layer, which is what `popover` buys: a nav bar is
+   inside a header, and a header is exactly the kind of ancestor that carries
+   `overflow` or a `transform` and would otherwise clip or re-anchor it. The
+   controller's own note has the measurements.
+ *
+ * Columns rather than a single list, which is what makes this a megamenu at all,
+ * and how many is the consumer's: the panel knows how wide it is and not what is
+ * going in it. `auto-fit` with a floor means a panel given three groups draws
+ * three and one given seven wraps them, without a property counting anything. */
+[part="panel"] {
+  background-color: var(--helix-color-surface-overlay);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-lg);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(var(--megamenu-column-size, 12rem), 1fr));
+  inline-size: max-content;
+  margin: var(--helix-space-none);
+  max-inline-size: min(var(--megamenu-size, 56rem), calc(100vw - var(--helix-space-xl) * 2));
+  padding: var(--helix-space-lg);
+}
+
+[part="panel"][hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="trigger"] {
+    transition: none;
+  }
+}

@@ -2452,6 +2452,60 @@ to say so.
 | `--loader-color` | Color of the moving arc. |
 | `--loader-track-color` | Color of the circle behind it. |
 
+## Megamenu
+
+### Root — `helix-megamenu`
+
+A section of a navigation that opens a panel of destinations.
+
+Extends `HelixBaseMegamenu`.
+
+Presentation only: the trigger, and the panel it opens as a grid of columns.
+Everything about what opens it and what closes it is the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
+| `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
+| `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
+| `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The panel's contents: the consumer's own lists and headings. |
+| `trigger` | The control that opens it. Falls back to a button named by `label`. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `trigger` | The default trigger, where none was slotted. |
+| `panel` | The region that opens. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--megamenu-size` | How wide the panel may get. |
+| `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
+
 ## Menu
 
 ### Root — `helix-menu`

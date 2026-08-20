@@ -53,6 +53,7 @@ import type {
   HelixListItem,
   HelixListbox,
   HelixLoader,
+  HelixMegamenu,
   HelixMenu,
   HelixMenuItem,
   HelixMeter,
@@ -5220,6 +5221,93 @@ no longer called Spinner: the old name described one appearance of two. */
   "prop:size"?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixLoader["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+/** `HelixMegamenu` component event */
+export type HelixMegamenuElementEvent<E = Event> = TypedEvent<HelixMegamenu, E>;
+/** `helix-open` event type */
+export type HelixMegamenuHelixOpenElementEvent =
+  HelixMegamenuElementEvent<HelixOpenEvent>;
+/** `helix-close` event type */
+export type HelixMegamenuHelixCloseElementEvent =
+  HelixMegamenuElementEvent<HelixCloseEvent>;
+
+export type HelixMegamenuProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  open?: HelixMegamenu["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "default-open"?: HelixMegamenu["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  defaultOpen?: HelixMegamenu["defaultOpen"];
+  /** The section's name, which names the default trigger and the panel. */
+  label?: HelixMegamenu["label"];
+
+  /** Fired before it opens, and cancelable. */
+  "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "onhelix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
+};
+
+export type HelixMegamenuSolidJsProps = {
+  /** Whether the element is open.
+
+One property, not two. Reading gives the real state whichever mode the
+element is in, so `dialog.open` answers the question anyone asking it
+meant. Writing hands ownership to the consumer, which is what the
+attribute in `<helix-dialog open>` does as well: from then on the element
+announces changes and applies none of them.
+
+It reads as an accessor pair rather than a field because those are two
+different questions sharing one name, and the alternative was a second
+property answering the first. That worked for a boolean, where `isOpen`
+reads well; there is no such word for a value or an active item, so all
+four of these mixins now have this shape instead of two shapes.
+
+**Not reflected, and that is required rather than tidy.** Reflection
+writes the resolved state back as an attribute, and writing the attribute
+is how a consumer says they own it. So an uncontrolled element that
+opened itself would put `open` on its own host and, from the next thing
+that read it, be indistinguishable from one the consumer controls:
+cloned, serialised for hydration, or diffed by a framework, it would come
+back controlled and stop responding. `data-open` carries the resolved
+state for stylesheets, which is what it has always been for. */
+  "prop:open"?: HelixMegamenu["open"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "bool:default-open"?: HelixMegamenu["defaultOpen"];
+  /** Initial open state for uncontrolled use, where nothing declared one. */
+  "prop:defaultOpen"?: HelixMegamenu["defaultOpen"];
+  /** The section's name, which names the default trigger and the panel. */
+  "prop:label"?: HelixMegamenu["label"];
+  /** Fired before it opens, and cancelable. */
+  "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
+  /** Fired before it closes, and cancelable. */
+  "on:helix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14928,6 +15016,84 @@ export type CustomElements = {
   >;
 
   /**
+   * Presentation only: the trigger, and the panel it opens as a grid of columns.
+   * Everything about what opens it and what closes it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `label`: The section's name, which names the default trigger and the panel.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's contents: the consumer's own lists and headings.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
+   * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `panel`: The region that opens.
+   */
+  "helix-megamenu": Partial<
+    HelixMegamenuProps & BaseProps<HelixMegamenu> & BaseEvents
+  > & HelixMegamenuControlled;
+
+  /**
    * The tick and the arrow hold their space whether or not they are showing, so
    * the labels in a menu start at one place and the rows read as a column rather
    * than as a ragged list.
@@ -23496,6 +23662,87 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Presentation only: the trigger, and the panel it opens as a grid of columns.
+   * Everything about what opens it and what closes it is the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the element is open.
+   *
+   * One property, not two. Reading gives the real state whichever mode the
+   * element is in, so `dialog.open` answers the question anyone asking it
+   * meant. Writing hands ownership to the consumer, which is what the
+   * attribute in `<helix-dialog open>` does as well: from then on the element
+   * announces changes and applies none of them.
+   *
+   * It reads as an accessor pair rather than a field because those are two
+   * different questions sharing one name, and the alternative was a second
+   * property answering the first. That worked for a boolean, where `isOpen`
+   * reads well; there is no such word for a value or an active item, so all
+   * four of these mixins now have this shape instead of two shapes.
+   *
+   * **Not reflected, and that is required rather than tidy.** Reflection
+   * writes the resolved state back as an attribute, and writing the attribute
+   * is how a consumer says they own it. So an uncontrolled element that
+   * opened itself would put `open` on its own host and, from the next thing
+   * that read it, be indistinguishable from one the consumer controls:
+   * cloned, serialised for hydration, or diffed by a framework, it would come
+   * back controlled and stop responding. `data-open` carries the resolved
+   * state for stylesheets, which is what it has always been for.
+   * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `label`: The section's name, which names the default trigger and the panel.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-open`: Fired before it opens, and cancelable.
+   * - `helix-close`: Fired before it closes, and cancelable.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The panel's contents: the consumer's own lists and headings.
+   * - `trigger`: The control that opens it. Falls back to a button named by `label`.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
+   *
+   * Announces before it acts, so `preventDefault()` on the `helix-open` or
+   * `helix-close` is a refusal and nothing moves. In uncontrolled mode the
+   * element then updates itself; in controlled mode it applies nothing and
+   * waits for the consumer to pass a new `open`, which is what "controlled"
+   * means.
+   * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
+   * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `trigger`: The default trigger, where none was slotted.
+   * - `panel`: The region that opens.
+   */
+  "helix-megamenu": Partial<
+    HelixMegamenuProps &
+      HelixMegamenuSolidJsProps &
+      BaseProps<HelixMegamenu> &
+      BaseEvents
+  > & HelixMegamenuControlledSolidJs;
+
+  /**
    * The tick and the arrow hold their space whether or not they are showing, so
    * the labels in a menu start at one place and the rows read as a column rather
    * than as a ragged list.
@@ -28546,6 +28793,10 @@ export type CustomCssProperties = {
   "--loader-color"?: string;
   /** Color of the circle behind it. */
   "--loader-track-color"?: string;
+  /** How wide the panel may get. */
+  "--megamenu-size"?: string;
+  /** The narrowest a column goes before the grid wraps. */
+  "--megamenu-column-size"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
   /** Tallest the surface grows before it scrolls. */
@@ -29417,6 +29668,41 @@ type HelixListboxControlledSolidJs =
         ref: BaseProps<HelixListbox>["ref"];
       }
     | { filter?: undefined }
+  );
+
+/**
+ * helix-megamenu: a controlled `open` announces and waits, so the handler comes with it.
+ */
+type HelixMegamenuControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixMegamenu["open"];
+        "onhelix-open": (event: HelixMegamenuHelixOpenElementEvent) => void;
+        "onhelix-close": (event: HelixMegamenuHelixCloseElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        open: HelixMegamenu["open"];
+        ref: import('react').Ref<HelixMegamenu>;
+      }
+    | { open?: undefined }
+  );
+
+/** helix-megamenu, in Solid's dialect: `on:` and the event name. */
+type HelixMegamenuControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-open` and `helix-close`. */
+        open: HelixMegamenu["open"];
+        "on:helix-open": (event: HelixMegamenuHelixOpenElementEvent) => void;
+        "on:helix-close": (event: HelixMegamenuHelixCloseElementEvent) => void;
+      }
+    | {
+        open: HelixMegamenu["open"];
+        ref: BaseProps<HelixMegamenu>["ref"];
+      }
+    | { open?: undefined }
   );
 
 /**

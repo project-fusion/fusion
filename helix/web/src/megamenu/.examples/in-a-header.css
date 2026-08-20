@@ -1,0 +1,15 @@
+/* The panel's contents are the consumer's, so their arrangement is too. A
+   column is a heading and the destinations under it, which is a stack. */
+helix-megamenu div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+helix-megamenu h3 {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin: var(--helix-space-none);
+  text-transform: uppercase;
+}
