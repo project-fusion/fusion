@@ -109,6 +109,22 @@
             },
             {
               "kind": "field",
+              "name": "widths",
+              "privacy": "private",
+              "default": "new WeakMap<HTMLElement, number>()",
+              "description": "Each item's width, taken while every item was showing.\n\nCached because a hidden item measures zero, and the arithmetic needs the\nwidth it *would* have. Recomputing from the live tree after anything is\nhidden is how a collapsed container decides it now fits, un-hides\neverything, decides it does not, and oscillates.\n\nKeyed by element, so an item leaving takes its entry with it and an item\narriving has none until it is seen at full width."
+            },
+            {
+              "kind": "field",
+              "name": "retry",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "description": "A pending retry, so a run of updates schedules one frame and not twelve."
+            },
+            {
+              "kind": "field",
               "name": "fits",
               "description": "How many items fit, counted from the *end*.\n\nThe end rather than the start, because what collapses keeps its outermost\nitems: a trail keeps where you are, and a path keeps its root. The host\npairs this with however many it keeps at the front."
             },
@@ -139,6 +155,17 @@
                 }
               },
               "description": "Recomputes what fits, from widths taken while everything is shown.\n\nThe host calls this after its own update as well, because an item arriving\nor leaving changes the answer and no resize accompanies it."
+            },
+            {
+              "kind": "method",
+              "name": "schedule",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "One retry per frame, however many updates asked for it.\n\nThe host measures from `updated`, which runs inside Lit's update and so\nbefore layout: on the first pass every child is zero wide, and with only\nthe container observed nothing else will ever fire. A frame is exactly the\nwait, because layout has happened by the time one is delivered."
             },
             {
               "kind": "method",
