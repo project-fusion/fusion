@@ -279,9 +279,28 @@
      still renders rather than dropping to a serif default. */
   --helix-font-display: var(--_helix-family-display, var(--_helix-family-sans));
 
+  /* The body size is `md`, and it is 14.
+   *
+   * **Written down because it was not, which is how it came to be wrong.** It
+   * was 15, and unlike every other decision in these files that carried no
+   * reason at all: it arrived in a bulk token commit rather than being argued
+   * for, and nobody could say afterwards why 15 rather than 14 or 16.
+   *
+   * 14 is the size a dense product interface is set at, and it divides. Fifteen
+   * against `--helix-leading-normal` is a 22.5 pixel line box, and that half
+   * pixel is not free: it is what made aligning a mark to the middle of a line
+   * of type fiddly enough to need an optical correction in `Timeline`. Fourteen
+   * gives 21.
+   *
+   * **Only the bottom of the ramp moved.** `lg` and everything above it are
+   * headings and were not the thing in question, so they are where they were:
+   * re-cutting them would have been a change to how every page is set, made
+   * while answering a question about body copy. `sm` had to move because it was
+   * 14 itself, and a scale with two rungs the same size is a scale with a rung
+   * missing. */
   --helix-text-xs: var(--_helix-size-12);
-  --helix-text-sm: var(--_helix-size-14);
-  --helix-text-md: var(--_helix-size-15);
+  --helix-text-sm: var(--_helix-size-13);
+  --helix-text-md: var(--_helix-size-14);
   --helix-text-lg: var(--_helix-size-18);
   --helix-text-xl: var(--_helix-size-24);
   --helix-text-2xl: var(--_helix-size-32);

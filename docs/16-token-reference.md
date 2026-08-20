@@ -105,8 +105,8 @@ Font size.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 85 |
-| `--helix-text-sm` | `var(--_helix-size-14)` | 107 |
-| `--helix-text-md` | `var(--_helix-size-15)` | 38 |
+| `--helix-text-sm` | `var(--_helix-size-13)` | 107 |
+| `--helix-text-md` | `var(--_helix-size-14)` | 38 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 18 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 20 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 8 |
