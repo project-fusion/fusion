@@ -1,28 +1,35 @@
-/* The rail beside the content, and the two rows the rail is measured against.
+/* Two columns and two rows: the rail beside the entry, the time above what
+ * happened.
  *
- * `min-block-size` on the rail rather than a height on the host: the entry is as
- * tall as what is in it, and the line has to run the whole of that however much
- * that is. */
+ * **The rail is a subgrid, and that is the whole of the alignment.** The mark
+ * has to sit on the title rather than at the top of the entry, and the distance
+ * between those is the height of the time, which only the browser knows: a
+ * consumer writing "Tuesday 19 August" over two lines moves it. Sharing the
+ * parent's rows means the rail is told, so the mark lands on the title and the
+ * line above it covers exactly the gap. */
 :host {
-  display: flex;
-  gap: var(--helix-space-md);
+  column-gap: var(--helix-space-md);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 [part="rail"] {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  justify-items: center;
 }
 
-/* Above the mark, because it is the line arriving from the entry before. The
-   first entry has nothing before it, and `:host(:first-child)` is the whole of
-   knowing that: no index, no counting parent, no script, and true in the
+/* The line arriving from the entry above, which runs the height of the time.
+   The first entry has nothing above it, and `:host(:first-child)` is the whole
+   of knowing that: no index, no counting parent, no script, and true in the
    server's own markup. Hidden rather than removed, so the mark stays on the same
    line as every other one. */
 [part="connector"] {
   background-color: var(--helix-color-border);
-  block-size: var(--helix-space-md);
-  flex: 0 0 auto;
+  block-size: 100%;
+  grid-row: 1;
   inline-size: var(--timeline-rail-size, var(--helix-border-thick));
 }
 
@@ -30,65 +37,103 @@
   visibility: hidden;
 }
 
-/* And the rest of the line, which runs from the mark to the bottom of whatever
-   this entry holds. `flex: 1` rather than a second fixed length, so a long entry
-   is joined to the next one and a short one does not overshoot it. */
+/* And the rest of the line, from under the mark to the bottom of the entry.
+   In the mark's own cell rather than after it, offset by the mark's size: two
+   grid items in one cell stack, and the margin is what keeps the line below the
+   thing it leaves rather than drawn across it. */
 [part="rail"]::after {
+  align-self: stretch;
   background-color: var(--helix-color-border);
   content: "";
-  flex: 1 1 auto;
+  /* The column said as well as the row. Auto-placement puts two items that name
+     only a row into two columns, so the line came down beside the mark instead
+     of out of it, in a rail one column wider than it looked. */
+  grid-column: 1;
+  grid-row: 2;
   inline-size: var(--timeline-rail-size, var(--helix-border-thick));
+  margin-block-start: var(--timeline-marker-size, var(--helix-size-icon-md));
 }
 
 :host(:last-child) [part="rail"]::after {
   visibility: hidden;
 }
 
-/* A dot, and a box for whatever is slotted instead. Sized from the mark rather
-   than from the text, so a row with an icon and a row with a dot keep their
-   marks on one line down the page. */
+/* A ring rather than a disc.
+ *
+ * A column of filled circles is a column of traffic lights: the colour is the
+ * loudest thing on the card and it is saying something small, which is what
+ * kind of event this was. A ring in the tone with the mark drawn inside it in
+ * the same colour reads as an annotation on the line rather than a warning, and
+ * an entry with nothing slotted still gets a dot, because a ring with nothing
+ * in it is a hole. */
 [part="marker"] {
   --icon-size: var(--helix-size-icon-sm);
 
   align-items: center;
+  align-self: start;
   aspect-ratio: 1;
-  background-color: var(--_timeline-tone, var(--helix-color-border));
+  background-color: var(--helix-color-background);
   border-radius: var(--helix-radii-full);
-  color: var(--helix-color-background);
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--_timeline-tone, var(--helix-color-border));
+  color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
   display: inline-flex;
-  flex: 0 0 auto;
+  grid-column: 1;
+  grid-row: 2;
   inline-size: var(--timeline-marker-size, var(--helix-size-icon-md));
   justify-content: center;
 }
 
-:host([tone="danger"]) [part="marker"] {
+/* The dot inside the ring, where nothing was slotted. It is the slot's fallback
+   content, so nothing has to detect anything: `::slotted()` cannot go inside
+   `:has()`, and the first version of this tried, matched nothing, and left every
+   unmarked entry as an empty ring. */
+[part="dot"] {
+  background-color: var(--_timeline-tone, var(--helix-color-border));
+  block-size: var(--helix-space-xs);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--helix-space-xs);
+}
+
+:host([tone="danger"]) {
   --_timeline-tone: var(--helix-color-danger);
 }
 
-:host([tone="info"]) [part="marker"] {
+:host([tone="info"]) {
   --_timeline-tone: var(--helix-color-info);
 }
 
-:host([tone="neutral"]) [part="marker"] {
+:host([tone="neutral"]) {
   --_timeline-tone: var(--helix-color-foreground-muted);
 }
 
-:host([tone="primary"]) [part="marker"] {
+:host([tone="primary"]) {
   --_timeline-tone: var(--helix-color-primary);
 }
 
-:host([tone="success"]) [part="marker"] {
+:host([tone="success"]) {
   --_timeline-tone: var(--helix-color-success);
 }
 
-:host([tone="warning"]) [part="marker"] {
+:host([tone="warning"]) {
   --_timeline-tone: var(--helix-color-warning);
+}
+
+[part="time"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  grid-column: 2;
+  grid-row: 1;
+  padding-block-end: var(--helix-space-2xs);
 }
 
 [part="content"] {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
+  grid-column: 2;
+  grid-row: 2;
   min-inline-size: 0;
   padding-block-end: var(--timeline-gap, var(--helix-space-lg));
 }
@@ -97,42 +142,41 @@
   padding-block-end: var(--helix-space-none);
 }
 
-[part="time"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-}
-
-/* Along the page instead of down it. The rail turns, the line becomes the row
-   above the content, and the entry is as wide as what is in it. */
+/* Along the page instead of down it.
+ *
+ * The mark goes to the start of the entry rather than a fixed distance into it,
+ * and the line runs from it to the next one. Turned with a leading run of line
+ * still in place, every mark sat that far into its own entry while the label
+ * below started at the edge, so the first entry's word was captioned by the
+ * second entry's dot. */
 :host-context([orientation="horizontal"]) {
+  display: flex;
   flex-direction: column;
   flex: 1 1 0;
-  gap: var(--helix-space-sm);
+  /* The same rhythm the column has between a mark, its time and its title,
+     rather than a looser one because the axis turned. */
+  gap: var(--helix-space-xs);
 }
 
 :host-context([orientation="horizontal"]) [part="rail"] {
   align-items: center;
+  display: flex;
   flex-direction: row;
 }
 
-:host-context([orientation="horizontal"]) [part="connector"],
+:host-context([orientation="horizontal"]) [part="connector"] {
+  display: none;
+}
+
 :host-context([orientation="horizontal"]) [part="rail"]::after {
   block-size: var(--timeline-rail-size, var(--helix-border-thick));
-}
-
-/* The same arrangement as the column, turned: a fixed run of line before the
-   mark and the rest of it after. Letting the leading half grow instead put every
-   mark at the far end of its own entry, so "Alpha" was labelled by the dot above
-   the entry after it. The screenshot is what said so. */
-:host-context([orientation="horizontal"]) [part="connector"] {
-  flex: 0 0 auto;
-  inline-size: var(--helix-space-md);
-}
-
-:host-context([orientation="horizontal"]) [part="rail"]::after {
+  flex: 1 1 auto;
   inline-size: auto;
+  margin-block-start: var(--helix-space-none);
+}
+
+:host-context([orientation="horizontal"]) [part="marker"] {
+  align-self: center;
 }
 
 :host-context([orientation="horizontal"]) [part="content"] {

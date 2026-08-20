@@ -64,7 +64,10 @@
  * layer's own and the panel would have gone on drawing prose links in a box.
  * Which is what it did. */
 [part="panel"] {
-  background-color: var(--helix-color-surface-overlay);
+  /* The page's own ground, not a raised surface. White in the light and black in
+     the dark: a navigation panel is the site continuing, and `surface-overlay`
+     put a grey card in front of a black page as though the nav were a dialog. */
+  background-color: var(--helix-color-background);
   /* Said, not omitted. The user agent gives `[popover]` a border of its own,
      and it is `solid` with no width or colour named, which computes to a medium
      black rule: dropping the outline this had by deleting the declaration drew
@@ -111,11 +114,10 @@
  * under a header is: it is not a card, so it is not outlined like one. */
 :host([appearance="full"]) [part="panel"],
 :host([data-narrow]) [part="panel"] {
-  /* The same surface the card takes, which is the page's own white and a grey
-     in the dark. It was `surface`, one step off the background, and against a
-     header painted `background` that read as a slightly dirty white rather than
-     as a panel over the page. */
-  background-color: var(--helix-color-surface-overlay);
+  /* The same ground the card takes, and the same one the header above it is
+     painted with, so the band reads as the header continuing downward rather
+     than as a card laid over it. */
+  background-color: var(--helix-color-background);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
   grid-auto-flow: column;

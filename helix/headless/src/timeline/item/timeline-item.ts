@@ -28,10 +28,14 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/timeline
  *
  * @slot - What happened.
- * @slot marker - The mark on the line. Falls back to a dot.
+ * @slot marker - The mark on the line. Falls back to a dot, which is the slot's
+ * own fallback content rather than anything this element works out: whether a
+ * consumer slotted a mark is a question only the platform can answer, and it
+ * answers it by rendering what is inside the slot when nothing replaced it.
  * @slot time - When it happened, as a reader should see it written.
  *
  * @csspart connector - The line arriving at this entry.
+ * @csspart dot - The mark drawn where nothing was slotted for one.
  * @csspart content - What happened, and the time above it.
  * @csspart marker - The mark on the line.
  * @csspart rail - The column holding the mark and the line.
@@ -60,25 +64,30 @@ export class HelixBaseTimelineItem extends HelixElement {
 
   protected override render(): TemplateResult {
     const when = html`<slot name="time"></slot>`
+    /* The time is a sibling of the content rather than the first thing inside
+       it, so the two are separate rows and the rail can align its mark to the
+       second of them. Nested, the mark could only ever be a fixed distance from
+       the top of the entry, which is the time's height on a good day and wrong
+       the moment a consumer writes two lines of it. */
     return html`<div part="rail">
         <div
           part="connector"
           aria-hidden="true"
         ></div>
-        <span part="marker"><slot name="marker"></slot></span>
+        <span part="marker"
+          ><slot name="marker"><span part="dot"></span></slot
+        ></span>
       </div>
-      <div part="content">
-        ${
-          this.datetime === ''
-            ? html`<span part="time">${when}</span>`
-            : html`<time
-                part="time"
-                datetime=${this.datetime}
-                >${when}</time
-              >`
-        }
-        <slot></slot>
-      </div>`
+      ${
+        this.datetime === ''
+          ? html`<span part="time">${when}</span>`
+          : html`<time
+              part="time"
+              datetime=${this.datetime}
+              >${when}</time
+            >`
+      }
+      <div part="content"><slot></slot></div>`
   }
 }
 

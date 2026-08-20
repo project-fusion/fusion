@@ -82,6 +82,23 @@ describe('a timeline', () => {
       expect(rail(entries[2])).toBe('hidden')
     })
 
+    test('the mark sits on the title, not at the top of the entry', async () => {
+      /* The distance between the two is the height of the time, which only the
+         browser knows: a consumer writing "Tuesday 19 August" over two lines
+         moves it. The rail shares the entry's rows so it is told, rather than
+         being given a fixed offset that is right for one line of time and wrong
+         for two. Asserted with two lines, which is the case a constant fails. */
+      const host = await timeline(`
+        <helix-timeline-item datetime="2026-08-19">
+          <span slot="time">Tuesday 19 August, in the morning, at some length</span>
+          <strong>Deployed</strong>
+        </helix-timeline-item>`)
+      const entry = host.querySelector('helix-timeline-item') as Entry
+      const mark = (part(entry, 'marker') as HTMLElement).getBoundingClientRect()
+      const title = (entry.querySelector('strong') as HTMLElement).getBoundingClientRect()
+      expect(Math.abs(mark.top + mark.height / 2 - (title.top + title.height / 2))).toBeLessThan(3)
+    })
+
     test('the marks line up however tall the entries are', async () => {
       /* The point of the component: a record is read down its marks, and an
          entry with three lines of text must not push its own mark out of the
