@@ -105,7 +105,14 @@ if (hasLayout()) {
     const opened = async (): Promise<HTMLElement> => {
       const bar = (await mount(
         `<nav style="padding:40px">
-          <helix-megamenu label="Products"><a href="/one">One</a></helix-megamenu>
+          <helix-megamenu label="Products">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
+            </div>
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/two"><strong>Two</strong><span>Second.</span></a>
+            </div>
+          </helix-megamenu>
         </nav>`,
       )) as HTMLElement
       const host = bar.querySelector('helix-megamenu') as HTMLElement & {
@@ -138,6 +145,87 @@ if (hasLayout()) {
       const trigger = (part(host, 'trigger') as HTMLElement).getBoundingClientRect()
       expect(panel.width).toBeGreaterThan(0)
       expect(panel.top).toBeGreaterThanOrEqual(trigger.bottom - 1)
+    })
+
+    test('the card is as wide as its columns, not as wide as nothing', async () => {
+      /* The panel is fixed and in the top layer, so nothing gives it a width and
+         a `1fr` track in a box with no definite size resolves against nothing:
+         without `max-content` a two-column panel came out 34 pixels wide with
+         its rows overflowing it. Asserted here rather than by eye, because the
+         browser pane a person looks through reports a zero viewport when it is
+         hidden, which makes every `vw` in this stylesheet nought and the whole
+         measurement a fiction. */
+      const host = await opened()
+      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      expect(panel.width).toBeGreaterThan(400)
+      const rows = [...host.querySelectorAll('[data-megamenu-item]')]
+      for (const row of rows) {
+        expect(row.getBoundingClientRect().right).toBeLessThanOrEqual(panel.right + 1)
+      }
+    })
+
+    test('and the band spans the page and starts under the trigger', async () => {
+      const bar = (await mount(
+        `<nav style="padding:40px">
+          <helix-megamenu appearance="full" label="Products">
+            <div data-megamenu-group>
+              <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
+            </div>
+          </helix-megamenu>
+        </nav>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+      await new Promise((done) => requestAnimationFrame(() => done(null)))
+
+      const panel = (part(host, 'panel') as HTMLElement).getBoundingClientRect()
+      const trigger = (part(host, 'trigger') as HTMLElement).getBoundingClientRect()
+      expect(Math.round(panel.left)).toBe(0)
+      expect(Math.round(panel.width)).toBe(document.documentElement.clientWidth)
+      expect(Math.round(panel.top)).toBe(Math.round(trigger.bottom))
+    })
+
+    test('a plain link in a group starts where its heading does', async () => {
+      /* The panel is inside the nav, so its anchors match the nav bar's own
+         rule, which centres a word in a horizontal strip. Left unanswered, a
+         column of plain links came out centred under a heading that was not. */
+      const bar = (await mount(
+        `<nav style="padding:40px">
+          <helix-megamenu label="Products">
+            <div data-megamenu-group>
+              <h3 data-megamenu-heading>More</h3>
+              <a data-navigation-item href="#docs">Documentation</a>
+              <a data-navigation-item href="#status">A much longer destination</a>
+            </div>
+          </helix-megamenu>
+        </nav>`,
+      )) as HTMLElement
+      const host = bar.querySelector('helix-megamenu') as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await host.updateComplete
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await host.updateComplete
+
+      /* The text, not the box. A flex column stretches its children, so each of
+         these boxes spans the column whether its text is centred in it or not,
+         and the box edge reads the same either way: the first version of this
+         spec passed on the centred markup it was written to catch. A range over
+         the contents measures where the words actually start. */
+      const edge = (element: Element): number => {
+        const range = document.createRange()
+        range.selectNodeContents(element)
+        return Math.round(range.getBoundingClientRect().left)
+      }
+      const heading = host.querySelector('[data-megamenu-heading]') as HTMLElement
+      const links = [...host.querySelectorAll('[data-navigation-item]')] as HTMLElement[]
+      expect(links.map(edge)).toEqual([edge(heading), edge(heading)])
+      /* Differing lengths, so a shared edge cannot be two equal boxes centred. */
+      expect(links[0].textContent).not.toBe(links[1].textContent)
     })
 
     test('the host takes a box, so a nav can measure its marker against it', async () => {

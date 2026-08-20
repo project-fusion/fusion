@@ -18,6 +18,7 @@ import { styles } from './megamenu-root.css.js'
  *
  * @cssproperty --megamenu-size - How wide the panel may get.
  * @cssproperty --megamenu-column-size - The narrowest a column goes before the grid wraps.
+ * @cssproperty --megamenu-full-size - How wide the band's contents may get, centred in it.
  */
 @customElement('helix-megamenu')
 export class HelixMegamenu extends HelixBaseMegamenu {

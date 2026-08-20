@@ -1103,6 +1103,16 @@
               "readonly": true
             },
             {
+              "kind": "field",
+              "name": "places",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether this one is placed by measurement, read fresh so it may change.",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "show",
               "return": {

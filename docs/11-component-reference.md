@@ -2467,6 +2467,7 @@ Everything about what opens it and what closes it is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'full' \| undefined` | - | `HelixBaseMegamenu` | Whether the panel is a card under the trigger or a band across the page. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseMegamenu` | The section's name, which names the default trigger and the panel. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
@@ -2505,6 +2506,7 @@ Everything about what opens it and what closes it is the base class.
 | --- | --- |
 | `--megamenu-size` | How wide the panel may get. |
 | `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
+| `--megamenu-full-size` | How wide the band's contents may get, centred in it. |
 
 ## Menu
 

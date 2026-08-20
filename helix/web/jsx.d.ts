@@ -5267,6 +5267,20 @@ state for stylesheets, which is what it has always been for. */
   defaultOpen?: HelixMegamenu["defaultOpen"];
   /** The section's name, which names the default trigger and the panel. */
   label?: HelixMegamenu["label"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  appearance?: HelixMegamenu["appearance"];
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
@@ -5304,6 +5318,20 @@ state for stylesheets, which is what it has always been for. */
   "prop:defaultOpen"?: HelixMegamenu["defaultOpen"];
   /** The section's name, which names the default trigger and the panel. */
   "prop:label"?: HelixMegamenu["label"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  "prop:appearance"?: HelixMegamenu["appearance"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
   /** Fired before it closes, and cancelable. */
@@ -15047,6 +15075,19 @@ export type CustomElements = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: The section's name, which names the default trigger and the panel.
+   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    *
    * ## Events
    *
@@ -15081,6 +15122,7 @@ export type CustomElements = {
    *
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
+   * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -23693,6 +23735,19 @@ export type CustomElementsSolidJs = {
    * state for stylesheets, which is what it has always been for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: The section's name, which names the default trigger and the panel.
+   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    *
    * ## Events
    *
@@ -23727,6 +23782,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
+   * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -28797,6 +28853,8 @@ export type CustomCssProperties = {
   "--megamenu-size"?: string;
   /** The narrowest a column goes before the grid wraps. */
   "--megamenu-column-size"?: string;
+  /** How wide the band's contents may get, centred in it. */
+  "--megamenu-full-size"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
   /** Tallest the surface grows before it scrolls. */

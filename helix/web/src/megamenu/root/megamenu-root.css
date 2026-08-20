@@ -52,14 +52,17 @@
 }
 
 /* The panel is in the top layer, which is what `popover` buys: a nav bar is
-   inside a header, and a header is exactly the kind of ancestor that carries
-   `overflow` or a `transform` and would otherwise clip or re-anchor it. The
-   controller's own note has the measurements.
+ * inside a header, and a header is exactly the kind of ancestor that carries
+ * `overflow` or a `transform` and would otherwise clip or re-anchor it. The
+ * controller's own note has the measurements.
  *
- * Columns rather than a single list, which is what makes this a megamenu at all,
- * and how many is the consumer's: the panel knows how wide it is and not what is
- * going in it. `auto-fit` with a floor means a panel given three groups draws
- * three and one given seven wraps them, without a property counting anything. */
+ * The panel is a box and nothing else. What is *in* it is the consumer's own
+ * markup, and it is styled by the `data-megamenu-*` recipes in the base layer
+ * rather than from here, for the reason `Outline` records against exactly this
+ * mistake: a `::slotted()` rule loses to any document rule whatever its
+ * specificity, so a rule here naming the anchors would have lost to the base
+ * layer's own and the panel would have gone on drawing prose links in a box.
+ * Which is what it did. */
 [part="panel"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -67,12 +70,49 @@
   box-shadow: var(--helix-shadow-lg);
   box-sizing: border-box;
   display: grid;
-  gap: var(--helix-space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(var(--megamenu-column-size, 12rem), 1fr));
+  gap: var(--helix-space-xl);
+  grid-auto-columns: minmax(var(--megamenu-column-size, 15rem), 1fr);
+  grid-auto-flow: column;
+  /* Sized by what is in it, and that is not optional here: the panel is fixed
+     and in the top layer, so nothing gives it a width, and a track list of
+     `1fr` in a box with no definite size resolves against nothing. Measured
+     without it: a two-column panel came out 34 pixels wide. */
   inline-size: max-content;
   margin: var(--helix-space-none);
-  max-inline-size: min(var(--megamenu-size, 56rem), calc(100vw - var(--helix-space-xl) * 2));
-  padding: var(--helix-space-lg);
+  max-inline-size: min(var(--megamenu-size, 52rem), calc(100vw - var(--helix-space-xl) * 2));
+  padding: var(--helix-space-md);
+}
+
+/* A band from edge to edge, which is the other shape a navigation panel takes.
+ *
+ * Placed here rather than by the controller, which is told not to measure: a
+ * band spans the viewport, so there is nothing to place it against. `100dvw`
+ * rather than `100vw`, which on a page with a classic scrollbar is wider than
+ * the viewport by the scrollbar and gives the band a horizontal scroll of its
+ * own.
+ *
+ * The corners and the top border go, because an edge-to-edge band has no
+ * outside corner to round and its top edge is the header's bottom one. What is
+ * left is a rule under it and the page's own surface, which is what a band
+ * under a header is. */
+:host([appearance="full"]) [part="panel"] {
+  background-color: var(--helix-color-surface);
+  border-inline: none;
+  border-radius: var(--helix-radii-none);
+  border-block-start: none;
+  box-shadow: var(--helix-shadow-md);
+  grid-auto-flow: column;
+  inline-size: 100dvw;
+  inset-block-start: var(--_megamenu-top, 100%);
+  inset-inline-start: 0;
+  max-inline-size: none;
+  padding-block: var(--helix-space-xl);
+  /* The contents on the page's measure rather than the band's: a row of links
+     running the whole width of a wide screen is a row nobody reads across.
+     Centred with `auto` margins on the grid itself, so the band stays full
+     width and only what is in it is held. */
+  padding-inline: max(var(--helix-space-xl), calc((100dvw - var(--megamenu-full-size, 72rem)) / 2));
+  position: fixed;
 }
 
 [part="panel"][hidden] {

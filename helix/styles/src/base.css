@@ -863,6 +863,107 @@ helix-toggle[disabled]::part(item) {
   color: var(--helix-color-foreground);
 }
 
+/* What goes inside a megamenu panel.
+ *
+ * **Here rather than in the component, and not by preference.** The panel's
+ * contents are the consumer's own markup, slotted, which puts them in the light
+ * DOM where every document rule reaches them: a `::slotted()` rule in the
+ * component loses to any of them whatever its specificity, so `Megamenu` could
+ * not stop the anchor rules above painting its destinations as prose links in a
+ * box. `Outline` records the same wall and the same fix, and `data-button` and
+ * `data-navigation-item` are the same shape of answer.
+ *
+ * A group is a column, a heading names it, and an item is a destination with
+ * room to explain itself. Nothing here is required: a panel of plain
+ * `data-navigation-item` links is a smaller megamenu and works.
+ */
+[data-megamenu-group] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* Quiet and small, because it labels a column rather than starting a section of
+   a document. Not a heading level: what makes it one is the `<h3>` the consumer
+   wrote, and this only says how it looks. */
+[data-megamenu-heading] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-wide);
+  margin: var(--helix-space-none);
+  padding-inline: var(--helix-space-xs);
+  text-transform: uppercase;
+}
+
+/* A destination with a name and a sentence about it.
+ *
+ * Two columns and two rows: a mark down the side of both, the name on the first
+ * and the sentence under it. The text is pinned to the second column rather
+ * than flowing, so a row with no mark starts where a row with one does and a
+ * panel mixing the two still reads as a column of names. The mark's column is
+ * `auto`, so with nothing in it there is nothing to indent past. */
+[data-megamenu-item] {
+  align-items: start;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: var(--helix-space-xs);
+  row-gap: var(--helix-space-2xs);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[data-megamenu-item] > :where(helix-icon, img, svg) {
+  --icon-size: var(--helix-size-icon-lg);
+
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  color: var(--helix-color-primary);
+}
+
+[data-megamenu-item] > :where(strong, b) {
+  grid-column: 2;
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-semibold);
+}
+
+[data-megamenu-item] > :where(span, p) {
+  grid-column: 2;
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+}
+
+[data-megamenu-item]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+}
+
+[data-megamenu-item][aria-current="page"] {
+  background-color: color-mix(in oklab, var(--helix-color-primary) 10%, transparent);
+}
+
+/* A plain link in a group, which the comment above promised would work.
+ *
+ * It did not. A panel sits inside the nav, so its anchors match the nav bar's
+ * own rule up there and arrived centred, full-height and nowrapping: correct
+ * for a word in a horizontal bar, wrong for a stack, and the giveaway was a
+ * column of links centred under a heading that was not. The nav rule is
+ * `:where()`, so this needs no `!important`, only to be said.
+ *
+ * `:not([data-megamenu-item])` keeps it off the rows above, which want the grid
+ * they were given. Padding matches theirs, so a plain link, a row with no mark,
+ * and the heading all start on the same edge. */
+[data-megamenu-group] > :where([data-navigation-item], a):not([data-megamenu-item]) {
+  block-size: auto;
+  justify-content: start;
+  padding: var(--helix-space-xs);
+  white-space: normal;
+}
+
 /* A raised thumb, the same one the toggle group uses, because it is the same
    idea: this is the one of these you are on. */
 /* No surface of its own. The marker travelling behind it is the one surface,

@@ -70,6 +70,24 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
   @property()
   label = ''
 
+  /**
+   * Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
+   */
+  @property({ reflect: true })
+  appearance?: 'full'
+
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     /* The host, not the panel. A press on the trigger is a press on this
@@ -77,6 +95,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
        the click that toggles it. `Menu` says the same about its own. */
     boundary: () => this,
     onDismiss: () => this.close(),
+    place: () => this.appearance !== 'full',
     placement: () => 'bottom-start',
     surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="panel"]'),
   })
@@ -95,6 +114,27 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
       return
     }
     this.trigger.focus()
+  }
+
+  /**
+   * Where a full-bleed band starts, which is the only number it needs.
+   *
+   * The placing pass is off for that appearance, so nothing else is measuring:
+   * a band spans the viewport and has only one degree of freedom, how far down
+   * it sits, and that is the bottom of the trigger in viewport coordinates
+   * because the panel is fixed. A header that scrolls takes the band with it,
+   * which is what a panel hanging off a header should do.
+   *
+   * Written as a custom property rather than an inline `top`, so the stylesheet
+   * keeps the arrangement and this contributes the one measurement it cannot
+   * make. Nothing to do for the card, which the controller places.
+   */
+  private band(): void {
+    if (this.appearance !== 'full') {
+      return
+    }
+    const under = this.trigger.getBoundingClientRect().bottom
+    this.style.setProperty('--_megamenu-top', `${Math.round(under)}px`)
   }
 
   private readonly handleTriggerClick = (): void => {
@@ -119,6 +159,7 @@ export class HelixBaseMegamenu extends MixinControllerOpen(HelixElement) {
       }
       showing = this
       this.panel.show()
+      this.band()
     } else {
       if (showing === this) {
         showing = undefined

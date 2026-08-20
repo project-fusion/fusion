@@ -4513,6 +4513,20 @@ export type HelixBaseMegamenuHelixCloseElementEvent =
 export type HelixBaseMegamenuProps = {
   /** The section's name, which names the default trigger and the panel. */
   label?: HelixBaseMegamenu["label"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  appearance?: HelixBaseMegamenu["appearance"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -4550,6 +4564,20 @@ state for stylesheets, which is what it has always been for. */
 export type HelixBaseMegamenuSolidJsProps = {
   /** The section's name, which names the default trigger and the panel. */
   "prop:label"?: HelixBaseMegamenu["label"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  "prop:appearance"?: HelixBaseMegamenu["appearance"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -13618,6 +13646,19 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The section's name, which names the default trigger and the panel.
+   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -22003,6 +22044,19 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `label`: The section's name, which names the default trigger and the panel.
+   * - `appearance`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the

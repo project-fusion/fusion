@@ -28,6 +28,25 @@ export interface PopoverOptions {
   offset?: number | (() => number)
 
   /**
+   * Whether to measure the anchor and place the surface against it.
+   *
+   * On unless said otherwise, which is every surface that hangs off something:
+   * a menu, a select, a tooltip. Off is for a surface whose position is a fact
+   * about the page rather than about its trigger, and the one that asked for
+   * it is a full-bleed navigation panel: it spans the viewport and sits under
+   * the header, so there is nothing to measure and nothing to flip or shift
+   * to. Placing it anyway wrote a `translate` of the trigger's own offset over
+   * a band that is meant to start at the edge.
+   *
+   * The rest still applies, which is why this is an option here rather than a
+   * reason to do without the controller: the top layer and the dismissal are
+   * exactly what such a panel needs, and they are what this bundles. What it
+   * gives up is the measuring pass, and the surface's own stylesheet says where
+   * it goes.
+   */
+  place?: boolean | (() => boolean)
+
+  /**
    * Called when a press outside or an Escape asks for it to close.
    *
    * The host decides what closing means, because it is the only thing that
@@ -108,6 +127,15 @@ export class PopoverController implements ReactiveController {
     return this.shown
   }
 
+  /** Whether this one is placed by measurement, read fresh so it may change. */
+  private get places(): boolean {
+    const asked = this.options.place
+    if (asked === undefined) {
+      return true
+    }
+    return typeof asked === 'function' ? asked() : asked
+  }
+
   /**
    * Shows the surface, positions it, and starts listening for a way out.
    *
@@ -139,7 +167,9 @@ export class PopoverController implements ReactiveController {
       }
       surface.showPopover()
     }
-    this.floating.start()
+    if (this.places) {
+      this.floating.start()
+    }
     this.dismisser.activate()
   }
 
