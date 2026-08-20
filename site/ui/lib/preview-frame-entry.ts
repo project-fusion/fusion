@@ -136,16 +136,30 @@ post({ type: 'helix-preview-ready' })
  * should render what was typed and a cross-origin classic script was reachable
  * from an inline handler already.
  *
- * Side effects outlive a re-render, the way they do in any live preview: an
- * example that adds a listener to `document` has added it, and the next render
- * adds another. The frame reloads on a source change in development, which is
- * where that would otherwise accumulate.
+ * **Each one runs as a module, and that is not a nicety.** A classic script's
+ * top-level `const` belongs to the shared script scope, so the second render
+ * threw `Identifier 'terms' has already been declared` and the example stopped
+ * working: the listener never attached, and a controlled checkbox with nothing
+ * answering it is a checkbox that does not move. Caught in Chromium against the
+ * running sandbox, not here, because it takes a second render to happen and the
+ * first one looks perfect. A module has its own scope, so a re-render is a new
+ * one and nothing collides.
+ *
+ * An explicit `type` is left alone. Only a script that named none becomes a
+ * module, which is also what a consumer copying an example into a page wants.
+ *
+ * Side effects still outlive a re-render, the way they do in any live preview:
+ * an example that adds a listener to `document` has added it, and the next
+ * render adds another. Scope is what is fixed here, not lifetime.
  */
 function runScripts(root: HTMLElement): void {
   for (const original of [...root.querySelectorAll('script')]) {
     const script = document.createElement('script')
     for (const { name, value } of original.attributes) {
       script.setAttribute(name, value)
+    }
+    if (!script.type) {
+      script.type = 'module'
     }
     script.text = original.text
     original.replaceWith(script)
