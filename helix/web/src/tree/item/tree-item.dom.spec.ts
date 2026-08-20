@@ -122,7 +122,19 @@ describe('tree item geometry', () => {
     const link = item.querySelector('a') as HTMLElement
     const row = part(item, 'row') as HTMLElement
     const uncovered = row.getBoundingClientRect().width - link.getBoundingClientRect().width
-    // The row's own inset stays the row's; everything else is the target.
-    expect(uncovered).toBeLessThan(32)
+
+    /* The row's own inset stays the row's; everything else is the target. Asked
+       of the row rather than written as a number, because the number is not one
+       thing: 28 of leading inset where a chevron column is reserved, 8 of
+       trailing, and 4 of gap that the empty `end` slot spends by being a flex
+       item at all. That came to 40 against a hardcoded 32, and the hardcoded
+       figure is the part that was wrong: the link already covers every pixel
+       the row does not keep for itself. */
+    const style = getComputedStyle(row)
+    const inset =
+      Number.parseFloat(style.paddingInlineStart) +
+      Number.parseFloat(style.paddingInlineEnd) +
+      Number.parseFloat(style.columnGap)
+    expect(Math.round(uncovered)).toBeLessThanOrEqual(Math.ceil(inset))
   })
 })
