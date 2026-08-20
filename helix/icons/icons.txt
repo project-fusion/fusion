@@ -10,6 +10,7 @@ arrow-right
 arrow-square-out
 arrows-in-line-vertical
 arrows-out-line-vertical
+atom
 bell
 book-open-text
 briefcase
@@ -56,6 +57,7 @@ lightbulb
 link
 list
 magnifying-glass
+microscope
 minus
 monitor
 moon

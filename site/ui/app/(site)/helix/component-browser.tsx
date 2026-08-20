@@ -359,7 +359,7 @@ export function ComponentBrowser({
                 Start
               </Link>
               <Link data-button data-button-fill="standard" href="/helix/sandbox">
-                <helix-icon name="layout"></helix-icon>
+                <helix-icon name="microscope"></helix-icon>
                 Sandbox
               </Link>
             </helix-button-group>

@@ -15,8 +15,14 @@ export interface Destination {
   /**
    * The mark down the side of the row, from the curated set in `helix/icons`.
    *
-   * A utility glyph, deliberately. Bespoke product marks were tried here and
-   * are not good enough to ship: see the note on `Product` below.
+   * A utility glyph, deliberately, and the set of them reads as one idea:
+   * Helix is the DNA, so what you do to it is looked at through instruments.
+   * An atom for the components and a microscope for the sandbox rather than a
+   * cube and a rectangle, which were two shapes with nothing in common.
+   *
+   * Bespoke product marks were tried in place of these and are not good enough
+   * to ship. `brain`, `dna` and `test-tube` are in Phosphor too, for the Cortex
+   * row when it settles into whatever replaces `Overview`.
    */
   icon: string
   /**
@@ -95,13 +101,13 @@ export const PRODUCTS: Product[] = [
     destinations: [
       {
         href: '/helix',
-        icon: 'cube',
+        icon: 'atom',
         summary: 'Sixty-five families, each with its API and a running example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
-        icon: 'layout',
+        icon: 'microscope',
         summary: 'Edit an example and watch it render, with the source beside it.',
         title: 'Sandbox',
       },
