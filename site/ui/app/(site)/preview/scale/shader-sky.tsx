@@ -42,26 +42,34 @@ out vec4 outColor;
 
 /* Blue hour over a plain, and the optics are the reason it looks like this.
  *
- * **Why the light is blue and not orange.** A sunset is warm because a low sun
- * sends its beam through a long slant of atmosphere, Rayleigh scattering strips
- * the short wavelengths, and red is what survives. A blue sun would be wrong.
- * But blue hour is a real condition and the opposite case: once the sun is a few
- * degrees under the horizon the direct beam is gone entirely, what is left is
- * high-atmosphere scattered light, and that light is overwhelmingly blue. It is
- * the one time of day when this palette is the physically honest one, so that is
- * the moment this draws.
+ * **Why the light is blue.** A sunset is warm because a low sun sends its beam
+ * through a long slant of atmosphere and Rayleigh scattering takes the short
+ * wavelengths out. Blue hour is the opposite case: with the sun a few degrees
+ * under the horizon the direct beam is gone and what is left is high-atmosphere
+ * scattered light, which is almost entirely blue. It is the one condition where
+ * this palette is the physically honest one.
  *
  * **Why the disc is flattened and cut.** Refraction near the horizon lifts the
- * lower limb more than the upper one, so a rising sun is visibly wider than it
- * is tall. And the ground is in front of it: it rises from behind the horizon
- * rather than floating over the plain, which is what it did before.
+ * lower limb further than the upper, so a rising sun is measurably wider than
+ * tall. And the ground is in front of it: it rises from behind the line.
  *
- * **Why the far ground is not black.** Aerial perspective. Distance fades
- * toward the colour of the air, not toward nothing, so the plain washes into
- * the horizon instead of stopping at it.
+ * **What stops it looking cheap**, which was four separate things:
+ *
+ * - **Banding.** Wide smooth gradients quantised to eight bits step visibly.
+ *   Every output gets a sub-LSB dither, which trades a step for noise the eye
+ *   does not resolve.
+ * - **Aliasing.** A rail a fraction of a pixel wide either lands on the pixel
+ *   or misses it, and crawls as the camera moves. Coverage is computed against
+ *   the derivative and the line is allowed to go dim rather than thin once it
+ *   is under a pixel, which is what film does and what a hard threshold cannot.
+ * - **Flat tone.** One colour scaled by a number reads as plastic. The ground,
+ *   the air and the limb of the sun are three different tones now.
+ * - **No grain.** A perfectly clean render looks synthetic at exactly this kind
+ *   of low light. A little runs under everything.
  */
 
 float hash(float n) { return fract(sin(n * 12.9898) * 43758.5453); }
+float hash2(vec2 v) { return fract(sin(dot(v, vec2(127.1, 311.7))) * 43758.5453); }
 
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
@@ -69,83 +77,90 @@ void main() {
   p.x *= uResolution.x / uResolution.y;
 
   float horizon = -0.13;
-  /* Geometric, not linear. Depth is proportional to camera height, and what an
-     eye reads as speed is the *relative* change: from 0.030 a linear ramp gains
-     seventeen percent in the first step and under three percent in the last, so
-     the rise bolts away at the top of the page and crawls at the bottom.
-     Interpolated as a ratio, every unit of scroll changes the height by the
-     same factor, which is what makes the climb read as one move. */
   float height = 0.030 * pow(0.20 / 0.030, uScroll);
 
-  /* The disc sits mostly under the line and climbs a little as the camera
-     does, so the ladder is also a dawn. 1.45 is the refraction squash. */
-  /* Placed so a real cap clears the line at rest and more of it does by the
-     last rung. Squashed by 1.45, so the visible half height is the radius over
-     that: buried any deeper and there is no sun in the picture at all, which is
-     where this sat before. */
   float sunY = horizon - mix(0.030, 0.004, uScroll);
   vec2 toSun = vec2(p.x, (p.y - sunY) * 1.45);
   float sd = length(toSun);
 
-  float disc = 1.0 - smoothstep(0.075, 0.081, sd);
+  /* A softer limb. A hard cut reads as a sticker; a real disc at this altitude
+     is eaten into by the air around it. */
+  float disc = 1.0 - smoothstep(0.070, 0.085, sd);
   float halo = exp(-sd * sd * 18.0);
-  float sky = exp(-max(p.y - horizon, 0.0) * 7.0);
+  float glare = exp(-sd * sd * 90.0);
 
   vec3 col = vec3(0.0);
   float alpha = 0.0;
 
   if (p.y > horizon) {
-    /* Sky: the glow above the line, strongest where the light is under it. */
-    float lift = halo * 0.85 + sky * 0.16;
-    /* Warm only in the last of it, and toward white rather than to a new hue:
-       the heat is at the limb, and everything above it stays the brand. */
-    col = mix(uColor, vec3(1.0, 0.94, 0.86), disc * 0.55 + halo * halo * 0.25);
+    /* The sky is not black. Scattered light thins with height, which is a
+       falloff rather than a cut, and it is what the plain fades into. */
+    float above = p.y - horizon;
+    float sky = exp(-above * 6.5);
+    float lift = halo * 0.85 + sky * 0.20;
+
+    /* Three tones: the air, the halo, and the limb. The limb is the only warm
+       thing and it goes toward white rather than to a hue of its own. */
+    vec3 air = uColor * 0.72;
+    vec3 lit = mix(uColor * 1.1, vec3(1.0, 0.95, 0.88), disc * 0.6 + glare * 0.35);
+    col = mix(air, lit, clamp(disc + glare * 0.7, 0.0, 1.0));
     alpha = clamp(lift + disc, 0.0, 1.0);
   } else {
     float depth = height / (horizon - p.y);
-    float across = p.x * depth * 1.7;
+
+    /* Rails bow outward with distance rather than running dead straight at the
+       vanishing point. Dividing the across coordinate by a term that grows with
+       depth spreads the lanes apart the further out they go, so the plain reads
+       as a landscape sweeping away instead of as a road. */
+    float across = p.x * depth * 1.7 / (1.0 + 0.62 * depth);
 
     const float GRID = 9.0;
     float lane = across * GRID;
     float id = floor(lane);
 
-    /* The rail itself, thin across and barely there: it is the track a streak
-       runs on rather than the picture. */
-    float lineW = fwidth(lane) * 1.2 + 0.012;
-    float rail = 1.0 - smoothstep(0.0, lineW, abs(fract(lane) - 0.5));
+    /* Coverage, not a threshold. Under a pixel wide a rail is allowed to dim
+       instead of thinning, which is what stops it crawling between pixels. */
+    float w = fwidth(lane);
+    float rail = (1.0 - smoothstep(0.0, w * 1.4 + 0.010, abs(fract(lane) - 0.5)))
+      * clamp(1.0 / max(w * 3.4, 1.0), 0.10, 1.0);
 
-    /* A streak travelling away toward the light.
-     
-       The bright locus is where the phase wraps, and the phase advances with
-       time, so the head moves to greater depth and the tail trails behind it
-       on the viewer's side. Written the other way round, with brightness at
-       the start of the cycle, the tail leads and the whole field appears to
-       run backwards out of the horizon.
-     
-       Every lane gets its own phase and its own speed off a hash of its index,
-       so nothing arrives in step. A field where the streaks are synchronised
-       reads as a scanline sweeping. */
     float phase = hash(id);
     float speed = 0.55 + hash(id + 5.0) * 0.75;
-    /* Cycle length is in depth units, so a small coefficient puts one streak
-       per rail inside the range the fog leaves visible, and the plain reads as
-       empty. Shorter cycles and a softer falloff give a run of them with tails
-       long enough to read as motion rather than as dashes. */
     float t = fract(depth * 1.15 - uTime * speed * 0.28 + phase);
     float streak = pow(t, 3.5);
 
-    float fog = exp(-depth * 0.78);
+    /* Two terms. Near haze lifts the foreground off pure black; extinction
+       takes the distance. One exponential cannot do both. */
+    float extinction = exp(-depth * 0.78);
+    float haze = 1.0 - exp(-depth * 2.4);
     float toward = exp(-abs(p.x) * 1.05);
 
-    float ink = rail * (0.14 + streak * 2.1) * fog * (0.7 + toward * 0.7);
+    float ink = rail * (0.14 + streak * 2.1) * extinction * (0.7 + toward * 0.7);
 
-    /* Aerial perspective: the last of the plain is the air rather than the
-       dark, so the two meet instead of one stopping against the other. */
-    float air = (1.0 - fog) * (halo * 0.5 + 0.05) * toward;
+    /* The same value the sky carries at the line, so the two meet instead of
+       stepping. Before, the ground's haze was scaled by distance from centre
+       and the sky's was not, which left a bright band running along the horizon
+       out to both edges: the sky sat near 0.2 and the ground under 0.03. */
+    float airGlow = halo * 0.85 + 0.20;
+    float air = haze * airGlow;
 
-    col = uColor * (0.62 + toward * 0.45 + streak * 0.5);
+    /* The ground is cooler than the sky and the streaks are warmer than the
+       ground, so the plain has a range rather than one value times a scalar. */
+    vec3 ground = uColor * vec3(0.82, 0.92, 1.06);
+    col = mix(ground * (0.6 + toward * 0.4), mix(uColor, vec3(1.0), 0.35), streak * 0.75);
     alpha = clamp(ink + air, 0.0, 1.0);
   }
+
+  /* A little fall-off at the corners, so the frame has a centre. */
+  alpha *= 1.0 - 0.30 * dot(p, p);
+
+  /* Grain under everything, and a sub-LSB dither over it. The first stops the
+     render looking synthetic at this light level; the second is what keeps a
+     wide gradient from stepping. */
+  float grain = (hash2(gl_FragCoord.xy + fract(uTime) * 91.7) - 0.5) * 0.030;
+  float dither = (hash2(gl_FragCoord.xy * 1.7) - 0.5) * (1.0 / 255.0);
+  alpha = clamp(alpha + grain * alpha + dither, 0.0, 1.0);
+  col += dither;
 
   outColor = vec4(col, alpha);
 }`
