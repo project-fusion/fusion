@@ -1,4 +1,5 @@
 import { stageAppearance, VERTICALS } from '../../../verticals'
+import { ShaderSky } from './shader-sky'
 import '../../../preview.css'
 
 export const metadata = { title: 'Candidate: scale' }
@@ -63,8 +64,11 @@ export default function Page() {
           no Helix component for a surface that draws light, and `Flex` would be
           claiming this is a layout. */}
       <div aria-hidden="true" className="scSky">
+        {/* The CSS sky is the real one. The shader draws over it and is free to
+            fail: no context, no compile, no canvas, and what is left is this. */}
         <div className="scField" />
         <div className="scSun" />
+        <ShaderSky />
       </div>
 
       <section className="scBand">
