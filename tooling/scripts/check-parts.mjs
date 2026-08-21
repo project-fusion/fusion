@@ -60,7 +60,19 @@ for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) 
     if (name) {
       helpers.set(
         name,
-        [...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+        /* What it writes and what it forwards. A part reached through
+           `exportparts` is a part a consumer styles, and `drawTooltip` forwards
+           `Tooltip`'s bubble rather than drawing one: read for `part` alone,
+           three charts documented a `tooltip` nothing appeared to render. */
+        [
+          ...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+          ...[...code.matchAll(/exportparts="([^"]+)"/g)].flatMap((m) =>
+            m[1]
+              .split(',')
+              .map((one) => one.split(':').pop()?.trim() ?? '')
+              .filter(Boolean),
+          ),
+        ],
       )
     }
   }

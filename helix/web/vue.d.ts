@@ -6963,8 +6963,6 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
-  /** Half the width of the tooltip's point. */
-  "--chart-tooltip-arrow"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
   /** Height of the drawing. */

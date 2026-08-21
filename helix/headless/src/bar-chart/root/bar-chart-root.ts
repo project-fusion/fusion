@@ -10,6 +10,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import '../../tooltip/index.js'
 
 /** The drawing's own coordinates. Height only: the width is the element's. */
 const HEIGHT = 100
@@ -50,8 +51,9 @@ const HEIGHT = 100
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
  * @csspart plot - The drawing.
- * @csspart tooltip - What a pointer resting on a reading shows.
- * @csspart tooltip-arrow - The point of the tooltip, resting on the reading.
+ * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-anchor - The `Tooltip` element itself.
+ * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -219,19 +221,11 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings
     const across = at * slot + slot / 2
-    return sideways
-      ? drawTooltip(this.rows, at, {
-          shift: 'translate(calc(var(--chart-tooltip-arrow, 6px)), -50%)',
-          side: 'start',
-          x: `${far}%`,
-          y: `${across}%`,
-        })
-      : drawTooltip(this.rows, at, {
-          shift: 'translate(-50%, calc(-100% - var(--chart-tooltip-arrow, 6px)))',
-          side: 'bottom',
-          x: `${across}%`,
-          y: `${far}%`,
-        })
+    return drawTooltip(this.rows, at, {
+      placement: sideways ? 'right' : 'top',
+      x: sideways ? `${far}%` : `${across}%`,
+      y: sideways ? `${across}%` : `${far}%`,
+    })
   }
 }
 

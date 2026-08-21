@@ -145,13 +145,15 @@ describe('donut chart tooltip', () => {
        three o'clock and nine o'clock, which are opposite sides of the ring. */
     const host = await chart(TRAFFIC, 'for="traffic"')
     await hover(host, 1)
-    expect(part(host, 'tooltip')?.querySelector('[part="tooltip-label"]')?.textContent).toBe(
-      'Search',
-    )
+    /* Queried in the chart's own shadow root rather than through `part="tooltip"`.
+       The bubble is `Tooltip`'s now and reaches a consumer through `exportparts`;
+       what the chart still owns is the content it slots into it. */
+    expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Search')
   })
 
   test('nothing is shown until a pointer is on a slice', async () => {
-    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'tooltip')).toBeNull()
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    expect(host.shadowRoot?.querySelector('helix-tooltip')).toBeNull()
   })
 
   test('the slice under the pointer is marked, so the ring says which one too', async () => {

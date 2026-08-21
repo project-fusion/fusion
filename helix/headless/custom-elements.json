@@ -1833,12 +1833,16 @@
               "name": "plot"
             },
             {
-              "description": "What a pointer resting on a reading shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip"
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow"
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor"
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
             },
             {
               "description": "One column's name and value inside the tooltip.",
@@ -14505,12 +14509,16 @@
               "name": "plot"
             },
             {
-              "description": "What a pointer resting on a slice shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip"
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow"
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor"
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
             },
             {
               "description": "One column's name and value inside the tooltip.",
@@ -20554,12 +20562,16 @@
               "name": "plot"
             },
             {
-              "description": "What a pointer resting on a reading shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip"
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow"
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor"
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
             },
             {
               "description": "One column's name and value inside the tooltip.",

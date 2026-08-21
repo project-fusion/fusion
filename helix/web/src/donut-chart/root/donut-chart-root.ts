@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseDonutChart } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './donut-chart-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary Parts of a whole as a ring, read from a table.
@@ -31,7 +32,6 @@ import { styles } from './donut-chart-root.css.js'
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
- * @cssproperty --chart-tooltip-arrow - Half the width of the tooltip's point.
  * @cssproperty --donut-chart-size - Width and height of the ring.
  * @cssproperty --donut-chart-track-color - Colour of the ring under the slices.
  */

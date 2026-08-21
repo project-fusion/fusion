@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseBarChart } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './bar-chart-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary Categories as columns, read from a table.
@@ -18,7 +19,6 @@ import { styles } from './bar-chart-root.css.js'
  * @aliases Column Chart, Categorical Chart
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
- * @cssproperty --chart-tooltip-arrow - Half the width of the tooltip's point.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
  * @cssproperty --bar-chart-block-size - Height of the drawing.
  * @cssproperty --bar-chart-gap - Space between the drawing and its labels.

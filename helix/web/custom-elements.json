@@ -3389,10 +3389,6 @@
           "name": "HelixBarChart",
           "cssProperties": [
             {
-              "description": "Half the width of the tooltip's point.",
-              "name": "--chart-tooltip-arrow"
-            },
-            {
               "description": "Corner radius at the far end of a column.",
               "name": "--bar-chart-bar-radius"
             },
@@ -3807,7 +3803,7 @@
               }
             },
             {
-              "description": "What a pointer resting on a reading shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
@@ -3815,8 +3811,16 @@
               }
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow",
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -19363,10 +19367,6 @@
           "name": "HelixDonutChart",
           "cssProperties": [
             {
-              "description": "Half the width of the tooltip's point.",
-              "name": "--chart-tooltip-arrow"
-            },
-            {
               "description": "Width and height of the ring.",
               "name": "--donut-chart-size"
             },
@@ -19793,7 +19793,7 @@
               }
             },
             {
-              "description": "What a pointer resting on a slice shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
@@ -19801,8 +19801,16 @@
               }
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow",
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -27513,10 +27521,6 @@
           "name": "HelixLineChart",
           "cssProperties": [
             {
-              "description": "Half the width of the tooltip's point.",
-              "name": "--chart-tooltip-arrow"
-            },
-            {
               "description": "How much of a line's colour its wash takes.",
               "name": "--line-chart-area-opacity"
             },
@@ -28099,7 +28103,7 @@
               }
             },
             {
-              "description": "What a pointer resting on a reading shows.",
+              "description": "The bubble, forwarded from `Tooltip`.",
               "name": "tooltip",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
@@ -28107,8 +28111,16 @@
               }
             },
             {
-              "description": "The point of the tooltip, resting on the reading.",
-              "name": "tooltip-arrow",
+              "description": "The `Tooltip` element itself.",
+              "name": "tooltip-anchor",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"

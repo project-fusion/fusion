@@ -7,6 +7,7 @@ import {
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import '../../tooltip/index.js'
 
 /** The drawing's own coordinates, square because the shape has to stay round. */
 const BOX = 100
@@ -93,8 +94,9 @@ const THICKNESS: Record<string, number> = {
  *
  * @csspart centre - The middle of the ring, holding whatever is slotted.
  * @csspart plot - The drawing.
- * @csspart tooltip - What a pointer resting on a slice shows.
- * @csspart tooltip-arrow - The point of the tooltip, resting on the reading.
+ * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-anchor - The `Tooltip` element itself.
+ * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The slice's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -283,19 +285,18 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     const x = CENTRE + Math.cos(angle) * edge
     const y = CENTRE + Math.sin(angle) * edge
     return drawTooltip(this.rows, at, {
-      /* Half the box either way, then outward along the bearing. A ring has no
-         single side to hang the arrow on, so it is placed by direction. */
-      shift:
-        `translate(calc(-50% + ${Math.cos(angle) * 50}% + ${Math.cos(angle)} * var(--chart-tooltip-arrow, 6px)),` +
-        ` calc(-50% + ${Math.sin(angle) * 50}% + ${Math.sin(angle)} * var(--chart-tooltip-arrow, 6px)))`,
-      side:
+      /* The preferred side from the bearing's dominant axis, and
+         `FloatingController` moves it if that side does not fit. Four fixed
+         sides could not express a bearing at all, which is what made the arrow
+         miss the ring; a preference plus flipping can. */
+      placement:
         Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
           ? Math.cos(angle) > 0
-            ? 'start'
-            : 'end'
+            ? 'right'
+            : 'left'
           : Math.sin(angle) > 0
-            ? 'top'
-            : 'bottom',
+            ? 'bottom'
+            : 'top',
       x: `${x}%`,
       y: `${y}%`,
     })

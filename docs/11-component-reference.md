@@ -465,8 +465,9 @@ it is measured against.
 | `label` | One category's name. |
 | `labels` | The row of category names. |
 | `plot` | The drawing. |
-| `tooltip` | What a pointer resting on a reading shows. |
-| `tooltip-arrow` | The point of the tooltip, resting on the reading. |
+| `tooltip` | The bubble, forwarded from `Tooltip`. |
+| `tooltip-anchor` | The `Tooltip` element itself. |
+| `mark` | The invisible point the tooltip is anchored to. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The reading's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
@@ -476,7 +477,6 @@ it is measured against.
 
 | Property | Description |
 | --- | --- |
-| `--chart-tooltip-arrow` | Half the width of the tooltip's point. |
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
@@ -1855,8 +1855,9 @@ larger than the default.
 | --- | --- |
 | `centre` | The middle of the ring, holding whatever is slotted. |
 | `plot` | The drawing. |
-| `tooltip` | What a pointer resting on a slice shows. |
-| `tooltip-arrow` | The point of the tooltip, resting on the reading. |
+| `tooltip` | The bubble, forwarded from `Tooltip`. |
+| `tooltip-anchor` | The `Tooltip` element itself. |
+| `mark` | The invisible point the tooltip is anchored to. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The slice's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
@@ -1868,7 +1869,6 @@ larger than the default.
 
 | Property | Description |
 | --- | --- |
-| `--chart-tooltip-arrow` | Half the width of the tooltip's point. |
 | `--donut-chart-size` | Width and height of the ring. |
 | `--donut-chart-track-color` | Colour of the ring under the slices. |
 
@@ -2615,8 +2615,9 @@ answers for a shape.
 | `labels` | The row of reading names. |
 | `line` | One series. |
 | `plot` | The drawing. |
-| `tooltip` | What a pointer resting on a reading shows. |
-| `tooltip-arrow` | The point of the tooltip, resting on the reading. |
+| `tooltip` | The bubble, forwarded from `Tooltip`. |
+| `tooltip-anchor` | The `Tooltip` element itself. |
+| `mark` | The invisible point the tooltip is anchored to. |
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The reading's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
@@ -2626,7 +2627,6 @@ answers for a shape.
 
 | Property | Description |
 | --- | --- |
-| `--chart-tooltip-arrow` | Half the width of the tooltip's point. |
 | `--line-chart-area-opacity` | How much of a line's colour its wash takes. |
 | `--line-chart-block-size` | Height of the drawing. |
 | `--line-chart-gap` | Space between the drawing and its labels. |

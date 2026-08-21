@@ -13951,7 +13951,6 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -13966,8 +13965,9 @@ export type CustomElements = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -16571,7 +16571,6 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
@@ -16581,8 +16580,9 @@ export type CustomElements = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a slice shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -17744,7 +17744,6 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -17761,8 +17760,9 @@ export type CustomElements = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -24860,7 +24860,6 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -24875,8 +24874,9 @@ export type CustomElementsSolidJs = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -27544,7 +27544,6 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
@@ -27554,8 +27553,9 @@ export type CustomElementsSolidJs = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a slice shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -28761,7 +28761,6 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -28778,8 +28777,9 @@ export type CustomElementsSolidJs = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -35502,8 +35502,6 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
-  /** Half the width of the tooltip's point. */
-  "--chart-tooltip-arrow"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
   /** Height of the drawing. */

@@ -265,36 +265,27 @@
   stroke: var(--helix-color-series-24);
 }
 
-/* The tooltip, placed on the reading rather than under the pointer.
+/* The mark the bubble is anchored to, and the bubble's own content.
  *
- * `--_chart-tooltip-at` is the middle of the reading's slot, which is where the
- * drawing put it, so the box holds still while a pointer wanders inside one
- * column. Following the pointer exactly gives a tooltip that never settles and
- * is harder to read than the number in it.
- *
- * `translate` by half its own width rather than a margin, because the width is
- * the content's and nothing here knows it. Clamped so the first and last
- * readings do not push it off the chart: `min()` and `max()` against the
- * element's own inline size is the whole of it, and it costs no measurement. */
-[part="tooltip"] {
-  background-color: var(--helix-color-surface-raised);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-md);
-  box-sizing: border-box;
-  display: grid;
-  font-size: var(--helix-text-xs);
-  gap: var(--helix-space-2xs);
-  grid-area: 1 / 1;
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
+ * The mark is invisible and zero-sized: it exists so `Tooltip` has an element to
+ * point `for` at, since a reading is a position and not a thing. Placement,
+ * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
+ * reason a chart no longer draws its own. */
+[part="mark"] {
+  block-size: 0;
+  inline-size: 0;
+  position: absolute;
+}
+
+[part="tooltip-anchor"] {
+  inset: 0;
   pointer-events: none;
   position: absolute;
-  white-space: nowrap;
-  z-index: var(--helix-layer-popover);
 }
 
 [part="tooltip-label"] {
   color: var(--helix-color-foreground-muted);
+  display: block;
   font-weight: var(--helix-weight-medium);
 }
 
@@ -316,9 +307,8 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* A dot in the series colour, so a row of the tooltip and a line in the drawing
-   are visibly the same thing. Drawn with a pseudo-element rather than a real
-   one, since it says nothing a reader of the table needs. */
+/* A dot in the series colour, so a row of the bubble and a line in the drawing
+   are visibly the same thing, and only where something was plotted. */
 [part="tooltip-cell"][data-series]::before {
   block-size: 0.5em;
   border-radius: var(--helix-radii-full);
@@ -422,28 +412,6 @@
   background-color: var(--helix-color-series-24);
 }
 
-/* The tooltip glides between readings rather than teleporting.
- *
- * A box that jumps from slot to slot reads as a new tooltip each time and the
- * eye re-finds it on every step; moved, it stays the same object and the eye
- * follows. The distance is one slot, so the duration is short: long enough to
- * be a movement and not long enough to lag behind the pointer.
- *
- * `inset-inline-start` rather than a transform, because the transform is
- * already carrying the half-width offset and animating both fights. */
-[part="tooltip"] {
-  transition:
-    inset-block-start var(--helix-duration-fast) var(--helix-easing-decelerate),
-    inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
-    opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="tooltip"] {
-    transition: none;
-  }
-}
-
 /* The slice under the pointer, thickened rather than recoloured.
  *
  * Recolouring would break the agreement with a legend beside it. Growing the
@@ -531,56 +499,6 @@
   [part="track"] {
     transition: none;
   }
-}
-
-/* Placed at the point the chart handed over, and shifted off it by its own size.
- *
- * `--_chart-tooltip-at` and `--_chart-tooltip-down` are where the reading is,
- * in the plot's own percentages; `--_chart-tooltip-shift` is how to move the box
- * clear of it. The shift is a `translate` rather than an inset because the box's
- * size is its content's and nothing here knows it, and it comes from the chart
- * because only the chart knows which way its readings grow. */
-[part="tooltip"] {
-  inset-block-start: var(--_chart-tooltip-down, 0%);
-  inset-inline-start: var(--_chart-tooltip-at, 50%);
-  translate: none;
-  transform: var(--_chart-tooltip-shift, translate(-50%, -100%));
-}
-
-/* The arrow, a square turned forty-five degrees with two of its corners under
-   the box. Drawn from the same surface and border as the box so the seam does
-   not show, and hung on whichever edge the chart said. */
-[part="tooltip-arrow"] {
-  background-color: var(--helix-color-surface-raised);
-  block-size: calc(var(--chart-tooltip-arrow, 6px) * 2);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  inline-size: calc(var(--chart-tooltip-arrow, 6px) * 2);
-  position: absolute;
-  rotate: 45deg;
-}
-
-[part="tooltip"][data-side="bottom"] [part="tooltip-arrow"] {
-  clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
-  inset-block-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
-  inset-inline-start: calc(50% - var(--chart-tooltip-arrow, 6px));
-}
-
-[part="tooltip"][data-side="top"] [part="tooltip-arrow"] {
-  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
-  inset-block-start: calc(var(--chart-tooltip-arrow, 6px) * -1);
-  inset-inline-start: calc(50% - var(--chart-tooltip-arrow, 6px));
-}
-
-[part="tooltip"][data-side="start"] [part="tooltip-arrow"] {
-  clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
-  inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
-  inset-inline-start: calc(var(--chart-tooltip-arrow, 6px) * -1);
-}
-
-[part="tooltip"][data-side="end"] [part="tooltip-arrow"] {
-  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
-  inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
-  inset-inline-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
 }
 
 /* On the slices rather than the plot, which is the difference between a ring

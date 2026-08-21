@@ -12204,8 +12204,9 @@ export type CustomElements = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -14756,8 +14757,9 @@ export type CustomElements = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a slice shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -15892,8 +15894,9 @@ export type CustomElements = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -22880,8 +22883,9 @@ export type CustomElementsSolidJs = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -25498,8 +25502,9 @@ export type CustomElementsSolidJs = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a slice shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -26670,8 +26675,9 @@ export type CustomElementsSolidJs = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
-   * - `tooltip`: What a pointer resting on a reading shows.
-   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
+   * - `tooltip`: The bubble, forwarded from `Tooltip`.
+   * - `tooltip-anchor`: The `Tooltip` element itself.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
