@@ -183,3 +183,43 @@ slot[name="end"]::slotted(*) {
     transition: none;
   }
 }
+
+/* The grip, which is a pointer affordance and nothing else.
+ *
+ * `touch-action: none` is what makes it work on a touch screen at all. Without
+ * it the browser claims a horizontal drag for scrolling before the second
+ * `pointermove` arrives, so the gesture is taken away mid-drag and the value
+ * stops following the finger with nothing to say why.
+ *
+ * `ew-resize` rather than `grab`: the value moves on one axis, and a cursor
+ * offering both is offering something that does not happen. `user-select: none`
+ * because the press lands inside a field and the browser's own answer to a
+ * press-and-drag over text is to select it. */
+[part="grip"] {
+  align-items: center;
+  color: var(--helix-color-foreground-subtle);
+  cursor: ew-resize;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  padding-inline: var(--helix-space-2xs);
+  touch-action: none;
+  user-select: none;
+}
+
+[part="grip"] svg {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+:host(:not(:disabled):not([read-only])) [part="grip"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+/* Nothing to grip when there is nothing to change, and it says so rather than
+   staying lit and refusing. */
+:host(:disabled) [part="grip"],
+:host([read-only]) [part="grip"] {
+  cursor: default;
+  opacity: 0.5;
+}

@@ -6,10 +6,31 @@ import {
   MixinField,
   restoreValue,
 } from '@helix-io/core'
-import { minus, plus } from '@helix-io/icons'
+import { arrowsLeftRight, minus, plus } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/**
+ * How far a pointer travels for one step of the value, in pixels.
+ *
+ * Four, measured against the alternatives rather than picked: at one the value
+ * runs away from the pointer and a field with `step="1"` crosses a hundred in
+ * the width of a word, and at ten a reader has to cross the viewport to reach
+ * a useful number. Four is roughly a character's width at the sizes this is set
+ * in, so a step reads as "about one glyph of travel".
+ */
+const SCRUB_PITCH = 4
+
+/**
+ * And the same step over four times the travel, which is what fine means here.
+ *
+ * Fine lengthens the distance rather than shrinking the increment. A drag that
+ * produced values between the steps would be the one input in the library that
+ * can reach a number its own arrow keys cannot, and `step` would stop being the
+ * grid the control is on.
+ */
+const SCRUB_FINE = 16
 
 /**
  * @summary A number a reader types or steps to.
@@ -65,6 +86,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart field - The box holding everything.
  * @csspart control - The field itself.
  * @csspart decrement - The control that steps down.
+ * @csspart grip - The handle that changes the value when dragged, with `scrub`.
  * @csspart increment - The control that steps up.
  */
 @customElement('helix-base-number-input')
@@ -101,6 +123,17 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
   /** Whether the field refuses input while still submitting its value. */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * Whether a grip is shown that changes the value when it is dragged.
+   *
+   * Off by default, because it is chrome: a field that grows a handle nobody
+   * asked for has a handle in every form that ever rendered one. Where it earns
+   * its place is a value a reader tunes rather than states, a duration or a
+   * weight or a count they are looking for rather than one they know.
+   */
+  @property({ reflect: true, type: Boolean })
+  scrub = false
 
   /** Accessible name for the control that steps down. */
   @property({ attribute: 'decrement-label' })
@@ -179,6 +212,70 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
   /** One step down. */
   stepDown(large = false): void {
     this.nudge(large ? -(this.largeStep ?? 10) : -1)
+  }
+
+  /** Where the pointer went down, and what the value was there. */
+  private scrubFrom = 0
+  private scrubValue = 0
+
+  /**
+   * Press, and the value follows the pointer.
+   *
+   * Captured, so a drag that leaves the grip keeps going: a reader tuning a
+   * number moves further than a 20 pixel handle and the gesture ending because
+   * they overshot it would be the control refusing the very thing it offered.
+   * `preventDefault` because a press inside a field otherwise starts a text
+   * selection, which drags a blue wash across the label at the same time.
+   */
+  private readonly handleScrubDown = (event: PointerEvent): void => {
+    if (this.isDisabled || this.readOnly) {
+      return
+    }
+    ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+    this.scrubFrom = event.clientX
+    this.scrubValue = this.numeric ?? this.min ?? 0
+    event.preventDefault()
+  }
+
+  /**
+   * Read from where the press began, never from the last frame.
+   *
+   * Accumulating a delta per move drifts: every rounding to a step throws away
+   * the remainder, and a slow drag across a hundred events throws it away a
+   * hundred times, so the value and the pointer disagree by more the longer
+   * anyone holds. From the origin the arithmetic is the same on every frame and
+   * the value can only be where the pointer says it is.
+   */
+  private readonly handleScrubMove = (event: PointerEvent): void => {
+    const grip = event.currentTarget as HTMLElement
+    if (!grip.hasPointerCapture(event.pointerId)) {
+      return
+    }
+    const step = Math.abs(this.step) || 1
+    const unit = event.shiftKey ? (this.largeStep ?? 10) * step : step
+    const pitch = event.altKey ? SCRUB_FINE : SCRUB_PITCH
+    const steps = Math.round((event.clientX - this.scrubFrom) / pitch)
+    const next = String(this.clamp(this.scrubValue + steps * unit))
+    /* Compared before it is sent. A drag produces a move event per frame and
+       most of them land on the step the value is already on, and announcing
+       those would be `helix-input` firing sixty times a second saying nothing
+       changed. */
+    if (next === this.value) {
+      return
+    }
+    this.requestValue(next)
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
+    }
+  }
+
+  /** Let go, and the capture goes with it. */
+  private readonly handleScrubEnd = (event: PointerEvent): void => {
+    const grip = event.currentTarget as HTMLElement
+    if (grip.hasPointerCapture(event.pointerId)) {
+      grip.releasePointerCapture(event.pointerId)
+    }
   }
 
   /**
@@ -337,6 +434,33 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
     const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
     return html`${this.renderLabel()}
       <div part="field">
+        ${
+          /* Not a button, and hidden from assistive technology.
+             The grip adds no capability: the arrow keys on the field already
+             step the value, and `PageUp` already takes the large step this
+             offers as a modifier. So a control announced here would be one a
+             screen reader could find, focus, and get nothing from, which is
+             worse than the affordance being pointer-only and honest about it.
+             A `<span>` rather than a `<button>` for the same reason: a button
+             that does nothing when pressed is a lie the markup tells. */
+          ''
+        }
+        ${
+          this.scrub
+            ? html`<span
+                part="grip"
+                aria-hidden="true"
+                @pointercancel=${this.handleScrubEnd}
+                @pointerdown=${this.handleScrubDown}
+                @pointermove=${this.handleScrubMove}
+                @pointerup=${this.handleScrubEnd}
+              >
+                <svg fill="currentColor" viewBox=${arrowsLeftRight.viewBox} aria-hidden="true">
+                  ${unsafeSVG(arrowsLeftRight.content)}
+                </svg>
+              </span>`
+            : nothing
+        }
         <button
           part="decrement"
           type="button"

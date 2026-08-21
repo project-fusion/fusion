@@ -237,3 +237,88 @@ describe('input number validity', () => {
     expect(internals.validity.valid).toBe(true)
   })
 })
+
+describe('number input scrub', () => {
+  const drag = async (host: HTMLElement, dx: number, keys: Partial<PointerEventInit> = {}) => {
+    const grip = part(host, 'grip') as HTMLElement
+    /* happy-dom has no pointer capture, so the handlers' own guard would refuse
+       every move. Stubbed to the two answers the component asks for, which is
+       the smallest thing that lets the arithmetic be tested at all; whether a
+       real capture holds through a drag is a browser question and is asked in
+       the geometry block. */
+    let held = false
+    grip.setPointerCapture = () => {
+      held = true
+    }
+    grip.hasPointerCapture = () => held
+    grip.releasePointerCapture = () => {
+      held = false
+    }
+    grip.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 0, pointerId: 1 }))
+    grip.dispatchEvent(
+      new PointerEvent('pointermove', { bubbles: true, clientX: dx, pointerId: 1, ...keys }),
+    )
+    grip.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: dx, pointerId: 1 }))
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+  }
+
+  const scrubField = async (attrs: string) =>
+    mount(`<helix-number-input label="N" scrub ${attrs}></helix-number-input>`)
+
+  test('no grip without asking for one', async () => {
+    const host = await mount(
+      '<helix-number-input label="N" default-value="1"></helix-number-input>',
+    )
+    expect(part(host, 'grip')).toBeNull()
+  })
+
+  test('four pixels is one step', async () => {
+    const host = await scrubField('default-value="10" step="1"')
+    await drag(host, 12)
+    expect((host as HTMLElement & { value: string }).value).toBe('13')
+  })
+
+  test('dragging back goes down', async () => {
+    const host = await scrubField('default-value="10" step="1"')
+    await drag(host, -20)
+    expect((host as HTMLElement & { value: string }).value).toBe('5')
+  })
+
+  test('shift takes the large step', async () => {
+    const host = await scrubField('default-value="0" step="1" large-step="10"')
+    await drag(host, 8, { shiftKey: true })
+    expect((host as HTMLElement & { value: string }).value).toBe('20')
+  })
+
+  test('alt keeps the step and lengthens the travel', async () => {
+    /* The same 16 pixels: four steps at the normal pitch, one when fine. Fine
+       must never reach a value between the steps, or the drag could produce a
+       number the arrow keys cannot. */
+    const host = await scrubField('default-value="0" step="1"')
+    await drag(host, 16, { altKey: true })
+    expect((host as HTMLElement & { value: string }).value).toBe('1')
+  })
+
+  test('lands on the step, never between it', async () => {
+    const host = await scrubField('default-value="0" step="0.25"')
+    await drag(host, 10)
+    expect((host as HTMLElement & { value: string }).value).toBe('0.75')
+  })
+
+  test('stops at max and at min', async () => {
+    const up = await scrubField('default-value="8" step="1" min="0" max="10"')
+    await drag(up, 400)
+    const down = await scrubField('default-value="2" step="1" min="0" max="10"')
+    await drag(down, -400)
+    expect([
+      (up as HTMLElement & { value: string }).value,
+      (down as HTMLElement & { value: string }).value,
+    ]).toEqual(['10', '0'])
+  })
+
+  test('a read-only field does not move', async () => {
+    const host = await scrubField('default-value="10" step="1" read-only')
+    await drag(host, 40)
+    expect((host as HTMLElement & { value: string }).value).toBe('10')
+  })
+})
