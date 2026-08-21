@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseVideoPlaylistMenu } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './video-playlist-menu.css.js'
 import '../../icon/index.js'
 import '../../menu/index.js'
@@ -36,7 +37,13 @@ import '../../menu/index.js'
  */
 @customElement('helix-video-playlist-menu')
 export class HelixVideoPlaylistMenu extends HelixBaseVideoPlaylistMenu {
-  static override styles: CSSResultGroup = styles
+  /* `glyphStyles` first, and it is not optional. `drawIcon` renders a bare
+     `<svg data-glyph>` with no size of its own, and the only rule that sizes
+     one lives in the icon family's sheet. Without it the glyph came out 24x24
+     inside a 24x24 button, filling it edge to edge beside a 16x16 fullscreen
+     icon: right colour, right button, right position, and half again too big.
+     Nothing failed, because a missing rule is not an error. */
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

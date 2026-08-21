@@ -13,7 +13,7 @@ type Playlist = HTMLElement & { active: string; updateComplete: Promise<boolean>
 /** The composition the menu is designed for: it sits in the player's bar. */
 const mountMenu = async (): Promise<{ menu: Menu; playlist: Playlist }> => {
   const playlist = (await mount(`<helix-video-playlist default-active="one" label="Episodes">
-    <helix-video controls label="Player" slot="player">
+    <helix-video label="Player" slot="player">
       <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
     </helix-video>
     <helix-video-playlist-item src="/one.mp4" value="one">One</helix-video-playlist-item>
@@ -41,6 +41,24 @@ describe('video playlist menu', () => {
   test('finds its playlist upward, across the slot it was placed in', async () => {
     const { menu } = await mountMenu()
     expect(entries(menu)).toHaveLength(3)
+  })
+
+  test('the player renders a bar with a slot for it to land in', async () => {
+    /* Every other assertion here reads the menu's own shadow root, and all of
+       them passed while the menu was assigned to no slot at all: the example
+       and this file both set `controls` on the video, which means the
+       *browser* draws the bar and Helix's own is not rendered, so there was no
+       `controls` slot to land in. Structure without placement is a component
+       that renders correctly into nowhere, and a screenshot is what found it.
+     *
+     * Asserted through the player's slots rather than `menu.assignedSlot`,
+     * which happy-dom does not implement and reports as `undefined` whatever
+     * the truth. That is not a weaker test of this bug: with `controls` set
+     * there is no bar, so there is no `controls` slot, and this fails. */
+    const { playlist } = await mountMenu()
+    const player = playlist.querySelector('helix-video')
+    const slots = [...(player?.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) => one.name)
+    expect(slots).toContain('controls')
   })
 
   test('carries every entry, in the order the playlist holds them', async () => {
