@@ -1,6 +1,7 @@
 import { SERVICES } from '../../../services'
 import { stageAppearance } from '../../../verticals'
 import '../../../preview.css'
+import '../../../today.css'
 
 export const metadata = { title: 'Candidate: today' }
 
@@ -89,172 +90,165 @@ const LADDER = [
 export default function Page() {
   return (
     <>
-      <section className="dvHero">
+      <section className="specHero">
         <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text appearance="label" class="dvMono" tone="subtle">
+          <helix-text appearance="label" class="specHeroLabel">
             Fusion Development Group
           </helix-text>
 
-          <helix-text as="h1" class="dvTitle">
-            The hard part is
-            <br />
-            <em>already</em> built.
+          {/* One claim, two readings, which is how the page stops choosing
+              between its readers. An engineer hears that the thing is open and
+              theirs to use; a buyer hears that we built what we are about to
+              point at their product. Both are the same sentence. */}
+          <helix-text as="h1" class="specHeroTitle">
+            The tools are <em>open</em>. The work is what we sell.
           </helix-text>
 
-          <helix-text as="p" class="measure" tone="muted">
-            Seventy eight component families, a token layer that derives its own accessible palette
-            from one brand color, and the tooling that keeps both honest. We point it at your
-            product instead of starting over, which is what four weeks buys.
+          <helix-text as="p" class="specLede">
+            Helix is seventy eight component families under one open tier, with no part of it held
+            back for a paid plan. What we charge for is applying it to your product, which goes
+            faster because we are the people who built it.
           </helix-text>
 
-          <helix-flex data-density="lg" gap="sm" wrap>
-            <a data-button="solid" data-button-tone="primary" href="/services">
-              See what it costs
+          {/* The fork made structural. It used to be two buttons a reader had
+              to interpret; each door now says who it is for before it says
+              where it goes. */}
+          <div className="specDoors">
+            <a className="specDoor" href="/helix">
+              <helix-text class="specDoorFor">If you build interfaces</helix-text>
+              <helix-text appearance="title">Open Helix</helix-text>
+              <helix-text appearance="caption" tone="muted">
+                Seventy eight families with their API and a live example each. Web components, so
+                whatever framework you are on stays your choice.
+              </helix-text>
             </a>
-            <a data-button href="/helix">
-              Open Helix
+            <a className="specDoor" href="/services">
+              <helix-text class="specDoorFor">If you need the work done</helix-text>
+              <helix-text appearance="title">See what it costs</helix-text>
+              <helix-text appearance="caption" tone="muted">
+                An audit at $12,000, a design system sprint at $32,000, a build from sixty thousand.
+                Every price is on the page.
+              </helix-text>
             </a>
-          </helix-flex>
+          </div>
         </helix-flex>
       </section>
 
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" class="dvMono" tone="subtle">
-              The state of it
-            </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
+      <section className="shell">
+        <div className="spec">
+          <helix-text class="specLabel">The state of it</helix-text>
+          <helix-flex direction="column" gap="xl">
+            <helix-text as="h2" class="specTitle">
               What is real, and what is not
             </helix-text>
-          </helix-flex>
-
-          <helix-flex direction="column" gap="none">
-            {STACK.map((row) => (
-              <helix-flex align="start" class="tdRow" gap="xl" key={row.name} wrap>
-                <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
-                  <helix-text appearance="label" tone="subtle">
-                    {row.lede}
-                  </helix-text>
-                  {/* The stage, which is the site's own device and says more
-                      than a citation would: `Active` ships with users,
-                      `Building` is real work with nothing shipped, `Declared`
-                      is direction with no work started. */}
-                  <helix-tag tone={stageAppearance(row.stage)}>{row.stage}</helix-tag>
+            <helix-flex direction="column" gap="none">
+              {STACK.map((row) => (
+                <helix-flex align="start" class="tdRow" gap="xl" key={row.name} wrap>
+                  <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
+                    <helix-text appearance="label" tone="subtle">
+                      {row.lede}
+                    </helix-text>
+                    <helix-tag tone={stageAppearance(row.stage)}>{row.stage}</helix-tag>
+                  </helix-flex>
+                  <helix-flex class="tdBody" direction="column" gap="sm">
+                    <helix-text as="h3" class="tdName">
+                      {row.name}
+                    </helix-text>
+                    <helix-text as="p" tone="muted">
+                      {row.body}
+                    </helix-text>
+                    <a data-link href={row.action.href}>
+                      {row.action.label}
+                    </a>
+                  </helix-flex>
                 </helix-flex>
+              ))}
+            </helix-flex>
+          </helix-flex>
+        </div>
+      </section>
 
-                <helix-flex class="tdBody" direction="column" gap="sm">
-                  <helix-text as="h3" class="tdName">
-                    {row.name}
+      <section className="shell">
+        <div className="spec">
+          <helix-text class="specLabel">Why now</helix-text>
+          <helix-flex direction="column" gap="xl">
+            <helix-text as="h2" class="specTitle">
+              Two costs fell at the same time
+            </helix-text>
+            <helix-grid gap="2xl" min="19rem">
+              {MECHANISM.map((item) => (
+                <helix-flex direction="column" gap="sm" key={item.name}>
+                  <helix-text appearance="title" as="h3">
+                    {item.name}
                   </helix-text>
                   <helix-text as="p" tone="muted">
-                    {row.body}
-                  </helix-text>
-                  <a data-link href={row.action.href}>
-                    {row.action.label}
-                  </a>
-                </helix-flex>
-              </helix-flex>
-            ))}
-          </helix-flex>
-        </helix-flex>
-      </section>
-
-      {/* Why any of this is possible now, which is the question a reader asks
-          straight after finding out what is real. Two curves rather than one:
-          the pairing is the argument and either alone is a half of it. */}
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" class="dvMono" tone="subtle">
-              Why now
-            </helix-text>
-            <helix-text as="h2" class="tdAsk measure">
-              Two costs fell at the same time.
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="2xl" min="20rem">
-            {MECHANISM.map((item) => (
-              <helix-flex direction="column" gap="sm" key={item.name}>
-                <helix-text appearance="title" as="h3">
-                  {item.name}
-                </helix-text>
-                <helix-text as="p" tone="muted">
-                  {item.body}
-                </helix-text>
-              </helix-flex>
-            ))}
-          </helix-grid>
-
-          <helix-text as="p" class="measure" tone="muted">
-            The two things that forced a person to depend on an institution were the cost of
-            thinking at scale and the cost of power. Both are falling, which is what turns
-            sovereignty from a principle you agree with into a stack you can run.
-          </helix-text>
-        </helix-flex>
-      </section>
-
-      {/* How far the same argument runs, which is the part that makes this a
-          company rather than a consultancy. */}
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" class="dvMono" tone="subtle">
-              The ladder
-            </helix-text>
-            <helix-text as="h2" class="tdAsk measure">
-              The same stack, three times over.
-            </helix-text>
-          </helix-flex>
-
-          <helix-flex direction="column" gap="none">
-            {LADDER.map((rung) => (
-              <helix-flex align="start" class="tdRow" gap="xl" key={rung.name} wrap>
-                <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
-                  <helix-text appearance="label" tone="subtle">
-                    {rung.rung}
+                    {item.body}
                   </helix-text>
                 </helix-flex>
-                <helix-flex class="tdBody" direction="column" gap="sm">
-                  <helix-text as="h3" class="tdName">
-                    {rung.name}
-                  </helix-text>
-                  <helix-text as="p" tone="muted">
-                    {rung.body}
-                  </helix-text>
-                </helix-flex>
-              </helix-flex>
-            ))}
+              ))}
+            </helix-grid>
+            <helix-text as="p" class="measure" tone="muted">
+              The two things that forced a person to depend on an institution were the cost of
+              thinking at scale and the cost of power. Both are falling, which is what turns
+              sovereignty from a principle you agree with into a stack you can run.
+            </helix-text>
           </helix-flex>
-        </helix-flex>
+        </div>
       </section>
 
-      {/* Where the exit test is not trivial.
-          
-          Not Helix: a published package under a permissive license is already
-          yours and needs nothing said about it. The engagement is the part a
-          buyer is actually exposed on, so that is the part this answers. */}
-      <section className="band">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text as="h2" class="tdAsk measure">
-            We are not trying to become part of your stack.
-          </helix-text>
-          <helix-flex class="measure" direction="column" gap="md">
-            <helix-text as="p" tone="muted">
-              Handover is a condition of the work rather than a phase at the end of it. The
-              architecture decisions are written down with their trade-offs, not just made. If an
-              engagement would leave you unable to continue without us on a retainer, it is not one
-              we will take.
+      <section className="shell">
+        <div className="spec">
+          <helix-text class="specLabel">The ladder</helix-text>
+          <helix-flex direction="column" gap="xl">
+            <helix-text as="h2" class="specTitle">
+              The same stack, three times over
             </helix-text>
-            <helix-text as="p" tone="muted">
-              That is a rule we hold ourselves to and it is worth being plain about which parts of
-              it are hard. Keeping a design system you already have is not hard. Keeping a system
-              that remembers things for you, when the memory lives somewhere else, is. That is the
-              part Cortex exists to answer, and it is the part we have not shipped yet.
-            </helix-text>
+            <helix-flex direction="column" gap="none">
+              {LADDER.map((rung) => (
+                <helix-flex align="start" class="tdRow" gap="xl" key={rung.name} wrap>
+                  <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
+                    <helix-text appearance="label" tone="subtle">
+                      {rung.rung}
+                    </helix-text>
+                  </helix-flex>
+                  <helix-flex class="tdBody" direction="column" gap="sm">
+                    <helix-text as="h3" class="tdName">
+                      {rung.name}
+                    </helix-text>
+                    <helix-text as="p" tone="muted">
+                      {rung.body}
+                    </helix-text>
+                  </helix-flex>
+                </helix-flex>
+              ))}
+            </helix-flex>
           </helix-flex>
-        </helix-flex>
+        </div>
+      </section>
+
+      <section className="shell">
+        <div className="spec">
+          <helix-text class="specLabel">What you are risking</helix-text>
+          <helix-flex direction="column" gap="xl">
+            <helix-text as="h2" class="specTitle">
+              We are not trying to become part of your stack
+            </helix-text>
+            <helix-flex class="measure" direction="column" gap="md">
+              <helix-text as="p" tone="muted">
+                Handover is a condition of the work rather than a phase at the end of it. The
+                architecture decisions are written down with their trade-offs, not just made. If an
+                engagement would leave you unable to continue without us on a retainer, it is not
+                one we will take.
+              </helix-text>
+              <helix-text as="p" tone="muted">
+                That is a rule we hold ourselves to and it is worth being plain about which parts of
+                it are hard. Keeping a design system you already have is not hard. Keeping a system
+                that remembers things for you, when the memory lives somewhere else, is. That is the
+                part Cortex exists to answer, and it is the part we have not shipped yet.
+              </helix-text>
+            </helix-flex>
+          </helix-flex>
+        </div>
       </section>
 
       <section className="band closing">
