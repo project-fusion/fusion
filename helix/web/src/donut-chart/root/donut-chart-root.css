@@ -88,8 +88,31 @@
  * Overflow is left visible on purpose. Clipping a total that does not fit would
  * hide the problem rather than show it, and a consumer who wants a bigger hole
  * has the thickness hook. */
+/* Slotted content inherits through the slot, so this is where the hole's own
+   size reaches it. */
+[part="centre"] slot {
+  font-size: 8cqi;
+}
+
 [part="centre"] {
   box-sizing: border-box;
+  /* A container, so what is slotted here can be sized against the hole rather
+     than against the page. The hole is a proportion of the chart and the type
+     ramp is not, so absolute type fits at exactly one chart size: measured, a
+     `Stat` reading `10,000` painted across four slices at anything but the one
+     the default was tuned to. `cqi` is a hundredth of this box's width, and the
+     figure below is the *base* the slotted content is set from, not the size it
+     comes out at. `Stat` draws its value at a little over three times the size
+     it inherits, so 15cqi produced a number four times the width of the ring
+     with the slices behind it. Eight is the base that puts a six figure total
+     across about a quarter of the hole.
+   *
+   * The size is on the slot and not here, which is not a detail: an element
+   * cannot size itself in its own container's units, that being circular, so
+   * `cqi` written on the container resolves against whatever container is
+   * further up, or the viewport. Both earlier attempts did that and produced a
+   * total four times the width of the ring. */
+  container-type: inline-size;
   display: grid;
   inline-size: calc(100% * (80 - var(--_donut-thickness, 16)) / 100);
   place-items: center;
