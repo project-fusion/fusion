@@ -12756,6 +12756,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-gap`: Space between items and separators. (default: `undefined`)
+   * - `--breadcrumbs-overflow-size`: How tall the control in the gap may be. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -16796,6 +16797,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
+   * - `--option-block-inset`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
    * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
@@ -21956,6 +21958,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-gap`: Space between items and separators. (default: `undefined`)
+   * - `--breadcrumbs-overflow-size`: How tall the control in the gap may be. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -26122,6 +26125,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--option-inset`: Space before the label, shared with a group heading. (default: `undefined`)
+   * - `--option-block-inset`: Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. (default: `undefined`)
    * - `--option-active-color`: Wash behind the option the keyboard is on. (default: `undefined`)
    * - `--option-radii`: Corner radius of the row. A listbox and a select flatten it. (default: `undefined`)
    *
@@ -30891,6 +30895,8 @@ export type CustomCssProperties = {
   "--breadcrumb-hover-color"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
+  /** How tall the control in the gap may be. */
+  "--breadcrumbs-overflow-size"?: string;
   /** Space between the buttons, when `spaced`. */
   "--button-group-gap"?: string;
   /** Fill behind the button. */
@@ -31095,6 +31101,8 @@ export type CustomCssProperties = {
   "--navigation-gap"?: string;
   /** Space before the label, shared with a group heading. */
   "--option-inset"?: string;
+  /** Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. */
+  "--option-block-inset"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */

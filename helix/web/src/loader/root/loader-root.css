@@ -189,6 +189,25 @@
  * left is the mark, which is what a reader is waiting on. A pulse with nothing
  * slotted therefore shows nothing, and that is the honest reading of asking for
  * a mark that pulses and giving it no mark. */
+/* And bigger, because the mark is now the whole of it.
+ *
+ * The sizes are drawn for a ring with something small in the middle: at
+ * `loader-md` the mark is 40% of 24 pixels, which is under ten. On its own,
+ * with no rim around it to give it scale, that reads as a stray dot rather than
+ * a brand waiting. Two steps up puts the default at the size the `lg` ring was
+ * and keeps `size` meaning what it does elsewhere. */
+:host([appearance="pulse"]) {
+  --_loader-size: calc(var(--helix-size-loader-lg) * 2);
+}
+
+:host([appearance="pulse"][size="sm"]) {
+  --_loader-size: var(--helix-size-loader-lg);
+}
+
+:host([appearance="pulse"][size="lg"]) {
+  --_loader-size: calc(var(--helix-size-loader-lg) * 3);
+}
+
 :host([appearance="pulse"]) [part="track"] {
   display: none;
 }

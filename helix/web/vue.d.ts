@@ -6372,6 +6372,8 @@ export type CustomCssProperties = {
   "--breadcrumb-hover-color"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
+  /** How tall the control in the gap may be. */
+  "--breadcrumbs-overflow-size"?: string;
   /** Space between the buttons, when `spaced`. */
   "--button-group-gap"?: string;
   /** Fill behind the button. */
@@ -6576,6 +6578,8 @@ export type CustomCssProperties = {
   "--navigation-gap"?: string;
   /** Space before the label, shared with a group heading. */
   "--option-inset"?: string;
+  /** Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list. */
+  "--option-block-inset"?: string;
   /** Wash behind the option the keyboard is on. */
   "--option-active-color"?: string;
   /** Corner radius of the row. A listbox and a select flatten it. */

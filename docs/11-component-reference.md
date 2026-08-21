@@ -430,6 +430,7 @@ because a truncated path tells the reader less than a two-line one.
 | Property | Description |
 | --- | --- |
 | `--breadcrumbs-gap` | Space between items and separators. |
+| `--breadcrumbs-overflow-size` | How tall the control in the gap may be. |
 
 ### Breadcrumb — `helix-breadcrumb`
 
