@@ -26,6 +26,12 @@
 
   --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
   --_steps-mark-box: var(--_steps-m);
+  /* Air either side of every mark, so the rail arrives at it rather than into
+     it. The line ran to the mark's exact edge, measured at a gap of zero on
+     both sides of all three, which reads as one drawing rather than as a mark
+     on a rail; against an open circle it closes the shape, and the gap is what
+     says the circle is a thing the line passes rather than part of it. */
+  --_steps-connector-inset: var(--steps-connector-inset, var(--helix-space-2xs));
   --_steps-columns: minmax(0, 1fr);
   --_steps-marker-column: 1;
   --_steps-marker-justify: center;
@@ -41,17 +47,24 @@
     var(--steps-gap, var(--helix-space-md)) /
     2 -
     var(--_steps-mark-box) /
-    2
+    2 -
+    var(--_steps-connector-inset)
   );
   --_steps-lead-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-block-size: var(--helix-border-thin);
-  --_steps-trail-inline-start: calc(50% + var(--_steps-mark-box) / 2);
+  --_steps-trail-inline-start: calc(
+    50% +
+    var(--_steps-mark-box) /
+    2 +
+    var(--_steps-connector-inset)
+  );
   --_steps-trail-inline-size: calc(
     50% +
     var(--steps-gap, var(--helix-space-md)) /
     2 -
     var(--_steps-mark-box) /
-    2
+    2 -
+    var(--_steps-connector-inset)
   );
   --_steps-trail-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-trail-block-size: var(--helix-border-thin);

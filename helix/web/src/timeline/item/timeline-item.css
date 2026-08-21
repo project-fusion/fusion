@@ -72,21 +72,18 @@
   align-items: center;
   align-self: start;
   aspect-ratio: 1;
-  /* Raised off the line box onto the letters.
+  /* Not raised, which it was.
    *
-   * Centred on the line box, the mark measures as level with the title and does
-   * not look it: a line box carries the descender space under the baseline
-   * whether or not the title has a descender in it, so its middle sits below the
-   * middle of the capitals, which is where an eye reads the line as being. Half
-   * a descender is the difference, and this is it.
+   * There was a `translate: 0 -0.1em` here, measured when the mark was a
+   * `<span>` this sheet drew a circle on: a bare dot centres on the line box,
+   * and a line box carries descender space whether or not the words have a
+   * descender in them, so the dot read low and was lifted.
    *
-   * `translate` rather than a margin, and not only because the token check is
-   * right that a raw length has no business in one. This is a correction to
-   * where the mark is *seen*, not to where it sits: the line above and below is
-   * drawn against the mark's layout box, so moving the box would drag the line
-   * with it and leave the whole rail a pixel higher than the rule it belongs
-   * to. */
-  translate: 0 -0.1em;
+   * The mark is a glyph now, drawn inside a box Phosphor already balanced, and
+   * the lift became an error of exactly its own size. Measured across all four
+   * entries at a 14px title: the mark sat 1.4 pixels above the centre of its
+   * own label, on every row, which is `0.1em` to the pixel.
+   */
   background-color: var(--helix-color-background);
   /* Round, because all this shape does now is cut the line.
    *
