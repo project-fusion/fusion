@@ -2,7 +2,7 @@
 
 import type { HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { PreferencesDrawer } from './preferences'
 import { PRODUCTS } from './products'
@@ -31,6 +31,27 @@ const SECTIONS = [
 ]
 
 /**
+ * Everywhere the palette can take a reader.
+ *
+ * The masthead shows two sections because a masthead is a place to stand, not
+ * an index. A palette is the index, so it carries the pages a reader would
+ * otherwise have to find by reading: the thesis, the trust page, the two
+ * substrates, and the sections already on the bar.
+ *
+ * Written here rather than derived from a route manifest, because Next has no
+ * such thing to read at runtime and a generated one would list every preview
+ * and every slug. What belongs in a palette is a judgement about what somebody
+ * would go looking for.
+ */
+const DESTINATIONS = [
+  { href: '/services', label: 'Services' },
+  { href: '/insights', label: 'Insights' },
+  { href: '/helix', label: 'Helix, the design system' },
+  { href: '/thesis', label: 'Thesis' },
+  { href: '/trust', label: 'Trust' },
+]
+
+/**
  * Site navigation: the sections, centered in the masthead.
  *
  * Plain links inside a `Navigation`, marked with `aria-current` and styled by
@@ -56,8 +77,10 @@ const SECTIONS = [
  */
 export function SiteNav() {
   const pathname = usePathname()
+  const router = useRouter()
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
+  const [findOpen, setFindOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
@@ -304,6 +327,25 @@ export function SiteNav() {
           </helix-navigation>
         )}
 
+        {/* **A button as well as a shortcut, because a shortcut nobody is told
+            about is a feature for whoever wrote it.** The key is the fast path
+            and the button is how a reader finds out there is one: it carries
+            the keys it answers to, which is the only place on the page that
+            says so. Hidden on a narrow screen, where there is no keyboard to
+            press them with and the drawer is the way through. */}
+        {!narrow && (
+          <helix-button
+            appearance="outlined"
+            class="siteFind"
+            onClick={() => setFindOpen(true)}
+            slot="end"
+          >
+            <helix-icon name="magnifying-glass" slot="start"></helix-icon>
+            Search
+            <helix-kbd slot="end">⌘K</helix-kbd>
+          </helix-button>
+        )}
+
         <helix-tooltip content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
             <helix-icon name="gear"></helix-icon>
@@ -316,6 +358,43 @@ export function SiteNav() {
           </helix-button>
         )}
       </helix-app-header>
+
+      {/* **The palette listens for its own hotkey from the document**, so it
+          answers from wherever the reader is, including from inside another
+          field. `open` is controlled here because the button opens it too, and
+          a controlled property that is not answered is a control that goes
+          quiet: both events are bound.
+
+          The handler is typed structurally rather than by the generated
+          `HelixCommandHelixSelectElementEvent`, which is a global in
+          `jsx.d.ts` and not importable by name. A hyphenated JSX prop is
+          exempt from checking on an intrinsic element anyway, so the annotation
+          is here to give `detail` a shape rather than to be enforced.
+
+          `helix-select` fires once with the chosen value and the palette
+          forgets it, which is what a command is. Routing is the consumer's job,
+          so the value is the href and this is the only thing that knows it. */}
+      <helix-command
+        label="Search"
+        onhelix-close={() => setFindOpen(false)}
+        onhelix-open={() => setFindOpen(true)}
+        onhelix-select={(event: { detail: { value: string } }) => {
+          setFindOpen(false)
+          router.push(event.detail.value)
+        }}
+        open={findOpen}
+        placeholder="Search the site"
+      >
+        {DESTINATIONS.map((one) => (
+          <helix-option key={one.href} value={one.href}>
+            {one.label}
+          </helix-option>
+        ))}
+        <helix-text slot="footer" tone="subtle">
+          <helix-kbd>Esc</helix-kbd>
+          to close
+        </helix-text>
+      </helix-command>
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 

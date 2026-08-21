@@ -393,11 +393,25 @@ export default function Home() {
             </Link>
           </helix-flex>
 
-          {/* Three, and the registry is already newest-first, so this is a
-              slice rather than a sort: the landing page should not hold a
-              second opinion about what recent means. */}
-          <helix-grid gap="xl" min="18rem">
-            {INSIGHTS.slice(0, 3).map((insight) => (
+          {/* **A carousel, and this is the section that earns one.**
+              The registry is already newest-first, so this is an order rather
+              than a ranking, and a carousel is what shows a set of peers whose
+              order carries no weight past the first. It used to be a grid of
+              the newest three with a link out for the rest, which meant the
+              page held eight arguments and showed three of them.
+
+              Not the hero, where a reader who arrived for one sentence should
+              not be handed a thing that moves. Not the showcase, which is
+              already a panel that cycles and would then be a carousel inside
+              a carousel. Not Services or Questions, whose items are a set to
+              be read whole rather than one at a time.
+
+              No `autoplay`. Everything here is prose a reader chooses to
+              start, and copy that slides away mid-sentence is the reason
+              carousels have the reputation they do. `loop` because the set is
+              small and reaching the end of eight is not a wall worth hitting. */}
+          <helix-carousel label="Insights" loop>
+            {INSIGHTS.map((insight) => (
               <Link
                 aria-label={insight.title}
                 className="insightCard"
@@ -421,7 +435,7 @@ export default function Home() {
                 </helix-card>
               </Link>
             ))}
-          </helix-grid>
+          </helix-carousel>
         </helix-flex>
       </section>
 
