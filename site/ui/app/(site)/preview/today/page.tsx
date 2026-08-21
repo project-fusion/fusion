@@ -208,10 +208,15 @@ export default function Page() {
             Two weeks, fixed price, and the honest answer may be that you do not need the rest.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <a data-button="solid" data-button-tone="primary" href="/services">
+            <a
+              data-button="solid"
+              data-button-fill="standard"
+              data-button-tone="primary"
+              href="/services"
+            >
               See what it costs
             </a>
-            <a data-button href="mailto:hello@fusion.dev">
+            <a data-button data-button-fill="standard" href="mailto:hello@fusion.dev">
               hello@fusion.dev
             </a>
           </helix-flex>

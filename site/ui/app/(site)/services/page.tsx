@@ -157,6 +157,7 @@ export default function Page() {
           </helix-text>
           <a
             data-button="solid"
+            data-button-fill="standard"
             data-button-tone="primary"
             data-density="lg"
             href="mailto:hello@fusion.dev"

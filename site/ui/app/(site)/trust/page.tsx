@@ -118,10 +118,15 @@ export default function Page() {
             the list is short enough that the check is a real one.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <a data-button="solid" data-button-tone="primary" href="mailto:hello@fusion.dev">
+            <a
+              data-button="solid"
+              data-button-fill="standard"
+              data-button-tone="primary"
+              href="mailto:hello@fusion.dev"
+            >
               hello@fusion.dev
             </a>
-            <a data-button href="/thesis">
+            <a data-button data-button-fill="standard" href="/thesis">
               Read the thesis
             </a>
           </helix-flex>

@@ -78,10 +78,15 @@ export default function Home() {
             a two week audit of what is worth building, and every price is stated before you ask.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <Link data-button="solid" data-button-tone="primary" href="/services">
+            <Link
+              data-button="solid"
+              data-button-fill="standard"
+              data-button-tone="primary"
+              href="/services"
+            >
               See what it costs
             </Link>
-            <Link data-button href="/helix">
+            <Link data-button data-button-fill="standard" href="/helix">
               Open Helix
             </Link>
           </helix-flex>
@@ -355,6 +360,7 @@ export default function Home() {
           </helix-text>
           <a
             data-button="solid"
+            data-button-fill="standard"
             data-button-tone="primary"
             data-density="lg"
             href="mailto:hello@fusion.dev"
