@@ -235,10 +235,42 @@ export const FRAGMENT = `#version 300 es
        amplitude bends it instead: the folds deepen and the ridge travels
        further, which is what an aurora does when it is disturbed. */
     float agitate = falloff((q.x - qp.x) * (q.x - qp.x), 1.5) * reach;
-    float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * (1.3 + agitate * 2.6);
-    float band = falloff((q.y - ridge) * (q.y - ridge), 3.2);
-    float fall = fbm(vec2(q.x * 7.0, q.y * 0.7 - t * 2.6));
-    return band * mix(0.3, 1.6, fall);
+
+    /* A curtain hangs. It does not sit.
+    
+       This was a falloff symmetric about the ridge, which is a band with a
+       wavy centre line, and a band with vertical noise on it is an equaliser.
+       An aurora has a sharp top edge where the field lines end and light that
+       falls away beneath it, so the top and the bottom cannot be the same
+       function. Cut hard above, hung long below.
+    
+       Two of them, offset and at different depths, because a single sheet reads
+       as a decal and what makes the real thing look like drapery is one curtain
+       seen through another. */
+    float lit = 0.0;
+    for (int i = 0; i < 2; i++) {
+      float f = float(i);
+      /* Two octaves, not a warp. A warp folds the domain back on itself and
+         puts high frequencies in the ridge, and against a hard top edge every
+         wiggle becomes a spike: the first pass came out a mountain range. What
+         an aurora has is a long undulation with a few folds in it, which is
+         what a low fundamental and one overtone give. */
+      float ridge =
+        ((noise(vec2(q.x * (0.55 + f * 0.2) + f * 4.0, t * 0.3)) - 0.5) * 1.7 +
+          (noise(vec2(q.x * (1.3 + f * 0.4) + f * 9.0, t * 0.45)) - 0.5) * 0.55) *
+          (1.0 + agitate * 2.0) +
+        f * 0.22;
+      float depth = ridge - q.y;
+      /* Sharp, but not a cliff: the edge is where the light stops, and a step
+         narrower than a pixel is an aliased line rather than an edge. */
+      float edge = smoothstep(-0.1, 0.05, depth);
+      float hang = exp(-max(depth, 0.0) * (1.5 + f * 0.7));
+      /* Stretched hard along the fall, so the striations are the vertical rays
+         a curtain is actually made of rather than texture on a stripe. */
+      float rays = fbm(vec2(q.x * (9.0 + f * 4.0), q.y * 0.35 - t * (2.2 + f)));
+      lit += edge * hang * mix(0.25, 1.5, rays) * (1.0 - f * 0.45);
+    }
+    return lit;
   }
 
   /* One beam, split into an ordered spread by whatever it passes through.
@@ -281,9 +313,17 @@ export const FRAGMENT = `#version 300 es
        its own ray as the fan widens, rather than letting them curve. The
        contrast has to carry, or the whole thing reads as one beam that simply
        got wider, which is not the point being made. */
-    float bands = 0.5 + 0.5 * sin(across / spread * 6.5 - t * 1.1);
+    float u = across / spread;
+    /* Discrete bands with gaps between them, not a ripple.
+    
+       A sine across the fan is a continuous swell, and what comes out of a
+       prism is a set of separated things: the whole argument is that one input
+       becomes countable outputs. Folding the coordinate into cells and lighting
+       the middle of each gives edges to count. */
+    float cell = fract(u * 2.6 + 0.5) - 0.5;
+    float bands = falloff(cell * cell, 11.0);
     float after = smoothstep(-0.02, 0.22, along);
-    float structure = mix(1.0, mix(0.18, 1.55, bands), after);
+    float structure = mix(1.0, mix(0.12, 1.7, bands), after);
 
     float grain = warped(vec2(along * 1.1, across * 2.2), t * 0.45);
     return beam * structure * mix(0.65, 1.2, grain) * falloff(dot(q, q), 0.5);
@@ -369,8 +409,23 @@ export const FRAGMENT = `#version 300 es
     for (int i = 0; i < 5; i++) {
       float f = float(i);
       float amp = (0.3 + hash(vec2(f, 3.0)) * 0.45) * gather;
-      float y = sin(q.x * (1.2 + f * 0.28) + t * (0.5 + f * 0.22) + f * 1.7) * amp;
-      lit += falloff((q.y - y) * (q.y - y), 20.0) * (0.55 + hash(vec2(f, 9.0)) * 0.7);
+
+      /* Two harmonics, not one. A single sine is a mechanical curve and five of
+         them are five mechanical curves: the second, at an incommensurate
+         frequency and running the other way, is what stops each thread
+         repeating itself across the frame. */
+      float y =
+        sin(q.x * (1.2 + f * 0.28) + t * (0.5 + f * 0.22) + f * 1.7) * amp +
+        sin(q.x * (2.7 + f * 0.51) - t * (0.31 + f * 0.17) + f * 3.1) * amp * 0.42;
+
+      /* And each hangs at its own height. Centred on the same line, five
+         threads cross only where their phases happen to meet, which is a fan;
+         spread apart they cross everywhere, which is a weave. */
+      y += (hash(vec2(f, 23.0)) - 0.5) * 0.75 * gather;
+
+      /* Thickness varies too, so the set does not read as one pen. */
+      float thick = 15.0 + hash(vec2(f, 41.0)) * 16.0;
+      lit += falloff((q.y - y) * (q.y - y), thick) * (0.55 + hash(vec2(f, 9.0)) * 0.7);
     }
     float grain = fbm(vec2(q.x * 2.2, q.y * 2.2 - t));
     return lit * mix(0.7, 1.2, grain) * falloff(dot(q, q), 0.4);

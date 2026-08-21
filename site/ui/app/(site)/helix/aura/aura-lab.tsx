@@ -44,7 +44,10 @@ const INTERACTIONS = ['native', 'light', 'shadow', 'ripple', 'none'] as const
 
 /** Every knob, and the grain that is useful for what it does. */
 const KNOBS = [
-  { key: 'tilt', label: 'Tilt', max: 90, min: -90, step: 1 },
+  /* A full turn, because a shape has a direction and half a turn cannot
+     reverse it: streaks travelling down the frame only come from the top at
+     180, which the old range could not reach. */
+  { key: 'tilt', label: 'Tilt', max: 180, min: -180, step: 1 },
   { key: 'speed', label: 'Speed', max: 3, min: 0, step: 0.05 },
   { key: 'scale', label: 'Scale', max: 3, min: 0.3, step: 0.05 },
   { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
