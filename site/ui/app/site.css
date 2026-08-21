@@ -84,6 +84,43 @@
   padding-block: var(--site-band);
 }
 
+/* One band, one screen.
+ *
+ * Scoped to the landing page rather than written onto `.band`, which four other
+ * routes also use. A services page is a list to compare down and a page of
+ * prose is not improved by being cut into screens; here the bands are nine
+ * claims, and one at a time is the argument rather than a layout.
+ *
+ * `min-block-size`, never `block-size`. The verticals band is a heading and
+ * five rows and legitimately exceeds a short viewport, and a fixed height would
+ * crop it rather than let it grow.
+ *
+ * `svh` rather than `vh` or `dvh`. `vh` is the tallest the viewport ever gets,
+ * so on a phone every band overflows by the height of the browser chrome.
+ * `dvh` is whatever it currently is, so a band resizes while that chrome hides
+ * and the page moves under the reader's thumb mid-scroll. `svh` is the small
+ * stable one and moves for nothing.
+ *
+ * `align-content` rather than `justify-content`, because the axis being
+ * centered on is the block one and a grid's block axis is its content axis.
+ * The single `.shell` child still stretches across, so nothing about the
+ * horizontal inset changes. */
+.reel > .band {
+  align-content: center;
+  display: grid;
+  min-block-size: 100svh;
+}
+
+/* The header is `position: sticky`, so it takes a row in flow: the first screen
+ * is the header plus whatever the band under it asks for. Subtracted, the hero
+ * is exactly the window; left alone it is the window plus the bar, and the page
+ * opens already scrollable by a sliver that says nothing. Only the first band
+ * pays it, because everything after it scrolls under the bar rather than
+ * beneath it. */
+.reel > .hero {
+  min-block-size: calc(100svh - var(--helix-size-header));
+}
+
 /* The header spans the viewport, so its own centering is turned off and it
    takes the page's inset instead. */
 /* The masthead holds a fixed inset rather than the page's fluid one.

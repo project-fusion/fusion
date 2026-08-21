@@ -64,7 +64,7 @@ const questions = [
 
 export default function Home() {
   return (
-    <>
+    <div className="reel">
       <section className="hero">
         <helix-flex class="shell" direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
@@ -375,6 +375,6 @@ export default function Home() {
           </a>
         </helix-flex>
       </section>
-    </>
+    </div>
   )
 }
