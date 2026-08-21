@@ -472,10 +472,23 @@
  *
  * The arrival is a draw-in rather than a fade, using the dash trick: a dash as
  * long as the whole path, offset by the same, is a line that has not been drawn
- * yet. `pathLength` normalises it to 100 so one number covers every path
- * whatever its real length, which is the only way this works without measuring
- * each one. */
+ * yet.
+ *
+ * **The dash is here and not on the element, and it is a flat number rather
+ * than a normalised one.** `pathLength="100"` was the first version, so that one
+ * dash value could cover every path whatever its real length. Written as a
+ * static attribute in a Lit template it is parsed as HTML, which lowercases
+ * attribute names, and SVG's are case-sensitive: it arrived as `pathlength`,
+ * meant nothing, and left `stroke-dasharray="100"` as a hundred *user units* on
+ * a path some three hundred long. Every line rendered as four dashes with gaps
+ * between them, which looked like a chart with missing data.
+ *
+ * A thousand is longer than any path can be in a hundred-unit box, so the dash
+ * covers whatever it is given and the offset hides the whole of it. The
+ * drawing speed varies a little with the path's real length, which is the cost
+ * of not measuring each one and is not visible. */
 [part="line"] {
+  stroke-dasharray: 1000;
   transition:
     d var(--helix-duration-normal) var(--helix-easing-emphasized),
     stroke-dashoffset var(--helix-duration-slow) var(--helix-easing-decelerate);
@@ -483,7 +496,7 @@
 
 @starting-style {
   [part="line"] {
-    stroke-dashoffset: 100;
+    stroke-dashoffset: 1000;
   }
 }
 
