@@ -55,6 +55,37 @@ const STACK = [
   },
 ]
 
+/** The pairing, which is the whole reason any of this is possible now. */
+const MECHANISM = [
+  {
+    body: 'What used to need an institution now runs on hardware a person can own. The cost of thinking at scale fell far enough that the question stopped being whether you can afford it and became where you want it to run.',
+    name: 'Intelligence got cheap',
+  },
+  {
+    body: "The other half, and the one people forget. A model you own is still someone else's dependency if you cannot power the machine it runs on. Both curves broke at once, and that is the part that is new.",
+    name: 'Energy got cheap',
+  },
+]
+
+/** The same stack at three scales, which is the argument the company is making. */
+const LADDER = [
+  {
+    body: 'Your own keys, your own data, your own hardware. Nothing about your working life is recoverable by a company that changes its pricing.',
+    name: 'Personal',
+    rung: 'One person',
+  },
+  {
+    body: 'The same properties with more people and an audit trail. A company that cannot be held hostage by a vendor roadmap, because it runs the substrate and holds the data.',
+    name: 'Organizational',
+    rung: 'One company',
+  },
+  {
+    body: 'The same properties again, with the stakes that follow from a country running its capability on infrastructure it does not control. A written thesis, not a product, and we say so.',
+    name: 'National',
+    rung: 'One country',
+  },
+]
+
 export default function Page() {
   return (
     <>
@@ -129,6 +160,76 @@ export default function Page() {
         </helix-flex>
       </section>
 
+      {/* Why any of this is possible now, which is the question a reader asks
+          straight after finding out what is real. Two curves rather than one:
+          the pairing is the argument and either alone is a half of it. */}
+      <section className="band">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" class="dvMono" tone="subtle">
+              Why now
+            </helix-text>
+            <helix-text as="h2" class="tdAsk measure">
+              Two costs fell at the same time.
+            </helix-text>
+          </helix-flex>
+
+          <helix-grid gap="2xl" min="20rem">
+            {MECHANISM.map((item) => (
+              <helix-flex direction="column" gap="sm" key={item.name}>
+                <helix-text appearance="title" as="h3">
+                  {item.name}
+                </helix-text>
+                <helix-text as="p" tone="muted">
+                  {item.body}
+                </helix-text>
+              </helix-flex>
+            ))}
+          </helix-grid>
+
+          <helix-text as="p" class="measure" tone="muted">
+            The two things that forced a person to depend on an institution were the cost of
+            thinking at scale and the cost of power. Both are falling, which is what turns
+            sovereignty from a principle you agree with into a stack you can run.
+          </helix-text>
+        </helix-flex>
+      </section>
+
+      {/* How far the same argument runs, which is the part that makes this a
+          company rather than a consultancy. */}
+      <section className="band">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" class="dvMono" tone="subtle">
+              The ladder
+            </helix-text>
+            <helix-text as="h2" class="tdAsk measure">
+              The same stack, three times over.
+            </helix-text>
+          </helix-flex>
+
+          <helix-flex direction="column" gap="none">
+            {LADDER.map((rung) => (
+              <helix-flex align="start" class="tdRow" gap="xl" key={rung.name} wrap>
+                <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
+                  <helix-text appearance="label" tone="subtle">
+                    {rung.rung}
+                  </helix-text>
+                </helix-flex>
+                <helix-flex class="tdBody" direction="column" gap="sm">
+                  <helix-text as="h3" class="tdName">
+                    {rung.name}
+                  </helix-text>
+                  <helix-text as="p" tone="muted">
+                    {rung.body}
+                  </helix-text>
+                </helix-flex>
+              </helix-flex>
+            ))}
+          </helix-flex>
+        </helix-flex>
+      </section>
+
       {/* Where the exit test is not trivial.
           
           Not Helix: a published package under a permissive license is already
@@ -152,6 +253,27 @@ export default function Page() {
               that remembers things for you, when the memory lives somewhere else, is. That is the
               part Cortex exists to answer, and it is the part we have not shipped yet.
             </helix-text>
+          </helix-flex>
+        </helix-flex>
+      </section>
+
+      <section className="band closing">
+        <helix-flex align="center" class="shell" direction="column" gap="lg">
+          <helix-text as="h2" class="tdAsk">
+            Start with the audit.
+          </helix-text>
+          <helix-text as="p" class="measure" tone="muted">
+            Two weeks at a fixed price, and the honest answer at the end of it may be that you do
+            not need the larger engagement. Say plainly what you are trying to do and we will tell
+            you whether we are the right people for it.
+          </helix-text>
+          <helix-flex data-density="lg" gap="sm" wrap>
+            <a data-button="solid" data-button-tone="primary" href="/services">
+              See what it costs
+            </a>
+            <a data-button href="mailto:hello@fusion.dev">
+              hello@fusion.dev
+            </a>
           </helix-flex>
         </helix-flex>
       </section>
