@@ -2389,11 +2389,10 @@ helix-drawer helix-tree {
  * Two equal columns of seven equal cards is a stack rather than a composition:
  * every card the same width means nothing in the panel matters more than
  * anything else, which is the opposite of what an anchor is for. */
+/* One cell, with every view stacked in it. The columns moved onto the views
+   themselves, since each one is now its own grid. */
 .showcase {
-  align-items: start;
   display: grid;
-  gap: var(--helix-space-md);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .showcase > .showcaseAnchor {
@@ -2594,4 +2593,36 @@ helix-drawer helix-tree {
 .showcaseRowLine {
   inline-size: 100%;
   min-inline-size: 4rem;
+}
+
+/* The three views share one cell, and all but one is hidden.
+ *
+ * Stacked rather than swapped: nothing mounts when the switch is pressed, so
+ * nothing has to upgrade and the grid never lays out around elements that do
+ * not have a size yet. The cell is as tall as the tallest view, which the stage
+ * clips anyway. */
+.showcaseView {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-area: 1 / 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.showcaseView[hidden] {
+  display: none;
+}
+
+/* The faces sit in a row, which is `orientation` and not a custom property I
+   invented: five of them stacked is a list of moods, and what a scale wants is
+   to be seen at once. The mark carries the meaning here, so the words under it
+   shrink to a caption. */
+.showcaseFaces svg {
+  inline-size: var(--helix-size-checkbox);
+}
+
+@media (width < 56rem) {
+  .showcaseView {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
