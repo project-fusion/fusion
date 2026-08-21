@@ -2558,3 +2558,15 @@ helix-drawer helix-tree {
     margin-inline: calc(-1 * var(--helix-space-lg));
   }
 }
+
+/* The code block sits in the mosaic without a card, so it needs the block
+   spacing a card would have given it and nothing else. */
+.showcaseCode {
+  display: block;
+}
+
+/* The code block sits in the mosaic on its own, so it needs to be a block and
+   nothing else: it brings its own surface. */
+.showcaseCode {
+  display: block;
+}

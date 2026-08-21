@@ -427,9 +427,14 @@ export default function Home() {
                 </helix-flex>
               </helix-card>
 
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-code-block label="Install Helix">bun add @helix-io/web</helix-code-block>
-              </helix-card>
+              {/* No card around this one. `CodeBlock` is already a figure with
+                  its own box, its own border and a name across the top, so
+                  wrapping it draws a second edge a few pixels outside the first
+                  and the whole thing reads as a box in a box. What belongs in a
+                  card is content that has no surface of its own. */}
+              <helix-code-block class="showcaseCode" label="Install Helix">
+                bun add @helix-io/web
+              </helix-code-block>
 
               <helix-card appearance="outlined" class="showcaseCard">
                 <helix-table label="Packages">
@@ -470,6 +475,51 @@ export default function Home() {
                   <helix-button appearance="subtle">Subtle</helix-button>
                   <helix-kbd>Cmd K</helix-kbd>
                   <helix-loader></helix-loader>
+                </helix-flex>
+              </helix-card>
+
+              <helix-card appearance="outlined" class="showcaseCard">
+                <helix-tabs default-active="palette" label="Derivation">
+                  <helix-tabs-tab value="palette">Palette</helix-tabs-tab>
+                  <helix-tabs-tab value="ramp">Ramp</helix-tabs-tab>
+                  <helix-tabs-panel slot="panels" value="palette">
+                    <helix-flex align="center" gap="sm" wrap>
+                      <helix-tag tone="primary">Primary</helix-tag>
+                      <helix-tag tone="success">Success</helix-tag>
+                      <helix-tag tone="warning">Warning</helix-tag>
+                      <helix-tag tone="danger">Danger</helix-tag>
+                    </helix-flex>
+                  </helix-tabs-panel>
+                  <helix-tabs-panel slot="panels" value="ramp">
+                    <helix-text tone="muted">
+                      Eleven steps, checked against both grounds.
+                    </helix-text>
+                  </helix-tabs-panel>
+                </helix-tabs>
+              </helix-card>
+
+              <helix-card appearance="outlined" class="showcaseCard">
+                <helix-timeline label="Release history">
+                  <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
+                    <helix-icon name="check" slot="marker"></helix-icon>
+                    <span slot="time">09:12</span>
+                    <helix-text appearance="body-strong">Contrast pass</helix-text>
+                  </helix-timeline-item>
+                  <helix-timeline-item datetime="2026-08-21T08:40">
+                    <span slot="time">08:40</span>
+                    <helix-text appearance="body-strong">Tokens regenerated</helix-text>
+                  </helix-timeline-item>
+                </helix-timeline>
+              </helix-card>
+
+              <helix-card appearance="outlined" class="showcaseCard">
+                <helix-flex align="center" gap="lg" justify="between" wrap>
+                  <helix-rating default-value="4" label="Docs"></helix-rating>
+                  <helix-flex align="center" gap="sm">
+                    <helix-avatar name="Ada Whitfield"></helix-avatar>
+                    <helix-avatar name="Grace Nakamura"></helix-avatar>
+                    <helix-avatar name="Lin Ortega"></helix-avatar>
+                  </helix-flex>
                 </helix-flex>
               </helix-card>
             </div>
