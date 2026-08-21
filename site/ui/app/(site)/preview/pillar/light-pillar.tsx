@@ -44,6 +44,13 @@ export function LightPillar(): React.ReactElement {
       antialias: false,
       depth: false,
       powerPreference: 'low-power',
+      /* `preserveDrawingBuffer` is deliberately absent, and is also how this
+         gets inspected. Without it the buffer is cleared once the frame is
+         presented, so `readPixels` and `drawImage` both answer black and the
+         only instrument left is a screenshot, which is exactly the instrument
+         that lies about a soft gradient. Turn it on to sample the canvas, take
+         the reading, and turn it back off: a full-screen buffer copied every
+         frame is real bandwidth to pay forever for a measurement taken once. */
       stencil: false,
     })
     if (!gl) {
@@ -72,7 +79,9 @@ export function LightPillar(): React.ReactElement {
       uniform vec2 uResolution;
       uniform float uTime;
       uniform vec3 uGround;
+      uniform vec3 uHaze;
       uniform vec3 uGlow;
+      uniform vec3 uDeep;
       uniform vec3 uInk;
 
       /* Value noise. Cheaper than gradient noise and indistinguishable once it
@@ -159,17 +168,49 @@ export function LightPillar(): React.ReactElement {
          * either, since the mode is a primitive this package may not read and
          * light-dark() takes colors alone.
          *
-         * Reading the ground as a uniform settles all of it on one path. The
-         * shaft is the brand hue rising out of whatever the page is: light out
-         * of black in dark mode, ink into white in light mode, and the token
-         * layer decides which without this file knowing.
+         * So the ramp is four token stops and the token layer inverts every one
+         * of them. Ground is the page, white or black. Haze is
+         * primary-subtle, which is brand-50 against white and brand-900
+         * against black, so the first thing off the page is already brand
+         * rather than a grey. Glow is primary itself. Ink is the foreground,
+         * and it lands only on the core.
          *
-         * The hot core goes toward the foreground, which is the same move a
-         * second time. White in dark mode gives a beam with a bright axis;
-         * near-black in light mode gives a dense one. One expression, and the
-         * palette inverts it. */
-        vec3 rgb = mix(uGround, uGlow, lift);
-        rgb = mix(rgb, uInk, clamp(core, 0.0, 1.0) * 0.4);
+         * Read down, that is white to pale blue to brand to black in light mode
+         * and black to deep blue to brand to white in dark, which is
+         * monotonic in lightness both ways and never asks the palette which
+         * mode it is in.
+         *
+         * The ramps overlap and saturate early, which is the fix for a shaft
+         * that came out grey. One straight mix from ground to glow leaves most
+         * of the bloom near the ground, since most of it sits at a lift of a
+         * tenth or two: technically brand-tinted, and read as dark grey. Full
+         * brand by a third of the way up means the large soft area is the brand
+         * color and only the thin core departs from it. */
+        vec3 rgb = mix(uGround, uHaze, smoothstep(0.0, 0.16, lift));
+        rgb = mix(rgb, uGlow, smoothstep(0.10, 0.46, lift));
+        /* Measured: lift peaks near 0.6, so a ramp starting at 0.6 never fired
+           and the brightest pixel on the canvas was the glow token exactly. The
+           core has to reach the foreground for the shaft to read as a source
+           rather than as a shape, so the ramp starts where the shaft actually
+           gets to. */
+        /* Where the core goes depends on which way the page runs, and the
+           ground is already here to answer it.
+           
+           Both ends were the foreground token, which is white on black and
+           near-black on white. The dark half is right: a light source has a hot
+           white axis. The light half is not. Mixing a saturated blue toward
+           black takes the chroma out of exactly the pixels that carry the most
+           of it, so the strongest part of the shaft came out the greyest, which
+           is backwards.
+           
+           So light mode peaks on primary-active instead, a deep brand blue, and
+           the shaft gets more saturated as it intensifies rather than less. No
+           new channel is needed to know which mode it is in: the mode is a fact
+           about the ground, and the ground is a uniform. Relative luminance
+           over a half is a light page. */
+        float lightGround = step(0.5, dot(uGround, vec3(0.2126, 0.7152, 0.0722)));
+        vec3 peak = mix(uInk, uDeep, lightGround);
+        rgb = mix(rgb, peak, smoothstep(0.40, 0.62, lift) * 0.6);
 
         /* Dither before the buffer quantizes. A shaft this soft spans a few
            hundred 8-bit steps across a whole screen, and without a sub-step of
@@ -212,7 +253,9 @@ export function LightPillar(): React.ReactElement {
     const uResolution = gl.getUniformLocation(program, 'uResolution')
     const uTime = gl.getUniformLocation(program, 'uTime')
     const uGround = gl.getUniformLocation(program, 'uGround')
+    const uHaze = gl.getUniformLocation(program, 'uHaze')
     const uGlow = gl.getUniformLocation(program, 'uGlow')
+    const uDeep = gl.getUniformLocation(program, 'uDeep')
     const uInk = gl.getUniformLocation(program, 'uInk')
 
     /* The token layer's answer, whatever it currently is. `getComputedStyle` on
@@ -258,7 +301,9 @@ export function LightPillar(): React.ReactElement {
 
     const applyColors = () => {
       gl.uniform3fv(uGround, readColor('--helix-color-background', [0, 0, 0]))
+      gl.uniform3fv(uHaze, readColor('--helix-color-primary-subtle', [0.05, 0.09, 0.28]))
       gl.uniform3fv(uGlow, readColor('--helix-color-primary', [0.24, 0.36, 0.9]))
+      gl.uniform3fv(uDeep, readColor('--helix-color-primary-active', [0.1, 0.2, 0.55]))
       gl.uniform3fv(uInk, readColor('--helix-color-foreground', [1, 1, 1]))
     }
     applyColors()
