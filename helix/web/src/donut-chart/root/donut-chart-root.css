@@ -553,3 +553,12 @@
   inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
   inset-inline-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
 }
+
+/* On the slices rather than the plot, which is the difference between a ring
+   and a chart with axes: a line answers anywhere along its width, so the whole
+   drawing is the target, while a ring answers only where a slice is and the
+   hole in the middle answers nothing. Pointing at the hole and being told it is
+   readable would be a promise the chart does not keep. */
+[part="segment"] {
+  cursor: crosshair;
+}

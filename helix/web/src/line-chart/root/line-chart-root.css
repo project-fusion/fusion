@@ -583,3 +583,17 @@
   inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
   inset-inline-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
 }
+
+/* A crosshair over the drawing, because the drawing reads a position.
+ *
+ * `pointer` would be wrong and is the tempting one: it promises a click, and a
+ * chart has nothing to click. `crosshair` is the conventional signal for a
+ * surface that answers where the pointer is, which is exactly what the tooltip
+ * does, and it says so before the reader has moved far enough to see one.
+ *
+ * On the plot and not the host, so the row of labels underneath keeps the
+ * ordinary cursor: they are words, and words that are not links should not look
+ * like a target. */
+[part="plot"] {
+  cursor: crosshair;
+}
