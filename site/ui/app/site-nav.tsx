@@ -1,8 +1,9 @@
 'use client'
 
+import type { HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PreferencesDrawer } from './preferences'
 import { PRODUCTS } from './products'
 import { stageAppearance, VERTICALS } from './verticals'
@@ -59,6 +60,29 @@ export function SiteNav() {
   const [open, setOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
+
+  /* How far down the glass reaches while a panel is open.
+   *
+   * **One filter, not two, and this is what it costs.** `backdrop-filter` is
+   * clipped to its own element's box, so a bar and a panel each running their
+   * own blur produce two different results and a line across the join: a 57
+   * pixel box clamps a 16 pixel blur at both edges and averages flat, while the
+   * tall panel keeps its structure. Turning the bar's filter off and keeping its
+   * fill only moved the tell: the strip then showed the page sharp above a
+   * boundary and blurred below it, which over text is worse.
+   *
+   * Neither component can span the other. The panel is a `popover` in the top
+   * layer, so it cannot sit behind the bar, and the bar cannot grow to cover a
+   * panel whose height it does not know. So the app paints one glass sheet
+   * across both and turns the surface off in each: the bar's content is above
+   * it at the sticky layer, and the panel's is above it in the top layer, so
+   * both stay legible over a single continuous blur.
+   *
+   * Read from the panel after it has laid out, because `helix-open` fires
+   * before it moves, which is the whole reason the bar can start changing on
+   * the same frame the reveal starts. */
+  const panelRef = useRef<HelixMegamenu>(null)
+  const [glassSize, setGlassSize] = useState(0)
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
     const sync = () => setNarrow(query.matches)
@@ -112,16 +136,15 @@ export function SiteNav() {
           `background-color` over `--helix-duration-normal`, which is the
           duration the panel's reveal runs for, so they move together without
           either being told about the other. */}
+      {panelDown && <div className="navGlass" style={{ blockSize: `${glassSize}px` }} />}
+
       <helix-app-header
         appearance={onHero ? 'transparent' : undefined}
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
         style={
           panelDown
-            ? {
-                '--app-header-backdrop': 'none',
-                '--app-header-background': 'var(--helix-material-translucent)',
-              }
+            ? { '--app-header-backdrop': 'none', '--app-header-background': 'transparent' }
             : undefined
         }
       >
@@ -154,13 +177,17 @@ export function SiteNav() {
               /* Both fire before the panel moves and both are cancelable, so
                  the bar starts changing on the same frame the reveal starts
                  rather than a frame behind it. */
-              onhelix-open={() => setPanelDown(true)}
+              onhelix-open={() => {
+                setPanelDown(true)
+                requestAnimationFrame(() => {
+                  const panel = panelRef.current?.shadowRoot?.querySelector('[part="panel"]')
+                  setGlassSize(panel ? panel.getBoundingClientRect().bottom : 0)
+                })
+              }}
+              ref={panelRef}
               style={
                 panelDown
-                  ? {
-                      '--megamenu-backdrop': 'blur(var(--helix-material-blur-md))',
-                      '--megamenu-background': 'var(--helix-material-translucent)',
-                    }
+                  ? { '--megamenu-backdrop': 'none', '--megamenu-background': 'transparent' }
                   : undefined
               }
               suppressHydrationWarning

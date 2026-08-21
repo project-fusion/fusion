@@ -419,10 +419,13 @@ export class HelixAura extends HelixElement {
     gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
     gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
     gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
-    /* Unrolled oldest first. `trailNext` is where the next mark goes, so it is
-       also the oldest slot. */
+    /* Unrolled oldest first, and the offset moved when the head became
+       provisional. `trailNext` used to be the next slot to write, and so the
+       oldest; it is now the live head, and so the newest. The oldest is the one
+       after it. Left as it was, the stroke came out reversed in age and drew a
+       segment across the wrap. */
     for (let i = 0; i < 8; i++) {
-      const from = ((this.trailNext + i) % 8) * 3
+      const from = ((this.trailNext + 1 + i) % 8) * 3
       const to = i * 3
       this.ordered[to] = this.trail[from] ?? 1
       this.ordered[to + 1] = this.trail[from + 1] ?? 1
@@ -491,6 +494,7 @@ export class HelixAura extends HelixElement {
     const fade = 1 - Math.exp(-delta / (rising ? 0.05 : 0.22))
     this.eased.reach += (this.target.reach - this.eased.reach) * fade
     this.age(delta)
+    this.advanceWake()
 
     this.paint()
     this.frame = requestAnimationFrame(this.tick)
@@ -535,6 +539,11 @@ export class HelixAura extends HelixElement {
        made it, which is the whole effect, and short enough that a page left
        alone settles rather than keeping a drawing nobody made. */
     for (let i = 2; i < this.trail.length; i += 3) {
+      /* The provisional head is rewritten every frame and is always fresh, so
+         ageing it would fight `advanceWake` for the same slot. */
+      if (i === this.trailNext * 3 + 2) {
+        continue
+      }
       const next = (this.trail[i] ?? 1) + delta / 2
       this.trail[i] = next > 1 ? 1 : next
     }
@@ -549,32 +558,43 @@ export class HelixAura extends HelixElement {
     this.target.x = ((event.clientX - left) / width - 0.5) * 2 * aspect
     this.target.y = -((event.clientY - top) / height - 0.5) * 2
     this.target.reach = this.interactive ? 1 : 0
+  }
 
-    /* Marks are spaced by distance, not by a clock.
-     *
-     * A pointer emits far more events than eight slots hold, so something has
-     * to thin them, and time was the wrong axis twice over. A fast gesture laid
-     * marks a third of a frame apart and the wake stepped, while a slow one
-     * stacked all eight inside a thumbnail. And the countdown was decremented
-     * from the frame loop, so with the loop stopped it never expired: measured
-     * at 200 events, exactly one mark was ever dropped.
-     *
-     * By distance the spacing is even at every speed, which is what a wake
-     * looks like, and it depends on nothing but the pointer. */
+  /**
+   * Keeps the head of the wake on the cursor, and commits it as it travels.
+   *
+   * **The head used to be a committed mark, and that was both faults at once.**
+   * Marks are spaced by distance so eight slots cover a gesture rather than the
+   * last few milliseconds of one, but committing was also the only time the
+   * stroke grew: its leading end therefore sat up to a full gate behind the
+   * pointer, and caught up in jumps of exactly that size. Latent, and jagged,
+   * for one reason.
+   *
+   * So the slot at `trailNext` is provisional. It is rewritten every frame to
+   * wherever the field has actually eased to, which is where the cursor looks
+   * like it is, so the stroke always reaches the pointer. Crossing the gate does
+   * not move the head, it just stops the previous position from being
+   * overwritten, and a new provisional head starts from there. The wake grows
+   * continuously and is still only ever eight points.
+   *
+   * Measured against `eased` rather than `target`, or the stroke would reach a
+   * place the field has not arrived at yet and lead its own parallax.
+   */
+  private advanceWake(): void {
     if (!this.interactive) {
       return
     }
+    const head = this.trailNext * 3
+    this.trail[head] = this.eased.x
+    this.trail[head + 1] = this.eased.y
+    this.trail[head + 2] = 0
+
     const last = ((this.trailNext + 7) % 8) * 3
-    const dx = this.target.x - (this.trail[last] ?? 0)
-    const dy = this.target.y - (this.trail[last + 1] ?? 0)
-    if (dx * dx + dy * dy < 0.014) {
-      return
+    const dx = this.eased.x - (this.trail[last] ?? 0)
+    const dy = this.eased.y - (this.trail[last + 1] ?? 0)
+    if (dx * dx + dy * dy >= 0.014) {
+      this.trailNext = (this.trailNext + 1) % 8
     }
-    const at = this.trailNext * 3
-    this.trail[at] = this.target.x
-    this.trail[at + 1] = this.target.y
-    this.trail[at + 2] = 0
-    this.trailNext = (this.trailNext + 1) % 8
   }
 
   private readonly handleLeave = (): void => {

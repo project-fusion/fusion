@@ -182,6 +182,22 @@
  * corners the eye goes to and leaves the bar looking loosely packed.
  *
  * So it is `space-2xl`, which is forty eight, at every width. */
+/* One sheet of glass under the masthead and the panel together.
+ *
+ * Sized by the app, because neither component can measure the other, and laid
+ * at `raised` so it sits over the page and under the bar: the masthead is
+ * sticky at a higher layer and the panel is in the top layer, so both keep
+ * their content above a single continuous blur. */
+.navGlass {
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  background-color: var(--helix-material-translucent);
+  inset-block-start: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--helix-layer-raised);
+}
+
 helix-app-header {
   --app-header-inset: var(--helix-space-2xl);
   --app-header-max-inline-size: none;
