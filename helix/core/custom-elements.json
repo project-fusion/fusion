@@ -1614,6 +1614,50 @@
         },
         {
           "kind": "class",
+          "description": "The eyedropper opening, and closing again.\n\nTwo events rather than one carrying a flag, because what a consumer does with\nthem is not symmetrical: the surface holding the picker has to get out of the\nway for the sample and come back afterwards, and those are two moments with\ndifferent work in each.\n\n**A class rather than the bare `Event` these were.** They dispatched, they\nbubbled, `ColorInput` bound both, and `check:events` matched\n`new CustomEvent(` and so held neither to being declared: two pieces of\npublic API that a consumer could hear and could not find. The check reads\n`new Event(` now as well.\n\nNo detail, because there is nothing to say beyond that it happened.",
+          "name": "HelixSampleStartEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-sample-start'"
+            }
+          ],
+          "superclass": {
+            "name": "Event",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "The eyedropper closing, whether or not a colour was taken.",
+          "name": "HelixSampleEndEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-sample-end'"
+            }
+          ],
+          "superclass": {
+            "name": "Event",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
           "description": "",
           "name": "HelixDismissEvent",
           "members": [
@@ -1968,6 +2012,22 @@
           "name": "HelixTourAskEvent",
           "declaration": {
             "name": "HelixTourAskEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSampleStartEvent",
+          "declaration": {
+            "name": "HelixSampleStartEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSampleEndEvent",
+          "declaration": {
+            "name": "HelixSampleEndEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2848,6 +2908,22 @@
           "name": "HelixPreviousEvent",
           "declaration": {
             "name": "HelixPreviousEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSampleEndEvent",
+          "declaration": {
+            "name": "HelixSampleEndEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixSampleStartEvent",
+          "declaration": {
+            "name": "HelixSampleStartEvent",
             "module": "./events/events.js"
           }
         },

@@ -119,6 +119,8 @@ import type {
   HelixSelectEvent,
   HelixChangeEvent,
   HelixToggleEvent,
+  HelixSampleEndEvent,
+  HelixSampleStartEvent,
   HelixCopyEvent,
   HelixCreateEvent,
   HelixNavigateEvent,
@@ -1268,6 +1270,12 @@ export type HelixColorPickerElementEvent<E = Event> = TypedEvent<
   HelixColorPicker,
   E
 >;
+/** `helix-sample-end` event type */
+export type HelixColorPickerHelixSampleEndElementEvent =
+  HelixColorPickerElementEvent<HelixSampleEndEvent>;
+/** `helix-sample-start` event type */
+export type HelixColorPickerHelixSampleStartElementEvent =
+  HelixColorPickerElementEvent<HelixSampleStartEvent>;
 /** `helix-change` event type */
 export type HelixColorPickerHelixChangeElementEvent =
   HelixColorPickerElementEvent<HelixChangeEvent>;
@@ -1381,6 +1389,10 @@ reflected none of them. */
 };
 
 export type HelixColorPickerVueEvents = {
+  /** The eyedropper has closed, whether or not a colour was taken. */
+  "helix-sample-end": HelixColorPickerHelixSampleEndElementEvent;
+  /** The eyedropper is opening, so anything covering the page should get out of the way. */
+  "helix-sample-start": HelixColorPickerHelixSampleStartElementEvent;
   /** Fired when the color changes. */
   "helix-change": HelixColorPickerHelixChangeElementEvent;
   /** Fired when the color is put on the clipboard. */
@@ -3448,6 +3460,12 @@ export type HelixOptionVueEvents = {
   "helix-select": HelixOptionHelixSelectElementEvent;
 };
 
+/** `HelixOutline` component event */
+export type HelixOutlineElementEvent<E = Event> = TypedEvent<HelixOutline, E>;
+/** `helix-change` event type */
+export type HelixOutlineHelixChangeElementEvent =
+  HelixOutlineElementEvent<HelixChangeEvent>;
+
 export type HelixOutlineVueProps = {
   /** Accessible name for the navigation. */
   label?: HelixOutline["label"];
@@ -3479,7 +3497,10 @@ JavaScript rather than CSS decides. */
   behavior?: HelixOutline["behavior"];
 };
 
-export type HelixOutlineVueEvents = {};
+export type HelixOutlineVueEvents = {
+  /** The section being read has changed, carrying its id as the value. */
+  "helix-change": HelixOutlineHelixChangeElementEvent;
+};
 
 /** `HelixPagination` component event */
 export type HelixPaginationElementEvent<E = Event> = TypedEvent<
@@ -4107,6 +4128,12 @@ export type HelixRadioVueEvents = {
   "helix-select": HelixRadioHelixSelectElementEvent;
 };
 
+/** `HelixRating` component event */
+export type HelixRatingElementEvent<E = Event> = TypedEvent<HelixRating, E>;
+/** `helix-change` event type */
+export type HelixRatingHelixChangeElementEvent =
+  HelixRatingElementEvent<HelixChangeEvent>;
+
 export type HelixRatingVueProps = {
   /** Which mark the row is drawn with.
 
@@ -4228,7 +4255,10 @@ reflected none of them. */
   name?: HelixRating["name"];
 };
 
-export type HelixRatingVueEvents = {};
+export type HelixRatingVueEvents = {
+  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  "helix-change": HelixRatingHelixChangeElementEvent;
+};
 
 /** `HelixSandboxPreview` component event */
 export type HelixSandboxPreviewElementEvent<E = Event> = TypedEvent<

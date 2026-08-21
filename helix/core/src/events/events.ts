@@ -208,6 +208,39 @@ export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
   }
 }
 
+/**
+ * The eyedropper opening, and closing again.
+ *
+ * Two events rather than one carrying a flag, because what a consumer does with
+ * them is not symmetrical: the surface holding the picker has to get out of the
+ * way for the sample and come back afterwards, and those are two moments with
+ * different work in each.
+ *
+ * **A class rather than the bare `Event` these were.** They dispatched, they
+ * bubbled, `ColorInput` bound both, and `check:events` matched
+ * `new CustomEvent(` and so held neither to being declared: two pieces of
+ * public API that a consumer could hear and could not find. The check reads
+ * `new Event(` now as well.
+ *
+ * No detail, because there is nothing to say beyond that it happened.
+ */
+export class HelixSampleStartEvent extends Event {
+  static readonly eventName = 'helix-sample-start'
+
+  constructor() {
+    super(HelixSampleStartEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
+/** The eyedropper closing, whether or not a colour was taken. */
+export class HelixSampleEndEvent extends Event {
+  static readonly eventName = 'helix-sample-end'
+
+  constructor() {
+    super(HelixSampleEndEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
 export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   static readonly eventName = 'helix-dismiss'
 
@@ -700,6 +733,8 @@ const registry = {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixSampleEndEvent,
+  HelixSampleStartEvent,
   HelixSelectEvent,
   HelixToggleEvent,
   HelixTourAskEvent,

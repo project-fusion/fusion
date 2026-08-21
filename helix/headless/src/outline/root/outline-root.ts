@@ -1,4 +1,4 @@
-import { customElement, HelixElement, IndicatorController } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixElement, IndicatorController } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -44,6 +44,8 @@ import { property, state } from 'lit/decorators.js'
  * @category navigation
  * @aliases Table of contents, On this page, Outline
  * @documentation https://helix.fusion.dev/components/outline
+ *
+ * @event {HelixChangeEvent} helix-change - The section being read has changed, carrying its id as the value.
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
@@ -207,7 +209,20 @@ export class HelixBaseOutline extends HelixElement {
         link.removeAttribute('aria-current')
       }
     }
-    this.reading = active?.target.id ?? ''
+    /* And say so, which it did not.
+     *
+     * `reading` is derived from scroll position and was announced to nobody, so
+     * a consumer syncing a URL hash to the reading position had to poll for it:
+     * the one fact this component computes that nothing else on the page can,
+     * and the only way out of it was a `MutationObserver` on the anchors.
+     *
+     * Only on a change, because this runs from a scroll frame and an event per
+     * frame is not a signal, it is a firehose. */
+    const next = active?.target.id ?? ''
+    if (next !== this.reading) {
+      this.reading = next
+      this.dispatchEvent(new HelixChangeEvent({ property: 'reading', value: next }))
+    }
   }
 
   /**

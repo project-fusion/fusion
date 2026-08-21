@@ -81,6 +81,8 @@ export {
   HelixNextEvent,
   HelixOpenEvent,
   HelixPreviousEvent,
+  HelixSampleEndEvent,
+  HelixSampleStartEvent,
   HelixSelectEvent,
   HelixToggleEvent,
   HelixTourAskEvent,

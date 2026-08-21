@@ -46,6 +46,8 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://helix.fusion.dev/components/rating
  *
+ * @event {HelixChangeEvent} helix-change - Fired before the score changes, and cancelable.
+ *
  * **The mark is a stylesheet's, not a slot's.** A slot projects its content
  * once, and there are two layers of marks here: slotting a star would put it in
  * the track or the fill and leave the other empty. So the mark is a shape the

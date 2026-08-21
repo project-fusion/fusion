@@ -1229,6 +1229,8 @@ brought its own card would be a card inside a card there.
 
 | Event | Type | Description |
 | --- | --- | --- |
+| `helix-sample-end` | `HelixSampleEndEvent` | The eyedropper has closed, whether or not a colour was taken. |
+| `helix-sample-start` | `HelixSampleStartEvent` | The eyedropper is opening, so anything covering the page should get out of the way. |
 | `helix-change` | `HelixChangeEvent` | Fired when the color changes. |
 | `helix-copy` | `HelixCopyEvent` | Fired when the color is put on the clipboard. |
 
@@ -3195,6 +3197,12 @@ document is not always where the headings are.
 | `label` | `label` | `string` | `'On this page'` | `HelixBaseOutline` | Accessible name for the navigation. |
 | `offset` | `offset` | `number` | `0` | `HelixBaseOutline` | How far below the top of the window a heading counts as reached, in pixels. |
 
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | The section being read has changed, carrying its id as the value. |
+
 #### Slots
 
 | Slot | Description |
@@ -3823,6 +3831,12 @@ Everything about what the score is and how it is chosen is the base class.
 | `formResetCallback()` | `MixinControllerValue` | Returns the control to the value its markup declared. |
 | `formStateRestoreCallback()` | `MixinControllerValue` | Restores the value when the browser brings a form back. |
 | `requestValue()` | `MixinControllerValue` | Requests a new value, and reports whether the request stood. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. |
 
 #### Slots
 

@@ -4,6 +4,8 @@ import {
   customElement,
   type HelixChangeEvent,
   HelixFormElement,
+  HelixSampleEndEvent,
+  HelixSampleStartEvent,
   MixinControllerValue,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -81,6 +83,9 @@ interface EyeDropperConstructor {
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
+ *
+ * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a colour was taken.
+ * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
  *
  * @event {HelixChangeEvent} helix-change - Fired when the color changes.
  * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
@@ -294,7 +299,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
     if (!Dropper) {
       return
     }
-    this.dispatchEvent(new Event('helix-sample-start', { bubbles: true, composed: true }))
+    this.dispatchEvent(new HelixSampleStartEvent())
     try {
       const { sRGBHex } = await new Dropper().open()
       const parsed = parseColor(sRGBHex)
@@ -306,7 +311,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
       /* Cancelling is how this is normally left, and the platform reports it as
          a rejection. There is nothing to recover from and nothing to say. */
     }
-    this.dispatchEvent(new Event('helix-sample-end', { bubbles: true, composed: true }))
+    this.dispatchEvent(new HelixSampleEndEvent())
   }
 
   /**

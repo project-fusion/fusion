@@ -8267,6 +8267,22 @@
           "events": [
             {
               "type": {
+                "text": "HelixSampleEndEvent"
+              },
+              "description": "The eyedropper has closed, whether or not a colour was taken.",
+              "name": "helix-sample-end",
+              "reactProp": "onhelix-sample-end"
+            },
+            {
+              "type": {
+                "text": "HelixSampleStartEvent"
+              },
+              "description": "The eyedropper is opening, so anything covering the page should get out of the way.",
+              "name": "helix-sample-start",
+              "reactProp": "onhelix-sample-start"
+            },
+            {
+              "type": {
                 "text": "HelixChangeEvent"
               },
               "description": "Fired when the color changes.",
@@ -26303,6 +26319,16 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "The section being read has changed, carrying its id as the value.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            }
+          ],
           "attributes": [
             {
               "name": "label",
@@ -32070,6 +32096,16 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            }
+          ],
           "attributes": [
             {
               "name": "max",
@@ -32239,7 +32275,7 @@
             "category": "forms",
             "since": "0.1.0",
             "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/rating\n\n**The mark is a stylesheet's, not a slot's.** A slot projects its content\nonce, and there are two layers of marks here: slotting a star would put it in\nthe track or the fill and leave the other empty. So the mark is a shape the\nstyled tier masks with, which is also what lets a partial one be a clip of the\nwhole rather than a second drawing of it.",
+            "documentation": "https://helix.fusion.dev/components/rating",
             "aliases": [
               "Stars",
               "Score",

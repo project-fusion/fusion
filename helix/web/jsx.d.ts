@@ -83,6 +83,8 @@ import type {
   HelixRadio,
   HelixRadioGroup,
   HelixRating,
+  HelixSampleEndEvent,
+  HelixSampleStartEvent,
   HelixSandbox,
   HelixSandboxPreview,
   HelixSandboxSource,
@@ -2473,6 +2475,12 @@ export type HelixColorPickerElementEvent<E = Event> = TypedEvent<
   HelixColorPicker,
   E
 >;
+/** `helix-sample-end` event type */
+export type HelixColorPickerHelixSampleEndElementEvent =
+  HelixColorPickerElementEvent<HelixSampleEndEvent>;
+/** `helix-sample-start` event type */
+export type HelixColorPickerHelixSampleStartElementEvent =
+  HelixColorPickerElementEvent<HelixSampleStartEvent>;
 /** `helix-change` event type */
 export type HelixColorPickerHelixChangeElementEvent =
   HelixColorPickerElementEvent<HelixChangeEvent>;
@@ -2584,6 +2592,14 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixColorPicker["name"];
 
+  /** The eyedropper has closed, whether or not a colour was taken. */
+  "onhelix-sample-end"?: (
+    e: HelixColorPickerHelixSampleEndElementEvent,
+  ) => void;
+  /** The eyedropper is opening, so anything covering the page should get out of the way. */
+  "onhelix-sample-start"?: (
+    e: HelixColorPickerHelixSampleStartElementEvent,
+  ) => void;
   /** Fired when the color changes. */
   "onhelix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
@@ -2693,6 +2709,14 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixColorPicker["name"];
+  /** The eyedropper has closed, whether or not a colour was taken. */
+  "on:helix-sample-end"?: (
+    e: HelixColorPickerHelixSampleEndElementEvent,
+  ) => void;
+  /** The eyedropper is opening, so anything covering the page should get out of the way. */
+  "on:helix-sample-start"?: (
+    e: HelixColorPickerHelixSampleStartElementEvent,
+  ) => void;
   /** Fired when the color changes. */
   "on:helix-change"?: (e: HelixColorPickerHelixChangeElementEvent) => void;
   /** Fired when the color is put on the clipboard. */
@@ -6666,6 +6690,12 @@ export type HelixOptionSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixOutline` component event */
+export type HelixOutlineElementEvent<E = Event> = TypedEvent<HelixOutline, E>;
+/** `helix-change` event type */
+export type HelixOutlineHelixChangeElementEvent =
+  HelixOutlineElementEvent<HelixChangeEvent>;
+
 export type HelixOutlineProps = {
   /** Accessible name for the navigation. */
   label?: HelixOutline["label"];
@@ -6695,6 +6725,9 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   behavior?: HelixOutline["behavior"];
+
+  /** The section being read has changed, carrying its id as the value. */
+  "onhelix-change"?: (e: HelixOutlineHelixChangeElementEvent) => void;
 };
 
 export type HelixOutlineSolidJsProps = {
@@ -6726,6 +6759,8 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   "prop:behavior"?: HelixOutline["behavior"];
+  /** The section being read has changed, carrying its id as the value. */
+  "on:helix-change"?: (e: HelixOutlineHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7938,6 +7973,12 @@ card with no box loses the only thing that says you may pick several. */
   textContent?: string | number;
 };
 
+/** `HelixRating` component event */
+export type HelixRatingElementEvent<E = Event> = TypedEvent<HelixRating, E>;
+/** `helix-change` event type */
+export type HelixRatingHelixChangeElementEvent =
+  HelixRatingElementEvent<HelixChangeEvent>;
+
 export type HelixRatingProps = {
   /** Which mark the row is drawn with.
 
@@ -8057,6 +8098,9 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixRating["name"];
+
+  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  "onhelix-change"?: (e: HelixRatingHelixChangeElementEvent) => void;
 };
 
 export type HelixRatingSolidJsProps = {
@@ -8178,6 +8222,8 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixRating["name"];
+  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  "on:helix-change"?: (e: HelixRatingHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14836,6 +14882,8 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
@@ -18231,6 +18279,12 @@ export type CustomElements = {
    * consumer can own; this one cannot be, and saying so with the type is better
    * than saying it in a sentence nobody reads. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: The section being read has changed, carrying its id as the value.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -19276,6 +19330,12 @@ export type CustomElements = {
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -19359,7 +19419,7 @@ export type CustomElements = {
    */
   "helix-rating": Partial<
     HelixRatingProps & BaseProps<HelixRating> & BaseEvents
-  >;
+  > & HelixRatingControlled;
 
   /**
    * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
@@ -25381,6 +25441,8 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
+   * - `helix-sample-end`: The eyedropper has closed, whether or not a colour was taken.
+   * - `helix-sample-start`: The eyedropper is opening, so anything covering the page should get out of the way.
    * - `helix-change`: Fired when the color changes.
    * - `helix-copy`: Fired when the color is put on the clipboard.
    *
@@ -28877,6 +28939,12 @@ export type CustomElementsSolidJs = {
    * consumer can own; this one cannot be, and saying so with the type is better
    * than saying it in a sentence nobody reads. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: The section being read has changed, carrying its id as the value.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -29959,6 +30027,12 @@ export type CustomElementsSolidJs = {
    * - `form`: The form this control belongs to, if any. (property only) (readonly)
    * - `labels`: Labels associated with this control. (property only) (readonly)
    *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -30045,7 +30119,7 @@ export type CustomElementsSolidJs = {
       HelixRatingSolidJsProps &
       BaseProps<HelixRating> &
       BaseEvents
-  >;
+  > & HelixRatingControlledSolidJs;
 
   /**
    * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
@@ -35664,6 +35738,39 @@ type HelixRadioGroupControlledSolidJs =
     | {
         value: HelixRadioGroup["value"];
         ref: BaseProps<HelixRadioGroup>["ref"];
+      }
+    | { value?: undefined }
+  );
+
+/**
+ * helix-rating: a controlled `value` announces and waits, so the handler comes with it.
+ */
+type HelixRatingControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixRating["value"];
+        "onhelix-change": (event: HelixRatingHelixChangeElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        value: HelixRating["value"];
+        ref: import('react').Ref<HelixRating>;
+      }
+    | { value?: undefined }
+  );
+
+/** helix-rating, in Solid's dialect: `on:` and the event name. */
+type HelixRatingControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        value: HelixRating["value"];
+        "on:helix-change": (event: HelixRatingHelixChangeElementEvent) => void;
+      }
+    | {
+        value: HelixRating["value"];
+        ref: BaseProps<HelixRating>["ref"];
       }
     | { value?: undefined }
   );
