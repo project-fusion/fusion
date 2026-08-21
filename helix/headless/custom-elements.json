@@ -33623,6 +33623,16 @@
             },
             {
               "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the track runs, `vertical` standing it on end.\n\nFor a level rather than a quantity: a fader, a channel, anything a reader\npictures as high and low rather than as less and more. Absent is\nhorizontal, which is what almost every slider in a form wants.\n\n**A vertical track has no length of its own**, the way a horizontal one\ntakes the width of the row it is in. `--slider-length` is that number and\ndefaults to nine rem, so one dropped into a layout is a usable height\nrather than a thumb sitting on nothing.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "defaultValue",
               "type": {
                 "text": "string"
@@ -34288,6 +34298,14 @@
               "fieldName": "step"
             },
             {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical' | undefined"
+              },
+              "description": "Which way the track runs, `vertical` standing it on end.\n\nFor a level rather than a quantity: a fader, a channel, anything a reader\npictures as high and low rather than as less and more. Absent is\nhorizontal, which is what almost every slider in a form wants.\n\n**A vertical track has no length of its own**, the way a horizontal one\ntakes the width of the row it is in. `--slider-length` is that number and\ndefaults to nine rem, so one dropped into a layout is a usable height\nrather than a thumb sitting on nothing.",
+              "fieldName": "orientation"
+            },
+            {
               "name": "default-value",
               "type": {
                 "text": "string"
@@ -34474,6 +34492,10 @@
               "name": "area"
             },
             {
+              "description": "One column, under `plot=\"bar\"`.",
+              "name": "bar"
+            },
+            {
               "description": "The path itself.",
               "name": "line"
             },
@@ -34495,6 +34517,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "plot",
+              "type": {
+                "text": "'area' | 'bar' | undefined"
+              },
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape. Neither is\nwrong; they answer different questions, and a bar plot chosen for drama is\na bar plot that will be given a cut baseline next.\n\nThis tier rather than the one above, and that retires an argument the first\nversion of the area made. It said the region should always be drawn and\nonly sometimes painted, so that the shape stayed here and the paint stayed\nthere. That works for one variant and does not survive a second: a bar plot\ndraws no line and no region at all, so what is drawn genuinely varies and\ndrawing everything always would mean a line and an area under every bar\nchart, kept invisible by CSS.\n\n`curve` applies to a line and an area and is ignored by bars, which have no\nbetween to interpolate.",
+              "attribute": "plot",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "curve",
@@ -34647,6 +34679,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "plot",
+              "type": {
+                "text": "'area' | 'bar' | undefined"
+              },
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape. Neither is\nwrong; they answer different questions, and a bar plot chosen for drama is\na bar plot that will be given a cut baseline next.\n\nThis tier rather than the one above, and that retires an argument the first\nversion of the area made. It said the region should always be drawn and\nonly sometimes painted, so that the shape stayed here and the paint stayed\nthere. That works for one variant and does not survive a second: a bar plot\ndraws no line and no region at all, so what is drawn genuinely varies and\ndrawing everything always would mean a line and an area under every bar\nchart, kept invisible by CSS.\n\n`curve` applies to a line and an area and is ignored by bars, which have no\nbetween to interpolate.",
+              "fieldName": "plot"
+            },
             {
               "name": "curve",
               "type": {

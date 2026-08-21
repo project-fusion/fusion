@@ -18,9 +18,15 @@ import { styles } from './sparkline-root.css.js'
  * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
  * first and heavy in the second.
  *
- * One colour on the host, read by the line, the wash and the mark alike, so
- * moving `--sparkline-color` cannot leave three parts of one drawing
+ * One colour on the host, read by the line, the wash, the columns and the mark
+ * alike, so moving `--sparkline-color` cannot leave parts of one drawing
  * disagreeing.
+ *
+ * The line's weight is set in `em` rather than pixels, so it grows with the
+ * drawing the way the drawing grows with its type. A fixed 1.5px was the first
+ * version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
+ * keeps a stroke out of the view box's stretch, which is the point, and it also
+ * keeps it out of every other reason it might want to be bigger.
  *
  * @since 0.1.0
  * @status experimental
@@ -30,43 +36,46 @@ import { styles } from './sparkline-root.css.js'
  *
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
  * @cssproperty --sparkline-area-opacity - How much of the line's colour the wash takes where it meets the line.
+ * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.
  * @cssproperty --sparkline-block-size - Height of the drawing.
- * @cssproperty --sparkline-color - Colour of the line, the wash and the mark.
+ * @cssproperty --sparkline-color - Colour of the line, the wash, the columns and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
- * @cssproperty --sparkline-width - Thickness of the line.
+ * @cssproperty --sparkline-width - Thickness of the line, overriding `weight`.
  */
 @customElement('helix-sparkline')
 export class HelixSparkline extends HelixBaseSparkline {
   static override styles: CSSResultGroup = [terminusStyles, styles]
 
   /**
-   * Whether the region under the line is filled.
+   * How heavy the line is drawn.
    *
-   * Absent is the line alone, which is the sparkline that sits in a line of
-   * text. `area` washes the region beneath it, which reads as a silhouette and
-   * carries better at small sizes and from further away, at the cost of the
-   * exact path being harder to follow where two of them are compared.
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
    *
-   * The wash is a ramp of the line's own colour, strongest where it meets the
-   * line and gone by the floor of the box. Not a flat fill, because the floor
-   * is the edge of the data's own range rather than a true zero, and a fill of
-   * even weight down to it draws a hard edge along a number that means nothing.
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
    */
   @property({ reflect: true })
-  appearance?: 'area'
+  weight?: 'thick' | 'thin'
 
   /**
    * The shape of the mark on the last reading.
    *
-   * Absent is a dot, which is how a sparkline is usually ended, and absent
-   * rather than defaulted because a reflecting property with a default writes
-   * its attribute onto a host the consumer rendered, which React reports as a
+   * Absent is a dot, which is how a line is usually ended, and absent rather
+   * than defaulted because a reflecting property with a default writes its
+   * attribute onto a host the consumer rendered, which React reports as a
    * hydration mismatch.
    *
    * `none` lets the line stop on its own, which suits a series read as a shape
    * rather than for where it finished. `ring` lets the ground through, for a
    * chart drawn over something busy. `triangle` points along the axis and reads
    * as "and onward" rather than as a second claim about the data.
+   *
+   * A `bar` plot draws none of them: the last column already is the last
+   * reading, and a mark on top of it would say the same thing twice.
    *
    * The shapes come from `chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.

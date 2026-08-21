@@ -36,7 +36,14 @@
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: var(--sparkline-width, 1.5px);
+  /* In `em`, so the line grows with the drawing.
+   *
+   * A fixed `1.5px` was the first version, and it left a 200 pixel sparkline
+   * wearing a hairline. `vector-effect` below keeps the stroke out of the view
+   * box's stretch, which is what it is for, and it also keeps it out of every
+   * other reason the stroke might want to be bigger. `0.11em` is 1.54px at the
+   * 14px base, so the default weight is where it was and now moves. */
+  stroke-width: var(--sparkline-width, var(--_sparkline-weight, 0.11em));
 
   /* The whole reason one drawing fits any box.
    *
@@ -86,11 +93,11 @@
   stop-opacity: 0;
 }
 
-:host([appearance="area"]) [part="area"] {
+:host([plot="area"]) [part="area"] {
   fill: url("#sparkline-wash");
 }
 
-:host([appearance="area"]) [part="wash-start"] {
+:host([plot="area"]) [part="wash-start"] {
   stop-opacity: var(--sparkline-area-opacity, 0.45);
 }
 
@@ -100,6 +107,28 @@
  * the region was doing no work: the fill read as a smudge under the peak rather
  * than as a filled area. Holding a tenth at the bottom keeps the whole region
  * present and still lets the top read as the denser end. */
-:host([appearance="area"]) [part="wash-end"] {
+:host([plot="area"]) [part="wash-end"] {
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 4);
+}
+
+/* Three steps, and the hook still wins over all of them. */
+:host([weight="thin"]) {
+  --_sparkline-weight: 0.07em;
+}
+
+:host([weight="thick"]) {
+  --_sparkline-weight: 0.18em;
+}
+
+/* A column per reading, under `plot="bar"`.
+ *
+ * Filled rather than stroked, and the geometry comes from the tier below, which
+ * insets each column inside its own slot so a series of seven and a series of
+ * forty both fill the box. Nothing here needs `vector-effect`: a fill has no
+ * stroke to be stretched, so a rect in the view box's own units is exactly as
+ * wide as its share of the width whatever the drawing is scaled to, which is
+ * the behaviour a bar wants and the opposite of what a line wants. */
+[part="bar"] {
+  fill: currentColor;
+  rx: var(--sparkline-bar-radius, 0.5);
 }

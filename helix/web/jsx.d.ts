@@ -8822,6 +8822,17 @@ the line.
   markerLabels?: HelixSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   step?: HelixSlider["step"];
+  /** Which way the track runs, `vertical` standing it on end.
+
+For a level rather than a quantity: a fader, a channel, anything a reader
+pictures as high and low rather than as less and more. Absent is
+horizontal, which is what almost every slider in a form wants.
+
+**A vertical track has no length of its own**, the way a horizontal one
+takes the width of the row it is in. `--slider-length` is that number and
+defaults to nine rem, so one dropped into a layout is a usable height
+rather than a thumb sitting on nothing. */
+  orientation?: HelixSlider["orientation"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8947,6 +8958,17 @@ the line.
   "prop:markerLabels"?: HelixSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   "prop:step"?: HelixSlider["step"];
+  /** Which way the track runs, `vertical` standing it on end.
+
+For a level rather than a quantity: a fader, a channel, anything a reader
+pictures as high and low rather than as less and more. Absent is
+horizontal, which is what almost every slider in a form wants.
+
+**A vertical track has no length of its own**, the way a horizontal one
+takes the width of the row it is in. `--slider-length` is that number and
+defaults to nine rem, so one dropped into a layout is a usable height
+rather than a thumb sitting on nothing. */
+  "prop:orientation"?: HelixSlider["orientation"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8988,23 +9010,22 @@ reflected none of them. */
 };
 
 export type HelixSparklineProps = {
-  /** Whether the region under the line is filled.
+  /** How heavy the line is drawn.
 
-Absent is the line alone, which is the sparkline that sits in a line of
-text. `area` washes the region beneath it, which reads as a silhouette and
-carries better at small sizes and from further away, at the cost of the
-exact path being harder to follow where two of them are compared.
+Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+in a table row among many; `thick` suits one standing on its own, where a
+hairline reads as an accident.
 
-The wash is a ramp of the line's own colour, strongest where it meets the
-line and gone by the floor of the box. Not a flat fill, because the floor
-is the edge of the data's own range rather than a true zero, and a fill of
-even weight down to it draws a hard edge along a number that means nothing. */
-  appearance?: HelixSparkline["appearance"];
+Three steps rather than a number, because `--sparkline-width` is already
+the number and an attribute earns its place by being the thing a consumer
+reaches for without reading the stylesheet. The hook stays for anything the
+three do not cover. */
+  weight?: HelixSparkline["weight"];
   /** The shape of the mark on the last reading.
 
-Absent is a dot, which is how a sparkline is usually ended, and absent
-rather than defaulted because a reflecting property with a default writes
-its attribute onto a host the consumer rendered, which React reports as a
+Absent is a dot, which is how a line is usually ended, and absent rather
+than defaulted because a reflecting property with a default writes its
+attribute onto a host the consumer rendered, which React reports as a
 hydration mismatch.
 
 `none` lets the line stop on its own, which suits a series read as a shape
@@ -9012,9 +9033,43 @@ rather than for where it finished. `ring` lets the ground through, for a
 chart drawn over something busy. `triangle` points along the axis and reads
 as "and onward" rather than as a second claim about the data.
 
+A `bar` plot draws none of them: the last column already is the last
+reading, and a mark on top of it would say the same thing twice.
+
 The shapes come from `chart/terminus.css`, shared with every other chart
 that ends a line, so the set is the same wherever one appears. */
   terminus?: HelixSparkline["terminus"];
+  /** What the readings are drawn as.
+
+Absent is a line, `area` is a line with the region beneath it washed, and
+`bar` is a column per reading.
+
+**A bar plot measures from zero and the other two measure from the data's
+own range**, which is the one way the plots are not interchangeable. A line
+says where the readings sit relative to each other, so a scale over their
+extent uses the whole box and claims nothing about absolute size. A bar's
+length *is* the value, so any baseline but zero makes the lengths
+proportional to nothing.
+
+**Which is a reason to prefer a line for readings in a narrow band far from
+zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+seven columns of nearly the same height, and that is the true picture: they
+*are* nearly the same. The same readings as a line fill the box and show
+the movement, because a line is only ever claiming a shape. Neither is
+wrong; they answer different questions, and a bar plot chosen for drama is
+a bar plot that will be given a cut baseline next.
+
+This tier rather than the one above, and that retires an argument the first
+version of the area made. It said the region should always be drawn and
+only sometimes painted, so that the shape stayed here and the paint stayed
+there. That works for one variant and does not survive a second: a bar plot
+draws no line and no region at all, so what is drawn genuinely varies and
+drawing everything always would mean a line and an area under every bar
+chart, kept invisible by CSS.
+
+`curve` applies to a line and an area and is ignored by bars, which have no
+between to interpolate. */
+  plot?: HelixSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
@@ -9055,23 +9110,22 @@ does not. */
 };
 
 export type HelixSparklineSolidJsProps = {
-  /** Whether the region under the line is filled.
+  /** How heavy the line is drawn.
 
-Absent is the line alone, which is the sparkline that sits in a line of
-text. `area` washes the region beneath it, which reads as a silhouette and
-carries better at small sizes and from further away, at the cost of the
-exact path being harder to follow where two of them are compared.
+Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+in a table row among many; `thick` suits one standing on its own, where a
+hairline reads as an accident.
 
-The wash is a ramp of the line's own colour, strongest where it meets the
-line and gone by the floor of the box. Not a flat fill, because the floor
-is the edge of the data's own range rather than a true zero, and a fill of
-even weight down to it draws a hard edge along a number that means nothing. */
-  "prop:appearance"?: HelixSparkline["appearance"];
+Three steps rather than a number, because `--sparkline-width` is already
+the number and an attribute earns its place by being the thing a consumer
+reaches for without reading the stylesheet. The hook stays for anything the
+three do not cover. */
+  "prop:weight"?: HelixSparkline["weight"];
   /** The shape of the mark on the last reading.
 
-Absent is a dot, which is how a sparkline is usually ended, and absent
-rather than defaulted because a reflecting property with a default writes
-its attribute onto a host the consumer rendered, which React reports as a
+Absent is a dot, which is how a line is usually ended, and absent rather
+than defaulted because a reflecting property with a default writes its
+attribute onto a host the consumer rendered, which React reports as a
 hydration mismatch.
 
 `none` lets the line stop on its own, which suits a series read as a shape
@@ -9079,9 +9133,43 @@ rather than for where it finished. `ring` lets the ground through, for a
 chart drawn over something busy. `triangle` points along the axis and reads
 as "and onward" rather than as a second claim about the data.
 
+A `bar` plot draws none of them: the last column already is the last
+reading, and a mark on top of it would say the same thing twice.
+
 The shapes come from `chart/terminus.css`, shared with every other chart
 that ends a line, so the set is the same wherever one appears. */
   "prop:terminus"?: HelixSparkline["terminus"];
+  /** What the readings are drawn as.
+
+Absent is a line, `area` is a line with the region beneath it washed, and
+`bar` is a column per reading.
+
+**A bar plot measures from zero and the other two measure from the data's
+own range**, which is the one way the plots are not interchangeable. A line
+says where the readings sit relative to each other, so a scale over their
+extent uses the whole box and claims nothing about absolute size. A bar's
+length *is* the value, so any baseline but zero makes the lengths
+proportional to nothing.
+
+**Which is a reason to prefer a line for readings in a narrow band far from
+zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+seven columns of nearly the same height, and that is the true picture: they
+*are* nearly the same. The same readings as a line fill the box and show
+the movement, because a line is only ever claiming a shape. Neither is
+wrong; they answer different questions, and a bar plot chosen for drama is
+a bar plot that will be given a cut baseline next.
+
+This tier rather than the one above, and that retires an argument the first
+version of the area made. It said the region should always be drawn and
+only sometimes painted, so that the shape stayed here and the paint stayed
+there. That works for one variant and does not survive a second: a bar plot
+draws no line and no region at all, so what is drawn genuinely varies and
+drawing everything always would mean a line and an area under every bar
+chart, kept invisible by CSS.
+
+`curve` applies to a line and an area and is ignored by bars, which have no
+between to interpolate. */
+  "prop:plot"?: HelixSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
@@ -19894,6 +19982,16 @@ export type CustomElements = {
    *
    * /** Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
+   * - `orientation`: Which way the track runs, `vertical` standing it on end.
+   *
+   * For a level rather than a quantity: a fader, a channel, anything a reader
+   * pictures as high and low rather than as less and more. Absent is
+   * horizontal, which is what almost every slider in a form wants.
+   *
+   * **A vertical track has no length of its own**, the way a horizontal one
+   * takes the width of the row it is in. `--slider-length` is that number and
+   * defaults to nine rem, so one dropped into a layout is a usable height
+   * rather than a thumb sitting on nothing.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -20031,30 +20129,35 @@ export type CustomElements = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
-   * One colour on the host, read by the line, the wash and the mark alike, so
-   * moving `--sparkline-color` cannot leave three parts of one drawing
+   * One colour on the host, read by the line, the wash, the columns and the mark
+   * alike, so moving `--sparkline-color` cannot leave parts of one drawing
    * disagreeing.
+   *
+   * The line's weight is set in `em` rather than pixels, so it grows with the
+   * drawing the way the drawing grows with its type. A fixed 1.5px was the first
+   * version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
+   * keeps a stroke out of the view box's stretch, which is the point, and it also
+   * keeps it out of every other reason it might want to be bigger.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the region under the line is filled.
+   * - `weight`: How heavy the line is drawn.
    *
-   * Absent is the line alone, which is the sparkline that sits in a line of
-   * text. `area` washes the region beneath it, which reads as a silhouette and
-   * carries better at small sizes and from further away, at the cost of the
-   * exact path being harder to follow where two of them are compared.
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
    *
-   * The wash is a ramp of the line's own colour, strongest where it meets the
-   * line and gone by the floor of the box. Not a flat fill, because the floor
-   * is the edge of the data's own range rather than a true zero, and a fill of
-   * even weight down to it draws a hard edge along a number that means nothing.
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
    * - `terminus`: The shape of the mark on the last reading.
    *
-   * Absent is a dot, which is how a sparkline is usually ended, and absent
-   * rather than defaulted because a reflecting property with a default writes
-   * its attribute onto a host the consumer rendered, which React reports as a
+   * Absent is a dot, which is how a line is usually ended, and absent rather
+   * than defaulted because a reflecting property with a default writes its
+   * attribute onto a host the consumer rendered, which React reports as a
    * hydration mismatch.
    *
    * `none` lets the line stop on its own, which suits a series read as a shape
@@ -20062,8 +20165,41 @@ export type CustomElements = {
    * chart drawn over something busy. `triangle` points along the axis and reads
    * as "and onward" rather than as a second claim about the data.
    *
+   * A `bar` plot draws none of them: the last column already is the last
+   * reading, and a mark on top of it would say the same thing twice.
+   *
    * The shapes come from `chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.
+   * - `plot`: What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape. Neither is
+   * wrong; they answer different questions, and a bar plot chosen for drama is
+   * a bar plot that will be given a cut baseline next.
+   *
+   * This tier rather than the one above, and that retires an argument the first
+   * version of the area made. It said the region should always be drawn and
+   * only sometimes painted, so that the shape stayed here and the paint stayed
+   * there. That works for one variant and does not survive a second: a bar plot
+   * draws no line and no region at all, so what is drawn genuinely varies and
+   * drawing everything always would mean a line and an area under every bar
+   * chart, kept invisible by CSS.
+   *
+   * `curve` applies to a line and an area and is ignored by bars, which have no
+   * between to interpolate.
    * - `curve`: How the line gets from one reading to the next.
    *
    * Absent joins them and claims nothing in between, which is why it is the
@@ -20104,16 +20240,18 @@ export type CustomElements = {
    *
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
+   * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line, the wash and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
-   * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
+   * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The region between the line and the bottom of its range.
+   * - `bar`: One column, under `plot="bar"`.
    * - `line`: The path itself.
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
@@ -30491,6 +30629,16 @@ export type CustomElementsSolidJs = {
    *
    * /** Whether each mark says which value it stands at.
    * - `step`: How far one press of an arrow key moves it.
+   * - `orientation`: Which way the track runs, `vertical` standing it on end.
+   *
+   * For a level rather than a quantity: a fader, a channel, anything a reader
+   * pictures as high and low rather than as less and more. Absent is
+   * horizontal, which is what almost every slider in a form wants.
+   *
+   * **A vertical track has no length of its own**, the way a horizontal one
+   * takes the width of the row it is in. `--slider-length` is that number and
+   * defaults to nine rem, so one dropped into a layout is a usable height
+   * rather than a thumb sitting on nothing.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -30631,30 +30779,35 @@ export type CustomElementsSolidJs = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
-   * One colour on the host, read by the line, the wash and the mark alike, so
-   * moving `--sparkline-color` cannot leave three parts of one drawing
+   * One colour on the host, read by the line, the wash, the columns and the mark
+   * alike, so moving `--sparkline-color` cannot leave parts of one drawing
    * disagreeing.
+   *
+   * The line's weight is set in `em` rather than pixels, so it grows with the
+   * drawing the way the drawing grows with its type. A fixed 1.5px was the first
+   * version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
+   * keeps a stroke out of the view box's stretch, which is the point, and it also
+   * keeps it out of every other reason it might want to be bigger.
    *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: Whether the region under the line is filled.
+   * - `weight`: How heavy the line is drawn.
    *
-   * Absent is the line alone, which is the sparkline that sits in a line of
-   * text. `area` washes the region beneath it, which reads as a silhouette and
-   * carries better at small sizes and from further away, at the cost of the
-   * exact path being harder to follow where two of them are compared.
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
    *
-   * The wash is a ramp of the line's own colour, strongest where it meets the
-   * line and gone by the floor of the box. Not a flat fill, because the floor
-   * is the edge of the data's own range rather than a true zero, and a fill of
-   * even weight down to it draws a hard edge along a number that means nothing.
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
    * - `terminus`: The shape of the mark on the last reading.
    *
-   * Absent is a dot, which is how a sparkline is usually ended, and absent
-   * rather than defaulted because a reflecting property with a default writes
-   * its attribute onto a host the consumer rendered, which React reports as a
+   * Absent is a dot, which is how a line is usually ended, and absent rather
+   * than defaulted because a reflecting property with a default writes its
+   * attribute onto a host the consumer rendered, which React reports as a
    * hydration mismatch.
    *
    * `none` lets the line stop on its own, which suits a series read as a shape
@@ -30662,8 +30815,41 @@ export type CustomElementsSolidJs = {
    * chart drawn over something busy. `triangle` points along the axis and reads
    * as "and onward" rather than as a second claim about the data.
    *
+   * A `bar` plot draws none of them: the last column already is the last
+   * reading, and a mark on top of it would say the same thing twice.
+   *
    * The shapes come from `chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.
+   * - `plot`: What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape. Neither is
+   * wrong; they answer different questions, and a bar plot chosen for drama is
+   * a bar plot that will be given a cut baseline next.
+   *
+   * This tier rather than the one above, and that retires an argument the first
+   * version of the area made. It said the region should always be drawn and
+   * only sometimes painted, so that the shape stayed here and the paint stayed
+   * there. That works for one variant and does not survive a second: a bar plot
+   * draws no line and no region at all, so what is drawn genuinely varies and
+   * drawing everything always would mean a line and an area under every bar
+   * chart, kept invisible by CSS.
+   *
+   * `curve` applies to a line and an area and is ignored by bars, which have no
+   * between to interpolate.
    * - `curve`: How the line gets from one reading to the next.
    *
    * Absent joins them and claims nothing in between, which is why it is the
@@ -30704,16 +30890,18 @@ export type CustomElementsSolidJs = {
    *
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
+   * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line, the wash and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line, the wash, the columns and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
-   * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
+   * - `--sparkline-width`: Thickness of the line, overriding `weight`. (default: `undefined`)
    *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The region between the line and the bottom of its range.
+   * - `bar`: One column, under `plot="bar"`.
    * - `line`: The path itself.
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
@@ -34212,13 +34400,15 @@ export type CustomCssProperties = {
   "--chart-terminus-size"?: string;
   /** How much of the line's colour the wash takes where it meets the line. */
   "--sparkline-area-opacity"?: string;
+  /** Corner radius on a column, under `plot="bar"`. */
+  "--sparkline-bar-radius"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
-  /** Colour of the line, the wash and the mark. */
+  /** Colour of the line, the wash, the columns and the mark. */
   "--sparkline-color"?: string;
   /** Width of the drawing. */
   "--sparkline-inline-size"?: string;
-  /** Thickness of the line. */
+  /** Thickness of the line, overriding `weight`. */
   "--sparkline-width"?: string;
   /** Edge length of the mark. */
   "--speed-dial-item-size"?: string;

@@ -3902,6 +3902,17 @@ the line.
   markerLabels?: HelixBaseSlider["markerLabels"];
   /** How far one press of an arrow key moves it. */
   step?: HelixBaseSlider["step"];
+  /** Which way the track runs, `vertical` standing it on end.
+
+For a level rather than a quantity: a fader, a channel, anything a reader
+pictures as high and low rather than as less and more. Absent is
+horizontal, which is what almost every slider in a form wants.
+
+**A vertical track has no length of its own**, the way a horizontal one
+takes the width of the row it is in. `--slider-length` is that number and
+defaults to nine rem, so one dropped into a layout is a usable height
+rather than a thumb sitting on nothing. */
+  orientation?: HelixBaseSlider["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseSlider["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -3965,6 +3976,37 @@ export type HelixBaseSliderVueEvents = {
 };
 
 export type HelixBaseSparklineVueProps = {
+  /** What the readings are drawn as.
+
+Absent is a line, `area` is a line with the region beneath it washed, and
+`bar` is a column per reading.
+
+**A bar plot measures from zero and the other two measure from the data's
+own range**, which is the one way the plots are not interchangeable. A line
+says where the readings sit relative to each other, so a scale over their
+extent uses the whole box and claims nothing about absolute size. A bar's
+length *is* the value, so any baseline but zero makes the lengths
+proportional to nothing.
+
+**Which is a reason to prefer a line for readings in a narrow band far from
+zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+seven columns of nearly the same height, and that is the true picture: they
+*are* nearly the same. The same readings as a line fill the box and show
+the movement, because a line is only ever claiming a shape. Neither is
+wrong; they answer different questions, and a bar plot chosen for drama is
+a bar plot that will be given a cut baseline next.
+
+This tier rather than the one above, and that retires an argument the first
+version of the area made. It said the region should always be drawn and
+only sometimes painted, so that the shape stayed here and the paint stayed
+there. That works for one variant and does not survive a second: a bar plot
+draws no line and no region at all, so what is drawn genuinely varies and
+drawing everything always would mean a line and an area under every bar
+chart, kept invisible by CSS.
+
+`curve` applies to a line and an area and is ignored by bars, which have no
+between to interpolate. */
+  plot?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the

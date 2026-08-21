@@ -66,20 +66,74 @@ describe('sparkline', () => {
     expect(part(bare, 'svg')?.hasAttribute('role')).toBe(false)
   })
 
-  test('the region under the line is drawn whether or not it is painted', async () => {
-    /* Geometry belongs to the tier below and paint to this one, so the shape is
-       always there and `appearance` decides whether anything is poured in. A
-       headless consumer gets the region without having to work out that a
-       sparkline's baseline is its own minimum rather than zero. */
-    const host = await spark('values="1 5 9"')
-    const area = part(host, 'area')?.getAttribute('d') ?? ''
-    expect(area).toContain(part(host, 'line')?.getAttribute('d') ?? 'no line')
+  test('a line plot draws a line, an area adds the region, a bar draws neither', async () => {
+    /* What is drawn varies by plot, which is why this is a headless property
+       and why the region is no longer drawn under everything and hidden. */
+    const line = await spark('values="1 5 9"')
+    expect(part(line, 'line')).not.toBeNull()
+    expect(part(line, 'area')).toBeNull()
+    expect(part(line, 'bar')).toBeNull()
+
+    const area = await spark('plot="area" values="1 5 9"')
+    expect(part(area, 'line')).not.toBeNull()
+    const closed = part(area, 'area')?.getAttribute('d') ?? ''
+    expect(closed).toContain(part(area, 'line')?.getAttribute('d') ?? 'no line')
     // Closed along the floor of the box and back, which is what makes it fillable.
-    expect(area.endsWith('L100,32L0,32Z')).toBe(true)
+    expect(closed.endsWith('L100,32L0,32Z')).toBe(true)
+
+    const bars = await spark('plot="bar" values="1 5 9"')
+    expect(part(bars, 'line')).toBeNull()
+    expect(bars.shadowRoot?.querySelectorAll('[part="bar"]')).toHaveLength(3)
+  })
+
+  test('columns measure from zero, so their lengths are proportional to the values', async () => {
+    /* The one way the plots are not interchangeable. A line says where the
+       readings sit relative to each other, so its scale runs over their extent;
+       a bar's length is the value, so any baseline but zero makes the lengths
+       proportional to nothing.
+
+       Over the extent, the smallest reading landed on the floor with no height
+       at all, and seven readings came out as six columns and a gap. */
+    const host = await spark('plot="bar" values="1 5 9"')
+    const columns = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+    const heights = columns.map((one) => Number(one.getAttribute('height')))
+    expect(heights[0]).toBeGreaterThan(0)
+    /* The proportion rather than the pixels, which is the property being
+       claimed: a column five times the value is five times the length. Asserted
+       as an equality first, and `32/9` and `Math.abs(floor - y(value))` differ
+       in the last bit of a double. */
+    const tallest = heights[2] as number
+    expect(Math.abs((heights[0] as number) / tallest - 1 / 9)).toBeLessThan(1e-6)
+    expect(Math.abs((heights[1] as number) / tallest - 5 / 9)).toBeLessThan(1e-6)
+    // Inset inside its slot, so neighbours do not touch.
+    expect(Number(columns[0]?.getAttribute('width'))).toBeLessThan(100 / 3)
+  })
+
+  test('a series that goes negative hangs its columns below the baseline', async () => {
+    // Zero is included at both ends, so the baseline lands inside the box.
+    const host = await spark('plot="bar" values="-4 0 4"')
+    const columns = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+    const tops = columns.map((one) => Number(one.getAttribute('y')))
+    // The baseline is halfway, the negative starts there and the positive ends there.
+    expect(tops[0]).toBe(16)
+    expect(tops[2]).toBe(0)
+    // A reading of exactly zero paints nothing, which is the honest drawing of it.
+    expect(Number(columns[1]?.getAttribute('height'))).toBe(0)
+  })
+
+  test('a line still measures from its own range, so the shape fills the box', async () => {
+    const host = await spark('values="1 5 9"')
+    expect(heights(host)).toEqual([32, 16, 0])
+  })
+
+  test('a bar plot ends on its last column rather than on a mark', async () => {
+    // A line ends somewhere and a row of columns does not.
+    expect(part(await spark('plot="bar" values="1 5 9"'), 'terminus')).toBeNull()
+    expect(part(await spark('values="1 5 9"'), 'terminus')).not.toBeNull()
   })
 
   test('one value draws no region either, since there is no line to close', async () => {
-    expect(part(await spark('values="4"'), 'area')).toBeNull()
+    expect(part(await spark('plot="area" values="4"'), 'area')).toBeNull()
   })
 
   test('a curve changes the path and nothing else about the reading', async () => {
@@ -108,7 +162,7 @@ describe('sparkline', () => {
 
   test('the area follows whatever curve the line took', async () => {
     // Otherwise the fill and the line disagree about where the top edge is.
-    const host = await spark('curve="smooth" values="1 5 2 6"')
+    const host = await spark('curve="smooth" plot="area" values="1 5 2 6"')
     expect(part(host, 'area')?.getAttribute('d')).toContain(
       part(host, 'line')?.getAttribute('d') ?? 'no line',
     )
@@ -181,19 +235,19 @@ if (hasLayout()) {
       expect(line.getBBox().height).toBeGreaterThan(0)
     })
 
-    test('the region is unpainted by default and washed under appearance', async () => {
+    test('the wash is a ramp off the line, and the line keeps its full strength', async () => {
       /* Two elements rather than a fill on the line itself: a closed path
          strokes its closing edges, so filling the line would draw a rule along
-         the bottom of the box and up both sides. Asserted through the computed
-         fill, since the shape is present either way. */
-      /* Both in one mount. `mount` replaces the body, so reading the first
-         one's computed style after mounting the second reads a detached
-         element, and every computed value comes back as the empty string. The
+         the bottom of the box and up both sides.
+
+         Both mounted together, because `mount` replaces the body and reading
+         the first one's computed style after mounting the second reads a
+         detached element, where every computed value is the empty string. The
          first version of this test did exactly that and reported the component
          for a stroke it had never lost. */
       await mount(`<div>
         <helix-sparkline id="plain" values="1 9 3"></helix-sparkline>
-        <helix-sparkline appearance="area" id="washed" values="1 9 3"></helix-sparkline>
+        <helix-sparkline id="washed" plot="area" values="1 9 3"></helix-sparkline>
       </div>`)
       const plain = document.getElementById('plain') as HTMLElement
       const washed = document.getElementById('washed') as HTMLElement
@@ -203,13 +257,36 @@ if (hasLayout()) {
         ),
       )
 
-      expect(getComputedStyle(part(plain, 'area') as Element).fill).toBe('none')
-      expect(getComputedStyle(part(washed, 'area') as Element).fill).not.toBe('none')
-      // The line stays at full strength over the wash, which an `opacity` on
-      // the element would not have allowed.
+      // A line plot draws no region at all now, rather than one kept invisible.
+      expect(part(plain, 'area')).toBeNull()
+      const stops = [...(washed.shadowRoot?.querySelectorAll('stop') ?? [])]
+      const opacities = stops.map((stop) => Number(getComputedStyle(stop).stopOpacity))
+      expect(opacities[0]).toBeGreaterThan(opacities[1] as number)
+      expect(opacities[1]).toBeGreaterThan(0)
+      // The line stays at full strength over it, which an `opacity` on the
+      // element would not have allowed.
       expect(getComputedStyle(part(washed, 'line') as Element).stroke).toBe(
         getComputedStyle(part(plain, 'line') as Element).stroke,
       )
+    })
+
+    test('weight moves the stroke, and the hook still wins over it', async () => {
+      await mount(`<div>
+        <helix-sparkline id="thin" values="1 9 3" weight="thin"></helix-sparkline>
+        <helix-sparkline id="regular" values="1 9 3"></helix-sparkline>
+        <helix-sparkline id="thick" values="1 9 3" weight="thick"></helix-sparkline>
+      </div>`)
+      const widths = await Promise.all(
+        ['thin', 'regular', 'thick'].map(async (id) => {
+          const host = document.getElementById(id) as HTMLElement & {
+            updateComplete: Promise<unknown>
+          }
+          await host.updateComplete
+          return Number.parseFloat(getComputedStyle(part(host, 'line') as Element).strokeWidth)
+        }),
+      )
+      expect(widths[0]).toBeLessThan(widths[1] as number)
+      expect(widths[1]).toBeLessThan(widths[2] as number)
     })
 
     test('the line keeps its weight whatever the box, and the mark stays round', async () => {

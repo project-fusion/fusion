@@ -59,6 +59,7 @@ const readValues = (input: string): number[] =>
  * @documentation https://helix.fusion.dev/components/sparkline
  *
  * @csspart area - The region between the line and the bottom of its range.
+ * @csspart bar - One column, under `plot="bar"`.
  * @csspart line - The path itself.
  * @csspart svg - The drawing.
  * @csspart terminus - The mark on the last value.
@@ -67,6 +68,41 @@ const readValues = (input: string): number[] =>
  */
 @customElement('helix-base-sparkline')
 export class HelixBaseSparkline extends HelixElement {
+  /**
+   * What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape. Neither is
+   * wrong; they answer different questions, and a bar plot chosen for drama is
+   * a bar plot that will be given a cut baseline next.
+   *
+   * This tier rather than the one above, and that retires an argument the first
+   * version of the area made. It said the region should always be drawn and
+   * only sometimes painted, so that the shape stayed here and the paint stayed
+   * there. That works for one variant and does not survive a second: a bar plot
+   * draws no line and no region at all, so what is drawn genuinely varies and
+   * drawing everything always would mean a line and an area under every bar
+   * chart, kept invisible by CSS.
+   *
+   * `curve` applies to a line and an area and is ignored by bars, which have no
+   * between to interpolate.
+   */
+  @property({ reflect: true })
+  plot?: 'area' | 'bar'
+
   /**
    * How the line gets from one reading to the next.
    *
@@ -178,21 +214,70 @@ export class HelixBaseSparkline extends HelixElement {
        An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
        so the empty case is stated here rather than left to look like a bug. */
     const x = linear([0, Math.max(points.length - 1, 1)], [0, BOX.width])
-    const y = linear(extent(points.length > 0 ? points : [0]), [BOX.height, 0])
+    /* **A bar measures from zero and a line measures from its own range**, and
+       that is a correctness difference rather than a preference.
+     *
+     * A line is a shape: what it says is where the readings sit relative to
+     * each other, so running the scale over the data's own extent uses the
+     * whole box and claims nothing about absolute size. A bar says something
+     * else. Its *length* is the value, so a baseline anywhere but zero makes
+     * the lengths proportional to nothing, which is the oldest misleading chart
+     * there is.
+     *
+     * Drawn over the data's extent, the smallest reading landed exactly on the
+     * floor and its column had no height at all: seven readings between 1,102
+     * and 1,408 came out as six columns and a gap, which looks like missing
+     * data and is really a scale saying the minimum is nothing.
+     *
+     * The zero is included at both ends, so a series that goes negative gets a
+     * baseline inside the box and its columns hang below it. */
+    const [low, high] = extent(points.length > 0 ? points : [0])
+    const y =
+      this.plot === 'bar'
+        ? linear([Math.min(0, low), Math.max(0, high)], [BOX.height, 0])
+        : linear([low, high], [BOX.height, 0])
     const coordinates: Point[] = points.map((value, index) => [x(index), y(value)])
-    const path = linePath(coordinates, this.curve)
+    const path = this.plot === 'bar' ? '' : linePath(coordinates, this.curve)
 
     /* The same line closed down to the floor of its own range, which is where
-       the fill goes. Drawn always and painted only by `appearance`: the shape
-       is geometry and belongs to this tier, and whether anything is poured into
-       it is a decision for the one above. A headless consumer gets the region
-       without having to work out that a sparkline's baseline is its minimum
-       rather than zero, which is the part that is easy to get wrong.
+       the wash goes. Its own path rather than a fill on the line, because a
+       closed path strokes its closing edges too: filling the line itself would
+       draw a rule along the bottom of the box and up both sides.
+     *
+     * The floor is the smallest reading and not a true zero, because the scale
+     * runs over the data's own extent. That is the part a consumer would get
+     * wrong writing this themselves, and it is why the shape is built here. */
+    const area =
+      this.plot === 'area' && path !== ''
+        ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
+        : ''
 
-       Its own path rather than a fill on the line, because a closed path
-       strokes its closing edges too: filling the line itself would draw a rule
-       along the bottom of the box and up both sides. */
-    const area = path === '' ? '' : `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
+    /* One column per reading, inset so neighbours do not touch.
+     *
+     * A rect rather than a thick stroked line, because a bar has two ends and a
+     * stroke has a cap: `stroke-linecap` would round or square both ends of
+     * every column together, and the floor end should always be flat.
+     *
+     * The width is a share of the slot rather than a fixed number, so a series
+     * of seven and a series of forty both fill the box. Fourteen percent of the
+     * gap is the smallest separation that still reads as separate columns at
+     * the sizes a sparkline is drawn at, and it comes off the slot rather than
+     * off the bar so a two-reading series does not get two enormous slabs. */
+    const slot = BOX.width / Math.max(points.length, 1)
+    const floor = y(0)
+    const bars =
+      this.plot === 'bar'
+        ? points.map((value, index) => ({
+            /* From the baseline to the reading, whichever of the two is
+               higher up the box. A reading of exactly zero is a column of no
+               height, which paints nothing, and that is the honest drawing of
+               nothing rather than a hairline implying something. */
+            height: Math.abs(floor - y(value)),
+            width: slot * 0.72,
+            x: index * slot + slot * 0.14,
+            y: Math.min(floor, y(value)),
+          }))
+        : []
 
     return html`<svg
         aria-hidden=${this.label === '' ? 'true' : nothing}
@@ -229,8 +314,19 @@ export class HelixBaseSparkline extends HelixElement {
              asserted the `d` attribute, the part, the ARIA and the computed
              `vector-effect`, and all of those are true of an HTML element
              wearing the same name. */
-          path === '' ? nothing : svg`<path d=${area} part="area" /><path d=${path} part="line" />`
+          path === '' ? nothing : svg`<path d=${path} part="line" />`
         }
+        ${area === '' ? nothing : svg`<path d=${area} part="area" />`}
+        ${bars.map(
+          (bar) =>
+            svg`<rect
+              height=${bar.height}
+              part="bar"
+              width=${bar.width}
+              x=${bar.x}
+              y=${bar.y}
+            />`,
+        )}
       </svg>
       ${
         /* The mark on the last value, as an element beside the drawing rather
@@ -239,7 +335,10 @@ export class HelixBaseSparkline extends HelixElement {
            space with it: a circle in there is an ellipse whose squash depends on
            how wide the consumer made it. Percentages of the host are the same
            two numbers in a space nothing stretches. */
-        points.length < 2
+        /* A line ends somewhere and a row of columns does not, so a bar plot
+           draws no terminus: the last column already is the last reading, and a
+           dot on top of it would be a second mark saying the same thing. */
+        points.length < 2 || this.plot === 'bar'
           ? nothing
           : html`<span
               aria-hidden="true"

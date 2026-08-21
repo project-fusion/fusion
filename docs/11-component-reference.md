@@ -4360,6 +4360,7 @@ the thumb being dragged.
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseSlider` | Which way the track runs, `vertical` standing it on end. |
 | `range` | `range` | `boolean` | `false` | `HelixBaseSlider` | Whether there are two thumbs and the value is a pair. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
@@ -4423,26 +4424,34 @@ lets one drawing fill a 60px slot and a 600px one, and without
 `vector-effect: non-scaling-stroke` the same line comes out hairline in the
 first and heavy in the second.
 
-One colour on the host, read by the line, the wash and the mark alike, so
-moving `--sparkline-color` cannot leave three parts of one drawing
+One colour on the host, read by the line, the wash, the columns and the mark
+alike, so moving `--sparkline-color` cannot leave parts of one drawing
 disagreeing.
+
+The line's weight is set in `em` rather than pixels, so it grows with the
+drawing the way the drawing grows with its type. A fixed 1.5px was the first
+version and left a 200 pixel sparkline wearing a hairline: `vector-effect`
+keeps a stroke out of the view box's stretch, which is the point, and it also
+keeps it out of every other reason it might want to be bigger.
 
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'area' \| undefined` | - | - | Whether the region under the line is filled. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseSparkline` | How the line gets from one reading to the next. |
 | `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
+| `plot` | `plot` | `'area' \| 'bar' \| undefined` | - | `HelixBaseSparkline` | What the readings are drawn as. |
 | `terminus` | `terminus` | `'none' \| 'ring' \| 'square' \| 'triangle' \| undefined` | - | - | The shape of the mark on the last reading. |
 | `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
+| `weight` | `weight` | `'thick' \| 'thin' \| undefined` | - | - | How heavy the line is drawn. |
 
 #### Parts
 
 | Part | Description |
 | --- | --- |
 | `area` | The region between the line and the bottom of its range. |
+| `bar` | One column, under `plot="bar"`. |
 | `line` | The path itself. |
 | `svg` | The drawing. |
 | `terminus` | The mark on the last value. |
@@ -4455,10 +4464,11 @@ disagreeing.
 | --- | --- |
 | `--chart-terminus-size` | Size of the mark on the last reading. |
 | `--sparkline-area-opacity` | How much of the line's colour the wash takes where it meets the line. |
+| `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |
 | `--sparkline-block-size` | Height of the drawing. |
-| `--sparkline-color` | Colour of the line, the wash and the mark. |
+| `--sparkline-color` | Colour of the line, the wash, the columns and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |
-| `--sparkline-width` | Thickness of the line. |
+| `--sparkline-width` | Thickness of the line, overriding `weight`. |
 
 ## Speed Dial
 
