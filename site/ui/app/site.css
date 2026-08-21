@@ -2379,22 +2379,38 @@ helix-drawer helix-tree {
  *
  * `break-inside: avoid` is what stops a card being cut in half at the column
  * boundary, and it has to be on the card rather than the container. */
+/* **A grid, not columns, once the anchor has to span.**
+ *
+ * `column-span: all` is the multicol way to say it and it collapsed the whole
+ * panel: every card measured 34 wide. Grid says the same thing without the
+ * ambiguity, and `align-items: start` is what keeps the masonry property that
+ * mattered, each card its own height rather than padded to its row's tallest.
+ *
+ * Two equal columns of seven equal cards is a stack rather than a composition:
+ * every card the same width means nothing in the panel matters more than
+ * anything else, which is the opposite of what an anchor is for. */
 .showcase {
-  column-gap: var(--helix-space-lg);
-  columns: 2;
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.showcase > .showcaseAnchor {
+  grid-column: 1 / -1;
 }
 
 .showcaseCard {
-  break-inside: avoid;
   display: block;
-  margin-block-end: var(--helix-space-lg);
 }
 
 /* One column where two would be a pair of narrow strips. The cards hold tables
    and sliders, and neither survives being halved. */
+/* One column where two would be a pair of narrow strips. The cards hold a table
+   and a slider, and neither survives being halved. */
 @media (width < 56rem) {
   .showcase {
-    columns: 1;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -2427,4 +2443,66 @@ helix-drawer helix-tree {
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   line-height: var(--helix-leading-tight);
+}
+
+/* The one band after the hero that takes a whole screen.
+ *
+ * It is a window rather than a passage: an argument held apart from the thing
+ * it is about by a rule. A window wants a frame, and a frame wants a height
+ * that was decided rather than one that ended wherever the last card did. */
+.showcaseBand {
+  min-block-size: 100svh;
+}
+
+/* Prose, rule, stage. The prose column is clamped rather than fractional: a
+   measure is a number of characters, and giving it a share of the width means
+   it gets longer on a wider screen, which is the one direction a line of text
+   must not go. The stage takes what is left. */
+.showcaseSplit {
+  align-items: stretch;
+  display: grid;
+  gap: var(--helix-space-2xl);
+  grid-template-columns: minmax(16rem, 24rem) auto minmax(0, 1fr);
+}
+
+.showcaseProse {
+  align-self: center;
+}
+
+/* Sunken, which is the one surface token that reads as behind the page rather
+   than on it, so the cards sit in a recess and the panel reads as a thing being
+   looked into.
+ *
+ * Masked at the foot rather than cut. A hard edge says the layout ran out; a
+ * fade says there is more, which there is. `mask-image` and not a gradient
+ * overlay, because an overlay would need the page's own background colour and
+ * this panel is not that colour. */
+.showcaseStage {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
+  max-block-size: 68svh;
+  overflow: hidden;
+  padding: var(--helix-space-lg);
+}
+
+/* Stacked where a split would be two narrow strips, and the rule turns with it.
+   A vertical divider between stacked blocks is a line pointing the wrong way. */
+@media (width < 64rem) {
+  .showcaseBand {
+    min-block-size: 0;
+  }
+
+  .showcaseSplit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .showcaseSplit helix-divider {
+    display: none;
+  }
+
+  .showcaseStage {
+    max-block-size: none;
+  }
 }
