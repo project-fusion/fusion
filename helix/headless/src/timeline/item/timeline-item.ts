@@ -1,6 +1,8 @@
 import { customElement, HelixElement, hostAria } from '@helix-io/core'
+import { circle, record } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One event on a timeline: when it happened, and what it was.
@@ -62,6 +64,23 @@ export class HelixBaseTimelineItem extends HelixElement {
     hostAria(this.internals, { role: 'listitem' })
   }
 
+  /**
+   * The mark for an entry that slotted none, which the tone decides.
+   *
+   * Toned entries are reporting something, so they take the circle with a
+   * centre, which is `Steps` drawing the stage a reader is standing on. Untoned
+   * ones are just things that happened and take the open circle, which is
+   * `Steps` drawing a stage nobody has reached. The same two glyphs in both
+   * components rather than two that resemble each other: a shape drawn twice
+   * drifts, and these are already the marks a reader has learned one page over.
+   */
+  private get dot(): TemplateResult {
+    const icon = this.tone === undefined ? circle : record
+    return html`<svg part="dot" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
+      ${unsafeSVG(icon.content)}
+    </svg>`
+  }
+
   protected override render(): TemplateResult {
     const when = html`<slot name="time"></slot>`
     /* The time is a sibling of the content rather than the first thing inside
@@ -75,7 +94,7 @@ export class HelixBaseTimelineItem extends HelixElement {
           aria-hidden="true"
         ></div>
         <span part="marker"
-          ><slot name="marker"><span part="dot"></span></slot
+          ><slot name="marker">${this.dot}</slot
         ></span>
       </div>
       ${

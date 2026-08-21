@@ -115,13 +115,12 @@
    `:has()`, and the first version of this tried, matched nothing, and left every
    unmarked entry as an empty ring. */
 [part="dot"] {
-  background-color: var(--_timeline-tone, var(--helix-color-border));
-  /* A step up from `xs`, because it is the mark now rather than the thing
-     inside one. At the ring's old size it read as a bullet that had lost its
-     box, which is exactly what it was. */
-  block-size: var(--helix-space-sm);
-  border-radius: var(--helix-radii-full);
-  inline-size: var(--helix-space-sm);
+  /* Sized, and nothing else. It was a `<span>` this sheet drew a circle on, and
+     drawing a circle beside a component that already has one is how two marks
+     that should be identical end up nearly identical. It is `Steps`' own glyph
+     now, at the size the slotted marks beside it take. */
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
 }
 
 :host([tone="danger"]) {

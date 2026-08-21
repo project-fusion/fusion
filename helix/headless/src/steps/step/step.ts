@@ -1,5 +1,5 @@
 import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
-import { checkCircleFill, circle, record } from '@helix-io/icons'
+import { check, circle, record } from '@helix-io/icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -111,11 +111,27 @@ export class HelixBaseStep extends HelixElement {
    * The mark this stage's state calls for.
    *
    * `complete` first, so a stage a reader has stepped back into keeps its check
-   * rather than losing it to the target: they did finish it, and the fill on
-   * the mark is what says they are back in it.
+   * rather than losing it to the target: they did finish it, and the name and
+   * the rule below still say which one is open.
+   *
+   * **Three shapes, and the reader can tell them apart with the colour off.**
+   * An outline circle for a stage nobody has reached, the same circle with a
+   * centre for the one they are standing on, a bare check for one that is done.
+   * The first two are one shape filling in, which is the progression, and the
+   * check is the only mark that leaves the family because finishing is the only
+   * state that is not a position in the sequence.
+   *
+   * What went was the coin around the check: a filled disc carrying a check
+   * beside a filled disc carrying a ring put two of the three inside the same
+   * container, and left hue doing most of the work of telling them apart.
+   *
+   * The bare check is `Timeline`'s, deliberately: the two components report the
+   * same kind of thing, a sequence with marks down it, and a check floating on
+   * a hairline in one beside a check inside a green coin in the other was two
+   * answers to one question. Timeline's rings came off the same day.
    */
   private get mark(): TemplateResult {
-    const icon = this.complete ? checkCircleFill : this.current ? record : circle
+    const icon = this.complete ? check : this.current ? record : circle
     return html`<svg fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg>`
   }
 
