@@ -139,9 +139,11 @@ export default function Page() {
             with their trade-offs rather than just made. If an engagement would leave you unable to
             continue without us on a retainer, it is not one we will take.
           </helix-text>
-          <a data-link href="/trust">
-            The bar every product clears before it ships
-          </a>
+          <helix-flex data-density="lg">
+            <a data-button href="/trust">
+              The trust bar
+            </a>
+          </helix-flex>
         </helix-flex>
       </section>
 
