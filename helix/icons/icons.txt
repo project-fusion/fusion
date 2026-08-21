@@ -16,6 +16,7 @@ atom
 bell
 book-open-text
 briefcase
+calendar-blank
 caret-double-left
 caret-double-right
 caret-down

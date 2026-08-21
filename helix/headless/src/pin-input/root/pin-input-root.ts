@@ -306,7 +306,13 @@ export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixForm
 
   protected override render(): TemplateResult {
     const characters = this.characters
-    return html`${this.renderLabel()}
+    /* `renderGroupLabel` and not `renderLabel`, which is what every other
+       grouped control here uses. `renderLabel` emits `for="control"` and no
+       element in this template carries that id, because a pin input is a row of
+       cells and not one control: the visible label pointed at nothing, so
+       pressing it focused nothing and the group had no accessible name at all.
+       The set names itself through `hostAria` instead. */
+    return html`${this.renderGroupLabel()}
       <div part="field" role="group" aria-describedby=${this.describedBy ?? nothing}>
         ${characters.map(
           (character, at) => html`<input

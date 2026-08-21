@@ -50,8 +50,7 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
  *
- * @csspart surface - The floating panel the menu is drawn on.
- * @csspart menu - The surface.
+ * @csspart menu - The floating panel the menu is drawn on.
  * @csspart header - The bar above a submenu, holding the way back and its name.
  * @csspart back - The control that returns from a submenu.
  * @csspart title - The name of the submenu that is showing.
@@ -250,7 +249,12 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
     if (!item) {
       return
     }
-    const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
+    /* `menu`, which is the part this template actually renders. It said
+       `surface` and therefore always found null, so `scrollItemIntoView` ran
+       with no scroller and took the page behind the menu with it, which is the
+       one thing that method exists to prevent. The controller three lines up
+       had the right name all along. */
+    const surface = this.renderRoot.querySelector<HTMLElement>('[part="menu"]')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
 

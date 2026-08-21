@@ -15970,8 +15970,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `surface`: The floating panel the menu is drawn on.
-   * - `menu`: The surface.
+   * - `menu`: The floating panel the menu is drawn on.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
    * - `title`: The name of the submenu that is showing.
@@ -26369,8 +26368,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `surface`: The floating panel the menu is drawn on.
-   * - `menu`: The surface.
+   * - `menu`: The floating panel the menu is drawn on.
    * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
    * - `title`: The name of the submenu that is showing.

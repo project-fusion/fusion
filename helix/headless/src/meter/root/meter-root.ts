@@ -1,5 +1,5 @@
 import { customElement, HelixElement, hostAria } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
@@ -298,8 +298,16 @@ export class HelixBaseMeter extends HelixElement {
     return html`<svg part="track" viewBox="0 0 100 100" aria-hidden="true">
       <circle part="groove" pathLength="100" style="--_meter-sweep: ${sweep}" />
       ${
+        /* `svg` and not `html`, which is the bug the sparkline records one
+           file over. A nested Lit template is parsed on its own, so a
+           `<circle>` written in one has no `<svg>` around it and lands in the
+           XHTML namespace: it takes the part, takes the style, inherits every
+           rule in the stylesheet, and draws nothing, because geometry belongs
+           to the namespace and not to the tag name. Both threshold ticks were
+           invisible in `shape="ring"` and `shape="arc"`, which is the whole of
+           what the round example shows. */
         bounds
-          ? html`<circle
+          ? svg`<circle
                 part="tick"
                 pathLength="100"
                 style="--_meter-along: ${along(bounds.low)}"

@@ -44,6 +44,24 @@ const toUtc = (iso: string): Date | null => {
 
 const toIso = (date: Date): string => date.toISOString().slice(0, 10)
 
+/**
+ * Today, in the reader's own timezone.
+ *
+ * **`toISOString` converts to UTC first, which makes "today" a different day
+ * for most of the planet.** Anywhere west of UTC, from late afternoon onward,
+ * `toIso(new Date())` names tomorrow: the mark landed on the wrong cell and the
+ * server and the client disagreed about which one, since the two run in
+ * different zones. The parts are read locally instead and pasted together,
+ * which is the only way to get a calendar date out of a `Date` without a
+ * conversion happening on the way.
+ */
+const localToday = (): string => {
+  const now = new Date()
+  const month = `${now.getMonth() + 1}`.padStart(2, '0')
+  const day = `${now.getDate()}`.padStart(2, '0')
+  return `${now.getFullYear()}-${month}-${day}`
+}
+
 /** Splits a comma-separated attribute, tolerating spaces and empty entries. */
 const list = (value: string): string[] =>
   value
@@ -479,7 +497,11 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
     /* Announced as off, not merely inert. Removing it from the accessibility
        tree would take the dates with it; this says the control exists and
        cannot be used, which is the same call `HelixFormElement` documents. */
-    this.internals.ariaDisabled = this.disabled ? 'true' : null
+    /* `isDisabled` and not `disabled`, which is the whole reason the getter
+       exists: a calendar inside a disabled fieldset is disabled and its own
+       property says nothing about it. Writing `disabled` here also overwrote
+       the answer `HelixFormElement.willUpdate` had just computed. */
+    this.internals.ariaDisabled = this.isDisabled ? 'true' : null
     this.internals.ariaInvalid = this.invalid ? 'true' : null
     this.report()
   }
@@ -576,7 +598,7 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
        `aria-current="date"` is the word for it, and not on the cell either, so a
        consumer could not add the mark from CSS. Computed once per month rather
        than per cell. */
-    const today = toIso(new Date())
+    const today = localToday()
     const range = this.range
 
     // One set of controls across the whole run: back on the first month,

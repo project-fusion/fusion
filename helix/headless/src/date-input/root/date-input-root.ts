@@ -7,6 +7,7 @@ import {
   MixinField,
   PopoverController,
 } from '@helix-io/core'
+import '../../icon/index.js'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../date-picker/index.js'
@@ -603,6 +604,20 @@ export class HelixBaseDateInput extends MixinControllerOpen(
                 >`
   }
 
+  /**
+   * The mark on the button that opens the calendar, behind a seam.
+   *
+   * **It had no fallback, so a date input written without a hand-slotted icon
+   * drew an empty button.** Every example in the family passes one, which is
+   * exactly what hid it; `Select`'s own template records the identical bug as
+   * already fixed there, and `Time Input` has drawn a clock all along. Slotting
+   * anything still replaces it, which is this library's rule for a content
+   * default.
+   */
+  protected renderTrigger(): TemplateResult {
+    return html`<slot name="trigger"><helix-icon name="calendar-blank"></helix-icon></slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -639,7 +654,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
           ?disabled=${this.isDisabled}
           @click=${() => this.toggleOpen()}
         >
-          <slot name="trigger"></slot>
+          ${this.renderTrigger()}
         </button>
       </div>
 

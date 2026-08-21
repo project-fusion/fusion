@@ -61,18 +61,24 @@ describe('chart legend', () => {
     expect(names(host)).toEqual(['Accounts by plan'])
   })
 
-  test('the entries carry a palette index, which starts over after eight', async () => {
-    const wide = `<table id="wide"><thead><tr>${[
-      'x',
-      ...Array.from({ length: 9 }, (_, i) => `S${i + 1}`),
-    ]
-      .map((h) => `<th>${h}</th>`)
-      .join('')}</tr></thead><tbody><tr><th scope="row">R</th>${Array.from(
-      { length: 9 },
-      () => '<td>1</td>',
-    ).join('')}</tr></tbody></table>`
+  test('the entries carry a palette index, which starts over after twenty-four', async () => {
+    /* The palette is eight hues in three tones, so a legend past eight repeats
+       a hue in a different tone rather than repeating a colour. This pinned
+       eight until the tokens went to twenty-four, at which point a chart of
+       twelve painted series nine and its legend painted series one: the two
+       disagreeing is the one thing the legend exists to prevent. */
+    const names = Array.from({ length: 26 }, (_, index) => `S${index + 1}`)
+    const wide = `<table id="wide"><thead><tr>${['x', ...names]
+      .map((header) => `<th>${header}</th>`)
+      .join('')}</tr></thead><tbody><tr><th scope="row">R</th>${names
+      .map(() => '<td>1</td>')
+      .join('')}</tr></tbody></table>`
     const host = await legend(wide, 'for="wide"')
-    expect(indices(host)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '1'])
+    const drawn = indices(host)
+    expect(drawn.slice(0, 8)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8'])
+    expect(drawn[23]).toBe('24')
+    expect(drawn[24]).toBe('1')
+    expect(drawn[25]).toBe('2')
   })
 
   test('a list is a list, so a screen reader counts the series', async () => {

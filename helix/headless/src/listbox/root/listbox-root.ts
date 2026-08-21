@@ -829,7 +829,13 @@ export class HelixBaseListbox extends MixinCollection(
         part="items"
         id="items"
         aria-busy=${this.loading ? 'true' : nothing}
-        tabindex=${this.disabled ? -1 : 0}
+        ${
+          /* `isDisabled`, matching the filter input above it. The two lines
+             disagreed, so a listbox in a disabled fieldset kept its tab stop
+             and took arrow keys while its own filter was correctly out. */
+          ''
+        }
+        tabindex=${this.isDisabled ? -1 : 0}
       >
         <slot @slotchange=${() => this.place()}></slot>
         ${

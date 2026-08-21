@@ -11756,6 +11756,17 @@
               "description": "One chosen date, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark on the button that opens the calendar, behind a seam.\n\n**It had no fallback, so a date input written without a hand-slotted icon\ndrew an empty button.** Every example in the family passes one, which is\nexactly what hid it; `Select`'s own template records the identical bug as\nalready fixed there, and `Time Input` has drawn a clock all along. Slotting\nanything still replaces it, which is this library's rule for a content\ndefault."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -22960,10 +22971,6 @@
           "cssParts": [
             {
               "description": "The floating panel the menu is drawn on.",
-              "name": "surface"
-            },
-            {
-              "description": "The surface.",
               "name": "menu"
             },
             {

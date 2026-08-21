@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** How many colours the series palette has, and so where it starts over. */
-const PALETTE = 8
+const PALETTE = 24
 
 /**
  * @summary The names a chart draws, each beside the colour it is drawn in.
@@ -153,9 +153,12 @@ export class HelixBaseChartLegend extends HelixElement {
   protected override render(): TemplateResult {
     /* The index rather than the colour, because a colour is a token and the
        headless tier holds none. The styled tier maps one to the other, and it
-       starts over after eight: a ninth series takes the first colour again,
-       which is a collision, and a chart with nine series has a worse problem
-       than the palette does. */
+       starts over after twenty-four.
+     *
+     * The palette is eight hues in three tones, so a legend of nine repeats the
+     * first hue in a brighter tone rather than repeating a colour outright. It
+     * is still a hue collision and a chart with nine series has a worse problem
+     * than the palette does; twenty-four is where it stops being able to help. */
     return html`<ul part="list" role="list">
       ${this.#names().map(
         (name, index) => html`<li

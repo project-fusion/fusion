@@ -379,9 +379,22 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
       this.stepUp(true)
     } else if (event.key === 'PageDown') {
       this.stepDown(true)
-    } else if (event.key === 'Home' && this.min !== undefined) {
+      /* Guarded the way `nudge` is. A read-only field still receives keydown,
+         so Home on one with a `min` silently rewrote the value that the arrows
+         beside it correctly refused to touch. */
+    } else if (
+      event.key === 'Home' &&
+      this.min !== undefined &&
+      !this.isDisabled &&
+      !this.readOnly
+    ) {
       this.requestValue(String(this.min))
-    } else if (event.key === 'End' && this.max !== undefined) {
+    } else if (
+      event.key === 'End' &&
+      this.max !== undefined &&
+      !this.isDisabled &&
+      !this.readOnly
+    ) {
       this.requestValue(String(this.max))
     } else {
       return

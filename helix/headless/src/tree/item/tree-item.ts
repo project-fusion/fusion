@@ -331,7 +331,6 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
         <div part="group" role="group" ?hidden=${!this.open}>
           <slot name="children"></slot>
         </div>
-      </div>
       </div>`
   }
 }
