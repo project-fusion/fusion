@@ -9,7 +9,7 @@
   <!-- Written where the gap belongs, holding the steps that fold. The crumbs
        and the menu items are both markup, so the container query in the sheet
        decides which of the two a reader sees and nothing has to run first. -->
-  <helix-breadcrumb overflow>
+  <helix-breadcrumb>
     <helix-menu label="Hidden steps">
       <helix-icon-button
         appearance="ghost"
@@ -24,17 +24,8 @@
     </helix-menu>
   </helix-breadcrumb>
 
-  <helix-breadcrumb
-    data-folds
-    href="/design"
-  >Design</helix-breadcrumb>
-  <helix-breadcrumb
-    data-folds
-    href="/design/components"
-  >Components</helix-breadcrumb>
-  <helix-breadcrumb
-    data-folds
-    href="/design/components/navigation"
-  >Navigation</helix-breadcrumb>
+  <helix-breadcrumb href="/design">Design</helix-breadcrumb>
+  <helix-breadcrumb href="/design/components">Components</helix-breadcrumb>
+  <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
   <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
 </helix-breadcrumbs>

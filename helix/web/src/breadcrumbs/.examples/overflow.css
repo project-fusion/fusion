@@ -1,9 +1,13 @@
 /* The trail folds by container query, which is the whole of the mechanism.
  *
- * `data-folds` marks the steps that go and `overflow` marks the crumb that
- * replaces them, so the two swap at one width and neither the component nor a
- * script has to work out which. It is server rendered, so a narrow page paints
- * folded on the first frame rather than painting the full trail and snapping.
+ * Nothing here is a Helix attribute. The crumb holding the menu is the one that
+ * has a menu in it, and the middle is everything that is neither the root nor
+ * the page the reader is on, which is the design rule stated in CSS rather than
+ * hand-marked in the HTML and then restated. `current` is the only selector
+ * that is ours, and a crumb already carries it.
+ *
+ * It is server rendered, so a narrow page paints folded on the first frame
+ * rather than painting the full trail and snapping.
  *
  * `container-type: inline-size` goes on the trail because the crumbs are its
  * light-DOM children, and a container query is answered by descendants. */
@@ -16,19 +20,19 @@ helix-breadcrumbs {
 }
 
 /* Wide enough for the path: every step, and no control in the way. */
-helix-breadcrumb[overflow] {
+helix-breadcrumb:has(helix-menu) {
   display: none;
 }
 
 @container (max-width: 34rem) {
-  helix-breadcrumb[data-folds] {
+  helix-breadcrumb:not(:first-child, [current], :has(helix-menu)) {
     display: none;
   }
 
-  /* The value the trail's own sheet gives it, not `revert`: these rules are in
+  /* The value the crumb's own sheet gives it, not `revert`: these rules are in
      the document and the component's are in a shadow root, so reverting lands
      on the user agent's `inline` rather than on anything Helix wrote. */
-  helix-breadcrumb[overflow] {
+  helix-breadcrumb:has(helix-menu) {
     display: inline-flex;
   }
 }

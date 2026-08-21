@@ -28,6 +28,7 @@ import { styles } from './breadcrumb.css.js'
  *
  * @cssproperty --breadcrumbs-separator-color - Color of the chevron.
  * @cssproperty --breadcrumb-hover-color - Fill behind a step under the pointer.
+ * @cssproperty --breadcrumb-control-size - How tall a control slotted into a crumb is.
  */
 @customElement('helix-breadcrumb')
 export class HelixBreadcrumb extends HelixBaseBreadcrumb {

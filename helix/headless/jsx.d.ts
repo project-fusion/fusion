@@ -722,18 +722,6 @@ export type HelixBaseBlockquoteSolidJsProps = {
 };
 
 export type HelixBaseBreadcrumbProps = {
-  /** Whether this crumb is the trail's overflow control rather than a step.
-
-A crumb, not a box the root renders around a slot. It sits in the same
-`<ol>`, so it needs the same `listitem` role and the same separator before
-it, and all of that already exists here.
-
-**And it is written where the gap belongs.** A named slot renders where the
-slot element sits, which was the end of the list, so the ellipsis came out
-after the current page rather than between the root and the tail. Nobody
-reads that as a collapsed middle. In source order the consumer puts it
-exactly where the crumbs it stands for were. */
-  overflow?: HelixBaseBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   current?: HelixBaseBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -749,18 +737,6 @@ one, and nothing selects on it. */
 };
 
 export type HelixBaseBreadcrumbSolidJsProps = {
-  /** Whether this crumb is the trail's overflow control rather than a step.
-
-A crumb, not a box the root renders around a slot. It sits in the same
-`<ol>`, so it needs the same `listitem` role and the same separator before
-it, and all of that already exists here.
-
-**And it is written where the gap belongs.** A named slot renders where the
-slot element sits, which was the end of the list, so the ellipsis came out
-after the current page rather than between the root and the tail. Nobody
-reads that as a collapsed middle. In source order the consumer puts it
-exactly where the crumbs it stands for were. */
-  "prop:overflow"?: HelixBaseBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   "prop:current"?: HelixBaseBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -11229,17 +11205,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
-   *
-   * A crumb, not a box the root renders around a slot. It sits in the same
-   * `<ol>`, so it needs the same `listitem` role and the same separator before
-   * it, and all of that already exists here.
-   *
-   * **And it is written where the gap belongs.** A named slot renders where the
-   * slot element sits, which was the end of the list, so the ellipsis came out
-   * after the current page rather than between the root and the tail. Nobody
-   * reads that as a collapsed middle. In source order the consumer puts it
-   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -11304,16 +11269,26 @@ export type CustomElements = {
    *   items went uncounted, and the result was still wrong at 34rem.
    *
    * So the trail lays out crumbs and separators, and the consumer writes what
-   * folds. A `helix-menu` of `helix-menu-item`s in a crumb marked `overflow`, and
-   * a container query deciding when it shows: server rendered, no observer, and
-   * correct before the first script runs. `.examples/overflow.css` is the whole
-   * of it.
+   * folds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query
+   * deciding when it shows: server rendered, no observer, and correct before the
+   * first script runs. `.examples/overflow.css` is the whole of it.
+   *
+   * **And the crumbs carry no marker for any of it.** There was an `overflow`
+   * property on the crumb, which existed so the controller could tell a control
+   * from a step and so the trail could size it. With the controller gone the
+   * first use went with it, and the second is better answered by the crumb
+   * sizing whatever is slotted into it, which is true of every crumb rather than
+   * of one a consumer remembered to mark. What is left is a fact CSS can already
+   * see: the crumb with the menu in it is `:has(helix-menu)`, and the middle is
+   * `:not(:first-child, [current])`. A marker would be the design rule written
+   * twice, once in the HTML and once in the sheet, with nothing keeping the two
+   * honest.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The trail's items, in order from root to current page, with an `overflow` crumb wherever the gap should appear.
+   * - `(default)`: The trail's items, in order from root to current page, with the crumb holding the fold wherever the gap should appear.
    *
    * ## CSS Parts
    *
@@ -20235,17 +20210,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
-   *
-   * A crumb, not a box the root renders around a slot. It sits in the same
-   * `<ol>`, so it needs the same `listitem` role and the same separator before
-   * it, and all of that already exists here.
-   *
-   * **And it is written where the gap belongs.** A named slot renders where the
-   * slot element sits, which was the end of the list, so the ellipsis came out
-   * after the current page rather than between the root and the tail. Nobody
-   * reads that as a collapsed middle. In source order the consumer puts it
-   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -20313,16 +20277,26 @@ export type CustomElementsSolidJs = {
    *   items went uncounted, and the result was still wrong at 34rem.
    *
    * So the trail lays out crumbs and separators, and the consumer writes what
-   * folds. A `helix-menu` of `helix-menu-item`s in a crumb marked `overflow`, and
-   * a container query deciding when it shows: server rendered, no observer, and
-   * correct before the first script runs. `.examples/overflow.css` is the whole
-   * of it.
+   * folds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query
+   * deciding when it shows: server rendered, no observer, and correct before the
+   * first script runs. `.examples/overflow.css` is the whole of it.
+   *
+   * **And the crumbs carry no marker for any of it.** There was an `overflow`
+   * property on the crumb, which existed so the controller could tell a control
+   * from a step and so the trail could size it. With the controller gone the
+   * first use went with it, and the second is better answered by the crumb
+   * sizing whatever is slotted into it, which is true of every crumb rather than
+   * of one a consumer remembered to mark. What is left is a fact CSS can already
+   * see: the crumb with the menu in it is `:has(helix-menu)`, and the middle is
+   * `:not(:first-child, [current])`. A marker would be the design rule written
+   * twice, once in the HTML and once in the sheet, with nothing keeping the two
+   * honest.
    *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: The trail's items, in order from root to current page, with an `overflow` crumb wherever the gap should appear.
+   * - `(default)`: The trail's items, in order from root to current page, with the crumb holding the fold wherever the gap should appear.
    *
    * ## CSS Parts
    *

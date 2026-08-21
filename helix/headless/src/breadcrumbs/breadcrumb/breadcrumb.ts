@@ -52,22 +52,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  */
 @customElement('helix-base-breadcrumb')
 export class HelixBaseBreadcrumb extends HelixElement {
-  /**
-   * Whether this crumb is the trail's overflow control rather than a step.
-   *
-   * A crumb, not a box the root renders around a slot. It sits in the same
-   * `<ol>`, so it needs the same `listitem` role and the same separator before
-   * it, and all of that already exists here.
-   *
-   * **And it is written where the gap belongs.** A named slot renders where the
-   * slot element sits, which was the end of the list, so the ellipsis came out
-   * after the current page rather than between the root and the tail. Nobody
-   * reads that as a collapsed middle. In source order the consumer puts it
-   * exactly where the crumbs it stands for were.
-   */
-  @property({ reflect: true, type: Boolean })
-  overflow = false
-
   /** Whether this item is the page the reader is on. */
   @property({ reflect: true, type: Boolean })
   current = false

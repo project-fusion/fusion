@@ -1993,17 +1993,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "overflow",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this crumb is the trail's overflow control rather than a step.\n\nA crumb, not a box the root renders around a slot. It sits in the same\n`<ol>`, so it needs the same `listitem` role and the same separator before\nit, and all of that already exists here.\n\n**And it is written where the gap belongs.** A named slot renders where the\nslot element sits, which was the end of the list, so the ellipsis came out\nafter the current page rather than between the root and the tail. Nobody\nreads that as a collapsed middle. In source order the consumer puts it\nexactly where the crumbs it stands for were.",
-              "attribute": "overflow",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "current",
               "type": {
                 "text": "boolean"
@@ -2115,15 +2104,6 @@
           ],
           "attributes": [
             {
-              "name": "overflow",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether this crumb is the trail's overflow control rather than a step.\n\nA crumb, not a box the root renders around a slot. It sits in the same\n`<ol>`, so it needs the same `listitem` role and the same separator before\nit, and all of that already exists here.\n\n**And it is written where the gap belongs.** A named slot renders where the\nslot element sits, which was the end of the list, so the ellipsis came out\nafter the current page rather than between the root and the tail. Nobody\nreads that as a collapsed middle. In source order the consumer puts it\nexactly where the crumbs it stands for were.",
-              "fieldName": "overflow"
-            },
-            {
               "name": "current",
               "type": {
                 "text": "boolean"
@@ -2230,7 +2210,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**The trail does not measure itself, and the overflow is markup.** It held a\n`collapse` property, a `ResizeObserver` through `CollapseController`, an\n`overflowed` getter and a `helix-change` event, all to answer one question:\nhow many crumbs fit. Removed 20 Aug 2026, because the question is the wrong\none and answering it cost more than it returned.\n\n- **It can never reach the server.** There is no width without a DOM, so the\n  server shipped every crumb and the client removed some after hydrating. A\n  trail that collapses therefore painted wrong on every single load, and the\n  SSR spec asserting \"hides no crumb, whatever collapse says\" was recording\n  that as correct behaviour rather than as the cost it is.\n- **The consumer already wrote the crumbs.** The measurement hid some, then\n  announced which, so that the consumer could read them back off the element\n  and clone them into menu items. The overflow example spent 32 lines of\n  JavaScript making a round trip out of data that started in its own markup.\n- **Nobody specifies a breadcrumb in units of fit.** Designs say \"keep the\n  root and the current page, fold the middle\", which is a fact about depth,\n  or \"fold below this width\", which is a fact CSS knows. The arithmetic was\n  the only thing that needed a width, and it was wrong three times in one day:\n  the observer watched a container that did not exist yet, the gap between\n  items went uncounted, and the result was still wrong at 34rem.\n\nSo the trail lays out crumbs and separators, and the consumer writes what\nfolds. A `helix-menu` of `helix-menu-item`s in a crumb marked `overflow`, and\na container query deciding when it shows: server rendered, no observer, and\ncorrect before the first script runs. `.examples/overflow.css` is the whole\nof it.",
+          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**The trail does not measure itself, and the overflow is markup.** It held a\n`collapse` property, a `ResizeObserver` through `CollapseController`, an\n`overflowed` getter and a `helix-change` event, all to answer one question:\nhow many crumbs fit. Removed 20 Aug 2026, because the question is the wrong\none and answering it cost more than it returned.\n\n- **It can never reach the server.** There is no width without a DOM, so the\n  server shipped every crumb and the client removed some after hydrating. A\n  trail that collapses therefore painted wrong on every single load, and the\n  SSR spec asserting \"hides no crumb, whatever collapse says\" was recording\n  that as correct behaviour rather than as the cost it is.\n- **The consumer already wrote the crumbs.** The measurement hid some, then\n  announced which, so that the consumer could read them back off the element\n  and clone them into menu items. The overflow example spent 32 lines of\n  JavaScript making a round trip out of data that started in its own markup.\n- **Nobody specifies a breadcrumb in units of fit.** Designs say \"keep the\n  root and the current page, fold the middle\", which is a fact about depth,\n  or \"fold below this width\", which is a fact CSS knows. The arithmetic was\n  the only thing that needed a width, and it was wrong three times in one day:\n  the observer watched a container that did not exist yet, the gap between\n  items went uncounted, and the result was still wrong at 34rem.\n\nSo the trail lays out crumbs and separators, and the consumer writes what\nfolds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query\ndeciding when it shows: server rendered, no observer, and correct before the\nfirst script runs. `.examples/overflow.css` is the whole of it.\n\n**And the crumbs carry no marker for any of it.** There was an `overflow`\nproperty on the crumb, which existed so the controller could tell a control\nfrom a step and so the trail could size it. With the controller gone the\nfirst use went with it, and the second is better answered by the crumb\nsizing whatever is slotted into it, which is true of every crumb rather than\nof one a consumer remembered to mark. What is left is a fact CSS can already\nsee: the crumb with the menu in it is `:has(helix-menu)`, and the middle is\n`:not(:first-child, [current])`. A marker would be the design rule written\ntwice, once in the HTML and once in the sheet, with nothing keeping the two\nhonest.",
           "name": "HelixBaseBreadcrumbs",
           "cssParts": [
             {
@@ -2240,7 +2220,7 @@
           ],
           "slots": [
             {
-              "description": "The trail's items, in order from root to current page, with an `overflow` crumb wherever the gap should appear.",
+              "description": "The trail's items, in order from root to current page, with the crumb holding the fold wherever the gap should appear.",
               "name": ""
             }
           ],

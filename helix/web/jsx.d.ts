@@ -827,18 +827,6 @@ export type HelixBlockquoteSolidJsProps = {
 };
 
 export type HelixBreadcrumbProps = {
-  /** Whether this crumb is the trail's overflow control rather than a step.
-
-A crumb, not a box the root renders around a slot. It sits in the same
-`<ol>`, so it needs the same `listitem` role and the same separator before
-it, and all of that already exists here.
-
-**And it is written where the gap belongs.** A named slot renders where the
-slot element sits, which was the end of the list, so the ellipsis came out
-after the current page rather than between the root and the tail. Nobody
-reads that as a collapsed middle. In source order the consumer puts it
-exactly where the crumbs it stands for were. */
-  overflow?: HelixBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   current?: HelixBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -854,18 +842,6 @@ one, and nothing selects on it. */
 };
 
 export type HelixBreadcrumbSolidJsProps = {
-  /** Whether this crumb is the trail's overflow control rather than a step.
-
-A crumb, not a box the root renders around a slot. It sits in the same
-`<ol>`, so it needs the same `listitem` role and the same separator before
-it, and all of that already exists here.
-
-**And it is written where the gap belongs.** A named slot renders where the
-slot element sits, which was the end of the list, so the ellipsis came out
-after the current page rather than between the root and the tail. Nobody
-reads that as a collapsed middle. In source order the consumer puts it
-exactly where the crumbs it stands for were. */
-  "prop:overflow"?: HelixBreadcrumb["overflow"];
   /** Whether this item is the page the reader is on. */
   "prop:current"?: HelixBreadcrumb["current"];
   /** Where the crumb goes, and nothing where it is the current page.
@@ -12657,17 +12633,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
-   *
-   * A crumb, not a box the root renders around a slot. It sits in the same
-   * `<ol>`, so it needs the same `listitem` role and the same separator before
-   * it, and all of that already exists here.
-   *
-   * **And it is written where the gap belongs.** A named slot renders where the
-   * slot element sits, which was the end of the list, so the ellipsis came out
-   * after the current page rather than between the root and the tail. Nobody
-   * reads that as a collapsed middle. In source order the consumer puts it
-   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -12692,6 +12657,7 @@ export type CustomElements = {
    *
    * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
    * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
+   * - `--breadcrumb-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -12719,7 +12685,6 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-gap`: Space between items and separators. (default: `undefined`)
-   * - `--breadcrumbs-overflow-size`: How tall the control in the gap may be. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21839,17 +21804,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `overflow`: Whether this crumb is the trail's overflow control rather than a step.
-   *
-   * A crumb, not a box the root renders around a slot. It sits in the same
-   * `<ol>`, so it needs the same `listitem` role and the same separator before
-   * it, and all of that already exists here.
-   *
-   * **And it is written where the gap belongs.** A named slot renders where the
-   * slot element sits, which was the end of the list, so the ellipsis came out
-   * after the current page rather than between the root and the tail. Nobody
-   * reads that as a collapsed middle. In source order the consumer puts it
-   * exactly where the crumbs it stands for were.
    * - `current`: Whether this item is the page the reader is on.
    * - `href`: Where the crumb goes, and nothing where it is the current page.
    *
@@ -21874,6 +21828,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--breadcrumbs-separator-color`: Color of the chevron. (default: `undefined`)
    * - `--breadcrumb-hover-color`: Fill behind a step under the pointer. (default: `undefined`)
+   * - `--breadcrumb-control-size`: How tall a control slotted into a crumb is. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -21904,7 +21859,6 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--breadcrumbs-gap`: Space between items and separators. (default: `undefined`)
-   * - `--breadcrumbs-overflow-size`: How tall the control in the gap may be. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30839,10 +30793,10 @@ export type CustomCssProperties = {
   "--breadcrumbs-separator-color"?: string;
   /** Fill behind a step under the pointer. */
   "--breadcrumb-hover-color"?: string;
+  /** How tall a control slotted into a crumb is. */
+  "--breadcrumb-control-size"?: string;
   /** Space between items and separators. */
   "--breadcrumbs-gap"?: string;
-  /** How tall the control in the gap may be. */
-  "--breadcrumbs-overflow-size"?: string;
   /** Space between the buttons, when `spaced`. */
   "--button-group-gap"?: string;
   /** Fill behind the button. */

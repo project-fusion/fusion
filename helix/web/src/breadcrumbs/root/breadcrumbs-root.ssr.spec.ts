@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test'
 import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
-/* The overflow crumb holds a menu the consumer wrote, so the server has to be
-   able to render one: an unimported tag renders as an inert unknown element. */
+/* A crumb holds the menu the consumer wrote, so the server has to be able to
+   render one: an unimported tag renders as an inert unknown element. */
 import '../../menu/index.js'
 
 const trail = html`<helix-breadcrumbs>
@@ -46,14 +46,14 @@ describe('breadcrumbs overflow, server rendered', () => {
      container query, which is why neither is conditional here. */
   const folding = html`<helix-breadcrumbs>
     <helix-breadcrumb href="/">Home</helix-breadcrumb>
-    <helix-breadcrumb overflow>
+    <helix-breadcrumb>
       <helix-menu label="Hidden steps">
         <helix-menu-item href="/a">A</helix-menu-item>
         <helix-menu-item href="/b">B</helix-menu-item>
       </helix-menu>
     </helix-breadcrumb>
-    <helix-breadcrumb data-folds href="/a">A</helix-breadcrumb>
-    <helix-breadcrumb data-folds href="/b">B</helix-breadcrumb>
+    <helix-breadcrumb href="/a">A</helix-breadcrumb>
+    <helix-breadcrumb href="/b">B</helix-breadcrumb>
     <helix-breadcrumb current>C</helix-breadcrumb>
   </helix-breadcrumbs>`
 

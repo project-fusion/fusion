@@ -39,10 +39,20 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *   items went uncounted, and the result was still wrong at 34rem.
  *
  * So the trail lays out crumbs and separators, and the consumer writes what
- * folds. A `helix-menu` of `helix-menu-item`s in a crumb marked `overflow`, and
- * a container query deciding when it shows: server rendered, no observer, and
- * correct before the first script runs. `.examples/overflow.css` is the whole
- * of it.
+ * folds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query
+ * deciding when it shows: server rendered, no observer, and correct before the
+ * first script runs. `.examples/overflow.css` is the whole of it.
+ *
+ * **And the crumbs carry no marker for any of it.** There was an `overflow`
+ * property on the crumb, which existed so the controller could tell a control
+ * from a step and so the trail could size it. With the controller gone the
+ * first use went with it, and the second is better answered by the crumb
+ * sizing whatever is slotted into it, which is true of every crumb rather than
+ * of one a consumer remembered to mark. What is left is a fact CSS can already
+ * see: the crumb with the menu in it is `:has(helix-menu)`, and the middle is
+ * `:not(:first-child, [current])`. A marker would be the design rule written
+ * twice, once in the HTML and once in the sheet, with nothing keeping the two
+ * honest.
  *
  * @since 0.1.0
  * @status experimental
@@ -50,8 +60,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @aliases Breadcrumb, Crumbs
  * @documentation https://helix.fusion.dev/components/breadcrumbs
  *
- * @slot - The trail's items, in order from root to current page, with an
- * `overflow` crumb wherever the gap should appear.
+ * @slot - The trail's items, in order from root to current page, with the
+ * crumb holding the fold wherever the gap should appear.
  *
  * @csspart list - The ordered list.
  */
@@ -65,9 +75,9 @@ export class HelixBaseBreadcrumbs extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* One slot. The overflow crumb is a crumb the consumer placed in source
-       order, so there is nothing here to position it: the list renders what it
-       was given, in the order it was given. */
+    /* One slot. The crumb holding the fold is one the consumer placed in
+       source order, so there is nothing here to position it: the list renders
+       what it was given, in the order it was given. */
     return html`<ol part="list" role="list">
       <slot></slot>
     </ol>`

@@ -1,4 +1,18 @@
 :host {
+  /* A control in a crumb is a crumb-sized target, not an icon-sized one.
+   *
+   * `::slotted(a)` below is a line box with `2xs` above and below, which comes
+   * out at 28. An `IconButton` slotted beside it takes the control size, 40, so
+   * the row stepped around it, and it was pinned to the icon's own size to stop
+   * that: 20 against links of 28, so hovering a step and then the control gave
+   * two different fills. The same arithmetic as the link, so the two agree by
+   * construction rather than by a number kept in step by hand.
+   *
+   * Here and not on the control, because `::slotted()` reaches one level and
+   * the trigger is inside whatever was slotted. A custom property inherits the
+   * rest of the way, and one nothing reads costs nothing. */
+  --icon-button-size: var(--breadcrumb-control-size, calc(1lh + var(--helix-space-2xs) * 2));
+
   align-items: center;
   display: inline-flex;
   gap: var(--breadcrumbs-gap, var(--helix-space-xs));
@@ -124,6 +138,23 @@
   gap: var(--helix-space-2xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   text-decoration: none;
+}
+
+/* The block half of that padding is what the hover fill is made of, so a crumb
+ * that has no fill does not need it.
+ *
+ * It is rendered for every crumb, a `<span>` where there is no `href`, which is
+ * the current page and any crumb holding a control. For a control that padding
+ * is counted twice: the control is already sized to a crumb's own box above, so
+ * wrapping it in four more pixels made the row 36 against everyone else's 28
+ * and the trail stepped around it. Sized smaller to fit inside instead, and the
+ * control's hover fill is 20 tall beside links of 28, which is the same
+ * mismatch seen from the other end.
+ *
+ * The inline half stays: it is the rhythm between a crumb and its chevron, and
+ * the current page keeps it whether or not anything lights up. */
+:host(:not([href])) [part="link"] {
+  padding-block: var(--helix-space-none);
 }
 
 /* The same hover the slotted path has, because `::slotted(a:hover)` cannot

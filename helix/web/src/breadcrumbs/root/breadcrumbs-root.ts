@@ -21,7 +21,6 @@ import { styles } from './breadcrumbs-root.css.js'
  * @csspart list - The ordered list.
  *
  * @cssproperty --breadcrumbs-gap - Space between items and separators.
- * @cssproperty --breadcrumbs-overflow-size - How tall the control in the gap may be.
  */
 @customElement('helix-breadcrumbs')
 export class HelixBreadcrumbs extends HelixBaseBreadcrumbs {
