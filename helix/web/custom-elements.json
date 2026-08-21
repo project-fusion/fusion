@@ -1641,6 +1641,15 @@
             },
             {
               "kind": "field",
+              "name": "terminus",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in\ncharge, so an angle is still sayable where the angle really is the point,\nwhich is what an aura in a square tile wants.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
+              "attribute": "terminus"
+            },
+            {
+              "kind": "field",
               "name": "variance",
               "type": {
                 "text": "number"
@@ -1942,6 +1951,16 @@
               }
             },
             {
+              "kind": "field",
+              "name": "bearing",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The angle actually drawn, which is `terminus` resolved against the box.\n\n`atan` of the run over the rise, the run being the fraction of the width\nthe exit is asked for and the rise the box's own height. A getter rather\nthan a stored value because the box changes and this has no business\nknowing when: it is read once per frame from numbers that are already\nthere.",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "drifted",
               "privacy": "private",
@@ -1969,8 +1988,7 @@
                     "text": "number"
                   }
                 }
-              ],
-              "description": "One axis, wandering around its set value.\n\nTwo sines at an irrational ratio rather than one, so a single axis has no\nperiod of its own either. Bounded by construction: the weights sum to one,\nso the value never leaves `base` plus or minus `span`."
+              ]
             },
             {
               "kind": "method",
@@ -2186,6 +2204,14 @@
               "fieldName": "tilt"
             },
             {
+              "name": "terminus",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Where the axis crosses the top edge, as a fraction of the width.\n\n**An angle does not say what a consumer means, and this does.** The axis\nruns `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else\nthe moment the box changes shape. Measured on the landing page hero, which\nwas tuned to 23 degrees against a box two screens tall: at a 1152 pixel\nwindow that lands the exit at 979, between the navigation and the actions,\nand at a 720 pixel window it lands at 611, a third of the way further left.\nNothing is wrong with either number and neither is what anybody asked for.\n\nGiven as a fraction rather than a length so it survives the same change:\n`0.5` is the middle of the top edge at every size. Absent leaves `tilt` in\ncharge, so an angle is still sayable where the angle really is the point,\nwhich is what an aura in a square tile wants.\n\nDerived from the box the resize observer already keeps, so it costs no\nlayout read per frame, and the drift is applied to the result rather than\nto the angle behind it: the field still wanders, around a bearing that\nholds the exit where it was put.",
+              "fieldName": "terminus"
+            },
+            {
               "name": "variance",
               "type": {
                 "text": "number"
@@ -2254,6 +2280,10 @@
               {
                 "description": "Light travelling in lanes. The pointer is an obstacle the trails bow around.",
                 "slug": "streaks"
+              },
+              {
+                "description": "Where the light leaves the top edge, held there whatever the box does.",
+                "slug": "terminus"
               },
               {
                 "description": "Five curves woven to a pinch, and the pointer carries the pinch.",

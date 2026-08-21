@@ -67,15 +67,16 @@ export default function Home() {
   return (
     <div className="reel">
       {/* Starting at the top of the page and running past the hero.
-          
-          The tilt is 23 rather than a rounder number because it is derived.
-          The braid's axis is the line where the rotated x is zero, which in
-          screen terms is `x = y * tan(tilt)`, so at the top of the box it comes
-          out at `tan(tilt)`. Against a field 1280 by 1600 that is an aspect of
-          0.8, and 42 degrees put the axis at 1360: past the right edge, so it
-          left through the side instead of the top and read as running into the
-          corner. 23 lands it at 979, which is the midpoint between the
-          navigation's right edge and the actions.
+
+          `terminus` and not `tilt`, because the thing being asked for is where
+          the braid leaves the top edge and an angle only says that for one
+          shape of box. It was 23 degrees, derived against a field 1280 by 1600
+          to land the axis at 979, the midpoint between the navigation's right
+          edge and the actions. That number holds at exactly one window height:
+          measured at a 720 pixel viewport the same 23 degrees put the exit at
+          611, a third of the way further left, because the reel is two screens
+          tall and its aspect moves with the window. 0.76 of the width is the
+          same intent said in the terms the reader sees, and it holds.
           
           It used to be inside the hero, so it stopped dead at the end of the
           first band. It scrolls with the page rather than being pinned to the
@@ -83,7 +84,13 @@ export default function Home() {
           it never asks for the hit test and every control keeps its presses. It
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
-      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={0.45} tilt={23}></helix-aura>
+      <helix-aura
+        class="reelAura"
+        gain={0.55}
+        scale={1.7}
+        speed={0.45}
+        terminus={0.76}
+      ></helix-aura>
       <div className="reelScrim" />
 
       <section className="hero">

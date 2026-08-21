@@ -1,0 +1,6 @@
+/* Aura fills the box it is given, the way an image does, so an example has to
+   give it one. Two of the same height, because the point is where the light
+   leaves and not how tall the frame is. */
+.stage {
+  block-size: 11rem;
+}

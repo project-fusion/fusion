@@ -156,6 +156,30 @@ export class HelixAura extends HelixElement {
   tilt = 14
 
   /**
+   * Where the axis crosses the top edge, as a fraction of the width.
+   *
+   * **An angle does not say what a consumer means, and this does.** The axis
+   * runs `x = y * tan(tilt)`, so the same `tilt` puts the exit somewhere else
+   * the moment the box changes shape. Measured on the landing page hero, which
+   * was tuned to 23 degrees against a box two screens tall: at a 1152 pixel
+   * window that lands the exit at 979, between the navigation and the actions,
+   * and at a 720 pixel window it lands at 611, a third of the way further left.
+   * Nothing is wrong with either number and neither is what anybody asked for.
+   *
+   * Given as a fraction rather than a length so it survives the same change:
+   * `0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
+   * charge, so an angle is still sayable where the angle really is the point,
+   * which is what an aura in a square tile wants.
+   *
+   * Derived from the box the resize observer already keeps, so it costs no
+   * layout read per frame, and the drift is applied to the result rather than
+   * to the angle behind it: the field still wanders, around a bearing that
+   * holds the exit where it was put.
+   */
+  @property({ type: Number })
+  terminus?: number
+
+  /**
    * How much the members of a population differ from one another, `0` a set
    * that is uniform and `1` the resting amount. Clamped to that range: these
    * are interpolations, so a larger number extrapolates rather than
@@ -508,7 +532,7 @@ export class HelixAura extends HelixElement {
     /* Each axis wanders on its own period. The seeds are deliberately not
        simple ratios of each other: two axes on periods that divide would come
        back into phase and give the whole field a beat. */
-    gl.uniform1f(uniforms.uTilt ?? null, this.drifted(this.tilt, 14, 0.037))
+    gl.uniform1f(uniforms.uTilt ?? null, this.drifted(this.bearing, 14, 0.037))
     gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
     gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
     gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
@@ -638,6 +662,23 @@ export class HelixAura extends HelixElement {
    * period of its own either. Bounded by construction: the weights sum to one,
    * so the value never leaves `base` plus or minus `span`.
    */
+  /**
+   * The angle actually drawn, which is `terminus` resolved against the box.
+   *
+   * `atan` of the run over the rise, the run being the fraction of the width
+   * the exit is asked for and the rise the box's own height. A getter rather
+   * than a stored value because the box changes and this has no business
+   * knowing when: it is read once per frame from numbers that are already
+   * there.
+   */
+  private get bearing(): number {
+    if (this.terminus === undefined) {
+      return this.tilt
+    }
+    const { height, width } = this.box
+    return (Math.atan((this.terminus * width) / height) * 180) / Math.PI
+  }
+
   private drifted(base: number, span: number, seed: number): number {
     if (!this.drift) {
       return base
