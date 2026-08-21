@@ -38,29 +38,39 @@ import type { CSSProperties, ReactNode } from 'react'
 export const contentArt: Record<string, ReactNode> = {
   /** Rows read as a set, divided by a rule and nothing else. */
   /**
-   * Two strands crossing inside a bloom, with a line of content over them.
+   * Shafts of light fanning from a source above the frame.
    *
-   * **Contours, not a gradient.** The first pass drew the falloff as two
-   * `linearGradient`s of `currentColor`, which broke three rules at once: the
-   * grid is monotone and has no accent, ink has exactly three steps, and a
-   * continuous ramp is every step there is. Three nested bands at `0.12`,
-   * `0.28` and `0.55` say the same thing in the vocabulary every other card
-   * uses, and read as a diagram of a light rather than a bad photograph of one.
+   * **Contours, not a gradient, and that is the only thing the first pass got
+   * wrong.** It drew this composition with two `linearGradient`s, which is a
+   * better picture and an illegal one: ink here is a percentage of foreground
+   * at `0.12`, `0.28` or `0.55`, and a ramp is every step there is. Redrawn as
+   * a bloom, two shafts and a core at exactly those three, the fan survives and
+   * the ink is countable.
    *
-   * **The bar is as much the subject as the light is.** Without it this is a
-   * picture in a bounded box, which is `image` exactly. The one thing that
-   * makes an aura an aura is that words sit on it. One bar and not a stack:
-   * two would be a layout, and this is a surface.
+   * The correction after that went too far the other way, into flat bands and a
+   * serpentine, which obeyed every rule and stopped looking like light. A card
+   * has to be legible as its component first.
    *
-   * `artOpen` on the bloom alone. The strands are the part that is always
-   * there; the bloom is what arrives around them, which is the difference
-   * between a flat background and this one.
+   * The apex sits far above and to the right, well outside the clip. Distance
+   * is what stops it reading as a road: brought close, the shafts converge hard
+   * on a vanishing point and the card becomes a highway at night. Pushed out to
+   * nearly three times the plane's height, they rake across it almost parallel,
+   * which is what light through an opening actually does.
+   *
+   * **The widths are uneven on purpose.** Three shafts at one width and one
+   * spacing read as paint: a fan is legible as light because the gaps between
+   * its members are not equal, which is what an opening actually casts. And the
+   * bloom stops short of the plane's edges, so there is dark on both sides to
+   * be lit against.
+   *
+   * `artOpen` on the bloom and the shafts. The core is the part that is always
+   * there; the fan is what arrives around it.
    */
   aura: (
     <>
       <defs>
-        {/* The shaft runs past the plane on every side and `artOpen` scales it
-            further, so it is clipped to the plane's own radius. */}
+        {/* The fan is drawn from a point outside the plane and `artOpen` scales
+            it further, so it is clipped to the plane's own radius. */}
         <clipPath id="helixArtAuraPlane">
           <rect height="112" rx="8" width="224" x="48" y="44" />
         </clipPath>
@@ -69,41 +79,14 @@ export const contentArt: Record<string, ReactNode> = {
       <rect className="artSunken" height="112" rx="8" width="224" x="48" y="44" />
 
       <g clipPath="url(#helixArtAuraPlane)">
-        {/* Leaned, because the component leans by default and a column standing
-            straight behind left-aligned words reads as a divider between them
-            and the space beside them. */}
-        <g transform="rotate(-12 160 100)">
-          <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
-            <rect className="artInk" fillOpacity="0.12" height="150" width="104" x="108" y="25" />
-            <rect className="artInk" fillOpacity="0.28" height="150" width="52" x="134" y="25" />
-          </g>
-          {/* Two strands, each bowing where the other does not, crossing three
-              times over the height: the braid the component draws when nothing
-              is chosen.
-              
-              Stroked rather than filled, because a ribbon drawn as a closed
-              path meets itself at both ends and reads as an eye. And written
-              as explicit cubics rather than with the `S` shorthand, which
-              reflects the previous control point and tied a loop at every
-              join: two filled blobs on a card whose subject is a pair of
-              curves. */}
-          <path
-            className="artStroke"
-            d="M140 25C140 42 180 58 180 75C180 92 140 108 140 125C140 142 180 158 180 175"
-            strokeOpacity="0.55"
-            strokeWidth="2.5"
-          />
-          <path
-            className="artStroke"
-            d="M180 25C180 42 140 58 140 75C140 92 180 108 180 125C180 142 140 158 140 175"
-            strokeOpacity="0.55"
-            strokeWidth="2.5"
-          />
+        <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
+          <path className="artInk" d="M244-132 52 156h184z" fillOpacity="0.12" />
+          <path className="artInk" d="M244-132 84 156h34z" fillOpacity="0.28" />
+          <path className="artInk" d="M244-132 140 156h18z" fillOpacity="0.28" />
+          <path className="artInk" d="M244-132 186 156h28z" fillOpacity="0.28" />
         </g>
+        <path className="artInk" d="M244-132 122 156h10z" fillOpacity="0.55" />
       </g>
-
-      {/* The words the light is behind. */}
-      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="72" x="64" y="132" />
 
       <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
     </>
