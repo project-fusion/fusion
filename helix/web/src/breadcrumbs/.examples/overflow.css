@@ -14,9 +14,15 @@
 helix-breadcrumbs {
   container-type: inline-size;
   display: block;
-  /* Narrow on purpose. Without a width the example never reaches the query and
-     demonstrates the absence of the thing it exists to show. */
+  /* Drag the trailing edge. It starts folded, because an example of a fold that
+     opens fitting demonstrates the absence of itself, and it opens as soon as
+     there is room, so neither arrangement is one you have to take on trust.
+     `resize` needs a scroll container, and the menu is a popover in the top
+     layer, so it still escapes this one. */
   inline-size: 26rem;
+  max-inline-size: 100%;
+  overflow: auto;
+  resize: horizontal;
 }
 
 /* Wide enough for the path: every step, and no control in the way. */

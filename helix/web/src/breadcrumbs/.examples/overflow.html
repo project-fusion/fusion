@@ -6,9 +6,10 @@
 <helix-breadcrumbs aria-label="Breadcrumb">
   <helix-breadcrumb href="/">Home</helix-breadcrumb>
 
-  <!-- Written where the gap belongs, holding the steps that fold. The crumbs
-       and the menu items are both markup, so the container query in the sheet
-       decides which of the two a reader sees and nothing has to run first. -->
+  <!-- Written where the gap belongs, holding the steps that fold. They are the
+       same three steps as the crumbs below, on purpose: both arrangements are
+       markup, so the sheet shows one and hides the other rather than anything
+       building the second from the first at runtime. -->
   <helix-breadcrumb>
     <helix-menu label="Hidden steps">
       <helix-icon-button
