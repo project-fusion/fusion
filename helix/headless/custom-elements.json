@@ -2230,7 +2230,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**`collapse` hides the middle, and only ever the middle.** A trail that does\nnot fit keeps its root and its current page, because those are the two a\nreader is orienting by: the first says where the tree begins and the last says\nwhere they are. Everything between them goes behind one trigger.\n\n**The server sends the whole trail, and the client only ever removes.** There\nis no width to measure without a DOM, so nothing is hidden until\n`CollapseController` has measured, and a reader with no JavaScript keeps every\ncrumb. That is the right answer rather than a fallback, and this arrangement\ncannot leave them with less.\n\n**The overflow control is the consumer's, and it is a crumb.** Rendering a menu here\nwould put `Menu`, and the popover machinery under it, into anything that\nimports a breadcrumb trail, which is a lot to carry for a trail that usually\nfits. So the trail hides crumbs and reports which, and whatever is slotted as\n`overflow` decides how to show them. It appears only while something is\nactually hidden.",
+          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**`collapse` hides the middle, and only ever the middle.** A trail that does\nnot fit keeps its root and its current page, because those are the two a\nreader is orienting by: the first says where the tree begins and the last says\nwhere they are. Everything between them goes behind one trigger.\n\n**The server sends the whole trail, and the client only ever removes.** There\nis no width to measure without a DOM, so nothing is hidden until\n`CollapseController` has measured, and a reader with no JavaScript keeps every\ncrumb. That is the right answer rather than a fallback, and this arrangement\ncannot leave them with less.\n\n**The overflow control is the consumer's, and it is a crumb.** Rendering a menu here\nwould put `Menu`, and the popover machinery under it, into anything that\nimports a breadcrumb trail, which is a lot to carry for a trail that usually\nfits. So the trail hides crumbs and reports which, and whatever is slotted as\n`overflow` decides how to show them. It appears only while something is\nactually hidden.\n\n**And it says when the set changes, which it did not.** Reporting which\ncrumbs are hidden through a getter and never announcing that the answer moved\nleft a consumer with a menu they had no moment to fill: the trail collapsed on\na resize and whatever was slotted as `overflow` heard nothing. A getter is an\nanswer to a question nobody knew to ask again.",
           "name": "HelixBaseBreadcrumbs",
           "cssParts": [
             {
@@ -2397,6 +2397,16 @@
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
               }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
             }
           ],
           "attributes": [

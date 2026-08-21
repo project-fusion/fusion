@@ -1,8 +1,8 @@
 #
 # One name per line. Phosphor names resolve from @phosphor-icons/core at build
+# The icon set.
 # rather than finding and pasting an SVG. A name the package does not have is
 # read from raw/, which is where marks that are not Phosphor live.
-# The icon set.
 # time, regular weight first and then fill, so adding an icon is adding a line
 airplay
 arrow-left
@@ -33,6 +33,7 @@ copy
 corners-in
 corners-out
 cube
+dots-three
 dots-three-vertical
 download
 envelope

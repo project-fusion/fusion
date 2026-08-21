@@ -3343,6 +3343,20 @@
               }
             }
           ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumbs",
+                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
+              }
+            }
+          ],
           "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
           "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
         }

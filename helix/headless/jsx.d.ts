@@ -780,14 +780,28 @@ one, and nothing selects on it. */
   textContent?: string | number;
 };
 
+/** `HelixBaseBreadcrumbs` component event */
+export type HelixBaseBreadcrumbsElementEvent<E = Event> = TypedEvent<
+  HelixBaseBreadcrumbs,
+  E
+>;
+/** `helix-change` event type */
+export type HelixBaseBreadcrumbsHelixChangeElementEvent =
+  HelixBaseBreadcrumbsElementEvent<HelixChangeEvent>;
+
 export type HelixBaseBreadcrumbsProps = {
   /** Whether a trail that does not fit hides its middle. */
   collapse?: HelixBaseBreadcrumbs["collapse"];
+
+  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
+  "onhelix-change"?: (e: HelixBaseBreadcrumbsHelixChangeElementEvent) => void;
 };
 
 export type HelixBaseBreadcrumbsSolidJsProps = {
   /** Whether a trail that does not fit hides its middle. */
   "prop:collapse"?: HelixBaseBreadcrumbs["collapse"];
+  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
+  "on:helix-change"?: (e: HelixBaseBreadcrumbsHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11305,6 +11319,12 @@ export type CustomElements = {
    * `overflow` decides how to show them. It appears only while something is
    * actually hidden.
    *
+   * **And it says when the set changes, which it did not.** Reporting which
+   * crumbs are hidden through a getter and never announcing that the answer moved
+   * left a consumer with a menu they had no moment to fill: the trail collapsed on
+   * a resize and whatever was slotted as `overflow` heard nothing. A getter is an
+   * answer to a question nobody knew to ask again.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -11315,6 +11335,12 @@ export type CustomElements = {
    * Elements rather than data, so a consumer reads `href` and text off the same
    * objects they wrote. Handing over a copy would be a second version of the
    * trail to keep in step. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.
    *
    * ## Slots
    *
@@ -20315,6 +20341,12 @@ export type CustomElementsSolidJs = {
    * `overflow` decides how to show them. It appears only while something is
    * actually hidden.
    *
+   * **And it says when the set changes, which it did not.** Reporting which
+   * crumbs are hidden through a getter and never announcing that the answer moved
+   * left a consumer with a menu they had no moment to fill: the trail collapsed on
+   * a resize and whatever was slotted as `overflow` heard nothing. A getter is an
+   * answer to a question nobody knew to ask again.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -20325,6 +20357,12 @@ export type CustomElementsSolidJs = {
    * Elements rather than data, so a consumer reads `href` and text off the same
    * objects they wrote. Handing over a copy would be a second version of the
    * trail to keep in step. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.
    *
    * ## Slots
    *

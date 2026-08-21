@@ -1,4 +1,10 @@
-import { CollapseController, customElement, HelixElement, hostAria } from '@helix-io/core'
+import {
+  CollapseController,
+  customElement,
+  HelixChangeEvent,
+  HelixElement,
+  hostAria,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
 
@@ -38,11 +44,20 @@ const KEEP_LEADING = 1
  * `overflow` decides how to show them. It appears only while something is
  * actually hidden.
  *
+ * **And it says when the set changes, which it did not.** Reporting which
+ * crumbs are hidden through a getter and never announcing that the answer moved
+ * left a consumer with a menu they had no moment to fill: the trail collapsed on
+ * a resize and whatever was slotted as `overflow` heard nothing. A getter is an
+ * answer to a question nobody knew to ask again.
+ *
  * @since 0.1.0
  * @status experimental
  * @category navigation
  * @aliases Breadcrumb, Crumbs
  * @documentation https://helix.fusion.dev/components/breadcrumbs
+ *
+ * @event {HelixChangeEvent} helix-change - Fired when the hidden set changes,
+ * carrying the count. Read `overflowed` off the element for the crumbs.
  *
  * @slot - The trail's items, in order from root to current page, with an
  * `overflow` crumb wherever the gap should appear.
@@ -146,6 +161,14 @@ export class HelixBaseBreadcrumbs extends HelixElement {
       next.length === this.hiddenAt.length && next.every((value, at) => value === this.hiddenAt[at])
     if (!same) {
       this.hiddenAt = next
+      /* Announced, because the overflow control is the consumer's and a getter
+         alone gave them no moment to read it. Bubbling and composed, so a page
+         holding several trails can listen once. The count rather than the
+         crumbs: a detail carries a string, and the elements are on the property
+         where a consumer can read `href` and text off their own objects. */
+      this.dispatchEvent(
+        new HelixChangeEvent({ property: 'overflowed', value: String(next.length) }),
+      )
     }
 
     /* `hidden` on the consumer's own element, which is the one thing here that

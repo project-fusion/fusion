@@ -1,5 +1,4 @@
 <!-- @summary A trail that hides its middle when it will not fit, behind a menu you supply. -->
-
 <helix-breadcrumbs
   aria-label="Breadcrumb"
   collapse
@@ -25,3 +24,30 @@
   <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
   <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
 </helix-breadcrumbs>
+
+<script type="module">
+  /* The trail hides crumbs and says which. Filling the menu is the consumer's
+     half, and without it the control opens on nothing, which is what "the
+     overflow is not showing" looked like from the outside.
+
+     Queried rather than reached for from `currentScript`, which is null inside
+     a module: modules run after parsing and the property is only set while a
+     classic script is executing. */
+  const trail = document.querySelector('helix-breadcrumbs')
+  const menu = trail.querySelector('helix-menu')
+
+  const fill = () => {
+    for (const stale of menu.querySelectorAll('helix-menu-item')) {
+      stale.remove()
+    }
+    for (const crumb of trail.overflowed) {
+      const item = document.createElement('helix-menu-item')
+      item.textContent = crumb.textContent.trim()
+      item.href = crumb.getAttribute('href') ?? ''
+      menu.append(item)
+    }
+  }
+
+  trail.addEventListener('helix-change', fill)
+  fill()
+</script>
