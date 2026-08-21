@@ -139,6 +139,20 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     scheme === 'dark' ? { ...neutral, lightness: 0.15 } : { ...neutral, lightness: 0.985 }
   const rawSurface: Oklch =
     scheme === 'dark' ? { ...neutral, lightness: 0.21 } : { chroma: 0, hue: 0, lightness: 1 }
+  /* **The surfaces a component actually names, not just the two the page has.**
+     A dropdown sits on `surface-overlay`, a recess on `surface-sunken`, a card
+     that lifts on `surface-raised`. Emitting only `background` and `surface`
+     left every one of those reading a token nothing derived, so a themed panel
+     kept the stock greys exactly where a popover opened. */
+  /* Stated per scheme rather than stepped off `surface`, because a step has to
+     know which way is away and the answer is not the same for all three. Raised
+     and overlay move off the surface; sunken goes *under the background*, and a
+     light theme's surface is already pure white, so stepping it produced a
+     lightness of 1.05 and the gamut check caught it. */
+  const rawRaised: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.25 : 0.96 }
+  const rawOverlay: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.25 : 1 }
+  const rawSunken: Oklch = { ...neutral, lightness: scheme === 'dark' ? 0.11 : 0.93 }
+
   const background = fitToGamut(rawBackground)
   const surface = fitToGamut(rawSurface)
 
@@ -146,7 +160,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // page background: in a dark theme `surface` is *lighter* than `background`,
   // so light text loses contrast there. Solving against a single surface ships
   // a palette that passes on the page and fails inside every card.
-  const surfaces = [background, surface]
+  const surfaces = [background, surface, fitToGamut(rawRaised), fitToGamut(rawSunken)]
   const solveForAll = (sample: Omit<Oklch, 'lightness'>, target: number): Oklch => {
     const worstCase = (candidate: Oklch): number =>
       Math.min(...surfaces.map((s) => contrastRatio(fitToGamut(candidate), s)))
@@ -164,7 +178,28 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // target. That is what preserves brand identity while guaranteeing contrast.
   const rawPrimary = solveForAll({ chroma: brand.chroma, hue: brand.hue }, contrastTarget)
   const primary = fitToGamut(rawPrimary)
-  const primaryForeground = lightnessForContrast({ chroma: 0, hue: 0 }, primary, contrastTarget)
+  const onAccent = lightnessForContrast({ chroma: 0, hue: 0 }, primary, contrastTarget)
+
+  /* **The primary's own steps, because components read them and nothing made
+     them.** `hover` and `active` are the same colour under a pointer and under
+     a press, so they step in lightness and keep the hue and chroma that make it
+     the brand. `subtle` is the tinted ground a quiet badge sits on, which is
+     near the page rather than near the brand.
+
+     The direction is toward the ink in both schemes: darker on a light page,
+     lighter on a dark one, so a press always reads as more rather than as
+     whichever way the scheme happens to run. */
+  const toward = scheme === 'dark' ? 1 : -1
+  const step = (by: number): Oklch => ({
+    chroma: brand.chroma,
+    hue: brand.hue,
+    lightness: rawPrimary.lightness + by * toward,
+  })
+  const rawSubtle: Oklch = {
+    chroma: Math.min(brand.chroma, 0.06),
+    hue: brand.hue,
+    lightness: scheme === 'dark' ? rawSurface.lightness + 0.06 : 0.95,
+  }
 
   const tokens: DerivedToken[] = [
     token('color-background', rawBackground),
@@ -172,8 +207,21 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     token('color-border', border, background),
     token('color-foreground', foreground, background),
     token('color-foreground-muted', foregroundMuted, background),
+    token('color-surface-raised', rawRaised),
+    token('color-surface-overlay', rawOverlay),
+    token('color-surface-sunken', rawSunken),
     token('color-primary', rawPrimary, background),
-    token('color-primary-foreground', primaryForeground, primary),
+    /* **`foreground-on-accent`, which is the name the stylesheet reads.** This
+       emitted `color-primary-foreground` and nothing consumed it: every
+       component putting text on the brand asks for
+       `--helix-color-foreground-on-accent`, so the engine and the token layer
+       were naming the same colour differently and a themed page kept the stock
+       one. The token layer has 135 names and this has a handful, so the
+       handful moved. */
+    token('color-foreground-on-accent', onAccent, primary),
+    token('color-primary-hover', step(0.05)),
+    token('color-primary-active', step(0.1)),
+    token('color-primary-subtle', rawSubtle),
   ]
 
   // Pairings are declared explicitly rather than inferred from token names.
@@ -185,7 +233,11 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     ['foreground-muted on background', foregroundMuted, background],
     ['foreground-muted on surface', foregroundMuted, surface],
     ['primary on background', primary, background],
-    ['primary-foreground on primary', primaryForeground, primary],
+    ['foreground-on-accent on primary', onAccent, primary],
+    ['foreground on surface-raised', foreground, fitToGamut(rawRaised)],
+    ['foreground on surface-overlay', foreground, fitToGamut(rawOverlay)],
+    ['foreground on surface-sunken', foreground, fitToGamut(rawSunken)],
+    ['foreground-muted on surface-overlay', foregroundMuted, fitToGamut(rawOverlay)],
   ]
 
   const violations = pairings

@@ -2576,10 +2576,17 @@ helix-drawer helix-tree {
   grid-area: switch;
 }
 
+/* The colour and its reset share the brand cell, so the switch keeps its own
+   column and the pair stays together at the end of the row. */
 .showcaseBrand {
   align-self: center;
   grid-area: brand;
-  justify-self: end;
+}
+
+.showcaseReset {
+  align-self: center;
+  grid-area: reset;
+  justify-self: start;
 }
 
 /* The stage stacks: the anchor, the switch, then whatever the switch is
@@ -2597,10 +2604,10 @@ helix-drawer helix-tree {
   column-gap: var(--helix-space-md);
   display: grid;
   grid-template-areas:
-    "anchor anchor"
-    "switch brand"
-    "views views";
-  grid-template-columns: minmax(0, 1fr) auto;
+    "anchor anchor anchor"
+    "switch brand  reset"
+    "views  views  views";
+  grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-rows: auto auto minmax(0, 1fr);
   row-gap: var(--helix-space-lg);
 }
