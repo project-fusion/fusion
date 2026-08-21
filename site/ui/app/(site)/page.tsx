@@ -65,13 +65,13 @@ const questions = [
 export default function Home() {
   return (
     <div className="reel">
-      {/* Behind the whole page, not only the hero.
+      {/* Starting at the top of the page and running past the hero.
           
-          `position: fixed`, so the light holds still while nine screens of
-          content pass over it: a field that scrolled away would be a hero
-          decoration with extra steps. No `interactive`, so it never asks for
-          the hit test and every control on the page keeps its presses. It stops
-          itself in a background tab, and where WebGL is refused it draws
+          It used to be inside the hero, so it stopped dead at the end of the
+          first band. It scrolls with the page rather than being pinned to the
+          window: a field that never moves is a wallpaper. No `interactive`, so
+          it never asks for the hit test and every control keeps its presses. It
+          stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
       <helix-aura class="reelAura" gain={0.55} scale={1.35} speed={0.45} tilt={42}></helix-aura>
       <div className="reelScrim" />

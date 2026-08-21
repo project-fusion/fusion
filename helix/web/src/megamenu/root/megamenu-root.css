@@ -239,12 +239,13 @@
      one thing this rule exists to prevent. */
   backdrop-filter: var(--megamenu-backdrop, none);
   background-color: var(--megamenu-background, var(--helix-color-background));
-  /* One edge, and it is the bottom one. A band is flush with the bar above it
-     and runs to both sides, so the only boundary it has is where it meets the
-     page underneath. In both modes: in the light it firms up what the shadow is
-     already saying, and in the dark it is the only thing saying it. */
+  /* No edge at all. The bottom hairline was there to say where the band ends,
+     which the shadow underneath it already says, and a line under a band that
+     is meant to read as the header continuing downward turns the whole thing
+     back into a card with a rule on it. It is the more visible mistake once the
+     band goes glass: a hard hairline across a translucent surface is the one
+     opaque thing on it. */
   border: none;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
   /* Shadow on the bottom edge and nowhere else. A blurred shadow spills every

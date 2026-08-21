@@ -105,6 +105,11 @@
  * centered on is the block one and a grid's block axis is its content axis.
  * The single `.shell` child still stretches across, so nothing about the
  * horizontal inset changes. */
+/* The containing block for the aura, which is absolute against it. */
+.reel {
+  position: relative;
+}
+
 .reel > .band {
   align-content: center;
   display: grid;
@@ -242,9 +247,26 @@ helix-drawer {
  * second statement of the same thing, and the layer scale has no negative step
  * to spend on it anyway. */
 .reelAura {
-  inset: 0;
+  /* Absolute against the reel, not fixed against the window.
+   *
+   * Fixed was the wrong reading of "down the whole page": it pins the light to
+   * the viewport, so nine screens of content slide over a field that never
+   * moves, which is a wallpaper rather than a page. What was actually wrong was
+   * that the aura stopped at the hero's bottom edge, cut off exactly where the
+   * first band ended.
+   *
+   * So it starts at the top and runs past that edge, and the shape fades itself
+   * out at the bottom of its own box: every shape here ends with a vertical
+   * envelope, so a taller box means a longer fade rather than a hard stop.
+   *
+   * Two screens rather than all nine, because the field is aspect-corrected
+   * against its own box: stretched over the full reel it would be nine times
+   * taller than wide, and the braid would come out a thread. */
+  block-size: 200svh;
+  inset-block-start: 0;
+  inset-inline: 0;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
 }
 
 /* Every band sits over the light, so every band has to be positioned or it
@@ -257,8 +279,8 @@ helix-drawer {
  *
  * The claim is white and holds its own, but the lede under it is muted, and a
  * braid drifts: text that is legible in one frame is not text that is legible.
- * Fixed alongside the aura, because it now has nine screens of copy to protect
- * rather than one, and a scrim that scrolled would leave eight of them bare.
+ * It covers the same box the aura does, and scrolls with it, so the two stay
+ * registered to each other wherever the reader is on the page.
  *
  * The right stays clear on purpose. A scrim across the whole hero would be a
  * dimmer switch on the thing it was added to show. */
@@ -269,9 +291,11 @@ helix-drawer {
     color-mix(in srgb, var(--helix-color-background) 72%, transparent) 46%,
     color-mix(in srgb, var(--helix-color-background) 0%, transparent) 78%
   );
-  inset: 0;
+  block-size: 200svh;
+  inset-block-start: 0;
+  inset-inline: 0;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
 }
 
 /* Above the light. Positioned, and that is the whole of the stacking:
