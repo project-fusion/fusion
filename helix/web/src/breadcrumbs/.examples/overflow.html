@@ -1,15 +1,7 @@
-<!-- @summary A trail that folds its middle below a width, into a menu you wrote. -->
-<link
-  href="styles.css"
-  rel="stylesheet"
->
+<!-- @summary A trail whose middle is folded into a menu, written where the gap is. -->
 <helix-breadcrumbs aria-label="Breadcrumb">
   <helix-breadcrumb href="/">Home</helix-breadcrumb>
 
-  <!-- Written where the gap belongs, holding the steps that fold. They are the
-       same three steps as the crumbs below, on purpose: both arrangements are
-       markup, so the sheet shows one and hides the other rather than anything
-       building the second from the first at runtime. -->
   <helix-breadcrumb>
     <helix-menu label="Hidden steps">
       <helix-icon-button
@@ -25,8 +17,5 @@
     </helix-menu>
   </helix-breadcrumb>
 
-  <helix-breadcrumb href="/design">Design</helix-breadcrumb>
-  <helix-breadcrumb href="/design/components">Components</helix-breadcrumb>
-  <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
   <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
 </helix-breadcrumbs>

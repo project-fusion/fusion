@@ -11269,9 +11269,11 @@ export type CustomElements = {
    *   items went uncounted, and the result was still wrong at 34rem.
    *
    * So the trail lays out crumbs and separators, and the consumer writes what
-   * folds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query
-   * deciding when it shows: server rendered, no observer, and correct before the
-   * first script runs. `.examples/overflow.css` is the whole of it.
+   * folds: a `helix-menu` of `helix-menu-item`s in a crumb, where the gap
+   * belongs. Server rendered, no observer, no stylesheet, and correct before the
+   * first script runs. A trail that should fold only at some widths is a
+   * container query in the consumer's own sheet, which is theirs to write and
+   * theirs to leave out.
    *
    * **And the crumbs carry no marker for any of it.** There was an `overflow`
    * property on the crumb, which existed so the controller could tell a control
@@ -20277,9 +20279,11 @@ export type CustomElementsSolidJs = {
    *   items went uncounted, and the result was still wrong at 34rem.
    *
    * So the trail lays out crumbs and separators, and the consumer writes what
-   * folds. A `helix-menu` of `helix-menu-item`s in a crumb, and a container query
-   * deciding when it shows: server rendered, no observer, and correct before the
-   * first script runs. `.examples/overflow.css` is the whole of it.
+   * folds: a `helix-menu` of `helix-menu-item`s in a crumb, where the gap
+   * belongs. Server rendered, no observer, no stylesheet, and correct before the
+   * first script runs. A trail that should fold only at some widths is a
+   * container query in the consumer's own sheet, which is theirs to write and
+   * theirs to leave out.
    *
    * **And the crumbs carry no marker for any of it.** There was an `overflow`
    * property on the crumb, which existed so the controller could tell a control

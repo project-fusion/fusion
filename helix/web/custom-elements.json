@@ -3176,7 +3176,7 @@
                 "slug": "links"
               },
               {
-                "description": "A trail that folds its middle below a width, into a menu you wrote.",
+                "description": "A trail whose middle is folded into a menu, written where the gap is.",
                 "slug": "overflow"
               }
             ],
@@ -44832,8 +44832,31 @@
                 "text": "number"
               },
               "privacy": "private",
-              "description": "How far along the track the thumb sits, as a fraction.\n\nArithmetic rather than a measurement, because the browser already knows and\nmeasuring the thumb would be a guess at where the platform drew it. The\nstyled tier fills the track with it.\n\nRead from the control where there is one, not from `value`. A range\nsanitizes what it is given, clamping to the bounds and snapping to the\nstep, so a slider given an off-step or out-of-range value had a thumb in\none place and a fill, a readout and a submitted value in another. What the\ncontrol settled on is the truth about where the thumb is.",
+              "description": "How far along the track the thumb sits, as a fraction.\n\nArithmetic rather than a measurement, because the browser already knows\nwhere it drew the handle and measuring it would be a guess at that.\n\n**Sanitized here, not read back off the control.** This asked the input for\nits value, on the reasoning that a range clamps and snaps whatever it is\ngiven, so the control is the truth about where the thumb is. The reasoning\nis right and the timing is not: `fraction` is evaluated inside `render()`,\nand the `style` binding carrying it is committed *before* the `.value`\nbinding below it, so it read the value this very render was about to\nreplace. The fill was a render behind the thumb, and on the first pass it\nread the seeded midpoint and stayed there.\n\nMeasured on a slider from 0 to 1: after dragging to either end, the host's\n`value` was `1`, the control's was `1`, and `--_slider-fraction` was still\n`0.5`. Off by half a track, and stable, which is what made it look like a\ndrawing bug rather than a timing one.\n\nSo the same two operations a range performs are done here: snap to the step\nfrom `min`, then clamp to the bounds. Nothing is read from the tree, so\nthere is no order for this to be on the wrong side of.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "snapped",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "A value snapped to the step, counted from `min` the way a range counts it.\n\n`min` rather than zero is the whole of it: a slider from `0.2` with a step\nof `0.05` can land on `0.2`, `0.25` and so on, and snapping against zero\nwould offer `0.2` and `0.25` too but round the ones between to the wrong\nside. `precision` is what keeps `0.30000000000000004` off the track, the\nsame guard the marker labels already use.",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"
