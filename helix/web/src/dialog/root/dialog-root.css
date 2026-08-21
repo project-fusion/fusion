@@ -98,56 +98,30 @@
   outline: none;
 }
 
-/* The token where it is available, and a literal where the platform will not
- * provide it.
+/* **`::backdrop` inherits from its originating element, and the long note that
+ * used to sit here was measuring a browser that did not do that yet.**
  *
- * `::backdrop` is a pseudo-element in the top layer and cannot see custom
- * properties declared outside the shadow tree, which is every Helix token.
- * Measured in Chromium: a literal color applies, a property declared on
- * `:host` applies, and `--helix-color-overlay` comes out as nothing, so the
- * scrim was fully transparent and the page behind a modal was not dimmed at
- * all. Re-declaring the token onto the host does not help either, because a
- * custom property is substituted where it is *used*, so the reference simply
- * fails one level further down.
+ * It recorded that `--helix-color-overlay` "comes out as nothing", that a
+ * `var()` fallback could not rescue it because the token resolved to invalid
+ * rather than absent, and it concluded with a literal colour written out by
+ * hand, described as the only literal in this library and as the platform's
+ * price. Re-measured in Chromium 148 by putting the original declaration back
+ * into a live modal's shadow root: it paints `oklab(0.15 0 0 / 0.64)`, the
+ * property is readable from the pseudo-element, and a second token on another
+ * property resolves too. `Drawer` never hit it at all, which was the clue.
  *
- * A `var()` fallback does not rescue it either, and that is worth knowing: the
- * fallback fires only when a property is *unset*. `--helix-color-overlay` is
- * set and inherited fine; what fails is that its own value references
- * `--_helix-neutral-950`, which the backdrop cannot see, so the whole thing
- * resolves to invalid rather than to absent and the fallback never runs.
+ * `::backdrop` originally inherited from nothing, and the CSS working group
+ * changed it to inherit from its originating element; Chromium shipped that and
+ * the comment stayed. So the token comes back, and the duplication the note
+ * called unavoidable, along with its warning that nothing would tell you when
+ * the two drifted, goes with it.
  *
- * So the value is literal, and it is the only literal color in this library.
- * It is the same mix `--helix-color-overlay` is, written out. The duplication
- * is real and is the platform's price: if that token moves, this moves with it,
- * and there is nothing that will tell you.
- *
- * `light-dark()` wraps the two mixes rather than the two percentages, because
- * it returns a color: a percentage inside it is invalid. Written the other way
- * round the whole declaration collapsed to a tenth of an alpha, which is a
- * scrim you can barely see rather than an error you can find. The same trap the
- * option's highlight hit, and it caught me twice. */
-/* **The hook, and why it can be one at all.**
- *
- * The paragraphs above say `::backdrop` cannot see a Helix token, and that is
- * true of a token *referenced from inside the backdrop*: substitution happens
- * where the `var()` is written, and there it resolves against a context the
- * pseudo-element does not have. What the same measurement recorded and did not
- * follow up is that a property declared on `:host` does apply.
- *
- * That is the seam. A custom property's own `var()`s are substituted on the
- * element it is declared on, so `--dialog-scrim` set on the host resolves there,
- * where every token is in scope, and `::backdrop` reads a colour rather than a
- * reference it cannot follow. A consumer may write
- * `--dialog-scrim: var(--helix-color-overlay)` and it works, which is the thing
- * the literal below exists because nobody could do.
- *
- * The literal stays as the default, for the reason it was written: it is what
- * the pseudo-element falls back to, and it cannot itself be a token. */
+ * **The hook stays, because it is not what the literal was for.** A consumer
+ * overriding the scrim needs a name to set, and setting it on the host is still
+ * the right shape: the value resolves where every token is in scope. What has
+ * changed is only that the default no longer has to be spelled out. */
 :host {
-  --_dialog-scrim: light-dark(
-    color-mix(in oklab, black 40%, transparent),
-    color-mix(in oklab, black 64%, transparent)
-  );
+  --_dialog-scrim: var(--helix-color-overlay);
 }
 
 [part="dialog"]::backdrop {
