@@ -432,45 +432,6 @@ export function Showcase(): React.ReactElement {
             ></helix-sparkline>
           </helix-card>
 
-          {/* **The empty cell beside the figures, which is the only hole in
-              this view that anybody sees.** The table below is full width, so
-              the first row had one card in it and 352px of nothing beside it.
-              A ring is the right thing to put there: it answers a different
-              question from the line above it, shares rather than trend, so the
-              two are not the same chart drawn twice. */}
-          <helix-card appearance="outlined" class="showcaseCard">
-            <helix-flex direction="column" gap="md">
-              <table data-hidden-visually id="showcase-sources">
-                <caption>Downloads by source</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Source</th>
-                    <th scope="col">Downloads</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">npm</th>
-                    <td data-value="4200">4,200</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">jsDelivr</th>
-                    <td data-value="3100">3,100</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">unpkg</th>
-                    <td data-value="1800">1,800</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Git</th>
-                    <td data-value="900">900</td>
-                  </tr>
-                </tbody>
-              </table>
-              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
-            </helix-flex>
-          </helix-card>
-
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-timeline label="Release history">
               <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
@@ -553,6 +514,42 @@ export function Showcase(): React.ReactElement {
                 <helix-tag tone="success">Passing</helix-tag>
                 <helix-tag tone="warning">Near budget</helix-tag>
               </helix-flex>
+            </helix-flex>
+          </helix-card>
+
+          {/* Last, and a ring rather than a second line: it answers shares
+              where the sparkline above answers trend, so the two are not one
+              chart drawn twice. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <table data-hidden-visually id="showcase-sources">
+                <caption>Downloads by source</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col">Downloads</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">npm</th>
+                    <td data-value="4200">4,200</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">jsDelivr</th>
+                    <td data-value="3100">3,100</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">unpkg</th>
+                    <td data-value="1800">1,800</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Git</th>
+                    <td data-value="900">900</td>
+                  </tr>
+                </tbody>
+              </table>
+              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
             </helix-flex>
           </helix-card>
         </div>
