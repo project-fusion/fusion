@@ -12,8 +12,10 @@
 
    `transparent` is the one appearance where scrolling genuinely changes
    something, and it says so the honest way: no surface at the top of the page,
-   and one when it needs to hide what is passing under it. That is what
-   `data-scrolled` is still for.
+   and the material one when it needs to hide what is passing under it. That is
+   what `data-scrolled` is still for. The material rather than the flat fill,
+   because a bar that is see-through over a hero and opaque a pixel later
+   announces itself as a state machine.
 
    **But the line itself is a consumer's call, so the box stays.** A header over
    prose needs nothing; a header sitting straight onto tool chrome, a toolbar
@@ -73,8 +75,17 @@
   background-color: var(--app-header-background, transparent);
 }
 
+/* Scrolled, it takes the material rather than the flat fill.
+ *
+ * The flat one was the safe answer and the wrong one: a bar that is see-through
+ * at the top of a hero and opaque a pixel later announces itself as a state
+ * machine. Glass is the same promise kept continuously, the content still stops
+ * at the bar because it cannot be read through it, and what is passing under
+ * stays legible as motion. The hook still wins where a consumer sets it, in
+ * both states, which is how a scrolled bar gets tinted to match a hero. */
 :host([appearance="transparent"][data-scrolled]) {
-  background-color: var(--app-header-background, var(--helix-color-background));
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  background-color: var(--app-header-background, var(--helix-material-translucent));
 }
 
 :host([sticky]) {

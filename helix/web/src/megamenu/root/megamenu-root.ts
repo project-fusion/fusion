@@ -16,6 +16,8 @@ import { styles } from './megamenu-root.css.js'
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://helix.fusion.dev/components/megamenu
  *
+ * @cssproperty --megamenu-background - The panel's own fill.
+ * @cssproperty --megamenu-backdrop - A filter behind the panel, for glass.
  * @cssproperty --megamenu-size - How wide the panel may get.
  * @cssproperty --megamenu-column-size - The narrowest a column goes before the grid wraps.
  * @cssproperty --megamenu-full-size - How wide the band's contents may get, centred in it.

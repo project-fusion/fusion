@@ -66,8 +66,19 @@
 [part="panel"] {
   /* The page's own ground, not a raised surface. White in the light and black in
      the dark: a navigation panel is the site continuing, and `surface-overlay`
-     put a grey card in front of a black page as though the nav were a dialog. */
-  background-color: var(--helix-color-background);
+     put a grey card in front of a black page as though the nav were a dialog.
+     
+     Both are hooks so a consumer can make the panel glass, which is not an
+     appearance: `full` already occupies that axis with a layout, and a band
+     can be material or not independently of being a band. Two things that can
+     be true at once are two axes, so this is a custom property and not a
+     second value on `appearance`.
+     
+     Declared rather than absent, so turning the filter on cannot change what
+     the panel is composited against: `none` is the initial value and costs
+     nothing. */
+  backdrop-filter: var(--megamenu-backdrop, none);
+  background-color: var(--megamenu-background, var(--helix-color-background));
   /* A hairline in the dark, and nothing in the light.
    *
    * A shadow is a light-mode device. It works by darkening what is behind it,
@@ -223,8 +234,11 @@
 :host([data-narrow]) [part="panel"] {
   /* The same ground the card takes, and the same one the header above it is
      painted with, so the band reads as the header continuing downward rather
-     than as a card laid over it. */
-  background-color: var(--helix-color-background);
+     than as a card laid over it. Both follow the hooks for the same reason: if
+     the bar goes glass the band has to as well, or the seam between them is the
+     one thing this rule exists to prevent. */
+  backdrop-filter: var(--megamenu-backdrop, none);
+  background-color: var(--megamenu-background, var(--helix-color-background));
   /* One edge, and it is the bottom one. A band is flush with the bar above it
      and runs to both sides, so the only boundary it has is where it meets the
      page underneath. In both modes: in the light it firms up what the shadow is

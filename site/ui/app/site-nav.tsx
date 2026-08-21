@@ -92,34 +92,30 @@ export function SiteNav() {
     <>
       {/* No line under the bar until the page moves.
        
-          **The bar takes the panel's ground while a panel is down, and that is
-          the app's call rather than either component's.** The band paints
-          `--helix-color-background` and says in its own comment that it means
-          to read as the header continuing downward. It cannot, in the two
-          states where the bar is not that colour: transparent over the gallery
-          hero, where the hero shows through and the band appears to start from
-          nothing, and translucent once any page has scrolled, where a frosted
-          bar sits over a flat band and the seam between them is visible.
+          **The bar and the panel are one surface, and that is the app's call
+          rather than either component's.** The band paints the same ground the
+          header does and says in its own comment that it means to read as the
+          header continuing downward. It cannot when the two are painted
+          differently, which is exactly what happened while the bar was
+          transparent over a hero and the band was opaque: the band appeared to
+          start from nothing.
        
           Neither component can fix it. `Megamenu` does not know it is in a
           header, `AppHeader` does not know it contains a panel, and coupling
-          them in the library to find out would be a dependency between two
-          things that are correctly independent. This is the one place that
-          knows both.
+          them in the library would be a dependency between two things that are
+          correctly independent. This is the one place that knows both.
        
-          `--app-header-background` is the documented hook for exactly this: its
-          own comment says the hook wins in both states and is how a consumer
-          tints a bar to match their hero. The component already transitions
+          So while a panel is down the bar takes `material`, and the panel is
+          given the same fill and the same blur through `--megamenu-background`
+          and `--megamenu-backdrop`. Both glass together, rather than one of
+          each with a seam down the join. `AppHeader` transitions its own
           `background-color` over `--helix-duration-normal`, which is the
-          duration the panel's own reveal runs for, so the two move together
-          without either being told about the other. */}
+          duration the panel's reveal runs for, so they move together without
+          either being told about the other. */}
       <helix-app-header
-        appearance={onHero ? 'transparent' : undefined}
+        appearance={panelDown ? 'material' : onHero ? 'transparent' : undefined}
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
-        style={
-          panelDown ? { '--app-header-background': 'var(--helix-color-background)' } : undefined
-        }
       >
         <a data-link="quiet" href="/" slot="start">
           <Wordmark />
@@ -151,6 +147,14 @@ export function SiteNav() {
                  the bar starts changing on the same frame the reveal starts
                  rather than a frame behind it. */
               onhelix-open={() => setPanelDown(true)}
+              style={
+                panelDown
+                  ? {
+                      '--megamenu-backdrop': 'blur(var(--helix-material-blur-md))',
+                      '--megamenu-background': 'var(--helix-material-translucent)',
+                    }
+                  : undefined
+              }
               suppressHydrationWarning
             >
               {/* The trigger is slotted, and it has to be.
