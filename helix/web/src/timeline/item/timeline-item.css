@@ -84,10 +84,22 @@
    * entries at a 14px title: the mark sat 1.4 pixels above the centre of its
    * own label, on every row, which is `0.1em` to the pixel.
    */
-  background-color: var(--helix-color-background);
-  /* Round, because all this shape does now is cut the line.
+  /* Round, and it cuts nothing.
    *
-   * There was a ring here, a neutral one-pixel border on a rounded square, and
+   * There was a `background-color` here, the page's, and its note said it
+   * knocked the rail out behind the mark. That was true of a rail drawn
+   * continuously and stopped being true when the line was split: the connector
+   * is `grid-row: 1`, above the mark, and the rail is offset down by the mark's
+   * own size, so neither is ever drawn in the space the mark occupies. It was
+   * masking nothing and painting the page's colour onto a component that cannot
+   * know it is on a page. On a card it came out darker than the surface it sat
+   * on, which is what it looked like: a hole rather than a mark.
+   *
+   * A component must not paint the colour of something it does not own. The
+   * mark is transparent now and is correct on a card, a drawer, a toast and a
+   * photograph without being told which it is.
+   *
+   * There was a ring here too, a neutral one-pixel border on a rounded square, and
    * it is what made the column read as a row of stickers rather than a record:
    * a 16 pixel glyph inside a 20 pixel box with a 4 pixel radius is the shape
    * of an app icon, and four of them stacked read as four badges pinned to a
