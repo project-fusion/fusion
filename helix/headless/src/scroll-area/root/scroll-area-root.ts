@@ -38,6 +38,7 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @slot - What scrolls.
  *
  * @csspart viewport - The scrolling box.
+ * @csspart edges - Where the sideways edge cues are drawn.
  */
 @customElement('helix-base-scroll-area')
 export class HelixBaseScrollArea extends HelixElement {
@@ -152,7 +153,16 @@ export class HelixBaseScrollArea extends HelixElement {
       @scroll=${this.measure}
     >
       <slot @slotchange=${this.handleSlotChange}></slot>
-    </div>`
+    </div>
+    <!-- The block edges are drawn on the host, which has two pseudo-elements and
+         no more. The sideways pair needs two of its own, and an element to hang
+         them on is cheaper than the arithmetic that would fit four edges into
+         two: they can then be placed with logical properties, which is what
+         makes inline-start the right-hand edge when the reader reads that way. -->
+    <div
+      part="edges"
+      aria-hidden="true"
+    ></div>`
   }
 }
 

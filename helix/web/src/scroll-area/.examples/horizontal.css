@@ -1,0 +1,24 @@
+/* A row wider than its box, so the sideways edges have something to say.
+ *
+ * `--scroll-area-fade-block-end: 0` because nothing overflows downward here:
+ * the block fade would never appear, and leaving it declared would suggest it
+ * might. */
+helix-scroll-area {
+  --scroll-area-fade-block-end: 0;
+
+  inline-size: 22rem;
+}
+
+.cards {
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+.cards helix-card {
+  flex: 0 0 11rem;
+}
+
+.cards h3 {
+  font-size: var(--helix-text-md);
+  margin: 0;
+}

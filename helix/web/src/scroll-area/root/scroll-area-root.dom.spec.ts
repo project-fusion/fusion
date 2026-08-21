@@ -79,6 +79,41 @@ if (hasLayout()) {
       expect(host.hasAttribute('data-scrolls')).toBe(true)
     })
 
+    test('names the sideways edges too, and draws them', async () => {
+      /* Measured on all four from the start, and drawn on two until a row that
+         ran past its box needed the other pair. The host has two
+         pseudo-elements and four edges want four, so the sideways ones hang off
+         a part of their own and are placed with logical properties, which is
+         what makes inline-start the right-hand edge for a reader who reads that
+         way. */
+      const host = (await mount(
+        `<helix-scroll-area label="Row" style="display:block;inline-size:120px"><div style="display:flex"><span style="flex:0 0 200px">a</span><span style="flex:0 0 200px">b</span></div></helix-scroll-area>`,
+      )) as Area
+      await host.updateComplete
+      await new Promise((settled) => {
+        requestAnimationFrame(() => {
+          settled(undefined)
+        })
+      })
+      expect(host.getAttribute('data-more')).toBe('inline-end')
+
+      const view = part(host, 'viewport') as HTMLElement
+      view.scrollLeft = 100
+      view.dispatchEvent(new Event('scroll'))
+      await host.updateComplete
+      expect(host.getAttribute('data-more')).toBe('inline-start inline-end')
+
+      /* After the fade, not during it. These cross-fade over `duration-fast`,
+         so reading the moment the attribute lands catches them partway and the
+         number is whatever the frame happened to be on. */
+      await new Promise((settled) => {
+        setTimeout(settled, 250)
+      })
+      const edges = part(host, 'edges') as HTMLElement
+      expect(globalThis.getComputedStyle(edges, '::before').opacity).toBe('1')
+      expect(globalThis.getComputedStyle(edges, '::after').opacity).toBe('1')
+    })
+
     test('an edge is opted out by giving its fade no depth', async () => {
       /* A size rather than a switch, because it is the same question at both
          ends and a zero-depth fade has no box to be drawn in. A list scrolled

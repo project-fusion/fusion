@@ -4067,6 +4067,7 @@ have content past them is measured by the base class.
 | Part | Description |
 | --- | --- |
 | `viewport` | The scrolling box. |
+| `edges` | Where the sideways edge cues are drawn. |
 
 #### Custom properties
 
@@ -4075,6 +4076,8 @@ have content past them is measured by the base class.
 | `--scroll-area-fade` | How deep the fades are, at both edges. |
 | `--scroll-area-fade-block-start` | How deep the top one is, or `0` to drop it. |
 | `--scroll-area-fade-block-end` | And the bottom one. |
+| `--scroll-area-fade-inline-start` | How deep the leading sideways one is, or `0` to drop it. |
+| `--scroll-area-fade-inline-end` | And the trailing one. |
 | `--scroll-area-fade-color` | What they fade to, which is the ground behind. |
 | `--scroll-area-scrollbar` | The scrollbar width keyword. |
 | `--scroll-area-thumb-color` | The scrollbar's handle. |

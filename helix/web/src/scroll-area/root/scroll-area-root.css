@@ -88,9 +88,55 @@
   opacity: 1;
 }
 
+/* The sideways pair, on an element of its own because the host has two
+   pseudo-elements and four edges want four. Placed with logical properties, so
+   inline-start is the right-hand edge for a reader who reads that way. */
+[part="edges"] {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="edges"]::before,
+[part="edges"]::after {
+  content: "";
+  inset-block: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-raised);
+}
+
+[part="edges"]::before {
+  background: linear-gradient(
+    to right,
+    var(--scroll-area-fade-color, var(--helix-color-background)),
+    transparent
+  );
+  inline-size: var(--scroll-area-fade-inline-start, var(--scroll-area-fade, var(--helix-space-xl)));
+  inset-inline-start: 0;
+}
+
+[part="edges"]::after {
+  background: linear-gradient(
+    to left,
+    var(--scroll-area-fade-color, var(--helix-color-background)),
+    transparent
+  );
+  inline-size: var(--scroll-area-fade-inline-end, var(--scroll-area-fade, var(--helix-space-xl)));
+  inset-inline-end: 0;
+}
+
+:host([data-more~="inline-start"]) [part="edges"]::before,
+:host([data-more~="inline-end"]) [part="edges"]::after {
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :host::before,
-  :host::after {
+  :host::after,
+  [part="edges"]::before,
+  [part="edges"]::after {
     transition: none;
   }
 }

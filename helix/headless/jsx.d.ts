@@ -16517,6 +16517,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `viewport`: The scrolling box.
+   * - `edges`: Where the sideways edge cues are drawn.
    */
   "helix-base-scroll-area": Partial<
     HelixBaseScrollAreaProps & BaseProps<HelixBaseScrollArea> & BaseEvents
@@ -25668,6 +25669,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `viewport`: The scrolling box.
+   * - `edges`: Where the sideways edge cues are drawn.
    */
   "helix-base-scroll-area": Partial<
     HelixBaseScrollAreaProps &

@@ -6664,6 +6664,10 @@ export type CustomCssProperties = {
   "--scroll-area-fade-block-start"?: string;
   /** And the bottom one. */
   "--scroll-area-fade-block-end"?: string;
+  /** How deep the leading sideways one is, or `0` to drop it. */
+  "--scroll-area-fade-inline-start"?: string;
+  /** And the trailing one. */
+  "--scroll-area-fade-inline-end"?: string;
   /** What they fade to, which is the ground behind. */
   "--scroll-area-fade-color"?: string;
   /** The scrollbar width keyword. */

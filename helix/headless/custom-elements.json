@@ -31586,6 +31586,10 @@
             {
               "description": "The scrolling box.",
               "name": "viewport"
+            },
+            {
+              "description": "Where the sideways edge cues are drawn.",
+              "name": "edges"
             }
           ],
           "slots": [

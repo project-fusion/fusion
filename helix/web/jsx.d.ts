@@ -18285,6 +18285,8 @@ export type CustomElements = {
    * - `--scroll-area-fade`: How deep the fades are, at both edges. (default: `undefined`)
    * - `--scroll-area-fade-block-start`: How deep the top one is, or `0` to drop it. (default: `undefined`)
    * - `--scroll-area-fade-block-end`: And the bottom one. (default: `undefined`)
+   * - `--scroll-area-fade-inline-start`: How deep the leading sideways one is, or `0` to drop it. (default: `undefined`)
+   * - `--scroll-area-fade-inline-end`: And the trailing one. (default: `undefined`)
    * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
    * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
    * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
@@ -18295,6 +18297,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `viewport`: The scrolling box.
+   * - `edges`: Where the sideways edge cues are drawn.
    */
   "helix-scroll-area": Partial<
     HelixScrollAreaProps & BaseProps<HelixScrollArea> & BaseEvents
@@ -27650,6 +27653,8 @@ export type CustomElementsSolidJs = {
    * - `--scroll-area-fade`: How deep the fades are, at both edges. (default: `undefined`)
    * - `--scroll-area-fade-block-start`: How deep the top one is, or `0` to drop it. (default: `undefined`)
    * - `--scroll-area-fade-block-end`: And the bottom one. (default: `undefined`)
+   * - `--scroll-area-fade-inline-start`: How deep the leading sideways one is, or `0` to drop it. (default: `undefined`)
+   * - `--scroll-area-fade-inline-end`: And the trailing one. (default: `undefined`)
    * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
    * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
    * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
@@ -27660,6 +27665,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `viewport`: The scrolling box.
+   * - `edges`: Where the sideways edge cues are drawn.
    */
   "helix-scroll-area": Partial<
     HelixScrollAreaProps &
@@ -31137,6 +31143,10 @@ export type CustomCssProperties = {
   "--scroll-area-fade-block-start"?: string;
   /** And the bottom one. */
   "--scroll-area-fade-block-end"?: string;
+  /** How deep the leading sideways one is, or `0` to drop it. */
+  "--scroll-area-fade-inline-start"?: string;
+  /** And the trailing one. */
+  "--scroll-area-fade-inline-end"?: string;
   /** What they fade to, which is the ground behind. */
   "--scroll-area-fade-color"?: string;
   /** The scrollbar width keyword. */

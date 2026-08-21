@@ -20,6 +20,8 @@ import { styles } from './scroll-area-root.css.js'
  * @cssproperty --scroll-area-fade - How deep the fades are, at both edges.
  * @cssproperty --scroll-area-fade-block-start - How deep the top one is, or `0` to drop it.
  * @cssproperty --scroll-area-fade-block-end - And the bottom one.
+ * @cssproperty --scroll-area-fade-inline-start - How deep the leading sideways one is, or `0` to drop it.
+ * @cssproperty --scroll-area-fade-inline-end - And the trailing one.
  * @cssproperty --scroll-area-fade-color - What they fade to, which is the ground behind.
  * @cssproperty --scroll-area-scrollbar - The scrollbar width keyword.
  * @cssproperty --scroll-area-thumb-color - The scrollbar's handle.
