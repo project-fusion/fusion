@@ -72,7 +72,7 @@ export class HelixBaseImage extends HelixElement {
    * that is not is the exception worth writing down.
    */
   @property({ reflect: true })
-  loading: 'eager' | 'lazy' = 'lazy'
+  loading?: 'eager' | 'lazy'
 
   /** The candidate widths, passed through to the picture. */
   @property()
@@ -97,10 +97,21 @@ export class HelixBaseImage extends HelixElement {
   /**
    * Whether the picture is on its way, here, or never coming.
    *
-   * Reflected, so a stylesheet can answer all three without a rule per part,
-   * and read-only to a consumer: it is a report rather than a setting.
+   * Read-only to a consumer: it is a report rather than a setting.
+   *
+   * **Mirrored to `data-status`, and not reflected as `status`.** It is element
+   * state, so reflecting it puts the element's own bookkeeping into the markup
+   * a consumer rendered: React reads the attribute appearing at upgrade as a
+   * hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
+   * back declares that a picture has arrived which this element has never
+   * fetched. The `data-` name is the library's answer to both, being a
+   * different name a re-parse cannot mistake for a declaration, and it is what
+   * `data-open` and `data-checked` already do.
+   *
+   * `loading` writes nothing, because it is where every image starts and the
+   * resting state of a mirror is the attribute's absence.
    */
-  @property({ reflect: true })
+  @property({ attribute: false })
   status: 'error' | 'loaded' | 'loading' = 'loading'
 
   /** Which `src` the current status belongs to, so a new one starts over. */
@@ -171,6 +182,16 @@ export class HelixBaseImage extends HelixElement {
     if (changed.has('src')) {
       this.settle()
     }
+    /* The mirror, written here rather than reflected. `loading` is the resting
+       state and writes nothing, so a picture on its way carries no attribute
+       and one that has arrived or failed says which. */
+    if (changed.has('status')) {
+      if (this.status === 'loading') {
+        this.removeAttribute('data-status')
+      } else {
+        this.setAttribute('data-status', this.status)
+      }
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -182,7 +203,7 @@ export class HelixBaseImage extends HelixElement {
     return html`<img
         part="image"
         alt=${this.alt}
-        loading=${this.loading}
+        loading=${this.loading ?? 'lazy'}
         decoding="async"
         fetchpriority=${this.fetchPriority}
         src=${this.src || nothing}

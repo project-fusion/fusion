@@ -2348,8 +2348,19 @@ ninety-nine pictures. */
   fetchPriority?: HelixBaseImage["fetchPriority"];
   /** Whether the picture is on its way, here, or never coming.
 
-Reflected, so a stylesheet can answer all three without a rule per part,
-and read-only to a consumer: it is a report rather than a setting. */
+Read-only to a consumer: it is a report rather than a setting.
+
+**Mirrored to `data-status`, and not reflected as `status`.** It is element
+state, so reflecting it puts the element's own bookkeeping into the markup
+a consumer rendered: React reads the attribute appearing at upgrade as a
+hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
+back declares that a picture has arrived which this element has never
+fetched. The `data-` name is the library's answer to both, being a
+different name a re-parse cannot mistake for a declaration, and it is what
+`data-open` and `data-checked` already do.
+
+`loading` writes nothing, because it is where every image starts and the
+resting state of a mirror is the attribute's absence. */
   status?: HelixBaseImage["status"];
 };
 
@@ -3833,7 +3844,14 @@ export type HelixBaseRadioGroupHelixChangeElementEvent =
   HelixBaseRadioGroupElementEvent<HelixChangeEvent>;
 
 export type HelixBaseRadioGroupVueProps = {
-  /** Which way the choices run. A column reads one line per answer. */
+  /** Which way the choices run. A column reads one line per answer.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the column, which the stylesheet reads as the base rule, so
+only `horizontal` has to be named. */
   orientation?: HelixBaseRadioGroup["orientation"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseRadioGroup["defaultValue"];
@@ -5088,7 +5106,14 @@ export type HelixBaseTimeInputVueProps = {
 `list` offers whole times, which is what a product with slots or opening
 hours has. `wheels` splits them into an hour, a minute and a meridiem where
 the locale uses one, which is the only way to reach `23:45` without
-scrolling most of a day. `helix-time-picker` carries the longer note on the trade. */
+scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
   appearance?: HelixBaseTimeInput["appearance"];
   /** How many times can be held at once.
 
@@ -5317,7 +5342,14 @@ The bounds are still enforced, so a reader can be refused after the fact,
 which is worse than not being offered it.
 
 So: `list` where the set is the point, `wheels` where any time is allowed
-and the range is a whole day. */
+and the range is a whole day.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
   appearance?: HelixBaseTimePicker["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseTimePicker["defaultValue"];

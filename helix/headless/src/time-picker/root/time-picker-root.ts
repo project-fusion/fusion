@@ -203,9 +203,16 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    *
    * So: `list` where the set is the point, `wheels` where any time is allowed
    * and the range is a whole day.
+   *
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
    */
   @property({ reflect: true })
-  appearance: 'list' | 'wheels' = 'list'
+  appearance?: 'list' | 'wheels'
 
   /**
    * Every time on offer, as minutes since midnight.

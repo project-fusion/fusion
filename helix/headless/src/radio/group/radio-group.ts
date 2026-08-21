@@ -53,9 +53,18 @@ import { HelixBaseRadio } from '../root/radio-root.js'
  */
 @customElement('helix-base-radio-group')
 export class HelixBaseRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
-  /** Which way the choices run. A column reads one line per answer. */
+  /**
+   * Which way the choices run. A column reads one line per answer.
+   *
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the column, which the stylesheet reads as the base rule, so
+   * only `horizontal` has to be named.
+   */
   @property({ reflect: true })
-  orientation: 'horizontal' | 'vertical' = 'vertical'
+  orientation?: 'horizontal' | 'vertical'
 
   /* Moving and choosing are one act, which is the radio group pattern and is
      what this controller exists to stop being written per component. */

@@ -8144,9 +8144,8 @@
               "kind": "field",
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
               "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a picker on\n`hex` still takes an `rgb()` handed to it and stores the hex for it.",
               "attribute": "format",
               "reflects": true
@@ -8809,9 +8808,8 @@
             {
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
               "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\nOnly what is written. Everything is read whatever this says, so a picker on\n`hex` still takes an `rgb()` handed to it and stores the hex for it.",
               "fieldName": "format"
             },
@@ -18375,9 +18373,8 @@
               "kind": "field",
               "name": "loading",
               "type": {
-                "text": "'eager' | 'lazy'"
+                "text": "'eager' | 'lazy' | undefined"
               },
-              "default": "'lazy'",
               "description": "Whether to wait until it is nearly on screen.\n\n`lazy` by default, which is the opposite of the platform's, because a\npicture worth putting in a component is usually below the fold and the one\nthat is not is the exception worth writing down.",
               "attribute": "loading",
               "reflects": true
@@ -18419,9 +18416,7 @@
                 "text": "'error' | 'loaded' | 'loading'"
               },
               "default": "'loading'",
-              "description": "Whether the picture is on its way, here, or never coming.\n\nReflected, so a stylesheet can answer all three without a rule per part,\nand read-only to a consumer: it is a report rather than a setting.",
-              "attribute": "status",
-              "reflects": true
+              "description": "Whether the picture is on its way, here, or never coming.\n\nRead-only to a consumer: it is a report rather than a setting.\n\n**Mirrored to `data-status`, and not reflected as `status`.** It is element\nstate, so reflecting it puts the element's own bookkeeping into the markup\na consumer rendered: React reads the attribute appearing at upgrade as a\nhydration mismatch, and a serialized `<helix-image status=\"loaded\">` pasted\nback declares that a picture has arrived which this element has never\nfetched. The `data-` name is the library's answer to both, being a\ndifferent name a re-parse cannot mistake for a declaration, and it is what\n`data-open` and `data-checked` already do.\n\n`loading` writes nothing, because it is where every image starts and the\nresting state of a mirror is the attribute's absence."
             },
             {
               "kind": "field",
@@ -18585,9 +18580,8 @@
             {
               "name": "loading",
               "type": {
-                "text": "'eager' | 'lazy'"
+                "text": "'eager' | 'lazy' | undefined"
               },
-              "default": "'lazy'",
               "description": "Whether to wait until it is nearly on screen.\n\n`lazy` by default, which is the opposite of the platform's, because a\npicture worth putting in a component is usually below the fold and the one\nthat is not is the exception worth writing down.",
               "fieldName": "loading"
             },
@@ -18617,15 +18611,6 @@
               "default": "'auto'",
               "description": "How urgently to fetch it, for the one picture that is the page.\n\nThe hero of a page is usually its largest contentful paint, and the fix is\ntwo attributes rather than one: `loading=\"eager\"` stops it waiting for the\nviewport, and this stops it queueing behind everything else the parser\nfound first. Left alone the browser decides, which is right for the other\nninety-nine pictures.",
               "fieldName": "fetchPriority"
-            },
-            {
-              "name": "status",
-              "type": {
-                "text": "'error' | 'loaded' | 'loading'"
-              },
-              "default": "'loading'",
-              "description": "Whether the picture is on its way, here, or never coming.\n\nReflected, so a stylesheet can answer all three without a rule per part,\nand read-only to a consumer: it is a report rather than a setting.",
-              "fieldName": "status"
             }
           ],
           "superclass": {
@@ -31758,10 +31743,9 @@
               "kind": "field",
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "'vertical'",
-              "description": "Which way the choices run. A column reads one line per answer.",
+              "description": "Which way the choices run. A column reads one line per answer.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the column, which the stylesheet reads as the base rule, so\nonly `horizontal` has to be named.",
               "attribute": "orientation",
               "reflects": true
             },
@@ -32430,10 +32414,9 @@
             {
               "name": "orientation",
               "type": {
-                "text": "'horizontal' | 'vertical'"
+                "text": "'horizontal' | 'vertical' | undefined"
               },
-              "default": "'vertical'",
-              "description": "Which way the choices run. A column reads one line per answer.",
+              "description": "Which way the choices run. A column reads one line per answer.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the column, which the stylesheet reads as the base rule, so\nonly `horizontal` has to be named.",
               "fieldName": "orientation"
             },
             {
@@ -43604,10 +43587,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'list' | 'wheels'"
+                "text": "'list' | 'wheels' | undefined"
               },
-              "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -44703,10 +44685,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'list' | 'wheels'"
+                "text": "'list' | 'wheels' | undefined"
               },
-              "default": "'list'",
-              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.",
+              "description": "Whether the panel is one list of times or a column each.\n\n`list` offers whole times, which is what a product with slots or opening\nhours has. `wheels` splits them into an hour, a minute and a meridiem where\nthe locale uses one, which is the only way to reach `23:45` without\nscrolling most of a day. `helix-time-picker` carries the longer note on the trade.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
               "fieldName": "appearance"
             },
             {
@@ -45190,10 +45171,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'list' | 'wheels'"
+                "text": "'list' | 'wheels' | undefined"
               },
-              "default": "'list'",
-              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -45895,10 +45875,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'list' | 'wheels'"
+                "text": "'list' | 'wheels' | undefined"
               },
-              "default": "'list'",
-              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.",
+              "description": "Whether the times are one list or a column each.\n\n`list` is the default and offers whole times, which is what a product with\nopening hours or slots actually has. `wheels` splits them into an hour, a\nminute and, where the locale uses one, a meridiem: three short columns\ninstead of ninety-six rows, and the only way to reach `23:45` without\nscrolling most of a day.\n\nThe trade is that a wheel cannot say which *combinations* are on offer. A\nlist of half hours from nine to five is seventeen rows and every one of them\nis a time the product has; the same thing as columns is an hour column and a\nminute column, and nothing in either says the two are only valid together.\nThe bounds are still enforced, so a reader can be refused after the fact,\nwhich is worse than not being offered it.\n\nSo: `list` where the set is the point, `wheels` where any time is allowed\nand the range is a whole day.\n\n**Optional rather than defaulted, which is not a style preference.** A\nreflecting property with a default writes its attribute onto every host the\nmoment the element upgrades, including the ones a consumer rendered and did\nnot touch, and React reads that as a hydration mismatch. The absent\nattribute *is* the list, which the stylesheet reads as the base rule, so\nonly the departure has to be named.",
               "fieldName": "appearance"
             },
             {

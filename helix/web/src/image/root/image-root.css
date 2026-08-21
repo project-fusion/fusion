@@ -29,7 +29,7 @@
 /* Nothing to look at until there is something to look at. `visibility` rather
    than `opacity`, so a picture that failed is not sitting invisible on top of
    the fallback taking the pointer. */
-:host([status="error"]) [part="image"] {
+:host([data-status="error"]) [part="image"] {
   visibility: hidden;
 }
 
@@ -104,7 +104,7 @@
   transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-:host([status="loaded"]) [part="image"] {
+:host([data-status="loaded"]) [part="image"] {
   opacity: 1;
 }
 

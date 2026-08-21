@@ -1245,7 +1245,7 @@ brought its own card would be a card inside a card there.
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `format` | `format` | `ColorFormat \| undefined` | - | `HelixBaseColorPicker` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
 | `invalid` | `invalid` | `boolean` | `false` | `HelixBaseColorPicker` | Whether the current selection fails validation. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
@@ -2388,12 +2388,12 @@ base class.
 | --- | --- | --- | --- | --- | --- |
 | `alt` | `alt` | `string` | `''` | `HelixBaseImage` | What it shows, for a reader who cannot see it. |
 | `fetchPriority` | `fetch-priority` | `'auto' \| 'high' \| 'low'` | `'auto'` | `HelixBaseImage` | How urgently to fetch it, for the one picture that is the page. |
-| `loading` | `loading` | `'eager' \| 'lazy'` | `'lazy'` | `HelixBaseImage` | Whether to wait until it is nearly on screen. |
+| `loading` | `loading` | `'eager' \| 'lazy' \| undefined` | - | `HelixBaseImage` | Whether to wait until it is nearly on screen. |
 | `rounded` | `rounded` | `boolean` | `false` | - | Whether the corners are cut. |
 | `sizes` | `sizes` | `string` | `''` | `HelixBaseImage` | How much of the line it will take, passed through to the picture. |
 | `src` | `src` | `string` | `''` | `HelixBaseImage` | Where the picture is. |
 | `srcset` | `srcset` | `string` | `''` | `HelixBaseImage` | The candidate widths, passed through to the picture. |
-| `status` | `status` | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixBaseImage` | Whether the picture is on its way, here, or never coming. |
+| `status` | - | `'error' \| 'loaded' \| 'loading'` | `'loading'` | `HelixBaseImage` | Whether the picture is on its way, here, or never coming. |
 
 #### Events
 
@@ -3928,7 +3928,7 @@ group keeps its question above the row rather than beside the first choice.
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'vertical'` | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseRadioGroup` | Which way the choices run. A column reads one line per answer. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -5619,7 +5619,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
+| `appearance` | `appearance` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimeInput` | Whether the panel is one list of times or a column each. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
@@ -5714,7 +5714,7 @@ card would be a card inside a card there.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'list' \| 'wheels'` | `'list'` | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
+| `appearance` | `appearance` | `'list' \| 'wheels' \| undefined` | - | `HelixBaseTimePicker` | Whether the times are one list or a column each. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |
 | `disableTimes` | `disable-times` | `string` | `''` | `HelixBaseTimePicker` | Times that cannot be chosen, comma separated, as `HH:mm`. |
@@ -6506,7 +6506,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'plain' \| 'shadow' \| 'solid'` | `'shadow'` | - | Whether the bar floats on the picture or sits on its own ground. |
+| `appearance` | `appearance` | `'plain' \| 'solid' \| undefined` | - | - | Whether the bar floats on the picture or sits on its own ground. |
 | `controls` | `controls` | `boolean` | `false` | `HelixBaseVideo` | Whether the browser draws the controls instead of this element. |
 | `errorLabel` | `error-label` | `string` | `'This video could not be played'` | `HelixBaseVideo` | And what they are told when it will not play at all. |
 | `extraControls` | `extra-controls` | `string` | `''` | `HelixBaseVideo` | Controls beyond the ones every player has, named in the order they appear. |

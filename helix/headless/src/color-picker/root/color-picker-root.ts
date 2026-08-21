@@ -140,7 +140,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
    */
   @property({ reflect: true })
-  format: ColorFormat = 'hex'
+  format?: ColorFormat
 
   /**
    * Whether to leave the value out, for a picker whose value is stated elsewhere.
@@ -253,7 +253,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   private readonly move = (next: Partial<Color>): void => {
     this.moved = { ...this.color, ...next }
     this.owned = true
-    this.requestValue(formatColor(this.moved, this.format, this.alpha))
+    this.requestValue(formatColor(this.moved, this.format ?? 'hex', this.alpha))
   }
 
   /**
@@ -281,7 +281,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
 
   /** Walks the format on, and rewrites the value in it. */
   private readonly handleFormat = (): void => {
-    this.format = FORMATS[(FORMATS.indexOf(this.format) + 1) % FORMATS.length] ?? 'hex'
+    this.format = FORMATS[(FORMATS.indexOf(this.format ?? 'hex') + 1) % FORMATS.length] ?? 'hex'
     if (this.value !== '') {
       this.move({})
     }
@@ -452,11 +452,11 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                     ? nothing
                     : html`<helix-button
                         part="format"
-                        aria-label=${`Syntax: ${this.format}. Change it.`}
+                        aria-label=${`Syntax: ${this.format ?? 'hex'}. Change it.`}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
-                        ${this.format}
+                        ${this.format ?? 'hex'}
                       </helix-button>`
                 }
               </helix-button-group>`
