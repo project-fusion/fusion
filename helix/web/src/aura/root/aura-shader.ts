@@ -117,11 +117,16 @@ export const FRAGMENT = `#version 300 es
   }
 
   /* Two strands half a turn apart, inside a wider volume. */
-  float braid(vec2 q, float t) {
+  float braid(vec2 q, float t, vec2 qp, float reach) {
+    /* The strands lean toward the pointer where it is alongside them, and are
+       unmoved where it is not. A braid is a thing with a length, so what it can
+       answer with is a bend at a height, not a bulge at a point. */
+    float alongside = exp(-abs(q.y - qp.y) * 1.1) * reach;
+    float lean = qp.x * alongside * 0.45;
     float lit = 0.0;
     for (int i = 0; i < 2; i++) {
       float phase = float(i) * 3.14159265;
-      float x = q.x - 0.34 * sin(q.y * 1.6 + t * 1.4 + phase);
+      float x = q.x - lean - 0.34 * sin(q.y * 1.6 + t * 1.4 + phase);
       lit += 0.8 * exp(-abs(x) * 13.0);
     }
     float volume = exp(-abs(q.x) * 2.6);
@@ -133,8 +138,11 @@ export const FRAGMENT = `#version 300 es
   }
 
   /* A fan from a source above the frame, cut into filaments by angle. */
-  float rays(vec2 q, float t) {
-    vec2 o = vec2(0.0, 1.45);
+  float rays(vec2 q, float t, vec2 qp, float reach) {
+    /* The source moves and the whole fan re-aims. Rays are the one shape with
+       a thing casting them, so the honest answer to a pointer is to move that
+       rather than to brighten where it happens to be. */
+    vec2 o = vec2(qp.x * 0.4 * reach, 1.45);
     vec2 v = q - o;
     float dist = length(v);
     float ang = atan(v.x, -v.y);
@@ -145,18 +153,25 @@ export const FRAGMENT = `#version 300 es
   }
 
   /* Curtains on a drifting horizon. */
-  float aurora(vec2 q, float t) {
+  float aurora(vec2 q, float t, vec2 qp, float reach) {
+    /* The horizon swells under the pointer. A curtain answers along its own
+       length, so what moves is the ridge, not the brightness. */
     float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * 1.3;
+    ridge += exp(-(q.x - qp.x) * (q.x - qp.x) * 2.2) * reach * 0.45;
     float band = exp(-abs(q.y - ridge) * 3.2);
     float fall = fbm(vec2(q.x * 7.0, q.y * 0.7 - t * 2.6));
     return band * mix(0.3, 1.6, fall);
   }
 
   /* Rings in perspective, travelling out. */
-  float orbit(vec2 q, float t) {
+  float orbit(vec2 q, float t, vec2 qp, float reach) {
     vec2 e = vec2(q.x, q.y * 2.3);
     float r = length(e);
-    float rings = sin(r * 8.0 - t * 5.0) * 0.5 + 0.5;
+    /* The rings crowd where the pointer is, as though it were pressing on the
+       sheet they travel across. Phase rather than amplitude: rings are made of
+       spacing, so spacing is what they have to say anything with. */
+    float press = exp(-dot(q - qp, q - qp) * 2.4) * reach;
+    float rings = sin(r * 8.0 - t * 5.0 + press * 3.2) * 0.5 + 0.5;
     float grain = warped(vec2(atan(e.y, e.x) * 1.5, r * 1.2), t * 0.6);
     return pow(rings, 4.0) * mix(0.45, 1.45, grain) * exp(-r * 1.05);
   }
@@ -230,11 +245,15 @@ export const FRAGMENT = `#version 300 es
   }
 
   /* Two wave fields crossed, lit where they agree. */
-  float weave(vec2 q, float t) {
+  float weave(vec2 q, float t, vec2 qp, float reach) {
     float a = 0.62;
     float u1 = q.x * cos(a) + q.y * sin(a);
     float u2 = q.x * cos(-a) + q.y * sin(-a);
-    float w = sin(u1 * 9.0 + t * 2.2) * sin(u2 * 9.0 - t * 1.7);
+    /* The two fields are pushed out of step near the pointer, so the lattice
+       shears there rather than lighting up: what a weave is made of is where
+       its two halves agree, and disagreement is the only thing it can say. */
+    float shear = exp(-dot(q - qp, q - qp) * 2.6) * reach * 2.4;
+    float w = sin(u1 * 9.0 + t * 2.2 + shear) * sin(u2 * 9.0 - t * 1.7 - shear);
     float grain = warped(vec2(q.x * 1.5, q.y * 1.5), t * 0.5);
     return pow(max(w, 0.0), 2.2) * mix(0.5, 1.4, grain) * exp(-length(q) * 0.85);
   }
@@ -243,46 +262,57 @@ export const FRAGMENT = `#version 300 es
     vec2 p = uv * 2.0 - 1.0;
     p.x *= uResolution.x / max(uResolution.y, 1.0);
 
-    /* What the pointer does, and why it read as pointing somewhere else.
-
-       The response was a bare multiply by one plus the falloff. Over a lit
-       part of the field that brightens; over a dark part it multiplies nothing
-       and shows nothing, so the visible answer to moving the cursor appeared
-       wherever the shape already happened to be bright. That is not where the
-       cursor is, and no falloff tightens its way out of a response that is
-       absent half the time. The coordinate was exact the whole while, measured
-       against the shader's own arithmetic for the same pixel.
-
-       The grip term is the fix, and the first of three. It pulls the field
-       toward the pointer, so structure gathers under it. A displacement shows
-       up wherever there is pattern, lit or not, which is what makes a cursor
-       feel like it is touching a medium rather than shining on one. */
-    vec2 toPointer = p - uPointer;
-    float grip = exp(-dot(toPointer, toPointer) * 2.6) * uReach;
-
+    /* What the pointer does, and the two answers this stopped giving.
+    
+       It multiplied what was already lit, which shows nothing over a dark part
+       of the field, so the visible answer to moving the cursor appeared
+       wherever the shape happened to be bright rather than where the cursor
+       was. Replacing that with a pull toward the pointer fixed the location and
+       introduced the second problem: a radial pull is a magnifier, so every
+       shape answered a pointer by zooming, and the lift that remained answered
+       by glowing. Two gestures, applied identically to six different things,
+       neither of which had anything to do with the thing it was applied to.
+    
+       There is no shared response now. What is left here is parallax, and each
+       shape answers for itself below. */
     /* Parallax, and small on purpose. At 0.16 the whole field translated a
        sixth of the frame between one edge of the screen and the other, which
        reads as the background being dragged rather than as depth: a large
        global motion answering a small input, which no time constant rescues. */
-    vec2 q = p - uPointer * 0.05 * uReach - toPointer * grip * 0.32;
+    vec2 q = p - uPointer * 0.05 * uReach;
 
     float a = radians(uTilt);
-    q = vec2(q.x * cos(a) - q.y * sin(a), q.x * sin(a) + q.y * cos(a));
-    q *= uScale;
+    mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a));
+    q = turn * q * uScale;
+
+    /* The pointer, carried into the same frame the shapes are drawn in, so each
+       one can answer it in its own terms. */
+    vec2 qp = turn * uPointer * uScale;
 
     float t = uTime * 0.06;
 
+    /* Each shape answers the pointer in the terms it is made of, and there is
+       no shared response left over.
+    
+       There used to be two, applied to everything: the field was pulled toward
+       the cursor, and what was already lit was multiplied over a floor. Those
+       are a zoom and a glow, they are the same gesture on every shape, and
+       neither says anything about the shape it is on. A braid has a length and
+       can lean. Rays have a source and can re-aim. A curtain has a horizon and
+       can swell. Rings are made of spacing and can crowd. A weave is made of
+       agreement and can shear. Flow is stirred, and had the only one of these
+       that was ever about its own material. */
     float d = 0.0;
     if (uShape == 0) {
-      d = braid(q, t);
+      d = braid(q, t, qp, uReach);
     } else if (uShape == 1) {
-      d = rays(q, t);
+      d = rays(q, t, qp, uReach);
     } else if (uShape == 2) {
-      d = aurora(q, t);
+      d = aurora(q, t, qp, uReach);
     } else if (uShape == 3) {
-      d = orbit(q, t);
+      d = orbit(q, t, qp, uReach);
     } else if (uShape == 4) {
-      d = weave(q, t);
+      d = weave(q, t, qp, uReach);
     } else {
       d = flow(q, t);
     }
@@ -291,12 +321,6 @@ export const FRAGMENT = `#version 300 es
        Every shape is a density that falls off, so a power tightens or spreads
        that falloff and one control means the same thing in all five. */
     d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain;
-
-    /* Then it lifts what is lit, over a floor, so there is always something at
-       the cursor. The floor is small deliberately: a light that follows the
-       pointer across an unlit field is a torch, which is a different and much
-       cheaper idea, and a tenth says the pointer is here without becoming one. */
-    d = d * (1.0 + grip * 0.9) + grip * 0.1;
 
     d *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y));
 
