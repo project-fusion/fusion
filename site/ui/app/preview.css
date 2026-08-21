@@ -371,22 +371,3 @@
   position: relative;
   z-index: var(--helix-layer-raised);
 }
-
-/* The shader sits over the CSS sky and inherits the brand colour through
-   `color`, which is how the fragment shader is told what blue this theme is
-   without anything parsing `oklch` by hand. */
-.scCanvas {
-  block-size: 100%;
-  color: var(--helix-color-primary);
-  display: block;
-  inline-size: 100%;
-  inset: 0;
-  position: absolute;
-}
-
-/* The CSS sun and field are the fallback, and they retire once the shader has
-   drawn a frame. Both at once is the same light painted twice. */
-.scSky[data-shader] .scField,
-.scSky[data-shader] .scSun {
-  display: none;
-}
