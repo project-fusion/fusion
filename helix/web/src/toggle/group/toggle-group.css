@@ -166,3 +166,14 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
+
+/* The row that holds the track and whatever flanks it.
+ *
+ * `align-items: center` for the same reason the inline label uses it: the track
+ * is a control with padding and a border, so anything beside it that is only
+ * text would otherwise sit on a different optical line. */
+[part="row"] {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-sm);
+}

@@ -234,6 +234,19 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
   @property({ attribute: 'label-placement', reflect: true })
   labelPlacement?: 'start'
 
+  /**
+   * The row the track sits in, so something can sit beside it.
+   *
+   * **Bare slots, and a wrapper only around the row itself.** An unassigned
+   * slot is `display: contents` in the UA stylesheet and generates no box at
+   * all, so a group with nothing slotted lays out exactly as it did before this
+   * existed: no grid track, no flex item, no gap. Wrapping each side in a div
+   * instead would paint an empty inset band on every group in the library that
+   * never asked for one, which is the measurement Card already paid for.
+   *
+   * The row does always generate a box, and is entitled to: the track is always
+   * in it.
+   */
   protected override render(): TemplateResult {
     /* The track is an element now, where it used to be the host itself.
        It has to be: the label, the hint and the message are the host's children
@@ -241,7 +254,9 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
        as the segments. The track also owns the box the indicator is measured
        against, which is why `place` reads it rather than `this`. */
     return html`${this.renderGroupLabel()}
-      <div part="track">
+      <div part="row">
+        <slot name="start"></slot>
+        <div part="track">
         <div part="indicator" aria-hidden="true"></div>
         <slot
           @slotchange=${() => {
@@ -249,7 +264,9 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
             this.sync()
             this.indicator.place()
           }}
-        ></slot>
+          ></slot>
+        </div>
+        <slot name="end"></slot>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

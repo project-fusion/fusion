@@ -1,0 +1,48 @@
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<!-- @summary A track standing on end, for a level rather than a quantity. -->
+<helix-flex
+  align="end"
+  gap="2xl"
+>
+  <helix-slider
+    default-value="70"
+    label="Low"
+    max="100"
+    min="0"
+    orientation="vertical"
+    show-value
+  ></helix-slider>
+
+  <helix-slider
+    default-value="45"
+    label="Mid"
+    max="100"
+    min="0"
+    orientation="vertical"
+    show-value
+  ></helix-slider>
+
+  <helix-slider
+    default-value="20"
+    label="High"
+    max="100"
+    min="0"
+    orientation="vertical"
+    show-value
+  ></helix-slider>
+
+  <!-- Taller than the nine rem a vertical track takes by default. -->
+  <helix-slider
+    class="tall"
+    default-value="60"
+    label="Long"
+    max="100"
+    min="0"
+    orientation="vertical"
+    show-value
+  ></helix-slider>
+</helix-flex>

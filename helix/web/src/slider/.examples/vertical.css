@@ -1,0 +1,5 @@
+/* A vertical track has no length of its own the way a horizontal one takes the
+   width of its row, so `--slider-length` is the number. Nine rem by default. */
+.tall {
+  --slider-length: 14rem;
+}

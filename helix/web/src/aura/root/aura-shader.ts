@@ -387,9 +387,11 @@ export const FRAGMENT = `#version 300 es
        while the object stays where it was composed. */
     vec2 c = q;
 
-    float spin = t * 0.35 + qp.x * 0.55 * reach;
-    mat2 turn = mat2(cos(spin), sin(spin), -sin(spin), cos(spin));
-    float body = sdTriangle(turn * c, 0.42);
+    /* Static, and centred. It span slowly and turned with the pointer, and
+       both are motion in the one part of the picture that wants to be the fixed
+       thing the light happens to: the beam moves, the fan moves, the glass is
+       what they move against. */
+    float body = sdTriangle(c, 0.42);
 
     /* A rim, and an interior barely above the ground. Glass is mostly the
        edges: fill it and the wedge becomes a solid triangle sitting on the
@@ -542,7 +544,9 @@ export const FRAGMENT = `#version 300 es
          half the gap and each streak read as a blob with a smudge behind it;
          the thing is named for the trail, so the trail is the part that should
          dominate the head. */
-      float len = mix(1.7, 0.9 + hash(vec2(id, 47.0)) * 1.7, v);
+      /* Shorter than it was. A plume that stays bright for two and a half
+         units is a searchlight: the frame is two units tall. */
+      float len = mix(0.85, 0.5 + hash(vec2(id, 47.0)) * 0.8, v);
 
       /* **The lane is periodic, not a single streak that is put back when it
          runs out.** It was fract() over a fixed span of 3.6, so a head left the
@@ -621,9 +625,20 @@ export const FRAGMENT = `#version 300 es
          transition under the brightest part of the coma, where there is nothing
          left to see. */
       float onset = 1.0 - exp(-behind / (0.15 * len));
-      float spread = min(nose * (1.0 + behind * 3.0), 0.16);
+
+      /* **The straight edge was a min().** Clamping the plume's width with
+         min(nose * (1 + behind * 3), 0.16) saturates at a constant value of
+         behind, and a constant behind is a straight line across the lane: above
+         it the width was fixed and below it grew, and the kink between the two
+         drew a hard diagonal through the frame. A cap on a quantity that varies
+         along one axis is a cap along a line, which is the one shape this thing
+         must not have.
+    
+         An exponential approach reaches the same limit without ever having a
+         corner, so there is no line to see anywhere. */
+      float spread = nose + (0.11 - nose) * (1.0 - exp(-behind * 1.3));
       float tail = exp(-behind / len) * onset *
-        exp(-(across * across) / (2.0 * spread * spread)) * 0.75;
+        exp(-(across * across) / (2.0 * spread * spread)) * 0.5;
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
