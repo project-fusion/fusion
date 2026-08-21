@@ -185,7 +185,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
     return html`${this.renderPlot(shares, named)}
-      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}`
+`
   }
 
   /**
@@ -198,7 +198,23 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     shares: { fraction: number; start: number }[],
     named: string,
   ): TemplateResult {
-    return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
+    /* The thickness is declared here, on the box that holds both the ring and
+       the middle, and not on the slices.
+     *
+     * It was on each `<circle>`, and `[part="centre"]` read it to size the hole
+     * it fills. A custom property inherits down and never sideways, so the
+     * middle, being a sibling, always got the fallback: the hole was sized as if
+     * every ring were the resting thickness. At `hole="large"` that made the
+     * middle smaller than the actual hole and the total fitted with room to
+     * spare, and at the default the two matched exactly and the total overflowed
+     * onto the slices. One reads as fine and the other as a bug, from one
+     * mistake. */
+    return html`<div
+      aria-hidden="true"
+      part="plot"
+      style="--_donut-thickness: ${this.thickness}"
+      title=${named || nothing}
+    >
       <svg viewBox="0 0 ${BOX} ${BOX}" xmlns="http://www.w3.org/2000/svg">
         <circle
           cx=${CENTRE}
@@ -210,6 +226,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
         />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
+      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}
       ${this.renderTooltip()}
     </div>`
   }
@@ -234,7 +251,6 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       @pointerenter=${() => this.pointer.set(index)}
       part="segment"
       r=${this.radius}
-      style="--_donut-thickness: ${this.thickness}"
       stroke-dasharray="${length} ${GAP}"
       stroke-dashoffset=${-share.start * circumference}
     />`

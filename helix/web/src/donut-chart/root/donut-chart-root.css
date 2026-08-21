@@ -14,8 +14,7 @@
   place-items: center;
 }
 
-[part="plot"],
-[part="centre"] {
+[part="plot"] {
   grid-area: 1 / 1;
 }
 
@@ -125,6 +124,11 @@
 }
 
 [part="centre"] {
+  /* Centred in the plot, which it now sits inside rather than beside. */
+  inset: 0;
+  margin: auto;
+  position: absolute;
+
   box-sizing: border-box;
   /* A container, so what is slotted here can be sized against the hole rather
      than against the page. The hole is a proportion of the chart and the type
