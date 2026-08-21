@@ -1,5 +1,6 @@
 import { customElement, HelixElement, hostAria } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary Groups related content and actions into a single surface.
@@ -25,13 +26,29 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
- * @slot media - Image or video that runs edge to edge, outside the inset.
+ * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
  */
 @customElement('helix-base-card')
 export class HelixBaseCard extends HelixElement {
+  /**
+   * Puts the media after the content instead of before it.
+   *
+   * **A figure that concludes a card is the same region as one that opens it**,
+   * and the only thing that differs is which edge it is flush against. Media is
+   * the one region that escapes the inset, so a chart wanting to span the card
+   * has nowhere else to be: slotted into the content it keeps the padding on
+   * both sides, and there is no second bleeding region to add without saying
+   * twice what this says once.
+   *
+   * Reflected and undefaulted, so a card that has not asked reads as a card
+   * with no attribute on it and the stylesheet only describes the departure.
+   */
+  @property({ attribute: 'media-placement', reflect: true })
+  mediaPlacement?: 'end'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box. Set here rather than in

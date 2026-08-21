@@ -56,7 +56,10 @@
 
 /* Media is the one region that must escape the inset. A negative margin on all
    sides pulls it back out to the border, and the container's `overflow: hidden`
-   trims it to the radius. */
+   trims it to the radius.
+
+   Three of the four sides bleed and the fourth is the one facing the content,
+   which keeps its inset so the text below is not touching the picture. */
 slot[name="media"]::slotted(*) {
   block-size: auto;
   display: block;
@@ -64,6 +67,23 @@ slot[name="media"]::slotted(*) {
   margin: calc(var(--_card-inset) * -1);
   margin-block-end: 0;
   object-fit: cover;
+}
+
+/* The same region against the other edge.
+ *
+ * `order` rather than a second slot, because the slot is already the one that
+ * escapes the inset and a `media-end` would be the same rule written twice
+ * under a name that only says where it went. The bare slots are
+ * `display: contents`, so the slotted element is itself the grid item and takes
+ * `order` directly.
+ *
+ * The margin turns with it: the inset that was held at the end is held at the
+ * start instead, so the gap stays between the media and the content it is
+ * beside rather than following the source order. */
+:host([media-placement="end"]) slot[name="media"]::slotted(*) {
+  margin-block-end: calc(var(--_card-inset) * -1);
+  margin-block-start: 0;
+  order: 1;
 }
 
 /* The header reads as the card's own voice rather than as body copy. */

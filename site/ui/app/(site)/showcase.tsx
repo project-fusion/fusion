@@ -248,10 +248,17 @@ export function Showcase(): React.ReactElement {
       {/* On the switch's own line, because it belongs to the panel rather than
           to any one view: changing the colour with Data showing and finding the
           control gone would be the same fault the switch avoids. */}
+      {/* **`aria-label` rather than `label`, which is the field mixin's own
+          distinction: `label` means a visible label and `aria-label` means a
+          name.** The visible one cost a row of the field's grid, so the control
+          sat 20px below the toggle group beside it and the reset button lined
+          up with neither. Nothing here is a workaround for that: the mixin
+          renders the name clipped and the control is 40px, the same
+          `--helix-size-control` every other control is. */}
       <helix-color-input
+        aria-label="Brand"
         class="showcaseBrand"
         default-value={BRAND}
-        label="Brand"
         name="brand"
         onhelix-change={(event: CustomEvent<{ value: string }>) => {
           setBrand(event.detail.value)
@@ -355,26 +362,32 @@ export function Showcase(): React.ReactElement {
                 a label and a unit, and it is a figure rather than a chart
                 container. Given the card's width and a rule above it, the two
                 are one thing. */}
-          <helix-card appearance="outlined" class="showcaseCard">
-            <helix-flex direction="column" gap="md">
-              <helix-stat-group divided>
-                <helix-stat>
-                  1,284
-                  <span slot="label">Installs</span>
-                </helix-stat>
-                <helix-stat>
-                  99.98
-                  <span slot="label">Uptime</span>
-                  <span slot="unit">%</span>
-                </helix-stat>
-              </helix-stat-group>
-              <helix-divider></helix-divider>
-              <helix-sparkline
-                class="showcaseTrendLine"
-                label="Installs rose from 1,240 to 1,284 over seven days"
-                values="1240 1318 1102 1291 1244 1180 1284"
-              ></helix-sparkline>
-            </helix-flex>
+          <helix-card appearance="outlined" class="showcaseCard" media-placement="end">
+            <helix-stat-group divided>
+              <helix-stat>
+                1,284
+                <span slot="label">Installs</span>
+              </helix-stat>
+              <helix-stat>
+                99.98
+                <span slot="label">Uptime</span>
+                <span slot="unit">%</span>
+              </helix-stat>
+            </helix-stat-group>
+            {/* **The chart is the card's media, which is why it is a direct
+                child and carries no width of its own.** `media` is the one
+                region that escapes the inset, and `media-placement="end"` puts
+                it against the bottom edge rather than the top. A class setting
+                `inline-size: 100%` here would win: a document rule beats a
+                shadow one whatever the specificity, so it would hold the chart
+                to the content width and quietly undo the bleed. The divider
+                went with it, having been the thing separating the numbers from
+                the chart that the bleed now separates by itself. */}
+            <helix-sparkline
+              label="Installs rose from 1,240 to 1,284 over seven days"
+              slot="media"
+              values="1240 1318 1102 1291 1244 1180 1284"
+            ></helix-sparkline>
           </helix-card>
 
           <helix-card appearance="outlined" class="showcaseCard showcaseWide">

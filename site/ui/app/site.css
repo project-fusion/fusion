@@ -2399,14 +2399,15 @@ helix-drawer helix-tree {
   grid-column: 1 / -1;
 }
 
-.showcaseCard {
-  display: block;
-}
+/* **No `display` here.** `.showcaseCard { display: block }` sat here and beat
+   the card's own `:host { display: grid }`, because a document rule outranks a
+   shadow one whatever the specificity. Every showcase card was a block: the
+   region gap did nothing, the stat group sized to its content instead of the
+   column, and `media-placement="end"` could not work at all, `order` having
+   nothing to order. The card already knows what it is. */
 
 /* One column where two would be a pair of narrow strips. The cards hold tables
    and sliders, and neither survives being halved. */
-/* One column where two would be a pair of narrow strips. The cards hold a table
-   and a slider, and neither survives being halved. */
 @media (width < 56rem) {
   .showcase {
     grid-template-columns: minmax(0, 1fr);
@@ -2563,12 +2564,6 @@ helix-drawer helix-tree {
   }
 }
 
-/* The code block sits in the mosaic without a card, so it needs the block
-   spacing a card would have given it and nothing else. */
-.showcaseCode {
-  display: block;
-}
-
 /* The code block sits in the mosaic on its own, so it needs to be a block and
    nothing else: it brings its own surface. */
 .showcaseCode {
@@ -2590,7 +2585,14 @@ helix-drawer helix-tree {
   grid-area: brand;
 }
 
-.showcaseReset {
+/* **On the button, not on the tooltip that wraps it.**
+ *
+ * `helix-tooltip` is `display: contents`, so it generates no box and is not a
+ * grid item: every one of these three properties set on it was read by nothing
+ * and dropped without an error, which is the same silent class as a `[part=]`
+ * selector for a part nothing renders. The icon button is the grid item, so it
+ * is the thing that can be placed. */
+.showcaseReset > helix-icon-button {
   align-self: center;
   grid-area: reset;
   justify-self: start;
@@ -2637,10 +2639,6 @@ helix-drawer helix-tree {
 
 /* Sparklines take the width they are given and none by default. The one under
    the figures spans its card; the ones in table rows fill their cell. */
-.showcaseTrendLine {
-  inline-size: 100%;
-}
-
 .showcaseRowLine {
   inline-size: 100%;
   min-inline-size: 4rem;

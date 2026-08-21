@@ -14,7 +14,9 @@ import { styles } from './card-root.css.js'
  *
  * `media` runs edge to edge and clips to the card's corners, so an image needs
  * no inset correction. Set `orientation="horizontal"` to move it alongside the
- * header, content, and footer stack rather than above it.
+ * header, content, and footer stack rather than above it, or
+ * `media-placement="end"` to put it under the content instead of over it, which
+ * is what a chart concluding a card wants.
  *
  * Regions are bare slots with no wrapper element, so an omitted one occupies no
  * space without the card having to detect that it is missing. Style slotted
@@ -27,7 +29,7 @@ import { styles } from './card-root.css.js'
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card
  *
- * @slot media - Image or video that runs edge to edge, outside the inset.
+ * @slot media - Image, video, or chart that runs edge to edge, outside the inset.
  * @slot header - Title and any actions for the whole card.
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.
