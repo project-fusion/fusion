@@ -161,17 +161,39 @@ export const FRAGMENT = `#version 300 es
 
   /* A fan from a source above the frame, cut into filaments by angle. */
   float rays(vec2 q, float t, vec2 qp, float reach) {
-    /* The source moves and the whole fan re-aims. Rays are the one shape with
-       a thing casting them, so the honest answer to a pointer is to move that
-       rather than to brighten where it happens to be. */
-    vec2 o = vec2(qp.x * 0.4 * reach, 1.45);
+    /* The pointer occludes, rather than the source moving.
+    
+       Swinging the source re-aimed the whole fan, which is a thing a light does
+       and not a thing that happens when something passes in front of one. What
+       a reader knows about rays is that an object crossing them takes a bite
+       out of the light and drags a shadow behind itself, away from the source.
+       So the source is fixed and the pointer is a blocker.
+    
+       The shadow is angular, not radial: it is the wedge of directions the
+       object covers as seen from the source, and it only exists further along
+       than the object is. A fragment nearer the source than the blocker is in
+       front of it and stays lit, which is the whole difference between an
+       occluder and a dark patch that follows the cursor. */
+    vec2 o = vec2(0.0, 1.45);
     vec2 v = q - o;
     float dist = length(v);
     float ang = atan(v.x, -v.y);
+
+    vec2 vp = qp - o;
+    float distToBlocker = length(vp);
+    float angToBlocker = atan(vp.x, -vp.y);
+    /* Widened with distance, so the object reads as a fixed size rather than
+       as a wedge that grows the further out it is carried. */
+    float halfAngle = 0.075 / max(distToBlocker, 0.35);
+    float across = (ang - angToBlocker) / halfAngle;
+    float behind = smoothstep(0.0, 0.22, dist - distToBlocker);
+    float shadow = exp(-across * across) * behind * reach;
+
     float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8));
     float dust = warped(vec2(ang * 2.0, dist * 0.7), t * 0.4);
     float spread = smoothstep(0.85, 0.05, abs(ang));
-    return spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
+    float lit = spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
+    return lit * (1.0 - shadow * 0.82);
   }
 
   /* Curtains on a drifting horizon. */

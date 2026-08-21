@@ -203,7 +203,16 @@
      and the bar looked like it was answering a different event. The header's
      `normal` would have been closer and still wrong, since what a reader is
      watching is the panel. */
+  /* Collapsed to the top, the way the panel is, and not merely transparent.
+   *
+   * Fading alone left a faint dark rectangle standing where the panel used to
+   * be: the sheet keeps its full height throughout, so at the tail of the
+   * collapse the panel is a sliver and the glass is still a full-size pane at
+   * low opacity. Clipping it on the panel's own geometry means the two leave
+   * together and there is nothing behind to outlive the thing it was behind. */
+  clip-path: inset(0 0 100% 0);
   transition:
+    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
     opacity var(--helix-duration-slow) var(--helix-easing-decelerate),
     visibility var(--helix-duration-slow) allow-discrete;
   /* Hidden rather than only transparent, so an idle page is not running a
@@ -214,6 +223,7 @@
 }
 
 .navGlass[data-open] {
+  clip-path: inset(0 0 0 0);
   opacity: 1;
   visibility: visible;
 }
