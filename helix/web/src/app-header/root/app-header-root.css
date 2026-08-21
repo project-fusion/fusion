@@ -46,6 +46,7 @@
      with the scroll rule gone left `transparent` taking its surface in a single
      frame: the one thing a scroll still changes was the one thing not fading. */
   transition:
+    backdrop-filter var(--helix-duration-normal) var(--helix-easing-standard),
     background-color var(--helix-duration-normal) var(--helix-easing-standard),
     border-color var(--helix-duration-normal) var(--helix-easing-standard);
 }

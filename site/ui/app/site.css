@@ -193,9 +193,35 @@
   background-color: var(--helix-material-translucent);
   inset-block-start: 0;
   inset-inline: 0;
+  opacity: 0;
   pointer-events: none;
   position: fixed;
+  /* `slow`, which is the panel's own duration and not the masthead's.
+     
+     The sheet had no transition at all: mounted and unmounted with the panel,
+     it appeared and vanished in a frame while the panel took 320ms to travel,
+     and the bar looked like it was answering a different event. The header's
+     `normal` would have been closer and still wrong, since what a reader is
+     watching is the panel. */
+  transition:
+    opacity var(--helix-duration-slow) var(--helix-easing-decelerate),
+    visibility var(--helix-duration-slow) allow-discrete;
+  /* Hidden rather than only transparent, so an idle page is not running a
+     full-screen blur behind an invisible element. Discrete, so it flips at the
+     end of the fade rather than the start of it. */
+  visibility: hidden;
   z-index: var(--helix-layer-raised);
+}
+
+.navGlass[data-open] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navGlass {
+    transition: none;
+  }
 }
 
 helix-app-header {

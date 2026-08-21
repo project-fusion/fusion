@@ -136,7 +136,17 @@ export function SiteNav() {
           `background-color` over `--helix-duration-normal`, which is the
           duration the panel's reveal runs for, so they move together without
           either being told about the other. */}
-      {panelDown && <div className="navGlass" style={{ blockSize: `${glassSize}px` }} />}
+      {/* Always rendered, and opened by an attribute rather than by mounting.
+          
+          Unmounted on close, the sheet vanished on the frame the panel began
+          collapsing: nothing transitions out of the DOM. So it stays, and
+          `data-open` drives a fade over the same duration the panel's own
+          clip-path runs for. */}
+      <div
+        className="navGlass"
+        data-open={panelDown ? '' : undefined}
+        style={{ blockSize: `${glassSize}px` }}
+      />
 
       <helix-app-header
         appearance={onHero ? 'transparent' : undefined}
