@@ -42,6 +42,7 @@ import type {
   HelixInput,
   HelixKbd,
   HelixLegend,
+  HelixLineChart,
   HelixListItem,
   HelixList,
   HelixListbox,
@@ -2784,6 +2785,50 @@ shadow root names a table in that root rather than in the document.
 };
 
 export type HelixLegendVueEvents = {};
+
+export type HelixLineChartVueProps = {
+  /** Whether a wash is drawn under each line.
+
+Absent is lines alone, which is what suits more than one series: washes
+stack and the lower ones are read through the upper. One series over a
+ground it should feel like a quantity against is the case for this. */
+  area?: HelixLineChart["area"];
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between. `smooth` is easier to
+follow across a long series and invents the values between the readings; it
+is monotone cubic, so what it invents never leaves the band the data sets.
+`step` claims the opposite, that a reading holds until the next.
+
+Absent rather than defaulted to `straight`, because a reflecting property
+with a default writes its attribute onto every host anybody renders,
+including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
+the host carries only what the consumer wrote, and caught it. */
+  curve?: HelixLineChart["curve"];
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixLineChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixLineChart["label"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  zero?: HelixLineChart["zero"];
+};
+
+export type HelixLineChartVueEvents = {};
 
 export type HelixListItemVueProps = {
   /** Where the row goes, and nothing when it goes nowhere.
@@ -6973,6 +7018,14 @@ export type CustomCssProperties = {
   "--legend-gap"?: string;
   /** Size of the colour patch. */
   "--legend-swatch-size"?: string;
+  /** How much of a line's colour its wash takes. */
+  "--line-chart-area-opacity"?: string;
+  /** Height of the drawing. */
+  "--line-chart-block-size"?: string;
+  /** Space between the drawing and its labels. */
+  "--line-chart-gap"?: string;
+  /** Thickness of a line. */
+  "--line-chart-width"?: string;
   /** Padding inside the row. */
   "--list-item-inset"?: string;
   /** Weight of a description list's term. */
@@ -7578,6 +7631,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixLegend,
     HelixLegendVueProps,
     HelixLegendVueEvents
+  >;
+  /** The lines take the series palette in order, so a chart of one is series one and a chart of four is the first four, and a legend beside it maps the same twenty-four.  The stroke does not scale with the box. 'preserveAspectRatio="none"' is what lets one drawing fill a narrow card and a wide panel, and without 'vector-effect: non-scaling-stroke' the same line comes out hairline in the first and heavy in the second. It rescues strokes and not geometry, which is why the readings are joined by lines and marked by nothing: a circle in a stretched coordinate space is an ellipse, and there is no vector-effect that answers for a shape. */
+  "helix-line-chart": DefineCustomElement<
+    HelixLineChart,
+    HelixLineChartVueProps,
+    HelixLineChartVueEvents
   >;
   /** A grid rather than a flex row, so the supporting text lines up under the label rather than under the leading icon. The leading and trailing regions hold their own width and the middle takes the rest. */
   "helix-list-item": DefineCustomElement<

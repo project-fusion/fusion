@@ -40,6 +40,7 @@ import type {
   HelixBaseInput,
   HelixBaseKbd,
   HelixBaseLegend,
+  HelixBaseLineChart,
   HelixBaseListItem,
   HelixBaseList,
   HelixBaseListbox,
@@ -2318,6 +2319,50 @@ shadow root names a table in that root rather than in the document.
 };
 
 export type HelixBaseLegendVueEvents = {};
+
+export type HelixBaseLineChartVueProps = {
+  /** Whether a wash is drawn under each line.
+
+Absent is lines alone, which is what suits more than one series: washes
+stack and the lower ones are read through the upper. One series over a
+ground it should feel like a quantity against is the case for this. */
+  area?: HelixBaseLineChart["area"];
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between. `smooth` is easier to
+follow across a long series and invents the values between the readings; it
+is monotone cubic, so what it invents never leaves the band the data sets.
+`step` claims the opposite, that a reading holds until the next.
+
+Absent rather than defaulted to `straight`, because a reflecting property
+with a default writes its attribute onto every host anybody renders,
+including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
+the host carries only what the consumer wrote, and caught it. */
+  curve?: HelixBaseLineChart["curve"];
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseLineChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixBaseLineChart["label"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  zero?: HelixBaseLineChart["zero"];
+};
+
+export type HelixBaseLineChartVueEvents = {};
 
 export type HelixBaseListItemVueProps = {
   /** Where the row goes, and nothing when it goes nowhere.
@@ -6211,6 +6256,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseLegend,
     HelixBaseLegendVueProps,
     HelixBaseLegendVueEvents
+  >;
+  /** The chart for a shape rather than for a quantity, which is what decides the one thing a bar chart is not allowed to do.  **It measures from its own range and not from zero, deliberately.** 'BarChart' refuses that switch because a bar's length *is* its value, so a baseline anywhere else makes the lengths proportional to nothing. A line claims no such thing: it says where the readings went, and forcing zero into the range of a series that moves between 980 and 1020 flattens the entire shape into a rule across the top of the box. The two rules are opposite because the two charts answer opposite questions, and 'zero' is here for the case where the distance from nothing is the point.  **One scale across every series**, the same as the bar chart, because two series drawn to different scales are two charts sharing a picture.  **The labels are HTML beside the drawing rather than '<text>' inside it**, for the reason 'BarChart' records: an '<svg>' that fills its box scales its type with everything else, the same 'font-size' arriving at 10px in a narrow chart and 43px in a wide one, and there is no non-scaling-font to answer it the way 'vector-effect' answers strokes.  The table is the accessible representation and this drawing is 'aria-hidden'. A reader who wants the numbers gets the numbers, not a described picture. */
+  "helix-base-line-chart": DefineCustomElement<
+    HelixBaseLineChart,
+    HelixBaseLineChartVueProps,
+    HelixBaseLineChartVueEvents
   >;
   /** Layout and semantics, and deliberately not a target.  **'href' makes the row itself the link.** *Corrected 19 Aug 2026.* This said a row could not become one, on the grounds that "a whole-row target needs the anchor to wrap the layout, and the layout is what this component is." That is true of the *consumer's* anchor, which cannot wrap slots it does not own, and it is not true of the component's: an '<a part="row">' wraps this component's own layout perfectly well. 'Tree.Item' does exactly that, and the two were refusing and accepting 'href' on the same argument.  What the anchor buys is what the row could not fake: the whole row is a target, Enter follows it, middle click opens a tab, the status bar shows the destination, and it all works before any JavaScript runs.  What it costs is client-side routing, and that is the consumer's to restore. A router renders its own anchor and cannot render one inside this shadow root, so a framework wanting a soft navigation intercepts the click on the way out: the anchor is in 'composedPath()', and taking only a plain primary press leaves every native gesture alone.  **'data-list-item' is still the answer for a row that is not a destination.** A list row is often a container of controls rather than a place to go, and a row with 'href' unset behaves exactly as it always did. */
   "helix-base-list-item": DefineCustomElement<

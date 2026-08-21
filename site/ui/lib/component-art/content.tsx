@@ -392,6 +392,39 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * Two lines over one baseline, which is what separates this card from the
+   * sparkline's.
+   *
+   * A sparkline is one stroke and no ground; a line chart is several series on
+   * one scale, so the card shows two that cross rather than two that run
+   * parallel. Crossing is the fact a shared scale makes visible and two scales
+   * would hide.
+   *
+   * Still, like the other charts. The readings do not move.
+   */
+  'line-chart': (
+    <>
+      <path
+        className="artStroke"
+        d="M64 128L108 104L152 116L196 76L240 88"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeOpacity="0.55"
+        strokeWidth="2.5"
+      />
+      <path
+        className="artStroke"
+        d="M64 92L108 118L152 100L196 126L240 118"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeOpacity="0.28"
+        strokeWidth="2.5"
+      />
+      <rect className="artRule" height="1" width="224" x="48" y="144" />
+    </>
+  ),
+
   list: (
     <>
       {[

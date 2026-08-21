@@ -47,6 +47,7 @@ declare module 'svelte/elements' {
     'helix-base-input': CustomElements['helix-base-input']
     'helix-base-kbd': CustomElements['helix-base-kbd']
     'helix-base-legend': CustomElements['helix-base-legend']
+    'helix-base-line-chart': CustomElements['helix-base-line-chart']
     'helix-base-list-item': CustomElements['helix-base-list-item']
     'helix-base-list': CustomElements['helix-base-list']
     'helix-base-listbox': CustomElements['helix-base-listbox']

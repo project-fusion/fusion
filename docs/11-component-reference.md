@@ -2480,6 +2480,56 @@ custom property set inline would be the headless tier naming a colour.
 | `--legend-gap` | Space between entries. |
 | `--legend-swatch-size` | Size of the colour patch. |
 
+## Line Chart
+
+### Root — `helix-line-chart`
+
+A series over time as a line, read from a table.
+
+Extends `HelixBaseLineChart`.
+
+The lines take the series palette in order, so a chart of one is series one
+and a chart of four is the first four, and a legend beside it maps the same
+twenty-four.
+
+The stroke does not scale with the box. `preserveAspectRatio="none"` is what
+lets one drawing fill a narrow card and a wide panel, and without
+`vector-effect: non-scaling-stroke` the same line comes out hairline in the
+first and heavy in the second. It rescues strokes and not geometry, which is
+why the readings are joined by lines and marked by nothing: a circle in a
+stretched coordinate space is an ellipse, and there is no vector-effect that
+answers for a shape.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
+| `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
+| `for` | `for` | `string` | `''` | `HelixBaseLineChart` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `HelixBaseLineChart` | The drawing's name, for a pointer resting on it. |
+| `zero` | `zero` | `boolean` | `false` | `HelixBaseLineChart` | Whether zero is forced into the range. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `area` | The wash under one line, where `area` is set. |
+| `baseline` | The rule at zero, where zero is inside the range. |
+| `label` | One reading's name. |
+| `labels` | The row of reading names. |
+| `line` | One series. |
+| `plot` | The drawing. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--line-chart-area-opacity` | How much of a line's colour its wash takes. |
+| `--line-chart-block-size` | Height of the drawing. |
+| `--line-chart-gap` | Space between the drawing and its labels. |
+| `--line-chart-width` | Thickness of a line. |
+
 ## List
 
 ### Root — `helix-list`

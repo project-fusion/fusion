@@ -1,0 +1,263 @@
+/* A grid of two rows, the drawing and the words under it, so the labels line up
+   with the readings without either knowing the other's size. */
+:host {
+  display: grid;
+  gap: var(--line-chart-gap, var(--helix-space-2xs));
+}
+
+[part="plot"] {
+  block-size: var(--line-chart-block-size, 12em);
+}
+
+[part="plot"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+  /* A stroke sits astride its own path, so half of the topmost line falls
+     outside the box. Visible rather than an inset, for the reason the sparkline
+     gives: an inset costs amplitude and grows with the box. */
+  overflow: visible;
+}
+
+/* The line, and the one declaration that keeps it a line.
+ *
+ * `preserveAspectRatio="none"` stretches the coordinate space to whatever box
+ * the chart is in, and a stroke stretches with it: measured on the sparkline,
+ * the same drawing renders a hairline in a narrow slot and a heavy rule in a
+ * wide one. `vector-effect` takes the stroke out of that transform. It does not
+ * take *geometry* out of it, which is why nothing here is a circle. */
+[part="line"] {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--line-chart-width, 2px);
+  vector-effect: non-scaling-stroke;
+}
+
+/* The wash, where `area` is set.
+ *
+ * Flat rather than a gradient, unlike the sparkline's. A sparkline is one
+ * series and the fade reads as depth under it; a line chart may hold several,
+ * and gradients stacked over one another read as a third colour wherever they
+ * cross rather than as two series that overlap. */
+[part="area"] {
+  opacity: var(--line-chart-area-opacity, 0.16);
+  stroke: none;
+}
+
+/* The rule at zero, drawn only where zero is inside the range. The tier below
+   decides that: a rule at the foot of a chart whose lowest reading is 980 is
+   the bottom of the box wearing the zero line's clothes. */
+[part="baseline"] {
+  stroke: var(--helix-color-border);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="labels"] {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Index to colour, the same twenty-four the legend maps. An attribute cannot
+   select a token, so it is one rule per series, and the line takes it as a
+   stroke where the bar chart takes it as a fill. */
+[part="line"][data-series="1"] {
+  stroke: var(--helix-color-series-1);
+}
+
+[part="area"][data-series="1"] {
+  fill: var(--helix-color-series-1);
+}
+
+[part="line"][data-series="2"] {
+  stroke: var(--helix-color-series-2);
+}
+
+[part="area"][data-series="2"] {
+  fill: var(--helix-color-series-2);
+}
+
+[part="line"][data-series="3"] {
+  stroke: var(--helix-color-series-3);
+}
+
+[part="area"][data-series="3"] {
+  fill: var(--helix-color-series-3);
+}
+
+[part="line"][data-series="4"] {
+  stroke: var(--helix-color-series-4);
+}
+
+[part="area"][data-series="4"] {
+  fill: var(--helix-color-series-4);
+}
+
+[part="line"][data-series="5"] {
+  stroke: var(--helix-color-series-5);
+}
+
+[part="area"][data-series="5"] {
+  fill: var(--helix-color-series-5);
+}
+
+[part="line"][data-series="6"] {
+  stroke: var(--helix-color-series-6);
+}
+
+[part="area"][data-series="6"] {
+  fill: var(--helix-color-series-6);
+}
+
+[part="line"][data-series="7"] {
+  stroke: var(--helix-color-series-7);
+}
+
+[part="area"][data-series="7"] {
+  fill: var(--helix-color-series-7);
+}
+
+[part="line"][data-series="8"] {
+  stroke: var(--helix-color-series-8);
+}
+
+[part="area"][data-series="8"] {
+  fill: var(--helix-color-series-8);
+}
+
+[part="line"][data-series="9"] {
+  stroke: var(--helix-color-series-9);
+}
+
+[part="area"][data-series="9"] {
+  fill: var(--helix-color-series-9);
+}
+
+[part="line"][data-series="10"] {
+  stroke: var(--helix-color-series-10);
+}
+
+[part="area"][data-series="10"] {
+  fill: var(--helix-color-series-10);
+}
+
+[part="line"][data-series="11"] {
+  stroke: var(--helix-color-series-11);
+}
+
+[part="area"][data-series="11"] {
+  fill: var(--helix-color-series-11);
+}
+
+[part="line"][data-series="12"] {
+  stroke: var(--helix-color-series-12);
+}
+
+[part="area"][data-series="12"] {
+  fill: var(--helix-color-series-12);
+}
+
+[part="line"][data-series="13"] {
+  stroke: var(--helix-color-series-13);
+}
+
+[part="area"][data-series="13"] {
+  fill: var(--helix-color-series-13);
+}
+
+[part="line"][data-series="14"] {
+  stroke: var(--helix-color-series-14);
+}
+
+[part="area"][data-series="14"] {
+  fill: var(--helix-color-series-14);
+}
+
+[part="line"][data-series="15"] {
+  stroke: var(--helix-color-series-15);
+}
+
+[part="area"][data-series="15"] {
+  fill: var(--helix-color-series-15);
+}
+
+[part="line"][data-series="16"] {
+  stroke: var(--helix-color-series-16);
+}
+
+[part="area"][data-series="16"] {
+  fill: var(--helix-color-series-16);
+}
+
+[part="line"][data-series="17"] {
+  stroke: var(--helix-color-series-17);
+}
+
+[part="area"][data-series="17"] {
+  fill: var(--helix-color-series-17);
+}
+
+[part="line"][data-series="18"] {
+  stroke: var(--helix-color-series-18);
+}
+
+[part="area"][data-series="18"] {
+  fill: var(--helix-color-series-18);
+}
+
+[part="line"][data-series="19"] {
+  stroke: var(--helix-color-series-19);
+}
+
+[part="area"][data-series="19"] {
+  fill: var(--helix-color-series-19);
+}
+
+[part="line"][data-series="20"] {
+  stroke: var(--helix-color-series-20);
+}
+
+[part="area"][data-series="20"] {
+  fill: var(--helix-color-series-20);
+}
+
+[part="line"][data-series="21"] {
+  stroke: var(--helix-color-series-21);
+}
+
+[part="area"][data-series="21"] {
+  fill: var(--helix-color-series-21);
+}
+
+[part="line"][data-series="22"] {
+  stroke: var(--helix-color-series-22);
+}
+
+[part="area"][data-series="22"] {
+  fill: var(--helix-color-series-22);
+}
+
+[part="line"][data-series="23"] {
+  stroke: var(--helix-color-series-23);
+}
+
+[part="area"][data-series="23"] {
+  fill: var(--helix-color-series-23);
+}
+
+[part="line"][data-series="24"] {
+  stroke: var(--helix-color-series-24);
+}
+
+[part="area"][data-series="24"] {
+  fill: var(--helix-color-series-24);
+}
