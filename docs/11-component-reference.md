@@ -1857,6 +1857,7 @@ larger than the default.
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
+| `sweep` | `sweep` | `'half' \| undefined` | - | `HelixBaseDonutChart` | How much of the circle the whole occupies. |
 
 #### Slots
 

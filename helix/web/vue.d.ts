@@ -2277,6 +2277,29 @@ which needs the radius: reading a custom property means `getComputedStyle`,
 which is client-only, so a server would have drawn a different ring than
 the client. A plot's proportions are markup for the same reason `curve` is. */
   hole?: HelixDonutChart["hole"];
+  /** How much of the circle the whole occupies.
+
+Absent is the full turn. `half` is a semi-donut: the same shares spread
+over a half circle that opens downward, which is the shape a dashboard
+uses when the ring sits above a figure and the space below it is doing
+something else.
+
+**A second property rather than another `hole` value**, because the two are
+different axes and can both be true: `hole` is radial and says how thick
+the band is, this is angular and says how far round it goes. A `half`
+`none` is a semi-pie and is a real thing to want.
+
+**Not a gauge**, and the distinction is worth stating because this row was
+first filed as one. A gauge is one value against a range, which is a
+different data shape entirely and is `Meter`, whose `round` example already
+draws the reading as a ring. This divides a whole into parts and then
+declines to use the bottom half of the circle.
+
+Reflected, because the stylesheet has three things to say about it: the
+rotation that puts the first slice at nine o'clock, the aspect ratio of a
+box that is no longer square, and where the middle sits once the bottom of
+the circle is not drawn. */
+  sweep?: HelixDonutChart["sweep"];
 };
 
 export type HelixDonutChartVueEvents = {};

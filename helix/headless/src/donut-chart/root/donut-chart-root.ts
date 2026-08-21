@@ -152,6 +152,38 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   @property({ reflect: true })
   hole?: 'large' | 'none' | 'small'
 
+  /**
+   * How much of the circle the whole occupies.
+   *
+   * Absent is the full turn. `half` is a semi-donut: the same shares spread
+   * over a half circle that opens downward, which is the shape a dashboard
+   * uses when the ring sits above a figure and the space below it is doing
+   * something else.
+   *
+   * **A second property rather than another `hole` value**, because the two are
+   * different axes and can both be true: `hole` is radial and says how thick
+   * the band is, this is angular and says how far round it goes. A `half`
+   * `none` is a semi-pie and is a real thing to want.
+   *
+   * **Not a gauge**, and the distinction is worth stating because this row was
+   * first filed as one. A gauge is one value against a range, which is a
+   * different data shape entirely and is `Meter`, whose `round` example already
+   * draws the reading as a ring. This divides a whole into parts and then
+   * declines to use the bottom half of the circle.
+   *
+   * Reflected, because the stylesheet has three things to say about it: the
+   * rotation that puts the first slice at nine o'clock, the aspect ratio of a
+   * box that is no longer square, and where the middle sits once the bottom of
+   * the circle is not drawn.
+   */
+  @property({ reflect: true })
+  sweep?: 'half'
+
+  /** The fraction of the circle the shares are spread over. */
+  private get span(): number {
+    return this.sweep === 'half' ? 0.5 : 1
+  }
+
   /** How thick the ring is drawn, in the drawing's own units. */
   private get thickness(): number {
     return THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0
@@ -218,13 +250,14 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       style="--_donut-thickness: ${this.thickness}"
       title=${named || nothing}
     >
-      <svg viewBox="0 0 ${BOX} ${BOX}" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox=${this.frame} xmlns="http://www.w3.org/2000/svg">
         <circle
           cx=${CENTRE}
           cy=${CENTRE}
           fill="none"
           part="track"
           r=${this.radius}
+          stroke-dasharray="${2 * Math.PI * this.radius * this.span} ${GAP}"
           stroke-width=${this.thickness}
         />
         ${shares.map((share, index) => this.renderSegment(share, index))}
@@ -234,13 +267,30 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     </div>`
   }
 
+  /**
+   * The view box, cropped to what is actually drawn.
+   *
+   * A full turn uses the square. A half arc uses the band from the top of the
+   * ring down to the centre line, plus the half stroke its flat ends hang
+   * below that, and cropping to it is the difference between a semi-donut and a
+   * semi-donut with an empty quarter of the box under it. The outer edge is
+   * `EDGE` from the centre whatever the thickness, which is what makes this two
+   * numbers rather than a measurement.
+   */
+  private get frame(): string {
+    if (this.sweep !== 'half') {
+      return `0 0 ${BOX} ${BOX}`
+    }
+    return `0 ${CENTRE - EDGE} ${BOX} ${EDGE + this.thickness / 2}`
+  }
+
   /** One slice, as a dash the length of its share. */
   protected renderSegment(
     share: { fraction: number; start: number },
     index: number,
   ): TemplateResult {
     const circumference = 2 * Math.PI * this.radius
-    const length = share.fraction * circumference
+    const length = share.fraction * circumference * this.span
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
        a positive offset would run the slices anticlockwise from twelve. The
        rotation that puts zero at the top is the stylesheet's, since it is a
@@ -255,7 +305,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       part="segment"
       r=${this.radius}
       stroke-dasharray="${length} ${GAP}"
-      stroke-dashoffset=${-share.start * circumference}
+      stroke-dashoffset=${-share.start * circumference * this.span}
     />`
   }
   /**

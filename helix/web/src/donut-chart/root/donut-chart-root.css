@@ -509,3 +509,61 @@
 [part="segment"] {
   cursor: crosshair;
 }
+
+/* A half circle, opening downward.
+ *
+ * Three things change and none of them is the drawing, which is why `sweep` is
+ * reflected: the geometry is the tier below's, and these are facts about how
+ * the picture is presented.
+ *
+ * **The box is no longer square.** The headless tier crops the view box to the
+ * band it actually draws, from the top of the ring to the centre line plus the
+ * half stroke the flat ends hang below it, so the ratio is the width over that
+ * band. `--_donut-thickness` is already published on the plot, for the middle
+ * to size itself against, and it is the only number here that moves.
+ *
+ * **The first slice starts at nine o'clock**, not twelve, because the whole is
+ * now the top half and a reader reads it left to right. `rotate(180deg)` rather
+ * than `-90deg`, and the same rule covers the track so the two cannot part. */
+:host([sweep="half"]) [part="plot"] svg {
+  aspect-ratio: 100 / calc(40 + var(--_donut-thickness, 16) / 2);
+}
+
+:host([sweep="half"]) [part="track"],
+:host([sweep="half"]) [part="segment"] {
+  transform: rotate(180deg);
+}
+
+/* **And the middle sits at the bottom, because that is where the centre of the
+   circle now is.** Cropping put the circle's centre on the box's bottom edge,
+   so a middle placed at fifty per cent of the plot floats inside the arc and
+   over its top. Bottom-aligned it lands in the opening, which is where a
+   semi-donut puts its figure. */
+:host([sweep="half"]) [part="centre"] {
+  inset-block-end: 0;
+  inset-block-start: auto;
+  translate: -50% 0;
+
+  /* **The opening is a half disc, twice as wide as it is tall**, and that is
+     the whole of what has to change here. The full ring's middle takes its
+     height from its content, which is safe inside a circle and is not inside a
+     half of one: measured, a `Stat` bottom-aligned in the opening grew upward
+     until its label sat on the arc. Capped to the inner radius over the box's
+     own height, both in the view box's units, so it holds at any thickness.
+   *
+   * And the type with it. `cqi` is a hundredth of the *width*, so text tuned
+   * against a circular hole is twice too tall for this one. Halved rather than
+   * moved to `cqmin`, which would need `container-type: size` and a definite
+   * height on the full ring too, where there is deliberately none. */
+  block-size: calc(
+    100% *
+    (40 - var(--_donut-thickness, 16)) /
+    (40 + var(--_donut-thickness, 16) / 2)
+  );
+}
+
+:host([sweep="half"]) [part="centre"] slot {
+  --stat-value-size: 12cqi;
+
+  font-size: 6.5cqi;
+}

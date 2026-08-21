@@ -19650,6 +19650,34 @@
             },
             {
               "kind": "field",
+              "name": "sweep",
+              "type": {
+                "text": "'half' | undefined"
+              },
+              "description": "How much of the circle the whole occupies.\n\nAbsent is the full turn. `half` is a semi-donut: the same shares spread\nover a half circle that opens downward, which is the shape a dashboard\nuses when the ring sits above a figure and the space below it is doing\nsomething else.\n\n**A second property rather than another `hole` value**, because the two are\ndifferent axes and can both be true: `hole` is radial and says how thick\nthe band is, this is angular and says how far round it goes. A `half`\n`none` is a semi-pie and is a real thing to want.\n\n**Not a gauge**, and the distinction is worth stating because this row was\nfirst filed as one. A gauge is one value against a range, which is a\ndifferent data shape entirely and is `Meter`, whose `round` example already\ndraws the reading as a ring. This divides a whole into parts and then\ndeclines to use the bottom half of the circle.\n\nReflected, because the stylesheet has three things to say about it: the\nrotation that puts the first slice at nine o'clock, the aspect ratio of a\nbox that is no longer square, and where the middle sits once the bottom of\nthe circle is not drawn.",
+              "attribute": "sweep",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "span",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The fraction of the circle the shares are spread over.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "thickness",
               "type": {
                 "text": "number"
@@ -19713,6 +19741,20 @@
                 }
               ],
               "description": "The ring itself, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice.",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The view box, cropped to what is actually drawn.\n\nA full turn uses the square. A half arc uses the band from the top of the\nring down to the centre line, plus the half stroke its flat ends hang\nbelow that, and cropping to it is the difference between a semi-donut and a\nsemi-donut with an empty quarter of the box under it. The outer edge is\n`EDGE` from the centre whatever the thickness, which is what makes this two\nnumbers rather than a measurement.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -19856,6 +19898,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same shares over a half circle, with the total in the opening.",
+                "slug": "arc"
+              },
+              {
                 "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
                 "slug": "pie"
               },
@@ -19914,6 +19960,18 @@
               },
               "description": "How much is left open in the middle.\n\nAbsent is a ring with room for a total in it. `small` and `large` move the\nhole without moving the outer edge, so a chart keeps its footprint.\n\n**`none` is a pie**, and it is the same drawing rather than another one:\nthe radius follows the thickness, so the inner edge reaching the centre is\nwhat closing the hole means. A pie reads less accurately than a ring, angle\nbeing harder to judge than length, but it is not *misleading* the way a bar\nmeasured from anything but zero is, which is why this is a value here and\nthe bar chart's baseline is not a property at all.\n\n**Geometry rather than a CSS hook, and it had to move.** This was\n`--donut-chart-thickness`, and the dash arithmetic needs the circumference,\nwhich needs the radius: reading a custom property means `getComputedStyle`,\nwhich is client-only, so a server would have drawn a different ring than\nthe client. A plot's proportions are markup for the same reason `curve` is.",
               "fieldName": "hole",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "name": "sweep",
+              "type": {
+                "text": "'half' | undefined"
+              },
+              "description": "How much of the circle the whole occupies.\n\nAbsent is the full turn. `half` is a semi-donut: the same shares spread\nover a half circle that opens downward, which is the shape a dashboard\nuses when the ring sits above a figure and the space below it is doing\nsomething else.\n\n**A second property rather than another `hole` value**, because the two are\ndifferent axes and can both be true: `hole` is radial and says how thick\nthe band is, this is angular and says how far round it goes. A `half`\n`none` is a semi-pie and is a real thing to want.\n\n**Not a gauge**, and the distinction is worth stating because this row was\nfirst filed as one. A gauge is one value against a range, which is a\ndifferent data shape entirely and is `Meter`, whose `round` example already\ndraws the reading as a ring. This divides a whole into parts and then\ndeclines to use the bottom half of the circle.\n\nReflected, because the stylesheet has three things to say about it: the\nrotation that puts the first slice at nine o'clock, the aspect ratio of a\nbox that is no longer square, and where the middle sits once the bottom of\nthe circle is not drawn.",
+              "fieldName": "sweep",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
