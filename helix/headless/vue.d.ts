@@ -102,6 +102,7 @@ import type {
   HelixBaseTourStop,
   HelixBaseTreeItem,
   HelixBaseTree,
+  HelixBaseTrend,
   HelixBaseVideoPlaylistItem,
   HelixBaseVideoPlaylist,
   HelixBaseVideo,
@@ -5435,6 +5436,27 @@ export type HelixBaseTreeVueEvents = {
   "helix-select": HelixBaseTreeHelixSelectElementEvent;
 };
 
+export type HelixBaseTrendVueProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  direction?: HelixBaseTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  good?: HelixBaseTrend["good"];
+};
+
+export type HelixBaseTrendVueEvents = {};
+
 /** `HelixBaseVideoPlaylistItem` component event */
 export type HelixBaseVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
   HelixBaseVideoPlaylistItem,
@@ -6302,6 +6324,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseTree,
     HelixBaseTreeVueProps,
     HelixBaseTreeVueEvents
+  >;
+  /** Three parts: a direction that is up, down or neutral, the metric that moved, and a label saying over what. The arrow carries the direction and its colour carries the judgment, and the two are separate properties because they are separate facts.  **'good' is absent by default, so an unjudged trend is grey.** Every dashboard convention says up is green, and for churn, latency, error rate, cost and bounce rate that convention is a lie told in the most legible colour on the page. A component that guesses is wrong roughly a third of the time and silent about it; one that waits to be told is uninformative until it is, which is the cheaper failure. State the metric's polarity once and the component does the part that varies.  The direction is also written as a word, because a coloured arrow says nothing to a reader who is not looking at it. 'part="direction"' is what the styled tier clips out of sight and leaves in the accessibility tree.  Both the metric and the label are bare slots. An element whose only job is to assign itself a slot on connect gives its own host an attribute after upgrade, which a React consumer's server markup never had. */
+  "helix-base-trend": DefineCustomElement<
+    HelixBaseTrend,
+    HelixBaseTrendVueProps,
+    HelixBaseTrendVueEvents
   >;
   /** **It holds what the player needs and nothing about playing.** A source, a poster and a name: the entry knows which file it stands for, and the playlist is what hands that to a player. Nothing here touches a '<video>', which is what keeps a playlist usable with a player the consumer configured themselves.  **A real '<button>', in a 'listitem'.** A playlist is a list of things to choose, and the list roles are the honest ones: 'list' and 'listitem' say how many there are and where you are in them, which 'listbox' would too, at the cost of the pattern a listbox obliges. 'Option' records that trap in full, that a listbox has to keep focus elsewhere and say which item is current with 'aria-activedescendant'. Nothing here needs that, because focus really moves to the button.  'aria-current' rather than 'aria-selected', which belongs to the roles that have a selection. What is true of the entry playing now is that it is the one the player is on. */
   "helix-base-video-playlist-item": DefineCustomElement<

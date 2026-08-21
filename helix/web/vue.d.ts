@@ -106,6 +106,7 @@ import type {
   HelixTourStop,
   HelixTreeItem,
   HelixTree,
+  HelixTrend,
   HelixVideoPlaylistItem,
   HelixVideoPlaylist,
   HelixVideo,
@@ -434,11 +435,13 @@ are interpolations, so a larger number extrapolates rather than
 exaggerating, and a streak whose length has passed through zero is drawn
 as a bar across the whole frame.
 
-Read only by the shapes that are made of many similar things: `streaks`,
-whose lanes draw a speed, a length, a width and a weight apiece, and
-`particles`, whose motes draw a size, a brightness and a wander. A shape
-with one subject has no population to vary, and `threads` is even on
-purpose, so on the remaining seven this is inert. */
+Read by the shapes made of many similar things, whether those are counted
+or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
+spacing and a weight apiece; `particles`, whose motes draw a size, a
+brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
+bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+single subject and nothing to vary, and `threads` is even on purpose, so on
+those four this is inert. */
   variance?: HelixAura["variance"];
 };
 
@@ -6194,6 +6197,27 @@ export type HelixTreeVueEvents = {
   "helix-change": HelixTreeHelixChangeElementEvent;
 };
 
+export type HelixTrendVueProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  direction?: HelixTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  good?: HelixTrend["good"];
+};
+
+export type HelixTrendVueEvents = {};
+
 /** `HelixVideoPlaylistItem` component event */
 export type HelixVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
   HelixVideoPlaylistItem,
@@ -6961,6 +6985,10 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
+  /** Colour of the arrow, overriding the judgment. */
+  "--trend-color"?: string;
+  /** Size of the arrow. */
+  "--trend-icon-size"?: string;
   /** Fill behind a row. */
   "--video-playlist-item-background-color"?: string;
   /** Width of the thumbnail column. */
@@ -7629,6 +7657,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixTree,
     HelixTreeVueProps,
     HelixTreeVueEvents
+  >;
+  /** The arrow takes the judgment colour and the number does not, which is the opposite of the dashboard convention and is measured rather than preferred: in light mode the success token is 3.8:1 on the surface, enough for a glyph and short of what 13px text needs, and there is no darker green in the ramp. The number therefore keeps the page's own foreground and stays the most legible thing here, which is right anyway, since the number is what a reader reads and the judgment is a gloss on it. */
+  "helix-trend": DefineCustomElement<
+    HelixTrend,
+    HelixTrendVueProps,
+    HelixTrendVueEvents
   >;
   /** Presentation only: the row, its thumbnail column, and the mark on the one playing. The base class holds what the entry is and what it announces. */
   "helix-video-playlist-item": DefineCustomElement<

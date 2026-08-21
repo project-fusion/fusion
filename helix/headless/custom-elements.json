@@ -17806,6 +17806,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/trend/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/video/index.js"
           }
         },
@@ -48283,6 +48291,203 @@
           "declaration": {
             "name": "HelixBaseTree",
             "module": "src/tree/root/tree-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/trend/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/trend/root/trend-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/trend/root/trend-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Three parts: a direction that is up, down or neutral, the metric that moved,\nand a label saying over what. The arrow carries the direction and its colour\ncarries the judgment, and the two are separate properties because they are\nseparate facts.\n\n**`good` is absent by default, so an unjudged trend is grey.** Every\ndashboard convention says up is green, and for churn, latency, error rate,\ncost and bounce rate that convention is a lie told in the most legible colour\non the page. A component that guesses is wrong roughly a third of the time\nand silent about it; one that waits to be told is uninformative until it is,\nwhich is the cheaper failure. State the metric's polarity once and the\ncomponent does the part that varies.\n\nThe direction is also written as a word, because a coloured arrow says\nnothing to a reader who is not looking at it. `part=\"direction\"` is what the\nstyled tier clips out of sight and leaves in the accessibility tree.\n\nBoth the metric and the label are bare slots. An element whose only job is to\nassign itself a slot on connect gives its own host an attribute after\nupgrade, which a React consumer's server markup never had.",
+          "name": "HelixBaseTrend",
+          "cssParts": [
+            {
+              "description": "The direction as a word, for readers who are not looking.",
+              "name": "direction"
+            },
+            {
+              "description": "The arrow.",
+              "name": "icon"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The metric that moved.",
+              "name": ""
+            },
+            {
+              "description": "What it moved over.",
+              "name": "label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'down' | 'neutral' | 'up' | undefined"
+              },
+              "description": "Which way the measurement moved.\n\nAbsent is neutral, so a trend with nothing to report draws a bar rather\nthan picking a direction. Optional rather than defaulted for the reason\n`Stat.direction` is: a reflecting property with a default writes its\nattribute onto the host the moment the element upgrades, and the host is\nmarkup the consumer rendered, which React compares against what it rendered\nand reports as a hydration mismatch.",
+              "attribute": "direction",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "good",
+              "type": {
+                "text": "'down' | 'up' | undefined"
+              },
+              "description": "Which direction is the improvement, for this metric.\n\nAbsent states the movement without judging it, which is the honest default:\nrevenue up is good news and latency up is bad news, and only the consumer\nknows which one this is. Set it once per metric and it holds while the\ndirection changes underneath.",
+              "attribute": "good",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "direction",
+              "type": {
+                "text": "'down' | 'neutral' | 'up' | undefined"
+              },
+              "description": "Which way the measurement moved.\n\nAbsent is neutral, so a trend with nothing to report draws a bar rather\nthan picking a direction. Optional rather than defaulted for the reason\n`Stat.direction` is: a reflecting property with a default writes its\nattribute onto the host the moment the element upgrades, and the host is\nmarkup the consumer rendered, which React compares against what it rendered\nand reports as a hydration mismatch.",
+              "fieldName": "direction"
+            },
+            {
+              "name": "good",
+              "type": {
+                "text": "'down' | 'up' | undefined"
+              },
+              "description": "Which direction is the improvement, for this metric.\n\nAbsent states the movement without judging it, which is the honest default:\nrevenue up is good news and latency up is bad news, and only the consumer\nknows which one this is. Set it once per metric and it holds while the\ndirection changes underneath.",
+              "fieldName": "good"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Which way a measurement moved, and whether that is good news.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/trend",
+            "aliases": [
+              "Delta",
+              "Change",
+              "Movement"
+            ],
+            "tier": "headless",
+            "group": "BaseTrend",
+            "part": "Root",
+            "source": "helix/headless/src/trend"
+          },
+          "tagName": "helix-base-trend",
+          "customElement": true,
+          "modulePath": "src/trend/root/trend-root.ts",
+          "definitionPath": "src/trend/root/trend-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTrend",
+          "declaration": {
+            "name": "HelixBaseTrend",
+            "module": "src/trend/root/trend-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-trend",
+          "declaration": {
+            "name": "HelixBaseTrend",
+            "module": "src/trend/root/trend-root.ts"
           }
         }
       ]

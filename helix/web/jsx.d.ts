@@ -125,6 +125,7 @@ import type {
   HelixTourStop,
   HelixTree,
   HelixTreeItem,
+  HelixTrend,
   HelixVideo,
   HelixVideoPlaylist,
   HelixVideoPlaylistItem,
@@ -780,11 +781,13 @@ are interpolations, so a larger number extrapolates rather than
 exaggerating, and a streak whose length has passed through zero is drawn
 as a bar across the whole frame.
 
-Read only by the shapes that are made of many similar things: `streaks`,
-whose lanes draw a speed, a length, a width and a weight apiece, and
-`particles`, whose motes draw a size, a brightness and a wander. A shape
-with one subject has no population to vary, and `threads` is even on
-purpose, so on the remaining seven this is inert. */
+Read by the shapes made of many similar things, whether those are counted
+or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
+spacing and a weight apiece; `particles`, whose motes draw a size, a
+brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
+bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+single subject and nothing to vary, and `threads` is even on purpose, so on
+those four this is inert. */
   variance?: HelixAura["variance"];
 };
 
@@ -849,11 +852,13 @@ are interpolations, so a larger number extrapolates rather than
 exaggerating, and a streak whose length has passed through zero is drawn
 as a bar across the whole frame.
 
-Read only by the shapes that are made of many similar things: `streaks`,
-whose lanes draw a speed, a length, a width and a weight apiece, and
-`particles`, whose motes draw a size, a brightness and a wander. A shape
-with one subject has no population to vary, and `threads` is even on
-purpose, so on the remaining seven this is inert. */
+Read by the shapes made of many similar things, whether those are counted
+or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
+spacing and a weight apiece; `particles`, whose motes draw a size, a
+brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
+bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+single subject and nothing to vary, and `threads` is even on purpose, so on
+those four this is inert. */
   "prop:variance"?: HelixAura["variance"];
 
   /** Set the innerHTML of the element */
@@ -11927,6 +11932,49 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
+export type HelixTrendProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  direction?: HelixTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  good?: HelixTrend["good"];
+};
+
+export type HelixTrendSolidJsProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  "prop:direction"?: HelixTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  "prop:good"?: HelixTrend["good"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixVideoPlaylistItem` component event */
 export type HelixVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
   HelixVideoPlaylistItem,
@@ -12861,11 +12909,13 @@ export type CustomElements = {
    * exaggerating, and a streak whose length has passed through zero is drawn
    * as a bar across the whole frame.
    *
-   * Read only by the shapes that are made of many similar things: `streaks`,
-   * whose lanes draw a speed, a length, a width and a weight apiece, and
-   * `particles`, whose motes draw a size, a brightness and a wander. A shape
-   * with one subject has no population to vary, and `threads` is even on
-   * purpose, so on the remaining seven this is inert.
+   * Read by the shapes made of many similar things, whether those are counted
+   * or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
+   * spacing and a weight apiece; `particles`, whose motes draw a size, a
+   * brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
+   * bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+   * single subject and nothing to vary, and `threads` is even on purpose, so on
+   * those four this is inert.
    *
    * ## CSS Parts
    *
@@ -21519,6 +21569,57 @@ export type CustomElements = {
   "helix-tree": Partial<HelixTreeProps & BaseProps<HelixTree> & BaseEvents>;
 
   /**
+   * The arrow takes the judgment colour and the number does not, which is the
+   * opposite of the dashboard convention and is measured rather than preferred:
+   * in light mode the success token is 3.8:1 on the surface, enough for a glyph
+   * and short of what 13px text needs, and there is no darker green in the ramp.
+   * The number therefore keeps the page's own foreground and stays the most
+   * legible thing here, which is right anyway, since the number is what a reader
+   * reads and the judgment is a gloss on it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the measurement moved.
+   *
+   * Absent is neutral, so a trend with nothing to report draws a bar rather
+   * than picking a direction. Optional rather than defaulted for the reason
+   * `Stat.direction` is: a reflecting property with a default writes its
+   * attribute onto the host the moment the element upgrades, and the host is
+   * markup the consumer rendered, which React compares against what it rendered
+   * and reports as a hydration mismatch.
+   * - `good`: Which direction is the improvement, for this metric.
+   *
+   * Absent states the movement without judging it, which is the honest default:
+   * revenue up is good news and latency up is bad news, and only the consumer
+   * knows which one this is. Set it once per metric and it holds while the
+   * direction changes underneath.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The metric that moved.
+   * - `label`: What it moved over.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--trend-color`: Colour of the arrow, overriding the judgment. (default: `undefined`)
+   * - `--trend-icon-size`: Size of the arrow. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `direction`: The direction as a word, for readers who are not looking.
+   * - `icon`: The arrow.
+   */
+  "helix-trend": Partial<HelixTrendProps & BaseProps<HelixTrend> & BaseEvents>;
+
+  /**
    * Presentation only: the row, its thumbnail column, and the mark on the one
    * playing. The base class holds what the entry is and what it announces.
    *
@@ -22255,11 +22356,13 @@ export type CustomElementsSolidJs = {
    * exaggerating, and a streak whose length has passed through zero is drawn
    * as a bar across the whole frame.
    *
-   * Read only by the shapes that are made of many similar things: `streaks`,
-   * whose lanes draw a speed, a length, a width and a weight apiece, and
-   * `particles`, whose motes draw a size, a brightness and a wander. A shape
-   * with one subject has no population to vary, and `threads` is even on
-   * purpose, so on the remaining seven this is inert.
+   * Read by the shapes made of many similar things, whether those are counted
+   * or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
+   * spacing and a weight apiece; `particles`, whose motes draw a size, a
+   * brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
+   * bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+   * single subject and nothing to vary, and `threads` is even on purpose, so on
+   * those four this is inert.
    *
    * ## CSS Parts
    *
@@ -31226,6 +31329,62 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The arrow takes the judgment colour and the number does not, which is the
+   * opposite of the dashboard convention and is measured rather than preferred:
+   * in light mode the success token is 3.8:1 on the surface, enough for a glyph
+   * and short of what 13px text needs, and there is no darker green in the ramp.
+   * The number therefore keeps the page's own foreground and stays the most
+   * legible thing here, which is right anyway, since the number is what a reader
+   * reads and the judgment is a gloss on it.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the measurement moved.
+   *
+   * Absent is neutral, so a trend with nothing to report draws a bar rather
+   * than picking a direction. Optional rather than defaulted for the reason
+   * `Stat.direction` is: a reflecting property with a default writes its
+   * attribute onto the host the moment the element upgrades, and the host is
+   * markup the consumer rendered, which React compares against what it rendered
+   * and reports as a hydration mismatch.
+   * - `good`: Which direction is the improvement, for this metric.
+   *
+   * Absent states the movement without judging it, which is the honest default:
+   * revenue up is good news and latency up is bad news, and only the consumer
+   * knows which one this is. Set it once per metric and it holds while the
+   * direction changes underneath.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The metric that moved.
+   * - `label`: What it moved over.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--trend-color`: Colour of the arrow, overriding the judgment. (default: `undefined`)
+   * - `--trend-icon-size`: Size of the arrow. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `direction`: The direction as a word, for readers who are not looking.
+   * - `icon`: The arrow.
+   */
+  "helix-trend": Partial<
+    HelixTrendProps &
+      HelixTrendSolidJsProps &
+      BaseProps<HelixTrend> &
+      BaseEvents
+  >;
+
+  /**
    * Presentation only: the row, its thumbnail column, and the mark on the one
    * playing. The base class holds what the entry is and what it announces.
    *
@@ -32045,6 +32204,10 @@ export type CustomCssProperties = {
   "--tree-chevron-order"?: string;
   /** Set from `chevron-placement`; the space before the chevron. */
   "--tree-chevron-gap"?: string;
+  /** Colour of the arrow, overriding the judgment. */
+  "--trend-color"?: string;
+  /** Size of the arrow. */
+  "--trend-icon-size"?: string;
   /** Fill behind a row. */
   "--video-playlist-item-background-color"?: string;
   /** Width of the thumbnail column. */

@@ -5,9 +5,11 @@
 # read from raw/, which is where marks that are not Phosphor live.
 # time, regular weight first and then fill, so adding an icon is adding a line
 airplay
+arrow-down
 arrow-left
 arrow-right
 arrow-square-out
+arrow-up
 arrows-in-line-vertical
 arrows-out-line-vertical
 atom

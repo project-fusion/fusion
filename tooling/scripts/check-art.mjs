@@ -157,8 +157,16 @@ const foldersSaid = wordFor(folders)
 
 for (const file of ['index.tsx', 'core.tsx']) {
   const text = readFileSync(join(ART, file), 'utf8')
+  /* Every ten-word from forty up, and the range is the whole point.
+   *
+   * This read `forty-x|fifty-x|sixty(-x)?|seventy(-x)?|fifty` and so stopped
+   * matching the day the catalog passed seventy-nine. `WORDS` ran to
+   * `eighty-five` and `wordFor` returned the right answer the whole time; the
+   * regex simply found nothing to compare it against, so the check passed by
+   * having no work to do. It was two families out of date when this was
+   * noticed, which is what a check that silently stops checking costs. */
   for (const [, word] of text.matchAll(
-    /\b(f(?:orty|ifty)-[a-z]+|(?:sixty|seventy)(?:-[a-z]+)?|fifty)\b/g,
+    /\b((?:forty|fifty|sixty|seventy|eighty|ninety)(?:-[a-z]+)?)\b/g,
   )) {
     if (word !== said && word !== foldersSaid) {
       problems.push(

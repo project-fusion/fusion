@@ -1,5 +1,9 @@
 /* A grid rather than a stack, so the unit sits on the value's baseline and the
-   label and detail span the full width above and below it. */
+   label spans the full width above it.
+
+   This named a `detail` slot below the number as well, and there is not one and
+   deliberately: a change beside a figure is a second fact, and the spec that
+   pins it says so. `helix-trend` is that fact and it goes beside the stat. */
 :host {
   /* Rows that line up across a group.
    *

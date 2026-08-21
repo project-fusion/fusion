@@ -98,6 +98,7 @@ import type {
   HelixBaseTourStop,
   HelixBaseTree,
   HelixBaseTreeItem,
+  HelixBaseTrend,
   HelixBaseVideo,
   HelixBaseVideoPlaylist,
   HelixBaseVideoPlaylistItem,
@@ -10375,6 +10376,49 @@ how markup says where to start. */
   textContent?: string | number;
 };
 
+export type HelixBaseTrendProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  direction?: HelixBaseTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  good?: HelixBaseTrend["good"];
+};
+
+export type HelixBaseTrendSolidJsProps = {
+  /** Which way the measurement moved.
+
+Absent is neutral, so a trend with nothing to report draws a bar rather
+than picking a direction. Optional rather than defaulted for the reason
+`Stat.direction` is: a reflecting property with a default writes its
+attribute onto the host the moment the element upgrades, and the host is
+markup the consumer rendered, which React compares against what it rendered
+and reports as a hydration mismatch. */
+  "prop:direction"?: HelixBaseTrend["direction"];
+  /** Which direction is the improvement, for this metric.
+
+Absent states the movement without judging it, which is the honest default:
+revenue up is good news and latency up is bad news, and only the consumer
+knows which one this is. Set it once per metric and it holds while the
+direction changes underneath. */
+  "prop:good"?: HelixBaseTrend["good"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseVideoPlaylistItem` component event */
 export type HelixBaseVideoPlaylistItemElementEvent<E = Event> = TypedEvent<
   HelixBaseVideoPlaylistItem,
@@ -19737,6 +19781,65 @@ export type CustomElements = {
    */
   "helix-base-tree": Partial<
     HelixBaseTreeProps & BaseProps<HelixBaseTree> & BaseEvents
+  >;
+
+  /**
+   * Three parts: a direction that is up, down or neutral, the metric that moved,
+   * and a label saying over what. The arrow carries the direction and its colour
+   * carries the judgment, and the two are separate properties because they are
+   * separate facts.
+   *
+   * **`good` is absent by default, so an unjudged trend is grey.** Every
+   * dashboard convention says up is green, and for churn, latency, error rate,
+   * cost and bounce rate that convention is a lie told in the most legible colour
+   * on the page. A component that guesses is wrong roughly a third of the time
+   * and silent about it; one that waits to be told is uninformative until it is,
+   * which is the cheaper failure. State the metric's polarity once and the
+   * component does the part that varies.
+   *
+   * The direction is also written as a word, because a coloured arrow says
+   * nothing to a reader who is not looking at it. `part="direction"` is what the
+   * styled tier clips out of sight and leaves in the accessibility tree.
+   *
+   * Both the metric and the label are bare slots. An element whose only job is to
+   * assign itself a slot on connect gives its own host an attribute after
+   * upgrade, which a React consumer's server markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the measurement moved.
+   *
+   * Absent is neutral, so a trend with nothing to report draws a bar rather
+   * than picking a direction. Optional rather than defaulted for the reason
+   * `Stat.direction` is: a reflecting property with a default writes its
+   * attribute onto the host the moment the element upgrades, and the host is
+   * markup the consumer rendered, which React compares against what it rendered
+   * and reports as a hydration mismatch.
+   * - `good`: Which direction is the improvement, for this metric.
+   *
+   * Absent states the movement without judging it, which is the honest default:
+   * revenue up is good news and latency up is bad news, and only the consumer
+   * knows which one this is. Set it once per metric and it holds while the
+   * direction changes underneath.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The metric that moved.
+   * - `label`: What it moved over.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `direction`: The direction as a word, for readers who are not looking.
+   * - `icon`: The arrow.
+   */
+  "helix-base-trend": Partial<
+    HelixBaseTrendProps & BaseProps<HelixBaseTrend> & BaseEvents
   >;
 
   /**
@@ -29199,6 +29302,68 @@ export type CustomElementsSolidJs = {
     HelixBaseTreeProps &
       HelixBaseTreeSolidJsProps &
       BaseProps<HelixBaseTree> &
+      BaseEvents
+  >;
+
+  /**
+   * Three parts: a direction that is up, down or neutral, the metric that moved,
+   * and a label saying over what. The arrow carries the direction and its colour
+   * carries the judgment, and the two are separate properties because they are
+   * separate facts.
+   *
+   * **`good` is absent by default, so an unjudged trend is grey.** Every
+   * dashboard convention says up is green, and for churn, latency, error rate,
+   * cost and bounce rate that convention is a lie told in the most legible colour
+   * on the page. A component that guesses is wrong roughly a third of the time
+   * and silent about it; one that waits to be told is uninformative until it is,
+   * which is the cheaper failure. State the metric's polarity once and the
+   * component does the part that varies.
+   *
+   * The direction is also written as a word, because a coloured arrow says
+   * nothing to a reader who is not looking at it. `part="direction"` is what the
+   * styled tier clips out of sight and leaves in the accessibility tree.
+   *
+   * Both the metric and the label are bare slots. An element whose only job is to
+   * assign itself a slot on connect gives its own host an attribute after
+   * upgrade, which a React consumer's server markup never had.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `direction`: Which way the measurement moved.
+   *
+   * Absent is neutral, so a trend with nothing to report draws a bar rather
+   * than picking a direction. Optional rather than defaulted for the reason
+   * `Stat.direction` is: a reflecting property with a default writes its
+   * attribute onto the host the moment the element upgrades, and the host is
+   * markup the consumer rendered, which React compares against what it rendered
+   * and reports as a hydration mismatch.
+   * - `good`: Which direction is the improvement, for this metric.
+   *
+   * Absent states the movement without judging it, which is the honest default:
+   * revenue up is good news and latency up is bad news, and only the consumer
+   * knows which one this is. Set it once per metric and it holds while the
+   * direction changes underneath.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The metric that moved.
+   * - `label`: What it moved over.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `direction`: The direction as a word, for readers who are not looking.
+   * - `icon`: The arrow.
+   */
+  "helix-base-trend": Partial<
+    HelixBaseTrendProps &
+      HelixBaseTrendSolidJsProps &
+      BaseProps<HelixBaseTrend> &
       BaseEvents
   >;
 

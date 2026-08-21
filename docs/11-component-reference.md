@@ -6069,6 +6069,50 @@ the row itself stays flat.
 | `--tree-gap` | Space between rows. |
 | `--tree-row-size` | Least height of a row, so rows with and without an icon match. |
 
+## Trend
+
+### Root — `helix-trend`
+
+Which way a measurement moved, and whether that is good news.
+
+Extends `HelixBaseTrend`.
+
+The arrow takes the judgment colour and the number does not, which is the
+opposite of the dashboard convention and is measured rather than preferred:
+in light mode the success token is 3.8:1 on the surface, enough for a glyph
+and short of what 13px text needs, and there is no darker green in the ramp.
+The number therefore keeps the page's own foreground and stays the most
+legible thing here, which is right anyway, since the number is what a reader
+reads and the judgment is a gloss on it.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `direction` | `direction` | `'down' \| 'neutral' \| 'up' \| undefined` | - | `HelixBaseTrend` | Which way the measurement moved. |
+| `good` | `good` | `'down' \| 'up' \| undefined` | - | `HelixBaseTrend` | Which direction is the improvement, for this metric. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The metric that moved. |
+| `label` | What it moved over. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `direction` | The direction as a word, for readers who are not looking. |
+| `icon` | The arrow. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--trend-color` | Colour of the arrow, overriding the judgment. |
+| `--trend-icon-size` | Size of the arrow. |
+
 ## Video
 
 ### Root — `helix-video`
