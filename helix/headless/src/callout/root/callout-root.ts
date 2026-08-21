@@ -48,6 +48,27 @@ export class HelixBaseCallout extends HelixElement {
   @property({ reflect: true })
   severity?: 'info' | 'success' | 'warning' | 'danger'
 
+  /**
+   * The mark for the callout's severity, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   *
+   * The mark and its label are passed in rather than looked up again, since
+   * `render` has already resolved the severity and a second lookup is a second
+   * place for the fallback to disagree with the tone around it.
+   */
+  protected renderIcon(icon: { content: string; viewBox: string }, label: string): TemplateResult {
+    return html`<slot name="icon">
+      <svg fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
+        ${unsafeSVG(icon.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* Falls back to `info`, because a callout exists to set a passage apart and
        is therefore always *about* something. `Toast.Item` takes the same lookup
@@ -55,13 +76,7 @@ export class HelixBaseCallout extends HelixElement {
        happened. Same vocabulary, two honest answers to an absent severity. */
     const { icon, label } = severityMark(this.severity) ?? SEVERITIES.info
 
-    return html`<span part="icon">
-        <slot name="icon">
-          <svg fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
-            ${unsafeSVG(icon.content)}
-          </svg>
-        </slot>
-      </span>
+    return html`<span part="icon">${this.renderIcon(icon, label)}</span>
       <div part="content">
         <slot name="title"></slot>
         <slot></slot>

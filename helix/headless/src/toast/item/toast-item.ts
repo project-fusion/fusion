@@ -3,6 +3,7 @@ import {
   HelixElement,
   MixinDismissible,
   requestControlledChange,
+  type SeverityMark,
   severityMark,
 } from '@helix-io/core'
 import { x } from '@helix-io/icons'
@@ -272,6 +273,49 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
     }
   }
 
+  /**
+   * The mark for the message's severity, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   *
+   * The mark is passed in rather than looked up again, since `render` has
+   * already resolved the severity and a second lookup is a second place for the
+   * fallback to disagree with the tone around it.
+   */
+  protected renderIcon(severity: SeverityMark): TemplateResult {
+    return html`<slot name="icon">
+      <svg
+        fill="currentColor"
+        viewBox=${severity.icon.viewBox}
+        role="img"
+        aria-label=${severity.label}
+      >
+        ${unsafeSVG(severity.icon.content)}
+      </svg>
+    </slot>`
+  }
+
+  /**
+   * The mark on the dismiss control, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderDismissIcon(): TemplateResult {
+    return html`<slot name="dismiss-icon">
+      <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+        ${unsafeSVG(x.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* Nothing when no severity was given, which is the common message: "Project
        saved" is not an error, a warning or an announcement, and an icon there
@@ -291,16 +335,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
       ${
         severity
           ? html`<span part="icon">
-              <slot name="icon">
-                <svg
-                  fill="currentColor"
-                  viewBox=${severity.icon.viewBox}
-                  role="img"
-                  aria-label=${severity.label}
-                >
-                  ${unsafeSVG(severity.icon.content)}
-                </svg>
-              </slot>
+              ${this.renderIcon(severity)}
             </span>`
           : nothing
       }
@@ -314,11 +349,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
               aria-label=${this.dismissLabel}
               @click=${() => this.dismiss()}
             >
-              <slot name="dismiss-icon">
-                <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-                  ${unsafeSVG(x.content)}
-                </svg>
-              </slot>
+              ${this.renderDismissIcon()}
             </button>`
           : nothing
       }

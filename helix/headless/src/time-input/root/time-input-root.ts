@@ -479,6 +479,19 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
                 >`
   }
 
+  /**
+   * The mark on the button that opens the clock, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderTrigger(): TemplateResult {
+    return html`<slot name="trigger"><helix-icon name="clock"></helix-icon></slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -512,7 +525,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
           ?disabled=${this.isDisabled}
           @click=${() => this.toggleOpen()}
         >
-          <slot name="trigger"><helix-icon name="clock"></helix-icon></slot>
+          ${this.renderTrigger()}
         </button>
       </div>
 

@@ -652,6 +652,17 @@
               "description": "Says on the `actions` region whether anything is in it.\n\nAn empty region is not free: it is still a flex item, so it still takes the\ncontainer's gap. There is no selector that can ask, `slot:empty` being\nabout a slot's fallback rather than its assigned nodes, so the component\nasks and says so, on the region inside this shadow root rather than on the\nhost: an attribute written onto the host is a change to markup the consumer\nrendered, which React reports on hydration and does not patch up."
             },
             {
+              "kind": "method",
+              "name": "renderIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark for the announcement's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
+            },
+            {
               "kind": "field",
               "name": "dismissible",
               "type": {
@@ -3017,6 +3028,31 @@
               "description": "What kind of attention the passage needs.",
               "attribute": "severity",
               "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "renderIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "icon",
+                  "type": {
+                    "text": "{ content: string; viewBox: string }"
+                  }
+                },
+                {
+                  "name": "label",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The mark for the callout's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark and its label are passed in rather than looked up again, since\n`render` has already resolved the severity and a second lookup is a second\nplace for the fallback to disagree with the tone around it."
             },
             {
               "kind": "field",
@@ -8796,6 +8832,17 @@
                 }
               ],
               "description": "One chosen option, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
+              "kind": "method",
+              "name": "renderIndicator",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The caret saying the field opens, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
             },
             {
               "kind": "field",
@@ -20340,6 +20387,17 @@
               "static": true,
               "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
               "description": "Focusing the host focuses the list inside it.\n\nThe focusable node is `[part=\"items\"]`, a div in this shadow root, and a\ncaller outside has no way to reach it: `select` opened its panel and called\n`.focus()` on this element, which is not focusable, so focus stayed on the\ntrigger and the arrow keys never reached the options at all. Delegation is\nthe platform answering that, and it keeps `document.activeElement` on the\nhost, which is what a caller reasons about."
+            },
+            {
+              "kind": "method",
+              "name": "renderFilterIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark in the filter's field, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
             },
             {
               "kind": "field",
@@ -32400,6 +32458,17 @@
               "description": "The list the trigger opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own\nlist, wrap this one, or pass it a property the base does not know about,\nwithout reimplementing the whole template. The public tag rather than the\nbase one: a consumer on the styled tier gets the styled listbox, and one on\nthe headless tier brings a listbox of their own under that name."
             },
             {
+              "kind": "method",
+              "name": "renderIndicator",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The caret saying the control opens, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -41892,6 +41961,17 @@
               "description": "One chosen time, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
+              "kind": "method",
+              "name": "renderTrigger",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark on the button that opens the clock, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -44583,6 +44663,36 @@
               "name": "handleResume",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "severity",
+                  "type": {
+                    "text": "SeverityMark"
+                  }
+                }
+              ],
+              "description": "The mark for the message's severity, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\nThe mark is passed in rather than looked up again, since `render` has\nalready resolved the severity and a second lookup is a second place for the\nfallback to disagree with the tone around it."
+            },
+            {
+              "kind": "method",
+              "name": "renderDismissIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark on the dismiss control, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
             },
             {
               "kind": "field",

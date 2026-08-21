@@ -101,6 +101,23 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
     )
   }
 
+  /**
+   * The mark for the announcement's tone, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderIcon(): TemplateResult {
+    return html`<slot name="icon">
+      <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+        ${unsafeSVG(x.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`<div part="content"><slot></slot></div>
       <div part="actions"><slot name="actions"></slot></div>
@@ -127,11 +144,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
               aria-label=${this.dismissLabel}
               @click=${() => this.dismiss()}
             >
-              <slot name="icon">
-                <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-                  ${unsafeSVG(x.content)}
-                </svg>
-              </slot>
+              ${this.renderIcon()}
             </button>`
           : nothing
       }`

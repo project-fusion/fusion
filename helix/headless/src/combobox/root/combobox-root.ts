@@ -685,6 +685,23 @@ export class HelixBaseCombobox extends MixinControllerOpen(
                   >`
   }
 
+  /**
+   * The caret saying the field opens, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderIndicator(): TemplateResult {
+    return html`<slot name="indicator">
+      <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretDown.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @click=${this.handleFieldClick}>
@@ -720,11 +737,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
           @keydown=${this.handleKeydown}
         />
         <slot name="end"></slot>
-        <slot name="indicator">
-          <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretDown.content)}
-          </svg>
-        </slot>
+        ${this.renderIndicator()}
       </div>
       <div part="surface" popover="manual" ?hidden=${!this.open}>
         ${this.renderListbox()}

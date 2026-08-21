@@ -781,6 +781,23 @@ export class HelixBaseListbox extends MixinCollection(
     delegatesFocus: true,
   }
 
+  /**
+   * The mark in the filter's field, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderFilterIcon(): TemplateResult {
+    return html`<slot name="filter-icon">
+      <svg fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
+        ${unsafeSVG(magnifyingGlass.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* One tab stop for the whole list, which is what a listbox is in the tab
        order: the arrows move within it. `tabindex` on the wrapper rather than
@@ -790,11 +807,7 @@ export class HelixBaseListbox extends MixinCollection(
         this.filterable
           ? html`<div part="search">
               <span part="filter-icon" aria-hidden="true">
-                <slot name="filter-icon">
-                  <svg fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
-                    ${unsafeSVG(magnifyingGlass.content)}
-                  </svg>
-                </slot>
+                ${this.renderFilterIcon()}
               </span>
               <input
                 part="search-field"

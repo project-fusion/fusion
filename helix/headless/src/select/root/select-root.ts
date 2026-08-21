@@ -303,6 +303,23 @@ export class HelixBaseSelect extends MixinControllerOpen(
     </helix-listbox>`
   }
 
+  /**
+   * The caret saying the control opens, behind a seam.
+   *
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding. Those answer different people: the
+   * slot is for the page and the method is for whoever is building the styled
+   * layer, and a fallback with only the first is one a tier can restyle and
+   * cannot change.
+   */
+  protected renderIndicator(): TemplateResult {
+    return html`<slot name="indicator">
+      <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretDown.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <button
@@ -333,11 +350,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
              library's rule for a content property. */
           ''
         }
-        <slot name="indicator">
-          <svg part="indicator" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
-            ${unsafeSVG(caretDown.content)}
-          </svg>
-        </slot>
+        ${this.renderIndicator()}
       </button>
 
       <div part="surface" popover="manual" ?hidden=${!this.open}>
