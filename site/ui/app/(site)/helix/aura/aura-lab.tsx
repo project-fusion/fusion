@@ -14,10 +14,6 @@ const SHAPES = [
   },
   { body: 'Horizontal curtains, drifting. The one shape here that is a horizon.', name: 'aurora' },
   {
-    body: 'One beam split into an ordered spread. The pointer is the prism.',
-    name: 'prism',
-  },
-  {
     body: 'Light travelling in lanes, at speed. The pointer is an obstacle to bow around.',
     name: 'streaks',
   },
@@ -78,7 +74,7 @@ const KNOBS = [
  * counted or continuous: lanes, motes, a fan, bundles, bands. The four left out
  * are the three with a single subject and `threads`, which is even on purpose.
  */
-const VARIES = new Set(['aurora', 'particles', 'prism', 'rays', 'streaks'])
+const VARIES = new Set(['aurora', 'particles', 'rays', 'streaks'])
 
 type Knob = (typeof KNOBS)[number]['key']
 

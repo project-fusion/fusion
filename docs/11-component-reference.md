@@ -279,7 +279,6 @@ takes no pointer events.
     \| 'fracture'
     \| 'lattice'
     \| 'particles'
-    \| 'prism'
     \| 'rays'
     \| 'streaks'
     \| 'threads'

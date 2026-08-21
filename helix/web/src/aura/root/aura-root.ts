@@ -76,7 +76,6 @@ export class HelixAura extends HelixElement {
     | 'fracture'
     | 'lattice'
     | 'particles'
-    | 'prism'
     | 'rays'
     | 'streaks'
     | 'threads'
@@ -166,8 +165,8 @@ export class HelixAura extends HelixElement {
    * Read by the shapes made of many similar things, whether those are counted
    * or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
    * spacing and a weight apiece; `particles`, whose motes draw a size, a
-   * brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
-   * bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+   * brightness and a wander; and `rays` and `aurora`, whose fan, bundles and
+   * folds widen or even out. `braid`, `waves` and `flow` have a
    * single subject and nothing to vary, and `threads` is even on purpose, so on
    * those four this is inert.
    */

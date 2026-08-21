@@ -8,7 +8,6 @@ export const SHAPES = [
   'braid',
   'rays',
   'aurora',
-  'prism',
   'streaks',
   'waves',
   'threads',
@@ -88,8 +87,7 @@ export const FRAGMENT = `#version 300 es
   /* How much the members of a population differ from one another, 1 being the
      resting amount and 0 a set that is uniform. Read by the shapes made of many
      similar things, whether those are counted or continuous: streaks has lanes,
-     particles has motes, rays has a fan, aurora has bundles and folds, prism
-     has bands. Braid, waves and flow have a single subject and nothing to vary.
+     particles has motes, rays has a fan, and aurora has bundles and folds. Braid, waves and flow have a single subject and nothing to vary.
      Threads is the deliberate exception, being even on purpose: a pass had
      already given its strands their own hashes and produced a scatter rather
      than a set. */
@@ -291,8 +289,8 @@ export const FRAGMENT = `#version 300 es
          narrower than a pixel is an aliased line rather than an edge. */
       /* **The border's sharpness varies along it.** One constant made one
          continuously crisp line across the whole curtain, and a line of even
-         weight reads as drawn rather than lit however it wanders: it is the
-         same fault the prism's rim had. A real lower border is hard where the
+         weight reads as drawn rather than lit however it wanders. A real lower
+         border is hard where the
          sheet faces us and diffuse where it turns away, so the crispness is
          drawn from the same slow noise the folds are. */
       float crisp = mix(0.04, 0.3, noise(vec2(q.x * 0.8 + f * 5.0, t * 0.15)));
@@ -346,134 +344,6 @@ export const FRAGMENT = `#version 300 es
       lit += edge * lengths * (rise * bundled * folded + rim) * (1.0 - f * 0.45);
     }
     return lit;
-  }
-
-  /* The distance to an equilateral triangle, negative inside.
-   *
-   * iq's, unchanged. The folds use abs() and sign(), which put derivative
-   * discontinuities exactly at the three corners, and a triangle is entitled to
-   * corners: the crease rule is about edges that should not be there.
-   */
-  float sdTriangle(vec2 p, float r) {
-    const float k = 1.7320508;
-    p.x = abs(p.x) - r;
-    p.y = p.y + r / k;
-    if (p.x + k * p.y > 0.0) {
-      p = vec2(p.x - k * p.y, -k * p.x - p.y) / 2.0;
-    }
-    p.x -= clamp(p.x, -2.0 * r, 0.0);
-    return -length(p) * sign(p.y);
-  }
-
-  /* One beam, an ordered spread, and the thing that did it.
-   *
-   * **This is the one shape that is about the token layer.** Helix derives a
-   * whole accessible palette from a single brand colour, and a prism is that
-   * argument as a picture: one thing goes in, an ordered set comes out, and the
-   * set is a consequence of the source rather than a list beside it.
-   *
-   * **The glass is drawn now, and that is the reimagining.** Every version
-   * before this was a beam that bent and fanned, with nothing at the corner to
-   * bend it, so it read as a fibre bundle or a searchlight: the deviation was
-   * the only evidence that anything had happened, and a deviation on its own is
-   * just a kink. Giving the wedge a rim and a faint interior turns the picture
-   * from an effect into a cause, which is the whole point being made.
-   *
-   * **The cursor is the prism**, literally rather than by implication. The beam
-   * runs whether or not anybody is there, and the wedge sits where the pointer
-   * is, so carrying it along the beam carries the split with it. It turns
-   * slowly at rest, about a degree a second, because an object that never moves
-   * against a field that does reads as a sticker on the glass.
-   */
-  float prism(vec2 q, float t, vec2 qp, float reach) {
-    /* **The glass stays put and the pointer turns it.** It used to sit at the
-       cursor, which meant the whole subject, wedge and beam and fan together,
-       translated across the frame and off the edge of it: there was nowhere to
-       stand where the shape was not moving, and no way to look at it at rest.
-       A background with no home is not a background.
-    
-       Turning it is the better half of the same idea anyway. Rotating a prism
-       is what changes the deviation, so the fan swings and the bands rearrange
-       while the object stays where it was composed. */
-    vec2 c = q;
-
-    /* Static, and centred. It span slowly and turned with the pointer, and
-       both are motion in the one part of the picture that wants to be the fixed
-       thing the light happens to: the beam moves, the fan moves, the glass is
-       what they move against. */
-    float body = sdTriangle(c, 0.42);
-
-    /* A rim, and an interior barely above the ground. Glass is mostly the
-       edges: fill it and the wedge becomes a solid triangle sitting on the
-       field, which is a logo rather than something light passes through. */
-    /* Softer than 16, which drew a hairline: an even hairline around a
-       triangle is a wireframe, and no amount of grading rescues a drawing whose
-       edges are one pixel of pure line. Wider and dimmer reads as an edge
-       catching light. */
-    float glassRim = falloff(body * body, 9.0);
-
-    vec2 dir = normalize(vec2(0.55, -1.0));
-    vec2 side = vec2(-dir.y, dir.x);
-    float along = dot(c, dir);
-    float acrossIn = dot(c, side);
-
-    /* **Graded, or it is a wireframe.** An outline of even weight is a vector
-       drawing of a triangle, which is what this looked like: a logo with beams
-       attached. Glass is only bright where light meets it, so the rim is lifted
-       along the beam and the far edges fall back to almost nothing.
-    
-       The interior carries a gradient rather than a flat wash, so the body has
-       somewhere thick and somewhere thin and reads as a solid the light is
-       inside of rather than a filled shape. */
-    float faceLight = mix(0.3, 1.55, smoothstep(-0.45, 0.3, along));
-    float interior = smoothstep(0.04, -0.3, body) * mix(0.05, 0.16, smoothstep(-0.3, 0.25, along));
-    /* And a halo around the whole wedge, well outside its own edges. Glass in
-       a lit field is surrounded by what it is scattering; without it the
-       triangle sits on the black with a hard boundary and reads as a shape cut
-       out of the picture rather than an object in it. */
-    float halo = falloff(max(body, 0.0) * max(body, 0.0), 2.2) * 0.16;
-    float glass = glassRim * 0.6 * faceLight + interior + halo;
-
-    /* The entry beam, which stops at the glass rather than running through it.
-       All of the light that the fan then divides, so it is the brighter half:
-       drawn at parity the shape begins at a corner with nothing arriving. */
-    float beam = exp(-(acrossIn * acrossIn) / (2.0 * 0.038 * 0.038)) *
-      smoothstep(0.1, -0.75, along);
-
-    /* Deviated, because that is what a prism does to what passes through it.
-       Spreading about the entry axis is a diffuser. */
-    float bend = radians(24.0);
-    vec2 out1 = vec2(dir.x * cos(bend) - dir.y * sin(bend), dir.x * sin(bend) + dir.y * cos(bend));
-    vec2 sideOut = vec2(-out1.y, out1.x);
-    float alongOut = dot(c, out1);
-    float acrossOut = dot(c, sideOut);
-
-    /* The fan leaves a face, not a point. A base of 0.05 put every band through
-       one pixel at the corner, which is a starburst. */
-    float past = smoothstep(0.08, 0.5, alongOut);
-    float spread = 0.1 + max(alongOut, 0.0) * 0.3;
-    float fan = exp(-(acrossOut * acrossOut) / (2.0 * spread * spread)) * past;
-
-    /* Banded across the fan rather than along it, because what leaves a prism
-       is separated by angle: dividing by the spread keeps each band on its own
-       ray as the fan widens rather than letting them curve. They resolve with
-       distance, merged at the face and apart further out, which is what
-       emerging from glass looks like. */
-    float u = acrossOut / spread;
-    /* Fewer and broader. At two per unit and a falloff of 6 each band was about
-       a ninth of its own cell, which draws wires rather than colours: what
-       leaves a prism is a set of overlapping bands, and the gaps between them
-       are the last thing to appear, not the first. */
-    float cell = fract(u * 1.5 + 0.5) - 0.5;
-    float resolved = smoothstep(0.0, 0.9, max(alongOut, 0.0));
-    float bands = falloff(cell * cell, mix(0.9, 2.4, resolved));
-
-    float pv = clamp(uVariance, 0.0, 1.0);
-    float order = mix(mix(0.825, 1.15, pv), mix(0.825, 0.5, pv), clamp(u * 0.5 + 0.5, 0.0, 1.0));
-    fan *= mix(mix(1.01, 0.45, pv), mix(1.01, 1.6, pv), bands) * order;
-
-    float grain = warped(vec2(along * 1.1, acrossIn * 2.2), t * 0.45);
-    return (beam * 1.25 + fan + glass) * mix(0.7, 1.15, grain) * falloff(dot(q, q), 0.5);
   }
 
   /* Light travelling in lanes, at speed.
@@ -1205,20 +1075,18 @@ export const FRAGMENT = `#version 300 es
     } else if (uShape == 2) {
       d = aurora(q, t, qp, own);
     } else if (uShape == 3) {
-      d = prism(q, t, qp, own);
-    } else if (uShape == 4) {
       d = streaks(q, t, qp, own);
-    } else if (uShape == 5) {
+    } else if (uShape == 4) {
       d = waves(q, t, qp, own);
-    } else if (uShape == 6) {
+    } else if (uShape == 5) {
       d = threads(q, t, qp, own);
-    } else if (uShape == 7) {
+    } else if (uShape == 6) {
       d = particles(q, t, qp, own);
-    } else if (uShape == 8) {
+    } else if (uShape == 7) {
       d = flow(q, t, turn, uPointer * 0.05 * uReach);
-    } else if (uShape == 9) {
+    } else if (uShape == 8) {
       d = caustics(q, t, qp, own);
-    } else if (uShape == 10) {
+    } else if (uShape == 9) {
       d = lattice(q, t, qp, own);
     } else {
       d = fracture(q, t, qp, own);
