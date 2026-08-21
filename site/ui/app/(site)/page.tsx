@@ -71,11 +71,12 @@ export default function Home() {
             Fusion Development Group
           </helix-text>
           <helix-text as="h1" class="heroTitle">
-            We built our own design system. We will build yours.
+            We build interface and intelligence software on tools we own.
           </helix-text>
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Interface and intelligence work, delivered into your repository under your license. The
-            substrate is already built, which is what makes four weeks a real number.
+            Most engagements start with a two week audit of what is worth building. The substrate
+            underneath the work is already built, which is what makes the estimates that follow real
+            numbers.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link data-button="solid" data-button-tone="primary" href="/services">

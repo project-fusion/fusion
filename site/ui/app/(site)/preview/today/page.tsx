@@ -74,24 +74,28 @@ export default function Page() {
             Fusion Development Group
           </helix-text>
 
-          {/* The proof, not the principle. It is the one sentence that says why
-              anyone should pick this over an agency, and it is a fact rather
-              than a claim: the system is on this site and can be opened. */}
+          {/* Holding copy, and it is holding rather than finished: the claim
+              this page needs is a decision rather than a draft, and the three
+              candidates are at the end of `the internal plan`. What it
+              must not do is name a deliverable, which the previous one did:
+              "we will build yours" sold the second of three offers as the whole
+              business and sized the company as an agency. */}
           <helix-text as="h1" class="specHeroTitle">
-            We built our own design system. We will build <em>yours</em>.
+            We build interface and intelligence software on tools <em>we own</em>.
           </helix-text>
 
           <helix-text as="p" class="specLede">
-            Interface and intelligence work, delivered into your repository under your license. The
-            substrate is already built, which is what makes four weeks a real number.
+            Most engagements start with a two week audit of what is worth building. The substrate
+            underneath is already built, which is what makes the estimates that follow real.
           </helix-text>
 
           <div className="specDoors">
             <a className="specDoor" href="/services">
               <helix-text class="specDoorFor">If you need the work done</helix-text>
-              <helix-text appearance="title">See what it costs</helix-text>
+              <helix-text appearance="title">Start with an audit</helix-text>
               <helix-text appearance="caption" tone="muted">
-                Audits from $12,000. Sprints from $32,000. Every price stated.
+                Two weeks, $12,000 to $18,000, and the honest answer may be that you do not need the
+                rest. Every price is stated.
               </helix-text>
             </a>
             <a className="specDoor" href="/helix">
