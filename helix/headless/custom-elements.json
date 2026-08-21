@@ -46759,6 +46759,10 @@
               "name": "bubble"
             },
             {
+              "description": "The point, which the floating pass places against the target.",
+              "name": "arrow"
+            },
+            {
               "description": "The region holding the slotted content.",
               "name": "content"
             },
@@ -46897,7 +46901,7 @@
               "name": "floating",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.target, /* A press outside does not end a tour, and this is the decision rather than a stub. Everywhere else a surface closes on an outside press because pressing elsewhere means the reader is finished with it. Here elsewhere is the thing being pointed at: the scrim lets the pointer through on purpose, so the first press a reader makes on the button the tour is describing would be the press that ends the tour. Leaving is the skip control and `Escape`, both of which say so. */ onDismiss: () => {}, placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"bubble\"]'), })"
+              "default": "new PopoverController(this, { anchor: () => this.target, arrow: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"arrow\"]'), /* A press outside does not end a tour, and this is the decision rather than a stub. Everywhere else a surface closes on an outside press because pressing elsewhere means the reader is finished with it. Here elsewhere is the thing being pointed at: the scrim lets the pointer through on purpose, so the first press a reader makes on the button the tour is describing would be the press that ends the tour. Leaving is the skip control and `Escape`, both of which say so. */ onDismiss: () => {}, placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"bubble\"]'), })"
             },
             {
               "kind": "method",

@@ -16,6 +16,7 @@ import '../../button/index.js'
  * @category overlays
  * @documentation https://helix.fusion.dev/components/tour
  *
+ * @cssproperty --tour-arrow-size - The point's box, before it is rotated.
  * @cssproperty --tour-bubble-size - How wide the panel may grow.
  * @cssproperty --tour-padding - Inset inside the panel.
  * @cssproperty --tour-surface-color - The panel's own surface.

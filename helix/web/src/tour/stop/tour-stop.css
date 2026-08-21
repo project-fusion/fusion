@@ -18,6 +18,14 @@
   inline-size: max-content;
   margin: var(--helix-space-none);
   max-inline-size: var(--tour-bubble-size, 22rem);
+  /* The arrow hangs half outside this box, and the user agent's own
+     `[popover] { overflow: auto }` was cutting that half off. Measured: the
+     arrow computed correctly at `inset-block-start: -5px`, its centre sat
+     exactly on the panel's top edge, and nothing was drawn. Said here because
+     a scroll is not wanted either: the panel has a `max-inline-size` and no
+     height limit, so it grows rather than scrolls, and a tour panel long enough
+     to need a scrollbar is a tour stop that should have been two. */
+  overflow: visible;
   padding: var(--tour-padding, var(--helix-space-md));
   position: fixed;
 }
@@ -47,4 +55,54 @@
 
 [part="skip"] {
   margin-inline-end: auto;
+}
+
+/* The point, half outside the panel and pointing at the target.
+ *
+ * A rotated square rather than a triangle, because a triangle is a `border`
+ * trick with no background of its own and cannot continue the panel's own
+ * border across it. Rotated, two of its edges are the outer ones and carry the
+ * border; the inner half overlaps the panel's edge and its background covers
+ * the line there, which is what makes the arrow read as the panel opening out
+ * rather than as a shape stuck to it.
+ *
+ * `rotate` and not `transform`, for the reason `FloatingController` writes out
+ * against its own `translate`: the individual properties compose ahead of
+ * `transform`, so a panel that ever animates a `scale` cannot multiply this.
+ *
+ * The floating pass writes the offset *along* the edge. Which edge, and the
+ * offset across it, is placement, and that is what the four rules below say. */
+[part="arrow"] {
+  background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
+  block-size: var(--tour-arrow-size, 0.625rem);
+  inline-size: var(--tour-arrow-size, 0.625rem);
+  position: absolute;
+  rotate: 45deg;
+}
+
+/* Half of the box, so the point sits outside and the rest covers the edge it
+   came through. `data-placement` is on the panel, written by the floating pass
+   once it knows which side it ended up on. */
+[part="bubble"][data-placement^="bottom"] [part="arrow"] {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-start: calc(var(--tour-arrow-size, 0.625rem) / -2);
+}
+
+[part="bubble"][data-placement^="top"] [part="arrow"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-end: calc(var(--tour-arrow-size, 0.625rem) / -2);
+}
+
+[part="bubble"][data-placement^="right"] [part="arrow"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-inline-start: calc(var(--tour-arrow-size, 0.625rem) / -2);
+}
+
+[part="bubble"][data-placement^="left"] [part="arrow"] {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-inline-end: calc(var(--tour-arrow-size, 0.625rem) / -2);
 }

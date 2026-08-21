@@ -52,6 +52,7 @@ import '../../button/index.js'
  * @slot actions - Replaces the controls, which are Back, Next and Skip.
  *
  * @csspart bubble - The panel that points at the target.
+ * @csspart arrow - The point, which the floating pass places against the target.
  * @csspart content - The region holding the slotted content.
  * @csspart actions - The row the controls sit in.
  * @csspart back - The control that goes to the previous stop.
@@ -112,6 +113,7 @@ export class HelixBaseTourStop extends HelixElement {
 
   private readonly floating = new PopoverController(this, {
     anchor: () => this.target,
+    arrow: () => this.renderRoot?.querySelector<HTMLElement>('[part="arrow"]'),
     /* A press outside does not end a tour, and this is the decision rather than
        a stub. Everywhere else a surface closes on an outside press because
        pressing elsewhere means the reader is finished with it. Here elsewhere
@@ -148,6 +150,18 @@ export class HelixBaseTourStop extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<div part="bubble" popover="manual" ?hidden=${!this.current}>
+      ${
+        /* The one surface in this library that draws one, and the reason is
+           worth stating because everything else here deliberately does not.
+           An arrow says which thing a panel is describing, and a menu or a
+           select does not need one: it hangs off its trigger and adjacency says
+           it. A tour panel is anchored to something it did not open, on a page
+           full of other things, and it may be flipped to the far side of its
+           target by collision. Fusion's own taste is to leave arrows off, which
+           is a fact about the house style rather than about the system. */
+        ''
+      }
+      <div part="arrow" aria-hidden="true"></div>
       <div part="content"><slot></slot></div>
       <div part="actions">
         <slot name="actions">
