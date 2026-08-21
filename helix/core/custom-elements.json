@@ -3431,6 +3431,14 @@
         },
         {
           "kind": "js",
+          "name": "formatNumbers",
+          "declaration": {
+            "name": "formatNumbers",
+            "module": "./utils/format-numbers/format-numbers.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "HostAria",
           "declaration": {
             "name": "HostAria",
@@ -6021,6 +6029,39 @@
           "declaration": {
             "name": "deepContains",
             "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/format-numbers/format-numbers.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "formatNumbers",
+          "return": {
+            "type": {
+              "text": "((value: number) => string)"
+            }
+          },
+          "parameters": [
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "formatNumbers",
+          "declaration": {
+            "name": "formatNumbers",
+            "module": "src/utils/format-numbers/format-numbers.ts"
           }
         }
       ]

@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@helix-io/core'
+import { customElement, formatNumbers, HelixElement } from '@helix-io/core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -82,18 +82,9 @@ export class HelixBasePaginationSummary extends HelixElement {
   @property()
   locale = ''
 
-  /** Built once per locale. Same reasoning as the calendar's date formatters. */
-  private cachedFormat: { format: Intl.NumberFormat; locale: string } | undefined
-
+  /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
-    if (this.cachedFormat?.locale !== this.locale) {
-      this.cachedFormat = {
-        format: new Intl.NumberFormat(this.locale || undefined),
-        locale: this.locale,
-      }
-    }
-    const { format } = this.cachedFormat
-    return (value) => format.format(value)
+    return formatNumbers(this.locale)
   }
 
   protected override render(): TemplateResult {

@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { deepActiveElement } from '../../utils/focusable-elements/focusable-elements.js'
 
 /*
  * The element that actually has focus, through any number of shadow roots.
@@ -26,14 +27,6 @@ const deepDepth = (node: Element | null): number => {
     depth += 1
   }
   return depth
-}
-
-const deepActiveElement = (): Element | null => {
-  let element = document.activeElement
-  while (element?.shadowRoot?.activeElement) {
-    element = element.shadowRoot.activeElement
-  }
-  return element
 }
 
 export interface DismissOptions {

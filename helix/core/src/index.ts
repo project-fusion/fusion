@@ -142,6 +142,7 @@ export {
   deepContains,
   focusableElements,
 } from './utils/focusable-elements/focusable-elements.js'
+export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
   type DisableableItem,

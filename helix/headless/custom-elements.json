@@ -28342,20 +28342,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "The number formatter, built once per locale rather than per render.\n\n`Intl.NumberFormat` is expensive to construct and this depends on nothing\nbut `locale`, where a render builds one per page in the run. Keyed on the\nlocale so a change to it is picked up, which a plain lazy field would not\ndo. Same shape as the calendar's three date formatters, for the same\nreasons its own note gives."
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true
             },
             {
@@ -28949,20 +28941,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "Built once per locale. Same reasoning as the calendar's date formatters."
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true
             },
             {
@@ -29231,20 +29215,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "Built once per locale. Same reasoning as the calendar's date formatters."
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true
             },
             {

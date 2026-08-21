@@ -1,5 +1,6 @@
 import {
   customElement,
+  formatNumbers,
   HelixChangeEvent,
   HelixElement,
   requestControlledChange,
@@ -122,18 +123,9 @@ export class HelixBasePaginationSize extends HelixElement {
     return this.valueMode === true
   }
 
-  /** Built once per locale. Same reasoning as the calendar's date formatters. */
-  private cachedFormat: { format: Intl.NumberFormat; locale: string } | undefined
-
+  /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
-    if (this.cachedFormat?.locale !== this.locale) {
-      this.cachedFormat = {
-        format: new Intl.NumberFormat(this.locale || undefined),
-        locale: this.locale,
-      }
-    }
-    const { format } = this.cachedFormat
-    return (value) => format.format(value)
+    return formatNumbers(this.locale)
   }
 
   /** The sizes, parsed once, with anything that is not a size dropped. */

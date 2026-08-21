@@ -1,5 +1,6 @@
 import {
   customElement,
+  formatNumbers,
   HelixElement,
   HelixNavigateEvent,
   hostAria,
@@ -349,26 +350,9 @@ export class HelixBasePagination extends HelixElement {
     return this.pageMode === true
   }
 
-  /**
-   * The number formatter, built once per locale rather than per render.
-   *
-   * `Intl.NumberFormat` is expensive to construct and this depends on nothing
-   * but `locale`, where a render builds one per page in the run. Keyed on the
-   * locale so a change to it is picked up, which a plain lazy field would not
-   * do. Same shape as the calendar's three date formatters, for the same
-   * reasons its own note gives.
-   */
-  private cachedFormat: { format: Intl.NumberFormat; locale: string } | undefined
-
+  /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {
-    if (this.cachedFormat?.locale !== this.locale) {
-      this.cachedFormat = {
-        format: new Intl.NumberFormat(this.locale || undefined),
-        locale: this.locale,
-      }
-    }
-    const { format } = this.cachedFormat
-    return (value) => format.format(value)
+    return formatNumbers(this.locale)
   }
 
   /**
