@@ -7,23 +7,22 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* The arrow carries the judgment and the number does not, which is a
-   correction and was measured rather than argued.
+/* The judgment colours the arrow and the number both, which is a correction to
+ * a correction and the second one is the interesting half.
  *
- * Colouring the metric is the dashboard convention and it was the first
- * version of this file. In light mode `--helix-color-success` paints
- * `rgb(0,147,81)` on `--helix-color-surface`, which is 3.8:1: fine for a
- * graphical object under 1.4.11, and short of the 4.5:1 that 13px text at
- * `weight-medium` needs. There is no darker green to reach for either, since
- * the success, warning and info ramps stop at 500 and only danger was ever
- * extended to 600.
+ * Colouring the metric is the dashboard convention and it was the first version
+ * here. It was taken out because `--helix-color-success` painted 3.8:1 on the
+ * light surface, fine for a glyph under 1.4.11 and short of the 4.5:1 that 13px
+ * text needs, and there was no darker green in the ramp to reach for.
  *
- * So the number keeps the page's own foreground and stays the most legible
- * thing here, which is right on its own terms: the number is what a reader
- * actually reads, and the judgment is a gloss on it. */
-[part="icon"] {
-  --icon-size: var(--trend-icon-size, 1em);
-
+ * **The ramp was the fault, not the component.** Success, warning and info all
+ * stopped at a 500 and only danger had ever been extended, so three of the four
+ * semantic status colours could be a fill and could not be a word. Extending
+ * them was #97; measured now, the worst of the four is 4.87 in the light and
+ * 4.53 in the dark, so the number can carry the colour as it always should
+ * have. Working around a token in a component would have left the same hole for
+ * the next component to fall into. */
+:host {
   color: var(--trend-color, var(--_trend-color));
 
   /* Grey until told what good means.
@@ -33,18 +32,22 @@
   --_trend-color: var(--helix-color-foreground-muted);
 }
 
+[part="icon"] {
+  --icon-size: var(--trend-icon-size, 1em);
+}
+
 /* The judgment, which is the direction crossed with what counts as better.
  *
  * Written as four selectors rather than computed, because the pair is four
  * cases and CSS has no exclusive-or. Neutral matches none of them and stays
  * grey, as does any trend with no `good` set. */
-:host([direction="up"][good="up"]) [part="icon"],
-:host([direction="down"][good="down"]) [part="icon"] {
+:host([direction="up"][good="up"]),
+:host([direction="down"][good="down"]) {
   --_trend-color: var(--helix-color-success);
 }
 
-:host([direction="up"][good="down"]) [part="icon"],
-:host([direction="down"][good="up"]) [part="icon"] {
+:host([direction="up"][good="down"]),
+:host([direction="down"][good="up"]) {
   --_trend-color: var(--helix-color-danger);
 }
 

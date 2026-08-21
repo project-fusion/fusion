@@ -242,7 +242,14 @@
     var(--_helix-syntax-tag-dark)
   );
 
-  /* Status. */
+  /* Status.
+   *
+   * The light half takes the 600 and the dark half the 400, for every severity
+   * rather than for danger alone. A 500 measures between 2.63 and 3.80 against
+   * the light surfaces, which is enough for a fill or a mark and short of what
+   * a word needs, so these tokens could not be used for the thing their names
+   * most suggest. `Trend` colours an arrow rather than its number because of
+   * it, and that comment can go now. */
   /* A series is a thing being compared, not a thing being reported.
    *
    * Separate from the status colours on purpose: `success` and `danger` mean
@@ -427,12 +434,12 @@
     oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-8)))
   );
 
-  --helix-color-info: light-dark(var(--_helix-info-500), var(--_helix-info-400));
+  --helix-color-info: light-dark(var(--_helix-info-600), var(--_helix-info-400));
   /* Both arms, like every other color here. These were single values, so a
      severity mark kept its light-mode color on a dark surface: measured on an
      inverted toast, danger at 2.85:1 against a 3:1 floor. */
-  --helix-color-success: light-dark(var(--_helix-success-500), var(--_helix-success-400));
-  --helix-color-warning: light-dark(var(--_helix-warning-500), var(--_helix-warning-400));
+  --helix-color-success: light-dark(var(--_helix-success-600), var(--_helix-success-400));
+  --helix-color-warning: light-dark(var(--_helix-warning-600), var(--_helix-warning-400));
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. See the primitive, which carries the
      argument. */

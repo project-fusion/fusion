@@ -228,6 +228,25 @@
      contrast rather than for tone. */
   --_helix-danger-600: oklch(from var(--_helix-danger-500) calc(l - 0.07) calc(c - 0.04) h);
 
+  /* And the other three, because a 500 is not dark enough to be text.
+   *
+   * Measured against the three light surface tokens: `success` at 500 is
+   * 3.58:1, `info` 3.80 and `warning` 2.63, all under the 4.5 that body text
+   * needs, and none of them had a 600 to fall back to. So a semantic token
+   * built on them could be a fill or a mark and could not be a word, and
+   * nothing anywhere said so: `Trend` found it by trying to colour a number.
+   *
+   * **The steps differ per hue, and that is the honest part.** A 600 is defined
+   * by the contrast it has to reach rather than by a fixed lightness drop,
+   * because the same drop buys different contrast at different hues: `-0.07`
+   * takes danger to 5.56, info to 5.09 and success to 4.87, and leaves warning
+   * at 3.21. Yellow starts at 0.7 rather than 0.58 and has the least room, so
+   * it takes `-0.18` to reach 5.02. Matching the numbers would have been tidier
+   * and would have shipped one severity that still could not be read. */
+  --_helix-info-600: oklch(from var(--_helix-info-500) calc(l - 0.07) calc(c - 0.04) h);
+  --_helix-success-600: oklch(from var(--_helix-success-500) calc(l - 0.07) calc(c - 0.04) h);
+  --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.18) calc(c - 0.02) h);
+
   --_helix-info-400: oklch(from var(--_helix-info-500) calc(l + 0.12) c h);
   --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
   /* Back to the shared `+ 0.12` now the light arm carries the brightness: from

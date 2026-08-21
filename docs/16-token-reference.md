@@ -78,9 +78,9 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-series-22` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-6))) )` | 5 |
 | `--helix-color-series-23` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-7))) )` | 5 |
 | `--helix-color-series-24` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-8))) )` | 5 |
-| `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
-| `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 29 |
-| `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
+| `--helix-color-info` | `light-dark(var(--_helix-info-600), var(--_helix-info-400))` | 8 |
+| `--helix-color-success` | `light-dark(var(--_helix-success-600), var(--_helix-success-400))` | 29 |
+| `--helix-color-warning` | `light-dark(var(--_helix-warning-600), var(--_helix-warning-400))` | 22 |
 | `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 133 |
 
 ## space
