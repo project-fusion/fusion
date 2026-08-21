@@ -10008,10 +10008,9 @@
               "kind": "field",
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\n**Undefaulted, because it reflects.** The two together are what stamp an\nattribute onto every host anybody renders, including the ones nobody\nconfigured: the server wrote `format=\"hex\"` on every colour input on the\npage, and React, holding no such prop, reported a hydration mismatch for\neach one. That is the fault `Tree.chevronPlacement` had and the reason the\narea rules say a reflected property takes no default. Hex is still what an\nunset one writes; the difference is that the resting arrangement is the\nattribute's absence rather than a value spelled out.",
               "attribute": "format",
               "reflects": true,
               "inheritedFrom": {
@@ -10651,10 +10650,9 @@
             {
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\n**Undefaulted, because it reflects.** The two together are what stamp an\nattribute onto every host anybody renders, including the ones nobody\nconfigured: the server wrote `format=\"hex\"` on every colour input on the\npage, and React, holding no such prop, reported a hydration mismatch for\neach one. That is the fault `Tree.chevronPlacement` had and the reason the\narea rules say a reflected property takes no default. Hex is still what an\nunset one writes; the difference is that the resting arrangement is the\nattribute's absence rather than a value spelled out.",
               "fieldName": "format",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -42866,10 +42864,9 @@
               "kind": "field",
               "name": "appearance",
               "type": {
-                "text": "'dots' | 'marks'"
+                "text": "'dots' | 'marks' | undefined"
               },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.\n\n**Undefaulted, because it reflects.** Defaulted to `marks` it wrote\n`appearance=\"marks\"` onto every rating the server rendered, which React\nheld no prop for and reported as a hydration mismatch. The stylesheet was\nalready written the right way round, naming only `dots`, so marks is what\nan unset one draws and nothing else had to move.",
               "attribute": "appearance",
               "reflects": true
             },
@@ -43802,10 +43799,9 @@
             {
               "name": "appearance",
               "type": {
-                "text": "'dots' | 'marks'"
+                "text": "'dots' | 'marks' | undefined"
               },
-              "default": "'marks'",
-              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.",
+              "description": "Which mark the row is drawn with.\n\n`marks` is the star, and is what a rating means to most readers. `dots`\ndrops the glyph for a plain circle, which says how much rather than how\ngood: a star carries a judgement that a level of spice, a difficulty or a\nconfidence has not earned.\n\nBoth are one shape repeated and clipped to the score, so halves work in\neither, and both are only a choice of drawing. A scale whose marks are\n*different* drawings is a set of choices rather than a quantity: that is\n`Radio.Group`, whose options already carry a value and a name each.\n\n**Undefaulted, because it reflects.** Defaulted to `marks` it wrote\n`appearance=\"marks\"` onto every rating the server rendered, which React\nheld no prop for and reported as a hydration mismatch. The stylesheet was\nalready written the right way round, naming only `dots`, so marks is what\nan unset one draws and nothing else had to move.",
               "fieldName": "appearance"
             },
             {

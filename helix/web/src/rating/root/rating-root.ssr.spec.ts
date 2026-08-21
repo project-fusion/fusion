@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -33,5 +33,12 @@ describe('rating server output', () => {
   test('nothing waits on the client to know how many marks there are', () => {
     const markup = withoutStyles(ssr(given))
     expect([...markup.matchAll(/part="mark"/g)].length).toBe(10)
+  })
+
+  test('the host carries only what the consumer wrote', () => {
+    /* `appearance` reflected and defaulted to `marks`, so the server stamped
+       `appearance="marks"` onto every rating anybody rendered and React, which
+       holds no such prop, reported a hydration mismatch for each one. */
+    expect(hostAttributes(ssr(given), 'helix-rating')).toEqual(['label', 'value'])
   })
 })

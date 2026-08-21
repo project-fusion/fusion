@@ -6379,10 +6379,9 @@
               "kind": "field",
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\n**Undefaulted, because it reflects.** The two together are what stamp an\nattribute onto every host anybody renders, including the ones nobody\nconfigured: the server wrote `format=\"hex\"` on every colour input on the\npage, and React, holding no such prop, reported a hydration mismatch for\neach one. That is the fault `Tree.chevronPlacement` had and the reason the\narea rules say a reflected property takes no default. Hex is still what an\nunset one writes; the difference is that the resting arrangement is the\nattribute's absence rather than a value spelled out.",
               "attribute": "format",
               "reflects": true
             },
@@ -7332,10 +7331,9 @@
             {
               "name": "format",
               "type": {
-                "text": "ColorFormat"
+                "text": "ColorFormat | undefined"
               },
-              "default": "'hex'",
-              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.",
+              "description": "The syntax the value is written in: `hex`, `rgb` or `hsl`.\n\n**Undefaulted, because it reflects.** The two together are what stamp an\nattribute onto every host anybody renders, including the ones nobody\nconfigured: the server wrote `format=\"hex\"` on every colour input on the\npage, and React, holding no such prop, reported a hydration mismatch for\neach one. That is the fault `Tree.chevronPlacement` had and the reason the\narea rules say a reflected property takes no default. Hex is still what an\nunset one writes; the difference is that the resting arrangement is the\nattribute's absence rather than a value spelled out.",
               "fieldName": "format"
             },
             {

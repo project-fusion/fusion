@@ -1238,7 +1238,16 @@ where the color is the answer rather than a setting. */
   appearance?: HelixColorInput["appearance"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixColorInput["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+**Undefaulted, because it reflects.** The two together are what stamp an
+attribute onto every host anybody renders, including the ones nobody
+configured: the server wrote `format="hex"` on every colour input on the
+page, and React, holding no such prop, reported a hydration mismatch for
+each one. That is the fault `Tree.chevronPlacement` had and the reason the
+area rules say a reflected property takes no default. Hex is still what an
+unset one writes; the difference is that the resting arrangement is the
+attribute's absence rather than a value spelled out. */
   format?: HelixColorInput["format"];
   /** Whether the reader may change the format from the panel. */
   "no-format"?: HelixColorInput["noFormat"];
@@ -4283,7 +4292,13 @@ confidence has not earned.
 Both are one shape repeated and clipped to the score, so halves work in
 either, and both are only a choice of drawing. A scale whose marks are
 *different* drawings is a set of choices rather than a quantity: that is
-`Radio.Group`, whose options already carry a value and a name each. */
+`Radio.Group`, whose options already carry a value and a name each.
+
+**Undefaulted, because it reflects.** Defaulted to `marks` it wrote
+`appearance="marks"` onto every rating the server rendered, which React
+held no prop for and reported as a hydration mismatch. The stylesheet was
+already written the right way round, naming only `dots`, so marks is what
+an unset one draws and nothing else had to move. */
   appearance?: HelixRating["appearance"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixRating["defaultValue"];

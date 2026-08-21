@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr } from '@fusion-io/testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr } from '@fusion-io/testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -36,5 +36,18 @@ describe('input color server output', () => {
 
   test('the picker ships inside it, rather than being built on hydration', () => {
     expect(partTag(markup, 'picker')).toContain('helix-color-picker')
+  })
+
+  test('the host carries only what the consumer wrote', () => {
+    /* `format` reflected and defaulted to `hex`, so the server stamped
+       `format="hex"` onto every colour input anybody rendered and React, which
+       holds no such prop, reported a hydration mismatch for each one. */
+    expect(hostAttributes(markup, 'helix-color-input')).toEqual([
+      'hint',
+      'label',
+      'name',
+      'swatches',
+      'value',
+    ])
   })
 })

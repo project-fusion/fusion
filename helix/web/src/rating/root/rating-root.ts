@@ -42,9 +42,15 @@ export class HelixRating extends HelixBaseRating {
    * either, and both are only a choice of drawing. A scale whose marks are
    * *different* drawings is a set of choices rather than a quantity: that is
    * `Radio.Group`, whose options already carry a value and a name each.
+   *
+   * **Undefaulted, because it reflects.** Defaulted to `marks` it wrote
+   * `appearance="marks"` onto every rating the server rendered, which React
+   * held no prop for and reported as a hydration mismatch. The stylesheet was
+   * already written the right way round, naming only `dots`, so marks is what
+   * an unset one draws and nothing else had to move.
    */
   @property({ reflect: true })
-  appearance: 'dots' | 'marks' = 'marks'
+  appearance?: 'dots' | 'marks'
 }
 
 declare global {

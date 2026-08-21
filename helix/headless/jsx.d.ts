@@ -1519,7 +1519,16 @@ where the color is the answer rather than a setting. */
   appearance?: HelixBaseColorInput["appearance"];
   /** Whether the color carries an alpha channel. */
   alpha?: HelixBaseColorInput["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+**Undefaulted, because it reflects.** The two together are what stamp an
+attribute onto every host anybody renders, including the ones nobody
+configured: the server wrote `format="hex"` on every colour input on the
+page, and React, holding no such prop, reported a hydration mismatch for
+each one. That is the fault `Tree.chevronPlacement` had and the reason the
+area rules say a reflected property takes no default. Hex is still what an
+unset one writes; the difference is that the resting arrangement is the
+attribute's absence rather than a value spelled out. */
   format?: HelixBaseColorInput["format"];
   /** Whether the reader may change the format from the panel. */
   "no-format"?: HelixBaseColorInput["noFormat"];
@@ -1641,7 +1650,16 @@ where the color is the answer rather than a setting. */
   "prop:appearance"?: HelixBaseColorInput["appearance"];
   /** Whether the color carries an alpha channel. */
   "prop:alpha"?: HelixBaseColorInput["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`. */
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+**Undefaulted, because it reflects.** The two together are what stamp an
+attribute onto every host anybody renders, including the ones nobody
+configured: the server wrote `format="hex"` on every colour input on the
+page, and React, holding no such prop, reported a hydration mismatch for
+each one. That is the fault `Tree.chevronPlacement` had and the reason the
+area rules say a reflected property takes no default. Hex is still what an
+unset one writes; the difference is that the resting arrangement is the
+attribute's absence rather than a value spelled out. */
   "prop:format"?: HelixBaseColorInput["format"];
   /** Whether the reader may change the format from the panel. */
   "bool:no-format"?: HelixBaseColorInput["noFormat"];
@@ -13134,6 +13152,15 @@ export type CustomElements = {
    * where the color is the answer rather than a setting.
    * - `alpha`: Whether the color carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * **Undefaulted, because it reflects.** The two together are what stamp an
+   * attribute onto every host anybody renders, including the ones nobody
+   * configured: the server wrote `format="hex"` on every colour input on the
+   * page, and React, holding no such prop, reported a hydration mismatch for
+   * each one. That is the fault `Tree.chevronPlacement` had and the reason the
+   * area rules say a reflected property takes no default. Hex is still what an
+   * unset one writes; the difference is that the resting arrangement is the
+   * attribute's absence rather than a value spelled out.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a color is in it.
    * - `swatches`: Colors offered under the picker, as a comma-separated list.
@@ -23840,6 +23867,15 @@ export type CustomElementsSolidJs = {
    * where the color is the answer rather than a setting.
    * - `alpha`: Whether the color carries an alpha channel.
    * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * **Undefaulted, because it reflects.** The two together are what stamp an
+   * attribute onto every host anybody renders, including the ones nobody
+   * configured: the server wrote `format="hex"` on every colour input on the
+   * page, and React, holding no such prop, reported a hydration mismatch for
+   * each one. That is the fault `Tree.chevronPlacement` had and the reason the
+   * area rules say a reflected property takes no default. Hex is still what an
+   * unset one writes; the difference is that the resting arrangement is the
+   * attribute's absence rather than a value spelled out.
    * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
    * - `placeholder`: What the field says before a color is in it.
    * - `swatches`: Colors offered under the picker, as a comma-separated list.

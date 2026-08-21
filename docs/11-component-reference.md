@@ -1117,7 +1117,7 @@ pads its own lower rows.
 | `feedback` | `feedback` | `string` | `''` | `MixinField` | What is wrong, in the reader's words rather than the browser's. |
 | `form` | - | `HTMLFormElement \| null` | - | `HelixFormElement` | The form this control belongs to, if any. |
 | `formAssociated` | - | `boolean` | `true` | `HelixFormElement` | Opts the element into form ownership, labels, and submission. |
-| `format` | `format` | `ColorFormat` | `'hex'` | `HelixBaseColorInput` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
+| `format` | `format` | `ColorFormat \| undefined` | - | `HelixBaseColorInput` | The syntax the value is written in: `hex`, `rgb` or `hsl`. |
 | `hint` | `hint` | `string` | `''` | `MixinField` | Help under the control, shown while there is nothing wrong. |
 | `isDisabled` | - | `boolean` | - | `HelixFormElement` | Whether the control is off, by its own attribute or by an ancestor. |
 | `label` | `label` | `string` | `''` | `MixinField` | The accessible name, and the fallback for the `label` slot. |
@@ -3955,7 +3955,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'dots' \| 'marks'` | `'marks'` | - | Which mark the row is drawn with. |
+| `appearance` | `appearance` | `'dots' \| 'marks' \| undefined` | - | - | Which mark the row is drawn with. |
 | `defaultValue` | `default-value` | `string` | `''` | `MixinControllerValue` | The value the markup declared, which is where a reset returns to. |
 | `describedBy` | - | `string \| undefined` | - | `MixinField` | Id of the description node, for `aria-describedby` on the control. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixFormElement` | Whether the control is non-interactive. |

@@ -1,5 +1,21 @@
+/* **A column, so a block given a height spends it on the code.**
+ *
+ * `display: block` left the header and the frame at their content heights and
+ * the rest of the host empty: stretched into a 118px row beside a card, the
+ * snippet drew 82px of itself and 36px of nothing, which reads as a box that
+ * failed to fill rather than as a short snippet. The frame takes the remainder,
+ * so a longer snippet and a stretched one both put their space in the same
+ * place, under the code.
+ *
+ * Free when nothing imposes a height: a flex column with no outside constraint
+ * is exactly as tall as its content, which is what it was before. */
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+}
+
+[part="frame"] {
+  flex: 1;
 }
 
 /* The name, over the code rather than floating on it. Only drawn when there is
@@ -39,6 +55,12 @@
    with a stray control next to it. Inside, it is one object. */
 [part="frame"] {
   position: relative;
+}
+
+/* Fills the frame it is in, which is what carries the host's height down to
+   the one part a reader is looking at. */
+[part="block"] {
+  block-size: 100%;
 }
 
 [part="copy"] {

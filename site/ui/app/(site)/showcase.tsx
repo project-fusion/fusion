@@ -590,8 +590,8 @@ export function Showcase(): React.ReactElement {
             The packages install from npm and ship as custom elements.
           </helix-callout>
 
-          <helix-code-block class="showcaseCode" label="Install Helix">
-            bun add @helix-io/web
+          <helix-code-block label="Install Helix">
+            {"bun add @helix-io/web\nimport '@helix-io/web/card'"}
           </helix-code-block>
 
           <helix-card appearance="outlined" class="showcaseCard">

@@ -2557,20 +2557,6 @@ helix-drawer helix-tree {
   }
 }
 
-/* The code block sits in the mosaic on its own, so it needs to be a block and
-   nothing else: it brings its own surface.
-
-   **Stretched, unlike the cards.** The view aligns its items to the start,
-   which is right for a card whose height is its content, and wrong for the one
-   item in the row that is a slab: a 74px block beside a 158px card reads as a
-   figure that failed to load rather than as a short snippet. `align-self` is
-   the departure and the block fills what it is given. */
-.showcaseCode {
-  align-self: stretch;
-  block-size: 100%;
-  display: block;
-}
-
 /* The switch and the colour share a line above the grid, and neither moves with
    it. A control that jumps to a new position when you use it is one you have to
    find again each time. */
