@@ -315,9 +315,8 @@ export function Showcase(): React.ReactElement {
               </helix-select>
               <helix-number-input default-value="8" label="Octaves" min={1}></helix-number-input>
               <helix-slider
-                default-value="20,70"
+                default-value="35,65"
                 label="Bloom"
-                markers={5}
                 max={100}
                 min={0}
                 range
@@ -405,7 +404,11 @@ export function Showcase(): React.ReactElement {
                 a label and a unit, and it is a figure rather than a chart
                 container. Given the card's width and a rule above it, the two
                 are one thing. */}
-          <helix-card appearance="outlined" class="showcaseCard" media-placement="end">
+          <helix-card
+            appearance="outlined"
+            class="showcaseCard showcaseFigures"
+            media-placement="end"
+          >
             <helix-stat-group class="showcaseStats" divided>
               <helix-stat>
                 1,284
@@ -519,7 +522,7 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
-              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
+              <helix-donut-chart class="showcaseRing" for="showcase-sources"></helix-donut-chart>
             </helix-flex>
           </helix-card>
 

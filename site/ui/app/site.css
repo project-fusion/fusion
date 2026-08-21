@@ -2676,6 +2676,23 @@ helix-drawer helix-tree {
   --bar-chart-block-size: 8em;
 }
 
+/* **The chart's height, which the card was deciding for it.** A sparkline in
+   the media slot is sized by the card's own rule, an outer-tree declaration
+   that outranks the chart's `:host`, so `--sparkline-block-size` reached
+   nothing and it drew at 118 inside a 222 card. `--card-media-block-size` is
+   the hook that rule now reads. The figures above it are 75, so a band about
+   half that is a trend line under a pair of numbers rather than a chart with a
+   caption. */
+.showcaseFigures {
+  --card-media-block-size: 2.75rem;
+}
+
+/* The ring at the size of the cell it is in, not the size a page would give
+   it. */
+.showcaseRing {
+  --donut-chart-size: 8rem;
+}
+
 /* Sparklines take the width they are given and none by default. The one under
    the figures spans its card; the ones in table rows fill their cell. */
 .showcaseRowLine {

@@ -36,6 +36,8 @@ import { styles } from './card-root.css.js'
  *
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
+ * @cssproperty --card-media-block-size - Height of the media region. Defaults to
+ *   `auto`, which is an image's own shape and is not a height a chart has.
  * @cssproperty --card-media-size - Width of the media column when horizontal.
  * @cssproperty --card-padding - Inset applied to each region.
  * @cssproperty --card-radii - Corner radius of the surface.

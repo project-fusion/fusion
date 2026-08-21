@@ -61,7 +61,14 @@
    Three of the four sides bleed and the fourth is the one facing the content,
    which keeps its inset so the text below is not touching the picture. */
 slot[name="media"]::slotted(*) {
-  block-size: auto;
+  /* **`auto` is the right default and the wrong one for a chart**, which is why
+     it is a hook rather than a constant. An image carries an intrinsic ratio, so
+     `auto` against a known width is exactly its own shape. A drawing carries
+     none: its height is whatever its box says, and this rule is what its box
+     says, since a rule in the outer tree outranks the chart's own `:host`. A
+     sparkline slotted here therefore could not be resized by the property it
+     documents for the purpose, and came out 118px in a 222px card. */
+  block-size: var(--card-media-block-size, auto);
   display: block;
   inline-size: calc(100% + var(--_card-inset) * 2);
   margin: calc(var(--_card-inset) * -1);
