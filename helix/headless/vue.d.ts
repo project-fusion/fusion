@@ -68,6 +68,7 @@ import type {
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
+  HelixBaseSparkline,
   HelixBaseSpeedDialItem,
   HelixBaseSpeedDial,
   HelixBaseSplitter,
@@ -3963,6 +3964,35 @@ export type HelixBaseSliderVueEvents = {
   change: HelixBaseSliderElementEvent;
 };
 
+export type HelixBaseSparklineVueProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  label?: HelixBaseSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  values?: HelixBaseSparkline["values"];
+};
+
+export type HelixBaseSparklineVueEvents = {};
+
 /** `HelixBaseSpeedDialItem` component event */
 export type HelixBaseSpeedDialItemElementEvent<E = Event> = TypedEvent<
   HelixBaseSpeedDialItem,
@@ -6163,6 +6193,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseSlider,
     HelixBaseSliderVueProps,
     HelixBaseSliderVueEvents
+  >;
+  /** The one chart here that takes its numbers from an attribute, and the reversal is deliberate. Every other chart reads a table because a reader might want to interrogate it; nobody interrogates the squiggle next to a figure. A fourteen-row table behind a bare trend line is fourteen dates read aloud in place of the one sentence that carries the meaning, so 'values' is the list and 'label' is the sentence.  That is the library's own rule rather than a second data channel: a content property is its slot's fallback, which is why 'Tooltip' takes 'content' and 'Avatar' takes 'name'. 'for' stays for the sparkline that genuinely has a table behind it, and it wins where both are given.  **No label means decorative, and that is a choice rather than an oversight.** A sparkline beside a stat that already says "Sessions, 1,102" has nothing of its own to announce, and an unnamed 'role="img"' announces "graphic" and stops. So an unlabelled sparkline is 'aria-hidden', and a labelled one is an image named by its sentence.  It goes *beside* a 'Stat' rather than inside one. The plan this was built from called for a 'trend' slot on 'Stat'; the spec already on 'Stat' says the opposite, that a change beside a figure is a second fact, and the spec is right. 'Trend' composes the same way. */
+  "helix-base-sparkline": DefineCustomElement<
+    HelixBaseSparkline,
+    HelixBaseSparklineVueProps,
+    HelixBaseSparklineVueEvents
   >;
   /** **A command, which is why this is a 'menuitem' and a megamenu's rows are not.** The distinction is what the thing does, not what it looks like: a megamenu holds destinations, so it is a disclosure of links, and this holds actions a screen can take, which is exactly what 'role="menu"' was written for. The roles follow the contents.  **The name is text, not a title.** A dial's actions are icons, and an icon with a 'title' is an action whose name only exists for whoever hovers it long enough. The label is rendered beside the mark and is the accessible name by being there, so it is read, searched and translated like anything else. */
   "helix-base-speed-dial-item": DefineCustomElement<

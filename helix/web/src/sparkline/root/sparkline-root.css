@@ -1,0 +1,63 @@
+:host {
+  block-size: var(--sparkline-block-size, 2.5em);
+  /* The mark is positioned against this box, so the box has to be one. */
+  position: relative;
+
+  /* Relative to the surrounding text rather than on the type scale, for the
+     reason `Kbd` gives: a line set beside a figure has to be a figure-sized
+     thing, and the scale is absolute and cannot say "a little wider than
+     this". */
+  display: inline-block;
+  inline-size: var(--sparkline-inline-size, 7em);
+  vertical-align: middle;
+}
+
+[part="svg"] {
+  block-size: 100%;
+  inline-size: 100%;
+  /* The stroke sits astride the path, so a value at the very top or bottom of
+     the range has half its line outside the box. Visible rather than an inset
+     range: an inset costs amplitude and grows with the box, and the overhang is
+     half a stroke whatever the size. */
+  overflow: visible;
+}
+
+/* The first series colour rather than the brand token, and they are nearly the
+   same colour on purpose: series 1 is the seed at hue rotation zero, held at a
+   lightness that clears a chart's ground. A sparkline is a chart, so it takes a
+   chart colour, and a page carrying one beside a line chart draws both series
+   one in the same ink. Measured against the surface: 5.35 in the light and 6.57
+   in the dark, where a graphic needs 3. */
+[part="line"] {
+  fill: none;
+  stroke: var(--sparkline-color, var(--helix-color-series-1));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--sparkline-width, 1.5px);
+
+  /* The whole reason one drawing fits any box.
+   *
+   * `preserveAspectRatio="none"` stretches the coordinate space to the element,
+   * and a stroke stretches with it: the same 1.5 comes out hairline in a narrow
+   * slot and heavy in a wide one, and thicker across than down in both. This
+   * takes the stroke out of that space, so `1.5px` is 1.5 device-independent
+   * pixels at every size. */
+  vector-effect: non-scaling-stroke;
+}
+
+/* Where the series ended, which is the one point a reader looks for.
+ *
+ * An element rather than a `<circle>`, because a circle inside a stretched
+ * coordinate space is an ellipse. `vector-effect` cannot help: it takes the
+ * stroke out of the transform and leaves the geometry in it. */
+[part="point"] {
+  background-color: var(--sparkline-color, var(--helix-color-series-1));
+  block-size: var(--sparkline-point-size, 4px);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--sparkline-point-size, 4px);
+  inset-block-start: var(--_sparkline-y);
+  inset-inline-start: var(--_sparkline-x);
+  position: absolute;
+  /* Centred on the point rather than hanging below and right of it. */
+  translate: -50% -50%;
+}

@@ -3088,6 +3088,30 @@
         },
         {
           "kind": "js",
+          "name": "extent",
+          "declaration": {
+            "name": "extent",
+            "module": "./utils/scale/scale.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "linear",
+          "declaration": {
+            "name": "linear",
+            "module": "./utils/scale/scale.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Scale",
+          "declaration": {
+            "name": "Scale",
+            "module": "./utils/scale/scale.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ScrollItemOptions",
           "declaration": {
             "name": "ScrollItemOptions",
@@ -5421,6 +5445,72 @@
           "declaration": {
             "name": "restoreValue",
             "module": "src/utils/restore-value/restore-value.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/scale/scale.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extent",
+          "return": {
+            "type": {
+              "text": "[number, number]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "values",
+              "type": {
+                "text": "readonly number[]"
+              }
+            }
+          ],
+          "description": "The smallest and largest of a set of numbers, as a scale's domain."
+        },
+        {
+          "kind": "function",
+          "name": "linear",
+          "return": {
+            "type": {
+              "text": "Scale"
+            }
+          },
+          "parameters": [
+            {
+              "name": "domain",
+              "type": {
+                "text": "readonly [number, number]"
+              }
+            },
+            {
+              "name": "range",
+              "type": {
+                "text": "readonly [number, number]"
+              }
+            }
+          ],
+          "description": "Maps a domain onto a range, linearly.\n\nA pure function rather than a controller, which is the distinction the rules\ndraw: a controller reacts to a host's lifecycle, and this is arithmetic on\nfour numbers. It holds nothing, subscribes to nothing, and can be called from\n`render` without anything being wired up first.\n\nThe range is given rather than assumed, so an inverted one is ordinary: SVG\ncounts down from the top, so a chart passes `[height, 0]` and gets a larger\nvalue drawn higher without anything here knowing why.\n\n**A flat domain maps to the middle of the range, and that is the case worth\nnaming.** Every value being equal makes the domain zero wide, and the obvious\narithmetic divides by it: seven identical readings drew a line at `NaN`, which\nan `<svg>` renders as no line at all rather than as an error. A flat series is\na real thing to plot and it should come out as a flat line halfway up."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "extent",
+          "declaration": {
+            "name": "extent",
+            "module": "src/utils/scale/scale.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "linear",
+          "declaration": {
+            "name": "linear",
+            "module": "src/utils/scale/scale.ts"
           }
         }
       ]

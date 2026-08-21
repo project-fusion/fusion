@@ -93,6 +93,7 @@ import type {
   HelixSelectEvent,
   HelixSkeleton,
   HelixSlider,
+  HelixSparkline,
   HelixSpeedDial,
   HelixSpeedDialItem,
   HelixSplitter,
@@ -8979,6 +8980,65 @@ reflected none of them. */
   "on:helix-input"?: (e: HelixSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixSliderElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixSparklineProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  label?: HelixSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  values?: HelixSparkline["values"];
+};
+
+export type HelixSparklineSolidJsProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  "prop:label"?: HelixSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  "prop:values"?: HelixSparkline["values"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -19822,6 +19882,64 @@ export type CustomElements = {
   > & HelixSliderControlled;
 
   /**
+   * Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
+   * thing and one set in a table row is a row-sized thing. The type scale is
+   * absolute and cannot say "a little wider than this".
+   *
+   * The stroke does not scale with the box. `preserveAspectRatio="none"` is what
+   * lets one drawing fill a 60px slot and a 600px one, and without
+   * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
+   * first and heavy in the second.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of a table to read instead, when there is one behind the line.
+   *
+   * The first column of numbers is the series drawn. This wins over `values`,
+   * because a table is the readable representation and a list of numbers in an
+   * attribute is not: given both, the one a reader can also read should be the
+   * one the drawing agrees with.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: What the line says, in a sentence.
+   *
+   * "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+   * the accessible representation of a sparkline, and a list of the fourteen
+   * numbers is not. Absent, the drawing is hidden from a screen reader rather
+   * than announced without a name.
+   * - `values`: The numbers, separated by whitespace or by commas.
+   *
+   * Both separators, so `values="1240 1318"` and an array assigned to the
+   * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+   * and a string is what survives React's hydration where an array property
+   * does not.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
+   * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
+   * - `--sparkline-point-size`: Diameter of the mark on the last value. (default: `undefined`)
+   * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The path itself.
+   * - `point`: The mark on the last value.
+   * - `svg`: The drawing.
+   */
+  "helix-sparkline": Partial<
+    HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents
+  >;
+
+  /**
    * Presentation only: a round mark the size of a small control, and the name on
    * a chip beside it so it can be read against whatever the dial is floating
    * over. Everything about choosing it is the base class.
@@ -30305,6 +30423,67 @@ export type CustomElementsSolidJs = {
   > & HelixSliderControlledSolidJs;
 
   /**
+   * Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
+   * thing and one set in a table row is a row-sized thing. The type scale is
+   * absolute and cannot say "a little wider than this".
+   *
+   * The stroke does not scale with the box. `preserveAspectRatio="none"` is what
+   * lets one drawing fill a 60px slot and a 600px one, and without
+   * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
+   * first and heavy in the second.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of a table to read instead, when there is one behind the line.
+   *
+   * The first column of numbers is the series drawn. This wins over `values`,
+   * because a table is the readable representation and a list of numbers in an
+   * attribute is not: given both, the one a reader can also read should be the
+   * one the drawing agrees with.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: What the line says, in a sentence.
+   *
+   * "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+   * the accessible representation of a sparkline, and a list of the fourteen
+   * numbers is not. Absent, the drawing is hidden from a screen reader rather
+   * than announced without a name.
+   * - `values`: The numbers, separated by whitespace or by commas.
+   *
+   * Both separators, so `values="1240 1318"` and an array assigned to the
+   * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+   * and a string is what survives React's hydration where an array property
+   * does not.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
+   * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
+   * - `--sparkline-point-size`: Diameter of the mark on the last value. (default: `undefined`)
+   * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The path itself.
+   * - `point`: The mark on the last value.
+   * - `svg`: The drawing.
+   */
+  "helix-sparkline": Partial<
+    HelixSparklineProps &
+      HelixSparklineSolidJsProps &
+      BaseProps<HelixSparkline> &
+      BaseEvents
+  >;
+
+  /**
    * Presentation only: a round mark the size of a small control, and the name on
    * a chip beside it so it can be read against whatever the dial is floating
    * over. Everything about choosing it is the base class.
@@ -33771,6 +33950,16 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** Height of the drawing. */
+  "--sparkline-block-size"?: string;
+  /** Colour of the line and the mark. */
+  "--sparkline-color"?: string;
+  /** Width of the drawing. */
+  "--sparkline-inline-size"?: string;
+  /** Diameter of the mark on the last value. */
+  "--sparkline-point-size"?: string;
+  /** Thickness of the line. */
+  "--sparkline-width"?: string;
   /** Edge length of the mark. */
   "--speed-dial-item-size"?: string;
   /** Space between the actions. */

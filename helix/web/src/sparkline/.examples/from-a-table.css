@@ -1,0 +1,6 @@
+/* Wider than the default, because this one is the subject rather than a mark
+   beside a figure. The default is sized in `em` so it takes the type it sits
+   in; a standalone line wants saying out loud. */
+helix-sparkline {
+  --sparkline-inline-size: 16em;
+}

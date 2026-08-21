@@ -68,6 +68,7 @@ import type {
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
+  HelixBaseSparkline,
   HelixBaseSpeedDial,
   HelixBaseSpeedDialItem,
   HelixBaseSplitter,
@@ -7598,6 +7599,65 @@ reflected none of them. */
   "on:helix-input"?: (e: HelixBaseSliderHelixInputElementEvent) => void;
   /** Relayed once the reader has let go. */
   "on:change"?: (e: HelixBaseSliderElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseSparklineProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  label?: HelixBaseSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  values?: HelixBaseSparkline["values"];
+};
+
+export type HelixBaseSparklineSolidJsProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  "prop:label"?: HelixBaseSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  "prop:values"?: HelixBaseSparkline["values"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -17845,6 +17905,68 @@ export type CustomElements = {
   "helix-base-slider": Partial<
     HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
   > & HelixBaseSliderControlled;
+
+  /**
+   * The one chart here that takes its numbers from an attribute, and the reversal
+   * is deliberate. Every other chart reads a table because a reader might want to
+   * interrogate it; nobody interrogates the squiggle next to a figure. A
+   * fourteen-row table behind a bare trend line is fourteen dates read aloud in
+   * place of the one sentence that carries the meaning, so `values` is the list
+   * and `label` is the sentence.
+   *
+   * That is the library's own rule rather than a second data channel: a content
+   * property is its slot's fallback, which is why `Tooltip` takes `content` and
+   * `Avatar` takes `name`. `for` stays for the sparkline that genuinely has a
+   * table behind it, and it wins where both are given.
+   *
+   * **No label means decorative, and that is a choice rather than an oversight.**
+   * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
+   * its own to announce, and an unnamed `role="img"` announces "graphic" and
+   * stops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an
+   * image named by its sentence.
+   *
+   * It goes *beside* a `Stat` rather than inside one. The plan this was built
+   * from called for a `trend` slot on `Stat`; the spec already on `Stat` says the
+   * opposite, that a change beside a figure is a second fact, and the spec is
+   * right. `Trend` composes the same way.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of a table to read instead, when there is one behind the line.
+   *
+   * The first column of numbers is the series drawn. This wins over `values`,
+   * because a table is the readable representation and a list of numbers in an
+   * attribute is not: given both, the one a reader can also read should be the
+   * one the drawing agrees with.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: What the line says, in a sentence.
+   *
+   * "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+   * the accessible representation of a sparkline, and a list of the fourteen
+   * numbers is not. Absent, the drawing is hidden from a screen reader rather
+   * than announced without a name.
+   * - `values`: The numbers, separated by whitespace or by commas.
+   *
+   * Both separators, so `values="1240 1318"` and an array assigned to the
+   * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+   * and a string is what survives React's hydration where an array property
+   * does not.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The path itself.
+   * - `point`: The mark on the last value.
+   * - `svg`: The drawing.
+   */
+  "helix-base-sparkline": Partial<
+    HelixBaseSparklineProps & BaseProps<HelixBaseSparkline> & BaseEvents
+  >;
 
   /**
    * **A command, which is why this is a `menuitem` and a megamenu's rows are not.**
@@ -28104,6 +28226,71 @@ export type CustomElementsSolidJs = {
       BaseProps<HelixBaseSlider> &
       BaseEvents
   > & HelixBaseSliderControlledSolidJs;
+
+  /**
+   * The one chart here that takes its numbers from an attribute, and the reversal
+   * is deliberate. Every other chart reads a table because a reader might want to
+   * interrogate it; nobody interrogates the squiggle next to a figure. A
+   * fourteen-row table behind a bare trend line is fourteen dates read aloud in
+   * place of the one sentence that carries the meaning, so `values` is the list
+   * and `label` is the sentence.
+   *
+   * That is the library's own rule rather than a second data channel: a content
+   * property is its slot's fallback, which is why `Tooltip` takes `content` and
+   * `Avatar` takes `name`. `for` stays for the sparkline that genuinely has a
+   * table behind it, and it wins where both are given.
+   *
+   * **No label means decorative, and that is a choice rather than an oversight.**
+   * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
+   * its own to announce, and an unnamed `role="img"` announces "graphic" and
+   * stops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an
+   * image named by its sentence.
+   *
+   * It goes *beside* a `Stat` rather than inside one. The plan this was built
+   * from called for a `trend` slot on `Stat`; the spec already on `Stat` says the
+   * opposite, that a change beside a figure is a second fact, and the spec is
+   * right. `Trend` composes the same way.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of a table to read instead, when there is one behind the line.
+   *
+   * The first column of numbers is the series drawn. This wins over `values`,
+   * because a table is the readable representation and a list of numbers in an
+   * attribute is not: given both, the one a reader can also read should be the
+   * one the drawing agrees with.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: What the line says, in a sentence.
+   *
+   * "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+   * the accessible representation of a sparkline, and a list of the fourteen
+   * numbers is not. Absent, the drawing is hidden from a screen reader rather
+   * than announced without a name.
+   * - `values`: The numbers, separated by whitespace or by commas.
+   *
+   * Both separators, so `values="1240 1318"` and an array assigned to the
+   * property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+   * and a string is what survives React's hydration where an array property
+   * does not.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `line`: The path itself.
+   * - `point`: The mark on the last value.
+   * - `svg`: The drawing.
+   */
+  "helix-base-sparkline": Partial<
+    HelixBaseSparklineProps &
+      HelixBaseSparklineSolidJsProps &
+      BaseProps<HelixBaseSparkline> &
+      BaseEvents
+  >;
 
   /**
    * **A command, which is why this is a `menuitem` and a megamenu's rows are not.**

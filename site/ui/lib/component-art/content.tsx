@@ -638,6 +638,40 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A line and the dot on its last value, with nothing else on the card.
+   *
+   * The nothing else is half the drawing. What separates a sparkline from a
+   * line chart is that it has no axis, no ticks and no grid, so the card that
+   * says so is the one where those are conspicuously absent; adding a baseline
+   * to give the line something to sit on would turn it into the chart it is
+   * not. The empty band above and below carries the other half, that this is a
+   * mark at the scale of the type beside it rather than a figure of its own.
+   *
+   * `artSolid` on the dot and ink on the line, because where the series ended
+   * is the one point a reader looks for, and it is the only thing here worth
+   * emphasising.
+   *
+   * Stroked rather than built from rects, which is the exception `code-block`
+   * already makes: a rule stays a filled rect so it never half-renders at one
+   * unit, and a path that changes direction six times cannot be rects at all.
+   *
+   * Still, like `stat`, `trend` and `chart-legend`. A sparkline does not move.
+   */
+  sparkline: (
+    <>
+      <path
+        className="artStroke"
+        d="M80 120L107 96L133 132L160 100L187 112L213 88L240 72"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeOpacity="0.55"
+        strokeWidth="2.5"
+      />
+      <circle className="artSolid" cx="240" cy="72" r="5" />
+    </>
+  ),
+
   splitter: (
     <>
       {/* All three move, because a divider that slides across two panes which

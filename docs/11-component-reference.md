@@ -4406,6 +4406,49 @@ the thumb being dragged.
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose color is the value. |
 
+## Sparkline
+
+### Root — `helix-sparkline`
+
+A line with no axes, for the shape of a series beside the number it belongs to.
+
+Extends `HelixBaseSparkline`.
+
+Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
+thing and one set in a table row is a row-sized thing. The type scale is
+absolute and cannot say "a little wider than this".
+
+The stroke does not scale with the box. `preserveAspectRatio="none"` is what
+lets one drawing fill a 60px slot and a 600px one, and without
+`vector-effect: non-scaling-stroke` the same line comes out hairline in the
+first and heavy in the second.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
+| `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
+| `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `line` | The path itself. |
+| `point` | The mark on the last value. |
+| `svg` | The drawing. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--sparkline-block-size` | Height of the drawing. |
+| `--sparkline-color` | Colour of the line and the mark. |
+| `--sparkline-inline-size` | Width of the drawing. |
+| `--sparkline-point-size` | Diameter of the mark on the last value. |
+| `--sparkline-width` | Thickness of the line. |
+
 ## Speed Dial
 
 ### Root — `helix-speed-dial`

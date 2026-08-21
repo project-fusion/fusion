@@ -17906,6 +17906,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/sparkline/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/speed-dial/index.js"
           }
         },
@@ -34433,6 +34441,259 @@
           "declaration": {
             "name": "HelixBaseSlider",
             "module": "src/slider/root/slider-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sparkline/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/sparkline/root/sparkline-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/sparkline/root/sparkline-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The one chart here that takes its numbers from an attribute, and the reversal\nis deliberate. Every other chart reads a table because a reader might want to\ninterrogate it; nobody interrogates the squiggle next to a figure. A\nfourteen-row table behind a bare trend line is fourteen dates read aloud in\nplace of the one sentence that carries the meaning, so `values` is the list\nand `label` is the sentence.\n\nThat is the library's own rule rather than a second data channel: a content\nproperty is its slot's fallback, which is why `Tooltip` takes `content` and\n`Avatar` takes `name`. `for` stays for the sparkline that genuinely has a\ntable behind it, and it wins where both are given.\n\n**No label means decorative, and that is a choice rather than an oversight.**\nA sparkline beside a stat that already says \"Sessions, 1,102\" has nothing of\nits own to announce, and an unnamed `role=\"img\"` announces \"graphic\" and\nstops. So an unlabelled sparkline is `aria-hidden`, and a labelled one is an\nimage named by its sentence.\n\nIt goes *beside* a `Stat` rather than inside one. The plan this was built\nfrom called for a `trend` slot on `Stat`; the spec already on `Stat` says the\nopposite, that a change beside a figure is a second fact, and the spec is\nright. `Trend` composes the same way.",
+          "name": "HelixBaseSparkline",
+          "cssParts": [
+            {
+              "description": "The path itself.",
+              "name": "line"
+            },
+            {
+              "description": "The mark on the last value.",
+              "name": "point"
+            },
+            {
+              "description": "The drawing.",
+              "name": "svg"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not: given both, the one a reader can also read should be the\none the drawing agrees with.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the line says, in a sentence.\n\n\"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days\" is\nthe accessible representation of a sparkline, and a list of the fourteen\nnumbers is not. Absent, the drawing is hidden from a screen reader rather\nthan announced without a name.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "values",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The numbers, separated by whitespace or by commas.\n\nBoth separators, so `values=\"1240 1318\"` and an array assigned to the\nproperty both work: assigning `[1240, 1318]` stringifies to `1240,1318`,\nand a string is what survives React's hydration where an array property\ndoes not.",
+              "attribute": "values"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#table",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLTableElement | null"
+                }
+              },
+              "description": "The table `for` names, or null where there is no document to ask."
+            },
+            {
+              "kind": "method",
+              "name": "#points",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number[]"
+                }
+              },
+              "description": "The series to draw: the table if there is one, the attribute otherwise."
+            },
+            {
+              "kind": "method",
+              "name": "#watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Follows the table, so an update to the numbers reaches the line."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not: given both, the one a reader can also read should be the\none the drawing agrees with.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the line says, in a sentence.\n\n\"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days\" is\nthe accessible representation of a sparkline, and a list of the fourteen\nnumbers is not. Absent, the drawing is hidden from a screen reader rather\nthan announced without a name.",
+              "fieldName": "label"
+            },
+            {
+              "name": "values",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The numbers, separated by whitespace or by commas.\n\nBoth separators, so `values=\"1240 1318\"` and an array assigned to the\nproperty both work: assigning `[1240, 1318]` stringifies to `1240,1318`,\nand a string is what survives React's hydration where an array property\ndoes not.",
+              "fieldName": "values"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A line with no axes, for the shape of a series beside the number it belongs to.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/sparkline",
+            "aliases": [
+              "Micro Chart",
+              "Trend Line",
+              "Inline Chart"
+            ],
+            "tier": "headless",
+            "group": "BaseSparkline",
+            "part": "Root",
+            "source": "helix/headless/src/sparkline"
+          },
+          "tagName": "helix-base-sparkline",
+          "customElement": true,
+          "modulePath": "src/sparkline/root/sparkline-root.ts",
+          "definitionPath": "src/sparkline/root/sparkline-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseSparkline",
+          "declaration": {
+            "name": "HelixBaseSparkline",
+            "module": "src/sparkline/root/sparkline-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-sparkline",
+          "declaration": {
+            "name": "HelixBaseSparkline",
+            "module": "src/sparkline/root/sparkline-root.ts"
           }
         }
       ]

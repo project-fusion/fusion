@@ -74,6 +74,7 @@ declare module 'svelte/elements' {
     'helix-base-select': CustomElements['helix-base-select']
     'helix-base-skeleton': CustomElements['helix-base-skeleton']
     'helix-base-slider': CustomElements['helix-base-slider']
+    'helix-base-sparkline': CustomElements['helix-base-sparkline']
     'helix-base-speed-dial-item': CustomElements['helix-base-speed-dial-item']
     'helix-base-speed-dial': CustomElements['helix-base-speed-dial']
     'helix-base-splitter': CustomElements['helix-base-splitter']

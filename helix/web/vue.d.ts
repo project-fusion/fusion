@@ -75,6 +75,7 @@ import type {
   HelixSelect,
   HelixSkeleton,
   HelixSlider,
+  HelixSparkline,
   HelixSpeedDialItem,
   HelixSpeedDial,
   HelixSplitter,
@@ -4648,6 +4649,35 @@ export type HelixSliderVueEvents = {
   change: HelixSliderElementEvent;
 };
 
+export type HelixSparklineVueProps = {
+  /** The id of a table to read instead, when there is one behind the line.
+
+The first column of numbers is the series drawn. This wins over `values`,
+because a table is the readable representation and a list of numbers in an
+attribute is not: given both, the one a reader can also read should be the
+one the drawing agrees with.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixSparkline["for"];
+  /** What the line says, in a sentence.
+
+"Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
+the accessible representation of a sparkline, and a list of the fourteen
+numbers is not. Absent, the drawing is hidden from a screen reader rather
+than announced without a name. */
+  label?: HelixSparkline["label"];
+  /** The numbers, separated by whitespace or by commas.
+
+Both separators, so `values="1240 1318"` and an array assigned to the
+property both work: assigning `[1240, 1318]` stringifies to `1240,1318`,
+and a string is what survives React's hydration where an array property
+does not. */
+  values?: HelixSparkline["values"];
+};
+
+export type HelixSparklineVueEvents = {};
+
 /** `HelixSpeedDialItem` component event */
 export type HelixSpeedDialItemElementEvent<E = Event> = TypedEvent<
   HelixSpeedDialItem,
@@ -6900,6 +6930,16 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** Height of the drawing. */
+  "--sparkline-block-size"?: string;
+  /** Colour of the line and the mark. */
+  "--sparkline-color"?: string;
+  /** Width of the drawing. */
+  "--sparkline-inline-size"?: string;
+  /** Diameter of the mark on the last value. */
+  "--sparkline-point-size"?: string;
+  /** Thickness of the line. */
+  "--sparkline-width"?: string;
   /** Edge length of the mark. */
   "--speed-dial-item-size"?: string;
   /** Space between the actions. */
@@ -7497,6 +7537,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixSlider,
     HelixSliderVueProps,
     HelixSliderVueEvents
+  >;
+  /** Sized in 'em' by default, so a sparkline set beside a figure is a figure-sized thing and one set in a table row is a row-sized thing. The type scale is absolute and cannot say "a little wider than this".  The stroke does not scale with the box. 'preserveAspectRatio="none"' is what lets one drawing fill a 60px slot and a 600px one, and without 'vector-effect: non-scaling-stroke' the same line comes out hairline in the first and heavy in the second. */
+  "helix-sparkline": DefineCustomElement<
+    HelixSparkline,
+    HelixSparklineVueProps,
+    HelixSparklineVueEvents
   >;
   /** Presentation only: a round mark the size of a small control, and the name on a chip beside it so it can be read against whatever the dial is floating over. Everything about choosing it is the base class. */
   "helix-speed-dial-item": DefineCustomElement<
