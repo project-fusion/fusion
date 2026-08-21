@@ -2450,23 +2450,59 @@ helix-drawer helix-tree {
  * It is a window rather than a passage: an argument held apart from the thing
  * it is about by a rule. A window wants a frame, and a frame wants a height
  * that was decided rather than one that ended wherever the last card did. */
+/* **A definite height, not a floor.** `min-block-size` lets the region grow,
+   and the stage's contents are twice a screen tall, so the middle row grew to
+   fit them: the band stopped being one screen and the prose, centred in a row
+   far taller than the window, ended up below the fold. A window has a size.
+   `align-content: stretch` overrides the centring every other band wants, so
+   the rows actually divide the height rather than clustering in the middle. */
 .showcaseBand {
-  min-block-size: 100svh;
+  align-content: stretch;
+  block-size: 100svh;
 }
 
 /* Prose, rule, stage. The prose column is clamped rather than fractional: a
    measure is a number of characters, and giving it a share of the width means
    it gets longer on a wider screen, which is the one direction a line of text
    must not go. The stage takes what is left. */
+/* Prose, rule, stage, bounded top and bottom.
+ *
+ * Three rows: a rule, the content, a rule. The content row is `1fr` so it takes
+ * whatever the full height band has left, which is what lets the stage fill its
+ * half of the region rather than sitting in it.
+ *
+ * The column gap is on the columns only. A row gap would push the rules away
+ * from the thing they bound, and a rule that does not touch what it encloses is
+ * a line near a box rather than its edge. The prose gets its clearance from its
+ * own block padding instead.
+ *
+ * The prose column is clamped rather than fractional: a measure is a number of
+ * characters, so a share of the width means longer lines on a wider screen,
+ * which is the one direction text must not go. Wider than it was, at 20 to 30
+ * rem, because the heading was breaking into five lines at 24. */
 .showcaseSplit {
   align-items: stretch;
+  block-size: 100%;
+  column-gap: var(--helix-space-2xl);
+  /* **`block-size: 100%` is a preference, and a grid item's automatic minimum
+     is its content.** Left at `auto` the split measured 1199 inside a 720 band
+     and hung 184 above the fold, taking the top rule with it. Zeroing the
+     minimum is what makes the percentage binding. */
+  min-block-size: 0;
   display: grid;
-  gap: var(--helix-space-2xl);
-  grid-template-columns: minmax(16rem, 24rem) auto minmax(0, 1fr);
+  grid-template-columns: minmax(20rem, 30rem) auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+/* The horizontal rules span everything, including the column gap, so the region
+   reads as one bounded thing rather than two boxes with lids. */
+.showcaseRule {
+  grid-column: 1 / -1;
 }
 
 .showcaseProse {
   align-self: center;
+  padding-block: var(--helix-space-2xl);
 }
 
 /* Sunken, which is the one surface token that reads as behind the page rather
@@ -2477,25 +2513,39 @@ helix-drawer helix-tree {
  * fade says there is more, which there is. `mask-image` and not a gradient
  * overlay, because an overlay would need the page's own background colour and
  * this panel is not that colour. */
+/* The stage fills the divided area rather than floating inside it.
+ *
+ * No border and no radius: the rules above, below and beside it *are* its
+ * edges, and a second edge drawn a pixel inside them is a box in a frame. No
+ * height cap either, because the row it sits in is already the height of the
+ * region, and capping it would leave a gap under it that the bottom rule would
+ * then be nowhere near.
+ *
+ * Masked at the foot rather than cut. A hard edge says the layout ran out; a
+ * fade says there is more, which there is. `mask-image` and not an overlay,
+ * because an overlay needs the colour behind it and this panel is not the
+ * page's colour. */
 .showcaseStage {
   background-color: var(--helix-color-surface-sunken);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
-  mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
-  max-block-size: 68svh;
+  /* Same rule again one level down: the stage is a grid item too, and its
+     contents are twice the height of the region it sits in. */
+  min-block-size: 0;
+  mask-image: linear-gradient(to bottom, black 84%, transparent 100%);
   overflow: hidden;
-  padding: var(--helix-space-lg);
+  padding: var(--helix-space-xl);
 }
 
 /* Stacked where a split would be two narrow strips, and the rule turns with it.
    A vertical divider between stacked blocks is a line pointing the wrong way. */
 @media (width < 64rem) {
   .showcaseBand {
-    min-block-size: 0;
+    align-content: center;
+    block-size: auto;
   }
 
   .showcaseSplit {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
 
   .showcaseSplit helix-divider {
@@ -2503,6 +2553,6 @@ helix-drawer helix-tree {
   }
 
   .showcaseStage {
-    max-block-size: none;
+    margin-inline: calc(-1 * var(--helix-space-lg));
   }
 }

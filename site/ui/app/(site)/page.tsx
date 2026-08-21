@@ -292,6 +292,12 @@ export default function Home() {
           says there is more, which there is. */}
       <section className="band reveal showcaseBand">
         <div className="shell showcaseSplit">
+          {/* Rules top and bottom, and one down the middle. Three dividers turn
+              the band into a bounded region rather than a passage through the
+              page: the section has a top and a bottom the way a table does, and
+              the stage fills its half of that region edge to edge. */}
+          <helix-divider class="showcaseRule"></helix-divider>
+
           <helix-flex class="showcaseProse" direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Helix
@@ -470,6 +476,8 @@ export default function Home() {
               </helix-card>
             </div>
           </div>
+
+          <helix-divider class="showcaseRule"></helix-divider>
         </div>
       </section>
 
