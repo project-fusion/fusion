@@ -268,18 +268,10 @@ helix-drawer {
  * section without being in the flow, or the hero grows by its height and the
  * type stops being the only thing on screen.
  *
- * **No `pointer-events` here any more, because the premise changed.** This said
- * `none`, on the grounds that the element is not `interactive` and asks for no
- * hit test, with a warning that it covers both calls to action and is one
- * refactor away from swallowing the press that pays for the site. It is
- * `interactive` now, and a document rule beats a shadow one, so that line was
- * silently overruling `:host([interactive]) { pointer-events: auto }` and the
- * aura reported `none` with the attribute set.
- *
- * The warning it carried is still worth answering, and the stacking order is
- * what answers it: the aura is absolutely positioned behind the hero, so a
- * press at a call to action hits the button, which sits above it. What the aura
- * gets is the moves over the parts of itself nothing covers. */
+ * `pointer-events: none` said here rather than relied on. The element is not
+ * `interactive`, so it asks for no hit test of its own, but it does cover the
+ * whole hero including both calls to action, and a layer over those is one
+ * refactor away from swallowing the press that pays for the site. */
 /* The aura, fixed behind the whole page.
  *
  * **Fixed rather than sitting in the hero.** The light runs the length of the
@@ -322,6 +314,7 @@ helix-drawer {
    * tilt and every scale, including the ones nobody has tried. The last third,
    * which at two screens is most of the band the aura shares with the page. */
   mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
+  pointer-events: none;
   position: absolute;
 }
 
