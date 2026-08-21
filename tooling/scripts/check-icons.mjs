@@ -88,6 +88,52 @@ for (const file of files) {
   }
 }
 
+/* And no component renders `<helix-icon>` for itself.
+ *
+ * **The element indexes the whole set at runtime**, `icons[this.name]`, which
+ * no bundler can shake: one component rendering one glyph puts every glyph into
+ * every consumer that imports it, about 15kB gzipped of path data for a mark
+ * that is one path. A named import through `drawIcon` ships the one.
+ *
+ * Two smaller reasons, both real. A named import is checked when the package
+ * compiles, where a `name` string is checked only when this script runs. And
+ * `helix-icon` is not registered on the headless tier at all, which registers
+ * `helix-base-icon`, so a headless consumer got an inert element and no mark.
+ *
+ * **Nothing does this today**, which is exactly when to write the rule down: it
+ * was nine components a week ago, the last two were converted deliberately, and
+ * without a check the next one costs nobody anything to add. Comments are
+ * stripped first, because several files explain this decision by naming the tag
+ * they no longer use.
+ */
+const RENDERED = /<helix-(?:base-)?icon\b/
+for (const file of files) {
+  /* The library's own components, and nothing else. `<helix-icon>` is a public
+     element and an app writing one is using it as intended: `site/ui` does, in
+     its nav and its wordmark, and it pays for the whole set once rather than
+     per component. What this forbids is a *component* making that choice on a
+     consumer's behalf, which is the case they cannot opt out of. */
+  /* Examples are excluded for the same reason apps are: an example is a
+     consumer writing markup, and `tree/with-icons` puts a glyph on each node
+     exactly the way a reader would. */
+  if (
+    !/helix\/(?:headless|web)\/src\//.test(file) ||
+    file.includes('/icon/') ||
+    file.includes('/.examples/')
+  ) {
+    continue
+  }
+  const source = readFileSync(file, 'utf8')
+    .replaceAll(/\/\*[\s\S]*?\*\//g, ' ')
+    .replaceAll(/\/\/[^\n]*/g, ' ')
+  if (RENDERED.test(source)) {
+    problems.push(
+      `${file}: renders <helix-icon>. The element indexes every glyph at runtime, so one use ` +
+        'ships all of them to every consumer. Use `drawIcon` with a named import.',
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(
     `Icons named that do not exist (${problems.length}):\n\n  ${problems.join('\n  ')}\n`,
@@ -95,4 +141,6 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log(`icons: ${files.length} files, every \`helix-icon\` names one of ${known.size} glyphs`)
+console.log(
+  `icons: ${files.length} files, every name is one of ${known.size} glyphs and no component renders <helix-icon>`,
+)

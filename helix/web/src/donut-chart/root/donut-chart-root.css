@@ -437,7 +437,7 @@
 
 @starting-style {
   [part="segment"] {
-    stroke-dasharray: 0 999;
+    stroke-dasharray: 0 9999;
   }
 }
 

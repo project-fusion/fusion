@@ -221,7 +221,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       part="segment"
       r=${this.radius}
       style="--_donut-thickness: ${this.thickness}"
-      stroke-dasharray="${length} ${circumference - length}"
+      stroke-dasharray="${length} ${GAP}"
       stroke-dashoffset=${-share.start * circumference}
     />`
   }
