@@ -2762,12 +2762,25 @@ helix-drawer helix-tree {
    * The tokens are the ones the design system already keeps for this, a
    * translucent fill over a blur, rather than an opacity invented here.
    *
+   * **And the scrim is the other half of why this reads flat.** `Dialog` paints
+   * `::backdrop` at 64% black in the dark theme, between this panel and the
+   * page, so what the blur samples is a darkened near-uniform field rather than
+   * the content: blurring it produces almost no visible difference whatever the
+   * panel's own alpha. That value is a literal in the dialog's stylesheet,
+   * which its own comment explains at length: `::backdrop` is in the top layer
+   * and cannot see a custom property declared outside the shadow tree, so the
+   * scrim cannot be themed the way everything else is. Making a palette's scrim
+   * lighter than a modal's is a change to that component, not to this file.
+   *
    * The border is the material's own, not the brand's. A blue hairline was the
    * first version and it read as a focus ring on a panel that was not focused:
    * the eye takes a saturated outline as a state, and a palette that always
    * looks selected has nothing left to say when a row actually is. */
+  /* `translucent`, not `-strong`. At 88% the panel let 12% of the page through
+     and the blur had almost nothing to work on: the effect was in the computed
+     styles and invisible on the screen. 72% is more than twice as much. */
   backdrop-filter: blur(var(--helix-material-blur-lg));
-  background-color: var(--helix-material-translucent-strong);
+  background-color: var(--helix-material-translucent);
   border: var(--helix-border-thin) solid var(--helix-material-border);
   border-radius: var(--helix-radii-lg);
   /* The largest the scale has. A palette arrives over a page the reader was
