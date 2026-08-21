@@ -184,9 +184,12 @@ export const FRAGMENT = `#version 300 es
     float angToBlocker = atan(vp.x, -vp.y);
     /* Widened with distance, so the object reads as a fixed size rather than
        as a wedge that grows the further out it is carried. */
-    float halfAngle = 0.075 / max(distToBlocker, 0.35);
+    float halfAngle = 0.055 / max(distToBlocker, 0.35);
     float across = (ang - angToBlocker) / halfAngle;
-    float behind = smoothstep(0.0, 0.22, dist - distToBlocker);
+    /* Cast from the near edge of the object rather than from somewhere past it.
+       Ramping in over a fifth of a unit started the shadow below the thing
+       supposedly casting it, which reads as two objects. */
+    float behind = smoothstep(-0.03, 0.05, dist - distToBlocker);
     float shadow = exp(-across * across) * behind * reach;
 
     float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8));
@@ -198,10 +201,13 @@ export const FRAGMENT = `#version 300 es
 
   /* Curtains on a drifting horizon. */
   float aurora(vec2 q, float t, vec2 qp, float reach) {
-    /* The horizon swells under the pointer. A curtain answers along its own
-       length, so what moves is the ridge, not the brightness. */
-    float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * 1.3;
-    ridge += exp(-(q.x - qp.x) * (q.x - qp.x) * 2.2) * reach * 0.45;
+    /* The curtain waves harder where the pointer is, rather than being lifted
+       by it. An aurora is a sheet with an amplitude, and a swell only raised
+       the whole thing locally, which is a bump in a line. Multiplying the
+       amplitude bends it instead: the folds deepen and the ridge travels
+       further, which is what an aurora does when it is disturbed. */
+    float agitate = falloff((q.x - qp.x) * (q.x - qp.x), 1.5) * reach;
+    float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * (1.3 + agitate * 2.6);
     float band = falloff((q.y - ridge) * (q.y - ridge), 3.2);
     float fall = fbm(vec2(q.x * 7.0, q.y * 0.7 - t * 2.6));
     return band * mix(0.3, 1.6, fall);
@@ -211,11 +217,17 @@ export const FRAGMENT = `#version 300 es
   float orbit(vec2 q, float t, vec2 qp, float reach) {
     vec2 e = vec2(q.x, q.y * 2.3);
     float r = length(e);
-    /* The rings crowd where the pointer is, as though it were pressing on the
-       sheet they travel across. Phase rather than amplitude: rings are made of
-       spacing, so spacing is what they have to say anything with. */
-    float press = exp(-dot(q - qp, q - qp) * 2.4) * reach;
-    float rings = sin(r * 8.0 - t * 5.0 + press * 3.2) * 0.5 + 0.5;
+    /* A second source of rings, centred on the pointer.
+    
+       Crowding the existing ones was a phase shift, which reads as a smear
+       rather than as anything happening. What rings are is something spreading
+       from a point, so the honest answer to a pointer is another point: near
+       the cursor the field becomes its own set travelling outward, blending
+       back into the first as it goes. A second stone in the same pond. */
+    vec2 ep = vec2(q.x - qp.x, (q.y - qp.y) * 2.3);
+    float drop = sin(length(ep) * 9.0 - t * 6.0) * 0.5 + 0.5;
+    float near = falloff(dot(q - qp, q - qp), 1.8) * reach;
+    float rings = mix(sin(r * 8.0 - t * 5.0) * 0.5 + 0.5, drop, near);
     float grain = warped(vec2(atan(e.y, e.x) * 1.5, r * 1.2), t * 0.6);
     return pow(rings, 4.0) * mix(0.45, 1.45, grain) * falloff(dot(e, e), 1.05);
   }
@@ -244,7 +256,7 @@ export const FRAGMENT = `#version 300 es
    * zero-length segment between the newest mark and the head is skipped below,
    * which is what makes the commit invisible.
    */
-  float flowWake(vec2 p, out vec2 push) {
+  float flowWake(vec2 at, mat2 turn, vec2 shift, out vec2 push) {
     push = vec2(0.0);
     float wake = 0.0;
 
@@ -254,13 +266,20 @@ export const FRAGMENT = `#version 300 es
       if (a.z >= 1.0 || b.z >= 1.0) {
         continue;
       }
-      vec2 ab = b.xy - a.xy;
+      /* The marks arrive in screen space, and the field is sampled after a
+         rotation, a scale and a parallax shift. Compared without carrying them
+         through the same three, the wake sits somewhere else entirely: at a
+         tilt of 42 and a scale of 1.7 it landed most of a frame from the
+         cursor, which is what read as offset rather than as lagging. */
+      vec2 pa = turn * (a.xy - shift) * uScale;
+      vec2 pb = turn * (b.xy - shift) * uScale;
+      vec2 ab = pb - pa;
       float len2 = dot(ab, ab);
       if (len2 < 1e-6) {
         continue;
       }
-      float t = clamp(dot(p - a.xy, ab) / len2, 0.0, 1.0);
-      vec2 off = p - (a.xy + ab * t);
+      float t = clamp(dot(at - pa, ab) / len2, 0.0, 1.0);
+      vec2 off = at - (pa + ab * t);
       /* Squared, so a wake thins as it dies rather than switching off. */
       float life = 1.0 - mix(a.z, b.z, t);
       float w = life * life * falloff(dot(off, off), 3.2);
@@ -270,10 +289,10 @@ export const FRAGMENT = `#version 300 es
     return wake;
   }
 
-  float flow(vec2 q, float t) {
+  float flow(vec2 q, float t, mat2 turn, vec2 shift) {
     vec2 push;
-    float wake = flowWake(q * 0.9, push);
-    vec2 p = q * 0.9 + push * 0.5;
+    float wake = flowWake(q, turn, shift, push);
+    vec2 p = q + push * 0.5;
 
     /* The field is warped by itself twice over, which is what gives a liquid
        its folded look: each sample is displaced by the field's own value, so
@@ -358,7 +377,7 @@ export const FRAGMENT = `#version 300 es
     } else if (uShape == 4) {
       d = weave(q, t, qp, uReach);
     } else {
-      d = flow(q, t);
+      d = flow(q, t, turn, uPointer * 0.05 * uReach);
     }
 
     /* Bloom as an exponent on the field rather than a term inside each shape.
