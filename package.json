@@ -21,6 +21,7 @@
     "check:reference": "node tooling/scripts/build-reference.mjs --check",
     "check:tokens-reference": "node tooling/scripts/build-tokens.mjs --check",
     "check:selectors": "node tooling/scripts/check-selectors.mjs",
+    "check:shaders": "node tooling/scripts/check-shaders.mjs",
     "check:specs": "node tooling/scripts/check-specs.mjs",
     "check:tokens": "node tooling/scripts/check-tokens.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
@@ -44,7 +45,7 @@
     "test": "turbo run test",
     "test:template": "node tooling/scripts/run-template-test.mjs",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:publishable && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:reference && bun run check:tokens-reference && bun run check:selectors && bun run check:overruled && bun run check:composed && bun run check:disabled && bun run check:motion && bun run check:hooks && bun run check:parts && bun run check:art && bun run check:events && bun run check:controlled && bun run check:react-bridge && bun run check:specs && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && bun run check:publishable && bun run check:tokens && bun run typecheck && bun run analyze && bun run check:examples && bun run check:reference && bun run check:tokens-reference && bun run check:selectors && bun run check:overruled && bun run check:composed && bun run check:disabled && bun run check:motion && bun run check:shaders && bun run check:hooks && bun run check:parts && bun run check:art && bun run check:events && bun run check:controlled && bun run check:react-bridge && bun run check:specs && bun run test && bun run rs:check && bun run rs:test",
     "check:motion": "node tooling/scripts/check-motion.mjs",
     "check:art": "node tooling/scripts/check-art.mjs"
   },

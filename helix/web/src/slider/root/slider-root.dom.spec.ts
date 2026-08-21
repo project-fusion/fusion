@@ -126,4 +126,60 @@ describe('slider bounds', () => {
     const range = host.shadowRoot?.querySelector('input') as HTMLInputElement
     expect(range.value).toBe('300')
   })
+
+  test('and the fill keeps up with the value rather than trailing a render', async () => {
+    /* The fill was arithmetic on the *control's* value, read inside `render()`,
+       and the `style` binding carrying it commits before the `.value` binding
+       below it. So it read the value the same render was about to replace, and
+       on the first pass it read the seeded midpoint and stayed there.
+
+       Measured on the bench before the fix: host `1`, control `1`, fraction
+       `0.5`. Half a track out, and stable, which is why it read as a drawing
+       bug. A 0-to-1 slider is the cheapest reproduction because the seeded
+       midpoint and the wrong answer are the same number. */
+    const host = (await mount(
+      '<helix-slider label="Pointer" max="1" min="0" step="0.05"></helix-slider>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+
+    const fill = () =>
+      host.shadowRoot?.querySelector('input')?.style.getPropertyValue('--_slider-fraction')
+
+    host.value = '1'
+    await host.updateComplete
+    expect(fill()).toBe('1')
+
+    host.value = '0'
+    await host.updateComplete
+    expect(fill()).toBe('0')
+
+    host.value = '0.25'
+    await host.updateComplete
+    expect(fill()).toBe('0.25')
+  })
+
+  test('and an off-step value fills where the thumb will actually land', async () => {
+    /* The DOM read this replaces was there for a reason: a range snaps what it
+       is given, so arithmetic straight off `value` would fill somewhere the
+       thumb never goes. The snapping is done here now, counted from `min`
+       rather than from zero, which is how a range counts it.
+
+       Only the fraction is asserted. happy-dom's range does not sanitize at
+       all, reporting `1.03` where a browser reports `1.05`, so the control's
+       own value here would be a test of the double rather than of this
+       element. That gap is also why reading the control hid the bug: in this
+       environment the stale read and the fresh one agree. */
+    const host = (await mount(
+      '<helix-slider label="Gain" max="2.5" min="0.2" step="0.05"></helix-slider>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    await host.updateComplete
+
+    host.value = '1.03'
+    await host.updateComplete
+    const control = host.shadowRoot?.querySelector('input') as HTMLInputElement
+    // 1.03 snaps to 1.05 from a min of 0.2, sixteen and a bit steps along.
+    expect(control.style.getPropertyValue('--_slider-fraction')).toBe(
+      String((1.05 - 0.2) / (2.5 - 0.2)),
+    )
+  })
 })

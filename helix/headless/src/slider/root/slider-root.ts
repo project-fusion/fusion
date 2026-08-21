@@ -262,24 +262,50 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   /**
    * How far along the track the thumb sits, as a fraction.
    *
-   * Arithmetic rather than a measurement, because the browser already knows and
-   * measuring the thumb would be a guess at where the platform drew it. The
-   * styled tier fills the track with it.
+   * Arithmetic rather than a measurement, because the browser already knows
+   * where it drew the handle and measuring it would be a guess at that.
    *
-   * Read from the control where there is one, not from `value`. A range
-   * sanitizes what it is given, clamping to the bounds and snapping to the
-   * step, so a slider given an off-step or out-of-range value had a thumb in
-   * one place and a fill, a readout and a submitted value in another. What the
-   * control settled on is the truth about where the thumb is.
+   * **Sanitized here, not read back off the control.** This asked the input for
+   * its value, on the reasoning that a range clamps and snaps whatever it is
+   * given, so the control is the truth about where the thumb is. The reasoning
+   * is right and the timing is not: `fraction` is evaluated inside `render()`,
+   * and the `style` binding carrying it is committed *before* the `.value`
+   * binding below it, so it read the value this very render was about to
+   * replace. The fill was a render behind the thumb, and on the first pass it
+   * read the seeded midpoint and stayed there.
+   *
+   * Measured on a slider from 0 to 1: after dragging to either end, the host's
+   * `value` was `1`, the control's was `1`, and `--_slider-fraction` was still
+   * `0.5`. Off by half a track, and stable, which is what made it look like a
+   * drawing bug rather than a timing one.
+   *
+   * So the same two operations a range performs are done here: snap to the step
+   * from `min`, then clamp to the bounds. Nothing is read from the tree, so
+   * there is no order for this to be on the wrong side of.
    */
   private get fraction(): number {
     const span = this.max - this.min
     if (span === 0) {
       return 0
     }
-    const control = this.renderRoot?.querySelector<HTMLInputElement>('[part="control"]')
-    const at = control ? Number(control.value) : this.valueAsNumber
-    return Math.min(1, Math.max(0, (at - this.min) / span))
+    return this.along(this.snapped(this.valueAsNumber))
+  }
+
+  /**
+   * A value snapped to the step, counted from `min` the way a range counts it.
+   *
+   * `min` rather than zero is the whole of it: a slider from `0.2` with a step
+   * of `0.05` can land on `0.2`, `0.25` and so on, and snapping against zero
+   * would offer `0.2` and `0.25` too but round the ones between to the wrong
+   * side. `precision` is what keeps `0.30000000000000004` off the track, the
+   * same guard the marker labels already use.
+   */
+  private snapped(at: number): number {
+    if (!(this.step > 0)) {
+      return at
+    }
+    const steps = Math.round((at - this.min) / this.step)
+    return Number((this.min + steps * this.step).toFixed(this.precision))
   }
 
   protected override willUpdate(changed: PropertyValues): void {
