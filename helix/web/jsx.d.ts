@@ -739,6 +739,24 @@ back into phase and the field has no cycle a reader can count. That is the
 difference between a background that breathes and one that is obviously on
 a timer. */
   drift?: HelixAura["drift"];
+  /** What the pointer does, where the shape's own answer is not wanted.
+
+Absent is `native`, which is each shape answering in the terms it is made
+of: braid leans, rays are occluded, threads pinch, particles scatter. The
+named options are generic, and are a deliberate step down in meaning. A
+response made of the same material as the shape says something about that
+shape; a lamp following the cursor says the same nothing on all nine.
+
+They exist because a consumer may want the quieter, more conventional
+answer, and because `none` is a real requirement. Not because any of them
+is the better default. */
+  interaction?: HelixAura["interaction"];
+  /** How far the pointer reaches into the field, `0` upward.
+
+Multiplied into the presence the pointer already fades in and out with, so
+it scales the whole response rather than any one part of it, whichever
+interaction is in play. */
+  reach?: HelixAura["reach"];
   /** Whether the pointer shifts and lifts the field.
 
 Reflected because the stylesheet selects on it: a background is not
@@ -778,6 +796,24 @@ back into phase and the field has no cycle a reader can count. That is the
 difference between a background that breathes and one that is obviously on
 a timer. */
   "prop:drift"?: HelixAura["drift"];
+  /** What the pointer does, where the shape's own answer is not wanted.
+
+Absent is `native`, which is each shape answering in the terms it is made
+of: braid leans, rays are occluded, threads pinch, particles scatter. The
+named options are generic, and are a deliberate step down in meaning. A
+response made of the same material as the shape says something about that
+shape; a lamp following the cursor says the same nothing on all nine.
+
+They exist because a consumer may want the quieter, more conventional
+answer, and because `none` is a real requirement. Not because any of them
+is the better default. */
+  "prop:interaction"?: HelixAura["interaction"];
+  /** How far the pointer reaches into the field, `0` upward.
+
+Multiplied into the presence the pointer already fades in and out with, so
+it scales the whole response rather than any one part of it, whichever
+interaction is in play. */
+  "prop:reach"?: HelixAura["reach"];
   /** Whether the pointer shifts and lifts the field.
 
 Reflected because the stylesheet selects on it: a background is not
@@ -12768,6 +12804,22 @@ export type CustomElements = {
    * back into phase and the field has no cycle a reader can count. That is the
    * difference between a background that breathes and one that is obviously on
    * a timer.
+   * - `interaction`: What the pointer does, where the shape's own answer is not wanted.
+   *
+   * Absent is `native`, which is each shape answering in the terms it is made
+   * of: braid leans, rays are occluded, threads pinch, particles scatter. The
+   * named options are generic, and are a deliberate step down in meaning. A
+   * response made of the same material as the shape says something about that
+   * shape; a lamp following the cursor says the same nothing on all nine.
+   *
+   * They exist because a consumer may want the quieter, more conventional
+   * answer, and because `none` is a real requirement. Not because any of them
+   * is the better default.
+   * - `reach`: How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    * - `interactive`: Whether the pointer shifts and lifts the field.
    *
    * Reflected because the stylesheet selects on it: a background is not
@@ -21175,6 +21227,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--tour-arrow-size`: The point's box, before it is rotated. (default: `undefined`)
    * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
    * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
    * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
@@ -21184,6 +21237,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `bubble`: The panel that points at the target.
+   * - `arrow`: The point, which the floating pass places against the target.
    * - `content`: The region holding the slotted content.
    * - `actions`: The row the controls sit in.
    * - `back`: The control that goes to the previous stop.
@@ -22133,6 +22187,22 @@ export type CustomElementsSolidJs = {
    * back into phase and the field has no cycle a reader can count. That is the
    * difference between a background that breathes and one that is obviously on
    * a timer.
+   * - `interaction`: What the pointer does, where the shape's own answer is not wanted.
+   *
+   * Absent is `native`, which is each shape answering in the terms it is made
+   * of: braid leans, rays are occluded, threads pinch, particles scatter. The
+   * named options are generic, and are a deliberate step down in meaning. A
+   * response made of the same material as the shape says something about that
+   * shape; a lamp following the cursor says the same nothing on all nine.
+   *
+   * They exist because a consumer may want the quieter, more conventional
+   * answer, and because `none` is a real requirement. Not because any of them
+   * is the better default.
+   * - `reach`: How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    * - `interactive`: Whether the pointer shifts and lifts the field.
    *
    * Reflected because the stylesheet selects on it: a background is not
@@ -30845,6 +30915,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--tour-arrow-size`: The point's box, before it is rotated. (default: `undefined`)
    * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
    * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
    * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
@@ -30854,6 +30925,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `bubble`: The panel that points at the target.
+   * - `arrow`: The point, which the floating pass places against the target.
    * - `content`: The region holding the slotted content.
    * - `actions`: The row the controls sit in.
    * - `back`: The control that goes to the previous stop.
@@ -31907,6 +31979,8 @@ export type CustomCssProperties = {
   "--tour-scrim-color"?: string;
   /** Corner radius of the lit box. */
   "--tour-spotlight-radius"?: string;
+  /** The point's box, before it is rotated. */
+  "--tour-arrow-size"?: string;
   /** How wide the panel may grow. */
   "--tour-bubble-size"?: string;
   /** Inset inside the panel. */

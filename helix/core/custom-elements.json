@@ -3008,6 +3008,14 @@
         },
         {
           "kind": "js",
+          "name": "onUnlessFalse",
+          "declaration": {
+            "name": "onUnlessFalse",
+            "module": "./utils/on-unless-false/on-unless-false.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ControlledChangeOptions",
           "declaration": {
             "name": "ControlledChangeOptions",
@@ -5191,6 +5199,31 @@
           "declaration": {
             "name": "forgetDisabled",
             "module": "src/utils/inherit-disabled/inherit-disabled.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/on-unless-false/on-unless-false.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "onUnlessFalse",
+          "type": {
+            "text": "ComplexAttributeConverter<boolean>"
+          },
+          "default": "{ fromAttribute: (value: string | null): boolean => value !== null && value !== 'false', /* Written out so it survives being reflected later. `''` rather than `'true'`, which is what a boolean attribute looks like everywhere else. */ toAttribute: (value: boolean): string | null => (value ? '' : 'false'), }",
+          "description": "For a boolean property that is on unless a consumer says otherwise.\n\n**Lit's boolean converter cannot express false, and that is the whole\nproblem.** It answers `value !== null`, so an attribute is true by being\nthere: `modal` is true, `modal=\"\"` is true, and `modal=\"false\"` is true as\nwell, because it is present. A property defaulting to `true` therefore has no\nattribute that turns it off at all, and a consumer who writes the obvious\nthing gets the opposite of what they asked for, silently.\n\nFound on `Drawer.modal`, where it mattered: a tour cannot point inside a\nmodal, so `modal=\"false\"` is exactly what a consumer reaches for, and it left\nthe drawer modal. Two others have the same shape, `Video.playsInline` and the\nsandbox source's `tabIndents`.\n\nSo: absent is the default, present is on, and the one string that means off\nis the one a consumer would write. `\"false\"` only, and not `\"0\"` or `\"no\"`,\nbecause a converter that accepts a vocabulary invites a consumer to guess at\nit, and the one they guess wrong is the one that silently means on.\n\n**The other answer is to invert the property, and it is worse.** `Drawer`\nwould take `modeless`, absent meaning modal, which satisfies the rule that a\nreflected property takes no default. It also renames the thing every consumer\nalready writes, to a word nobody reaches for, so that markup can express a\nstate that is rare. The name stays and the attribute learns to say no."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "onUnlessFalse",
+          "declaration": {
+            "name": "onUnlessFalse",
+            "module": "src/utils/on-unless-false/on-unless-false.ts"
           }
         }
       ]
