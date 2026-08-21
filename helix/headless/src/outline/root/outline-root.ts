@@ -461,6 +461,13 @@ export class HelixBaseOutline extends HelixElement {
     this.observer = undefined
     this.resize?.disconnect()
     this.resize = undefined
+    /* The landing timer, which nothing was clearing. It holds a closure over
+       this element for 1.2 seconds after it leaves the document and then
+       touches it, which on a route change is a write to a tree nobody is
+       looking at. Every other subscription here was already torn down, which is
+       what made this one easy to miss. */
+    clearTimeout(this.landed)
+    this.landed = undefined
   }
 
   override connectedCallback(): void {

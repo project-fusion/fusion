@@ -625,6 +625,13 @@ export class HelixBaseVideo extends HelixElement {
         track.mode = 'hidden'
       }
       this.captioned = track.mode === 'hidden'
+      /* Taken off whatever it was on before adding it here. This runs from
+         `loadedmetadata`, which fires again for every source a reader moves to,
+         and a consumer adding a `<track>` later gets another. Added without
+         removing, a playlist of six left six listeners on tracks that between
+         them fire for every cue in the video. */
+      this.cued?.removeEventListener('cuechange', this.handleCue)
+      this.cued = track
       track.addEventListener('cuechange', this.handleCue)
       this.handleCue()
     }
@@ -1043,6 +1050,9 @@ export class HelixBaseVideo extends HelixElement {
     event.preventDefault()
   }
 
+  /** The track currently being listened to, so the next one can take it off. */
+  private cued: TextTrack | undefined
+
   private readonly handleRemoteState = (): void => {
     this.remoteConnected = this.video?.remote?.state === 'connected'
   }
@@ -1055,6 +1065,8 @@ export class HelixBaseVideo extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     clearTimeout(this.idleTimer)
+    this.cued?.removeEventListener('cuechange', this.handleCue)
+    this.cued = undefined
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange)
     /* The watch outlives the element unless it is cancelled, and a callback
        holding a removed element is a leak with a `@state` write on the end. */

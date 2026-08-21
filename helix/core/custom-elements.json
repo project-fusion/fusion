@@ -1060,6 +1060,15 @@
               "description": "The guard behind `transitionend`, in case it never comes."
             },
             {
+              "kind": "field",
+              "name": "waiting",
+              "type": {
+                "text": "{ on: HTMLElement; settle: (event?: TransitionEvent) => void } | undefined"
+              },
+              "privacy": "private",
+              "description": "The listener currently waiting, so the next move can take it off first.\n\n**Without this, a move inside a second orphans a listener.** Each placement\nbuilt a fresh `settle` closure and then called `clearTimeout` on the timer\nbelonging to the *previous* one, which is the only thing that would have\nremoved it: the event itself never arrives under reduced motion, where\nthere is no transition to end. So a reader changing tabs quickly, or any\nreader at all with motion reduced, left one dead listener per selection on\nan element that lives as long as the page. The people who asked for less\nwork were the ones accumulating it."
+            },
+            {
               "kind": "method",
               "name": "place",
               "return": {
@@ -1067,6 +1076,17 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "stopWaiting",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Takes the pending listener and its guard off, wherever they came from."
             }
           ],
           "helix": {}

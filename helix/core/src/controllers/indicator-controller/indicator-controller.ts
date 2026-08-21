@@ -83,6 +83,10 @@ export class IndicatorController implements ReactiveController {
   hostDisconnected(): void {
     this.resize?.disconnect()
     this.resize = undefined
+    /* The host going away is the third way a move can end, and the one nothing
+       was watching. A timer holding a closure over a detached element keeps it
+       alive for the second it has left to run. */
+    this.stopWaiting()
   }
 
   /** Called after every update, which is when the marked child may have moved. */
@@ -102,6 +106,20 @@ export class IndicatorController implements ReactiveController {
 
   /** The guard behind `transitionend`, in case it never comes. */
   private settling: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * The listener currently waiting, so the next move can take it off first.
+   *
+   * **Without this, a move inside a second orphans a listener.** Each placement
+   * built a fresh `settle` closure and then called `clearTimeout` on the timer
+   * belonging to the *previous* one, which is the only thing that would have
+   * removed it: the event itself never arrives under reduced motion, where
+   * there is no transition to end. So a reader changing tabs quickly, or any
+   * reader at all with motion reduced, left one dead listener per selection on
+   * an element that lives as long as the page. The people who asked for less
+   * work were the ones accumulating it.
+   */
+  private waiting: { on: HTMLElement; settle: (event?: TransitionEvent) => void } | undefined
 
   place(): void {
     const indicator = this.options.indicator()
@@ -164,7 +182,7 @@ export class IndicatorController implements ReactiveController {
       return
     }
     indicator.toggleAttribute('data-moving', true)
-    clearTimeout(this.settling)
+    this.stopWaiting()
     /* `translate` only. `transitionend` fires once per property, and a
        stylesheet reacting to `data-moving` is very likely to transition
        something shorter than the travel: the outline's mark widens over
@@ -175,11 +193,21 @@ export class IndicatorController implements ReactiveController {
       if (event && event.propertyName !== 'translate') {
         return
       }
-      clearTimeout(this.settling)
       indicator.removeAttribute('data-moving')
-      indicator.removeEventListener('transitionend', settle)
+      this.stopWaiting()
     }
     indicator.addEventListener('transitionend', settle)
+    this.waiting = { on: indicator, settle }
     this.settling = setTimeout(settle, 1000)
+  }
+
+  /** Takes the pending listener and its guard off, wherever they came from. */
+  private stopWaiting(): void {
+    clearTimeout(this.settling)
+    this.settling = undefined
+    if (this.waiting) {
+      this.waiting.on.removeEventListener('transitionend', this.waiting.settle)
+      this.waiting = undefined
+    }
   }
 }

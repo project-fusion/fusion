@@ -53282,6 +53282,15 @@
             },
             {
               "kind": "field",
+              "name": "cued",
+              "type": {
+                "text": "TextTrack | undefined"
+              },
+              "privacy": "private",
+              "description": "The track currently being listened to, so the next one can take it off."
+            },
+            {
+              "kind": "field",
               "name": "handleRemoteState",
               "privacy": "private",
               "readonly": true

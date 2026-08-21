@@ -115,6 +115,16 @@ export class CopyController implements ReactiveController {
     if (!(await write(text))) {
       return
     }
+    /* **The host may have gone while the clipboard was being written.** Writing
+       is asynchronous, `hostDisconnected` runs the moment the element leaves,
+       and it clears a timer that does not exist yet: everything below this line
+       used to run afterwards regardless, starting a fresh timer on a detached
+       host and calling `requestUpdate` on it a second later. Checked here
+       rather than in `reset`, because the thing to skip is the whole
+       confirmation and not only its clock. */
+    if (this.host instanceof HTMLElement && !this.host.isConnected) {
+      return
+    }
     this.copied = true
     this.host.requestUpdate()
     this.host.dispatchEvent(new HelixCopyEvent({ value: text }))
