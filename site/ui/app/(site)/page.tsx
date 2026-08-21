@@ -66,7 +66,14 @@ export default function Home() {
   return (
     <div className="reel">
       <section className="hero">
-        <helix-flex class="shell" direction="column" gap="lg">
+        {/* Behind the claim, and behind it in every sense: no `interactive`, so
+            it never asks for the hit test and the two buttons below keep every
+            press. It stops itself off screen and in a background tab, and where
+            WebGL is refused it draws nothing and the hero is the type it always
+            was. */}
+        <helix-aura class="heroAura" gain={0.55} scale={1.35} speed={0.45}></helix-aura>
+        <div className="heroScrim" />
+        <helix-flex class="shell heroShell" direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Fusion Development Group
           </helix-text>

@@ -190,7 +190,59 @@ helix-drawer {
   align-items: center;
   display: flex;
   min-block-size: min(82vh, 46rem);
+  /* The aura is placed against this, so the hero has to be the containing
+     block. `overflow: hidden` because the field is drawn to the element's own
+     box and a canvas that overhangs the section would put light on the band
+     below it, which is a different statement than the one being made here. */
+  overflow: hidden;
   padding-block: var(--site-band);
+  position: relative;
+}
+
+/* The light behind the claim.
+ *
+ * Absolute rather than a background, because it is a canvas: it has to fill the
+ * section without being in the flow, or the hero grows by its height and the
+ * type stops being the only thing on screen.
+ *
+ * `pointer-events: none` said here rather than relied on. The element is not
+ * `interactive`, so it asks for no hit test of its own, but it does cover the
+ * whole hero including both calls to action, and a layer over those is one
+ * refactor away from swallowing the press that pays for the site. */
+.heroAura {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Ground under the words, thinning to nothing where they end.
+ *
+ * The claim is white and holds its own, but the lede under it is muted, and a
+ * braid drifts: text that is legible in one frame is not a text that is
+ * legible. The scrim is the same shape the shapes bench uses, held further
+ * right because the lede runs to roughly half the viewport here.
+ *
+ * The right stays clear on purpose. A scrim across the whole hero would be a
+ * dimmer switch on the thing it was added to show. */
+.heroScrim {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--helix-color-background) 100%, transparent) 0%,
+    color-mix(in srgb, var(--helix-color-background) 72%, transparent) 46%,
+    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 78%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Above the light. Positioned, and that is the whole of the stacking:
+   positioned elements with no `z-index` stack in tree order, and the order in
+   the markup is already aura, scrim, words. */
+.heroShell {
+  position: relative;
 }
 
 .heroTitle {
