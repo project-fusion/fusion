@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
-import { stageAppearance, VERTICALS } from '../verticals'
+import { stageAppearance } from '../verticals'
 
 /**
  * The Fusion landing page.
@@ -87,16 +87,25 @@ export default function Home() {
 
       <section className="hero">
         <helix-flex class="shell heroShell" direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
-            Fusion Development Group
-          </helix-text>
+          {/* A tag rather than a line of label text. The name is a thing, not a
+              sentence about one, and a tag is what this library uses for a
+              thing with a name. The line beside it says what we are made of,
+              which is the one fact the title does not carry. */}
+          <helix-flex align="center" data-density="sm" gap="sm" wrap>
+            <helix-tag>Fusion Development Group</helix-tag>
+            <helix-text appearance="label" tone="subtle">
+              Two substrates, and the work built on them
+            </helix-text>
+          </helix-flex>
           <helix-text as="h1" class="heroTitle">
             Interface and intelligence engineering
           </helix-text>
+          {/* One sentence. Three was a paragraph before the reader had decided
+              to read anything: the licence, the engagement and the pricing
+              policy all arrived above the fold and none of them is the reason
+              anybody stays. Each has a page, and the page says it better. */}
           <helix-text as="p" class="heroLede measure" tone="muted">
-            We build the software, and we built the tools underneath it. Helix is MIT and yours to
-            take without talking to us. If you would rather we did the work, it starts with a two
-            week audit and every price is stated before you ask.
+            We build the software, and we built the tools underneath it.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link
@@ -105,7 +114,7 @@ export default function Home() {
               data-button-tone="primary"
               href="/services"
             >
-              See what it costs
+              See what we do
             </Link>
             <Link data-button data-button-fill="standard" href="/helix">
               Open Helix
@@ -118,23 +127,23 @@ export default function Home() {
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
-              Two substrates
+              What we offer
             </helix-text>
             <helix-text as="h2" class="sectionTitle measure">
-              Everything else is built on these
+              Two substrates, and the work built on them
             </helix-text>
-            {/* Written for the reader who is not buying anything.
-                
-                `docs/18` records why this band moved above the selling: an
-                engineer evaluating a design system had to scroll past three
-                bands of offer to learn there was one, and what they found was a
-                paragraph. What they want is whether they may use it, how they
-                get it, and what happens to them if we stop. Three sentences,
-                and none of them mention an engagement. */}
+            {/* **The licence is not the argument, and it used to lead.** Whether
+                a package is MIT matters to about one reader in fifty and to
+                none of them first: it is a fact for the install page, where
+                somebody has already decided to try it. What every reader wants
+                to know is whether the thing keeps working without us, which is
+                the sovereignty constraint and is the sentence worth the space.
+    
+                Written for the reader who is not buying anything. `docs/18`
+                records why this band sits above the selling. */}
             <helix-text as="p" class="measure" tone="muted">
-              Take them and go. Helix is MIT, it installs from npm, and it ships as custom elements
-              so the framework above it stays your choice. Nothing here needs us to keep running,
-              which is the whole point of building it this way.
+              Take them and go. They install from npm and ship as custom elements, so the framework
+              above them stays your choice, and nothing here needs us to keep running.
             </helix-text>
           </helix-flex>
 
@@ -163,13 +172,16 @@ export default function Home() {
                     <helix-code-block label={`Install ${product.name}`}>
                       {product.install}
                     </helix-code-block>
+                    {/* No licence line. It is a fact for whoever is about to
+                        install, and the install page is one click away; on a
+                        landing card it takes the same weight as the button
+                        beside it and answers a question almost nobody asked
+                        yet. `license` stays on the product type, where the
+                        pages that do want it can read it. */}
                     <helix-flex align="center" data-density="sm" gap="sm" wrap>
                       <a data-button="subtle" href={product.href}>
                         Open the components
                       </a>
-                      <helix-text appearance="caption" tone="subtle">
-                        {product.license} licensed
-                      </helix-text>
                     </helix-flex>
                   </helix-flex>
                 ) : (
@@ -197,36 +209,11 @@ export default function Home() {
           anything they could buy, and both have pages of their own now. What a
           first visit needs here is the reason to choose this over an agency
           starting from a blank file. */}
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
-              Why us
-            </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
-              You are hiring the people who built the tools
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="xl" min="18rem">
-            {REASONS.map((reason) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={reason.name}>
-                <helix-text as="h3" class="substrateName">
-                  {reason.name}
-                </helix-text>
-                <helix-text as="p" tone="muted">
-                  {reason.body}
-                </helix-text>
-              </helix-flex>
-            ))}
-          </helix-grid>
-        </helix-flex>
-      </section>
-
-      {/* Services sits directly under `Why us`, which is a prominence decision
-          rather than an ordering accident. It used to sit sixth, under three
-          bands of argument: the only part of this anyone can buy was harder to
-          reach than the parts that cannot be bought yet. */}
+      {/* Services sits with the substrates, not after the argument for us.
+          What we currently offer is three things, and a reader deciding whether
+          to care should meet all three together: two they can take and one they
+          can hire. `Why us` is a reason to prefer the third and belongs after
+          it, not between them. */}
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
@@ -274,49 +261,115 @@ export default function Home() {
         </helix-flex>
       </section>
 
+      {/* *The verticals band is gone.* It explained the stage vocabulary and
+          then listed five rows to apply it to, which is a glossary followed by
+          its own index: two of the five are Declared, so the row a reader was
+          most likely to press was the one with the least behind it. The labels
+          themselves stay wherever a stage is actually claimed, and the thesis
+          page is where the argument for them belongs. */}
+      {/* **The showcase is the components, not a picture of them.**
+    
+          A design system on a landing page is usually a screenshot, which
+          proves nothing: the one claim worth making here is that these are real
+          custom elements that upgrade in your browser on the page you are
+          already on. So they are rendered, live, with nothing between the
+          reader and the thing. Everything below is the library drawing itself.
+    
+          Kept to controls that need no state to make sense. A form with real
+          validation on a landing page is a demo somebody has to finish; a row
+          of components at rest is what the library looks like. */}
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
-              Verticals
+              Helix
             </helix-text>
             <helix-text as="h2" class="sectionTitle measure">
-              Stage labels are honest
+              Drawn by the thing it documents
             </helix-text>
             <helix-text as="p" class="measure" tone="muted">
-              Active ships with users. Building is real work with nothing shipped. Declared is
-              committed direction with no work started. A roadmap that shows only the parts going
-              well is a brochure.
+              Every control below is a custom element from the library, rendered here rather than
+              pictured. The palette under them is derived from one brand colour, which is why
+              nothing had to be chosen twice.
             </helix-text>
           </helix-flex>
 
-          <helix-flex direction="column">
-            {VERTICALS.map((vertical) => (
-              <helix-flex
-                align="center"
-                class="verticalRow"
-                gap="md"
-                justify="between"
-                key={vertical.href}
-                wrap
-              >
-                <helix-flex direction="column" gap="2xs">
-                  <helix-flex align="center" data-density="sm" gap="sm">
-                    <helix-text as="h3" class="verticalName">
-                      {vertical.name}
-                    </helix-text>
-                    <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
-                  </helix-flex>
-                  <helix-text tone="muted">{vertical.summary}</helix-text>
-                </helix-flex>
-                <helix-flex data-density="sm">
-                  <a data-button href={vertical.href}>
-                    Open
-                  </a>
-                </helix-flex>
+          <helix-flex class="showcase" direction="column" gap="lg">
+            <helix-flex align="center" gap="sm" wrap>
+              <helix-button appearance="solid" tone="primary">
+                Primary
+              </helix-button>
+              <helix-button>Secondary</helix-button>
+              <helix-button appearance="subtle">Subtle</helix-button>
+              <helix-icon-button label="Copy">
+                <helix-icon name="copy"></helix-icon>
+              </helix-icon-button>
+              <helix-tag tone="primary">Tag</helix-tag>
+              <helix-badge>7</helix-badge>
+              <helix-kbd>Cmd K</helix-kbd>
+            </helix-flex>
+
+            <helix-flex align="center" gap="xl" wrap>
+              {/* `default-checked`, not `checked`. Declaring `checked` is a claim
+                  of ownership: the element then announces and applies nothing
+                  until a handler answers it, so a showcase written that way is
+                  a row of controls that cannot be pressed. The generated types
+                  refuse it, which is the check working. */}
+              <helix-switch default-checked label="Switch"></helix-switch>
+              <helix-checkbox default-checked label="Checkbox"></helix-checkbox>
+              <helix-slider
+                default-value="60"
+                label="Slider"
+                max={100}
+                min={0}
+                show-value
+              ></helix-slider>
+              <helix-meter class="showcaseBar" label="Meter" max={100} value={72}></helix-meter>
+            </helix-flex>
+
+            <helix-flex align="center" gap="xl" wrap>
+              <helix-avatar name="Fusion"></helix-avatar>
+              <helix-loader></helix-loader>
+              <helix-progress
+                class="showcaseBar"
+                label="Progress"
+                max={100}
+                value={45}
+              ></helix-progress>
+            </helix-flex>
+          </helix-flex>
+
+          <helix-flex data-density="lg">
+            <Link data-button href="/helix">
+              Open the component index
+            </Link>
+          </helix-flex>
+        </helix-flex>
+      </section>
+
+      <section className="band reveal">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" tone="subtle">
+              Why us
+            </helix-text>
+            <helix-text as="h2" class="sectionTitle measure">
+              You are hiring the people who built the tools
+            </helix-text>
+          </helix-flex>
+
+          <helix-grid gap="xl" min="18rem">
+            {REASONS.map((reason) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={reason.name}>
+                <helix-text as="h3" class="substrateName">
+                  {reason.name}
+                </helix-text>
+                <helix-text as="p" tone="muted">
+                  {reason.body}
+                </helix-text>
               </helix-flex>
             ))}
-          </helix-flex>
+          </helix-grid>
         </helix-flex>
       </section>
 

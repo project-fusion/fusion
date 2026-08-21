@@ -1009,7 +1009,8 @@ export const FRAGMENT = `#version 300 es
   /* Two wave fields crossed, lit where they agree. */
   void main() {
     vec2 p = uv * 2.0 - 1.0;
-    p.x *= uResolution.x / max(uResolution.y, 1.0);
+    float aspect = uResolution.x / max(uResolution.y, 1.0);
+    p.x *= aspect;
 
     /* What the pointer does, and the two answers this stopped giving.
     
@@ -1040,7 +1041,21 @@ export const FRAGMENT = `#version 300 es
        and the three generics for a consumer who asks for one. */
     vec2 q = p;
 
-    float a = radians(uTilt);
+    /* **The tilt is an angle on the screen, not in the sampling space.**
+     
+       p.x is stretched by the aspect before anything is rotated, so a
+       rotation applied here is a rotation in an anisotropic space, which is a
+       shear. Working it through: a feature along the shape's own x axis sits
+       where q.y = 0, which is p.y = -tan(a) * p.x, and since p.x is aspect
+       times the screen's x the slope a reader sees is aspect * tan(a). At a
+       widescreen 1.78 a tilt of 14 drew at 23.9 degrees, and the same number
+       drew differently in every box the component was put in.
+    
+       Solving aspect * tan(a) = tan(tilt) gives the angle to rotate by. The two
+       argument atan is what makes 90 work: tan blows up there, while
+       atan(1, 0) is exactly a quarter turn. */
+    float want = radians(uTilt);
+    float a = atan(sin(want), cos(want) * aspect);
     mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a));
     q = turn * q * uScale;
 
