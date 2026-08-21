@@ -19349,16 +19349,12 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The slices take the series palette in order, so a legend beside it maps the\nsame twenty-four.\n\nThe ring starts at twelve o'clock, which is a rotation applied here rather\nthan arithmetic done below: where a reader expects the first slice to begin\nis a fact about the picture, not about the numbers.\n\nA track is drawn under the slices, so a ring whose values do not fill it\nstill reads as a ring with a gap rather than as a broken arc.",
+          "description": "The slices take the series palette in order, so a legend beside it maps the\nsame twenty-four.\n\nThe ring starts at twelve o'clock, which is a rotation applied here rather\nthan arithmetic done below: where a reader expects the first slice to begin\nis a fact about the picture, not about the numbers.\n\nA track is drawn under the slices, so a ring whose values do not fill it\nstill reads as a ring with a gap rather than as a broken arc.\n\n**How thick the ring is drawn is `hole`, not a CSS hook.** It was\n`--donut-chart-thickness`, and the stroke's width and the ring's radius have\nto agree: the outer edge is `r + width / 2`, so setting one in CSS and\nderiving the other in markup gives a drawing that is wrong in both. Measured\nwith the hook still in place, every ring came out twelve units thick whatever\nits `hole`, so a pie was a small ring with a hole in it and `large` was drawn\nlarger than the default.",
           "name": "HelixDonutChart",
           "cssProperties": [
             {
               "description": "Width and height of the ring.",
               "name": "--donut-chart-size"
-            },
-            {
-              "description": "How heavy the ring is drawn.",
-              "name": "--donut-chart-thickness"
             },
             {
               "description": "Colour of the ring under the slices.",

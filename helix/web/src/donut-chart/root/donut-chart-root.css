@@ -50,9 +50,13 @@
   transform-origin: center;
 }
 
+/* The stroke's width is written into the markup beside its radius, not set
+   here, for the reason the radius gives: the two have to agree and only one of
+   them can be a CSS hook. Set here and derived there, every ring came out 12
+   units thick whatever its `hole`, so a pie was a small ring with a hole in it
+   and `large` was drawn bigger than the default. Seen in a browser. */
 [part="track"] {
   stroke: var(--donut-chart-track-color, var(--helix-color-surface-sunken));
-  stroke-width: var(--donut-chart-thickness, 12);
 }
 
 /* Butt caps, not round.
@@ -62,7 +66,11 @@
  * many small shares that reads as slices in the wrong order. */
 [part="segment"] {
   stroke-linecap: butt;
-  stroke-width: var(--donut-chart-thickness, 12);
+  /* From the markup, which is where the radius is decided, so the two cannot
+     disagree. Left out entirely the stroke falls to the SVG default of 1 and
+     every slice is a hairline, which is what happened when the old hook was
+     removed without putting anything in its place. */
+  stroke-width: var(--_donut-thickness);
 }
 
 /* The middle is the hole, and it is computed rather than guessed.
@@ -83,7 +91,7 @@
 [part="centre"] {
   box-sizing: border-box;
   display: grid;
-  inline-size: calc(100% * (80 - var(--donut-chart-thickness, 12)) / 100);
+  inline-size: calc(100% * (80 - var(--_donut-thickness, 16)) / 100);
   place-items: center;
   text-align: center;
 }
@@ -376,7 +384,7 @@
  * radius, so the hole does not move.
  */
 [part="segment"][data-active] {
-  stroke-width: calc(var(--donut-chart-thickness, 12) * 1.18);
+  stroke-width: calc(var(--_donut-thickness) * 1.18);
 }
 
 [part="segment"] {

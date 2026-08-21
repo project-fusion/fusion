@@ -136,9 +136,14 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   @property({ reflect: true })
   hole?: 'large' | 'none' | 'small'
 
+  /** How thick the ring is drawn, in the drawing's own units. */
+  private get thickness(): number {
+    return THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0
+  }
+
   /** The ring's radius, which follows its thickness so the outer edge holds. */
   private get radius(): number {
-    return EDGE - (THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0) / 2
+    return EDGE - this.thickness / 2
   }
 
   private get shares(): { fraction: number; start: number }[] {
@@ -182,7 +187,14 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   ): TemplateResult {
     return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
       <svg viewBox="0 0 ${BOX} ${BOX}" xmlns="http://www.w3.org/2000/svg">
-        <circle cx=${CENTRE} cy=${CENTRE} fill="none" part="track" r=${this.radius} />
+        <circle
+          cx=${CENTRE}
+          cy=${CENTRE}
+          fill="none"
+          part="track"
+          r=${this.radius}
+          stroke-width=${this.thickness}
+        />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
     </div>`
@@ -208,6 +220,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       @pointerenter=${() => this.pointer.set(index)}
       part="segment"
       r=${this.radius}
+      style="--_donut-thickness: ${this.thickness}"
       stroke-dasharray="${length} ${circumference - length}"
       stroke-dashoffset=${-share.start * circumference}
     />`

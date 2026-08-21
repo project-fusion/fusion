@@ -1,0 +1,68 @@
+<!-- @summary The same chart given different numbers, moving to the new shape rather than snapping to it. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="live"
+  >
+    <caption>Sessions a month</caption>
+    <thead>
+      <tr>
+        <th scope="col">Month</th>
+        <th scope="col">Sessions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Jan</th>
+        <td data-value="1180">1,180</td>
+      </tr>
+      <tr>
+        <th scope="row">Feb</th>
+        <td data-value="1240">1,240</td>
+      </tr>
+      <tr>
+        <th scope="row">Mar</th>
+        <td data-value="1190">1,190</td>
+      </tr>
+      <tr>
+        <th scope="row">Apr</th>
+        <td data-value="1320">1,320</td>
+      </tr>
+      <tr>
+        <th scope="row">May</th>
+        <td data-value="1410">1,410</td>
+      </tr>
+      <tr>
+        <th scope="row">Jun</th>
+        <td data-value="1380">1,380</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-line-chart
+    curve="smooth"
+    for="live"
+  ></helix-line-chart>
+
+  <helix-button
+    appearance="solid"
+    id="shuffle"
+    tone="primary"
+  >New numbers</helix-button>
+</helix-flex>
+
+<!-- Preview frame: the numbers are rewritten in the table, which is the only
+     thing a chart reads. Nothing here touches the chart. -->
+<script>
+  document.getElementById('shuffle').addEventListener('click', () => {
+    for (const cell of document.querySelectorAll('#live tbody td')) {
+      const value = 900 + Math.round(Math.random() * 700)
+      cell.dataset.value = String(value)
+      cell.textContent = value.toLocaleString()
+    }
+  })
+</script>

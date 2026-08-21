@@ -16416,6 +16416,14 @@ export type CustomElements = {
    * A track is drawn under the slices, so a ring whose values do not fill it
    * still reads as a ring with a gap rather than as a broken arc.
    *
+   * **How thick the ring is drawn is `hole`, not a CSS hook.** It was
+   * `--donut-chart-thickness`, and the stroke's width and the ring's radius have
+   * to agree: the outer edge is `r + width / 2`, so setting one in CSS and
+   * deriving the other in markup gives a drawing that is wrong in both. Measured
+   * with the hook still in place, every ring came out twelve units thick whatever
+   * its `hole`, so a pie was a small ring with a hole in it and `large` was drawn
+   * larger than the default.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -16481,7 +16489,6 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
-   * - `--donut-chart-thickness`: How heavy the ring is drawn. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
    * ## CSS Parts
@@ -27341,6 +27348,14 @@ export type CustomElementsSolidJs = {
    * A track is drawn under the slices, so a ring whose values do not fill it
    * still reads as a ring with a gap rather than as a broken arc.
    *
+   * **How thick the ring is drawn is `hole`, not a CSS hook.** It was
+   * `--donut-chart-thickness`, and the stroke's width and the ring's radius have
+   * to agree: the outer edge is `r + width / 2`, so setting one in CSS and
+   * deriving the other in markup gives a drawing that is wrong in both. Measured
+   * with the hook still in place, every ring came out twelve units thick whatever
+   * its `hole`, so a pie was a small ring with a hole in it and `large` was drawn
+   * larger than the default.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -27406,7 +27421,6 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
-   * - `--donut-chart-thickness`: How heavy the ring is drawn. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
    * ## CSS Parts
@@ -35466,8 +35480,6 @@ export type CustomCssProperties = {
   "--divider-inset-start"?: string;
   /** Width and height of the ring. */
   "--donut-chart-size"?: string;
-  /** How heavy the ring is drawn. */
-  "--donut-chart-thickness"?: string;
   /** Colour of the ring under the slices. */
   "--donut-chart-track-color"?: string;
   /** Corner radius on the edges that face the page. */

@@ -17,6 +17,14 @@ import { styles } from './donut-chart-root.css.js'
  * A track is drawn under the slices, so a ring whose values do not fill it
  * still reads as a ring with a gap rather than as a broken arc.
  *
+ * **How thick the ring is drawn is `hole`, not a CSS hook.** It was
+ * `--donut-chart-thickness`, and the stroke's width and the ring's radius have
+ * to agree: the outer edge is `r + width / 2`, so setting one in CSS and
+ * deriving the other in markup gives a drawing that is wrong in both. Measured
+ * with the hook still in place, every ring came out twelve units thick whatever
+ * its `hole`, so a pie was a small ring with a hole in it and `large` was drawn
+ * larger than the default.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -24,7 +32,6 @@ import { styles } from './donut-chart-root.css.js'
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
  * @cssproperty --donut-chart-size - Width and height of the ring.
- * @cssproperty --donut-chart-thickness - How heavy the ring is drawn.
  * @cssproperty --donut-chart-track-color - Colour of the ring under the slices.
  */
 @customElement('helix-donut-chart')
