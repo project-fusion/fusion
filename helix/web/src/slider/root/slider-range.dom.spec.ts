@@ -15,11 +15,11 @@ const slider = async (attrs = ''): Promise<Slider> => {
 }
 
 const thumbs = (host: Slider): HTMLInputElement[] => [
-  ...host.shadowRoot!.querySelectorAll<HTMLInputElement>('[part="control"]'),
+  ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLInputElement>('[part="control"]'),
 ]
 
 const move = async (host: Slider, which: 'end' | 'start', to: string): Promise<void> => {
-  const control = thumbs(host).find((one) => one.dataset.thumb === which)!
+  const control = thumbs(host).find((one) => one.dataset.thumb === which) as HTMLInputElement
   control.value = to
   control.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
   await host.updateComplete

@@ -10,7 +10,7 @@ const rating = async (attrs = ''): Promise<HTMLElement> =>
   mount(`<helix-rating label="Rate this" ${attrs}></helix-rating>`)
 
 const options = (host: HTMLElement): HTMLElement[] => [
-  ...host.shadowRoot!.querySelectorAll<HTMLElement>('[part="option"]'),
+  ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="option"]'),
 ]
 
 const fill = (host: HTMLElement): string => part(host, 'marks')?.getAttribute('style') ?? ''
@@ -200,7 +200,7 @@ if (hasLayout()) {
     }
 
     const shapes = (host: HTMLElement): (string | null)[] =>
-      [...host.shadowRoot!.querySelectorAll<HTMLElement>('[part="mark"] > i')].map(
+      [...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="mark"] > i')].map(
         (one) => one.dataset.shape ?? null,
       )
 
@@ -230,7 +230,7 @@ if (hasLayout()) {
 
     test('the slot itself is never seen, being where the shape arrives', async () => {
       const host = await withMarks('value="2"', 1)
-      const slot = host.shadowRoot!.querySelector('slot[name="mark"]')
+      const slot = (host.shadowRoot as ShadowRoot).querySelector('slot[name="mark"]')
       expect(slot?.hasAttribute('hidden')).toBe(true)
     })
   })
@@ -239,8 +239,10 @@ if (hasLayout()) {
     type Rating = HTMLElement & { value: string; updateComplete: Promise<unknown> }
 
     const centre = (host: HTMLElement, step: number): number => {
-      const option = [...host.shadowRoot!.querySelectorAll<HTMLElement>('[part="option"]')][step]
-      const box = option!.getBoundingClientRect()
+      const option = [
+        ...(host.shadowRoot as ShadowRoot).querySelectorAll<HTMLElement>('[part="option"]'),
+      ][step]
+      const box = (option as HTMLElement).getBoundingClientRect()
       return box.left + box.width / 2
     }
 
