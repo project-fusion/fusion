@@ -48,6 +48,11 @@ export {
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'
 export {
+  VirtualizeController,
+  type VirtualizeOptions,
+  type Window as VirtualizeWindow,
+} from './controllers/virtualize-controller/virtualize-controller.js'
+export {
   type CaretDetail,
   type ChangeDetail,
   type CompleteDetail,
