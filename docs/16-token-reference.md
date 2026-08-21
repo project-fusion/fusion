@@ -77,7 +77,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 271 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 228 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 228 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 122 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 123 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 75 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 64 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 40 |
@@ -191,8 +191,8 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 4 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 331 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 107 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 332 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 110 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 22 |
 
 ## easing
@@ -201,7 +201,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 299 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 302 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 65 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 29 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |

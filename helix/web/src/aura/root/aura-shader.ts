@@ -781,14 +781,21 @@ export const FRAGMENT = `#version 300 es
     
        There is no shared response now. What is left here is parallax, and each
        shape answers for itself below. */
-    /* Parallax, and small on purpose. At 0.16 the whole field translated a
-       sixth of the frame between one edge of the screen and the other, which
-       reads as the background being dragged rather than as depth: a large
-       global motion answering a small input, which no time constant rescues. */
-    /* Turning the response off turns all of it off, parallax included: a
-       consumer asking for none is not asking for a quieter one. */
-    float shift = uInteraction == 4 ? 0.0 : uReach;
-    vec2 q = p - uPointer * 0.05 * shift;
+    /* **No global response, parallax included.** Every named interaction is a
+       promise about what the pointer does, and translating the whole field is
+       not any of them: a consumer asking for a light asked for a light, not for
+       a light and a lean. It survived a pass that removed the other two shared
+       gestures on the grounds that it was small, and small is not the test.
+    
+       Measured on threads before removing it, sampling a column band on the far
+       side of the frame from the cursor and correlating: 90 pixels of vertical
+       travel on a 1224 pixel canvas, seven per cent of the frame, identical
+       under native, light, shadow and ripple and zero under none. Whatever the
+       pointer was told to do, it also moved everything.
+    
+       What answers the pointer now is each shape, in the terms it is made of,
+       and the three generics for a consumer who asks for one. */
+    vec2 q = p;
 
     float a = radians(uTilt);
     mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a));

@@ -102,6 +102,7 @@ export function AuraLab(): React.ReactElement {
   const [interactive, setInteractive] = useState(true)
   const [knobs, setKnobs] = useState(RESTING)
   const [interaction, setInteraction] = useState<(typeof INTERACTIONS)[number]>('native')
+  const [open, setOpen] = useState(true)
   const current = SHAPES[shape]
 
   return (
@@ -137,34 +138,40 @@ export function AuraLab(): React.ReactElement {
         </helix-flex>
       </helix-flex>
 
-      {/* One bar, fixed to the bottom, and the parameters behind a trigger.
-          
+      {/* One drawer, fixed to the bottom, and it collapses.
+
           The controls used to sit in the flow directly under the copy, which
           put nine sliders across the middle of the thing they were adjusting:
           a reader tuning bloom could not see most of what bloom was doing. A
-          bar leaves the field whole, and a popover means the seven numbers are
-          only on screen while somebody is using them. */}
-      <div className="auraBar">
-        <helix-flex class="auraBarInner" direction="column" gap="md">
-          <helix-toggle-group
-            appearance="filled"
-            label="Shape"
-            onhelix-change={(event: CustomEvent<{ value: string }>) => {
-              const next = SHAPES.findIndex((entry) => entry.name === event.detail.value)
-              if (next >= 0) {
-                setShape(next)
-              }
-            }}
-            value={current?.name}
-          >
-            {SHAPES.map((entry) => (
-              <helix-toggle key={entry.name} value={entry.name}>
-                {entry.name}
-              </helix-toggle>
-            ))}
-          </helix-toggle-group>
+          bar leaves the field whole. Collapsing leaves it entirely whole, which
+          is what somebody looking rather than tuning wants, and the material
+          stays either way so the light still reads through the strip. */}
+      <div className="auraBar" data-open={open ? '' : undefined}>
+        <helix-flex align="center" class="auraHandle" data-density="sm" gap="lg" justify="between">
+          <helix-flex align="center" gap="lg" wrap>
+            {/* Shape and pointer share a line. Nine toggles and five are two
+                short rows rather than one long one, and the shape group is
+                sized to its content instead of the full width so the pointer
+                group has somewhere to sit. */}
+            <helix-toggle-group
+              appearance="filled"
+              class="auraShapes"
+              label="Shape"
+              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+                const next = SHAPES.findIndex((entry) => entry.name === event.detail.value)
+                if (next >= 0) {
+                  setShape(next)
+                }
+              }}
+              value={current?.name}
+            >
+              {SHAPES.map((entry) => (
+                <helix-toggle key={entry.name} value={entry.name}>
+                  {entry.name}
+                </helix-toggle>
+              ))}
+            </helix-toggle-group>
 
-          <helix-flex align="center" gap="lg" justify="between" wrap>
             <helix-toggle-group
               appearance="filled"
               label="Pointer"
@@ -182,8 +189,29 @@ export function AuraLab(): React.ReactElement {
                 </helix-toggle>
               ))}
             </helix-toggle-group>
+          </helix-flex>
 
-            <helix-flex align="center" data-density="sm" gap="lg" wrap>
+          {/* The label carries the state, not aria-expanded. The attribute would
+              sit on the host while the button it describes is in the shadow
+              root, so it would announce nothing; a label that says which way
+              the press goes is the part that reaches a reader. */}
+          <helix-icon-button
+            class="auraCollapse"
+            label={open ? 'Collapse the parameters' : 'Expand the parameters'}
+            onClick={() => setOpen((was) => !was)}
+          >
+            <helix-icon name="caret-down"></helix-icon>
+          </helix-icon-button>
+        </helix-flex>
+
+        {/* The collapsing half. `grid-template-rows` from 1fr to 0fr is what
+            animates a height nobody has measured, which is the whole reason the
+            panel is a grid with one child. `visibility` rides the same
+            transition so the controls leave the tab order when they are shut,
+            and `allow-discrete` is what lets a discrete property take part. */}
+        <div className="auraPanel">
+          <helix-flex class="auraPanelInner" direction="column" gap="md">
+            <helix-flex align="center" data-density="sm" gap="lg" justify="end" wrap>
               <helix-switch
                 checked={interactive}
                 label="Follow"
@@ -196,34 +224,33 @@ export function AuraLab(): React.ReactElement {
                 Reset
               </button>
             </helix-flex>
-          </helix-flex>
 
-          {/* 7.5rem, not 8.5: the bar is one flat row and an eighth knob has to fit
-              in it. At 1280 the grid is 1184 wide and auto-fit gave seven tracks
-              of 148.57, so variance wrapped and the bar grew from 235 to 302.
-              Eight tracks and seven 24px gaps leave 127 apiece, so the floor has
-              to sit under that. */}
-          <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="7.5rem">
-            {KNOBS.map((knob) => (
-              <helix-slider
-                disabled={
-                  (knob.key === 'variance' && !VARIES.has(current?.name ?? '')) || undefined
-                }
-                key={knob.key}
-                label={knob.label}
-                max={knob.max}
-                min={knob.min}
-                onhelix-input={(event: CustomEvent<{ value: string }>) => {
-                  const next = Number(event.detail.value)
-                  setKnobs((held) => ({ ...held, [knob.key]: next }))
-                }}
-                show-value
-                step={knob.step}
-                value={String(knobs[knob.key])}
-              ></helix-slider>
-            ))}
-          </helix-grid>
-        </helix-flex>
+            {/* 7.5rem, not 8.5: eight knobs have to fit one row. At 1280 the
+                grid is 1184 wide and auto-fit gave seven tracks of 148.57, so
+                variance wrapped and the bar grew from 235 to 302. Eight tracks
+                and seven 24px gaps leave 127 apiece. */}
+            <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="7.5rem">
+              {KNOBS.map((knob) => (
+                <helix-slider
+                  disabled={
+                    (knob.key === 'variance' && !VARIES.has(current?.name ?? '')) || undefined
+                  }
+                  key={knob.key}
+                  label={knob.label}
+                  max={knob.max}
+                  min={knob.min}
+                  onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                    const next = Number(event.detail.value)
+                    setKnobs((held) => ({ ...held, [knob.key]: next }))
+                  }}
+                  show-value
+                  step={knob.step}
+                  value={String(knobs[knob.key])}
+                ></helix-slider>
+              ))}
+            </helix-grid>
+          </helix-flex>
+        </div>
       </div>
     </section>
   )

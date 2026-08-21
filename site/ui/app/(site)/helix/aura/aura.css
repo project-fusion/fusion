@@ -77,7 +77,82 @@
 }
 
 /* Flat on the bar rather than behind a trigger. A grid that wraps by itself,
-   so the seven find their own number of rows at whatever width there is. */
+   so the eight find their own number of rows at whatever width there is. */
 .auraKnobs {
   inline-size: 100%;
+}
+
+/* The handle row: shape and pointer on one line, the collapse control at the
+   end of it. */
+.auraHandle {
+  inline-size: 100%;
+}
+
+/* Sized to its content, not to the row. A toggle group is a block by default,
+   so the shape group took the whole width and pushed pointer onto a line of its
+   own, which is the layout this replaces. */
+.auraShapes {
+  inline-size: auto;
+}
+
+/* The chevron points at what pressing it does: down to shut, up to open. */
+.auraCollapse {
+  flex: none;
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.auraBar[data-open] .auraCollapse {
+  rotate: 180deg;
+}
+
+/* **`grid-template-rows` from 0fr to 1fr, because nothing here has measured a
+   height.** A panel whose contents wrap at eight different widths has no number
+   to animate to, and `max-inline-size` guesses would either clip the sliders or
+   leave the transition finishing against empty space.
+
+   `visibility` rides the same transition so a shut panel leaves the tab order
+   rather than staying reachable underneath, and `transition-behavior` is what
+   lets a discrete property take part at all: without it the controls become
+   focusable the instant the collapse starts. */
+.auraPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal);
+  transition-behavior: allow-discrete;
+  visibility: hidden;
+}
+
+.auraBar[data-open] .auraPanel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+/* The grid child has to be able to go to nothing, which it cannot do while its
+   own content sets a floor.
+
+   **The padding has to travel too, and `min-block-size` does not cover it.**
+   That property bounds the content box; padding renders underneath it whatever
+   the track is sized to, so a shut panel measured 16 pixels rather than 0 and
+   left a band of material with nothing in it. Transitioned on the same clock as
+   the rows, so it closes with them rather than snapping. */
+.auraPanelInner {
+  min-block-size: 0;
+  overflow: hidden;
+  padding-block-start: 0;
+  transition: padding-block-start var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.auraBar[data-open] .auraPanelInner {
+  padding-block-start: var(--helix-space-md);
+}
+
+/* No footer under a full-bleed field. The page is the component running at
+   size with a drawer over it, and a copyright line below that is a strip of
+   page furniture stapled to the bottom of a picture. Written here rather than
+   by moving the route out of the group, because everything else the layout
+   gives this page is wanted. */
+:root:has(.auraStage) .siteFooter {
+  display: none;
 }
