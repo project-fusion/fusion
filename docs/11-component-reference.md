@@ -3552,6 +3552,7 @@ breathe as a code is typed into it.
 | `length` | `length` | `number` | `6` | `HelixBasePinInput` | How many characters the code has. |
 | `mask` | `mask` | `boolean` | `false` | `HelixBasePinInput` | Whether the characters are hidden, the way a password is. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `placeholder` | `placeholder` | `string` | `''` | `HelixBasePinInput` | What an empty box shows, usually a single dot. |
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBasePinInput` | Whether the boxes refuse input while still submitting their value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |

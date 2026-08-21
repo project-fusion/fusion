@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 179 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 117 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 119 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 34 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 12 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
@@ -140,7 +140,7 @@ Font size.
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 102 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 116 |
-| `--helix-text-md` | `var(--_helix-size-14)` | 43 |
+| `--helix-text-md` | `var(--_helix-size-14)` | 49 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 19 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 23 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 13 |
@@ -228,8 +228,8 @@ The shape of the curve it takes it along.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-easing-standard` | `var(--_helix-curve-standard)` | 302 |
-| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 85 |
-| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 51 |
+| `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 65 |
+| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 71 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |
 

@@ -14550,6 +14550,16 @@
             },
             {
               "kind": "field",
+              "name": "thickness",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How thick the ring is drawn, in the drawing's own units.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "radius",
               "type": {
                 "text": "number"
@@ -29007,6 +29017,16 @@
             },
             {
               "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What an empty box shows, usually a single dot.\n\nThe platform's own placeholder, on each cell, rather than a character\ndrawn behind the field: it clears the moment anything is typed, it is\nalready excluded from the accessible value, and it works the same under\n`mask`, where the cell is a password input and a hand-drawn glyph would\nhave to know that.\n\nEmpty by default, because a row of boxes already reads as a row of boxes\nand a dot in each is a choice about how much the field should announce\nitself before anybody has touched it.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
               "name": "readOnly",
               "type": {
                 "text": "boolean"
@@ -29821,6 +29841,15 @@
               "default": "false",
               "description": "Whether the characters are hidden, the way a password is.",
               "fieldName": "mask"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What an empty box shows, usually a single dot.\n\nThe platform's own placeholder, on each cell, rather than a character\ndrawn behind the field: it clears the moment anything is typed, it is\nalready excluded from the accessible value, and it works the same under\n`mask`, where the cell is a password input and a hand-drawn glyph would\nhave to know that.\n\nEmpty by default, because a row of boxes already reads as a row of boxes\nand a dot in each is a choice about how much the field should announce\nitself before anybody has touched it.",
+              "fieldName": "placeholder"
             },
             {
               "name": "read-only",

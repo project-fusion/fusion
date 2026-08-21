@@ -3408,6 +3408,18 @@ inputs take it as a binding, which is what makes the keyboard follow. */
   type?: HelixBasePinInput["type"];
   /** Whether the characters are hidden, the way a password is. */
   mask?: HelixBasePinInput["mask"];
+  /** What an empty box shows, usually a single dot.
+
+The platform's own placeholder, on each cell, rather than a character
+drawn behind the field: it clears the moment anything is typed, it is
+already excluded from the accessible value, and it works the same under
+`mask`, where the cell is a password input and a hand-drawn glyph would
+have to know that.
+
+Empty by default, because a row of boxes already reads as a row of boxes
+and a dot in each is a choice about how much the field should announce
+itself before anybody has touched it. */
+  placeholder?: HelixBasePinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
   "read-only"?: HelixBasePinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */

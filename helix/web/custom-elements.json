@@ -19481,6 +19481,20 @@
             },
             {
               "kind": "field",
+              "name": "thickness",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "How thick the ring is drawn, in the drawing's own units.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "radius",
               "type": {
                 "text": "number"
@@ -27892,12 +27906,16 @@
                 "slug": "curves"
               },
               {
-                "description": "Zero forced into the range, for where the distance from nothing is the point.",
+                "description": "Open incidents, where the distance from none is the reading: its own range turns a quiet year into a collapse.",
                 "slug": "from-zero"
               },
               {
                 "description": "Two series on one scale, with a legend mapping the same palette.",
                 "slug": "several-series"
+              },
+              {
+                "description": "The same chart given different numbers, moving to the new shape rather than snapping to it.",
+                "slug": "taking-new-data"
               },
               {
                 "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
@@ -38919,6 +38937,20 @@
             },
             {
               "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What an empty box shows, usually a single dot.\n\nThe platform's own placeholder, on each cell, rather than a character\ndrawn behind the field: it clears the moment anything is typed, it is\nalready excluded from the accessible value, and it works the same under\n`mask`, where the cell is a password input and a hand-drawn glyph would\nhave to know that.\n\nEmpty by default, because a row of boxes already reads as a row of boxes\nand a dot in each is a choice about how much the field should announce\nitself before anybody has touched it.",
+              "attribute": "placeholder",
+              "inheritedFrom": {
+                "name": "HelixBasePinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "readOnly",
               "type": {
                 "text": "boolean"
@@ -39523,6 +39555,19 @@
               "default": "false",
               "description": "Whether the characters are hidden, the way a password is.",
               "fieldName": "mask",
+              "inheritedFrom": {
+                "name": "HelixBasePinInput",
+                "module": "src/pin-input/root/pin-input-root.ts"
+              }
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What an empty box shows, usually a single dot.\n\nThe platform's own placeholder, on each cell, rather than a character\ndrawn behind the field: it clears the moment anything is typed, it is\nalready excluded from the accessible value, and it works the same under\n`mask`, where the cell is a password input and a hand-drawn glyph would\nhave to know that.\n\nEmpty by default, because a row of boxes already reads as a row of boxes\nand a dot in each is a choice about how much the field should announce\nitself before anybody has touched it.",
+              "fieldName": "placeholder",
               "inheritedFrom": {
                 "name": "HelixBasePinInput",
                 "module": "src/pin-input/root/pin-input-root.ts"
