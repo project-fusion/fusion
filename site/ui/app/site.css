@@ -2572,18 +2572,28 @@ helix-drawer helix-tree {
    it. A control that jumps to a new position when you use it is one you have to
    find again each time. */
 .showcaseSwitch {
+  align-self: center;
   grid-area: switch;
 }
 
 .showcaseBrand {
+  align-self: center;
   grid-area: brand;
   justify-self: end;
 }
 
 /* The stage stacks: the anchor, the switch, then whatever the switch is
    showing, and the grid takes the rest so the fade lands on real content. */
+/* **No `align-items` on the grid, only on the row that wants it.**
+ *
+ * Centring every row centres the views row too, and the views are taller than
+ * the `1fr` they are given: a centred overflow spills in both directions, so
+ * the first card of each view climbed over the switch and into the anchor. What
+ * wanted centring was the switch beside the colour, which can ask for itself.
+ *
+ * The views row starts rather than stretches, so a short view sits under the
+ * switch instead of being pulled down the panel. */
 .showcaseStage {
-  align-items: center;
   column-gap: var(--helix-space-md);
   display: grid;
   grid-template-areas:
@@ -2592,7 +2602,7 @@ helix-drawer helix-tree {
     "views views";
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto minmax(0, 1fr);
-  row-gap: var(--helix-space-md);
+  row-gap: var(--helix-space-lg);
 }
 
 .showcaseAnchor {
@@ -2600,7 +2610,9 @@ helix-drawer helix-tree {
 }
 
 .showcase {
+  align-self: start;
   grid-area: views;
+  min-block-size: 0;
 }
 
 /* A cell that wants the pair of columns: a table with a sparkline in every row

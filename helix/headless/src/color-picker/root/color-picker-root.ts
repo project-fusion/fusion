@@ -5,6 +5,7 @@ import {
   drawIcon,
   type HelixChangeEvent,
   HelixFormElement,
+  type HelixInputEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   MixinControllerValue,
@@ -386,11 +387,30 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
       min="0"
       .value=${String(value)}
       ?disabled=${this.isDisabled}
-      @helix-change=${(event: Event) => {
-        event.stopPropagation()
-        this.move({ [channel]: Number((event as HelixChangeEvent).detail.value) })
-      }}
+      @helix-input=${(event: Event) => this.takeChannel(channel, event)}
+      @helix-change=${(event: Event) => this.takeChannel(channel, event)}
     ></helix-slider>`
+  }
+
+  /**
+   * A channel's new value, from whichever of the two events carried it.
+   *
+   * **Both, because a slider announces both and at different moments.** It is
+   * one of the five controls a reader edits continuously, so it sends
+   * `helix-input` all the way through a drag and `helix-change` when the drag
+   * ends. Listening only for the commit meant the picker heard nothing while a
+   * handle moved, and since it binds `.value` the slider is controlled: asked
+   * and not answered, it snapped back to the value the picker still held. The
+   * hue and alpha handles did not move at all.
+   *
+   * Taking both is not belt and braces. The drag needs the first and a keyboard
+   * step or a programmatic set is only guaranteed the second, and the handler
+   * is idempotent: the same value applied twice is the same colour.
+   */
+  private takeChannel(channel: 'alpha' | 'hue', event: Event): void {
+    event.stopPropagation()
+    const { value } = (event as HelixInputEvent | HelixChangeEvent).detail
+    this.move({ [channel]: Number(value) })
   }
 
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
