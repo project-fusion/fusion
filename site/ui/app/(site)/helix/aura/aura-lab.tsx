@@ -56,6 +56,11 @@ const KNOBS = [
      reverse it: streaks travelling down the frame only come from the top at
      180, which the old range could not reach. */
   { key: 'tilt', label: 'Tilt', max: 180, min: -180, step: 1 },
+  /* A fraction of the width, which is the property's own unit. It replaces
+     `tilt` rather than joining it, so the bar offers one or the other and the
+     slider under `Aim` swaps: both at once would show two live controls where
+     the element only listens to one. */
+  { key: 'terminus', label: 'Terminus', max: 1.5, min: -1.5, step: 0.02 },
   { key: 'speed', label: 'Speed', max: 3, min: 0, step: 0.05 },
   { key: 'scale', label: 'Scale', max: 3, min: 0.3, step: 0.05 },
   { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
@@ -78,6 +83,8 @@ const VARIES = new Set(['aurora', 'particles', 'rays', 'streaks'])
 
 type Knob = (typeof KNOBS)[number]['key']
 
+const AIMS = ['tilt', 'terminus'] as const
+
 const RESTING: Record<Knob, number> = {
   bloom: 0.5,
   drift: 0,
@@ -85,6 +92,7 @@ const RESTING: Record<Knob, number> = {
   reach: 1,
   scale: 1,
   speed: 1,
+  terminus: 0.5,
   tilt: 14,
   variance: 1,
 }
@@ -110,6 +118,11 @@ export function AuraLab(): React.ReactElement {
   const [interactive, setInteractive] = useState(true)
   const [knobs, setKnobs] = useState(RESTING)
   const [interaction, setInteraction] = useState<(typeof INTERACTIONS)[number]>('native')
+  /* Which of the two aiming properties is live. `terminus` overrides `tilt` on
+     the element, so the bar has to choose as well: a slider for the one being
+     ignored is a control that does nothing, which is the worst thing a bench
+     can show. */
+  const [aim, setAim] = useState<(typeof AIMS)[number]>('tilt')
   const [open, setOpen] = useState(true)
   const current = SHAPES[shape]
 
@@ -126,7 +139,8 @@ export function AuraLab(): React.ReactElement {
           scale={knobs.scale}
           shape={current?.name}
           speed={knobs.speed}
-          tilt={knobs.tilt}
+          terminus={aim === 'terminus' ? knobs.terminus : undefined}
+          tilt={aim === 'tilt' ? knobs.tilt : undefined}
           variance={knobs.variance}
         ></helix-aura>
       </div>
@@ -170,7 +184,14 @@ export function AuraLab(): React.ReactElement {
               each, which reads as a mistake. Wrapping the row instead drops the
               switch and the reset to a line of their own until there is room,
               and they are still the first row of controls. */}
-          <helix-flex align="center" gap="lg">
+          {/* Wrapping, now that there are three groups rather than two.
+              Measured at 1184 of bar: Shape is 781 and Pointer 375, which is
+              1180 with the gap and fits by four pixels, and Aim's 177 does not.
+              Dropping the smallest to its own line is what wrapping does here,
+              and it is not the case the comment below rejects: that was a pair
+              splitting so each half sat beside a gap, which reads as a mistake,
+              where a third group on a line of its own reads as a third group. */}
+          <helix-flex align="center" gap="lg" wrap>
             {/* Shape and pointer share a line. Nine toggles and five are two
                 short rows rather than one long one, and the shape group is
                 sized to its content instead of the full width so the pointer
@@ -208,6 +229,30 @@ export function AuraLab(): React.ReactElement {
               value={interaction}
             >
               {INTERACTIONS.map((one) => (
+                <helix-toggle key={one} value={one}>
+                  {one}
+                </helix-toggle>
+              ))}
+            </helix-toggle-group>
+
+            {/* Which property aims the field. They are alternatives on the
+                element, `terminus` winning wherever it is set, so they are
+                alternatives here: the slider below swaps rather than a second
+                one appearing beside a control the element has stopped
+                reading. */}
+            <helix-toggle-group
+              appearance="filled"
+              label="Aim"
+              label-placement="start"
+              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+                const next = AIMS.find((one) => one === event.detail.value)
+                if (next) {
+                  setAim(next)
+                }
+              }}
+              value={aim}
+            >
+              {AIMS.map((one) => (
                 <helix-toggle key={one} value={one}>
                   {one}
                 </helix-toggle>
@@ -257,24 +302,26 @@ export function AuraLab(): React.ReactElement {
                 variance wrapped and the bar grew from 235 to 302. Eight tracks
                 and seven 24px gaps leave 127 apiece. */}
             <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="7.5rem">
-              {KNOBS.map((knob) => (
-                <helix-slider
-                  disabled={
-                    (knob.key === 'variance' && !VARIES.has(current?.name ?? '')) || undefined
-                  }
-                  key={knob.key}
-                  label={knob.label}
-                  max={knob.max}
-                  min={knob.min}
-                  onhelix-input={(event: CustomEvent<{ value: string }>) => {
-                    const next = Number(event.detail.value)
-                    setKnobs((held) => ({ ...held, [knob.key]: next }))
-                  }}
-                  show-value
-                  step={knob.step}
-                  value={String(knobs[knob.key])}
-                ></helix-slider>
-              ))}
+              {KNOBS.filter((knob) => !AIMS.includes(knob.key as never) || knob.key === aim).map(
+                (knob) => (
+                  <helix-slider
+                    disabled={
+                      (knob.key === 'variance' && !VARIES.has(current?.name ?? '')) || undefined
+                    }
+                    key={knob.key}
+                    label={knob.label}
+                    max={knob.max}
+                    min={knob.min}
+                    onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                      const next = Number(event.detail.value)
+                      setKnobs((held) => ({ ...held, [knob.key]: next }))
+                    }}
+                    show-value
+                    step={knob.step}
+                    value={String(knobs[knob.key])}
+                  ></helix-slider>
+                ),
+              )}
             </helix-grid>
           </helix-flex>
         </div>

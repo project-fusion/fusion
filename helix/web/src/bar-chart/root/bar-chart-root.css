@@ -615,7 +615,7 @@
    has already made exactly as long as the plot it sits beside. */
 [part="axis"] {
   color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-2xs);
+  font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
   position: relative;
