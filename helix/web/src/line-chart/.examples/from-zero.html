@@ -1,8 +1,12 @@
-<!-- @summary Zero forced into the range, for where the distance from nothing is the point. -->
+<!-- @summary The same readings measured from their own range and from zero, which is the only way to see what the property does. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
 
 <helix-flex
   direction="column"
-  gap="md"
+  gap="lg"
 >
   <table
     data-hidden-visually
@@ -18,33 +22,53 @@
     <tbody>
       <tr>
         <th scope="row">Jan</th>
-        <td data-value="1180">1180</td>
+        <td data-value="1180">1,180</td>
       </tr>
       <tr>
         <th scope="row">Feb</th>
-        <td data-value="1240">1240</td>
+        <td data-value="1240">1,240</td>
       </tr>
       <tr>
         <th scope="row">Mar</th>
-        <td data-value="1190">1190</td>
+        <td data-value="1190">1,190</td>
       </tr>
       <tr>
         <th scope="row">Apr</th>
-        <td data-value="1320">1320</td>
+        <td data-value="1320">1,320</td>
       </tr>
       <tr>
         <th scope="row">May</th>
-        <td data-value="1410">1410</td>
+        <td data-value="1410">1,410</td>
       </tr>
       <tr>
         <th scope="row">Jun</th>
-        <td data-value="1380">1380</td>
+        <td data-value="1380">1,380</td>
       </tr>
     </tbody>
   </table>
 
-  <helix-line-chart
-    for="zeroed"
-    zero
-  ></helix-line-chart>
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-text
+      as="p"
+      tone="muted"
+    >Its own range, 1,180 to 1,410</helix-text>
+    <helix-line-chart for="zeroed"></helix-line-chart>
+  </helix-flex>
+
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-text
+      as="p"
+      tone="muted"
+    >From zero, 0 to 1,410</helix-text>
+    <helix-line-chart
+      for="zeroed"
+      zero
+    ></helix-line-chart>
+  </helix-flex>
 </helix-flex>
