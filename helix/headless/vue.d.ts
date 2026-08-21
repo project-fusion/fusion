@@ -29,6 +29,7 @@ import type {
   HelixBaseDatePicker,
   HelixBaseDialog,
   HelixBaseDivider,
+  HelixBaseDonutChart,
   HelixBaseDrawer,
   HelixBaseDrilldownItem,
   HelixBaseDrilldown,
@@ -1790,6 +1791,25 @@ here has to be. */
 };
 
 export type HelixBaseDividerVueEvents = {};
+
+export type HelixBaseDonutChartVueProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixBaseDonutChart["label"];
+};
+
+export type HelixBaseDonutChartVueEvents = {};
 
 /** `HelixBaseDrawer` component event */
 export type HelixBaseDrawerElementEvent<E = Event> = TypedEvent<
@@ -6190,6 +6210,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseDivider,
     HelixBaseDividerVueProps,
     HelixBaseDividerVueEvents
+  >;
+  /** The chart with the narrowest honest use, so the component is narrow too.  **It reads one column and treats the rows as the parts.** Every other chart here takes a column per series; a ring has one whole to divide, and a second ring inside the first is two charts sharing a picture in the most literal way. So the first column of numbers is the series and each row is a slice.  **It refuses negative values rather than drawing them.** A share of a whole cannot be less than nothing, and an arc for a negative number either runs backwards over its neighbours or is silently dropped. Those rows are skipped and the total is of what is left, which is the only reading that stays true.  **The shape is drawn with a dashed stroke, not with arc commands.** One '<circle>' per slice, its dash set to the slice's share of the circumference and its offset to where the slice begins. Arc paths need the sweep flag and a large-arc flag, both of which flip at values a reader never sees coming, and a slice of exactly one whole becomes a path with no length at all.  **And it keeps its aspect ratio**, alone among the charts here. The others set 'preserveAspectRatio="none"' so one drawing fills any box and rescue their strokes with 'vector-effect'; that rescues strokes and not geometry, so a ring drawn the same way is an ellipse in anything but a square.  The table is the accessible representation and this drawing is 'aria-hidden'. */
+  "helix-base-donut-chart": DefineCustomElement<
+    HelixBaseDonutChart,
+    HelixBaseDonutChartVueProps,
+    HelixBaseDonutChartVueEvents
   >;
   /** Takes 'MixinControllerOpen', so 'open', 'defaultOpen', and 'OpenChange' behave exactly as they do on an accordion item, and a consumer already knows the API.  Modal by default, which is three things together and not one: focus is trapped inside, Escape and an outside press close it, and the page behind is covered. A panel with the look of a modal and none of its behavior is worse than an inline one, because it invites the reader to treat it as blocking.  Content stays mounted when closed, so it is in the server's markup and can animate. It is 'inert' while closed, which takes it out of the tab order and the accessibility tree without removing its box. */
   "helix-base-drawer": DefineCustomElement<

@@ -1,0 +1,187 @@
+/* The ring and its middle share one grid cell, so whatever is slotted sits in
+   the hole without either knowing the other's size. */
+:host {
+  display: grid;
+  /* Bigger than the other charts' 12em, because the hole has to hold something.
+   *
+   * The hole is `80 - thickness` percent of the width, so at 12em it is about
+   * 114px, and a `Stat` reading `10,000` measures 138 at the default ramp:
+   * measured, the number painted across four slices. Type in a slot is the
+   * consumer's and does not scale with the ring, so the ring is what gives way.
+   * At 16em the hole is roughly 152px and the same total sits inside it. */
+  inline-size: var(--donut-chart-size, 16em);
+  place-items: center;
+}
+
+[part="plot"],
+[part="centre"] {
+  grid-area: 1 / 1;
+}
+
+[part="plot"] {
+  inline-size: 100%;
+}
+
+/* Square, and it stays square.
+ *
+ * Every other chart here sets `preserveAspectRatio="none"` so one drawing fills
+ * any box, and rescues its strokes with `vector-effect`. That rescues strokes
+ * and not geometry: a circle in a stretched coordinate space is an ellipse, and
+ * there is no vector-effect that answers for a shape. So this one keeps the
+ * default `xMidYMid meet` and takes an aspect ratio instead. */
+[part="plot"] svg {
+  aspect-ratio: 1;
+  display: block;
+  inline-size: 100%;
+}
+
+/* Zero at twelve o'clock.
+ *
+ * A rotation rather than arithmetic below, because where a reader expects the
+ * first slice to start is a fact about the picture. `transform-origin` is set
+ * in the view box's own units, which is what `transform-box: fill-box` and a
+ * percentage give: without it the origin is the SVG viewport's corner and the
+ * ring swings out of frame. */
+[part="track"],
+[part="segment"] {
+  transform: rotate(-90deg);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[part="track"] {
+  stroke: var(--donut-chart-track-color, var(--helix-color-surface-sunken));
+  stroke-width: var(--donut-chart-thickness, 12);
+}
+
+/* Butt caps, not round.
+ *
+ * A round cap adds half the stroke width to each end of every slice, so the
+ * arcs overlap their neighbours and the last one laps the first. On a ring of
+ * many small shares that reads as slices in the wrong order. */
+[part="segment"] {
+  stroke-linecap: butt;
+  stroke-width: var(--donut-chart-thickness, 12);
+}
+
+/* The middle is the hole, and it is computed rather than guessed.
+ *
+ * It was the whole grid cell at first, which is the size of the *chart*, so a
+ * total slotted into it was wider than the hole and painted across the ring on
+ * both sides. Seen rather than reasoned about: `10,000` at the default type
+ * scale spilled over four slices.
+ *
+ * The ring is drawn at r=40 in a 100 box with the stroke astride it, so the
+ * hole's diameter is `2 * (40 - thickness / 2)`, which is `80 - thickness`.
+ * Written out that way it follows the hook, so a thinner ring gives its middle
+ * more room without anybody adjusting a second number.
+ *
+ * Overflow is left visible on purpose. Clipping a total that does not fit would
+ * hide the problem rather than show it, and a consumer who wants a bigger hole
+ * has the thickness hook. */
+[part="centre"] {
+  box-sizing: border-box;
+  display: grid;
+  inline-size: calc(100% * (80 - var(--donut-chart-thickness, 12)) / 100);
+  place-items: center;
+  text-align: center;
+}
+
+/* Index to colour, the same twenty-four the legend maps. An attribute cannot
+   select a token, so it is one rule per slice, taken as a stroke because the
+   ring is a stroke. */
+[part="segment"][data-series="1"] {
+  stroke: var(--helix-color-series-1);
+}
+
+[part="segment"][data-series="2"] {
+  stroke: var(--helix-color-series-2);
+}
+
+[part="segment"][data-series="3"] {
+  stroke: var(--helix-color-series-3);
+}
+
+[part="segment"][data-series="4"] {
+  stroke: var(--helix-color-series-4);
+}
+
+[part="segment"][data-series="5"] {
+  stroke: var(--helix-color-series-5);
+}
+
+[part="segment"][data-series="6"] {
+  stroke: var(--helix-color-series-6);
+}
+
+[part="segment"][data-series="7"] {
+  stroke: var(--helix-color-series-7);
+}
+
+[part="segment"][data-series="8"] {
+  stroke: var(--helix-color-series-8);
+}
+
+[part="segment"][data-series="9"] {
+  stroke: var(--helix-color-series-9);
+}
+
+[part="segment"][data-series="10"] {
+  stroke: var(--helix-color-series-10);
+}
+
+[part="segment"][data-series="11"] {
+  stroke: var(--helix-color-series-11);
+}
+
+[part="segment"][data-series="12"] {
+  stroke: var(--helix-color-series-12);
+}
+
+[part="segment"][data-series="13"] {
+  stroke: var(--helix-color-series-13);
+}
+
+[part="segment"][data-series="14"] {
+  stroke: var(--helix-color-series-14);
+}
+
+[part="segment"][data-series="15"] {
+  stroke: var(--helix-color-series-15);
+}
+
+[part="segment"][data-series="16"] {
+  stroke: var(--helix-color-series-16);
+}
+
+[part="segment"][data-series="17"] {
+  stroke: var(--helix-color-series-17);
+}
+
+[part="segment"][data-series="18"] {
+  stroke: var(--helix-color-series-18);
+}
+
+[part="segment"][data-series="19"] {
+  stroke: var(--helix-color-series-19);
+}
+
+[part="segment"][data-series="20"] {
+  stroke: var(--helix-color-series-20);
+}
+
+[part="segment"][data-series="21"] {
+  stroke: var(--helix-color-series-21);
+}
+
+[part="segment"][data-series="22"] {
+  stroke: var(--helix-color-series-22);
+}
+
+[part="segment"][data-series="23"] {
+  stroke: var(--helix-color-series-23);
+}
+
+[part="segment"][data-series="24"] {
+  stroke: var(--helix-color-series-24);
+}

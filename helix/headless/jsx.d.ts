@@ -30,6 +30,7 @@ import type {
   HelixBaseDatePicker,
   HelixBaseDialog,
   HelixBaseDivider,
+  HelixBaseDonutChart,
   HelixBaseDrawer,
   HelixBaseDrilldown,
   HelixBaseDrilldownItem,
@@ -3428,6 +3429,45 @@ quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
   "prop:announced"?: HelixBaseDivider["announced"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseDonutChartProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixBaseDonutChart["label"];
+};
+
+export type HelixBaseDonutChartSolidJsProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  "prop:label"?: HelixBaseDonutChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14375,6 +14415,68 @@ export type CustomElements = {
   >;
 
   /**
+   * The chart with the narrowest honest use, so the component is narrow too.
+   *
+   * **It reads one column and treats the rows as the parts.** Every other chart
+   * here takes a column per series; a ring has one whole to divide, and a second
+   * ring inside the first is two charts sharing a picture in the most literal
+   * way. So the first column of numbers is the series and each row is a slice.
+   *
+   * **It refuses negative values rather than drawing them.** A share of a whole
+   * cannot be less than nothing, and an arc for a negative number either runs
+   * backwards over its neighbours or is silently dropped. Those rows are skipped
+   * and the total is of what is left, which is the only reading that stays true.
+   *
+   * **The shape is drawn with a dashed stroke, not with arc commands.** One
+   * `<circle>` per slice, its dash set to the slice's share of the circumference
+   * and its offset to where the slice begins. Arc paths need the sweep flag and a
+   * large-arc flag, both of which flip at values a reader never sees coming, and
+   * a slice of exactly one whole becomes a path with no length at all.
+   *
+   * **And it keeps its aspect ratio**, alone among the charts here. The others
+   * set `preserveAspectRatio="none"` so one drawing fills any box and rescue
+   * their strokes with `vector-effect`; that rescues strokes and not geometry, so
+   * a ring drawn the same way is an ellipse in anything but a square.
+   *
+   * The table is the accessible representation and this drawing is `aria-hidden`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `track`: The ring the slices are drawn on.
+   */
+  "helix-base-donut-chart": Partial<
+    HelixBaseDonutChartProps & BaseProps<HelixBaseDonutChart> & BaseEvents
+  >;
+
+  /**
    * Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
    * as they do on an accordion item, and a consumer already knows the API.
    *
@@ -24877,6 +24979,71 @@ export type CustomElementsSolidJs = {
     HelixBaseDividerProps &
       HelixBaseDividerSolidJsProps &
       BaseProps<HelixBaseDivider> &
+      BaseEvents
+  >;
+
+  /**
+   * The chart with the narrowest honest use, so the component is narrow too.
+   *
+   * **It reads one column and treats the rows as the parts.** Every other chart
+   * here takes a column per series; a ring has one whole to divide, and a second
+   * ring inside the first is two charts sharing a picture in the most literal
+   * way. So the first column of numbers is the series and each row is a slice.
+   *
+   * **It refuses negative values rather than drawing them.** A share of a whole
+   * cannot be less than nothing, and an arc for a negative number either runs
+   * backwards over its neighbours or is silently dropped. Those rows are skipped
+   * and the total is of what is left, which is the only reading that stays true.
+   *
+   * **The shape is drawn with a dashed stroke, not with arc commands.** One
+   * `<circle>` per slice, its dash set to the slice's share of the circumference
+   * and its offset to where the slice begins. Arc paths need the sweep flag and a
+   * large-arc flag, both of which flip at values a reader never sees coming, and
+   * a slice of exactly one whole becomes a path with no length at all.
+   *
+   * **And it keeps its aspect ratio**, alone among the charts here. The others
+   * set `preserveAspectRatio="none"` so one drawing fills any box and rescue
+   * their strokes with `vector-effect`; that rescues strokes and not geometry, so
+   * a ring drawn the same way is an ellipse in anything but a square.
+   *
+   * The table is the accessible representation and this drawing is `aria-hidden`.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `track`: The ring the slices are drawn on.
+   */
+  "helix-base-donut-chart": Partial<
+    HelixBaseDonutChartProps &
+      HelixBaseDonutChartSolidJsProps &
+      BaseProps<HelixBaseDonutChart> &
       BaseEvents
   >;
 

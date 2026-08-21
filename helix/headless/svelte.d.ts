@@ -36,6 +36,7 @@ declare module 'svelte/elements' {
     'helix-base-date-picker': CustomElements['helix-base-date-picker']
     'helix-base-dialog': CustomElements['helix-base-dialog']
     'helix-base-divider': CustomElements['helix-base-divider']
+    'helix-base-donut-chart': CustomElements['helix-base-donut-chart']
     'helix-base-drawer': CustomElements['helix-base-drawer']
     'helix-base-drilldown-item': CustomElements['helix-base-drilldown-item']
     'helix-base-drilldown': CustomElements['helix-base-drilldown']

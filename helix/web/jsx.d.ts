@@ -38,6 +38,7 @@ import type {
   HelixDialog,
   HelixDismissEvent,
   HelixDivider,
+  HelixDonutChart,
   HelixDrawer,
   HelixDrilldown,
   HelixDrilldownItem,
@@ -4198,6 +4199,45 @@ quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
   "prop:announced"?: HelixDivider["announced"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixDonutChartProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixDonutChart["label"];
+};
+
+export type HelixDonutChartSolidJsProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  "prop:label"?: HelixDonutChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -16190,6 +16230,61 @@ export type CustomElements = {
   >;
 
   /**
+   * The slices take the series palette in order, so a legend beside it maps the
+   * same twenty-four.
+   *
+   * The ring starts at twelve o'clock, which is a rotation applied here rather
+   * than arithmetic done below: where a reader expects the first slice to begin
+   * is a fact about the picture, not about the numbers.
+   *
+   * A track is drawn under the slices, so a ring whose values do not fill it
+   * still reads as a ring with a gap rather than as a broken arc.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
+   * - `--donut-chart-thickness`: How heavy the ring is drawn. (default: `undefined`)
+   * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `track`: The ring the slices are drawn on.
+   */
+  "helix-donut-chart": Partial<
+    HelixDonutChartProps & BaseProps<HelixDonutChart> & BaseEvents
+  >;
+
+  /**
    * The panel translates and the scrim fades, both on transform and opacity only,
    * which is the one place motion is allowed to carry the work: the surface at
    * rest is flat and the movement is what says something happened.
@@ -26920,6 +27015,64 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The slices take the series palette in order, so a legend beside it maps the
+   * same twenty-four.
+   *
+   * The ring starts at twelve o'clock, which is a rotation applied here rather
+   * than arithmetic done below: where a reader expects the first slice to begin
+   * is a fact about the picture, not about the numbers.
+   *
+   * A track is drawn under the slices, so a ring whose values do not fill it
+   * still reads as a ring with a gap rather than as a broken arc.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `label`: The drawing's name, for a pointer resting on it.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words and is already written.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
+   * - `--donut-chart-thickness`: How heavy the ring is drawn. (default: `undefined`)
+   * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `centre`: The middle of the ring, holding whatever is slotted.
+   * - `plot`: The drawing.
+   * - `segment`: One slice.
+   * - `track`: The ring the slices are drawn on.
+   */
+  "helix-donut-chart": Partial<
+    HelixDonutChartProps &
+      HelixDonutChartSolidJsProps &
+      BaseProps<HelixDonutChart> &
+      BaseEvents
+  >;
+
+  /**
    * The panel translates and the scrim fades, both on transform and opacity only,
    * which is the one place motion is allowed to carry the work: the surface at
    * rest is flat and the movement is what says something happened.
@@ -34895,6 +35048,12 @@ export type CustomCssProperties = {
   "--divider-inset-end"?: string;
   /** Off the near end only. */
   "--divider-inset-start"?: string;
+  /** Width and height of the ring. */
+  "--donut-chart-size"?: string;
+  /** How heavy the ring is drawn. */
+  "--donut-chart-thickness"?: string;
+  /** Colour of the ring under the slices. */
+  "--donut-chart-track-color"?: string;
   /** Corner radius on the edges that face the page. */
   "--drawer-radii"?: string;
   /** Width or height of the panel. */

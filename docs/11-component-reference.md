@@ -1785,6 +1785,54 @@ tall that is.
 | `--divider-inset-start` | Off the near end only. |
 | `--divider-thickness` | How heavy the rule is. |
 
+## Donut Chart
+
+### Root — `helix-donut-chart`
+
+Parts of a whole as a ring, read from a table.
+
+Extends `HelixBaseDonutChart`.
+
+The slices take the series palette in order, so a legend beside it maps the
+same twenty-four.
+
+The ring starts at twelve o'clock, which is a rotation applied here rather
+than arithmetic done below: where a reader expects the first slice to begin
+is a fact about the picture, not about the numbers.
+
+A track is drawn under the slices, so a ring whose values do not fill it
+still reads as a ring with a gap rather than as a broken arc.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `for` | `for` | `string` | `''` | `HelixBaseDonutChart` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `HelixBaseDonutChart` | The drawing's name, for a pointer resting on it. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | Goes in the middle of the ring. A total, usually. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `centre` | The middle of the ring, holding whatever is slotted. |
+| `plot` | The drawing. |
+| `segment` | One slice. |
+| `track` | The ring the slices are drawn on. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--donut-chart-size` | Width and height of the ring. |
+| `--donut-chart-thickness` | How heavy the ring is drawn. |
+| `--donut-chart-track-color` | Colour of the ring under the slices. |
+
 ## Drawer
 
 ### Root — `helix-drawer`

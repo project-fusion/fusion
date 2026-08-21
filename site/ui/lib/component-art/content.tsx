@@ -207,13 +207,6 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
-   * One rule, and the two groups it makes.
-   *
-   * One line either side, not two. The subject is the rule; the lines are only
-   * there to be separated by it, and a second line on each side says nothing
-   * the first did not while making the rule the smallest thing in the frame.
-   */
   divider: (
     <>
       {/* Centered, all three. They were flush left at 48 while the rule ran 48 to
@@ -251,6 +244,64 @@ export const contentArt: Record<string, ReactNode> = {
         y="100"
       />
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="176" x="72" y="108" />
+    </>
+  ),
+
+  /**
+   * One rule, and the two groups it makes.
+   *
+   * One line either side, not two. The subject is the rule; the lines are only
+   * there to be separated by it, and a second line on each side says nothing
+   * the first did not while making the rule the smallest thing in the frame.
+   */
+  /**
+   * A ring of three unequal arcs, drawn the way the component draws it.
+   *
+   * Unequal because a ring cut into equal parts reads as a diagram of a donut
+   * rather than as one, the same reason the bar chart's columns are not a
+   * staircase. Dashes rather than arc paths, for the reason the component
+   * records: an arc command needs a sweep flag and a large-arc flag, both of
+   * which flip at values a reader never sees coming.
+   *
+   * Still, like the other charts. The shares do not move.
+   */
+  'donut-chart': (
+    <>
+      <circle
+        className="artStroke"
+        cx="160"
+        cy="112"
+        fill="none"
+        r="44"
+        strokeDasharray="97 179"
+        strokeOpacity="0.55"
+        strokeWidth="14"
+        transform="rotate(-90 160 112)"
+      />
+      <circle
+        className="artStroke"
+        cx="160"
+        cy="112"
+        fill="none"
+        r="44"
+        strokeDasharray="83 193"
+        strokeDashoffset="-97"
+        strokeOpacity="0.28"
+        strokeWidth="14"
+        transform="rotate(-90 160 112)"
+      />
+      <circle
+        className="artStroke"
+        cx="160"
+        cy="112"
+        fill="none"
+        r="44"
+        strokeDasharray="56 220"
+        strokeDashoffset="-180"
+        strokeOpacity="0.16"
+        strokeWidth="14"
+        transform="rotate(-90 160 112)"
+      />
     </>
   ),
 

@@ -29,6 +29,7 @@ import type {
   HelixDatePicker,
   HelixDialog,
   HelixDivider,
+  HelixDonutChart,
   HelixDrawer,
   HelixDrilldownItem,
   HelixDrilldown,
@@ -2173,6 +2174,25 @@ here has to be. */
 };
 
 export type HelixDividerVueEvents = {};
+
+export type HelixDonutChartVueProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixDonutChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixDonutChart["label"];
+};
+
+export type HelixDonutChartVueEvents = {};
 
 /** `HelixDrawer` component event */
 export type HelixDrawerElementEvent<E = Event> = TypedEvent<HelixDrawer, E>;
@@ -6968,6 +6988,12 @@ export type CustomCssProperties = {
   "--divider-inset-end"?: string;
   /** Off the near end only. */
   "--divider-inset-start"?: string;
+  /** Width and height of the ring. */
+  "--donut-chart-size"?: string;
+  /** How heavy the ring is drawn. */
+  "--donut-chart-thickness"?: string;
+  /** Colour of the ring under the slices. */
+  "--donut-chart-track-color"?: string;
   /** Corner radius on the edges that face the page. */
   "--drawer-radii"?: string;
   /** Width or height of the panel. */
@@ -7553,6 +7579,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixDivider,
     HelixDividerVueProps,
     HelixDividerVueEvents
+  >;
+  /** The slices take the series palette in order, so a legend beside it maps the same twenty-four.  The ring starts at twelve o'clock, which is a rotation applied here rather than arithmetic done below: where a reader expects the first slice to begin is a fact about the picture, not about the numbers.  A track is drawn under the slices, so a ring whose values do not fill it still reads as a ring with a gap rather than as a broken arc. */
+  "helix-donut-chart": DefineCustomElement<
+    HelixDonutChart,
+    HelixDonutChartVueProps,
+    HelixDonutChartVueEvents
   >;
   /** The panel translates and the scrim fades, both on transform and opacity only, which is the one place motion is allowed to carry the work: the surface at rest is flat and the movement is what says something happened. */
   "helix-drawer": DefineCustomElement<

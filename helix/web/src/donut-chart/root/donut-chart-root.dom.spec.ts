@@ -1,0 +1,130 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, part, registerDom } from '@fusion-io/testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+})
+
+const CIRCUMFERENCE = 2 * Math.PI * 40
+
+const TRAFFIC = `<table id="traffic">
+  <caption>Sessions by source</caption>
+  <thead><tr><th scope="col">Source</th><th scope="col">Share</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Direct</th><td data-value="50">50</td></tr>
+    <tr><th scope="row">Search</th><td data-value="30">30</td></tr>
+    <tr><th scope="row">Social</th><td data-value="20">20</td></tr>
+  </tbody>
+</table>`
+
+const NEGATIVE = `<table id="negative">
+  <thead><tr><th scope="col">Source</th><th scope="col">Share</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Direct</th><td data-value="75">75</td></tr>
+    <tr><th scope="row">Refunds</th><td data-value="-10">-10</td></tr>
+    <tr><th scope="row">Search</th><td data-value="25">25</td></tr>
+  </tbody>
+</table>`
+
+const chart = async (table: string, attributes = ''): Promise<HTMLElement> => {
+  await mount(`<div>${table}<helix-donut-chart ${attributes}></helix-donut-chart></div>`)
+  const host = document.querySelector('helix-donut-chart') as HTMLElement & {
+    updateComplete: Promise<unknown>
+  }
+  await host.updateComplete
+  return host
+}
+
+const segments = (host: HTMLElement): Element[] => [
+  ...(host.shadowRoot?.querySelectorAll('[part="segment"]') ?? []),
+]
+
+/** The drawn length of a slice, which is the first number of its dash. */
+const drawn = (one: Element | undefined): number =>
+  Number(one?.getAttribute('stroke-dasharray')?.split(' ')[0] ?? 0)
+
+describe('donut chart', () => {
+  test('reads the table it names and draws one slice per row', async () => {
+    expect(segments(await chart(TRAFFIC, 'for="traffic"'))).toHaveLength(3)
+  })
+
+  test('each slice takes its share of the circumference', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const [a, b, c] = segments(host)
+    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5, 2)
+    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3, 2)
+    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2, 2)
+  })
+
+  test('the slices close the ring exactly, with nothing lost to rounding', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const total = segments(host).reduce((sum, one) => sum + drawn(one), 0)
+    expect(total).toBeCloseTo(CIRCUMFERENCE, 6)
+  })
+
+  test('each slice begins where the last one ended', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const offsets = segments(host).map((one) =>
+      Math.abs(Number(one.getAttribute('stroke-dashoffset'))),
+    )
+    expect(offsets[0]).toBe(0)
+    expect(offsets[1]).toBeCloseTo(CIRCUMFERENCE * 0.5, 2)
+    expect(offsets[2]).toBeCloseTo(CIRCUMFERENCE * 0.8, 2)
+  })
+
+  test('drops a negative row rather than drawing it backwards', async () => {
+    /* A share of a whole cannot be less than nothing. An arc for a negative
+       either runs backwards over its neighbours or vanishes, and the total it
+       was counted in is wrong either way. The remaining two are 75 and 25 of a
+       hundred, not of ninety. */
+    const host = await chart(NEGATIVE, 'for="negative"')
+    const drawnLengths = segments(host).map(drawn)
+    expect(drawnLengths[0]).toBeCloseTo(CIRCUMFERENCE * 0.75, 2)
+    expect(drawnLengths[1]).toBe(0)
+    expect(drawnLengths[2]).toBeCloseTo(CIRCUMFERENCE * 0.25, 2)
+  })
+
+  test('takes the palette in order, so a legend beside it agrees', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    expect(segments(host).map((one) => one.getAttribute('data-series'))).toEqual(['1', '2', '3'])
+  })
+
+  test('draws a track under the slices, so a partial ring is still a ring', async () => {
+    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'track')).not.toBeNull()
+  })
+
+  test('keeps its aspect ratio, alone among the charts', async () => {
+    /* The others stretch to their box and rescue the stroke with
+       `vector-effect`, which rescues strokes and not geometry. A ring drawn that
+       way is an ellipse. */
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const svg = host.shadowRoot?.querySelector('svg')
+    expect(svg?.getAttribute('preserveAspectRatio')).toBeNull()
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 100 100')
+  })
+
+  test('the drawing is hidden, because the table it read is the readable one', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('falls back to the caption, which is already the right words', async () => {
+    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'plot')?.getAttribute('title')).toBe(
+      'Sessions by source',
+    )
+  })
+
+  test('a whole of nothing draws no slices rather than dividing by zero', async () => {
+    const empty = `<table id="empty">
+      <thead><tr><th scope="col">Source</th><th scope="col">Share</th></tr></thead>
+      <tbody><tr><th scope="row">None</th><td data-value="0">0</td></tr></tbody>
+    </table>`
+    expect(segments(await chart(empty, 'for="empty"'))).toHaveLength(0)
+  })
+
+  test('the middle takes whatever is slotted into it', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    expect(part(host, 'centre')?.querySelector('slot')).not.toBeNull()
+  })
+})
