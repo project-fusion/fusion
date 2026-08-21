@@ -8,6 +8,7 @@ import type {
   HelixAvatar,
   HelixAvatarGroup,
   HelixBadge,
+  HelixBarChart,
   HelixBaseSplitter,
   HelixBlockquote,
   HelixBreadcrumb,
@@ -954,6 +955,59 @@ export type HelixBadgeSolidJsProps = {
   "prop:max"?: HelixBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
   "prop:label"?: HelixBadge["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBarChartProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBarChart["for"];
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  direction?: HelixBarChart["direction"];
+  /** What the chart is, in a sentence, for the drawing's accessible name.
+
+Absent falls back to the table's own caption, which is usually the right
+words already written once. */
+  label?: HelixBarChart["label"];
+};
+
+export type HelixBarChartSolidJsProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBarChart["for"];
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  "prop:direction"?: HelixBarChart["direction"];
+  /** What the chart is, in a sentence, for the drawing's accessible name.
+
+Absent falls back to the table's own caption, which is usually the right
+words already written once. */
+  "prop:label"?: HelixBarChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -13399,6 +13453,58 @@ export type CustomElements = {
   "helix-badge": Partial<HelixBadgeProps & BaseProps<HelixBadge> & BaseEvents>;
 
   /**
+   * The columns take the series palette in order, so a chart of one is series one
+   * and a chart of four is the first four. Rounded at the far end only, because a
+   * column grows from the baseline and a rounded foot would lift it off the rule
+   * it is measured against.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
+   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words already written once.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
+   * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
+   * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: One column.
+   * - `baseline`: The rule the columns stand on.
+   * - `group`: One category's columns, together.
+   * - `label`: One category's name.
+   * - `labels`: The row of category names.
+   * - `plot`: The drawing.
+   */
+  "helix-bar-chart": Partial<
+    HelixBarChartProps & BaseProps<HelixBarChart> & BaseEvents
+  >;
+
+  /**
    * Set larger than body text on the display face, because a pulled quotation is
    * a change of voice and the type is what says so. No quotation marks are drawn:
    * the size and the space around it already set the passage apart, and marks on
@@ -23850,6 +23956,61 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * The columns take the series palette in order, so a chart of one is series one
+   * and a chart of four is the first four. Rounded at the far end only, because a
+   * column grows from the baseline and a rounded foot would lift it off the rule
+   * it is measured against.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
+   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words already written once.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
+   * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
+   * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: One column.
+   * - `baseline`: The rule the columns stand on.
+   * - `group`: One category's columns, together.
+   * - `label`: One category's name.
+   * - `labels`: The row of category names.
+   * - `plot`: The drawing.
+   */
+  "helix-bar-chart": Partial<
+    HelixBarChartProps &
+      HelixBarChartSolidJsProps &
+      BaseProps<HelixBarChart> &
+      BaseEvents
+  >;
+
+  /**
    * Set larger than body text on the display face, because a pulled quotation is
    * a change of voice and the type is what says so. No quotation marks are drawn:
    * the size and the space around it already set the passage apart, and marks on
@@ -34074,6 +34235,12 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** Corner radius at the far end of a column. */
+  "--bar-chart-bar-radius"?: string;
+  /** Height of the drawing. */
+  "--bar-chart-block-size"?: string;
+  /** Space between the drawing and its labels. */
+  "--bar-chart-gap"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
   /** Color of the chevron. */

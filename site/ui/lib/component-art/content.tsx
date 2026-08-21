@@ -108,6 +108,30 @@ export const contentArt: Record<string, ReactNode> = {
   ),
 
   /** A passage set off by a rule and an indent. Two lines is a passage. */
+  /**
+   * Four columns standing on a rule, at four different heights.
+   *
+   * The rule is the subject as much as the columns are. What separates this
+   * from a row of bars is that a bar chart is measured *from* somewhere, and
+   * that somewhere is zero: a card with columns floating free would be drawing
+   * the mistake the component refuses to ship a switch for.
+   *
+   * Heights in a 4:2:7:5 ratio off the baseline, so no two are close enough to
+   * read as the same and the tallest is not the last. A card whose columns
+   * ascend evenly reads as a diagram of a bar chart rather than as one.
+   *
+   * Still, like the other charts. Columns do not move.
+   */
+  'bar-chart': (
+    <>
+      <rect className="artInk" fillOpacity="0.55" height="32" rx="2" width="28" x="64" y="112" />
+      <rect className="artInk" fillOpacity="0.28" height="16" rx="2" width="28" x="108" y="128" />
+      <rect className="artInk" fillOpacity="0.55" height="56" rx="2" width="28" x="152" y="88" />
+      <rect className="artInk" fillOpacity="0.28" height="40" rx="2" width="28" x="196" y="104" />
+      <rect className="artRule" height="1" width="224" x="48" y="144" />
+    </>
+  ),
+
   blockquote: (
     <>
       <rect className="artInk" fillOpacity="0.55" height="36" width="2" x="48" y="82" />

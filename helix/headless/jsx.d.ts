@@ -8,6 +8,7 @@ import type {
   HelixBaseAvatar,
   HelixBaseAvatarGroup,
   HelixBaseBadge,
+  HelixBaseBarChart,
   HelixBaseBlockquote,
   HelixBaseBreadcrumb,
   HelixBaseBreadcrumbs,
@@ -705,6 +706,59 @@ export type HelixBaseBadgeSolidJsProps = {
   "prop:max"?: HelixBaseBadge["max"];
   /** Accessible name. Required for a dot, which has no text to read. */
   "prop:label"?: HelixBaseBadge["label"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseBarChartProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseBarChart["for"];
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  direction?: HelixBaseBarChart["direction"];
+  /** What the chart is, in a sentence, for the drawing's accessible name.
+
+Absent falls back to the table's own caption, which is usually the right
+words already written once. */
+  label?: HelixBaseBarChart["label"];
+};
+
+export type HelixBaseBarChartSolidJsProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseBarChart["for"];
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  "prop:direction"?: HelixBaseBarChart["direction"];
+  /** What the chart is, in a sentence, for the drawing's accessible name.
+
+Absent falls back to the table's own caption, which is usually the right
+words already written once. */
+  "prop:label"?: HelixBaseBarChart["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11667,6 +11721,65 @@ export type CustomElements = {
   >;
 
   /**
+   * The chart most often asked for and the one most often drawn wrongly, so two
+   * decisions are made here rather than left to a consumer.
+   *
+   * **It measures from zero and there is no property to change that.** A bar's
+   * length *is* its value, so a baseline anywhere else makes the lengths
+   * proportional to nothing. That is the oldest misleading chart there is, and a
+   * design system that ships the switch has shipped the mistake. A reader who
+   * wants the differences between values rather than the values should be drawing
+   * a line, which claims only a shape.
+   *
+   * **The labels are HTML beside the drawing rather than `<text>` inside it.** An
+   * `<svg>` that fills its box scales everything in it, including type: the same
+   * `font-size` comes out at 10px in a narrow chart and 43px in a wide one, and
+   * there is no non-scaling-font to answer it the way `vector-effect` answers
+   * strokes. So the columns are drawn and the words are written around them.
+   *
+   * The table is the accessible representation and this drawing is `aria-hidden`.
+   * A reader who wants the numbers gets the numbers, not a described picture of
+   * them.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
+   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words already written once.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: One column.
+   * - `baseline`: The rule the columns stand on.
+   * - `group`: One category's columns, together.
+   * - `label`: One category's name.
+   * - `labels`: The row of category names.
+   * - `plot`: The drawing.
+   */
+  "helix-base-bar-chart": Partial<
+    HelixBaseBarChartProps & BaseProps<HelixBaseBarChart> & BaseEvents
+  >;
+
+  /**
    * Renders a real `<blockquote>` with a `<footer>` for the attribution, which is
    * the structure the HTML spec describes for exactly this: the attribution is
    * about the quotation rather than part of it, and putting it inside the quoted
@@ -21886,6 +21999,68 @@ export type CustomElementsSolidJs = {
     HelixBaseBadgeProps &
       HelixBaseBadgeSolidJsProps &
       BaseProps<HelixBaseBadge> &
+      BaseEvents
+  >;
+
+  /**
+   * The chart most often asked for and the one most often drawn wrongly, so two
+   * decisions are made here rather than left to a consumer.
+   *
+   * **It measures from zero and there is no property to change that.** A bar's
+   * length *is* its value, so a baseline anywhere else makes the lengths
+   * proportional to nothing. That is the oldest misleading chart there is, and a
+   * design system that ships the switch has shipped the mistake. A reader who
+   * wants the differences between values rather than the values should be drawing
+   * a line, which claims only a shape.
+   *
+   * **The labels are HTML beside the drawing rather than `<text>` inside it.** An
+   * `<svg>` that fills its box scales everything in it, including type: the same
+   * `font-size` comes out at 10px in a narrow chart and 43px in a wide one, and
+   * there is no non-scaling-font to answer it the way `vector-effect` answers
+   * strokes. So the columns are drawn and the words are written around them.
+   *
+   * The table is the accessible representation and this drawing is `aria-hidden`.
+   * A reader who wants the numbers gets the numbers, not a described picture of
+   * them.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the table to read.
+   *
+   * Resolved through `getRootNode()`, so a chart inside another component's
+   * shadow root names a table in that root rather than in the document. A
+   * `<table>` or anything built from grid roles, including `helix-table`.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
+   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   *
+   * Absent falls back to the table's own caption, which is usually the right
+   * words already written once.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bar`: One column.
+   * - `baseline`: The rule the columns stand on.
+   * - `group`: One category's columns, together.
+   * - `label`: One category's name.
+   * - `labels`: The row of category names.
+   * - `plot`: The drawing.
+   */
+  "helix-base-bar-chart": Partial<
+    HelixBaseBarChartProps &
+      HelixBaseBarChartSolidJsProps &
+      BaseProps<HelixBaseBarChart> &
       BaseEvents
   >;
 

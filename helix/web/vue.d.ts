@@ -7,6 +7,7 @@ import type {
   HelixAvatarGroup,
   HelixAvatar,
   HelixBadge,
+  HelixBarChart,
   HelixBlockquote,
   HelixBreadcrumb,
   HelixBreadcrumbs,
@@ -495,6 +496,32 @@ export type HelixBadgeVueProps = {
 };
 
 export type HelixBadgeVueEvents = {};
+
+export type HelixBarChartVueProps = {
+  /** The id of the table to read.
+
+Resolved through `getRootNode()`, so a chart inside another component's
+shadow root names a table in that root rather than in the document. A
+`<table>` or anything built from grid roles, including `helix-table`.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBarChart["for"];
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  direction?: HelixBarChart["direction"];
+  /** What the chart is, in a sentence, for the drawing's accessible name.
+
+Absent falls back to the table's own caption, which is usually the right
+words already written once. */
+  label?: HelixBarChart["label"];
+};
+
+export type HelixBarChartVueEvents = {};
 
 export type HelixBlockquoteVueProps = {
   /** URL identifying where the passage came from. */
@@ -6702,6 +6729,12 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** Corner radius at the far end of a column. */
+  "--bar-chart-bar-radius"?: string;
+  /** Height of the drawing. */
+  "--bar-chart-block-size"?: string;
+  /** Space between the drawing and its labels. */
+  "--bar-chart-gap"?: string;
   /** Size of the quoted passage. */
   "--blockquote-size"?: string;
   /** Color of the chevron. */
@@ -7259,6 +7292,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBadge,
     HelixBadgeVueProps,
     HelixBadgeVueEvents
+  >;
+  /** The columns take the series palette in order, so a chart of one is series one and a chart of four is the first four. Rounded at the far end only, because a column grows from the baseline and a rounded foot would lift it off the rule it is measured against. */
+  "helix-bar-chart": DefineCustomElement<
+    HelixBarChart,
+    HelixBarChartVueProps,
+    HelixBarChartVueEvents
   >;
   /** Set larger than body text on the display face, because a pulled quotation is a change of voice and the type is what says so. No quotation marks are drawn: the size and the space around it already set the passage apart, and marks on top of that are the same thing said twice. */
   "helix-blockquote": DefineCustomElement<

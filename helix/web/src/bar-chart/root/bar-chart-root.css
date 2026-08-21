@@ -1,0 +1,181 @@
+/* A grid of two rows, the drawing and the words under it, so the labels line up
+   with the columns without either knowing the other's size. */
+:host {
+  display: grid;
+  gap: var(--bar-chart-gap, var(--helix-space-2xs));
+}
+
+[part="plot"] {
+  block-size: var(--bar-chart-block-size, 12em);
+}
+
+[part="plot"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+  /* The baseline is a stroke and sits astride its own line, so half of it falls
+     outside the box. Visible rather than an inset, for the reason the sparkline
+     gives: an inset costs amplitude and grows with the box. */
+  overflow: visible;
+}
+
+/* The rule the columns stand on, and it is drawn rather than implied.
+ *
+ * Zero is where a bar chart is read from, so it is the one line worth showing.
+ * `vector-effect`, because the view box stretches to the element and a stroke
+ * stretches with it: without this the baseline is a hairline in a narrow chart
+ * and heavy in a wide one. */
+[part="baseline"] {
+  stroke: var(--helix-color-border);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* Rounded at the far end only.
+ *
+ * A column grows out of the baseline, so rounding its foot would lift it off
+ * the rule it is measured against and make short columns look like they start
+ * above zero. There is no per-corner radius on an SVG rect, so the shape is
+ * drawn square and the corners are taken off with a clip. */
+[part="bar"] {
+  clip-path: inset(0 round var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0);
+}
+
+[part="labels"] {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Categories down the side, for names that are words rather than dates.
+ *
+ * A row of long names either overlaps or turns on its side, and neither reads
+ * as well as putting them down the left where they are read normally. The
+ * drawing is rotated rather than recomputed, because the geometry is the same
+ * question asked along the other axis and two code paths would be two things to
+ * keep in step. */
+:host([direction="horizontal"]) {
+  grid-template-columns: auto 1fr;
+}
+
+:host([direction="horizontal"]) [part="plot"] {
+  block-size: var(--bar-chart-block-size, 12em);
+  order: 1;
+  rotate: 90deg;
+  scale: 1 -1;
+}
+
+:host([direction="horizontal"]) [part="labels"] {
+  grid-auto-columns: auto;
+  grid-auto-flow: row;
+}
+
+:host([direction="horizontal"]) [part="label"] {
+  text-align: end;
+}
+
+/* Index to colour, the same twenty-four the legend maps. An attribute cannot
+   select a token, so it is one rule per series. */
+[part="bar"][data-series="1"] {
+  fill: var(--helix-color-series-1);
+}
+
+[part="bar"][data-series="2"] {
+  fill: var(--helix-color-series-2);
+}
+
+[part="bar"][data-series="3"] {
+  fill: var(--helix-color-series-3);
+}
+
+[part="bar"][data-series="4"] {
+  fill: var(--helix-color-series-4);
+}
+
+[part="bar"][data-series="5"] {
+  fill: var(--helix-color-series-5);
+}
+
+[part="bar"][data-series="6"] {
+  fill: var(--helix-color-series-6);
+}
+
+[part="bar"][data-series="7"] {
+  fill: var(--helix-color-series-7);
+}
+
+[part="bar"][data-series="8"] {
+  fill: var(--helix-color-series-8);
+}
+
+[part="bar"][data-series="9"] {
+  fill: var(--helix-color-series-9);
+}
+
+[part="bar"][data-series="10"] {
+  fill: var(--helix-color-series-10);
+}
+
+[part="bar"][data-series="11"] {
+  fill: var(--helix-color-series-11);
+}
+
+[part="bar"][data-series="12"] {
+  fill: var(--helix-color-series-12);
+}
+
+[part="bar"][data-series="13"] {
+  fill: var(--helix-color-series-13);
+}
+
+[part="bar"][data-series="14"] {
+  fill: var(--helix-color-series-14);
+}
+
+[part="bar"][data-series="15"] {
+  fill: var(--helix-color-series-15);
+}
+
+[part="bar"][data-series="16"] {
+  fill: var(--helix-color-series-16);
+}
+
+[part="bar"][data-series="17"] {
+  fill: var(--helix-color-series-17);
+}
+
+[part="bar"][data-series="18"] {
+  fill: var(--helix-color-series-18);
+}
+
+[part="bar"][data-series="19"] {
+  fill: var(--helix-color-series-19);
+}
+
+[part="bar"][data-series="20"] {
+  fill: var(--helix-color-series-20);
+}
+
+[part="bar"][data-series="21"] {
+  fill: var(--helix-color-series-21);
+}
+
+[part="bar"][data-series="22"] {
+  fill: var(--helix-color-series-22);
+}
+
+[part="bar"][data-series="23"] {
+  fill: var(--helix-color-series-23);
+}
+
+[part="bar"][data-series="24"] {
+  fill: var(--helix-color-series-24);
+}

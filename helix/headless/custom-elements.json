@@ -1786,6 +1786,320 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/bar-chart/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/bar-chart/root/bar-chart-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/bar-chart/root/bar-chart-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The chart most often asked for and the one most often drawn wrongly, so two\ndecisions are made here rather than left to a consumer.\n\n**It measures from zero and there is no property to change that.** A bar's\nlength *is* its value, so a baseline anywhere else makes the lengths\nproportional to nothing. That is the oldest misleading chart there is, and a\ndesign system that ships the switch has shipped the mistake. A reader who\nwants the differences between values rather than the values should be drawing\na line, which claims only a shape.\n\n**The labels are HTML beside the drawing rather than `<text>` inside it.** An\n`<svg>` that fills its box scales everything in it, including type: the same\n`font-size` comes out at 10px in a narrow chart and 43px in a wide one, and\nthere is no non-scaling-font to answer it the way `vector-effect` answers\nstrokes. So the columns are drawn and the words are written around them.\n\nThe table is the accessible representation and this drawing is `aria-hidden`.\nA reader who wants the numbers gets the numbers, not a described picture of\nthem.",
+          "name": "HelixBaseBarChart",
+          "cssParts": [
+            {
+              "description": "One column.",
+              "name": "bar"
+            },
+            {
+              "description": "The rule the columns stand on.",
+              "name": "baseline"
+            },
+            {
+              "description": "One category's columns, together.",
+              "name": "group"
+            },
+            {
+              "description": "One category's name.",
+              "name": "label"
+            },
+            {
+              "description": "The row of category names.",
+              "name": "labels"
+            },
+            {
+              "description": "The drawing.",
+              "name": "plot"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for"
+            },
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Whether the categories run down the side rather than along the bottom.\n\nAbsent is columns. `horizontal` is the one to reach for when the category\nnames are words rather than dates: a row of long names either overlaps or\nturns on its side, and neither is as readable as putting them down the left\nwhere they read normally.",
+              "attribute": "direction",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the chart is, in a sentence, for the drawing's accessible name.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords already written once.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#source",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element | null"
+                }
+              },
+              "description": "The table or grid `for` names, or null where there is no document."
+            },
+            {
+              "kind": "method",
+              "name": "#watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Follows the table, so an update to the numbers reaches the columns."
+            },
+            {
+              "kind": "method",
+              "name": "renderPlot",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "series",
+                  "type": {
+                    "text": "Series[]"
+                  }
+                },
+                {
+                  "name": "categories",
+                  "type": {
+                    "text": "string[]"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "floor",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "named",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The columns themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice."
+            },
+            {
+              "kind": "method",
+              "name": "renderLabels",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "categories",
+                  "type": {
+                    "text": "string[]"
+                  }
+                }
+              ],
+              "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for"
+            },
+            {
+              "name": "direction",
+              "type": {
+                "text": "'horizontal' | undefined"
+              },
+              "description": "Whether the categories run down the side rather than along the bottom.\n\nAbsent is columns. `horizontal` is the one to reach for when the category\nnames are words rather than dates: a row of long names either overlaps or\nturns on its side, and neither is as readable as putting them down the left\nwhere they read normally.",
+              "fieldName": "direction"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the chart is, in a sentence, for the drawing's accessible name.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords already written once.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "Categories as columns, read from a table.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/bar-chart",
+            "aliases": [
+              "Column Chart",
+              "Categorical Chart"
+            ],
+            "tier": "headless",
+            "group": "BaseBarChart",
+            "part": "Root",
+            "source": "helix/headless/src/bar-chart"
+          },
+          "tagName": "helix-base-bar-chart",
+          "customElement": true,
+          "modulePath": "src/bar-chart/root/bar-chart-root.ts",
+          "definitionPath": "src/bar-chart/root/bar-chart-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseBarChart",
+          "declaration": {
+            "name": "HelixBaseBarChart",
+            "module": "src/bar-chart/root/bar-chart-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-bar-chart",
+          "declaration": {
+            "name": "HelixBaseBarChart",
+            "module": "src/bar-chart/root/bar-chart-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/blockquote/index.ts",
       "declarations": [],
       "exports": [
@@ -17672,6 +17986,14 @@
           "declaration": {
             "name": "*",
             "module": "src/badge/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/bar-chart/index.js"
           }
         },
         {

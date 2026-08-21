@@ -274,7 +274,10 @@ takes no pointer events.
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
 | `shape` | `shape` | `\| 'aurora'
     \| 'braid'
+    \| 'caustics'
     \| 'flow'
+    \| 'fracture'
+    \| 'lattice'
     \| 'particles'
     \| 'prism'
     \| 'rays'
@@ -426,6 +429,46 @@ on a dark icon reads as a bite taken out of the icon.
 | `--badge-background-color` | Fill of the indicator. |
 | `--badge-offset` | Pulls the mark in from the corner, along both axes. |
 | `--badge-ring-color` | The ring separating it from what is behind. |
+
+## Bar Chart
+
+### Root — `helix-bar-chart`
+
+Categories as columns, read from a table.
+
+Extends `HelixBaseBarChart`.
+
+The columns take the series palette in order, so a chart of one is series one
+and a chart of four is the first four. Rounded at the far end only, because a
+column grows from the baseline and a rounded foot would lift it off the rule
+it is measured against.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
+| `for` | `for` | `string` | `''` | `HelixBaseBarChart` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `HelixBaseBarChart` | What the chart is, in a sentence, for the drawing's accessible name. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `bar` | One column. |
+| `baseline` | The rule the columns stand on. |
+| `group` | One category's columns, together. |
+| `label` | One category's name. |
+| `labels` | The row of category names. |
+| `plot` | The drawing. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
+| `--bar-chart-block-size` | Height of the drawing. |
+| `--bar-chart-gap` | Space between the drawing and its labels. |
 
 ## Blockquote
 

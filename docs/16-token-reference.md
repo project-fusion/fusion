@@ -33,14 +33,14 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 83 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 161 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 163 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 115 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 33 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 12 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 191 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 193 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 155 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -54,30 +54,30 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
-| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.145 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-1))) )` | 5 |
-| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.129 calc(h + var(--_helix-series-hue-2))) )` | 3 |
-| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.105 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-3))) )` | 3 |
-| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-4))) )` | 3 |
-| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.108 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-5))) )` | 3 |
-| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.105 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-6))) )` | 3 |
-| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.145 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-7))) )` | 3 |
-| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-8))) )` | 3 |
-| `--helix-color-series-9` | `light-dark( oklch(from var(--_helix-seed-brand) 0.595 0.221 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.62 0.206 calc(h + var(--_helix-series-hue-1))) )` | 1 |
-| `--helix-color-series-10` | `light-dark( oklch(from var(--_helix-seed-brand) 0.645 0.238 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.645 0.238 calc(h + var(--_helix-series-hue-2))) )` | 1 |
-| `--helix-color-series-11` | `light-dark( oklch(from var(--_helix-seed-brand) 0.625 0.126 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.885 0.179 calc(h + var(--_helix-series-hue-3))) )` | 1 |
-| `--helix-color-series-12` | `light-dark( oklch(from var(--_helix-seed-brand) 0.565 0.295 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.62 0.252 calc(h + var(--_helix-series-hue-4))) )` | 1 |
-| `--helix-color-series-13` | `light-dark( oklch(from var(--_helix-seed-brand) 0.64 0.133 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.815 0.17 calc(h + var(--_helix-series-hue-5))) )` | 1 |
-| `--helix-color-series-14` | `light-dark( oklch(from var(--_helix-seed-brand) 0.63 0.11 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.825 0.144 calc(h + var(--_helix-series-hue-6))) )` | 1 |
-| `--helix-color-series-15` | `light-dark( oklch(from var(--_helix-seed-brand) 0.66 0.277 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.66 0.277 calc(h + var(--_helix-series-hue-7))) )` | 1 |
-| `--helix-color-series-16` | `light-dark( oklch(from var(--_helix-seed-brand) 0.63 0.154 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.895 0.219 calc(h + var(--_helix-series-hue-8))) )` | 1 |
-| `--helix-color-series-17` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-1))) )` | 1 |
-| `--helix-color-series-18` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-2))) )` | 1 |
-| `--helix-color-series-19` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-3))) )` | 1 |
-| `--helix-color-series-20` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-4))) )` | 1 |
-| `--helix-color-series-21` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-5))) )` | 1 |
-| `--helix-color-series-22` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-6))) )` | 1 |
-| `--helix-color-series-23` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-7))) )` | 1 |
-| `--helix-color-series-24` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-8))) )` | 1 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.145 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-1))) )` | 7 |
+| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.129 calc(h + var(--_helix-series-hue-2))) )` | 5 |
+| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.105 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-3))) )` | 5 |
+| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-4))) )` | 5 |
+| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.108 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-5))) )` | 5 |
+| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.105 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-6))) )` | 5 |
+| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.145 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.135 calc(h + var(--_helix-series-hue-7))) )` | 5 |
+| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-8))) )` | 5 |
+| `--helix-color-series-9` | `light-dark( oklch(from var(--_helix-seed-brand) 0.595 0.221 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.62 0.206 calc(h + var(--_helix-series-hue-1))) )` | 3 |
+| `--helix-color-series-10` | `light-dark( oklch(from var(--_helix-seed-brand) 0.645 0.238 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.645 0.238 calc(h + var(--_helix-series-hue-2))) )` | 3 |
+| `--helix-color-series-11` | `light-dark( oklch(from var(--_helix-seed-brand) 0.625 0.126 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.885 0.179 calc(h + var(--_helix-series-hue-3))) )` | 3 |
+| `--helix-color-series-12` | `light-dark( oklch(from var(--_helix-seed-brand) 0.565 0.295 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.62 0.252 calc(h + var(--_helix-series-hue-4))) )` | 3 |
+| `--helix-color-series-13` | `light-dark( oklch(from var(--_helix-seed-brand) 0.64 0.133 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.815 0.17 calc(h + var(--_helix-series-hue-5))) )` | 3 |
+| `--helix-color-series-14` | `light-dark( oklch(from var(--_helix-seed-brand) 0.63 0.11 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.825 0.144 calc(h + var(--_helix-series-hue-6))) )` | 3 |
+| `--helix-color-series-15` | `light-dark( oklch(from var(--_helix-seed-brand) 0.66 0.277 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.66 0.277 calc(h + var(--_helix-series-hue-7))) )` | 3 |
+| `--helix-color-series-16` | `light-dark( oklch(from var(--_helix-seed-brand) 0.63 0.154 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.895 0.219 calc(h + var(--_helix-series-hue-8))) )` | 3 |
+| `--helix-color-series-17` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-1))) )` | 3 |
+| `--helix-color-series-18` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-2))) )` | 3 |
+| `--helix-color-series-19` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-3))) )` | 3 |
+| `--helix-color-series-20` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-4))) )` | 3 |
+| `--helix-color-series-21` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-5))) )` | 3 |
+| `--helix-color-series-22` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-6))) )` | 3 |
+| `--helix-color-series-23` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-7))) )` | 3 |
+| `--helix-color-series-24` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-8))) )` | 3 |
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 29 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
@@ -90,7 +90,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 224 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 271 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 273 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 233 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 231 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 123 |
@@ -128,7 +128,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 92 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 94 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 116 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 43 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 19 |
@@ -173,7 +173,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 212 |
+| `--helix-border-thin` | `1px` | 214 |
 | `--helix-border-thick` | `2px` | 61 |
 
 ## shadow

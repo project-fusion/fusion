@@ -14,6 +14,7 @@ declare module 'svelte/elements' {
     'helix-base-avatar-group': CustomElements['helix-base-avatar-group']
     'helix-base-avatar': CustomElements['helix-base-avatar']
     'helix-base-badge': CustomElements['helix-base-badge']
+    'helix-base-bar-chart': CustomElements['helix-base-bar-chart']
     'helix-base-blockquote': CustomElements['helix-base-blockquote']
     'helix-base-breadcrumb': CustomElements['helix-base-breadcrumb']
     'helix-base-breadcrumbs': CustomElements['helix-base-breadcrumbs']
