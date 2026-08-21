@@ -365,7 +365,7 @@ export function Showcase(): React.ReactElement {
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
               <helix-pin-input label="Verification code" length={4}></helix-pin-input>
-              <helix-rating default-value={4} label="Documentation"></helix-rating>
+              <helix-rating default-value="4" label="Documentation"></helix-rating>
             </helix-flex>
           </helix-card>
 
