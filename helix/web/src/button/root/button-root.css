@@ -44,6 +44,17 @@
  * the old `tertiary` had. */
 :host {
   --_button-edge: var(--helix-color-border);
+  /* The solid fill, separate from the tone, and it has to be separate.
+   *
+   * `--_button-tone` is the colour of the *ink* on every appearance but this
+   * one: an outlined or ghost primary draws its label with it, and in dark mode
+   * that is deliberately the lighter brand so the text is legible on a dark
+   * page. A solid button wants the opposite, a fill dark enough to carry white,
+   * so pointing one variable at both made every filled tone fail in dark mode.
+   * Measured: primary 2.80, warning 1.84. Defaulted to the tone, which is what
+   * neutral wants and what this was before there were two of them. */
+  --_button-fill: var(--_button-tone);
+  --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
   /* Softened toward the page rather than deepened, because neutral's tone is
@@ -76,6 +87,8 @@
 :host([tone="primary"]),
 :host(:not([tone])[variant="primary"]) {
   --_button-edge: var(--helix-color-primary);
+  --_button-fill: var(--helix-color-primary-surface);
+  --_button-fill-hover: var(--helix-color-primary-surface-hover);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-primary);
   --_button-tone-hover: var(--helix-color-primary-hover);
@@ -84,11 +97,18 @@
 :host([tone="danger"]),
 :host(:not([tone])[variant="danger"]) {
   --_button-edge: var(--helix-color-danger);
+  --_button-fill: var(--helix-color-danger-surface);
+  --_button-fill-hover: var(--helix-color-danger-surface-hover);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-danger);
-  /* No `danger-hover` token exists, and inventing one for a single consumer is
-     a token nobody else would ever read. Mixed toward the ink, which deepens it
-     in light mode and in dark alike. */
+  /* Mixed toward the ink, for the ink states rather than the fill.
+   *
+   * This used to serve the solid fill as well, and its own note said it
+   * "deepens it in light mode and in dark alike", which is the half that was
+   * wrong: `--helix-color-foreground` is near-white in dark mode, so the mix
+   * *lightened* the fill and a hover made white text on it harder to read at
+   * the moment the reader was aiming at the button. The fill has a token now
+   * and goes one step darker in both modes. */
   --_button-tone-hover: color-mix(
     in oklab,
     var(--helix-color-danger) 86%,
@@ -200,7 +220,7 @@
 :host([appearance="solid"]) [part="button"],
 :host(:not([appearance])[variant="primary"]) [part="button"],
 :host(:not([appearance])[variant="danger"]) [part="button"] {
-  background-color: var(--button-background-color, var(--_button-tone));
+  background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
@@ -208,7 +228,7 @@
 :host(:not(:disabled)[appearance="solid"]) [part="button"]:hover,
 :host(:not(:disabled):not([appearance])[variant="primary"]) [part="button"]:hover,
 :host(:not(:disabled):not([appearance])[variant="danger"]) [part="button"]:hover {
-  background-color: var(--button-background-color, var(--_button-tone-hover));
+  background-color: var(--button-background-color, var(--_button-fill-hover));
   border-color: transparent;
 }
 

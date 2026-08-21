@@ -203,6 +203,29 @@
   --helix-color-primary-hover: var(--_helix-brand-600);
   --helix-color-primary-active: var(--_helix-brand-700);
   --helix-color-primary-subtle: light-dark(var(--_helix-brand-50), var(--_helix-brand-900));
+
+  /* A fill that carries `--helix-color-foreground-on-accent`, which is the one
+   * job no accent token in this set was doing.
+   *
+   * **The accents are lightened in dark mode because their main use is text on
+   * a dark page**, and `foreground-on-accent` is white in both modes, so every
+   * filled surface in the library failed in dark mode and nothing said so.
+   * Measured by painting each pair to a canvas and reading the pixels back,
+   * `getComputedStyle` reporting `oklch(...)` verbatim: primary 2.80, danger
+   * 3.12, info 2.64, success 2.51, warning 1.84. Body text wants 4.5 and large
+   * text wants 3, so four of the five missed both. Light mode was fine except
+   * primary at 4.40, which is under 4.5 as well and had not been noticed.
+   *
+   * So a surface does not vary by mode. It is the 600 in both, which is dark
+   * enough for white anywhere: measured 5.40 for primary and 5.45 to 6.52 for
+   * the rest, and still 3.29 against a dark surface, above the 3 a UI component
+   * needs to be seen at all.
+   *
+   * `--helix-color-primary` keeps its `light-dark` and is not the thing to fix:
+   * twenty-five rules use it as text, where lightening in dark mode is exactly
+   * right, and eight use it as a fill. One name was doing two jobs. */
+  --helix-color-primary-surface: var(--_helix-brand-600);
+  --helix-color-primary-surface-hover: var(--_helix-brand-700);
   --helix-color-focus-ring: var(--_helix-brand-500);
 
   /* Syntax. What a token in a piece of source is, not what it means to the
@@ -444,6 +467,16 @@
      on a page, `400` on a dark surface. See the primitive, which carries the
      argument. */
   --helix-color-danger: light-dark(var(--_helix-danger-600), var(--_helix-danger-400));
+  /* Fills that carry `foreground-on-accent`. See `--helix-color-primary-surface`
+     for why a surface does not vary by mode. */
+  --helix-color-danger-surface: var(--_helix-danger-600);
+  --helix-color-danger-surface-hover: var(--_helix-danger-700);
+  --helix-color-info-surface: var(--_helix-info-600);
+  --helix-color-info-surface-hover: var(--_helix-info-700);
+  --helix-color-success-surface: var(--_helix-success-600);
+  --helix-color-success-surface-hover: var(--_helix-success-700);
+  --helix-color-warning-surface: var(--_helix-warning-600);
+  --helix-color-warning-surface-hover: var(--_helix-warning-700);
 
   /* ======================================================== space ======= */
   --helix-space-none: var(--_helix-scale-0);
