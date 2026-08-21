@@ -85,6 +85,7 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @event {HelixOpenEvent} helix-open - Fired before the bubble shows, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it hides, and cancelable.
  *
+ * @csspart arrow - The point, resting against the trigger.
  * @csspart tooltip - The bubble.
  */
 @customElement('helix-base-tooltip')
@@ -193,6 +194,19 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
+   * Places the bubble again, for an anchor that moved without the page moving.
+   *
+   * Public because a chart needs it. Its mark walks from reading to reading
+   * while the page holds still, and `autoUpdate` watches scrolling, resizing
+   * and layout shift, none of which is that. Everything else floating here is
+   * anchored to something the page moves, which is why nothing wanted this
+   * until a chart did.
+   */
+  reposition(): void {
+    this.bubbleLayer.reposition()
+  }
+
+  /**
    * The element `for` names, or null.
    *
    * `getRootNode()` rather than `document`, which is what makes this work inside
@@ -219,6 +233,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
    * the press that opened it as a press outside. */
   private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
+    arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
     /* Annotated, because without it the array's element type is inferred from
        `this`, whose own type depends on this controller, and TypeScript stops
        at the cycle. */
@@ -601,6 +616,7 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   protected override render(): TemplateResult {
     return html`<slot></slot>
       <div part="tooltip" popover="manual" role="tooltip">
+        <span part="arrow"></span>
         <slot name="content" @slotchange=${this.handleContentChange}
           >${this.content}</slot
         >

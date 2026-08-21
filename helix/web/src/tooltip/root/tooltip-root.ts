@@ -19,6 +19,7 @@ import { styles } from './tooltip-root.css.js'
  * @aliases Hint, Popup label
  * @documentation https://helix.fusion.dev/components/tooltip
  *
+ * @cssproperty --tooltip-arrow-size - Size of the point at the bubble's edge.
  * @cssproperty --tooltip-background-color - Fill of the bubble.
  * @cssproperty --tooltip-max-inline-size - Widest the bubble grows before wrapping.
  */

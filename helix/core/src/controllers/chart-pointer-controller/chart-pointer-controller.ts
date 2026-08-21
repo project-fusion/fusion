@@ -38,6 +38,7 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
  */
 export class ChartPointerController implements ReactiveController {
   #host: ChartPointerHost
+  #moved = false
   #plot: HTMLElement | undefined
 
   /** The reading under the pointer, or -1 when the pointer is elsewhere. */
@@ -72,6 +73,30 @@ export class ChartPointerController implements ReactiveController {
   }
 
   /**
+   * Tells the tooltip its anchor moved, which nothing else would.
+   *
+   * The mark the tooltip is hung on is one element the chart walks from reading
+   * to reading with an inline style, and Floating UI's `autoUpdate` watches
+   * scrolling, resizing and layout shift. Moving an absolutely positioned
+   * element by writing `inset` is none of the three, so the bubble is placed
+   * once on open and then stays where the first reading was while the mark
+   * travels out from under it.
+   *
+   * Here rather than in the chart because the reading is this controller's, and
+   * after the update rather than in `set` because the mark is still at the old
+   * position until the render that follows.
+   */
+  hostUpdated(): void {
+    if (!this.#moved) {
+      return
+    }
+    this.#moved = false
+    this.#host.renderRoot
+      .querySelector<HTMLElement & { reposition?: () => void }>('[part="tooltip-anchor"]')
+      ?.reposition?.()
+  }
+
+  /**
    * The box the readings are laid out in, which is the plot and not the host.
    *
    * The host also holds the row of labels, so measuring against it would map
@@ -88,6 +113,7 @@ export class ChartPointerController implements ReactiveController {
   set(at: number): void {
     if (at !== this.at) {
       this.at = at
+      this.#moved = true
       this.#host.requestUpdate()
     }
   }
@@ -110,6 +136,7 @@ export class ChartPointerController implements ReactiveController {
     const next = Math.min(Math.max(slot, 0), count - 1)
     if (next !== this.at) {
       this.at = next
+      this.#moved = true
       this.#host.requestUpdate()
     }
   }

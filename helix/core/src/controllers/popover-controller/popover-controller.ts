@@ -202,6 +202,19 @@ export class PopoverController implements ReactiveController {
    * stop, and `autoUpdate` in particular holds listeners on every scrolling
    * ancestor of something no longer in the document.
    */
+  /**
+   * Places the surface again, for an anchor that moved without the page moving.
+   *
+   * `autoUpdate` watches scrolling, resizing and layout shift, which covers
+   * everything that moves an anchor *with* its surroundings. It does not cover
+   * an absolutely positioned anchor being moved by an inline style, and that is
+   * exactly what a chart does: the mark walks from reading to reading while the
+   * page holds still, so the bubble was placed once and stayed there.
+   */
+  reposition(): void {
+    this.floating.update()
+  }
+
   hostDisconnected(): void {
     this.shown = false
   }

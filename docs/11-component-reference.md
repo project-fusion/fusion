@@ -6113,6 +6113,7 @@ still points at the trigger after the bubble has slid along to stay in view.
 | Method | From | Description |
 | --- | --- | --- |
 | `hide()` | `HelixBaseTooltip` | Hides the bubble. |
+| `reposition()` | `HelixBaseTooltip` | Places the bubble again, for an anchor that moved without the page moving. |
 | `requestOpen()` | `MixinControllerOpen` | Requests an open-state change, and reports whether it was applied. |
 | `show()` | `HelixBaseTooltip` | Shows the bubble, unless there is nothing to show. |
 | `toggleOpen()` | `MixinControllerOpen` | Requests the opposite of the current state. |
@@ -6135,12 +6136,14 @@ still points at the trigger after the bubble has slid along to stay in view.
 
 | Part | Description |
 | --- | --- |
+| `arrow` | The point, resting against the trigger. |
 | `tooltip` | The bubble. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
+| `--tooltip-arrow-size` | Size of the point at the bubble's edge. |
 | `--tooltip-background-color` | Fill of the bubble. |
 | `--tooltip-max-inline-size` | Widest the bubble grows before wrapping. |
 
