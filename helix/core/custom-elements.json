@@ -92,6 +92,97 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/chart-pointer-controller/chart-pointer-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Which reading a pointer is nearest, for a chart that draws no markers.\n\n**The anchor is a position and not an element, and that is the whole reason\nthis exists.** A bar and a donut slice are elements a tooltip could be hung\non; a line is one `<path>` for a whole series, because\n`preserveAspectRatio=\"none\"` turns a circle into an ellipse and there is no\nvector-effect that answers for a shape, so `LineChart` deliberately draws no\nper-reading marker. Anchoring per datum works for two charts of four and\ncannot be extended to the third, so the resolution is arithmetic instead.\n\n**It maps along one axis only.** The nearest reading to a pointer is decided\nby x alone in a vertical chart, whatever y is doing, because a reader moving\nacross a chart is asking about a column of it rather than about a point. A\ntrue nearest-point search would make a two-series chart answer differently\ndepending on which line the pointer drifted toward, which is a tooltip that\nchanges its mind while the reader holds still.\n\n**Coarse pointers get nothing.** A touch has no hover, so a tooltip driven by\none appears where a finger already covers it and stays after the finger\nlifts. The table underneath is the readable version and is what a phone\nshould be given, so this listens for `pointermove` and ignores anything whose\n`pointerType` is not fine.",
+          "name": "ChartPointerController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "#host",
+              "privacy": "private",
+              "type": {
+                "text": "ChartPointerHost"
+              },
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "#plot",
+              "privacy": "private",
+              "type": {
+                "text": "HTMLElement | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "at",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "description": "The reading under the pointer, or -1 when the pointer is elsewhere."
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#box",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "DOMRect | undefined"
+                }
+              },
+              "description": "The box the readings are laid out in, which is the plot and not the host.\n\nThe host also holds the row of labels, so measuring against it would map\nthe pointer over a box taller than the drawing. Width is what this uses and\nthe two agree on width today, which is exactly the kind of coincidence that\nstops being true the first time a chart grows an axis down its side."
+            },
+            {
+              "kind": "field",
+              "name": "#move",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "#leave",
+              "privacy": "private",
+              "readonly": true
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ChartPointerController",
+          "declaration": {
+            "name": "ChartPointerController",
+            "module": "src/controllers/chart-pointer-controller/chart-pointer-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/command-controller/command-controller.ts",
       "declarations": [
         {
@@ -2481,6 +2572,22 @@
         },
         {
           "kind": "js",
+          "name": "ChartPointerController",
+          "declaration": {
+            "name": "ChartPointerController",
+            "module": "./controllers/chart-pointer-controller/chart-pointer-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ChartPointerHost",
+          "declaration": {
+            "name": "ChartPointerHost",
+            "module": "./controllers/chart-pointer-controller/chart-pointer-controller.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "CommandController",
           "declaration": {
             "name": "CommandController",
@@ -3217,6 +3324,14 @@
         },
         {
           "kind": "js",
+          "name": "drawTooltip",
+          "declaration": {
+            "name": "drawTooltip",
+            "module": "./utils/draw-tooltip/draw-tooltip.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "deepActiveElement",
           "declaration": {
             "name": "deepActiveElement",
@@ -3309,6 +3424,30 @@
           "declaration": {
             "name": "onUnlessFalse",
             "module": "./utils/on-unless-false/on-unless-false.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Row",
+          "declaration": {
+            "name": "Row",
+            "module": "./utils/read-series/read-series.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "RowCell",
+          "declaration": {
+            "name": "RowCell",
+            "module": "./utils/read-series/read-series.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "readRows",
+          "declaration": {
+            "name": "readRows",
+            "module": "./utils/read-series/read-series.js"
           }
         },
         {
@@ -3534,6 +3673,32 @@
               },
               "description": "What to call the drawing, the consumer's word or the table's own.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "type": {
+                "text": "ChartPointerController"
+              },
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on."
             }
           ],
           "helix": {}
@@ -3550,6 +3715,13 @@
               "readonly": true,
               "default": "new SourceController(this)",
               "description": "Resolves `for` and re-renders when the table behind it changes."
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway."
             },
             {
               "kind": "field",
@@ -3587,6 +3759,24 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true
             }
           ],
@@ -5623,6 +5813,46 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/utils/draw-tooltip/draw-tooltip.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "drawTooltip",
+          "return": {
+            "type": {
+              "text": "TemplateResult | typeof nothing"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              }
+            },
+            {
+              "name": "at",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "What a pointer resting on a reading shows, as markup every chart can use.\n\n**A function rather than a method on `MixinChartSource`, and that is forced.**\nA mixin's members reach a subclass only through its declared interface, and an\ninterface cannot carry a protected one: TypeScript refuses to widen a class to\nan interface across a protected member. Declaring it public would make a\nrender seam part of the published API and break the convention\n`check:seams` holds, that a composed thing sits behind\n`protected render…()`. So the markup is shared here, the way `drawIcon`\nshares a glyph, and each chart keeps a one-line seam of its own.\n\n**It shows the table's text and not the chart's numbers.** `$128k` is what\nthe cell says and `128000` is what the drawing measured, and a tooltip\nprinting the second is the chart overruling the table about how its own\nfigure reads. Every cell of the row is here, including columns nothing was\nplotted from, because a note or a status beside the figures is most of the\nreason to want a tooltip at all.\n\n**Hidden from assistive technology, on purpose.** The table is the accessible\nrepresentation and the drawing is `aria-hidden`; a reader on a keyboard gets\nthe table, which they can reach, rather than a tooltip which they cannot."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "drawTooltip",
+          "declaration": {
+            "name": "drawTooltip",
+            "module": "src/utils/draw-tooltip/draw-tooltip.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/utils/focusable-elements/focusable-elements.ts",
       "declarations": [
         {
@@ -5897,6 +6127,24 @@
               }
             }
           ]
+        },
+        {
+          "kind": "function",
+          "name": "readRows",
+          "return": {
+            "type": {
+              "text": "Row[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "table",
+              "type": {
+                "text": "Element"
+              }
+            }
+          ],
+          "description": "Reads a table as rows rather than as columns.\n\n**Everything `readSeries` throws away on purpose, a tooltip needs.** That\nfunction answers \"what should I draw\", so it keeps the parsed number and\ndiscards the cell's text, and it drops a column whose cells are not numbers\nat all. A chart drawing `128000` and a tooltip saying `128000` would be the\nchart overruling the table, which already decided that number reads `$128k`;\nand a column of notes beside the figures is exactly the extra a reader wants\nwhen their pointer is resting on a reading.\n\nSo this keeps both, and keeps the columns nothing plotted. A chart of two\nseries over a table of four columns still has four columns to show.\n\nThe traversal is the same shape as `readSeries` and deliberately separate.\nFolding them into one pass returning both would make every caller who wants\none build the other, and the two are asked for at different moments: series\non render, rows only where a pointer has stopped."
         }
       ],
       "exports": [
@@ -5905,6 +6153,14 @@
           "name": "readSeries",
           "declaration": {
             "name": "readSeries",
+            "module": "src/utils/read-series/read-series.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "readRows",
+          "declaration": {
+            "name": "readRows",
             "module": "src/utils/read-series/read-series.ts"
           }
         }

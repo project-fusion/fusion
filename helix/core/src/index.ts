@@ -3,6 +3,10 @@ export {
   type AriaForwardOptions,
 } from './controllers/aria-forward-controller/aria-forward-controller.js'
 export {
+  ChartPointerController,
+  type ChartPointerHost,
+} from './controllers/chart-pointer-controller/chart-pointer-controller.js'
+export {
   CommandController,
   type CommandOptions,
   HelixFallbackCommandEvent,
@@ -132,6 +136,7 @@ export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
+export { drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
 export {
   deepActiveElement,
   deepContains,
@@ -145,7 +150,14 @@ export {
 } from './utils/inherit-disabled/inherit-disabled.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
-export { readSeries, type Series, type SeriesPoint } from './utils/read-series/read-series.js'
+export {
+  type Row,
+  type RowCell,
+  readRows,
+  readSeries,
+  type Series,
+  type SeriesPoint,
+} from './utils/read-series/read-series.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,

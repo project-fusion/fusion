@@ -2,6 +2,7 @@
    with the readings without either knowing the other's size. */
 :host {
   display: grid;
+  position: relative;
   gap: var(--line-chart-gap, var(--helix-space-2xs));
 }
 
@@ -260,4 +261,169 @@
 
 [part="area"][data-series="24"] {
   fill: var(--helix-color-series-24);
+}
+
+/* The tooltip, placed on the reading rather than under the pointer.
+ *
+ * `--_chart-tooltip-at` is the middle of the reading's slot, which is where the
+ * drawing put it, so the box holds still while a pointer wanders inside one
+ * column. Following the pointer exactly gives a tooltip that never settles and
+ * is harder to read than the number in it.
+ *
+ * `translate` by half its own width rather than a margin, because the width is
+ * the content's and nothing here knows it.
+ *
+ * **It is not clamped, and that is a known edge rather than an oversight.** At
+ * the first and last reading a wide tooltip hangs past the chart. Clamping it
+ * needs its own width, which is the content's, and CSS has no way to ask: every
+ * fix is either a measurement in JavaScript on every pointer move or a fixed
+ * width that makes the box wrong for its content. The overflow is visible and
+ * legible, so the trade is to leave it. */
+[part="tooltip"] {
+  background-color: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-md);
+  box-sizing: border-box;
+  display: grid;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+  grid-area: 1 / 1;
+  inset-block-start: 0;
+  inset-inline-start: var(--_chart-tooltip-at, 50%);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% 0;
+  white-space: nowrap;
+  z-index: var(--helix-layer-popover);
+}
+
+[part="tooltip-label"] {
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* Name and value on one line, the value pushed to the end so a column of them
+   lines up whatever the names are. */
+[part="tooltip-cell"] {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+[part="tooltip-name"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="tooltip-value"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A dot in the series colour, so a row of the tooltip and a line in the drawing
+   are visibly the same thing. Drawn with a pseudo-element rather than a real
+   one, since it says nothing a reader of the table needs. */
+[part="tooltip-cell"][data-series]::before {
+  block-size: 0.5em;
+  border-radius: var(--helix-radii-full);
+  content: "";
+  inline-size: 0.5em;
+}
+
+[part="tooltip-cell"][data-series="1"]::before {
+  background-color: var(--helix-color-series-1);
+}
+
+[part="tooltip-cell"][data-series="2"]::before {
+  background-color: var(--helix-color-series-2);
+}
+
+[part="tooltip-cell"][data-series="3"]::before {
+  background-color: var(--helix-color-series-3);
+}
+
+[part="tooltip-cell"][data-series="4"]::before {
+  background-color: var(--helix-color-series-4);
+}
+
+[part="tooltip-cell"][data-series="5"]::before {
+  background-color: var(--helix-color-series-5);
+}
+
+[part="tooltip-cell"][data-series="6"]::before {
+  background-color: var(--helix-color-series-6);
+}
+
+[part="tooltip-cell"][data-series="7"]::before {
+  background-color: var(--helix-color-series-7);
+}
+
+[part="tooltip-cell"][data-series="8"]::before {
+  background-color: var(--helix-color-series-8);
+}
+
+[part="tooltip-cell"][data-series="9"]::before {
+  background-color: var(--helix-color-series-9);
+}
+
+[part="tooltip-cell"][data-series="10"]::before {
+  background-color: var(--helix-color-series-10);
+}
+
+[part="tooltip-cell"][data-series="11"]::before {
+  background-color: var(--helix-color-series-11);
+}
+
+[part="tooltip-cell"][data-series="12"]::before {
+  background-color: var(--helix-color-series-12);
+}
+
+[part="tooltip-cell"][data-series="13"]::before {
+  background-color: var(--helix-color-series-13);
+}
+
+[part="tooltip-cell"][data-series="14"]::before {
+  background-color: var(--helix-color-series-14);
+}
+
+[part="tooltip-cell"][data-series="15"]::before {
+  background-color: var(--helix-color-series-15);
+}
+
+[part="tooltip-cell"][data-series="16"]::before {
+  background-color: var(--helix-color-series-16);
+}
+
+[part="tooltip-cell"][data-series="17"]::before {
+  background-color: var(--helix-color-series-17);
+}
+
+[part="tooltip-cell"][data-series="18"]::before {
+  background-color: var(--helix-color-series-18);
+}
+
+[part="tooltip-cell"][data-series="19"]::before {
+  background-color: var(--helix-color-series-19);
+}
+
+[part="tooltip-cell"][data-series="20"]::before {
+  background-color: var(--helix-color-series-20);
+}
+
+[part="tooltip-cell"][data-series="21"]::before {
+  background-color: var(--helix-color-series-21);
+}
+
+[part="tooltip-cell"][data-series="22"]::before {
+  background-color: var(--helix-color-series-22);
+}
+
+[part="tooltip-cell"][data-series="23"]::before {
+  background-color: var(--helix-color-series-23);
+}
+
+[part="tooltip-cell"][data-series="24"]::before {
+  background-color: var(--helix-color-series-24);
 }

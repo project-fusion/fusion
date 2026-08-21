@@ -77,6 +77,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart field - The box holding everything.
  * @csspart control - The input itself.
  * @csspart clear - The button that empties the field.
+ * @csspart icon - A glyph this component draws.
  * @csspart reveal - The button that shows and hides a password.
  */
 @customElement('helix-base-input')

@@ -3416,6 +3416,17 @@
             },
             {
               "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "for",
               "type": {
                 "text": "string"
@@ -3462,6 +3473,32 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -3547,6 +3584,21 @@
                 }
               ],
               "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke.",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a reading shows.\n\nA seam over `drawTooltip`, which holds the markup every chart shares. The\nusual reason to override is arrangement: every cell of the row is already\nthere, including the columns nothing was plotted from.",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -3741,6 +3793,46 @@
             {
               "description": "The drawing.",
               "name": "plot",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "What a pointer resting on a reading shows.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -10629,6 +10721,22 @@
             }
           ],
           "slots": [
+            {
+              "description": "Content at the leading end of the field, inside its border.",
+              "name": "start",
+              "inheritedFrom": {
+                "name": "HelixBaseColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
+              "description": "Content at the trailing end, before the trigger.",
+              "name": "end",
+              "inheritedFrom": {
+                "name": "HelixBaseColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
             {
               "description": "The mark on the field saying a panel opens.",
               "name": "trigger",
@@ -19256,6 +19364,17 @@
             },
             {
               "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "for",
               "type": {
                 "text": "string"
@@ -19302,6 +19421,32 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -27233,6 +27378,17 @@
             },
             {
               "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "for",
               "type": {
                 "text": "string"
@@ -27287,6 +27443,32 @@
             },
             {
               "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "area",
               "type": {
                 "text": "boolean"
@@ -27306,7 +27488,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between. `smooth` is easier to\nfollow across a long series and invents the values between the readings; it\nis monotone cubic, so what it invents never leaves the band the data sets.\n`step` claims the opposite, that a reading holds until the next.\n\nAbsent rather than defaulted to `straight`, because a reflecting property\nwith a default writes its attribute onto every host anybody renders,\nincluding the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts\nthe host carries only what the consumer wrote, and caught it.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* Joining the readings claims nothing in\nbetween, which is true and is why `straight` still exists: a straight\nsegment asserts nothing about the values between two readings, and a curve\ninvents them. What settles it the other way is that the invention is\nbounded. The interpolation is monotone cubic, so it never leaves the band\nthe data sets and never introduces a peak or a trough the series does not\nhave, and within that bound the smoothed line is the easier one to follow\nacross a long series. `straight` becomes the deliberate claim.\n\n**Still absent rather than defaulted on the property**, because a\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured.\n`line-chart-root.ssr.spec.ts` asserts the host carries only what the\nconsumer wrote, and caught that the first time. The default therefore lives\nwhere the path is built, as `curve ?? 'smooth'`.\n\n`step` claims the opposite of both, that a reading holds until the next.",
               "attribute": "curve",
               "reflects": true,
               "inheritedFrom": {
@@ -27435,6 +27617,21 @@
                 }
               ],
               "description": "The reading names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box, for the reason the class doc gives.",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a reading shows.\n\nA seam over `drawTooltip`, which holds the markup every chart shares. The\nusual reason to override is arrangement: every cell of the row is already\nthere, including the columns nothing was plotted from.",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -27599,7 +27796,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between. `smooth` is easier to\nfollow across a long series and invents the values between the readings; it\nis monotone cubic, so what it invents never leaves the band the data sets.\n`step` claims the opposite, that a reading holds until the next.\n\nAbsent rather than defaulted to `straight`, because a reflecting property\nwith a default writes its attribute onto every host anybody renders,\nincluding the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts\nthe host carries only what the consumer wrote, and caught it.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* Joining the readings claims nothing in\nbetween, which is true and is why `straight` still exists: a straight\nsegment asserts nothing about the values between two readings, and a curve\ninvents them. What settles it the other way is that the invention is\nbounded. The interpolation is monotone cubic, so it never leaves the band\nthe data sets and never introduces a peak or a trough the series does not\nhave, and within that bound the smoothed line is the easier one to follow\nacross a long series. `straight` becomes the deliberate claim.\n\n**Still absent rather than defaulted on the property**, because a\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured.\n`line-chart-root.ssr.spec.ts` asserts the host carries only what the\nconsumer wrote, and caught that the first time. The default therefore lives\nwhere the path is built, as `curve ?? 'smooth'`.\n\n`step` claims the opposite of both, that a reading holds until the next.",
               "fieldName": "curve",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
@@ -27664,6 +27861,46 @@
             {
               "description": "The drawing.",
               "name": "plot",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "What a pointer resting on a reading shows.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -48948,7 +49185,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* It read that joining the readings\nclaims nothing in between and is the default for that reason, which is true\nand is why `straight` still exists: a straight segment asserts nothing about\nthe values between two readings, and a curve invents them.\n\nWhat settles it the other way is that the invention is bounded. The\ninterpolation is monotone cubic, so it never leaves the band the data sets\nand never introduces a peak or a trough the series does not have. Within\nthat bound the smoothed line is the easier one to follow across a long\nseries, which is what the drawing is for. `straight` becomes the claim a\nconsumer makes deliberately rather than the one they get by saying nothing.\n\n**The property stays optional and the default lives in the render.** A\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured, which the SSR specs\nassert against. So the resting state is still the attribute's absence, and\n`curve ?? 'smooth'` is what reads it.\n\n`step` claims the opposite of both, that a reading holds until the next.\nBars ignore it, having no between to interpolate.",
               "attribute": "curve",
               "reflects": true,
               "inheritedFrom": {
@@ -49128,7 +49365,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* It read that joining the readings\nclaims nothing in between and is the default for that reason, which is true\nand is why `straight` still exists: a straight segment asserts nothing about\nthe values between two readings, and a curve invents them.\n\nWhat settles it the other way is that the invention is bounded. The\ninterpolation is monotone cubic, so it never leaves the band the data sets\nand never introduces a peak or a trough the series does not have. Within\nthat bound the smoothed line is the easier one to follow across a long\nseries, which is what the drawing is for. `straight` becomes the claim a\nconsumer makes deliberately rather than the one they get by saying nothing.\n\n**The property stays optional and the default lives in the render.** A\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured, which the SSR specs\nassert against. So the resting state is still the attribute's absence, and\n`curve ?? 'smooth'` is what reads it.\n\n`step` claims the opposite of both, that a reading holds until the next.\nBars ignore it, having no between to interpolate.",
               "fieldName": "curve",
               "inheritedFrom": {
                 "name": "HelixBaseSparkline",

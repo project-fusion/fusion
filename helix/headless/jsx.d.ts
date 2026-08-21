@@ -4539,15 +4539,24 @@ ground it should feel like a quantity against is the case for this. */
   area?: HelixBaseLineChart["area"];
   /** How the line gets from one reading to the next.
 
-Absent joins them and claims nothing in between. `smooth` is easier to
-follow across a long series and invents the values between the readings; it
-is monotone cubic, so what it invents never leaves the band the data sets.
-`step` claims the opposite, that a reading holds until the next.
+**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+argument this comment used to make.* Joining the readings claims nothing in
+between, which is true and is why `straight` still exists: a straight
+segment asserts nothing about the values between two readings, and a curve
+invents them. What settles it the other way is that the invention is
+bounded. The interpolation is monotone cubic, so it never leaves the band
+the data sets and never introduces a peak or a trough the series does not
+have, and within that bound the smoothed line is the easier one to follow
+across a long series. `straight` becomes the deliberate claim.
 
-Absent rather than defaulted to `straight`, because a reflecting property
-with a default writes its attribute onto every host anybody renders,
-including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
-the host carries only what the consumer wrote, and caught it. */
+**Still absent rather than defaulted on the property**, because a
+reflecting property with a default writes its attribute onto every host
+anybody renders, including the ones nobody configured.
+`line-chart-root.ssr.spec.ts` asserts the host carries only what the
+consumer wrote, and caught that the first time. The default therefore lives
+where the path is built, as `curve ?? 'smooth'`.
+
+`step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixBaseLineChart["curve"];
   /** Whether zero is forced into the range.
 
@@ -4581,15 +4590,24 @@ ground it should feel like a quantity against is the case for this. */
   "prop:area"?: HelixBaseLineChart["area"];
   /** How the line gets from one reading to the next.
 
-Absent joins them and claims nothing in between. `smooth` is easier to
-follow across a long series and invents the values between the readings; it
-is monotone cubic, so what it invents never leaves the band the data sets.
-`step` claims the opposite, that a reading holds until the next.
+**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+argument this comment used to make.* Joining the readings claims nothing in
+between, which is true and is why `straight` still exists: a straight
+segment asserts nothing about the values between two readings, and a curve
+invents them. What settles it the other way is that the invention is
+bounded. The interpolation is monotone cubic, so it never leaves the band
+the data sets and never introduces a peak or a trough the series does not
+have, and within that bound the smoothed line is the easier one to follow
+across a long series. `straight` becomes the deliberate claim.
 
-Absent rather than defaulted to `straight`, because a reflecting property
-with a default writes its attribute onto every host anybody renders,
-including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
-the host carries only what the consumer wrote, and caught it. */
+**Still absent rather than defaulted on the property**, because a
+reflecting property with a default writes its attribute onto every host
+anybody renders, including the ones nobody configured.
+`line-chart-root.ssr.spec.ts` asserts the host carries only what the
+consumer wrote, and caught that the first time. The default therefore lives
+where the path is built, as `curve ?? 'smooth'`.
+
+`step` claims the opposite of both, that a reading holds until the next. */
   "prop:curve"?: HelixBaseLineChart["curve"];
   /** Whether zero is forced into the range.
 
@@ -7947,11 +7965,27 @@ is markup, the same reason `curve` lives here. */
   plot?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
-Absent joins them and claims nothing in between, which is why it is the
-default. `smooth` is easier to follow across a long series and invents the
-values between the readings; it is monotone cubic, so what it invents never
-leaves the band the data sets. `step` claims the opposite, that a reading
-holds until the next. Bars ignore it, having no between to interpolate. */
+**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+argument this comment used to make.* It read that joining the readings
+claims nothing in between and is the default for that reason, which is true
+and is why `straight` still exists: a straight segment asserts nothing about
+the values between two readings, and a curve invents them.
+
+What settles it the other way is that the invention is bounded. The
+interpolation is monotone cubic, so it never leaves the band the data sets
+and never introduces a peak or a trough the series does not have. Within
+that bound the smoothed line is the easier one to follow across a long
+series, which is what the drawing is for. `straight` becomes the claim a
+consumer makes deliberately rather than the one they get by saying nothing.
+
+**The property stays optional and the default lives in the render.** A
+reflecting property with a default writes its attribute onto every host
+anybody renders, including the ones nobody configured, which the SSR specs
+assert against. So the resting state is still the attribute's absence, and
+`curve ?? 'smooth'` is what reads it.
+
+`step` claims the opposite of both, that a reading holds until the next.
+Bars ignore it, having no between to interpolate. */
   curve?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
@@ -8009,11 +8043,27 @@ is markup, the same reason `curve` lives here. */
   "prop:plot"?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
-Absent joins them and claims nothing in between, which is why it is the
-default. `smooth` is easier to follow across a long series and invents the
-values between the readings; it is monotone cubic, so what it invents never
-leaves the band the data sets. `step` claims the opposite, that a reading
-holds until the next. Bars ignore it, having no between to interpolate. */
+**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+argument this comment used to make.* It read that joining the readings
+claims nothing in between and is the default for that reason, which is true
+and is why `straight` still exists: a straight segment asserts nothing about
+the values between two readings, and a curve invents them.
+
+What settles it the other way is that the invention is bounded. The
+interpolation is monotone cubic, so it never leaves the band the data sets
+and never introduces a peak or a trough the series does not have. Within
+that bound the smoothed line is the easier one to follow across a long
+series, which is what the drawing is for. `straight` becomes the claim a
+consumer makes deliberately rather than the one they get by saying nothing.
+
+**The property stays optional and the default lives in the render.** A
+reflecting property with a default writes its attribute onto every host
+anybody renders, including the ones nobody configured, which the SSR specs
+assert against. So the resting state is still the attribute's absence, and
+`curve ?? 'smooth'` is what reads it.
+
+`step` claims the opposite of both, that a reading holds until the next.
+Bars ignore it, having no between to interpolate. */
   "prop:curve"?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
@@ -12027,6 +12077,12 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -12034,6 +12090,13 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -12045,6 +12108,11 @@ export type CustomElements = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps & BaseProps<HelixBaseBarChart> & BaseEvents
@@ -13082,6 +13150,8 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
+   * - `start`: Content at the leading end of the field, inside its border.
+   * - `end`: Content at the trailing end, before the trigger.
    * - `trigger`: The mark on the field saying a panel opens.
    * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
@@ -13349,6 +13419,7 @@ export type CustomElements = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
+   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
@@ -14529,6 +14600,12 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -14536,6 +14613,13 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## Slots
    *
@@ -14995,6 +15079,7 @@ export type CustomElements = {
    *
    * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
@@ -15483,6 +15568,7 @@ export type CustomElements = {
    * - `field`: The box holding everything.
    * - `control`: The input itself.
    * - `clear`: The button that empties the field.
+   * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
   "helix-base-input": Partial<
@@ -15609,15 +15695,24 @@ export type CustomElements = {
    * ground it should feel like a quantity against is the case for this.
    * - `curve`: How the line gets from one reading to the next.
    *
-   * Absent joins them and claims nothing in between. `smooth` is easier to
-   * follow across a long series and invents the values between the readings; it
-   * is monotone cubic, so what it invents never leaves the band the data sets.
-   * `step` claims the opposite, that a reading holds until the next.
+   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+   * argument this comment used to make.* Joining the readings claims nothing in
+   * between, which is true and is why `straight` still exists: a straight
+   * segment asserts nothing about the values between two readings, and a curve
+   * invents them. What settles it the other way is that the invention is
+   * bounded. The interpolation is monotone cubic, so it never leaves the band
+   * the data sets and never introduces a peak or a trough the series does not
+   * have, and within that bound the smoothed line is the easier one to follow
+   * across a long series. `straight` becomes the deliberate claim.
    *
-   * Absent rather than defaulted to `straight`, because a reflecting property
-   * with a default writes its attribute onto every host anybody renders,
-   * including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
-   * the host carries only what the consumer wrote, and caught it.
+   * **Still absent rather than defaulted on the property**, because a
+   * reflecting property with a default writes its attribute onto every host
+   * anybody renders, including the ones nobody configured.
+   * `line-chart-root.ssr.spec.ts` asserts the host carries only what the
+   * consumer wrote, and caught that the first time. The default therefore lives
+   * where the path is built, as `curve ?? 'smooth'`.
+   *
+   * `step` claims the opposite of both, that a reading holds until the next.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -15636,6 +15731,12 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -15643,6 +15744,13 @@ export type CustomElements = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -15654,6 +15762,11 @@ export type CustomElements = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-line-chart": Partial<
     HelixBaseLineChartProps & BaseProps<HelixBaseLineChart> & BaseEvents
@@ -18727,11 +18840,27 @@ export type CustomElements = {
    * is markup, the same reason `curve` lives here.
    * - `curve`: How the line gets from one reading to the next.
    *
-   * Absent joins them and claims nothing in between, which is why it is the
-   * default. `smooth` is easier to follow across a long series and invents the
-   * values between the readings; it is monotone cubic, so what it invents never
-   * leaves the band the data sets. `step` claims the opposite, that a reading
-   * holds until the next. Bars ignore it, having no between to interpolate.
+   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+   * argument this comment used to make.* It read that joining the readings
+   * claims nothing in between and is the default for that reason, which is true
+   * and is why `straight` still exists: a straight segment asserts nothing about
+   * the values between two readings, and a curve invents them.
+   *
+   * What settles it the other way is that the invention is bounded. The
+   * interpolation is monotone cubic, so it never leaves the band the data sets
+   * and never introduces a peak or a trough the series does not have. Within
+   * that bound the smoothed line is the easier one to follow across a long
+   * series, which is what the drawing is for. `straight` becomes the claim a
+   * consumer makes deliberately rather than the one they get by saying nothing.
+   *
+   * **The property stays optional and the default lives in the render.** A
+   * reflecting property with a default writes its attribute onto every host
+   * anybody renders, including the ones nobody configured, which the SSR specs
+   * assert against. So the resting state is still the attribute's absence, and
+   * `curve ?? 'smooth'` is what reads it.
+   *
+   * `step` claims the opposite of both, that a reading holds until the next.
+   * Bars ignore it, having no between to interpolate.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -18916,6 +19045,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
@@ -21794,6 +21924,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `icon`: The glyph on the trigger.
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
@@ -22033,6 +22164,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
@@ -22566,6 +22698,12 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -22573,6 +22711,13 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -22584,6 +22729,11 @@ export type CustomElementsSolidJs = {
    * - `label`: One category's name.
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps &
@@ -23660,6 +23810,8 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
+   * - `start`: Content at the leading end of the field, inside its border.
+   * - `end`: Content at the trailing end, before the trigger.
    * - `trigger`: The mark on the field saying a panel opens.
    * - `hint`: Help under the field.
    * - `feedback`: What is wrong with it.
@@ -23930,6 +24082,7 @@ export type CustomElementsSolidJs = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
+   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
@@ -25134,6 +25287,12 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -25141,6 +25300,13 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## Slots
    *
@@ -25615,6 +25781,7 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
@@ -26115,6 +26282,7 @@ export type CustomElementsSolidJs = {
    * - `field`: The box holding everything.
    * - `control`: The input itself.
    * - `clear`: The button that empties the field.
+   * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
   "helix-base-input": Partial<
@@ -26250,15 +26418,24 @@ export type CustomElementsSolidJs = {
    * ground it should feel like a quantity against is the case for this.
    * - `curve`: How the line gets from one reading to the next.
    *
-   * Absent joins them and claims nothing in between. `smooth` is easier to
-   * follow across a long series and invents the values between the readings; it
-   * is monotone cubic, so what it invents never leaves the band the data sets.
-   * `step` claims the opposite, that a reading holds until the next.
+   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+   * argument this comment used to make.* Joining the readings claims nothing in
+   * between, which is true and is why `straight` still exists: a straight
+   * segment asserts nothing about the values between two readings, and a curve
+   * invents them. What settles it the other way is that the invention is
+   * bounded. The interpolation is monotone cubic, so it never leaves the band
+   * the data sets and never introduces a peak or a trough the series does not
+   * have, and within that bound the smoothed line is the easier one to follow
+   * across a long series. `straight` becomes the deliberate claim.
    *
-   * Absent rather than defaulted to `straight`, because a reflecting property
-   * with a default writes its attribute onto every host anybody renders,
-   * including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
-   * the host carries only what the consumer wrote, and caught it.
+   * **Still absent rather than defaulted on the property**, because a
+   * reflecting property with a default writes its attribute onto every host
+   * anybody renders, including the ones nobody configured.
+   * `line-chart-root.ssr.spec.ts` asserts the host carries only what the
+   * consumer wrote, and caught that the first time. The default therefore lives
+   * where the path is built, as `curve ?? 'smooth'`.
+   *
+   * `step` claims the opposite of both, that a reading holds until the next.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -26277,6 +26454,12 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
+   *
+   * Public for the same reason `series` and `named` are: a protected member
+   * cannot be cast onto across unrelated classes, so it would be invisible to
+   * every chart that needs it. Reading where a pointer is resting is a fair
+   * thing to ask a chart anyway. (property only) (readonly)
    * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
    * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
@@ -26284,6 +26467,13 @@ export type CustomElementsSolidJs = {
    * already written, already the right words, and already the thing a reader
    * of the table sees. A chart that made the consumer say it twice would be
    * asking for the second one to drift. (property only) (readonly)
+   * - `rows`: Every row of the table, with each cell's text as well as its number.
+   *
+   * This is where a tooltip's content comes from, and it is deliberately not
+   * `series`. A chart draws numbers; a reader resting a pointer on one wants
+   * what the table says, which is `$128k` and not `128000`, and often wants
+   * the column beside it that nothing plotted at all. (property only) (readonly)
+   * - `readings`: How many readings there are, which is what the pointer maps onto. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -26295,6 +26485,11 @@ export type CustomElementsSolidJs = {
    * - `labels`: The row of reading names.
    * - `line`: One series.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The reading's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-line-chart": Partial<
     HelixBaseLineChartProps &
@@ -29451,11 +29646,27 @@ export type CustomElementsSolidJs = {
    * is markup, the same reason `curve` lives here.
    * - `curve`: How the line gets from one reading to the next.
    *
-   * Absent joins them and claims nothing in between, which is why it is the
-   * default. `smooth` is easier to follow across a long series and invents the
-   * values between the readings; it is monotone cubic, so what it invents never
-   * leaves the band the data sets. `step` claims the opposite, that a reading
-   * holds until the next. Bars ignore it, having no between to interpolate.
+   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+   * argument this comment used to make.* It read that joining the readings
+   * claims nothing in between and is the default for that reason, which is true
+   * and is why `straight` still exists: a straight segment asserts nothing about
+   * the values between two readings, and a curve invents them.
+   *
+   * What settles it the other way is that the invention is bounded. The
+   * interpolation is monotone cubic, so it never leaves the band the data sets
+   * and never introduces a peak or a trough the series does not have. Within
+   * that bound the smoothed line is the easier one to follow across a long
+   * series, which is what the drawing is for. `straight` becomes the claim a
+   * consumer makes deliberately rather than the one they get by saying nothing.
+   *
+   * **The property stays optional and the default lives in the render.** A
+   * reflecting property with a default writes its attribute onto every host
+   * anybody renders, including the ones nobody configured, which the SSR specs
+   * assert against. So the resting state is still the attribute's absence, and
+   * `curve ?? 'smooth'` is what reads it.
+   *
+   * `step` claims the opposite of both, that a reading holds until the next.
+   * Bars ignore it, having no between to interpolate.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -29646,6 +29857,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
@@ -32618,6 +32830,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `icon`: The glyph on the trigger.
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
@@ -32861,6 +33074,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.

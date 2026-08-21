@@ -1,6 +1,7 @@
 import {
   type Curve,
   customElement,
+  drawTooltip,
   extent,
   HelixElement,
   linear,
@@ -57,6 +58,11 @@ const HEIGHT = 100
  * @csspart labels - The row of reading names.
  * @csspart line - One series.
  * @csspart plot - The drawing.
+ * @csspart tooltip - What a pointer resting on a reading shows.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-label - The reading's own name inside the tooltip.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  */
 @customElement('helix-base-line-chart')
 export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
@@ -136,7 +142,8 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
 
     const named = this.named
 
-    return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}`
+    return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}
+      ${this.renderTooltip()}`
   }
 
   /**
@@ -207,6 +214,17 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
     return html`<div aria-hidden="true" part="labels">
       ${readings.map((one) => html`<span part="label">${one}</span>`)}
     </div>`
+  }
+
+  /**
+   * What a pointer resting on a reading shows.
+   *
+   * A seam over `drawTooltip`, which holds the markup every chart shares. The
+   * usual reason to override is arrangement: every cell of the row is already
+   * there, including the columns nothing was plotted from.
+   */
+  protected renderTooltip(): TemplateResult | typeof nothing {
+    return drawTooltip(this.rows, this.pointer.at)
   }
 }
 

@@ -147,6 +147,7 @@ const SKIP_SECONDS = 10
  * @slot controls - Added to the control bar, before fullscreen.
  * @slot poster - Shown over the video until it starts.
  *
+ * @csspart icon - A glyph this component draws.
  * @csspart stage - The box holding the picture and its controls, and the focus
  * target the keys are bound to.
  * @csspart video - The video itself.

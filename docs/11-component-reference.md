@@ -450,6 +450,9 @@ it is measured against.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
+| `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
+| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 
 #### Parts
@@ -462,6 +465,11 @@ it is measured against.
 | `label` | One category's name. |
 | `labels` | The row of category names. |
 | `plot` | The drawing. |
+| `tooltip` | What a pointer resting on a reading shows. |
+| `tooltip-cell` | One column's name and value inside the tooltip. |
+| `tooltip-label` | The reading's own name inside the tooltip. |
+| `tooltip-name` | A column's name inside the tooltip. |
+| `tooltip-value` | A column's value inside the tooltip. |
 
 #### Custom properties
 
@@ -1145,6 +1153,8 @@ pads its own lower rows.
 
 | Slot | Description |
 | --- | --- |
+| `start` | Content at the leading end of the field, inside its border. |
+| `end` | Content at the trailing end, before the trigger. |
 | `trigger` | The mark on the field saying a panel opens. |
 | `hint` | Help under the field. |
 | `feedback` | What is wrong with it. |
@@ -1815,6 +1825,9 @@ still reads as a ring with a gap rather than as a broken arc.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
+| `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
+| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 
 #### Slots
@@ -2564,6 +2577,9 @@ answers for a shape.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
+| `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
+| `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `zero` | `zero` | `boolean` | `false` | `HelixBaseLineChart` | Whether zero is forced into the range. |
 
@@ -2577,6 +2593,11 @@ answers for a shape.
 | `labels` | The row of reading names. |
 | `line` | One series. |
 | `plot` | The drawing. |
+| `tooltip` | What a pointer resting on a reading shows. |
+| `tooltip-cell` | One column's name and value inside the tooltip. |
+| `tooltip-label` | The reading's own name inside the tooltip. |
+| `tooltip-name` | A column's name inside the tooltip. |
+| `tooltip-value` | A column's value inside the tooltip. |
 
 #### Custom properties
 

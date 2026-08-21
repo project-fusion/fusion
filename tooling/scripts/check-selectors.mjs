@@ -106,6 +106,26 @@ const stylesheets = (dir) => {
 /* What each class renders, and what it extends. A class is recorded by name
    rather than by file, because that is what `extends` names and what crosses a
    tier boundary. */
+/* What each shared `draw…` helper writes, read once from core's utils. */
+const helpers = new Map()
+for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) {
+  if (!dir.isDirectory() || !dir.name.startsWith('draw-')) {
+    continue
+  }
+  for (const entry of readdirSync(join('helix/core/src/utils', dir.name))) {
+    if (!entry.endsWith('.ts') || entry.includes('.spec.')) {
+      continue
+    }
+    const code = readFileSync(join('helix/core/src/utils', dir.name, entry), 'utf8')
+    const name = /export const (draw[A-Z]\w*)/.exec(code)?.[1]
+    if (name) {
+      helpers.set(
+        name,
+        [...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+      )
+    }
+  }
+}
 const renders = new Map()
 const bases = new Map()
 const fileOf = new Map()
@@ -158,6 +178,18 @@ for (const tier of TIERS) {
       }
       for (const [, part] of text.matchAll(/part="([a-z-]+)"/g)) {
         renders.get(last)?.add(part)
+      }
+      /* And the parts a shared `draw…` helper writes on the component's behalf.
+       *
+       * The same blind spot `check:parts` had, and it fails the opposite way,
+       * which is why both were needed: there, five real parts read as
+       * documented-and-never-rendered; here, five live stylesheet rules read as
+       * matching nothing. Two checks disagreeing with the code in opposite
+       * directions about one fact. */
+      for (const [, helper] of text.matchAll(/\b(draw[A-Z]\w*)\s*\(/g)) {
+        for (const part of helpers.get(helper) ?? []) {
+          renders.get(last)?.add(part)
+        }
       }
     }
   }

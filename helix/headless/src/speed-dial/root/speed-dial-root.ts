@@ -48,6 +48,7 @@ import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
  * @slot - The actions.
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.
  *
+ * @csspart icon - A glyph this component draws.
  * @csspart trigger - The default trigger, where none was slotted.
  * @csspart actions - The region the actions are drawn in.
  *

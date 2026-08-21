@@ -97,6 +97,7 @@ interface EyeDropperConstructor {
  * @csspart grid-saturation - The range input for the square's horizontal axis.
  * @csspart grid-brightness - The range input for its vertical axis.
  * @csspart controls - The row under the square.
+ * @csspart icon - A glyph this component draws.
  * @csspart sample - The chip of the current color, which copies it when pressed.
  * @csspart channels - The ramps beside it.
  * @csspart channel - One ramp.

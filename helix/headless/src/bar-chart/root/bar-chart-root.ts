@@ -1,5 +1,6 @@
 import {
   customElement,
+  drawTooltip,
   extent,
   HelixElement,
   linear,
@@ -49,6 +50,11 @@ const HEIGHT = 100
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
  * @csspart plot - The drawing.
+ * @csspart tooltip - What a pointer resting on a reading shows.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-label - The reading's own name inside the tooltip.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  */
 @customElement('helix-base-bar-chart')
 export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
@@ -93,7 +99,8 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const named = this.named
 
     return html`${this.renderPlot(series, categories, y, floor, named)}
-      ${this.renderLabels(categories)}`
+      ${this.renderLabels(categories)}
+      ${this.renderTooltip()}`
   }
 
   /**
@@ -179,6 +186,17 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     return html`<div aria-hidden="true" part="labels">
       ${categories.map((one) => html`<span part="label">${one}</span>`)}
     </div>`
+  }
+
+  /**
+   * What a pointer resting on a reading shows.
+   *
+   * A seam over `drawTooltip`, which holds the markup every chart shares. The
+   * usual reason to override is arrangement: every cell of the row is already
+   * there, including the columns nothing was plotted from.
+   */
+  protected renderTooltip(): TemplateResult | typeof nothing {
+    return drawTooltip(this.rows, this.pointer.at)
   }
 }
 

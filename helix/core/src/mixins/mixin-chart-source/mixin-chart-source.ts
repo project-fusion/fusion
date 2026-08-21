@@ -1,8 +1,9 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { readSeries, type Series } from '../../utils/read-series/read-series.js'
+import { type Row, readRows, readSeries, type Series } from '../../utils/read-series/read-series.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -68,6 +69,18 @@ export declare class MixinChartSourceInterface {
    * What to call the drawing, the consumer's word or the table's own.
    */
   get named(): string
+  /**
+   * Every row of the table, with each cell's text as well as its number.
+   */
+  get rows(): Row[]
+  /**
+   * How many readings there are, which is what the pointer maps onto.
+   */
+  get readings(): number
+  /**
+   * Which reading a pointer is nearest, for a tooltip to sit on.
+   */
+  pointer: ChartPointerController
 }
 
 /**
@@ -94,6 +107,16 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
   class ChartSourceElement extends Base {
     /** Resolves `for` and re-renders when the table behind it changes. */
     protected readonly source = new SourceController(this)
+
+    /**
+     * Which reading a pointer is nearest, for a tooltip to sit on.
+     *
+     * Public for the same reason `series` and `named` are: a protected member
+     * cannot be cast onto across unrelated classes, so it would be invisible to
+     * every chart that needs it. Reading where a pointer is resting is a fair
+     * thing to ask a chart anyway.
+     */
+    readonly pointer = new ChartPointerController(this)
 
     /**
      * The id of the table to read.
@@ -150,6 +173,24 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     get named(): string {
       return this.label || this.source.element?.querySelector('caption')?.textContent?.trim() || ''
+    }
+
+    /**
+     * Every row of the table, with each cell's text as well as its number.
+     *
+     * This is where a tooltip's content comes from, and it is deliberately not
+     * `series`. A chart draws numbers; a reader resting a pointer on one wants
+     * what the table says, which is `$128k` and not `128000`, and often wants
+     * the column beside it that nothing plotted at all.
+     */
+    get rows(): Row[] {
+      const element = this.source.element
+      return element ? readRows(element) : []
+    }
+
+    /** How many readings there are, which is what the pointer maps onto. */
+    get readings(): number {
+      return this.rows.length
     }
   }
 

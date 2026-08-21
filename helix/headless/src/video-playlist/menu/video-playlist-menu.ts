@@ -57,6 +57,7 @@ const ITEMS = 'helix-video-playlist-item, helix-base-video-playlist-item'
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
  * @csspart entry - One entry in the menu.
+ * @csspart icon - The glyph on the trigger.
  * @csspart poster - An entry's still, where it has one.
  * @csspart menu - The menu that holds the entries.
  * @csspart trigger - The button that opens it.

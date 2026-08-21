@@ -108,9 +108,21 @@ const readGrid = (grid: Element): Series[] => {
   }))
 }
 
+/* A column with no numbers in it is not a series.
+ *
+ * Both readers build one entry per data column and then drop the rows whose
+ * cells will not parse, so a column of notes came back as a series with a name
+ * and no points. Nothing drew it, which is why it went unseen, and `Legend`
+ * named it anyway: a swatch in the palette against a column no chart plotted,
+ * and every series after it shifted a colour.
+ *
+ * Found the moment tables grew columns a tooltip wanted and a drawing did not,
+ * which is the arrangement `readRows` exists for. */
+const plotted = (series: Series[]): Series[] => series.filter((one) => one.points.length > 0)
+
 export const readSeries = (table: Element): Series[] => {
   if (isGrid(table)) {
-    return readGrid(table)
+    return plotted(readGrid(table))
   }
   const element = table as HTMLTableElement
   const names = [...(element.tHead?.rows[0]?.cells ?? [])]
@@ -119,20 +131,118 @@ export const readSeries = (table: Element): Series[] => {
   const rows = [...(element.tBodies[0]?.rows ?? [])]
   const columns = Math.max(0, ...rows.map((row) => row.cells.length - 1))
 
-  return Array.from({ length: columns }, (_, column) => ({
-    name: names[column] ?? element.caption?.textContent?.trim() ?? '',
-    points: rows.flatMap((row) => {
-      const head = row.cells[0]
-      const cell = row.cells[column + 1]
-      if (!cell) {
-        return []
-      }
-      const raw = cell.dataset.value ?? cell.textContent ?? ''
-      const value = Number(raw.trim())
-      const when = head?.querySelector('time')?.getAttribute('datetime')
-      return Number.isFinite(value) && raw.trim() !== ''
-        ? [{ label: head?.textContent?.trim() ?? '', value, ...(when ? { when } : {}) }]
-        : []
-    }),
-  }))
+  return plotted(
+    Array.from({ length: columns }, (_, column) => ({
+      name: names[column] ?? element.caption?.textContent?.trim() ?? '',
+      points: rows.flatMap((row) => {
+        const head = row.cells[0]
+        const cell = row.cells[column + 1]
+        if (!cell) {
+          return []
+        }
+        const raw = cell.dataset.value ?? cell.textContent ?? ''
+        const value = Number(raw.trim())
+        const when = head?.querySelector('time')?.getAttribute('datetime')
+        return Number.isFinite(value) && raw.trim() !== ''
+          ? [{ label: head?.textContent?.trim() ?? '', value, ...(when ? { when } : {}) }]
+          : []
+      }),
+    })),
+  )
+}
+
+/** One cell of a row, as a reader sees it and as a chart measures it. */
+export interface RowCell {
+  /**
+   * The column's name, from the header.
+   */
+  name: string
+  /**
+   * The cell's own text, which is what a reader sees.
+   */
+  text: string
+  /**
+   * The number behind it, where there is one.
+   */
+  value?: number
+}
+
+/** One row of a table, headed and with every cell in it. */
+export interface Row {
+  /**
+   * The row's own label, from its header cell.
+   */
+  cells: RowCell[]
+  /**
+   * Every cell in the row, in order, numeric or not.
+   */
+  label: string
+  /**
+   * The machine-readable instant, if the row header carries a `<time>`.
+   */
+  when?: string
+}
+
+/**
+ * Reads a table as rows rather than as columns.
+ *
+ * **Everything `readSeries` throws away on purpose, a tooltip needs.** That
+ * function answers "what should I draw", so it keeps the parsed number and
+ * discards the cell's text, and it drops a column whose cells are not numbers
+ * at all. A chart drawing `128000` and a tooltip saying `128000` would be the
+ * chart overruling the table, which already decided that number reads `$128k`;
+ * and a column of notes beside the figures is exactly the extra a reader wants
+ * when their pointer is resting on a reading.
+ *
+ * So this keeps both, and keeps the columns nothing plotted. A chart of two
+ * series over a table of four columns still has four columns to show.
+ *
+ * The traversal is the same shape as `readSeries` and deliberately separate.
+ * Folding them into one pass returning both would make every caller who wants
+ * one build the other, and the two are asked for at different moments: series
+ * on render, rows only where a pointer has stopped.
+ */
+export const readRows = (table: Element): Row[] => {
+  const cell = (name: string, element: Element | undefined): RowCell | undefined => {
+    if (!element) {
+      return undefined
+    }
+    const text = element.textContent?.trim() ?? ''
+    const raw = (element as HTMLElement).dataset?.value ?? text
+    const value = Number(raw.trim())
+    return {
+      name,
+      text,
+      ...(Number.isFinite(value) && raw.trim() !== '' ? { value } : {}),
+    }
+  }
+
+  const row = (head: Element | undefined, rest: Element[], names: string[]): Row => {
+    const when = head?.querySelector('time')?.getAttribute('datetime')
+    return {
+      cells: rest
+        .map((one, index) => cell(names[index] ?? '', one))
+        .filter((one): one is RowCell => one !== undefined),
+      label: head?.textContent?.trim() ?? '',
+      ...(when ? { when } : {}),
+    }
+  }
+
+  if (isGrid(table)) {
+    const names = [...table.querySelectorAll(COLUMNS)]
+      .slice(1)
+      .map((one) => one.textContent?.trim() ?? '')
+    return [...table.querySelectorAll(ROWS)].map((one) => {
+      const cells = [...one.querySelectorAll(CELLS)]
+      return row(cells[0], cells.slice(1), names)
+    })
+  }
+
+  const element = table as HTMLTableElement
+  const names = [...(element.tHead?.rows[0]?.cells ?? [])]
+    .slice(1)
+    .map((one) => one.textContent?.trim() ?? '')
+  return [...(element.tBodies[0]?.rows ?? [])].map((one) =>
+    row(one.cells[0], [...one.cells].slice(1), names),
+  )
 }

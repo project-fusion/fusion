@@ -105,6 +105,7 @@ const kind = (file: File): string => {
  *
  * @csspart field - The box that is pressed and dropped on.
  * @csspart control - The file input itself, which carries the label and validity.
+ * @csspart icon - A glyph this component draws.
  * @csspart trigger - The label that opens the picker.
  * @csspart list - The chosen files.
  * @csspart file - One chosen file.

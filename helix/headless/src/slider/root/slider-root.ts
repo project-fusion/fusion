@@ -136,7 +136,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
   @property({ type: Number })
   step = 1
 
-  /**
+  /*
    * The value each mark stands at, snapped to a step it can be reached on.
    *
    * De-duplicated, because snapping can land two marks on one step: five marks

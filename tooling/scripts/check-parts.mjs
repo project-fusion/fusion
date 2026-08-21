@@ -45,6 +45,27 @@ const isSource = (path) =>
   extname(path) === '.ts' && !path.endsWith('.css.ts') && !path.includes('.spec.')
 
 /** Every component in both tiers, by class name. */
+/* What each shared `draw…` helper writes, read once from core's utils. */
+const helpers = new Map()
+for (const dir of readdirSync('helix/core/src/utils', { withFileTypes: true })) {
+  if (!dir.isDirectory() || !dir.name.startsWith('draw-')) {
+    continue
+  }
+  for (const file of readdirSync(join('helix/core/src/utils', dir.name))) {
+    if (!file.endsWith('.ts') || file.includes('.spec.')) {
+      continue
+    }
+    const code = readFileSync(join('helix/core/src/utils', dir.name, file), 'utf8')
+    const name = /export const (draw[A-Z]\w*)/.exec(code)?.[1]
+    if (name) {
+      helpers.set(
+        name,
+        [...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+      )
+    }
+  }
+}
+
 const components = new Map()
 
 for (const tier of TIERS) {
@@ -78,7 +99,24 @@ for (const tier of TIERS) {
         .map((one) => one.split(':').pop()?.trim() ?? '')
         .filter(Boolean),
     )
-    const rendered = [...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]), ...forwarded]
+    /* Parts written by a shared draw helper count as this component's.
+     *
+     * `drawTooltip` lives in core and holds the markup every chart shares,
+     * because a mixin cannot carry a protected render seam across its declared
+     * interface. Walking `extends` alone, the five tooltip parts read as
+     * documented-and-never-rendered on both charts that call it, and the fix
+     * this check suggests would have been to stop documenting parts a consumer
+     * can very much style. So a file that imports a `draw…` helper inherits the
+     * parts that helper writes. */
+    const drawn = [...code.matchAll(/\b(draw[A-Z]\w*)\s*\(/g)]
+      .map((m) => helpers.get(m[1]))
+      .filter(Boolean)
+      .flat()
+    const rendered = [
+      ...[...code.matchAll(/part="([a-z0-9-]+)"/g)].map((m) => m[1]),
+      ...forwarded,
+      ...drawn,
+    ]
     components.set(name, {
       bases: [...base.matchAll(/(\w+)/g)].map((m) => m[1]),
       documented,

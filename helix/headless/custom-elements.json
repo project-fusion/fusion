@@ -1831,6 +1831,26 @@
             {
               "description": "The drawing.",
               "name": "plot"
+            },
+            {
+              "description": "What a pointer resting on a reading shows.",
+              "name": "tooltip"
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell"
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label"
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name"
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value"
             }
           ],
           "members": [
@@ -1907,12 +1927,34 @@
               "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke."
             },
             {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a reading shows.\n\nA seam over `drawTooltip`, which holds the markup every chart shares. The\nusual reason to override is arrangement: every cell of the row is already\nthere, including the columns nothing was plotted from."
+            },
+            {
               "kind": "field",
               "name": "source",
               "privacy": "protected",
               "readonly": true,
               "default": "new SourceController(this)",
               "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
               "inheritedFrom": {
                 "name": "MixinChartSource",
                 "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
@@ -1966,6 +2008,32 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -6261,6 +6329,14 @@
           ],
           "slots": [
             {
+              "description": "Content at the leading end of the field, inside its border.",
+              "name": "start"
+            },
+            {
+              "description": "Content at the trailing end, before the trigger.",
+              "name": "end"
+            },
+            {
               "description": "The mark on the field saying a panel opens.",
               "name": "trigger"
             },
@@ -7683,6 +7759,10 @@
             {
               "description": "The row under the square.",
               "name": "controls"
+            },
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon"
             },
             {
               "description": "The chip of the current color, which copies it when pressed.",
@@ -14512,6 +14592,17 @@
             },
             {
               "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "for",
               "type": {
                 "text": "string"
@@ -14558,6 +14649,32 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -16126,6 +16243,10 @@
             {
               "description": "The file input itself, which carries the label and validity.",
               "name": "control"
+            },
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon"
             },
             {
               "description": "The label that opens the picker.",
@@ -18834,6 +18955,10 @@
               "name": "clear"
             },
             {
+              "description": "A glyph this component draws.",
+              "name": "icon"
+            },
+            {
               "description": "The button that shows and hides a password.",
               "name": "reveal"
             }
@@ -20349,6 +20474,26 @@
             {
               "description": "The drawing.",
               "name": "plot"
+            },
+            {
+              "description": "What a pointer resting on a reading shows.",
+              "name": "tooltip"
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell"
+            },
+            {
+              "description": "The reading's own name inside the tooltip.",
+              "name": "tooltip-label"
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name"
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value"
             }
           ],
           "members": [
@@ -20369,7 +20514,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between. `smooth` is easier to\nfollow across a long series and invents the values between the readings; it\nis monotone cubic, so what it invents never leaves the band the data sets.\n`step` claims the opposite, that a reading holds until the next.\n\nAbsent rather than defaulted to `straight`, because a reflecting property\nwith a default writes its attribute onto every host anybody renders,\nincluding the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts\nthe host carries only what the consumer wrote, and caught it.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* Joining the readings claims nothing in\nbetween, which is true and is why `straight` still exists: a straight\nsegment asserts nothing about the values between two readings, and a curve\ninvents them. What settles it the other way is that the invention is\nbounded. The interpolation is monotone cubic, so it never leaves the band\nthe data sets and never introduces a peak or a trough the series does not\nhave, and within that bound the smoothed line is the easier one to follow\nacross a long series. `straight` becomes the deliberate claim.\n\n**Still absent rather than defaulted on the property**, because a\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured.\n`line-chart-root.ssr.spec.ts` asserts the host carries only what the\nconsumer wrote, and caught that the first time. The default therefore lives\nwhere the path is built, as `curve ?? 'smooth'`.\n\n`step` claims the opposite of both, that a reading holds until the next.",
               "attribute": "curve",
               "reflects": true
             },
@@ -20484,12 +20629,34 @@
               "description": "The reading names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box, for the reason the class doc gives."
             },
             {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a reading shows.\n\nA seam over `drawTooltip`, which holds the markup every chart shares. The\nusual reason to override is arrangement: every cell of the row is already\nthere, including the columns nothing was plotted from."
+            },
+            {
               "kind": "field",
               "name": "source",
               "privacy": "protected",
               "readonly": true,
               "default": "new SourceController(this)",
               "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "pointer",
+              "readonly": true,
+              "default": "new ChartPointerController(this)",
+              "description": "Which reading a pointer is nearest, for a tooltip to sit on.\n\nPublic for the same reason `series` and `named` are: a protected member\ncannot be cast onto across unrelated classes, so it would be invisible to\nevery chart that needs it. Reading where a pointer is resting is a fair\nthing to ask a chart anyway.",
               "inheritedFrom": {
                 "name": "MixinChartSource",
                 "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
@@ -20543,6 +20710,32 @@
                 "text": "string"
               },
               "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "Row[]"
+              },
+              "description": "Every row of the table, with each cell's text as well as its number.\n\nThis is where a tooltip's content comes from, and it is deliberately not\n`series`. A chart draws numbers; a reader resting a pointer on one wants\nwhat the table says, which is `$128k` and not `128000`, and often wants\nthe column beside it that nothing plotted at all.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "readings",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many readings there are, which is what the pointer maps onto.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "MixinChartSource",
@@ -20634,7 +20827,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between. `smooth` is easier to\nfollow across a long series and invents the values between the readings; it\nis monotone cubic, so what it invents never leaves the band the data sets.\n`step` claims the opposite, that a reading holds until the next.\n\nAbsent rather than defaulted to `straight`, because a reflecting property\nwith a default writes its attribute onto every host anybody renders,\nincluding the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts\nthe host carries only what the consumer wrote, and caught it.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* Joining the readings claims nothing in\nbetween, which is true and is why `straight` still exists: a straight\nsegment asserts nothing about the values between two readings, and a curve\ninvents them. What settles it the other way is that the invention is\nbounded. The interpolation is monotone cubic, so it never leaves the band\nthe data sets and never introduces a peak or a trough the series does not\nhave, and within that bound the smoothed line is the easier one to follow\nacross a long series. `straight` becomes the deliberate claim.\n\n**Still absent rather than defaulted on the property**, because a\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured.\n`line-chart-root.ssr.spec.ts` asserts the host carries only what the\nconsumer wrote, and caught that the first time. The default therefore lives\nwhere the path is built, as `curve ?? 'smooth'`.\n\n`step` claims the opposite of both, that a reading holds until the next.",
               "fieldName": "curve"
             },
             {
@@ -35957,7 +36150,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* It read that joining the readings\nclaims nothing in between and is the default for that reason, which is true\nand is why `straight` still exists: a straight segment asserts nothing about\nthe values between two readings, and a curve invents them.\n\nWhat settles it the other way is that the invention is bounded. The\ninterpolation is monotone cubic, so it never leaves the band the data sets\nand never introduces a peak or a trough the series does not have. Within\nthat bound the smoothed line is the easier one to follow across a long\nseries, which is what the drawing is for. `straight` becomes the claim a\nconsumer makes deliberately rather than the one they get by saying nothing.\n\n**The property stays optional and the default lives in the render.** A\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured, which the SSR specs\nassert against. So the resting state is still the attribute's absence, and\n`curve ?? 'smooth'` is what reads it.\n\n`step` claims the opposite of both, that a reading holds until the next.\nBars ignore it, having no between to interpolate.",
               "attribute": "curve",
               "reflects": true
             },
@@ -36093,7 +36286,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
+              "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* It read that joining the readings\nclaims nothing in between and is the default for that reason, which is true\nand is why `straight` still exists: a straight segment asserts nothing about\nthe values between two readings, and a curve invents them.\n\nWhat settles it the other way is that the invention is bounded. The\ninterpolation is monotone cubic, so it never leaves the band the data sets\nand never introduces a peak or a trough the series does not have. Within\nthat bound the smoothed line is the easier one to follow across a long\nseries, which is what the drawing is for. `straight` becomes the claim a\nconsumer makes deliberately rather than the one they get by saying nothing.\n\n**The property stays optional and the default lives in the render.** A\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured, which the SSR specs\nassert against. So the resting state is still the attribute's absence, and\n`curve ?? 'smooth'` is what reads it.\n\n`step` claims the opposite of both, that a reading holds until the next.\nBars ignore it, having no between to interpolate.",
               "fieldName": "curve"
             },
             {
@@ -36473,6 +36666,10 @@
           "description": "**A menu, and deliberately not a new one.** Its rows are commands, which is\nwhat `role=\"menu\"` and `menuitem` exist for, so this takes them and takes the\nbehaviour with them: the arrow keys are `KeyboardNavigationController`, the\npanel is `PopoverController`, and open and closed is `MixinControllerOpen`.\n`Menu` is built from the same pieces. What is not shared is what actually\ndiffers: a dial has no submenus, no headers, no checkable rows and no long\nlist to type ahead through, and shipping it as an appearance of `Menu` would\nhave meant defining what a dial with a submenu in it does.\n\n**The trigger is a control the consumer slots**, and the floating action\nbutton is the usual one: `helix-icon-button` with `shape=\"circle\"` and\n`raised`. There is no `helix-fab` here, and the reason is worth stating,\nbecause a component would have re-declared `appearance`, `tone`, `label` and\na size around a control that already has all four. A round raised button is a\nshape, and where it sits is `data-dock` in the base layer.\n\n**Nothing is reserved from the keyboard.** A menu that drills has to keep the\nhorizontal pair for going in and coming back; a dial goes nowhere, so all four\narrows move through the actions and a reader who guesses either axis is\nanswered. That is the controller's own house position, and this is a component\nwith no reason to argue with it.",
           "name": "HelixBaseSpeedDial",
           "cssParts": [
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon"
+            },
             {
               "description": "The default trigger, where none was slotted.",
               "name": "trigger"
@@ -50956,6 +51153,10 @@
               "name": "entry"
             },
             {
+              "description": "The glyph on the trigger.",
+              "name": "icon"
+            },
+            {
               "description": "An entry's still, where it has one.",
               "name": "poster"
             },
@@ -51631,6 +51832,10 @@
           "description": "**The picture is a real `<video>`.** Decoding, buffering, captions, Picture\nin Picture, AirPlay and the codecs a device happens to have are all the\nplatform's, and none of them can be had from anything else. What is replaced\nis the control bar, which is the one part of a video element that cannot be\nstyled and looks different in every browser.\n\n**Every control is a real control.** The scrubber and the volume are\n`<input type=\"range\">`, so a reader gets arrow keys, Home and End, the\nplatform's own touch target and its screen reader announcement without this\nelement implementing any of it. Drawing a div and listening for pointer moves\nis how a media player ends up unusable from a keyboard.\n\n**Native controls are the fallback, not the default.** Where a consumer sets\n`controls`, the browser's bar is used and this one is not drawn: two sets of\ncontrols over one video is worse than either alone, and a consumer who asked\nfor the native bar has a reason.\n\nThe keys are the ones every player uses: Space and `k` to play or pause, the\narrows to seek and to change the volume, `m` to mute, `f` for fullscreen.\nThey are bound on this element rather than on the document, because a video\nis not a palette: keys belong to it only while a reader is on it.\n\n**And none of them where `controls` is set.** The browser's own bar owns\nthose keys, and two handlers on one press is a video that seeks twice or\nplays and immediately pauses. The focus stop goes with them, since the native\ncontrols bring their own.",
           "name": "HelixBaseVideo",
           "cssParts": [
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon"
+            },
             {
               "description": "The box holding the picture and its controls, and the focus target the keys are bound to.",
               "name": "stage"
