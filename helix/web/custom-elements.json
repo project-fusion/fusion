@@ -8629,6 +8629,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderCopyButton",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The button that takes the code, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own\ncopy control, wrap this one, or pass it something the base does not know\nabout, without reimplementing the whole template to do it. The public tag\nrather than the base one: a consumer on the styled tier gets the styled\nbutton, and one on the headless tier brings a button of their own under\nthat name.",
+              "inheritedFrom": {
+                "name": "HelixBaseCodeBlock",
+                "module": "src/code-block/root/code-block-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -9897,6 +9912,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The picker the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseColorInput",
+                "module": "src/color-input/root/color-input-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -11014,7 +11044,7 @@
             {
               "kind": "method",
               "name": "renderChannel",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -11047,6 +11077,21 @@
                 }
               ],
               "description": "One of the ramps under the square.",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTools",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The eyedropper and the swatch tools, which are a group of buttons, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -12632,6 +12677,44 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderListbox",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The list the field filters, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "option",
+                  "type": {
+                    "text": "{ text: string; value: string }"
+                  }
+                }
+              ],
+              "description": "One chosen option, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseCombobox",
+                "module": "src/combobox/root/combobox-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -13637,6 +13720,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderDialog",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The surface the palette opens in, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseCommand",
+                "module": "src/command/root/command-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -14106,6 +14204,29 @@
                 }
               ],
               "description": "Both faces, drawn rather than demanded.\n\nSlot fallback, which is this library's answer for content a component has a\nsensible default for: a copy button with no icons is not a copy button, and\nmaking every consumer slot the same clipboard is asking them to supply the\none thing the component is sure about. Slotting anything replaces it, at\nassignment time, with no property to set and nothing for the server and the\nclient to disagree about.",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "control",
+                  "type": {
+                    "text": "TemplateResult"
+                  }
+                }
+              ],
+              "description": "The bubble the control sits inside, behind a seam.\n\nIt takes the control rather than rendering it, because this one wraps: a\ntier above overriding it can drop the tooltip entirely and return the\nbutton, put something else around it, or keep the tooltip and change only\nhow it is anchored, and every one of those is a normal thing to want.\nRendering the button here as well would make all three a rewrite.",
               "inheritedFrom": {
                 "name": "HelixBaseCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
@@ -15681,6 +15802,44 @@
               "type": {
                 "text": "focus(options?: FocusOptions) => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The calendar the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One chosen date, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
               "inheritedFrom": {
                 "name": "HelixBaseDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -21049,6 +21208,29 @@
               "type": {
                 "text": "formResetCallback() => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderMeta",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "file",
+                  "type": {
+                    "text": "File"
+                  }
+                }
+              ],
+              "description": "What is known about a chosen file, as tags, behind a seam the styled tier\ncan move.\n\nOne method for both the size and the kind, because they are the same\nelement saying two things and two methods would be two places to keep in\nstep. Both parts are written out rather than passed in, and that is not\nstyle: a part name behind an interpolation is a part the manifest cannot\nsee, so `check:selectors` reported the stylesheet as matching nothing the\nmoment this took the name as an argument.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
               "inheritedFrom": {
                 "name": "HelixBaseFileInput",
                 "module": "src/file-input/root/file-input-root.ts"
@@ -35544,6 +35726,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderSelect",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control itself, which is the whole of this part, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBasePaginationSize",
+                "module": "src/pagination/size/pagination-size.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -44630,6 +44827,21 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderListbox",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The list the trigger opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own\nlist, wrap this one, or pass it a property the base does not know about,\nwithout reimplementing the whole template. The public tag rather than the\nbase one: a consumer on the styled tier gets the styled listbox, and one on\nthe headless tier brings a listbox of their own under that name.",
+              "inheritedFrom": {
+                "name": "HelixBaseSelect",
+                "module": "src/select/root/select-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -45524,6 +45736,10 @@
             {
               "description": "The whole track, for a slider whose color is the value.",
               "name": "--slider-track-image"
+            },
+            {
+              "description": "How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.",
+              "name": "--slider-length"
             }
           ],
           "members": [
@@ -46441,6 +46657,10 @@
               },
               {
                 "slug": "stepped"
+              },
+              {
+                "description": "A track standing on end, for a level rather than a quantity.",
+                "slug": "vertical"
               }
             ],
             "source": "helix/web/src/slider"
@@ -50443,6 +50663,21 @@
               "privacy": "private",
               "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the name and\nthe rule below still say which one is open.\n\n**Three shapes, and the reader can tell them apart with the colour off.**\nAn outline circle for a stage nobody has reached, the same circle with a\ncentre for the one they are standing on, a bare check for one that is done.\nThe first two are one shape filling in, which is the progression, and the\ncheck is the only mark that leaves the family because finishing is the only\nstate that is not a position in the sequence.\n\nWhat went was the coin around the check: a filled disc carrying a check\nbeside a filled disc carrying a ring put two of the three inside the same\ncontainer, and left hue doing most of the work of telling them apart.\n\nThe bare check is `Timeline`'s, deliberately: the two components report the\nsame kind of thing, a sequence with marks down it, and a check floating on\na hairline in one beside a check inside a green coin in the other was two\nanswers to one question. Timeline's rings came off the same day.",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The step's own label, which is a control because a step can be gone to, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -56641,6 +56876,44 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The clock the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One chosen time, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "formAssociated",
               "type": {
@@ -57886,7 +58159,7 @@
             {
               "kind": "method",
               "name": "renderColumn",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -57946,6 +58219,21 @@
                   "text": "TemplateResult"
                 }
               },
+              "inheritedFrom": {
+                "name": "HelixBaseTimePicker",
+                "module": "src/time-picker/root/time-picker-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderList",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The flat list of times, for the appearance that is not wheels, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname.",
               "inheritedFrom": {
                 "name": "HelixBaseTimePicker",
                 "module": "src/time-picker/root/time-picker-root.ts"
@@ -63237,6 +63525,21 @@
             },
             {
               "kind": "method",
+              "name": "renderActions",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "Skip, back and next, behind a seam the styled tier can move.\n\nThey are slot fallback rather than markup a consumer has to write, so a\ntour with nothing slotted still has the three controls a tour needs; and\nthey are a method as well, so a tier above can render its own three without\nreimplementing the panel around them. Both are needed: the slot is for the\nconsumer and the method is for the tier.",
+              "inheritedFrom": {
+                "name": "HelixBaseTourStop",
+                "module": "src/tour/stop/tour-stop.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "ask",
               "privacy": "private",
               "return": {
@@ -67246,7 +67549,7 @@
             {
               "kind": "method",
               "name": "renderExtra",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -67269,7 +67572,7 @@
             {
               "kind": "method",
               "name": "renderCaptions",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult | typeof nothing"
@@ -67284,7 +67587,7 @@
             {
               "kind": "method",
               "name": "renderOverflowItem",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -67306,7 +67609,7 @@
             {
               "kind": "method",
               "name": "renderBar",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"

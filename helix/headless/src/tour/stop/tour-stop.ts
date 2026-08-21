@@ -148,6 +148,42 @@ export class HelixBaseTourStop extends HelixElement {
     }
   }
 
+  /**
+   * Skip, back and next, behind a seam the styled tier can move.
+   *
+   * They are slot fallback rather than markup a consumer has to write, so a
+   * tour with nothing slotted still has the three controls a tour needs; and
+   * they are a method as well, so a tier above can render its own three without
+   * reimplementing the panel around them. Both are needed: the slot is for the
+   * consumer and the method is for the tier.
+   */
+  protected renderActions(): TemplateResult {
+    return html`<slot name="actions">
+      <helix-button part="skip" appearance="ghost" @click=${() => this.ask('skip')}>
+        ${this.skipLabel}
+      </helix-button>
+      ${
+        this.first
+          ? ''
+          : html`<helix-button
+              part="back"
+              appearance="outlined"
+              @click=${() => this.ask('back')}
+            >
+              ${this.backLabel}
+            </helix-button>`
+      }
+      <helix-button
+        part="next"
+        appearance="solid"
+        tone="primary"
+        @click=${() => this.ask('next')}
+      >
+        ${this.last ? this.doneLabel : this.nextLabel}
+      </helix-button>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     return html`<div part="bubble" popover="manual" ?hidden=${!this.current}>
       ${
@@ -164,30 +200,7 @@ export class HelixBaseTourStop extends HelixElement {
       <div part="arrow" aria-hidden="true"></div>
       <div part="content"><slot></slot></div>
       <div part="actions">
-        <slot name="actions">
-          <helix-button part="skip" appearance="ghost" @click=${() => this.ask('skip')}>
-            ${this.skipLabel}
-          </helix-button>
-          ${
-            this.first
-              ? ''
-              : html`<helix-button
-                  part="back"
-                  appearance="outlined"
-                  @click=${() => this.ask('back')}
-                >
-                  ${this.backLabel}
-                </helix-button>`
-          }
-          <helix-button
-            part="next"
-            appearance="solid"
-            tone="primary"
-            @click=${() => this.ask('next')}
-          >
-            ${this.last ? this.doneLabel : this.nextLabel}
-          </helix-button>
-        </slot>
+        ${this.renderActions()}
       </div>
     </div>`
   }

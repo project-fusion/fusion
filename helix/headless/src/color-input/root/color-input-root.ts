@@ -316,6 +316,33 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    * letting the panel's be the only one. It is worse for a form: the value could
    * not be read at a glance or pasted without opening a panel.
    */
+  /**
+   * The picker the field opens, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderPicker(): TemplateResult {
+    return html`<helix-color-picker
+      part="picker"
+      ?invalid=${this.resolvedFeedback !== ''}
+      ?alpha=${this.alpha}
+      ?no-format=${this.noFormat}
+      ?no-value=${this.appearance !== 'swatch'}
+      .format=${this.format}
+      .value=${this.picked}
+      swatches=${this.swatches || nothing}
+      ?disabled=${this.isDisabled}
+      @helix-change=${this.handlePickerChange}
+      @helix-sample-start=${this.handleSampleStart}
+      @helix-sample-end=${this.handleSampleEnd}
+    ></helix-color-picker>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
@@ -357,20 +384,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
       </div>
 
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-color-picker
-          part="picker"
-          ?invalid=${this.resolvedFeedback !== ''}
-          ?alpha=${this.alpha}
-          ?no-format=${this.noFormat}
-          ?no-value=${this.appearance !== 'swatch'}
-          .format=${this.format}
-          .value=${this.picked}
-          swatches=${this.swatches || nothing}
-          ?disabled=${this.isDisabled}
-          @helix-change=${this.handlePickerChange}
-          @helix-sample-start=${this.handleSampleStart}
-          @helix-sample-end=${this.handleSampleEnd}
-        ></helix-color-picker>
+        ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

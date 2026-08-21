@@ -1104,7 +1104,9 @@ export class HelixBaseVideo extends HelixElement {
    * two lists that have to stay in step is how a control ends up offered in one
    * place and not the other.
    */
-  private renderExtra(one: string): TemplateResult {
+  /* `protected` rather than `private`: the method was already the seam and a
+     tier above simply could not reach it. */
+  protected renderExtra(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<button
         part="remote"
@@ -1233,7 +1235,9 @@ export class HelixBaseVideo extends HelixElement {
    * nobody can choose between and that is the markup's fault to fix, not this
    * component's to paper over with "Track 2".
    */
-  private renderCaptions(): TemplateResult | typeof nothing {
+  /* `protected` rather than `private`: the method was already the seam and a
+     tier above simply could not reach it. */
+  protected renderCaptions(): TemplateResult | typeof nothing {
     /* Branched on the state rather than on the getter, so the render that draws
        this is one the state scheduled. Reading the tracks for their labels is
        fine either way: by the time this runs, the count that got us here was
@@ -1278,7 +1282,9 @@ export class HelixBaseVideo extends HelixElement {
     </helix-menu>`
   }
 
-  private renderOverflowItem(one: string): TemplateResult {
+  /* `protected` rather than `private`: the method was already the seam and a
+     tier above simply could not reach it. */
+  protected renderOverflowItem(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<helix-menu-item
         value="remote"
@@ -1338,7 +1344,9 @@ export class HelixBaseVideo extends HelixElement {
     </helix-menu-item>`
   }
 
-  private renderBar(): TemplateResult {
+  /* `protected` rather than `private`: the method was already the seam and a
+     tier above simply could not reach it. */
+  protected renderBar(): TemplateResult {
     const done = this.duration > 0 ? this.position / this.duration : 0
     return html`<div part="controls">
       <button

@@ -103,16 +103,26 @@ export class HelixBaseCodeBlock extends HelixElement {
       <div part="frame">
         <pre part="block"><code part="code"><slot @slotchange=${() =>
           this.requestUpdate()}></slot></code></pre>
-        ${
-          this.noCopy
-            ? nothing
-            : html`<helix-copy-button
-                part="copy"
-                label="Copy code"
-                .value=${this.text}
-              ></helix-copy-button>`
-        }
+        ${this.noCopy ? nothing : this.renderCopyButton()}
       </div>`
+  }
+
+  /**
+   * The button that takes the code, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own
+   * copy control, wrap this one, or pass it something the base does not know
+   * about, without reimplementing the whole template to do it. The public tag
+   * rather than the base one: a consumer on the styled tier gets the styled
+   * button, and one on the headless tier brings a button of their own under
+   * that name.
+   */
+  protected renderCopyButton(): TemplateResult {
+    return html`<helix-copy-button
+      part="copy"
+      label="Copy code"
+      .value=${this.text}
+    ></helix-copy-button>`
   }
 }
 

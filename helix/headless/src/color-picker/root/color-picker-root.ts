@@ -364,7 +364,9 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   }
 
   /** One of the ramps under the square. */
-  private renderChannel(
+  /* `protected` rather than `private`: the method was already the seam and a
+     tier above simply could not reach it. */
+  protected renderChannel(
     channel: 'alpha' | 'hue',
     label: string,
     max: number,
@@ -392,6 +394,45 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
+  }
+
+  /**
+   * The eyedropper and the swatch tools, which are a group of buttons, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderTools(): TemplateResult {
+    return html`<helix-button-group part="actions" label="Color tools">
+                ${
+                  this.sampling && !this.noEyedropper
+                    ? html`<helix-button
+                        part="eyedropper"
+                        aria-label="Sample a color from the screen"
+                        ?disabled=${this.isDisabled}
+                        @click=${this.handleEyeDropper}
+                      >
+                        <helix-icon name="eyedropper"></helix-icon>
+                      </helix-button>`
+                    : nothing
+                }
+                ${
+                  this.noFormat
+                    ? nothing
+                    : html`<helix-button
+                        part="format"
+                        aria-label=${`Syntax: ${this.format}. Change it.`}
+                        ?disabled=${this.isDisabled}
+                        @click=${this.handleFormat}
+                      >
+                        ${this.format}
+                      </helix-button>`
+                }
+              </helix-button-group>`
   }
 
   protected override render(): TemplateResult {
@@ -462,36 +503,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                 @input=${this.handleValueInput}
               />`
         }
-        ${
-          this.tools
-            ? html`<helix-button-group part="actions" label="Color tools">
-                ${
-                  this.sampling && !this.noEyedropper
-                    ? html`<helix-button
-                        part="eyedropper"
-                        aria-label="Sample a color from the screen"
-                        ?disabled=${this.isDisabled}
-                        @click=${this.handleEyeDropper}
-                      >
-                        <helix-icon name="eyedropper"></helix-icon>
-                      </helix-button>`
-                    : nothing
-                }
-                ${
-                  this.noFormat
-                    ? nothing
-                    : html`<helix-button
-                        part="format"
-                        aria-label=${`Syntax: ${this.format}. Change it.`}
-                        ?disabled=${this.isDisabled}
-                        @click=${this.handleFormat}
-                      >
-                        ${this.format}
-                      </helix-button>`
-                }
-              </helix-button-group>`
-            : nothing
-        }
+        ${this.tools ? html`${this.renderTools()}` : nothing}
       </div>
 
       ${

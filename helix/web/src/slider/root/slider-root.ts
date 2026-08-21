@@ -30,6 +30,7 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-fill-color - The part behind the thumb.
  * @cssproperty --slider-marker-color - The ticks along the track.
  * @cssproperty --slider-track-image - The whole track, for a slider whose color is the value.
+ * @cssproperty --slider-length - How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.
  */
 @customElement('helix-slider')
 export class HelixSlider extends HelixBaseSlider {

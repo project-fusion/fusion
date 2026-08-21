@@ -155,8 +155,8 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
   }
 
   protected override render(): TemplateResult {
-    return html`<helix-tooltip content=${this.says} exportparts="tooltip">
-      <button
+    return this.renderTooltip(
+      html`<button
       part="button"
       type="button"
       aria-label=${this.says}
@@ -173,7 +173,22 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
       }
       <slot name="copied" ?hidden=${!this.copied}>${HelixBaseCopyButton.icon(check)}</slot>
       <slot ?hidden=${this.copied}>${HelixBaseCopyButton.icon(copy)}</slot>
-      </button>
+      </button>`,
+    )
+  }
+
+  /**
+   * The bubble the control sits inside, behind a seam.
+   *
+   * It takes the control rather than rendering it, because this one wraps: a
+   * tier above overriding it can drop the tooltip entirely and return the
+   * button, put something else around it, or keep the tooltip and change only
+   * how it is anchored, and every one of those is a normal thing to want.
+   * Rendering the button here as well would make all three a rewrite.
+   */
+  protected renderTooltip(control: TemplateResult): TemplateResult {
+    return html`<helix-tooltip content=${this.says} exportparts="tooltip">
+      ${control}
     </helix-tooltip>`
   }
 }

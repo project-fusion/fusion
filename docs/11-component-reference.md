@@ -4406,6 +4406,7 @@ the thumb being dragged.
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
 | `--slider-track-image` | The whole track, for a slider whose color is the value. |
+| `--slider-length` | How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. |
 
 ## Sparkline
 

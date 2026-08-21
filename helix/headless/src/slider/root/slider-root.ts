@@ -384,6 +384,7 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
       part="field"
       data-markers=${this.markerValues.length > 0 ? '' : nothing}
       data-range=${this.range ? '' : nothing}
+      style="--_slider-fraction: ${this.fraction}; --_slider-from: ${this.along(start)}; --_slider-to: ${this.along(end)}"
     >
       ${this.range ? thumb('start', start) : nothing}
       ${this.range ? thumb('end', end) : nothing}

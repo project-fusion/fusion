@@ -162,9 +162,61 @@
  *
  * `pointer-events: none` goes with it. The overlay sits over the control and
  * without this a press that lands on a mark never reaches the range. */
+/* **Above the control, with the thumb punched out of it.**
+ *
+ * This was `z-index: 0` to keep the marks off the thumb, and the control
+ * computes to 10, so the marks went under the whole input and every stepped
+ * slider in the library drew nothing at all. Verified by setting them red and
+ * still seeing none, with `elementFromPoint` at a mark's centre returning the
+ * host: they were painted, sized, positioned and covered.
+ *
+ * The reason the original went below is real and does not go away by raising
+ * it: a native range's thumb and its track are one element, so there is no
+ * z-index that sits between them, and a mark drawn over the input is drawn over
+ * the thumb. What can sit between them is a hole. The overlay is inset by half
+ * a thumb at each end, which is exactly the thumb's travel, so a fraction of
+ * its own width is the thumb's centre and a radial mask there removes the mark
+ * the thumb is standing on and nothing else.
+ *
+ * `currentColor` rather than a colour: only the alpha of a mask is read, and it
+ * saves inventing a token for a value nobody sees. */
 [part="markers"] {
+  --_slider-hole: calc(var(--_slider-thumb) / 2 + var(--helix-border-thin));
+
+  mask-image: radial-gradient(
+    circle at calc(var(--_slider-fraction, 0) * 100%) 50%,
+    transparent var(--_slider-hole),
+    currentColor var(--_slider-hole)
+  );
   pointer-events: none;
-  z-index: 0;
+  z-index: var(--helix-layer-raised);
+}
+
+/* Two thumbs, two holes. Each mask is everything-but-a-hole, so intersecting
+   them is everything but both. */
+[part="field"][data-range] [part="markers"] {
+  mask-composite: intersect;
+  mask-image:
+    radial-gradient(
+      circle at calc(var(--_slider-from, 0) * 100%) 50%,
+      transparent var(--_slider-hole),
+      currentColor var(--_slider-hole)
+    ),
+    radial-gradient(
+      circle at calc(var(--_slider-to, 0) * 100%) 50%,
+      transparent var(--_slider-hole),
+      currentColor var(--_slider-hole)
+    );
+}
+
+/* Standing up, the thumb travels along the block axis and the hole with it.
+   Measured from the foot, because that is where the minimum is. */
+:host([orientation="vertical"]) [part="markers"] {
+  mask-image: radial-gradient(
+    circle at 50% calc(100% - var(--_slider-fraction, 0) * 100%),
+    transparent var(--_slider-hole),
+    currentColor var(--_slider-hole)
+  );
 }
 
 [part="marker"] {

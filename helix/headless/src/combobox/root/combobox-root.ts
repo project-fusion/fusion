@@ -632,6 +632,59 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     }
   }
 
+  /**
+   * The list the field filters, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderListbox(): TemplateResult {
+    return html`<helix-listbox
+      part="listbox"
+      id="listbox"
+      exportparts="items, empty"
+      aria-label=${this.listLabel}
+      empty-text=${this.emptyText}
+      loading-text=${this.loadingText}
+      ?loading=${this.loading}
+      ?multiple=${this.multiple}
+      .value=${this.value}
+      @helix-change=${this.handleChange}
+    >
+      <!-- The field's words are read off the options, and on the first
+           render there are none: the slot has not been assigned yet, so a
+           combobox with a value came up empty. Assignment changes no
+           property, so nothing else would schedule the update that fixes
+           it. Select was fixed for exactly this. -->
+      <slot @slotchange=${() => this.requestUpdate()}></slot>
+    </helix-listbox>`
+  }
+
+  /**
+   * One chosen option, as a tag, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderTag(option: { text: string; value: string }): TemplateResult {
+    return html`<helix-tag
+                    part="tag"
+                    data-value=${option.value}
+                    dismiss-label=${this.removeLabel}
+                    ?dismissible=${!this.isDisabled}
+                    @helix-dismiss=${this.handleDismiss}
+                    >${option.text}</helix-tag
+                  >`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @click=${this.handleFieldClick}>
@@ -639,16 +692,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
         ${
           this.multiple && this.chosen.length > 0
             ? html`<span part="tags">
-                ${this.shown.map(
-                  (option) => html`<helix-tag
-                    part="tag"
-                    data-value=${option.value}
-                    dismiss-label=${this.removeLabel}
-                    ?dismissible=${!this.isDisabled}
-                    @helix-dismiss=${this.handleDismiss}
-                    >${option.text}</helix-tag
-                  >`,
-                )}
+                ${this.shown.map((option) => this.renderTag(option))}
                 ${
                   this.restCount > 0
                     ? html`<span part="rest">${`+${this.restCount}`}</span>`
@@ -683,25 +727,7 @@ export class HelixBaseCombobox extends MixinControllerOpen(
         </slot>
       </div>
       <div part="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-listbox
-          part="listbox"
-          id="listbox"
-          exportparts="items, empty"
-          aria-label=${this.listLabel}
-          empty-text=${this.emptyText}
-          loading-text=${this.loadingText}
-          ?loading=${this.loading}
-          ?multiple=${this.multiple}
-          .value=${this.value}
-          @helix-change=${this.handleChange}
-        >
-          <!-- The field's words are read off the options, and on the first
-               render there are none: the slot has not been assigned yet, so a
-               combobox with a value came up empty. Assignment changes no
-               property, so nothing else would schedule the update that fixes
-               it. Select was fixed for exactly this. -->
-          <slot @slotchange=${() => this.requestUpdate()}></slot>
-        </helix-listbox>
+        ${this.renderListbox()}
         ${
           this.creation === ''
             ? nothing

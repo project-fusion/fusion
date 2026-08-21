@@ -272,6 +272,37 @@ export class HelixBaseSelect extends MixinControllerOpen(
     }
   }
 
+  /**
+   * The list the trigger opens, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own
+   * list, wrap this one, or pass it a property the base does not know about,
+   * without reimplementing the whole template. The public tag rather than the
+   * base one: a consumer on the styled tier gets the styled listbox, and one on
+   * the headless tier brings a listbox of their own under that name.
+   */
+  protected renderListbox(): TemplateResult {
+    return html`<helix-listbox
+      empty-text=${this.emptyText}
+      loading-text=${this.loadingText}
+      ?loading=${this.loading}
+      part="listbox"
+      exportparts="items, empty"
+      .value=${this.value}
+      ?multiple=${this.multiple}
+      ?filterable=${this.filterable}
+      aria-label=${this.label || nothing}
+      @helix-change=${this.handleChange}
+    >
+      <!-- The trigger's words are read off the options, and on the first
+           render there are none: the slot has not been assigned yet, so a
+           select with a value came up showing its placeholder. Assignment
+           changes no property, so nothing else would schedule the update
+           that fixes it. -->
+      <slot @slotchange=${() => this.requestUpdate()}></slot>
+    </helix-listbox>`
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <button
@@ -310,25 +341,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
       </button>
 
       <div part="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-listbox
-          empty-text=${this.emptyText}
-          loading-text=${this.loadingText}
-          ?loading=${this.loading}
-          part="listbox"
-          exportparts="items, empty"
-          .value=${this.value}
-          ?multiple=${this.multiple}
-          ?filterable=${this.filterable}
-          aria-label=${this.label || nothing}
-          @helix-change=${this.handleChange}
-        >
-          <!-- The trigger's words are read off the options, and on the first
-               render there are none: the slot has not been assigned yet, so a
-               select with a value came up showing its placeholder. Assignment
-               changes no property, so nothing else would schedule the update
-               that fixes it. -->
-          <slot @slotchange=${() => this.requestUpdate()}></slot>
-        </helix-listbox>
+        ${this.renderListbox()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

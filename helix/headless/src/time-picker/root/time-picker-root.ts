@@ -471,7 +471,9 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    * barred only when every minute in it is, since one free minute is a reason to
    * open the wheel rather than to close it.
    */
-  private renderColumn(
+  /* `protected` rather than `private`, which is the whole of what a seam is
+     here: the method already existed and a tier above could not reach it. */
+  protected renderColumn(
     part: 'hour' | 'meridiem' | 'minute',
     label: string,
     values: string[],
@@ -544,13 +546,17 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     </div>`
   }
 
-  protected override render(): TemplateResult {
-    /* A mode falls back to the list, for the reason the property records: a
-       range on wheels is two sets of wheels and a multiple is a set, which a
-       wheel cannot hold. */
-    if (this.appearance === 'wheels' && this.mode === undefined) {
-      return this.renderSpinner()
-    }
+  /**
+   * The flat list of times, for the appearance that is not wheels, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderList(): TemplateResult {
     return html`<helix-listbox
       part="list"
       exportparts="items, empty"
@@ -572,6 +578,16 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
         >`
       })}
     </helix-listbox>`
+  }
+
+  protected override render(): TemplateResult {
+    /* A mode falls back to the list, for the reason the property records: a
+       range on wheels is two sets of wheels and a multiple is a set, which a
+       wheel cannot hold. */
+    if (this.appearance === 'wheels' && this.mode === undefined) {
+      return this.renderSpinner()
+    }
+    return html`${this.renderList()}`
   }
 }
 

@@ -355,6 +355,29 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
    * against the control that refused it, not below a list of the ones that were
    * not.
    */
+  /**
+   * What is known about a chosen file, as tags, behind a seam the styled tier
+   * can move.
+   *
+   * One method for both the size and the kind, because they are the same
+   * element saying two things and two methods would be two places to keep in
+   * step. Both parts are written out rather than passed in, and that is not
+   * style: a part name behind an interpolation is a part the manifest cannot
+   * see, so `check:selectors` reported the stylesheet as matching nothing the
+   * moment this took the name as an argument.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderMeta(file: File): TemplateResult {
+    return html`<helix-tag part="size">${size(file.size, this.locale)}</helix-tag>
+      <helix-tag part="kind">${kind(file)}</helix-tag>`
+  }
+
   protected override render(): TemplateResult {
     const files = this.files
     return html`${this.renderLabel()}
@@ -395,8 +418,7 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
                   <span part="detail">
                     <span part="name">${file.name}</span>
                     <span part="meta">
-                      <helix-tag part="size">${size(file.size, this.locale)}</helix-tag>
-                      <helix-tag part="kind">${kind(file)}</helix-tag>
+                      ${this.renderMeta(file)}
                     </span>
                   </span>
                   <button

@@ -141,6 +141,27 @@ export class HelixBaseStep extends HelixElement {
     this.internals.ariaCurrent = this.current ? 'step' : null
   }
 
+  /**
+   * The step's own label, which is a control because a step can be gone to, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderLabel(): TemplateResult {
+    return html`<helix-button
+      part="label"
+      appearance="ghost"
+      ?disabled=${this.disabled}
+      @click=${this.select}
+    >
+      <slot></slot>
+    </helix-button>`
+  }
+
   protected override render(): TemplateResult {
     /* Two half lines, one either side of the mark, rather than one line running
        the whole way to the next step.
@@ -160,14 +181,7 @@ export class HelixBaseStep extends HelixElement {
         <slot name="marker">${this.mark}</slot>
       </span>
       <span part="body">
-        <helix-button
-          part="label"
-          appearance="ghost"
-          ?disabled=${this.disabled}
-          @click=${this.select}
-        >
-          <slot></slot>
-        </helix-button>
+        ${this.renderLabel()}
         <span part="description"><slot name="description"></slot></span>
       </span>
       <div part="content"><slot name="content"></slot></div>`

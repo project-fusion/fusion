@@ -5751,6 +5751,17 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "renderCopyButton",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The button that takes the code, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own\ncopy control, wrap this one, or pass it something the base does not know\nabout, without reimplementing the whole template to do it. The public tag\nrather than the base one: a consumer on the styled tier gets the styled\nbutton, and one on the headless tier brings a button of their own under\nthat name."
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -6304,6 +6315,17 @@
               "type": {
                 "text": "focus(options?: FocusOptions) => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The picker the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -7757,7 +7779,7 @@
             {
               "kind": "method",
               "name": "renderChannel",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -7790,6 +7812,17 @@
                 }
               ],
               "description": "One of the ramps under the square."
+            },
+            {
+              "kind": "method",
+              "name": "renderTools",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The eyedropper and the swatch tools, which are a group of buttons, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -8733,6 +8766,36 @@
                 }
               },
               "description": "Reports the answer and the verdict on it.\n\nThe value rather than the typed text, which is the whole point of the\ncomponent: a form that received \"jav\" got the filter, not an option."
+            },
+            {
+              "kind": "method",
+              "name": "renderListbox",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The list the field filters, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "option",
+                  "type": {
+                    "text": "{ text: string; value: string }"
+                  }
+                }
+              ],
+              "description": "One chosen option, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -9916,6 +9979,17 @@
               "description": "Keeps an option's own announcement inside the palette.\n\nEvery option says `helix-select` when it is chosen, which is how the list\nhears it, and the list does not stop it: the options are light DOM children\nof this element, so it carried straight on out to the consumer. They then\nheard two selections for one command, an option's and the palette's, under\none event name and distinguishable only by looking at the target.\n\nThe one this element dispatches has itself as the target and is let past.\nCombobox stops the listbox's `helix-change` for the same reason.\n\n`stopImmediatePropagation`, not `stopPropagation`. The consumer's listener\nis on this same element, and stopping propagation only keeps an event off\nthe *next* node: every other listener already bound here still runs, so the\noption's selection reached the consumer anyway. The listbox hears it well\nbefore this, from inside the shadow root, so nothing this element needs is\nlost by ending it here."
             },
             {
+              "kind": "method",
+              "name": "renderDialog",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The surface the palette opens in, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -10397,6 +10471,25 @@
                 }
               ],
               "description": "Both faces, drawn rather than demanded.\n\nSlot fallback, which is this library's answer for content a component has a\nsensible default for: a copy button with no icons is not a copy button, and\nmaking every consumer slot the same clipboard is asking them to supply the\none thing the component is sure about. Slotting anything replaces it, at\nassignment time, with no property to set and nothing for the server and the\nclient to disagree about."
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "control",
+                  "type": {
+                    "text": "TemplateResult"
+                  }
+                }
+              ],
+              "description": "The bubble the control sits inside, behind a seam.\n\nIt takes the control rather than rendering it, because this one wraps: a\ntier above overriding it can drop the tooltip entirely and return the\nbutton, put something else around it, or keep the tooltip and change only\nhow it is anchored, and every one of those is a normal thing to want.\nRendering the button here as well would make all three a rewrite."
             },
             {
               "kind": "field",
@@ -11270,6 +11363,36 @@
               "type": {
                 "text": "focus(options?: FocusOptions) => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The calendar the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One chosen date, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -15713,6 +15836,25 @@
               "type": {
                 "text": "formResetCallback() => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderMeta",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "file",
+                  "type": {
+                    "text": "File"
+                  }
+                }
+              ],
+              "description": "What is known about a chosen file, as tags, behind a seam the styled tier\ncan move.\n\nOne method for both the size and the kind, because they are the same\nelement saying two things and two methods would be two places to keep in\nstep. Both parts are written out rather than passed in, and that is not\nstyle: a part name behind an interpolation is a part the manifest cannot\nsee, so `check:selectors` reported the stylesheet as matching nothing the\nmoment this took the name as an argument.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -26867,6 +27009,17 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "renderSelect",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The control itself, which is the whole of this part, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -32236,6 +32389,17 @@
               "description": "Reports the answer and the verdict on it."
             },
             {
+              "kind": "method",
+              "name": "renderListbox",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The list the trigger opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own\nlist, wrap this one, or pass it a property the base does not know about,\nwithout reimplementing the whole template. The public tag rather than the\nbase one: a consumer on the styled tier gets the styled listbox, and one on\nthe headless tier brings a listbox of their own under that name."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -37186,6 +37350,17 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The step's own label, which is a control because a step can be gone to, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
               "kind": "field",
               "name": "internals",
               "type": {
@@ -41687,6 +41862,36 @@
               }
             },
             {
+              "kind": "method",
+              "name": "renderPicker",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The clock the field opens, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
+              "kind": "method",
+              "name": "renderTag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One chosen time, as a tag, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
+            },
+            {
               "kind": "field",
               "name": "open",
               "type": {
@@ -43121,7 +43326,7 @@
             {
               "kind": "method",
               "name": "renderColumn",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -43177,6 +43382,17 @@
                   "text": "TemplateResult"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderList",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The flat list of times, for the appearance that is not wheels, behind a seam the styled tier can move.\n\nA method rather than a fragment inline, so a tier above can render its own,\nwrap this one, pass it a property the base does not know about, or leave it\nout, without reimplementing the whole template to do any of them. The\npublic tag rather than the base one: a consumer on the styled tier gets the\nstyled element, and one on the headless tier brings their own under that\nname."
             },
             {
               "kind": "field",
@@ -47506,6 +47722,17 @@
             },
             {
               "kind": "method",
+              "name": "renderActions",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "Skip, back and next, behind a seam the styled tier can move.\n\nThey are slot fallback rather than markup a consumer has to write, so a\ntour with nothing slotted still has the three controls a tour needs; and\nthey are a method as well, so a tier above can render its own three without\nreimplementing the panel around them. Both are needed: the slot is for the\nconsumer and the method is for the tier."
+            },
+            {
+              "kind": "method",
               "name": "ask",
               "privacy": "private",
               "return": {
@@ -50630,7 +50857,7 @@
             {
               "kind": "method",
               "name": "renderExtra",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -50649,7 +50876,7 @@
             {
               "kind": "method",
               "name": "renderCaptions",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult | typeof nothing"
@@ -50660,7 +50887,7 @@
             {
               "kind": "method",
               "name": "renderOverflowItem",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
@@ -50678,7 +50905,7 @@
             {
               "kind": "method",
               "name": "renderBar",
-              "privacy": "private",
+              "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"

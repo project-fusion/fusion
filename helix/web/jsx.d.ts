@@ -20103,6 +20103,7 @@ export type CustomElements = {
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
+   * - `--slider-length`: How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -30750,6 +30751,7 @@ export type CustomElementsSolidJs = {
    * - `--slider-fill-color`: The part behind the thumb. (default: `undefined`)
    * - `--slider-marker-color`: The ticks along the track. (default: `undefined`)
    * - `--slider-track-image`: The whole track, for a slider whose color is the value. (default: `undefined`)
+   * - `--slider-length`: How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. (default: `undefined`)
    *
    * ## CSS Parts
    *
@@ -34396,6 +34398,8 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
+  "--slider-length"?: string;
   /** Size of the mark on the last reading. */
   "--chart-terminus-size"?: string;
   /** How much of the line's colour the wash takes where it meets the line. */

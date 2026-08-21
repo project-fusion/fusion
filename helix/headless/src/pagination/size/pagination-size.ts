@@ -208,13 +208,17 @@ export class HelixBasePaginationSize extends HelixElement {
     }
   }
 
-  protected override render(): TemplateResult | typeof nothing {
-    if (this.options.length === 0) {
-      return nothing
-    }
-    /* `Select` renders the label and gives the trigger the id it points at, so
-       the association is the platform's and is already covered by that
-       component's own specs. Nothing here reconstructs it. */
+  /**
+   * The control itself, which is the whole of this part, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderSelect(): TemplateResult {
     return html`<helix-select
       part="control"
       exportparts="label, trigger, value"
@@ -226,6 +230,16 @@ export class HelixBasePaginationSize extends HelixElement {
         (size) => html`<helix-option value=${String(size)}>${this.numbers(size)}</helix-option>`,
       )}
     </helix-select>`
+  }
+
+  protected override render(): TemplateResult | typeof nothing {
+    if (this.options.length === 0) {
+      return nothing
+    }
+    /* `Select` renders the label and gives the trigger the id it points at, so
+       the association is the platform's and is already covered by that
+       component's own specs. Nothing here reconstructs it. */
+    return html`${this.renderSelect()}`
   }
 }
 

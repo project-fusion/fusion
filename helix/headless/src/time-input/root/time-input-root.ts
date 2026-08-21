@@ -429,13 +429,44 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
     this.control?.focus(options)
   }
 
-  protected override render(): TemplateResult {
-    return html`${this.renderLabel()}
-      <div part="field" @keydown=${this.handleKeydown}>
-        ${
-          this.mode === 'multiple'
-            ? this.shownTimes.map(
-                (at) => html`<helix-tag
+  /**
+   * The clock the field opens, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderPicker(): TemplateResult {
+    return html`<helix-time-picker
+      part="picker"
+      ?invalid=${this.resolvedFeedback !== ''}
+      mode=${this.mode ?? nothing}
+      appearance=${this.appearance}
+      label=${this.label || 'Time'}
+      locale=${this.locale || nothing}
+      max=${this.max}
+      min=${this.min}
+      step=${this.step}
+      .value=${this.picked}
+      @helix-change=${this.handlePicked}
+    ></helix-time-picker>`
+  }
+
+  /**
+   * One chosen time, as a tag, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderTag(at: string): TemplateResult {
+    return html`<helix-tag
                   part="time"
                   dismissible
                   dismiss-label=${`Remove ${this.written(at)}`}
@@ -445,10 +476,13 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
                     this.removeTime(at)
                   }}
                   >${this.written(at)}</helix-tag
-                >`,
-              )
-            : nothing
-        }
+                >`
+  }
+
+  protected override render(): TemplateResult {
+    return html`${this.renderLabel()}
+      <div part="field" @keydown=${this.handleKeydown}>
+        ${this.mode === 'multiple' ? this.shownTimes.map((at) => this.renderTag(at)) : nothing}
         ${this.restCount > 0 ? html`<span part="rest">${`+${this.restCount}`}</span>` : nothing}
         <input
           part="control"
@@ -483,19 +517,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
       </div>
 
       <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
-        <helix-time-picker
-          part="picker"
-          ?invalid=${this.resolvedFeedback !== ''}
-          mode=${this.mode ?? nothing}
-          appearance=${this.appearance}
-          label=${this.label || 'Time'}
-          locale=${this.locale || nothing}
-          max=${this.max}
-          min=${this.min}
-          step=${this.step}
-          .value=${this.picked}
-          @helix-change=${this.handlePicked}
-        ></helix-time-picker>
+        ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }

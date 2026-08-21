@@ -157,7 +157,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 208 |
+| `--helix-border-thin` | `1px` | 210 |
 | `--helix-border-thick` | `2px` | 61 |
 
 ## shadow
@@ -255,7 +255,7 @@ Position in the stack. Positional, never named after a component.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
-| `--helix-layer-raised` | `10` | 32 |
+| `--helix-layer-raised` | `10` | 34 |
 | `--helix-layer-sticky` | `100` | 6 |
 | `--helix-layer-overlay` | `1000` | 4 |
 | `--helix-layer-toast` | `1200` | 2 |

@@ -226,12 +226,17 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  protected override render(): TemplateResult {
-    /* No part of its own on the host, and the dialog's own box forwarded under
-       its own name: `::part(dialog)` then reaches the thing with the shadow and
-       the padding, rather than a host that is only a wrapper. `align` is not set
-       here either, being a styled-tier property: where the panel sits is
-       presentation, and this tier renders no CSS. */
+  /**
+   * The surface the palette opens in, behind a seam the styled tier can move.
+   *
+   * A method rather than a fragment inline, so a tier above can render its own,
+   * wrap this one, pass it a property the base does not know about, or leave it
+   * out, without reimplementing the whole template to do any of them. The
+   * public tag rather than the base one: a consumer on the styled tier gets the
+   * styled element, and one on the headless tier brings their own under that
+   * name.
+   */
+  protected renderDialog(): TemplateResult {
     return html`<helix-dialog
       exportparts="dialog"
       label=${this.label}
@@ -262,6 +267,15 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
         ></slot>
       </div>
     </helix-dialog>`
+  }
+
+  protected override render(): TemplateResult {
+    /* No part of its own on the host, and the dialog's own box forwarded under
+       its own name: `::part(dialog)` then reaches the thing with the shadow and
+       the padding, rather than a host that is only a wrapper. `align` is not set
+       here either, being a styled-tier property: where the panel sits is
+       presentation, and this tier renders no CSS. */
+    return html`${this.renderDialog()}`
   }
 }
 
