@@ -6,73 +6,63 @@ import '../../../today.css'
 export const metadata = { title: 'Candidate: today' }
 
 /**
- * A's type language, no rail, and a page that leads with what exists.
+ * What we do, why us, what it costs, and where it goes.
  *
- * **The hero claims the asset rather than the principle.** "Everything we build,
- * you keep" was the constraint worn as a promise, and it over-claims twice: for
- * an open package it is what open source already is, and for contract work it is
- * what a normal statement of work says. What is actually unusual is that the
- * substrate is already built, which is why four weeks buys what it buys.
+ * **The page used to argue before it offered.** The hero sold a principle, and
+ * three of six bands were the mechanism, the ladder and the exit test: a reader
+ * looking for a design system met four screens of thesis before they met a
+ * reason to hire anyone. Those bands are `/thesis` and `/trust` now, and what
+ * is left is the case.
  *
- * **The exit test is not on this page as a general claim.** It is nearly empty
- * for the only thing shipping: a published package under a permissive license
- * needs no promise, because a reader can simply keep the last version. Making a
- * feature of that reads as taking credit for the ordinary. Where it is not empty
- * is the engagement, and that is where it is stated.
- *
- * Stages come from `verticals.ts` and prices from `services.ts`, so this page
- * cannot drift from either the way the services copy did once already.
+ * The constraint has not gone anywhere, it has changed job. As a headline it
+ * asked a buyer to care about a governance rule; as a line in `Why us` it is
+ * what it always was to them, which is that they are not acquiring a
+ * dependency. The philosophy is the last band and it is a link.
  */
 
-/** What exists, what it costs, and what does not exist yet. */
+/** The reasons to choose this over an agency that starts from a blank file. */
+const WHY = [
+  {
+    body: 'A token layer, two tiers, generated framework wrappers, a sandbox and the checks that keep it honest. We are not learning this on your project.',
+    name: 'The system already exists',
+  },
+  {
+    body: 'Four weeks, two days a week, because the hard part is behind us. An agency starting from nothing quotes three months for the same deliverable.',
+    name: 'It is faster because of that',
+  },
+  {
+    body: 'Your repository, your license. Handover is a condition of the work, not a phase at the end, and no engagement should leave you needing us on a retainer.',
+    name: 'You keep all of it',
+  },
+  {
+    body: 'Active ships with users, Building is real work with nothing shipped, Declared is a direction. Nothing here is described as further along than it is.',
+    name: 'We tell you what is not done',
+  },
+]
+
+/** What exists today, and what does not. */
 const STACK = [
   {
     action: { href: '/helix', label: 'Open Helix' },
-    body: 'Every component with its API, a live example, and a sandbox to try it in. One open tier, so there is no part of it you have to buy.',
+    body: 'Every component with its API, a live example, and a sandbox to try it in. One open tier.',
     lede: 'Use it',
     name: 'Helix',
     stage: 'Building' as const,
   },
   {
     action: { href: '/services', label: 'See the offers' },
-    body: `An audit at ${SERVICES[0]?.price} to find what is worth building, then a sprint or a build. Most engagements start with the audit.`,
+    body: `An audit at ${SERVICES[0]?.price} to find what is worth building, then a sprint or a build.`,
     lede: 'Buy it',
     name: 'The work',
     stage: 'Active' as const,
   },
   {
     action: { href: '/cortex', label: 'Read the shape' },
-    body: 'What a system knows, where it learned it, and how far to trust it. The design is written down. Nothing has shipped.',
+    body: 'What a system knows, where it learned it, and how far to trust it. Written down. Not shipped.',
     lede: 'Not yet',
     name: 'Cortex',
     stage: 'Building' as const,
   },
-  {
-    action: { href: '/energy', label: 'See the map' },
-    body: 'Committed direction, no work started. On the site because a roadmap showing only the good parts is a brochure.',
-    lede: 'On the map',
-    name: 'Energy and Capital',
-    stage: 'Declared' as const,
-  },
-]
-
-/** The pairing, which is the whole reason any of this is possible now. */
-const MECHANISM = [
-  {
-    body: 'What needed an institution now runs on hardware you can own. The question stopped being whether you can afford it and became where you want it to run.',
-    name: 'Intelligence got cheap',
-  },
-  {
-    body: 'The half people forget. A model you own is still a dependency if you cannot power the machine it runs on. Both curves broke at once.',
-    name: 'Energy got cheap',
-  },
-]
-
-/** The same stack at three scales, which is the argument the company is making. */
-const LADDER = [
-  { body: 'Your keys, your data, your hardware.', name: 'Personal', rung: 'One person' },
-  { body: 'The same, with an audit trail.', name: 'Organizational', rung: 'One company' },
-  { body: 'The same again, and only a thesis.', name: 'National', rung: 'One country' },
 ]
 
 export default function Page() {
@@ -84,30 +74,19 @@ export default function Page() {
             Fusion Development Group
           </helix-text>
 
-          {/* One claim, two readings, which is how the page stops choosing
-              between its readers. An engineer hears that the thing is open and
-              theirs to use; a buyer hears that we built what we are about to
-              point at their product. Both are the same sentence. */}
+          {/* The proof, not the principle. It is the one sentence that says why
+              anyone should pick this over an agency, and it is a fact rather
+              than a claim: the system is on this site and can be opened. */}
           <helix-text as="h1" class="specHeroTitle">
-            The tools are <em>open</em>. The work is what we sell.
+            We built our own design system. We will build <em>yours</em>.
           </helix-text>
 
           <helix-text as="p" class="specLede">
-            Helix is open, and no part of it is held back for a paid plan. We sell the work of
-            applying it.
+            Interface and intelligence work, delivered into your repository under your license. The
+            substrate is already built, which is what makes four weeks a real number.
           </helix-text>
 
-          {/* The fork made structural. It used to be two buttons a reader had
-              to interpret; each door now says who it is for before it says
-              where it goes. */}
           <div className="specDoors">
-            <a className="specDoor" href="/helix">
-              <helix-text class="specDoorFor">If you build interfaces</helix-text>
-              <helix-text appearance="title">Open Helix</helix-text>
-              <helix-text appearance="caption" tone="muted">
-                Components, tokens and a sandbox. Your framework stays your choice.
-              </helix-text>
-            </a>
             <a className="specDoor" href="/services">
               <helix-text class="specDoorFor">If you need the work done</helix-text>
               <helix-text appearance="title">See what it costs</helix-text>
@@ -115,8 +94,38 @@ export default function Page() {
                 Audits from $12,000. Sprints from $32,000. Every price stated.
               </helix-text>
             </a>
+            <a className="specDoor" href="/helix">
+              <helix-text class="specDoorFor">If you build interfaces</helix-text>
+              <helix-text appearance="title">Open Helix</helix-text>
+              <helix-text appearance="caption" tone="muted">
+                Components, tokens and a sandbox. Your framework stays your choice.
+              </helix-text>
+            </a>
           </div>
         </helix-flex>
+      </section>
+
+      <section className="shell">
+        <div className="spec">
+          <helix-text class="specLabel">Why us</helix-text>
+          <helix-flex direction="column" gap="xl">
+            <helix-text as="h2" class="specTitle">
+              You are hiring the people who built the tools
+            </helix-text>
+            <helix-grid gap="2xl" min="18rem">
+              {WHY.map((item) => (
+                <helix-flex direction="column" gap="sm" key={item.name}>
+                  <helix-text appearance="title" as="h3">
+                    {item.name}
+                  </helix-text>
+                  <helix-text as="p" tone="muted">
+                    {item.body}
+                  </helix-text>
+                </helix-flex>
+              ))}
+            </helix-grid>
+          </helix-flex>
+        </div>
       </section>
 
       <section className="shell">
@@ -153,72 +162,34 @@ export default function Page() {
         </div>
       </section>
 
+      {/* The story, last and short. It is the reason the work compounds rather
+          than the reason to buy it, and a reader who wants it can follow it. */}
       <section className="shell">
         <div className="spec">
-          <helix-text class="specLabel">Why now</helix-text>
+          <helix-text class="specLabel">Where this goes</helix-text>
           <helix-flex direction="column" gap="xl">
             <helix-text as="h2" class="specTitle">
-              Two costs fell at the same time
-            </helix-text>
-            <helix-grid gap="2xl" min="19rem">
-              {MECHANISM.map((item) => (
-                <helix-flex direction="column" gap="sm" key={item.name}>
-                  <helix-text appearance="title" as="h3">
-                    {item.name}
-                  </helix-text>
-                  <helix-text as="p" tone="muted">
-                    {item.body}
-                  </helix-text>
-                </helix-flex>
-              ))}
-            </helix-grid>
-          </helix-flex>
-        </div>
-      </section>
-
-      <section className="shell">
-        <div className="spec">
-          <helix-text class="specLabel">The ladder</helix-text>
-          <helix-flex direction="column" gap="xl">
-            <helix-text as="h2" class="specTitle">
-              The same stack, three times over
-            </helix-text>
-            {/* Three across rather than three stacked. The same three claims
-                as a column of prose is a wall of text; as a row of words it is
-                a diagram, and the rungs are legible without reading. */}
-            <helix-grid class="specRungs" gap="none" min="14rem">
-              {LADDER.map((rung) => (
-                <helix-flex class="specRung" direction="column" gap="sm" key={rung.name}>
-                  <helix-text class="specDoorFor">{rung.rung}</helix-text>
-                  <helix-text as="h3" class="specRungName">
-                    {rung.name}
-                  </helix-text>
-                  <helix-text appearance="caption" tone="muted">
-                    {rung.body}
-                  </helix-text>
-                </helix-flex>
-              ))}
-            </helix-grid>
-          </helix-flex>
-        </div>
-      </section>
-
-      <section className="shell">
-        <div className="spec">
-          <helix-text class="specLabel">What you are risking</helix-text>
-          <helix-flex direction="column" gap="xl">
-            <helix-text as="h2" class="specTitle">
-              We are not trying to become part of your stack
+              Software now. The rest of the stack after.
             </helix-text>
             <helix-flex class="measure" direction="column" gap="md">
               <helix-text as="p" tone="muted">
-                Handover is a condition of the work, not a phase at the end. If an engagement would
-                leave you needing us on a retainer, we will not take it.
+                Helix is the interface layer and Cortex is memory and provenance. Each engagement
+                that feeds one of them makes the next one faster, which is why we take the work we
+                take. Energy and hardware are further out and we say so.
               </helix-text>
               <helix-text as="p" tone="muted">
-                Worth being plain about which part of that is hard. Keeping a design system is not.
-                Keeping a memory that lives somewhere else is, and that is what Cortex is for.
+                Behind all of it is one rule: nothing we build should create a dependency you cannot
+                leave. It is a commitment about architecture rather than a slogan, and it is written
+                down where you can check it.
               </helix-text>
+            </helix-flex>
+            <helix-flex data-density="sm" gap="lg" wrap>
+              <a data-link href="/thesis">
+                Read the thesis
+              </a>
+              <a data-link href="/trust">
+                What has to be true before anything ships
+              </a>
             </helix-flex>
           </helix-flex>
         </div>
