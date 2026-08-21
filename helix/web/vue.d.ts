@@ -919,20 +919,6 @@ stretched across the picture, so this moves the arrows up and down within
 it rather than moving the bar. Centered unless asked otherwise, which is
 where an arrow over a photograph belongs. */
   controlsAlign?: HelixCarousel["controlsAlign"];
-  /** How many slides are shown across the track at once. Absent shows one.
-
-No default, because it reflects. A reflected property with a value writes
-its attribute on upgrade, and the host then carries something a consumer's
-server markup never had, which React reports as a mismatch. The one-across
-case is the absent attribute, and the styles read it that way. */
-  "per-view"?: HelixCarousel["perView"];
-  /** How many slides are shown across the track at once. Absent shows one.
-
-No default, because it reflects. A reflected property with a value writes
-its attribute on upgrade, and the host then carries something a consumer's
-server markup never had, which React reports as a mismatch. The one-across
-case is the absent attribute, and the styles read it that way. */
-  perView?: HelixCarousel["perView"];
   /** Accessible name for the carousel. */
   label?: HelixCarousel["label"];
   /** The slide in view, counted from zero.
@@ -972,6 +958,40 @@ want. */
   autoplay?: HelixCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   interval?: HelixCarousel["interval"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "per-view"?: HelixCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  perView?: HelixCarousel["perView"];
 };
 
 export type HelixCarouselVueEvents = {
@@ -7623,7 +7643,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixCardVueProps,
     HelixCardVueEvents
   >;
-  /** The track scroll-snaps, so a drag and a trackpad swipe move it with the browser's own momentum and the controls only have to scroll.  Slides take the full track by default. 'per-view' fits more than one across, up to five, which is what a run of cards wants rather than a run of full-width panels. */
+  /** The track scroll-snaps, so a drag and a trackpad swipe move it with the browser's own momentum and the controls only have to scroll.  Slides take the full track by default. 'per-view' fits more than one across, up to five, and is declared on the tier below because it decides how many positions the track has rather than only how wide a slide is, which is what a run of cards wants rather than a run of full-width panels. */
   "helix-carousel": DefineCustomElement<
     HelixCarousel,
     HelixCarouselVueProps,

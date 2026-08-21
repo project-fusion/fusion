@@ -597,6 +597,40 @@ want. */
   autoplay?: HelixBaseCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   interval?: HelixBaseCarousel["interval"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "per-view"?: HelixBaseCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  perView?: HelixBaseCarousel["perView"];
 };
 
 export type HelixBaseCarouselVueEvents = {

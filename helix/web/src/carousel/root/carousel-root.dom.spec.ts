@@ -376,3 +376,34 @@ describe('carousel chrome placement', () => {
     expect(along(host, 'indicators')).toBe('')
   })
 })
+
+describe('carousel across several slides at once', () => {
+  /* Six slides four across stop three times: 0 to 3, 1 to 4, 2 to 5. Everything
+     here is that one number, and every failure it replaced came from counting
+     slides instead. */
+  const four = async (): Promise<HTMLElement> =>
+    mount(`<helix-carousel label="Reel" per-view="4">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-carousel>`)
+
+  test('the indicators count positions, not slides', async () => {
+    const host = await four()
+    expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
+  })
+
+  test('and it will not walk past the last one', async () => {
+    // Clamped to the last *slide* this reached five, and three of those indices
+    // scrolled to the same offset the track had already run out at.
+    const host = await four()
+    ;(host as HTMLElement & { goTo(index: number): void }).goTo(9)
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect((host as HTMLElement & { index: number }).index).toBe(2)
+  })
+
+  test('one across is unchanged, so a plain carousel counts its slides', async () => {
+    const host = await mount(`<helix-carousel label="Reel">
+      <div>1</div><div>2</div><div>3</div>
+    </helix-carousel>`)
+    expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
+  })
+})

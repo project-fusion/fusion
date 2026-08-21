@@ -3959,6 +3959,25 @@
             },
             {
               "kind": "field",
+              "name": "perView",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How many slides are shown across the track at once. Absent shows one.\n\n**Here rather than on the styled tier, because it decides how many places\nthe track can stop.** It was declared above as a width, which is what it\nlooks like from the stylesheet: one rule per value setting a custom\nproperty, and the slides divide the track by it. But a carousel showing\nfour of six slides has three positions, not six, and everything that counts\npositions is in this file. Left up there, `goTo` clamped to the last\n*slide*, so three of the six indicators pointed at a scroll offset the\ntrack had already reached and could not pass: pressing next walked the dots\nto the end while the slides stopped moving a third of the way through.\n\nNo default, because it reflects. A reflected property with a value writes\nits attribute on upgrade, and the host then carries something a consumer's\nserver markup never had, which React reports as a mismatch. The one-across\ncase is the absent attribute, and the styles read it that way.",
+              "attribute": "per-view",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "positions",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many distinct views the track holds, which is what the indicators count.\n\nA window of `perView` slides sliding one at a time over `n` of them stops\n`n - perView + 1` times, so six slides four across is three: 0 to 3, 1 to 4,\n2 to 5. One at minimum, since a carousel showing everything it has still\nhas the one place to be.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "slides",
               "type": {
                 "text": "HTMLElement[]"
@@ -4217,6 +4236,14 @@
               "default": "5000",
               "description": "How long each slide is held, in milliseconds.",
               "fieldName": "interval"
+            },
+            {
+              "name": "per-view",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "How many slides are shown across the track at once. Absent shows one.\n\n**Here rather than on the styled tier, because it decides how many places\nthe track can stop.** It was declared above as a width, which is what it\nlooks like from the stylesheet: one rule per value setting a custom\nproperty, and the slides divide the track by it. But a carousel showing\nfour of six slides has three positions, not six, and everything that counts\npositions is in this file. Left up there, `goTo` clamped to the last\n*slide*, so three of the six indicators pointed at a scroll offset the\ntrack had already reached and could not pass: pressing next walked the dots\nto the end while the slides stopped moving a third of the way through.\n\nNo default, because it reflects. A reflected property with a value writes\nits attribute on upgrade, and the host then carries something a consumer's\nserver markup never had, which React reports as a mismatch. The one-across\ncase is the absent attribute, and the styles read it that way.",
+              "fieldName": "perView"
             }
           ],
           "superclass": {

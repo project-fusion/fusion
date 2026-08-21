@@ -807,7 +807,8 @@ The track scroll-snaps, so a drag and a trackpad swipe move it with the
 browser's own momentum and the controls only have to scroll.
 
 Slides take the full track by default. `per-view` fits more than one across,
-up to five,
+up to five, and is declared on the tier below because it decides how many
+positions the track has rather than only how wide a slide is,
 which is what a run of cards wants rather than a run of full-width panels.
 
 #### Properties
@@ -825,7 +826,8 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `label` | `label` | `string` | `'Carousel'` | `HelixBaseCarousel` | Accessible name for the carousel. |
 | `loop` | `loop` | `boolean` | `false` | `HelixBaseCarousel` | Whether moving past either end wraps to the other. |
 | `orientation` | `orientation` | `'horizontal' \| 'vertical' \| undefined` | - | `HelixBaseCarousel` | Which way the track runs. |
-| `perView` | `per-view` | `number \| undefined` | - | - | How many slides are shown across the track at once. Absent shows one. |
+| `perView` | `per-view` | `number \| undefined` | - | `HelixBaseCarousel` | How many slides are shown across the track at once. Absent shows one. |
+| `positions` | - | `number` | - | `HelixBaseCarousel` | How many distinct views the track holds, which is what the indicators count. |
 | `slides` | - | `HTMLElement[]` | - | `HelixBaseCarousel` | The slides, in light-DOM order. Empty on the server, which has no tree. |
 
 #### Methods

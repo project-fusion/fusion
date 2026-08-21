@@ -12,7 +12,8 @@ import { styles } from './carousel-root.css.js'
  * browser's own momentum and the controls only have to scroll.
  *
  * Slides take the full track by default. `per-view` fits more than one across,
- * up to five,
+ * up to five, and is declared on the tier below because it decides how many
+ * positions the track has rather than only how wide a slide is,
  * which is what a run of cards wants rather than a run of full-width panels.
  *
  * @since 0.1.0
@@ -111,17 +112,6 @@ export class HelixCarousel extends HelixBaseCarousel {
    */
   @property({ attribute: 'controls-align', reflect: true })
   controlsAlign?: 'center' | 'end' | 'start'
-
-  /**
-   * How many slides are shown across the track at once. Absent shows one.
-   *
-   * No default, because it reflects. A reflected property with a value writes
-   * its attribute on upgrade, and the host then carries something a consumer's
-   * server markup never had, which React reports as a mismatch. The one-across
-   * case is the absent attribute, and the styles read it that way.
-   */
-  @property({ attribute: 'per-view', reflect: true, type: Number })
-  perView?: number
 
   static override styles: CSSResultGroup = styles
 }

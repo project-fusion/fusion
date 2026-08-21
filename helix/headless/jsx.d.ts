@@ -1121,6 +1121,40 @@ want. */
   autoplay?: HelixBaseCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   interval?: HelixBaseCarousel["interval"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "per-view"?: HelixBaseCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  perView?: HelixBaseCarousel["perView"];
 
   /** Fired when the slide in view changes, with its index. */
   "onhelix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
@@ -1166,6 +1200,40 @@ want. */
   "prop:autoplay"?: HelixBaseCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   "prop:interval"?: HelixBaseCarousel["interval"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "attr:per-view"?: HelixBaseCarousel["perView"];
+  /** How many slides are shown across the track at once. Absent shows one.
+
+**Here rather than on the styled tier, because it decides how many places
+the track can stop.** It was declared above as a width, which is what it
+looks like from the stylesheet: one rule per value setting a custom
+property, and the slides divide the track by it. But a carousel showing
+four of six slides has three positions, not six, and everything that counts
+positions is in this file. Left up there, `goTo` clamped to the last
+*slide*, so three of the six indicators pointed at a scroll offset the
+track had already reached and could not pass: pressing next walked the dots
+to the end while the slides stopped moving a third of the way through.
+
+No default, because it reflects. A reflected property with a value writes
+its attribute on upgrade, and the host then carries something a consumer's
+server markup never had, which React reports as a mismatch. The one-across
+case is the absent attribute, and the styles read it that way. */
+  "prop:perView"?: HelixBaseCarousel["perView"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
 
@@ -12720,6 +12788,28 @@ export type CustomElements = {
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
+   * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
+   *
+   * **Here rather than on the styled tier, because it decides how many places
+   * the track can stop.** It was declared above as a width, which is what it
+   * looks like from the stylesheet: one rule per value setting a custom
+   * property, and the slides divide the track by it. But a carousel showing
+   * four of six slides has three positions, not six, and everything that counts
+   * positions is in this file. Left up there, `goTo` clamped to the last
+   * *slide*, so three of the six indicators pointed at a scroll offset the
+   * track had already reached and could not pass: pressing next walked the dots
+   * to the end while the slides stopped moving a third of the way through.
+   *
+   * No default, because it reflects. A reflected property with a value writes
+   * its attribute on upgrade, and the host then carries something a consumer's
+   * server markup never had, which React reports as a mismatch. The one-across
+   * case is the absent attribute, and the styles read it that way.
+   * - `positions`: How many distinct views the track holds, which is what the indicators count.
+   *
+   * A window of `perView` slides sliding one at a time over `n` of them stops
+   * `n - perView + 1` times, so six slides four across is three: 0 to 3, 1 to 4,
+   * 2 to 5. One at minimum, since a carousel showing everything it has still
+   * has the one place to be. (property only) (readonly)
    * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    *
    * ## Events
@@ -23444,6 +23534,28 @@ export type CustomElementsSolidJs = {
    * - `loop`: Whether moving past either end wraps to the other.
    * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
+   * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
+   *
+   * **Here rather than on the styled tier, because it decides how many places
+   * the track can stop.** It was declared above as a width, which is what it
+   * looks like from the stylesheet: one rule per value setting a custom
+   * property, and the slides divide the track by it. But a carousel showing
+   * four of six slides has three positions, not six, and everything that counts
+   * positions is in this file. Left up there, `goTo` clamped to the last
+   * *slide*, so three of the six indicators pointed at a scroll offset the
+   * track had already reached and could not pass: pressing next walked the dots
+   * to the end while the slides stopped moving a third of the way through.
+   *
+   * No default, because it reflects. A reflected property with a value writes
+   * its attribute on upgrade, and the host then carries something a consumer's
+   * server markup never had, which React reports as a mismatch. The one-across
+   * case is the absent attribute, and the styles read it that way.
+   * - `positions`: How many distinct views the track holds, which is what the indicators count.
+   *
+   * A window of `perView` slides sliding one at a time over `n` of them stops
+   * `n - perView + 1` times, so six slides four across is three: 0 to 3, 1 to 4,
+   * 2 to 5. One at minimum, since a carousel showing everything it has still
+   * has the one place to be. (property only) (readonly)
    * - `slides`: The slides, in light-DOM order. Empty on the server, which has no tree. (property only) (readonly)
    *
    * ## Events

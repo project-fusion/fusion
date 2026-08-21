@@ -129,6 +129,40 @@ export class HelixBaseCarousel extends HelixElement {
 
   private timer: ReturnType<typeof setInterval> | undefined
 
+  /**
+   * How many slides are shown across the track at once. Absent shows one.
+   *
+   * **Here rather than on the styled tier, because it decides how many places
+   * the track can stop.** It was declared above as a width, which is what it
+   * looks like from the stylesheet: one rule per value setting a custom
+   * property, and the slides divide the track by it. But a carousel showing
+   * four of six slides has three positions, not six, and everything that counts
+   * positions is in this file. Left up there, `goTo` clamped to the last
+   * *slide*, so three of the six indicators pointed at a scroll offset the
+   * track had already reached and could not pass: pressing next walked the dots
+   * to the end while the slides stopped moving a third of the way through.
+   *
+   * No default, because it reflects. A reflected property with a value writes
+   * its attribute on upgrade, and the host then carries something a consumer's
+   * server markup never had, which React reports as a mismatch. The one-across
+   * case is the absent attribute, and the styles read it that way.
+   */
+  @property({ attribute: 'per-view', reflect: true, type: Number })
+  perView?: number
+
+  /**
+   * How many distinct views the track holds, which is what the indicators count.
+   *
+   * A window of `perView` slides sliding one at a time over `n` of them stops
+   * `n - perView + 1` times, so six slides four across is three: 0 to 3, 1 to 4,
+   * 2 to 5. One at minimum, since a carousel showing everything it has still
+   * has the one place to be.
+   */
+  get positions(): number {
+    const across = Math.max(1, Math.floor(this.perView ?? 1))
+    return Math.max(1, this.slides.length - across + 1)
+  }
+
   /** The slides, in light-DOM order. Empty on the server, which has no tree. */
   get slides(): HTMLElement[] {
     /* `?? []` is the server, and the comment above it was already right and
@@ -140,7 +174,8 @@ export class HelixBaseCarousel extends HelixElement {
        being reached, which is what the guard is for.
 
        Empty is also the honest answer rather than damage control. The
-       indicators are one per slide, the server cannot count children, so they
+       indicators are one per position and a position is counted from the
+       children, which the server cannot see, so they
        arrive with the upgrade. Nothing moves when they do: the tags are hidden
        until they are defined. */
     return [...(this.children ?? [])].filter(
@@ -171,10 +206,13 @@ export class HelixBaseCarousel extends HelixElement {
 
   /** Moves to a slide, wrapping only where `loop` says to. */
   goTo(index: number): void {
-    const count = this.slides.length
-    if (count === 0) {
+    if (this.slides.length === 0) {
       return
     }
+    /* Positions, not slides. The last place a four-across track of six can stop
+       is the third, and clamping to the sixth gave three indices that all
+       scrolled to the same clamped offset. */
+    const count = this.positions
     const next = this.loop ? (index + count) % count : Math.min(Math.max(index, 0), count - 1)
     if (next === this.index) {
       return
@@ -334,7 +372,13 @@ export class HelixBaseCarousel extends HelixElement {
     }
     // The nearest slide to the scroller's leading edge, so a drag that settles
     // between two reports the one it settled on.
-    const nearest = this.slides.reduce(
+    /* Only the leading edges a window can actually rest on. Past the last
+       position every remaining slide is on screen already, and taking the
+       nearest of *those* to the scroller's edge reported a place the reader
+       could not get back to: dragged fully right, a four-across six reported
+       the sixth slide and the dots jumped to an indicator that no longer
+       existed. */
+    const nearest = this.slides.slice(0, this.positions).reduce(
       (best, slide, index) => {
         const distance =
           this.orientation === 'vertical'
@@ -522,8 +566,8 @@ export class HelixBaseCarousel extends HelixElement {
                  * selected. */
                 ''
               }
-              ${this.slides.map(
-                (_slide, at) => html`<button
+              ${Array.from({ length: this.positions }).map(
+                (_place, at) => html`<button
                   part="indicator"
                   type="button"
                   aria-label=${`Slide ${at + 1}`}
