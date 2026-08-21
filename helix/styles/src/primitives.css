@@ -35,8 +35,32 @@
 [data-helix-theme] {
   /* ------------------------------------------------------- seed -------- */
   /* The intent inputs. `@helix-io/theme` derives everything below from
-     these, guaranteeing contrast by construction rather than by audit. */
-  --_helix-seed-brand: oklch(0.58 0.19 258);
+     these, guaranteeing contrast by construction rather than by audit.
+   *
+   * **The public names are the ones without the underscore, and that is not
+   * cosmetic.** The convention here is that a single leading underscore means
+   * `helix/styles` only, and `check:tokens` enforces it from the outside. These
+   * three are the *entry point to theming*: they are the only colour inputs the
+   * whole palette derives from, primary and its steps solve off the brand, the
+   * twenty-four series are hue rotations of it, and the neutrals take the cast.
+   * A consumer who wants a different palette has nothing else to write.
+   *
+   * They were private, and the marketing site wrote to them anyway, because the
+   * series ramp has no other input. A rule everybody has to break is a rule
+   * that is wrong rather than a codebase that is undisciplined. So the private
+   * names stay, still the only thing the ramps below read, and each falls back
+   * through a public one a consumer may set.
+   *
+   * Written this way round rather than renaming, so nothing that already writes
+   * the private name breaks while the public name becomes the thing to write.
+   *
+   * **What is still missing is a vocabulary for a *relationship*.** One seed
+   * says what the brand is and cannot say "an accent complementary to it", "a
+   * second brand seeded independently", or "a status set that leans toward the
+   * brand rather than ignoring it". Those want a second input and a way to name
+   * how it relates to the first, and they are a design question rather than a
+   * rename. #110 carries it. */
+  --_helix-seed-brand: var(--helix-seed-brand, oklch(0.58 0.19 258));
   /* Zero, and the ramp is gray.
      
      The idea was that a gray with a trace of the brand in it belongs to the
@@ -47,8 +71,8 @@
      so a fixed figure is a rising tint as the surface darkens, and a dark
      interface is mostly large flat surfaces. The brand carries the hue; the
      grays hold everything else up. */
-  --_helix-seed-neutral-chroma: 0;
-  --_helix-seed-neutral-hue: 258;
+  --_helix-seed-neutral-chroma: var(--helix-seed-neutral-chroma, 0);
+  --_helix-seed-neutral-hue: var(--helix-seed-neutral-hue, 258);
 
   /* The two components every neutral step shares, named once.
    *
