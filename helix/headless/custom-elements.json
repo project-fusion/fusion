@@ -1825,8 +1825,16 @@
               "name": "gridline"
             },
             {
+              "description": "One scale's numbers, drawn only when `secondary` splits them.",
+              "name": "axis"
+            },
+            {
               "description": "A series drawn as a line rather than as columns, under `lines`.",
               "name": "line"
+            },
+            {
+              "description": "One number on an axis.",
+              "name": "tick"
             },
             {
               "description": "One category's columns, together.",
@@ -1904,6 +1912,26 @@
             },
             {
               "kind": "field",
+              "name": "secondary",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are measured against a scale of their own, by name.\n\nSpace separated and matched the way `lines` is, against the column headings\nthe table gives. Opt in: absent, every series shares one domain, which is\nwhat makes a chart comparable and is the right default.\n\n**Two scales on one frame let an author put any two shapes in any relation\nby choosing the ranges, and a reader cannot see it happening.** That is not\na caveat, it is what the feature does: a line that crosses the columns\ntwice and a line that never touches them can be the same two series drawn\nagainst different ranges. It earns its place when the two quantities are\ngenuinely incomparable, a count against a percentage, and it is a way to\nmislead in every other case.\n\n**So it draws its axes**, and that is not optional here. The chart renders\nno value axis at all when there is one scale, because the columns are\nmeasured against each other and a reader needs no numbers to do that. With\ntwo, a reader has no way of knowing there are two, let alone which series\nis on which, so both scales are labelled the moment this is set. An\nunlabelled second axis is the deceptive case rather than the tidy one.\n\nThe grid stays on the primary axis, since a rule measured against two\nscales at once is a rule that means nothing. The tooltip is unaffected: it\nhas always shown every column's own number, which is the reader's way out\nof any scale question the picture raises.",
+              "attribute": "secondary",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "scaled",
+              "type": {
+                "text": "Set<string>"
+              },
+              "privacy": "private",
+              "description": "The series names on the second scale, lowercased and trimmed.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "lined",
               "type": {
                 "text": "Set<string>"
@@ -1977,9 +2005,66 @@
                   "type": {
                     "text": "string"
                   }
+                },
+                {
+                  "name": "z",
+                  "optional": true,
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
                 }
               ],
               "description": "The columns themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice."
+            },
+            {
+              "kind": "method",
+              "name": "renderAxis",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "scale",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                },
+                {
+                  "name": "which",
+                  "type": {
+                    "text": "'primary' | 'secondary'"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "widest",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "tint",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The numbers along one scale, drawn only where there are two of them.\n\n**A chart with one scale renders no axis, on purpose.** Columns measured\nagainst each other need no numbers to be compared, and a row of them beside\na small chart is furniture that makes the drawing smaller for no reading a\nreader was going to do. With two scales that argument inverts: a reader\ncannot tell there are two, cannot tell which series is on which, and cannot\nrecover either from the picture. So this appears with `secondary` and never\nwithout it.\n\n**Beside the plot and not inside it**, which is the second thing this got\nwrong. Inside, the numbers are drawn over the drawing, and a horizontal\nchart shows it immediately: its value axis runs along the bottom, which is\nwhere the last row of bars is. The vertical case has the same fault and\nenough slack to hide it. The plot is also the pointer's catchment and the\ntooltip's containing block, both measured from its box, so padding it to\nmake room would move every reading half an axis to the right.\n\nA column of the host grid instead, which the stylesheet grows only when\n`secondary` is set. That is what the property reflects for.\n\nThe primary hugs the edge the drawing starts at and the secondary the edge\nit ends at: down the two sides for columns, along the bottom and top for\nbars, which is where each axis is when the chart is turned."
             },
             {
               "kind": "method",
@@ -2312,6 +2397,14 @@
               },
               "description": "Which series are drawn as a line instead of as columns, by name.\n\nSpace separated, matched against the column headings the table gives, so a\nchart says `lines=\"Margin\"` rather than counting columns. Names because\nthey are what the table already carries and what the legend already shows:\nan index is a fourth place the column order is written down and the first\none to go stale when somebody moves a column.\n\n**A combination chart is one scale, and that is the honest half of it.**\nBoth marks are measured against the same domain, so a line here says\nsomething comparable to the columns beside it. The usual reason to reach\nfor a combination chart is the other thing, a count against a percentage on\na second axis, and that is deliberately not this: two scales on one frame\nlet the author put any two shapes in any relation by choosing the ranges,\nand the reader has no way to see it happening.\n\nA line among columns still measures from zero, because the columns do and\nthey share the axis. That is the trade for comparability, and it is why\nthis is a bar chart that can carry a line rather than a line chart that can\ncarry columns.",
               "fieldName": "lines"
+            },
+            {
+              "name": "secondary",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are measured against a scale of their own, by name.\n\nSpace separated and matched the way `lines` is, against the column headings\nthe table gives. Opt in: absent, every series shares one domain, which is\nwhat makes a chart comparable and is the right default.\n\n**Two scales on one frame let an author put any two shapes in any relation\nby choosing the ranges, and a reader cannot see it happening.** That is not\na caveat, it is what the feature does: a line that crosses the columns\ntwice and a line that never touches them can be the same two series drawn\nagainst different ranges. It earns its place when the two quantities are\ngenuinely incomparable, a count against a percentage, and it is a way to\nmislead in every other case.\n\n**So it draws its axes**, and that is not optional here. The chart renders\nno value axis at all when there is one scale, because the columns are\nmeasured against each other and a reader needs no numbers to do that. With\ntwo, a reader has no way of knowing there are two, let alone which series\nis on which, so both scales are labelled the moment this is set. An\nunlabelled second axis is the deceptive case rather than the tidy one.\n\nThe grid stays on the primary axis, since a rule measured against two\nscales at once is a rule that means nothing. The tooltip is unaffected: it\nhas always shown every column's own number, which is the reader's way out\nof any scale question the picture raises.",
+              "fieldName": "secondary"
             },
             {
               "name": "for",

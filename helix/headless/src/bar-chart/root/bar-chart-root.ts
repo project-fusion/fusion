@@ -51,7 +51,9 @@ const HEIGHT = 100
  * @csspart band - The slot the pointer is resting in.
  * @csspart baseline - The rule the columns stand on.
  * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
  * @csspart line - A series drawn as a line rather than as columns, under `lines`.
+ * @csspart tick - One number on an axis.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
@@ -126,6 +128,46 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
   @property()
   lines?: string
 
+  /**
+   * Which series are measured against a scale of their own, by name.
+   *
+   * Space separated and matched the way `lines` is, against the column headings
+   * the table gives. Opt in: absent, every series shares one domain, which is
+   * what makes a chart comparable and is the right default.
+   *
+   * **Two scales on one frame let an author put any two shapes in any relation
+   * by choosing the ranges, and a reader cannot see it happening.** That is not
+   * a caveat, it is what the feature does: a line that crosses the columns
+   * twice and a line that never touches them can be the same two series drawn
+   * against different ranges. It earns its place when the two quantities are
+   * genuinely incomparable, a count against a percentage, and it is a way to
+   * mislead in every other case.
+   *
+   * **So it draws its axes**, and that is not optional here. The chart renders
+   * no value axis at all when there is one scale, because the columns are
+   * measured against each other and a reader needs no numbers to do that. With
+   * two, a reader has no way of knowing there are two, let alone which series
+   * is on which, so both scales are labelled the moment this is set. An
+   * unlabelled second axis is the deceptive case rather than the tidy one.
+   *
+   * The grid stays on the primary axis, since a rule measured against two
+   * scales at once is a rule that means nothing. The tooltip is unaffected: it
+   * has always shown every column's own number, which is the reader's way out
+   * of any scale question the picture raises.
+   */
+  @property({ reflect: true })
+  secondary?: string
+
+  /** The series names on the second scale, lowercased and trimmed. */
+  private get scaled(): Set<string> {
+    return new Set(
+      (this.secondary ?? '')
+        .split(/\s+/)
+        .map((name) => name.trim().toLowerCase())
+        .filter(Boolean),
+    )
+  }
+
   /** The series names drawn as a line, lowercased and trimmed for matching. */
   private get lined(): Set<string> {
     return new Set(
@@ -175,8 +217,20 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        the box and its columns hang below it. `extent` over every series at once
        rather than per series, because two series drawn to different scales are
        two charts sharing a picture. */
+    const scaled = this.scaled
+    const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
+    /* Two extents where a series asked for its own, and the primary is taken
+       over the series that did *not*: measuring the primary over everything
+       would stretch it to hold numbers no column is drawn against, which is the
+       one thing splitting the axes was meant to stop. Empty on either side
+       falls back to the whole set, so `secondary` naming a column that is not
+       there leaves a chart rather than a blank. */
     const values = series.flatMap((one) => one.points.map((point) => point.value))
-    const [low, high] = extent(values.length > 0 ? values : [0])
+    const on = (which: (one: Series) => boolean): number[] => {
+      const found = series.filter(which).flatMap((one) => one.points.map((point) => point.value))
+      return found.length > 0 ? found : values.length > 0 ? values : [0]
+    }
+    const [low, high] = extent(scaled.size === 0 ? on(() => true) : on((one) => !own(one)))
     /* **The range is inverted for columns and not for bars**, which is the
        whole of what makes the two directions different arithmetic rather than
        one drawing turned on its side. SVG counts down from the top, so a column
@@ -187,14 +241,53 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        longest bar at x=0 and every shorter one hard against the right edge,
        growing away from the baseline instead of out of it. */
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
-    const y =
-      this.direction === 'horizontal' ? linear(domain, [0, HEIGHT]) : linear(domain, [HEIGHT, 0])
+    const range: [number, number] = this.direction === 'horizontal' ? [0, HEIGHT] : [HEIGHT, 0]
+    const y = linear(domain, range)
     const floor = y(0)
+
+    const sideways = this.direction === 'horizontal'
+    const [second, top] = extent(scaled.size > 0 ? on(own) : [0])
+    const other: [number, number] = [Math.min(0, second), Math.max(0, top)]
+    const z = scaled.size > 0 ? linear(other, range) : undefined
 
     const named = this.named
 
-    return html`${this.renderPlot(series, categories, y, domain, floor, named)}
-      ${this.renderLabels(categories)}`
+    /* Widest number on either scale, in characters, so the axis column is the
+       size of its own contents.
+     *
+     * The ticks are absolutely positioned, which is what puts each one on the
+     * level it names and also what stops any of them contributing a width: an
+     * axis of six numbers laid out that way is an empty box. The count is known
+     * here and unknowable to a selector, so it is written as a length and the
+       stylesheet reads it. */
+    const widest =
+      z === undefined
+        ? 0
+        : Math.max(
+            ...[...ticks(domain), ...ticks(other)].map((level) => level.toLocaleString().length),
+          )
+
+    /* The second axis wears its series' colour when exactly one series is on it,
+       which is the case worth helping and the only one a single colour can
+       describe honestly: with two sharing it, painting the axis either of their
+       colours says it belongs to that one.
+     *
+       **Written onto the axis and not onto the plot**, which is where it went
+       first and where it did nothing. The axis is the plot's sibling now that it
+       is a column of the host grid, and a custom property inherits down and
+       never sideways. Measured: both axes came out the neutral, which is the
+       same mistake `--_donut-thickness` made one component over. */
+    const lone = series.filter(own)
+    const tint =
+      lone.length === 1 && lone[0] !== undefined
+        ? `--_bar-chart-secondary: var(--helix-color-series-${seriesIndex(series.indexOf(lone[0]))})`
+        : undefined
+
+    return html`${
+      z === undefined ? nothing : this.renderAxis(y, domain, 'primary', sideways, widest)
+    }${this.renderPlot(series, categories, y, domain, floor, named, z)}${
+      z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
+    }${this.renderLabels(categories)}`
   }
 
   /**
@@ -210,6 +303,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     domain: [number, number],
     floor: number,
     named: string,
+    z?: (value: number) => number,
   ): TemplateResult {
     const sideways = this.direction === 'horizontal'
     const slot = 100 / categories.length
@@ -228,6 +322,13 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
        visible: with `Target` drawn as a line, `Forecast` moved up into its slot
        *and* into its colour, so a chart of four series painted three columns in
        the first three colours and the line in the third one as well. */
+    const scaled = this.scaled
+    const own = (one: Series): boolean => scaled.has(one.name.trim().toLowerCase())
+    /* The scale a series is measured against, resolved once per series rather
+       than per point. `z` is absent unless `secondary` named something, so the
+       ordinary chart takes exactly the path it took before this existed. */
+    const against = (one: Series): ((value: number) => number) =>
+      z !== undefined && own(one) ? z : y
     const columns = series
       .map((one, index) => ({ one, tone: index }))
       .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()))
@@ -243,8 +344,14 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
      * Swapping the two axes here costs one branch and keeps every other fact
      * about the chart the same. `value` runs along x when the bars are
      * sideways and along y otherwise; `category` takes the other one. */
-    const bar = (value: number, index: number, depth: number, tone: number): TemplateResult => {
-      const at = y(value)
+    const bar = (
+      value: number,
+      index: number,
+      depth: number,
+      tone: number,
+      scale: (value: number) => number,
+    ): TemplateResult => {
+      const at = scale(value)
       const along = Math.min(floor, at)
       const size = Math.abs(floor - at)
       const across = index * slot + slot * 0.14 + depth * thickness
@@ -267,7 +374,12 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
           />`
     }
 
-    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot" title=${named || nothing}>
+    return html`<div
+      aria-hidden="true"
+      id="helix-chart-plot"
+      part="plot"
+      title=${named || nothing}
+    >
       <svg
         preserveAspectRatio="none"
         viewBox="0 0 100 ${HEIGHT}"
@@ -287,7 +399,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
                makes a reader match its heading against the row of names to find
                out which columns it means. */
             svg`<g data-active=${this.pointer.at === index ? '' : nothing} part="group">
-              ${columns.map(({ one, tone }, depth) => bar(one.points[index]?.value ?? 0, index, depth, tone))}
+              ${columns.map(({ one, tone }, depth) => bar(one.points[index]?.value ?? 0, index, depth, tone, against(one)))}
             </g>`,
         )}
         ${
@@ -297,12 +409,64 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
              rather than to any one slot. */
           series.map((one) =>
             lined.has(one.name.trim().toLowerCase())
-              ? this.renderLine(one, series.indexOf(one), slot, y, sideways)
+              ? this.renderLine(one, series.indexOf(one), slot, against(one), sideways)
               : nothing,
           )
         }
       </svg>
       ${this.renderTooltip()}
+    </div>`
+  }
+
+  /**
+   * The numbers along one scale, drawn only where there are two of them.
+   *
+   * **A chart with one scale renders no axis, on purpose.** Columns measured
+   * against each other need no numbers to be compared, and a row of them beside
+   * a small chart is furniture that makes the drawing smaller for no reading a
+   * reader was going to do. With two scales that argument inverts: a reader
+   * cannot tell there are two, cannot tell which series is on which, and cannot
+   * recover either from the picture. So this appears with `secondary` and never
+   * without it.
+   *
+   * **Beside the plot and not inside it**, which is the second thing this got
+   * wrong. Inside, the numbers are drawn over the drawing, and a horizontal
+   * chart shows it immediately: its value axis runs along the bottom, which is
+   * where the last row of bars is. The vertical case has the same fault and
+   * enough slack to hide it. The plot is also the pointer's catchment and the
+   * tooltip's containing block, both measured from its box, so padding it to
+   * make room would move every reading half an axis to the right.
+   *
+   * A column of the host grid instead, which the stylesheet grows only when
+   * `secondary` is set. That is what the property reflects for.
+   *
+   * The primary hugs the edge the drawing starts at and the secondary the edge
+   * it ends at: down the two sides for columns, along the bottom and top for
+   * bars, which is where each axis is when the chart is turned.
+   */
+  protected renderAxis(
+    scale: (value: number) => number,
+    domain: [number, number],
+    which: 'primary' | 'secondary',
+    sideways: boolean,
+    widest: number,
+    tint?: string,
+  ): TemplateResult {
+    const sizing = sideways ? undefined : `--_bar-chart-axis: ${widest}ch`
+    return html`<div
+      aria-hidden="true"
+      data-axis=${which}
+      part="axis"
+      style=${[sizing, tint].filter(Boolean).join('; ') || nothing}
+    >
+      ${ticks(domain).map(
+        (level) =>
+          html`<span
+            part="tick"
+            style=${sideways ? `inset-inline-start: ${scale(level)}%` : `inset-block-start: ${scale(level)}%`}
+            >${level.toLocaleString()}</span
+          >`,
+      )}
     </div>`
   }
 

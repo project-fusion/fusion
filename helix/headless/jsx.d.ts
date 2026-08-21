@@ -767,6 +767,32 @@ they share the axis. That is the trade for comparability, and it is why
 this is a bar chart that can carry a line rather than a line chart that can
 carry columns. */
   lines?: HelixBaseBarChart["lines"];
+  /** Which series are measured against a scale of their own, by name.
+
+Space separated and matched the way `lines` is, against the column headings
+the table gives. Opt in: absent, every series shares one domain, which is
+what makes a chart comparable and is the right default.
+
+**Two scales on one frame let an author put any two shapes in any relation
+by choosing the ranges, and a reader cannot see it happening.** That is not
+a caveat, it is what the feature does: a line that crosses the columns
+twice and a line that never touches them can be the same two series drawn
+against different ranges. It earns its place when the two quantities are
+genuinely incomparable, a count against a percentage, and it is a way to
+mislead in every other case.
+
+**So it draws its axes**, and that is not optional here. The chart renders
+no value axis at all when there is one scale, because the columns are
+measured against each other and a reader needs no numbers to do that. With
+two, a reader has no way of knowing there are two, let alone which series
+is on which, so both scales are labelled the moment this is set. An
+unlabelled second axis is the deceptive case rather than the tidy one.
+
+The grid stays on the primary axis, since a rule measured against two
+scales at once is a rule that means nothing. The tooltip is unaffected: it
+has always shown every column's own number, which is the reader's way out
+of any scale question the picture raises. */
+  secondary?: HelixBaseBarChart["secondary"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -832,6 +858,32 @@ they share the axis. That is the trade for comparability, and it is why
 this is a bar chart that can carry a line rather than a line chart that can
 carry columns. */
   "prop:lines"?: HelixBaseBarChart["lines"];
+  /** Which series are measured against a scale of their own, by name.
+
+Space separated and matched the way `lines` is, against the column headings
+the table gives. Opt in: absent, every series shares one domain, which is
+what makes a chart comparable and is the right default.
+
+**Two scales on one frame let an author put any two shapes in any relation
+by choosing the ranges, and a reader cannot see it happening.** That is not
+a caveat, it is what the feature does: a line that crosses the columns
+twice and a line that never touches them can be the same two series drawn
+against different ranges. It earns its place when the two quantities are
+genuinely incomparable, a count against a percentage, and it is a way to
+mislead in every other case.
+
+**So it draws its axes**, and that is not optional here. The chart renders
+no value axis at all when there is one scale, because the columns are
+measured against each other and a reader needs no numbers to do that. With
+two, a reader has no way of knowing there are two, let alone which series
+is on which, so both scales are labelled the moment this is set. An
+unlabelled second axis is the deceptive case rather than the tidy one.
+
+The grid stays on the primary axis, since a rule measured against two
+scales at once is a rule that means nothing. The tooltip is unaffected: it
+has always shown every column's own number, which is the reader's way out
+of any scale question the picture raises. */
+  "prop:secondary"?: HelixBaseBarChart["secondary"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -12470,6 +12522,31 @@ export type CustomElements = {
    * they share the axis. That is the trade for comparability, and it is why
    * this is a bar chart that can carry a line rather than a line chart that can
    * carry columns.
+   * - `secondary`: Which series are measured against a scale of their own, by name.
+   *
+   * Space separated and matched the way `lines` is, against the column headings
+   * the table gives. Opt in: absent, every series shares one domain, which is
+   * what makes a chart comparable and is the right default.
+   *
+   * **Two scales on one frame let an author put any two shapes in any relation
+   * by choosing the ranges, and a reader cannot see it happening.** That is not
+   * a caveat, it is what the feature does: a line that crosses the columns
+   * twice and a line that never touches them can be the same two series drawn
+   * against different ranges. It earns its place when the two quantities are
+   * genuinely incomparable, a count against a percentage, and it is a way to
+   * mislead in every other case.
+   *
+   * **So it draws its axes**, and that is not optional here. The chart renders
+   * no value axis at all when there is one scale, because the columns are
+   * measured against each other and a reader needs no numbers to do that. With
+   * two, a reader has no way of knowing there are two, let alone which series
+   * is on which, so both scales are labelled the moment this is set. An
+   * unlabelled second axis is the deceptive case rather than the tidy one.
+   *
+   * The grid stays on the primary axis, since a rule measured against two
+   * scales at once is a rule that means nothing. The tooltip is unaffected: it
+   * has always shown every column's own number, which is the reader's way out
+   * of any scale question the picture raises.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -12511,7 +12588,9 @@ export type CustomElements = {
    * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
+   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `line`: A series drawn as a line rather than as columns, under `lines`.
+   * - `tick`: One number on an axis.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -23289,6 +23368,31 @@ export type CustomElementsSolidJs = {
    * they share the axis. That is the trade for comparability, and it is why
    * this is a bar chart that can carry a line rather than a line chart that can
    * carry columns.
+   * - `secondary`: Which series are measured against a scale of their own, by name.
+   *
+   * Space separated and matched the way `lines` is, against the column headings
+   * the table gives. Opt in: absent, every series shares one domain, which is
+   * what makes a chart comparable and is the right default.
+   *
+   * **Two scales on one frame let an author put any two shapes in any relation
+   * by choosing the ranges, and a reader cannot see it happening.** That is not
+   * a caveat, it is what the feature does: a line that crosses the columns
+   * twice and a line that never touches them can be the same two series drawn
+   * against different ranges. It earns its place when the two quantities are
+   * genuinely incomparable, a count against a percentage, and it is a way to
+   * mislead in every other case.
+   *
+   * **So it draws its axes**, and that is not optional here. The chart renders
+   * no value axis at all when there is one scale, because the columns are
+   * measured against each other and a reader needs no numbers to do that. With
+   * two, a reader has no way of knowing there are two, let alone which series
+   * is on which, so both scales are labelled the moment this is set. An
+   * unlabelled second axis is the deceptive case rather than the tidy one.
+   *
+   * The grid stays on the primary axis, since a rule measured against two
+   * scales at once is a rule that means nothing. The tooltip is unaffected: it
+   * has always shown every column's own number, which is the reader's way out
+   * of any scale question the picture raises.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -23330,7 +23434,9 @@ export type CustomElementsSolidJs = {
    * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
+   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `line`: A series drawn as a line rather than as columns, under `lines`.
+   * - `tick`: One number on an axis.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.

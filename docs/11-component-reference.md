@@ -456,6 +456,7 @@ it is measured against.
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
 | `rows` | - | `Row[]` | - | `MixinChartSource` | Every row of the table, with each cell's text as well as its number. |
+| `secondary` | `secondary` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are measured against a scale of their own, by name. |
 | `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 
 #### Parts
@@ -466,7 +467,9 @@ it is measured against.
 | `band` | The slot the pointer is resting in. |
 | `baseline` | The rule the columns stand on. |
 | `gridline` | One rule across the plot, under `gridlines`. |
+| `axis` | One scale's numbers, drawn only when `secondary` splits them. |
 | `line` | A series drawn as a line rather than as columns, under `lines`. |
+| `tick` | One number on an axis. |
 | `group` | One category's columns, together. |
 | `label` | One category's name. |
 | `labels` | The row of category names. |

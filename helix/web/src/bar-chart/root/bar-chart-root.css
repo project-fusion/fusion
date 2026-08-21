@@ -541,3 +541,120 @@
   stroke-width: var(--bar-chart-line-width, 2.5px);
   vector-effect: non-scaling-stroke;
 }
+
+/* The numbers along a scale, drawn only when `secondary` split them in two.
+ *
+ * **A column of the host grid, not a layer over the plot.** Inside the plot the
+ * numbers are drawn over the drawing, which a horizontal chart shows at once
+ * because its value axis runs along the bottom where the last row of bars is.
+ * Padding the plot instead is worse: it is the pointer's catchment and the
+ * tooltip's containing block, both measured from its box, so every reading
+ * would move by half an axis.
+ *
+ * The grid only grows these tracks under `[secondary]`, which is what the
+ * property reflects for. Without it the chart is exactly the two-part grid it
+ * has always been.
+ *
+ * `--_bar-chart-axis` is written by the tier below, in characters, because the
+ * ticks are absolutely positioned: that is what puts each on the level it names
+ * and also what stops any of them giving the column a width. The widest number
+ * is known where the ticks are made and unknowable to a selector. */
+:host([secondary]) {
+  grid-template-columns: auto 1fr auto;
+}
+
+:host([secondary]) [part="axis"][data-axis="primary"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:host([secondary]) [part="plot"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+:host([secondary]) [part="axis"][data-axis="secondary"] {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+:host([secondary]) [part="labels"] {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* Turned sideways the value axis is horizontal, so the two scales are rows
+   rather than columns: the primary under the bars where a reader looks for it,
+   the secondary above them, and the names still in their own column beside. */
+:host([direction="horizontal"][secondary]) {
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+}
+
+:host([direction="horizontal"][secondary]) [part="axis"][data-axis="secondary"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+:host([direction="horizontal"][secondary]) [part="labels"] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+:host([direction="horizontal"][secondary]) [part="plot"] {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+:host([direction="horizontal"][secondary]) [part="axis"][data-axis="primary"] {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* Relative, so a tick's percentage resolves against the axis, which the grid
+   has already made exactly as long as the plot it sits beside. */
+[part="axis"] {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-2xs);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  position: relative;
+}
+
+:host(:not([direction="horizontal"])) [part="axis"] {
+  inline-size: var(--_bar-chart-axis, 3ch);
+}
+
+:host([direction="horizontal"]) [part="axis"] {
+  block-size: 1lh;
+}
+
+/* Centred on the level it names rather than hanging below it: a number whose
+   top edge is on the line reads as belonging to the band under it, which is off
+   by one gridline for the whole column. */
+[part="tick"] {
+  position: absolute;
+}
+
+:host(:not([direction="horizontal"])) [part="tick"] {
+  inset-inline-end: 0;
+  translate: 0 -50%;
+}
+
+:host([direction="horizontal"]) [part="tick"] {
+  translate: -50% 0;
+}
+
+:host(:not([direction="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+
+/* The secondary scale wears its series' colour when exactly one series is on
+   it, which is the case worth helping and the only one a single colour can
+   describe honestly. Two series sharing a second axis get the neutral, because
+   picking one of their colours would say the axis belongs to that one. The tier
+   below writes the property only in the lone case. */
+[part="axis"][data-axis="secondary"] {
+  color: var(--_bar-chart-secondary, var(--helix-color-foreground-subtle));
+}
