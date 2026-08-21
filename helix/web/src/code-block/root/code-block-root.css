@@ -14,14 +14,24 @@
   border-start-end-radius: var(--helix-radii-sm);
   border-start-start-radius: var(--helix-radii-sm);
   display: flex;
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-sm);
+  /* `2xs` around a line of `xs` text made a 24px strip, which is a bar that has
+     been squeezed rather than one that is deliberately tight. The inline
+     padding matches the block's own, so the name sits over the first character
+     of the code rather than a few pixels off it. */
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-md);
 }
 
+/* **The name is a name, not code.** It was set in the mono face, which put
+   "Install Helix" in the same type as the command under it and made a title
+   read as the snippet's first line. The block below is the only thing here
+   that is code. Medium rather than regular, because at `xs` and muted a
+   regular weight has nothing left to be a heading with. */
 [part="label"] {
   color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-mono);
+  font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
 }
 
 /* The positioning context for the copy button, which sits inside the code box.
@@ -55,7 +65,15 @@
   margin: var(--helix-space-none);
   overflow-x: auto;
   padding-block: var(--helix-space-sm);
-  padding-inline: var(--helix-space-md) calc(var(--helix-size-control) + var(--helix-space-sm));
+  padding-inline: var(--helix-space-md);
+}
+
+/* **The gutter is only reserved when something is standing in it.** The end
+   padding held a control's width unconditionally, so a block with `no-copy`
+   paid 40px of empty margin for a button that was never rendered, and a short
+   line sat oddly far from a border it was nowhere near. */
+:host(:not([no-copy])) [part="block"] {
+  padding-inline-end: calc(var(--helix-size-control) + var(--helix-space-sm));
 }
 
 /* Only under a header does the block give up its top edge, so the two boxes

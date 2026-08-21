@@ -409,3 +409,40 @@
     transition: none;
   }
 }
+
+/* Columns grow into place, and move when the numbers do.
+ *
+ * `x`, `y`, `width` and `height` are geometry properties on an SVG rect, which
+ * means CSS can transition them: the same four attributes Lit rewrites when a
+ * series changes. Nothing here animates a `transform`, which would scale the
+ * corner radius with the column and make a short bar's corners rounder than a
+ * tall one's.
+ *
+ * `@starting-style` gives the arrival a value to come from, and it is a height
+ * of zero at the baseline rather than an opacity: a bar chart that fades in
+ * says nothing, and one that grows out of its own baseline says what a bar
+ * chart is for. */
+[part="bar"] {
+  transition:
+    height var(--helix-duration-normal) var(--helix-easing-emphasized),
+    width var(--helix-duration-normal) var(--helix-easing-emphasized),
+    x var(--helix-duration-normal) var(--helix-easing-emphasized),
+    y var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+@starting-style {
+  :host(:not([direction="horizontal"])) [part="bar"] {
+    height: 0;
+    y: 100;
+  }
+
+  :host([direction="horizontal"]) [part="bar"] {
+    width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="bar"] {
+    transition: none;
+  }
+}

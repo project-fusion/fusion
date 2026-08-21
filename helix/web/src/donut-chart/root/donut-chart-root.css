@@ -402,3 +402,44 @@
   inset-block-start: 50%;
   translate: -50% -50%;
 }
+
+/* The ring answers a change in its numbers, and draws itself on arrival.
+ *
+ * A chart that swaps its shape between frames makes a reader re-read the whole
+ * picture; one that moves lets them follow the part that changed, which is the
+ * only part they were asking about.
+ *
+ * The dash is what carries both. A slice's length and where it starts are two
+ * numbers on one circle, so a share growing is a `stroke-dasharray` animating
+ * and nothing about the element changes: no reflow, no re-layout, and Lit keeps
+ * the same node because the template is keyed by position.
+ *
+ * `@starting-style` for the arrival, which is the whole reason the ring sweeps
+ * in rather than appearing: it gives the browser a value to come *from* the
+ * first time an element is painted, and there is no other way to transition
+ * from nothing. `stroke-dashoffset` is what it starts from, so every slice
+ * enters along the circle rather than fading. */
+[part="segment"] {
+  transition:
+    r var(--helix-duration-normal) var(--helix-easing-emphasized),
+    stroke-dasharray var(--helix-duration-normal) var(--helix-easing-emphasized),
+    stroke-dashoffset var(--helix-duration-normal) var(--helix-easing-emphasized),
+    stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  [part="segment"] {
+    stroke-dasharray: 0 999;
+  }
+}
+
+[part="track"] {
+  transition: r var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="segment"],
+  [part="track"] {
+    transition: none;
+  }
+}

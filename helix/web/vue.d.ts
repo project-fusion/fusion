@@ -2214,6 +2214,24 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   label?: HelixDonutChart["label"];
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  hole?: HelixDonutChart["hole"];
 };
 
 export type HelixDonutChartVueEvents = {};
@@ -6947,6 +6965,8 @@ export type CustomCssProperties = {
   "--card-background-color"?: string;
   /** Border color of the surface. */
   "--card-border-color"?: string;
+  /** Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. */
+  "--card-media-block-size"?: string;
   /** Width of the media column when horizontal. */
   "--card-media-size"?: string;
   /** Inset applied to each region. */

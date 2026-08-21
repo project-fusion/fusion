@@ -1,9 +1,4 @@
 <!-- @summary A lighter ring, for a card where the shares matter less than the total. -->
-<link
-  href="styles.css"
-  rel="stylesheet"
-/>
-
 <helix-flex
   direction="column"
   gap="md"
@@ -39,7 +34,10 @@
     </tbody>
   </table>
 
-  <helix-donut-chart for="thinned">
+  <helix-donut-chart
+    for="thinned"
+    hole="large"
+  >
     <helix-stat>
       10,000
       <span slot="label">Sessions</span>

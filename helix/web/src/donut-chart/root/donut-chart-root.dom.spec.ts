@@ -6,7 +6,11 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const CIRCUMFERENCE = 2 * Math.PI * 40
+/* The radius follows the thickness so the outer edge always lands at 40, so a
+   ring of the resting thickness is drawn at `40 - 16 / 2`. Written out rather
+   than imported, because a spec that derives its expectation the same way the
+   code does asserts only that the code agrees with itself. */
+const CIRCUMFERENCE = 2 * Math.PI * 32
 
 const TRAFFIC = `<table id="traffic">
   <caption>Sessions by source</caption>
@@ -158,5 +162,47 @@ describe('donut chart tooltip', () => {
       false,
       true,
     ])
+  })
+})
+
+describe('donut chart hole', () => {
+  const radius = (host: HTMLElement): number => Number(segments(host)[0]?.getAttribute('r') ?? 0)
+
+  test('the outer edge holds at 40 whatever the thickness, so nothing clips', async () => {
+    /* The bug this replaced: a fixed `r=40` with the stroke astride it grew
+       outward as well as inward, so a thickness past 20 crossed the view box
+       and was cut with nothing to say so. Derived, `r + thickness / 2` is 40
+       for every value. */
+    for (const [hole, thickness] of [
+      ['small', 26],
+      ['', 16],
+      ['large', 8],
+      ['none', 40],
+    ] as const) {
+      const host = await chart(TRAFFIC, `for="traffic" ${hole ? `hole="${hole}"` : ''}`)
+      expect(radius(host) + thickness / 2).toBeCloseTo(40, 6)
+    }
+  })
+
+  test('`none` closes the hole entirely, which is a pie', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic" hole="none"')
+    /* Inner edge at the centre: `r - thickness / 2` is zero, which solves to
+       `r = EDGE / 2` and not to `r = 0`. A radius of zero draws nothing, and
+       that was the first version of this arithmetic. */
+    expect(radius(host)).toBeCloseTo(20, 6)
+    expect(radius(host) - 40 / 2).toBeCloseTo(0, 6)
+  })
+
+  test('a pie renders no middle, since there is nowhere to slot anything', async () => {
+    /* A slot nobody can see is worse than one that is not there: a consumer
+       fills it and nothing happens. */
+    expect(part(await chart(TRAFFIC, 'for="traffic" hole="none"'), 'centre')).toBeNull()
+    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'centre')).not.toBeNull()
+  })
+
+  test('the dash follows the radius, so the slices still close the ring', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic" hole="large"')
+    const total = segments(host).reduce((sum, one) => sum + drawn(one), 0)
+    expect(total).toBeCloseTo(2 * Math.PI * radius(host), 6)
   })
 })

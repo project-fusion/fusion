@@ -460,3 +460,48 @@
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
 }
+
+/* The line moves to its new shape, and draws itself on arrival.
+ *
+ * `d` is transitionable where the two paths have the same commands in the same
+ * order, which is true whenever a series keeps its length and changes its
+ * numbers, and that is the case worth animating. A series that gains or loses a
+ * reading has a different command list and snaps, which is honest: the shape is
+ * a different shape and pretending otherwise would interpolate between points
+ * that do not correspond.
+ *
+ * The arrival is a draw-in rather than a fade, using the dash trick: a dash as
+ * long as the whole path, offset by the same, is a line that has not been drawn
+ * yet. `pathLength` normalises it to 100 so one number covers every path
+ * whatever its real length, which is the only way this works without measuring
+ * each one. */
+[part="line"] {
+  transition:
+    d var(--helix-duration-normal) var(--helix-easing-emphasized),
+    stroke-dashoffset var(--helix-duration-slow) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  [part="line"] {
+    stroke-dashoffset: 100;
+  }
+}
+
+[part="area"] {
+  transition:
+    d var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-slow) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  [part="area"] {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="line"],
+  [part="area"] {
+    transition: none;
+  }
+}

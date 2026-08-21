@@ -1,9 +1,0 @@
-/* A ring drawn light enough that the number in the hole leads.
- *
- * The thickness is in the drawing's own units rather than in pixels: the view
- * box is 100 across, so 5 is a twentieth of the width and stays a twentieth
- * whatever size the chart is given. A pixel value would be a different ring in
- * a card and in a dashboard. */
-helix-donut-chart {
-  --donut-chart-thickness: 5;
-}

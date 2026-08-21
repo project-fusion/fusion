@@ -3703,6 +3703,10 @@
               {
                 "description": "Categories down the side, which is what names rather than dates need: a row of long labels either overlaps or turns on its side.",
                 "slug": "horizontal"
+              },
+              {
+                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
               }
             ],
             "source": "helix/web/src/bar-chart"
@@ -5877,6 +5881,10 @@
             {
               "description": "Border color of the surface.",
               "name": "--card-border-color"
+            },
+            {
+              "description": "Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has.",
+              "name": "--card-media-block-size"
             },
             {
               "description": "Width of the media column when horizontal.",
@@ -11902,6 +11910,14 @@
             {
               "description": "The row under the square.",
               "name": "controls",
+              "inheritedFrom": {
+                "name": "HelixBaseColorPicker",
+                "module": "src/color-picker/root/color-picker-root.ts"
+              }
+            },
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
                 "module": "src/color-picker/root/color-picker-root.ts"
@@ -19455,12 +19471,39 @@
             },
             {
               "kind": "field",
+              "name": "hole",
+              "type": {
+                "text": "'large' | 'none' | 'small' | undefined"
+              },
+              "description": "How much is left open in the middle.\n\nAbsent is a ring with room for a total in it. `small` and `large` move the\nhole without moving the outer edge, so a chart keeps its footprint.\n\n**`none` is a pie**, and it is the same drawing rather than another one:\nthe radius follows the thickness, so the inner edge reaching the centre is\nwhat closing the hole means. A pie reads less accurately than a ring, angle\nbeing harder to judge than length, but it is not *misleading* the way a bar\nmeasured from anything but zero is, which is why this is a value here and\nthe bar chart's baseline is not a property at all.\n\n**Geometry rather than a CSS hook, and it had to move.** This was\n`--donut-chart-thickness`, and the dash arithmetic needs the circumference,\nwhich needs the radius: reading a custom property means `getComputedStyle`,\nwhich is client-only, so a server would have drawn a different ring than\nthe client. A plot's proportions are markup for the same reason `curve` is.",
+              "attribute": "hole",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "radius",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The ring's radius, which follows its thickness so the outer edge holds.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "shares",
               "type": {
                 "text": "{ fraction: number; start: number }[]"
               },
               "privacy": "private",
-              "description": "The slices, in table order, with anything negative dropped.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
@@ -19520,6 +19563,21 @@
                 }
               ],
               "description": "One slice, as a dash the length of its share.",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a slice shows.\n\nPlaced in the middle rather than along an axis, a ring having none, and the\nmiddle is where a reader is already looking: the hole usually holds a\ntotal, so a tooltip over it replaces one figure with the one being asked\nabout rather than covering something else.",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -19619,12 +19677,20 @@
                 "slug": "default"
               },
               {
+                "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
+                "slug": "pie"
+              },
+              {
                 "description": "A lighter ring, for a card where the shares matter less than the total.",
                 "slug": "thin"
               },
               {
                 "description": "A legend beside the ring, mapping the same palette in the same order.",
                 "slug": "with-a-legend"
+              },
+              {
+                "description": "A pointer resting on a slice, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
               },
               {
                 "description": "A total in the hole, which is what the middle of a ring is for.",
@@ -19661,6 +19727,18 @@
                 "name": "MixinChartSource",
                 "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
               }
+            },
+            {
+              "name": "hole",
+              "type": {
+                "text": "'large' | 'none' | 'small' | undefined"
+              },
+              "description": "How much is left open in the middle.\n\nAbsent is a ring with room for a total in it. `small` and `large` move the\nhole without moving the outer edge, so a chart keeps its footprint.\n\n**`none` is a pie**, and it is the same drawing rather than another one:\nthe radius follows the thickness, so the inner edge reaching the centre is\nwhat closing the hole means. A pie reads less accurately than a ring, angle\nbeing harder to judge than length, but it is not *misleading* the way a bar\nmeasured from anything but zero is, which is why this is a value here and\nthe bar chart's baseline is not a property at all.\n\n**Geometry rather than a CSS hook, and it had to move.** This was\n`--donut-chart-thickness`, and the dash arithmetic needs the circumference,\nwhich needs the radius: reading a custom property means `getComputedStyle`,\nwhich is client-only, so a server would have drawn a different ring than\nthe client. A plot's proportions are markup for the same reason `curve` is.",
+              "fieldName": "hole",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
             }
           ],
           "slots": [
@@ -19685,6 +19763,46 @@
             {
               "description": "The drawing.",
               "name": "plot",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "What a pointer resting on a slice shows.",
+              "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "The slice's own name inside the tooltip.",
+              "name": "tooltip-label",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -22592,6 +22710,14 @@
             {
               "description": "The file input itself, which carries the label and validity.",
               "name": "control",
+              "inheritedFrom": {
+                "name": "HelixBaseFileInput",
+                "module": "src/file-input/root/file-input-root.ts"
+              }
+            },
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon",
               "inheritedFrom": {
                 "name": "HelixBaseFileInput",
                 "module": "src/file-input/root/file-input-root.ts"
@@ -26731,6 +26857,14 @@
               }
             },
             {
+              "description": "A glyph this component draws.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseInput",
+                "module": "src/input/root/input-root.ts"
+              }
+            },
+            {
               "description": "The button that shows and hides a password.",
               "name": "reveal",
               "inheritedFrom": {
@@ -27560,6 +27694,29 @@
             },
             {
               "kind": "method",
+              "name": "renderGuide",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                }
+              ],
+              "description": "A rule down the reading the tooltip is about.\n\nWithout it the tooltip is a box of numbers floating over a drawing, and a\nreader has to match its heading against the row of names to find out which\ncolumn it means. The rule is the whole of what connects the two, and it\nmatters most on a line, where there is no marker under the pointer to\nstand in for one.\n\nDrawn before the series so a line is never cut by it.",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "renderSeries",
               "privacy": "protected",
               "return": {
@@ -27745,6 +27902,10 @@
               {
                 "description": "Two series on one scale, with a legend mapping the same palette.",
                 "slug": "several-series"
+              },
+              {
+                "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
+                "slug": "with-a-tooltip"
               }
             ],
             "source": "helix/web/src/line-chart"
@@ -27829,6 +27990,14 @@
             {
               "description": "The rule at zero, where zero is inside the range.",
               "name": "baseline",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "A rule down the reading a pointer is resting on.",
+              "name": "guide",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -50418,6 +50587,14 @@
           ],
           "cssParts": [
             {
+              "description": "A glyph this component draws.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseSpeedDial",
+                "module": "src/speed-dial/root/speed-dial-root.ts"
+              }
+            },
+            {
               "description": "The default trigger, where none was slotted.",
               "name": "trigger",
               "inheritedFrom": {
@@ -68562,6 +68739,14 @@
               }
             },
             {
+              "description": "The glyph on the trigger.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseVideoPlaylistMenu",
+                "module": "src/video-playlist/menu/video-playlist-menu.ts"
+              }
+            },
+            {
               "description": "An entry's still, where it has one.",
               "name": "poster",
               "inheritedFrom": {
@@ -70683,6 +70868,14 @@
             }
           ],
           "cssParts": [
+            {
+              "description": "A glyph this component draws.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
             {
               "description": "The box holding the picture and its controls, and the focus target the keys are bound to.",
               "name": "stage",

@@ -3487,6 +3487,24 @@ here has to be. */
 };
 
 export type HelixBaseDonutChartProps = {
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  hole?: HelixBaseDonutChart["hole"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -3504,6 +3522,24 @@ words and is already written. */
 };
 
 export type HelixBaseDonutChartSolidJsProps = {
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  "prop:hole"?: HelixBaseDonutChart["hole"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -14588,6 +14624,23 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `hole`: How much is left open in the middle.
+   *
+   * Absent is a ring with room for a total in it. `small` and `large` move the
+   * hole without moving the outer edge, so a chart keeps its footprint.
+   *
+   * **`none` is a pie**, and it is the same drawing rather than another one:
+   * the radius follows the thickness, so the inner edge reaching the centre is
+   * what closing the hole means. A pie reads less accurately than a ring, angle
+   * being harder to judge than length, but it is not *misleading* the way a bar
+   * measured from anything but zero is, which is why this is a value here and
+   * the bar chart's baseline is not a property at all.
+   *
+   * **Geometry rather than a CSS hook, and it had to move.** This was
+   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+   * which needs the radius: reading a custom property means `getComputedStyle`,
+   * which is client-only, so a server would have drawn a different ring than
+   * the client. A plot's proportions are markup for the same reason `curve` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -14633,6 +14686,11 @@ export type CustomElements = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The slice's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
@@ -15758,6 +15816,7 @@ export type CustomElements = {
    *
    * - `area`: The wash under one line, where `area` is set.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.
@@ -25275,6 +25334,23 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `hole`: How much is left open in the middle.
+   *
+   * Absent is a ring with room for a total in it. `small` and `large` move the
+   * hole without moving the outer edge, so a chart keeps its footprint.
+   *
+   * **`none` is a pie**, and it is the same drawing rather than another one:
+   * the radius follows the thickness, so the inner edge reaching the centre is
+   * what closing the hole means. A pie reads less accurately than a ring, angle
+   * being harder to judge than length, but it is not *misleading* the way a bar
+   * measured from anything but zero is, which is why this is a value here and
+   * the bar chart's baseline is not a property at all.
+   *
+   * **Geometry rather than a CSS hook, and it had to move.** This was
+   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+   * which needs the radius: reading a custom property means `getComputedStyle`,
+   * which is client-only, so a server would have drawn a different ring than
+   * the client. A plot's proportions are markup for the same reason `curve` is.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -25320,6 +25396,11 @@ export type CustomElementsSolidJs = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The slice's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
@@ -26481,6 +26562,7 @@ export type CustomElementsSolidJs = {
    *
    * - `area`: The wash under one line, where `area` is set.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.

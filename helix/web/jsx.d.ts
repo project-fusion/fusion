@@ -4269,6 +4269,24 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   label?: HelixDonutChart["label"];
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  hole?: HelixDonutChart["hole"];
 };
 
 export type HelixDonutChartSolidJsProps = {
@@ -4286,6 +4304,24 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   "prop:label"?: HelixDonutChart["label"];
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  "prop:hole"?: HelixDonutChart["hole"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14339,6 +14375,7 @@ export type CustomElements = {
    *
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
@@ -15291,6 +15328,7 @@ export type CustomElements = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
+   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
@@ -16394,6 +16432,23 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `hole`: How much is left open in the middle.
+   *
+   * Absent is a ring with room for a total in it. `small` and `large` move the
+   * hole without moving the outer edge, so a chart keeps its footprint.
+   *
+   * **`none` is a pie**, and it is the same drawing rather than another one:
+   * the radius follows the thickness, so the inner edge reaching the centre is
+   * what closing the hole means. A pie reads less accurately than a ring, angle
+   * being harder to judge than length, but it is not *misleading* the way a bar
+   * measured from anything but zero is, which is why this is a value here and
+   * the bar chart's baseline is not a property at all.
+   *
+   * **Geometry rather than a CSS hook, and it had to move.** This was
+   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+   * which needs the radius: reading a custom property means `getComputedStyle`,
+   * which is client-only, so a server would have drawn a different ring than
+   * the client. A plot's proportions are markup for the same reason `curve` is.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -16435,6 +16490,11 @@ export type CustomElements = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The slice's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
@@ -16861,6 +16921,7 @@ export type CustomElements = {
    *
    * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
@@ -17409,6 +17470,7 @@ export type CustomElements = {
    * - `field`: The box holding everything.
    * - `control`: The input itself.
    * - `clear`: The button that empties the field.
+   * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
   "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents> & HelixInputControlled;
@@ -17601,6 +17663,7 @@ export type CustomElements = {
    *
    * - `area`: The wash under one line, where `area` is set.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.
@@ -21117,6 +21180,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
@@ -23780,6 +23844,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `icon`: The glyph on the trigger.
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
@@ -24005,6 +24070,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
@@ -25191,6 +25257,7 @@ export type CustomElementsSolidJs = {
    *
    * - `--card-background-color`: Surface behind the card. (default: `undefined`)
    * - `--card-border-color`: Border color of the surface. (default: `undefined`)
+   * - `--card-media-block-size`: Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. (default: `undefined`)
    * - `--card-media-size`: Width of the media column when horizontal. (default: `undefined`)
    * - `--card-padding`: Inset applied to each region. (default: `undefined`)
    * - `--card-radii`: Corner radius of the surface. (default: `undefined`)
@@ -26162,6 +26229,7 @@ export type CustomElementsSolidJs = {
    * - `grid-saturation`: The range input for the square's horizontal axis.
    * - `grid-brightness`: The range input for its vertical axis.
    * - `controls`: The row under the square.
+   * - `icon`: A glyph this component draws.
    * - `sample`: The chip of the current color, which copies it when pressed.
    * - `channels`: The ramps beside it.
    * - `channel`: One ramp.
@@ -27289,6 +27357,23 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `hole`: How much is left open in the middle.
+   *
+   * Absent is a ring with room for a total in it. `small` and `large` move the
+   * hole without moving the outer edge, so a chart keeps its footprint.
+   *
+   * **`none` is a pie**, and it is the same drawing rather than another one:
+   * the radius follows the thickness, so the inner edge reaching the centre is
+   * what closing the hole means. A pie reads less accurately than a ring, angle
+   * being harder to judge than length, but it is not *misleading* the way a bar
+   * measured from anything but zero is, which is why this is a value here and
+   * the bar chart's baseline is not a property at all.
+   *
+   * **Geometry rather than a CSS hook, and it had to move.** This was
+   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+   * which needs the radius: reading a custom property means `getComputedStyle`,
+   * which is client-only, so a server would have drawn a different ring than
+   * the client. A plot's proportions are markup for the same reason `curve` is.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -27330,6 +27415,11 @@ export type CustomElementsSolidJs = {
    *
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
+   * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-cell`: One column's name and value inside the tooltip.
+   * - `tooltip-label`: The slice's own name inside the tooltip.
+   * - `tooltip-name`: A column's name inside the tooltip.
+   * - `tooltip-value`: A column's value inside the tooltip.
    * - `segment`: One slice.
    * - `track`: The ring the slices are drawn on.
    */
@@ -27773,6 +27863,7 @@ export type CustomElementsSolidJs = {
    *
    * - `field`: The box that is pressed and dropped on.
    * - `control`: The file input itself, which carries the label and validity.
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The label that opens the picker.
    * - `list`: The chosen files.
    * - `file`: One chosen file.
@@ -28338,6 +28429,7 @@ export type CustomElementsSolidJs = {
    * - `field`: The box holding everything.
    * - `control`: The input itself.
    * - `clear`: The button that empties the field.
+   * - `icon`: A glyph this component draws.
    * - `reveal`: The button that shows and hides a password.
    */
   "helix-input": Partial<
@@ -28540,6 +28632,7 @@ export type CustomElementsSolidJs = {
    *
    * - `area`: The wash under one line, where `area` is set.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.
@@ -32171,6 +32264,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `trigger`: The default trigger, where none was slotted.
    * - `actions`: The region the actions are drawn in.
    */
@@ -34934,6 +35028,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `icon`: The glyph on the trigger.
    * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
@@ -35165,6 +35260,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `icon`: A glyph this component draws.
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
@@ -35276,6 +35372,8 @@ export type CustomCssProperties = {
   "--card-background-color"?: string;
   /** Border color of the surface. */
   "--card-border-color"?: string;
+  /** Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. */
+  "--card-media-block-size"?: string;
   /** Width of the media column when horizontal. */
   "--card-media-size"?: string;
   /** Inset applied to each region. */

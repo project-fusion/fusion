@@ -223,7 +223,14 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
     const wash = `${path}L${last[0]},${HEIGHT}L${first[0]},${HEIGHT}Z`
     return svg`${
       this.area ? svg`<path d=${wash} data-series=${index} part="area" />` : nothing
-    }<path d=${path} data-series=${index} fill="none" part="line" />`
+    }<path
+      d=${path}
+      data-series=${index}
+      fill="none"
+      part="line"
+      pathLength="100"
+      stroke-dasharray="100"
+    />`
   }
 
   /**

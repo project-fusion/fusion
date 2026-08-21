@@ -14503,6 +14503,26 @@
               "name": "plot"
             },
             {
+              "description": "What a pointer resting on a slice shows.",
+              "name": "tooltip"
+            },
+            {
+              "description": "One column's name and value inside the tooltip.",
+              "name": "tooltip-cell"
+            },
+            {
+              "description": "The slice's own name inside the tooltip.",
+              "name": "tooltip-label"
+            },
+            {
+              "description": "A column's name inside the tooltip.",
+              "name": "tooltip-name"
+            },
+            {
+              "description": "A column's value inside the tooltip.",
+              "name": "tooltip-value"
+            },
+            {
               "description": "One slice.",
               "name": "segment"
             },
@@ -14520,12 +14540,31 @@
           "members": [
             {
               "kind": "field",
+              "name": "hole",
+              "type": {
+                "text": "'large' | 'none' | 'small' | undefined"
+              },
+              "description": "How much is left open in the middle.\n\nAbsent is a ring with room for a total in it. `small` and `large` move the\nhole without moving the outer edge, so a chart keeps its footprint.\n\n**`none` is a pie**, and it is the same drawing rather than another one:\nthe radius follows the thickness, so the inner edge reaching the centre is\nwhat closing the hole means. A pie reads less accurately than a ring, angle\nbeing harder to judge than length, but it is not *misleading* the way a bar\nmeasured from anything but zero is, which is why this is a value here and\nthe bar chart's baseline is not a property at all.\n\n**Geometry rather than a CSS hook, and it had to move.** This was\n`--donut-chart-thickness`, and the dash arithmetic needs the circumference,\nwhich needs the radius: reading a custom property means `getComputedStyle`,\nwhich is client-only, so a server would have drawn a different ring than\nthe client. A plot's proportions are markup for the same reason `curve` is.",
+              "attribute": "hole",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "radius",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "The ring's radius, which follows its thickness so the outer edge holds.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "shares",
               "type": {
                 "text": "{ fraction: number; start: number }[]"
               },
               "privacy": "private",
-              "description": "The slices, in table order, with anything negative dropped.",
               "readonly": true
             },
             {
@@ -14577,6 +14616,17 @@
                 }
               ],
               "description": "One slice, as a dash the length of its share."
+            },
+            {
+              "kind": "method",
+              "name": "renderTooltip",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "What a pointer resting on a slice shows.\n\nPlaced in the middle rather than along an axis, a ring having none, and the\nmiddle is where a reader is already looking: the hole usually holds a\ntotal, so a tooltip over it replaces one figure with the one being asked\nabout rather than covering something else."
             },
             {
               "kind": "field",
@@ -14751,6 +14801,42 @@
               }
             }
           ],
+          "attributes": [
+            {
+              "name": "hole",
+              "type": {
+                "text": "'large' | 'none' | 'small' | undefined"
+              },
+              "description": "How much is left open in the middle.\n\nAbsent is a ring with room for a total in it. `small` and `large` move the\nhole without moving the outer edge, so a chart keeps its footprint.\n\n**`none` is a pie**, and it is the same drawing rather than another one:\nthe radius follows the thickness, so the inner edge reaching the centre is\nwhat closing the hole means. A pie reads less accurately than a ring, angle\nbeing harder to judge than length, but it is not *misleading* the way a bar\nmeasured from anything but zero is, which is why this is a value here and\nthe bar chart's baseline is not a property at all.\n\n**Geometry rather than a CSS hook, and it had to move.** This was\n`--donut-chart-thickness`, and the dash arithmetic needs the circumference,\nwhich needs the radius: reading a custom property means `getComputedStyle`,\nwhich is client-only, so a server would have drawn a different ring than\nthe client. A plot's proportions are markup for the same reason `curve` is.",
+              "fieldName": "hole"
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            }
+          ],
           "mixins": [
             {
               "name": "MixinChartSource",
@@ -14779,34 +14865,6 @@
           },
           "tagName": "helix-base-donut-chart",
           "customElement": true,
-          "attributes": [
-            {
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "fieldName": "for",
-              "inheritedFrom": {
-                "name": "MixinChartSource",
-                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
-              }
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
-              "fieldName": "label",
-              "inheritedFrom": {
-                "name": "MixinChartSource",
-                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
-              }
-            }
-          ],
           "modulePath": "src/donut-chart/root/donut-chart-root.ts",
           "definitionPath": "src/donut-chart/root/donut-chart-root.ts"
         }
@@ -20460,6 +20518,10 @@
               "name": "baseline"
             },
             {
+              "description": "A rule down the reading a pointer is resting on.",
+              "name": "guide"
+            },
+            {
               "description": "One reading's name.",
               "name": "label"
             },
@@ -20571,6 +20633,25 @@
                 }
               ],
               "description": "The lines themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice."
+            },
+            {
+              "kind": "method",
+              "name": "renderGuide",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                }
+              ],
+              "description": "A rule down the reading the tooltip is about.\n\nWithout it the tooltip is a box of numbers floating over a drawing, and a\nreader has to match its heading against the row of names to find out which\ncolumn it means. The rule is the whole of what connects the two, and it\nmatters most on a line, where there is no marker under the pointer to\nstand in for one.\n\nDrawn before the series so a line is never cut by it."
             },
             {
               "kind": "method",

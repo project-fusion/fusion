@@ -1818,6 +1818,24 @@ here has to be. */
 export type HelixBaseDividerVueEvents = {};
 
 export type HelixBaseDonutChartVueProps = {
+  /** How much is left open in the middle.
+
+Absent is a ring with room for a total in it. `small` and `large` move the
+hole without moving the outer edge, so a chart keeps its footprint.
+
+**`none` is a pie**, and it is the same drawing rather than another one:
+the radius follows the thickness, so the inner edge reaching the centre is
+what closing the hole means. A pie reads less accurately than a ring, angle
+being harder to judge than length, but it is not *misleading* the way a bar
+measured from anything but zero is, which is why this is a value here and
+the bar chart's baseline is not a property at all.
+
+**Geometry rather than a CSS hook, and it had to move.** This was
+`--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+which needs the radius: reading a custom property means `getComputedStyle`,
+which is client-only, so a server would have drawn a different ring than
+the client. A plot's proportions are markup for the same reason `curve` is. */
+  hole?: HelixBaseDonutChart["hole"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's

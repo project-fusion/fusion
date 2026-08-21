@@ -6,14 +6,42 @@ import {
   seriesIndex,
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /** The drawing's own coordinates, square because the shape has to stay round. */
 const BOX = 100
 const CENTRE = BOX / 2
 
-/** Where the ring is drawn, leaving room for the stroke on either side. */
-const RADIUS = 40
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+/** The outer edge of the ring, whatever its thickness. */
+const EDGE = 40
+
+/**
+ * How much of the radius the ring takes, by name.
+ *
+ * **The outer edge is fixed and the radius follows the thickness**, which is
+ * what makes `none` a pie and makes clipping impossible. The stroke sits astride
+ * its own radius, so a ring drawn at a fixed `r` grows outward as well as
+ * inward: measured against a 100 box, the old fixed `r=40` had an unstated
+ * ceiling at a thickness of 20, and anything past it crossed the view box and
+ * was cut with nothing to say so. Closing the hole that way would have needed a
+ * thickness of 80, spanning `r=0` to `r=80` in a box whose half is 50.
+ *
+ * Derived instead, `r = EDGE - thickness / 2`, the outer edge lands on `EDGE`
+ * for every value and the inner edge is `EDGE - thickness`. A pie is where the
+ * inner edge reaches the centre, which solves to `thickness = EDGE`: the ring
+ * is then drawn at `r = EDGE / 2` and its stroke spans the whole radius.
+ *
+ * `EDGE * 2` was the first answer and is the trap in this arithmetic. It gives
+ * `r = 0`, and a circle of radius zero draws nothing at all, so a pie came out
+ * as an empty box. The stroke reaches `thickness / 2` either side of `r`, not
+ * `thickness`.
+ */
+const THICKNESS: Record<string, number> = {
+  large: 8,
+  medium: 16,
+  none: EDGE,
+  small: 26,
+}
 
 /**
  * @summary Parts of a whole as a ring, read from a table.
@@ -64,19 +92,55 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
  */
 @customElement('helix-base-donut-chart')
 export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
-  constructor() {
-    super()
-    /* The pointer is not mapped across this one.
-     *
-     * Every other chart lays its readings out left to right, so the nearest is
-     * arithmetic on x. A ring's slices are real elements at every angle, and x
-     * alone would answer with whichever slice happened to share a horizontal
-     * position with the pointer: at three o'clock and at nine o'clock it would
-     * give the same reading for opposite sides of the chart. So the slices say
-     * which one they are, and this only holds the answer. */
+  /** The slices, in table order, with anything negative dropped. */
+  /**
+   * The pointer is not mapped across this one.
+   *
+   * Every other chart lays its readings out left to right, so the nearest is
+   * arithmetic on x. A ring's slices are real elements at every angle, and x
+   * alone would answer with whichever slice shared a horizontal position with
+   * the pointer: at three o'clock and at nine o'clock it would give the same
+   * reading for opposite sides of the chart. So the slices say which one they
+   * are and this only holds the answer.
+   *
+   * Set here rather than in a constructor, and that is not a style choice. The
+   * analyzer reads `this.pointer.tracks = false` in a constructor body as a
+   * declaration of a public field called `tracks`, and failed the build with
+   * `HelixBaseDonutChart.tracks has no description` for a member that does not
+   * exist on this class at all.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
     this.pointer.tracks = false
   }
-  /** The slices, in table order, with anything negative dropped. */
+
+  /**
+   * How much is left open in the middle.
+   *
+   * Absent is a ring with room for a total in it. `small` and `large` move the
+   * hole without moving the outer edge, so a chart keeps its footprint.
+   *
+   * **`none` is a pie**, and it is the same drawing rather than another one:
+   * the radius follows the thickness, so the inner edge reaching the centre is
+   * what closing the hole means. A pie reads less accurately than a ring, angle
+   * being harder to judge than length, but it is not *misleading* the way a bar
+   * measured from anything but zero is, which is why this is a value here and
+   * the bar chart's baseline is not a property at all.
+   *
+   * **Geometry rather than a CSS hook, and it had to move.** This was
+   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
+   * which needs the radius: reading a custom property means `getComputedStyle`,
+   * which is client-only, so a server would have drawn a different ring than
+   * the client. A plot's proportions are markup for the same reason `curve` is.
+   */
+  @property({ reflect: true })
+  hole?: 'large' | 'none' | 'small'
+
+  /** The ring's radius, which follows its thickness so the outer edge holds. */
+  private get radius(): number {
+    return EDGE - (THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0) / 2
+  }
+
   private get shares(): { fraction: number; start: number }[] {
     const series = this.series
     const values = (series[0]?.points ?? [])
@@ -98,8 +162,11 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   protected override render(): TemplateResult {
     const shares = this.shares
     const named = this.named
+    /* No middle where there is no hole. A `centre` part over a pie would put
+       slotted content on top of the slices, and a slot nobody can see is worse
+       than one that is not there: a consumer fills it and nothing happens. */
     return html`${this.renderPlot(shares, named)}
-      <div part="centre"><slot></slot></div>
+      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}
       ${this.renderTooltip()}`
   }
 
@@ -115,7 +182,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   ): TemplateResult {
     return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
       <svg viewBox="0 0 ${BOX} ${BOX}" xmlns="http://www.w3.org/2000/svg">
-        <circle cx=${CENTRE} cy=${CENTRE} fill="none" part="track" r=${RADIUS} />
+        <circle cx=${CENTRE} cy=${CENTRE} fill="none" part="track" r=${this.radius} />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
     </div>`
@@ -126,7 +193,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     share: { fraction: number; start: number },
     index: number,
   ): TemplateResult {
-    const length = share.fraction * CIRCUMFERENCE
+    const circumference = 2 * Math.PI * this.radius
+    const length = share.fraction * circumference
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
        a positive offset would run the slices anticlockwise from twelve. The
        rotation that puts zero at the top is the stylesheet's, since it is a
@@ -139,9 +207,9 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
       fill="none"
       @pointerenter=${() => this.pointer.set(index)}
       part="segment"
-      r=${RADIUS}
-      stroke-dasharray="${length} ${CIRCUMFERENCE - length}"
-      stroke-dashoffset=${-share.start * CIRCUMFERENCE}
+      r=${this.radius}
+      stroke-dasharray="${length} ${circumference - length}"
+      stroke-dashoffset=${-share.start * circumference}
     />`
   }
   /**
@@ -153,6 +221,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * about rather than covering something else.
    */
   protected renderTooltip(): TemplateResult | typeof nothing {
+    /* Over the hole where there is one, and above the drawing where there is
+       not: a tooltip centred on a pie covers the slices it is describing. */
     return drawTooltip(this.rows, this.pointer.at, '50%')
   }
 }

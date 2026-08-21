@@ -787,6 +787,7 @@ element you slotted, not a wrapper around it.
 | --- | --- |
 | `--card-background-color` | Surface behind the card. |
 | `--card-border-color` | Border color of the surface. |
+| `--card-media-block-size` | Height of the media region. Defaults to `auto`, which is an image's own shape and is not a height a chart has. |
 | `--card-media-size` | Width of the media column when horizontal. |
 | `--card-padding` | Inset applied to each region. |
 | `--card-radii` | Corner radius of the surface. |
@@ -1258,6 +1259,7 @@ brought its own card would be a card inside a card there.
 | `grid-saturation` | The range input for the square's horizontal axis. |
 | `grid-brightness` | The range input for its vertical axis. |
 | `controls` | The row under the square. |
+| `icon` | A glyph this component draws. |
 | `sample` | The chip of the current color, which copies it when pressed. |
 | `channels` | The ramps beside it. |
 | `channel` | One ramp. |
@@ -1823,6 +1825,7 @@ still reads as a ring with a gap rather than as a broken arc.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `hole` | `hole` | `'large' \| 'none' \| 'small' \| undefined` | - | `HelixBaseDonutChart` | How much is left open in the middle. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -1842,6 +1845,11 @@ still reads as a ring with a gap rather than as a broken arc.
 | --- | --- |
 | `centre` | The middle of the ring, holding whatever is slotted. |
 | `plot` | The drawing. |
+| `tooltip` | What a pointer resting on a slice shows. |
+| `tooltip-cell` | One column's name and value inside the tooltip. |
+| `tooltip-label` | The slice's own name inside the tooltip. |
+| `tooltip-name` | A column's name inside the tooltip. |
+| `tooltip-value` | A column's value inside the tooltip. |
 | `segment` | One slice. |
 | `track` | The ring the slices are drawn on. |
 
@@ -2140,6 +2148,7 @@ invisible.
 | --- | --- |
 | `field` | The box that is pressed and dropped on. |
 | `control` | The file input itself, which carries the label and validity. |
+| `icon` | A glyph this component draws. |
 | `trigger` | The label that opens the picker. |
 | `list` | The chosen files. |
 | `file` | One chosen file. |
@@ -2463,6 +2472,7 @@ whatever holds it, not a `size` here. Invalid styling waits for
 | `field` | The box holding everything. |
 | `control` | The input itself. |
 | `clear` | The button that empties the field. |
+| `icon` | A glyph this component draws. |
 | `reveal` | The button that shows and hides a password. |
 
 #### Custom properties
@@ -2589,6 +2599,7 @@ answers for a shape.
 | --- | --- |
 | `area` | The wash under one line, where `area` is set. |
 | `baseline` | The rule at zero, where zero is inside the range. |
+| `guide` | A rule down the reading a pointer is resting on. |
 | `label` | One reading's name. |
 | `labels` | The row of reading names. |
 | `line` | One series. |
@@ -4705,6 +4716,7 @@ moves through it is the base class.
 
 | Part | Description |
 | --- | --- |
+| `icon` | A glyph this component draws. |
 | `trigger` | The default trigger, where none was slotted. |
 | `actions` | The region the actions are drawn in. |
 
@@ -6495,6 +6507,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 
 | Part | Description |
 | --- | --- |
+| `icon` | A glyph this component draws. |
 | `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
 | `video` | The video itself. |
 | `poster` | What covers it before it plays. |
@@ -6686,6 +6699,7 @@ not.
 | Part | Description |
 | --- | --- |
 | `entry` | One entry in the menu. |
+| `icon` | The glyph on the trigger. |
 | `poster` | An entry's still, where it has one. |
 | `menu` | The menu that holds the entries. |
 | `trigger` | The button that opens it. |
