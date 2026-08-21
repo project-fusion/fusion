@@ -26,6 +26,8 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://helix.fusion.dev/components/line-chart
  *
+ * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
+ * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --line-chart-area-opacity - How much of a line's colour its wash takes.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.

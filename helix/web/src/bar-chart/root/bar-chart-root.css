@@ -463,3 +463,26 @@
 [part="plot"] {
   cursor: crosshair;
 }
+
+/* The grid, under `gridlines`, and the slot the pointer is in.
+ *
+ * Both are furniture: they say how to read the drawing rather than saying
+ * anything about the data, so both are quiet enough to be looked past and
+ * neither takes a series colour. A gridline that competes with a line is a
+ * chart with two readings of equal weight, one of which is a ruler.
+ *
+ * `non-scaling-stroke` for the rules, for the reason the line gives: the view
+ * box is stretched to the element, so a hairline in a narrow chart is a rule in
+ * a wide one and both are the same declaration.
+ *
+ * The band is a fill and needs none of that: a rect in the view box's own units
+ * is exactly its share of the width at any size, which is what a slot is. */
+[part="gridline"] {
+  stroke: var(--bar-chart-gridline-color, var(--helix-color-border));
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="band"] {
+  fill: var(--bar-chart-band-color, var(--helix-color-surface-sunken));
+}

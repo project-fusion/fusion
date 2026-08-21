@@ -1813,8 +1813,16 @@
               "name": "bar"
             },
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "band"
+            },
+            {
               "description": "The rule the columns stand on.",
               "name": "baseline"
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "gridline"
             },
             {
               "description": "One category's columns, together.",
@@ -1873,6 +1881,16 @@
               "reflects": true
             },
             {
+              "kind": "field",
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines"
+            },
+            {
               "kind": "method",
               "name": "renderPlot",
               "privacy": "protected",
@@ -1901,6 +1919,12 @@
                   }
                 },
                 {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                },
+                {
                   "name": "floor",
                   "type": {
                     "text": "number"
@@ -1914,6 +1938,62 @@
                 }
               ],
               "description": "The columns themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice."
+            },
+            {
+              "kind": "method",
+              "name": "renderGridlines",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The grid, behind everything, or nothing at all.\n\nAcross the measured axis, which turns with `direction`: a rule belongs to\nthe axis the bars are measured on and not the one they are arranged on, so\ncolumns get horizontal rules and rows get vertical ones. Getting that\nbackwards draws a grid that divides the categories, which are already\ndivided by being separate bars.\n\nDrawn before the baseline, so where a gridline and zero coincide the\nbaseline is what shows: zero is a fact about the data and a gridline is a\nruler."
+            },
+            {
+              "kind": "method",
+              "name": "renderBand",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The slot the pointer is resting in, drawn behind the columns.\n\n**The honest version of the fade.** A group under the pointer already sets\n`data-active` and the stylesheet dims the others, which says which group is\nmeant by making four of five quieter: it reads as the chart losing\nconfidence rather than as one column being pointed at. A band says the same\nthing by lighting the region the pointer is actually in, and the region is\nthe whole slot, because that is the catchment the pointer resolves against.\n\nBoth are kept. The fade separates the active group from its neighbours and\nthe band says where the neighbourhood is, and on a chart of two categories\nthe fade alone is ambiguous about which half is lit."
             },
             {
               "kind": "method",
@@ -1931,8 +2011,7 @@
                     "text": "string[]"
                   }
                 }
-              ],
-              "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke."
+              ]
             },
             {
               "kind": "method",
@@ -2126,6 +2205,15 @@
               },
               "description": "Whether the categories run down the side rather than along the bottom.\n\nAbsent is columns. `horizontal` is the one to reach for when the category\nnames are words rather than dates: a row of long names either overlaps or\nturns on its side, and neither is as readable as putting them down the left\nwhere they read normally.",
               "fieldName": "direction"
+            },
+            {
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "fieldName": "gridlines"
             },
             {
               "name": "for",
@@ -20565,8 +20653,16 @@
               "name": "area"
             },
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "band"
+            },
+            {
               "description": "The rule at zero, where zero is inside the range.",
               "name": "baseline"
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "gridline"
             },
             {
               "description": "A rule down the reading a pointer is resting on.",
@@ -20641,6 +20737,16 @@
             },
             {
               "kind": "field",
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines"
+            },
+            {
+              "kind": "field",
               "name": "zero",
               "type": {
                 "text": "boolean"
@@ -20711,6 +20817,50 @@
                 }
               ],
               "description": "The lines themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice."
+            },
+            {
+              "kind": "method",
+              "name": "renderGridlines",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                }
+              ],
+              "description": "The grid, behind everything, or nothing at all.\n\nDrawn first so a series is never cut by a rule, and before the baseline so\nthat where the two coincide the baseline wins: zero is a fact about the\ndata and a gridline is a ruler, and the reader should see the fact."
+            },
+            {
+              "kind": "method",
+              "name": "renderBand",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The slot the pointer is resting in, drawn behind the drawing.\n\nA band and not a second rule. The guide says exactly where the reading is\nand the band says which share of the width belongs to it, which is what a\nreader is actually pointing at: the catchment is a slot wide, so a pointer\na few pixels off the line is still asking about that reading, and without\nthe band nothing on screen says so.\n\nThe same slot arithmetic the pointer controller resolves with, so the lit\nregion and the region that answers are the same region by construction\nrather than by two files agreeing."
             },
             {
               "kind": "method",
@@ -20988,6 +21138,15 @@
               },
               "description": "How the line gets from one reading to the next.\n\n**`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the\nargument this comment used to make.* Joining the readings claims nothing in\nbetween, which is true and is why `straight` still exists: a straight\nsegment asserts nothing about the values between two readings, and a curve\ninvents them. What settles it the other way is that the invention is\nbounded. The interpolation is monotone cubic, so it never leaves the band\nthe data sets and never introduces a peak or a trough the series does not\nhave, and within that bound the smoothed line is the easier one to follow\nacross a long series. `straight` becomes the deliberate claim.\n\n**Still absent rather than defaulted on the property**, because a\nreflecting property with a default writes its attribute onto every host\nanybody renders, including the ones nobody configured.\n`line-chart-root.ssr.spec.ts` asserts the host carries only what the\nconsumer wrote, and caught that the first time. The default therefore lives\nwhere the path is built, as `curve ?? 'smooth'`.\n\n`step` claims the opposite of both, that a reading holds until the next.",
               "fieldName": "curve"
+            },
+            {
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "fieldName": "gridlines"
             },
             {
               "name": "zero",

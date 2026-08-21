@@ -7,6 +7,7 @@ import {
   MixinChartSource,
   type Series,
   seriesIndex,
+  ticks,
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -46,7 +47,9 @@ const HEIGHT = 100
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
  * @csspart bar - One column.
+ * @csspart band - The slot the pointer is resting in.
  * @csspart baseline - The rule the columns stand on.
+ * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
@@ -71,6 +74,26 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   direction?: 'horizontal'
+
+  /**
+   * Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for. A chart in a card and a chart beside a figure are
+   * read as a shape, and a grid over one is furniture around a drawing nobody
+   * is measuring. A chart with an axis is read by comparing a column to a
+   * level, and there is nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts. They run across the
+   * measured axis, which turns with `direction`: down the box for columns and
+   * along it for rows, because the axis a rule belongs to is the one the bars
+   * are measured on and not the one they are arranged on.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
+   */
+  @property({ type: Boolean })
+  gridlines = false
 
   protected override render(): TemplateResult {
     const series = this.series
@@ -101,7 +124,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
 
     const named = this.named
 
-    return html`${this.renderPlot(series, categories, y, floor, named)}
+    return html`${this.renderPlot(series, categories, y, domain, floor, named)}
       ${this.renderLabels(categories)}`
   }
 
@@ -115,6 +138,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     series: Series[],
     categories: string[],
     y: (value: number) => number,
+    domain: [number, number],
     floor: number,
     named: string,
   ): TemplateResult {
@@ -162,11 +186,13 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
+        ${this.renderGridlines(y, domain, sideways)}
         ${
           sideways
             ? svg`<line part="baseline" x1=${floor} x2=${floor} y1="0" y2="100" />`
             : svg`<line part="baseline" x1="0" x2="100" y1=${floor} y2=${floor} />`
         }
+        ${this.renderBand(categories.length, sideways)}
         ${categories.map(
           (_, index) =>
             /* The group the tooltip is about says so, and the stylesheet fades
@@ -189,6 +215,59 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    * scales its type along with everything else, and there is no non-scaling
    * equivalent for a font the way `vector-effect` is one for a stroke.
    */
+  /**
+   * The grid, behind everything, or nothing at all.
+   *
+   * Across the measured axis, which turns with `direction`: a rule belongs to
+   * the axis the bars are measured on and not the one they are arranged on, so
+   * columns get horizontal rules and rows get vertical ones. Getting that
+   * backwards draws a grid that divides the categories, which are already
+   * divided by being separate bars.
+   *
+   * Drawn before the baseline, so where a gridline and zero coincide the
+   * baseline is what shows: zero is a fact about the data and a gridline is a
+   * ruler.
+   */
+  protected renderGridlines(
+    y: (value: number) => number,
+    domain: [number, number],
+    sideways: boolean,
+  ): TemplateResult | typeof nothing {
+    if (!this.gridlines) {
+      return nothing
+    }
+    return svg`${ticks(domain).map((level) =>
+      sideways
+        ? svg`<line part="gridline" x1=${y(level)} x2=${y(level)} y1="0" y2="100" />`
+        : svg`<line part="gridline" x1="0" x2="100" y1=${y(level)} y2=${y(level)} />`,
+    )}`
+  }
+
+  /**
+   * The slot the pointer is resting in, drawn behind the columns.
+   *
+   * **The honest version of the fade.** A group under the pointer already sets
+   * `data-active` and the stylesheet dims the others, which says which group is
+   * meant by making four of five quieter: it reads as the chart losing
+   * confidence rather than as one column being pointed at. A band says the same
+   * thing by lighting the region the pointer is actually in, and the region is
+   * the whole slot, because that is the catchment the pointer resolves against.
+   *
+   * Both are kept. The fade separates the active group from its neighbours and
+   * the band says where the neighbourhood is, and on a chart of two categories
+   * the fade alone is ambiguous about which half is lit.
+   */
+  protected renderBand(count: number, sideways: boolean): TemplateResult | typeof nothing {
+    const at = this.pointer.at
+    if (at < 0 || count === 0) {
+      return nothing
+    }
+    const slot = 100 / count
+    return sideways
+      ? svg`<rect height=${slot} part="band" width="100" x="0" y=${at * slot} />`
+      : svg`<rect height="100" part="band" width=${slot} x=${at * slot} y="0" />`
+  }
+
   protected renderLabels(categories: string[]): TemplateResult {
     return html`<div aria-hidden="true" part="labels">
       ${categories.map((one) => html`<span part="label">${one}</span>`)}

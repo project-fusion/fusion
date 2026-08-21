@@ -383,6 +383,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   direction?: HelixBaseBarChart["direction"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for. A chart in a card and a chart beside a figure are
+read as a shape, and a grid over one is furniture around a drawing nobody
+is measuring. A chart with an axis is read by comparing a column to a
+level, and there is nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts. They run across the
+measured axis, which turns with `direction`: down the box for columns and
+along it for rows, because the axis a rule belongs to is the one the bars
+are measured on and not the one they are arranged on.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixBaseBarChart["gridlines"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -2454,6 +2470,21 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixBaseLineChart["curve"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for, which is the honest default rather than a timid one:
+a chart in a card and a chart beside a figure are read as a shape, and a
+grid over one is furniture around a drawing nobody is measuring. A chart
+with an axis is read by comparing a reading to a level, and there is
+nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts, and two charts over
+different ranges rule at the same levels.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixBaseLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.

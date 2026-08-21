@@ -168,6 +168,7 @@ export {
 } from './utils/resolve-active-item/resolve-active-item.js'
 export { holdCaret, restoreValue } from './utils/restore-value/restore-value.js'
 export { extent, linear, type Scale } from './utils/scale/scale.js'
+export { ticks } from './utils/scale/ticks.js'
 export {
   type ScrollItemOptions,
   scrollItemIntoView,

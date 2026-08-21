@@ -1,0 +1,38 @@
+<!-- @summary Rules across the measured axis, which turns with the direction the columns run. -->
+
+<table
+  data-hidden-visually
+  id="barchartgrid"
+>
+  <caption>Deploys per service</caption>
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Deploys</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Gateway</th>
+      <td data-value="34">34</td>
+    </tr>
+    <tr>
+      <th scope="row">Billing</th>
+      <td data-value="18">18</td>
+    </tr>
+    <tr>
+      <th scope="row">Search</th>
+      <td data-value="47">47</td>
+    </tr>
+    <tr>
+      <th scope="row">Identity</th>
+      <td data-value="9">9</td>
+    </tr>
+  </tbody>
+</table>
+
+<helix-bar-chart
+  direction="horizontal"
+  for="barchartgrid"
+  gridlines
+></helix-bar-chart>

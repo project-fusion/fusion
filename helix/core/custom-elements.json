@@ -3603,6 +3603,14 @@
         },
         {
           "kind": "js",
+          "name": "ticks",
+          "declaration": {
+            "name": "ticks",
+            "module": "./utils/scale/ticks.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "ScrollItemOptions",
           "declaration": {
             "name": "ScrollItemOptions",
@@ -6429,6 +6437,44 @@
           "declaration": {
             "name": "linear",
             "module": "src/utils/scale/scale.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/scale/ticks.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "ticks",
+          "return": {
+            "type": {
+              "text": "number[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "domain",
+              "type": {
+                "text": "readonly [number, number]"
+              }
+            },
+            {
+              "name": "count",
+              "default": "5"
+            }
+          ],
+          "description": "The round numbers a reader would infer inside a domain.\n\n**A gridline at an arbitrary number is worse than no gridline.** The point of\na rule across a chart is that a reader can name the level it sits at without\nbeing told, so it has to land on a number a person would have picked: 0, 250,\n500, not 187.4. Dividing the domain into equal parts gives the second, and\nthat is what makes this arithmetic rather than a loop.\n\nThe step is the power of ten below the rough interval, multiplied by whichever\nof 1, 2, 5 or 10 lands nearest the count asked for. Those four because they\nare the multipliers that keep every tick short in decimal, which is the whole\nproperty being bought: 2.5 divides as evenly as 2 and reads as a worse number.\n\n**The count is a target and not a promise**, which is the usual surprise.\nAsking for five over a domain of 0 to 1000 gives six (0, 200, ... 1000);\nasking for five over 0 to 12 gives seven at a step of 2. Forcing the count\nwould mean forcing the step, which is the thing worth keeping round. A caller\nthat needs an exact number of rules wants equal division and not this.\n\nTicks outside the domain are dropped rather than clamped, so nothing is drawn\noff the end of the box and no two rules land on the same line.\n\nA pure function, for the reason `linear` gives beside it: it holds nothing,\nsubscribes to nothing, and can be called from `render`."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ticks",
+          "declaration": {
+            "name": "ticks",
+            "module": "src/utils/scale/ticks.ts"
           }
         }
       ]

@@ -10,6 +10,7 @@ import {
   type Point,
   type Series,
   seriesIndex,
+  ticks,
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -54,7 +55,9 @@ const HEIGHT = 100
  * @documentation https://helix.fusion.dev/components/line-chart
  *
  * @csspart area - The wash under one line, where `area` is set.
+ * @csspart band - The slot the pointer is resting in.
  * @csspart baseline - The rule at zero, where zero is inside the range.
+ * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
@@ -104,6 +107,25 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   curve?: Curve
+
+  /**
+   * Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for, which is the honest default rather than a timid one:
+   * a chart in a card and a chart beside a figure are read as a shape, and a
+   * grid over one is furniture around a drawing nobody is measuring. A chart
+   * with an axis is read by comparing a reading to a level, and there is
+   * nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts, and two charts over
+   * different ranges rule at the same levels.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
+   */
+  @property({ type: Boolean })
+  gridlines = false
 
   /**
    * Whether zero is forced into the range.
@@ -178,16 +200,59 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
+        ${this.renderGridlines(y, domain)}
         ${
           floor === undefined
             ? nothing
             : svg`<line part="baseline" x1="0" x2=${WIDTH} y1=${floor} y2=${floor} />`
         }
+        ${this.renderBand(series[0]?.points.length ?? 0)}
         ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
       ${this.renderTooltip()}
     </div>`
+  }
+
+  /**
+   * The grid, behind everything, or nothing at all.
+   *
+   * Drawn first so a series is never cut by a rule, and before the baseline so
+   * that where the two coincide the baseline wins: zero is a fact about the
+   * data and a gridline is a ruler, and the reader should see the fact.
+   */
+  protected renderGridlines(
+    y: (value: number) => number,
+    domain: [number, number],
+  ): TemplateResult | typeof nothing {
+    if (!this.gridlines) {
+      return nothing
+    }
+    return svg`${ticks(domain).map(
+      (level) => svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${y(level)} y2=${y(level)} />`,
+    )}`
+  }
+
+  /**
+   * The slot the pointer is resting in, drawn behind the drawing.
+   *
+   * A band and not a second rule. The guide says exactly where the reading is
+   * and the band says which share of the width belongs to it, which is what a
+   * reader is actually pointing at: the catchment is a slot wide, so a pointer
+   * a few pixels off the line is still asking about that reading, and without
+   * the band nothing on screen says so.
+   *
+   * The same slot arithmetic the pointer controller resolves with, so the lit
+   * region and the region that answers are the same region by construction
+   * rather than by two files agreeing.
+   */
+  protected renderBand(count: number): TemplateResult | typeof nothing {
+    const at = this.pointer.at
+    if (at < 0 || count === 0) {
+      return nothing
+    }
+    const slot = WIDTH / count
+    return svg`<rect height=${HEIGHT} part="band" width=${slot} x=${at * slot} y="0" />`
   }
 
   /**

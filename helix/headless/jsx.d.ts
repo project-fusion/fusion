@@ -726,6 +726,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   direction?: HelixBaseBarChart["direction"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for. A chart in a card and a chart beside a figure are
+read as a shape, and a grid over one is furniture around a drawing nobody
+is measuring. A chart with an axis is read by comparing a column to a
+level, and there is nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts. They run across the
+measured axis, which turns with `direction`: down the box for columns and
+along it for rows, because the axis a rule belongs to is the one the bars
+are measured on and not the one they are arranged on.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixBaseBarChart["gridlines"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -750,6 +766,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   "prop:direction"?: HelixBaseBarChart["direction"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for. A chart in a card and a chart beside a figure are
+read as a shape, and a grid over one is furniture around a drawing nobody
+is measuring. A chart with an axis is read by comparing a column to a
+level, and there is nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts. They run across the
+measured axis, which turns with `direction`: down the box for columns and
+along it for rows, because the axis a rule belongs to is the one the bars
+are measured on and not the one they are arranged on.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  "prop:gridlines"?: HelixBaseBarChart["gridlines"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -4680,6 +4712,21 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixBaseLineChart["curve"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for, which is the honest default rather than a timid one:
+a chart in a card and a chart beside a figure are read as a shape, and a
+grid over one is furniture around a drawing nobody is measuring. A chart
+with an axis is read by comparing a reading to a level, and there is
+nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts, and two charts over
+different ranges rule at the same levels.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixBaseLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
@@ -4731,6 +4778,21 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   "prop:curve"?: HelixBaseLineChart["curve"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for, which is the honest default rather than a timid one:
+a chart in a card and a chart beside a figure are read as a shape, and a
+grid over one is furniture around a drawing nobody is measuring. A chart
+with an axis is read by comparing a reading to a level, and there is
+nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts, and two charts over
+different ranges rule at the same levels.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  "prop:gridlines"?: HelixBaseLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
@@ -12257,6 +12319,21 @@ export type CustomElements = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for. A chart in a card and a chart beside a figure are
+   * read as a shape, and a grid over one is furniture around a drawing nobody
+   * is measuring. A chart with an axis is read by comparing a column to a
+   * level, and there is nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts. They run across the
+   * measured axis, which turns with `direction`: down the box for columns and
+   * along it for rows, because the axis a rule belongs to is the one the bars
+   * are measured on and not the one they are arranged on.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -12295,7 +12372,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `bar`: One column.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -15962,6 +16041,20 @@ export type CustomElements = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for, which is the honest default rather than a timid one:
+   * a chart in a card and a chart beside a figure are read as a shape, and a
+   * grid over one is furniture around a drawing nobody is measuring. A chart
+   * with an axis is read by comparing a reading to a level, and there is
+   * nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts, and two charts over
+   * different ranges rule at the same levels.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -16006,7 +16099,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The wash under one line, where `area` is set.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
@@ -22979,6 +23074,21 @@ export type CustomElementsSolidJs = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for. A chart in a card and a chart beside a figure are
+   * read as a shape, and a grid over one is furniture around a drawing nobody
+   * is measuring. A chart with an axis is read by comparing a column to a
+   * level, and there is nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts. They run across the
+   * measured axis, which turns with `direction`: down the box for columns and
+   * along it for rows, because the axis a rule belongs to is the one the bars
+   * are measured on and not the one they are arranged on.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -23017,7 +23127,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `bar`: One column.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -26786,6 +26898,20 @@ export type CustomElementsSolidJs = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for, which is the honest default rather than a timid one:
+   * a chart in a card and a chart beside a figure are read as a shape, and a
+   * grid over one is furniture around a drawing nobody is measuring. A chart
+   * with an axis is read by comparing a reading to a level, and there is
+   * nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts, and two charts over
+   * different ranges rule at the same levels.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -26830,7 +26956,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The wash under one line, where `area` is set.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.

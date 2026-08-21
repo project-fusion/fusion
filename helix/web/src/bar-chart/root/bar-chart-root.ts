@@ -19,6 +19,8 @@ import '../../tooltip/index.js'
  * @aliases Column Chart, Categorical Chart
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
+ * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
+ * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
  * @cssproperty --bar-chart-block-size - Height of the drawing.
  * @cssproperty --bar-chart-gap - Space between the drawing and its labels.
