@@ -99,16 +99,24 @@ const body = (text, name) => {
 
 /* Whether a body starts watching again, following one level of `this.method()`.
  *
- * Either building an observer or calling `observe` on one that survived. The
- * second is a real shape and was nearly missed: `Sandbox` holds its observer in
- * a field, so the object outlives a disconnect, and what does not survive is the
- * registration. A disconnected observer reports nothing until something observes
- * with it again, and only `firstUpdated` ever did.
+ * **`observe` and not `new`, which is the whole question.** An observer that
+ * exists and watches nothing is exactly as dead as one that does not exist, and
+ * the two failures are reached from opposite directions. `Sandbox` holds its
+ * observer in a field, so the object outlives a disconnect and only the
+ * registration is lost. `ScrollArea` does the reverse: it builds a fresh
+ * observer in `connectedCallback` and registers its targets in `firstUpdated`,
+ * which never runs again, so a reconnected scroll area has a new observer
+ * watching nothing at all.
+ *
+ * This asked for `new` *or* `observe` at first and passed `ScrollArea` on the
+ * `new`, which is a check agreeing with the half of the code that was fine. The
+ * registration is the thing that has to survive, so that is the thing to ask
+ * for.
  *
  * One level rather than a full graph, because every component in the library
  * calls the builder directly from the lifecycle hook, and a deeper walk would be
  * reach nothing has asked for. */
-const WATCHES = /new\s+(?:Intersection|Mutation|Resize|Performance)Observer\b|\.observe\(/
+const WATCHES = /\.observe\(/
 
 const builds = (text, source) => {
   if (WATCHES.test(source)) {
@@ -138,8 +146,9 @@ for (const root of ROOTS) {
     watching += 1
     if (!builds(text, body(text, 'connectedCallback'))) {
       problems.push(
-        `${file}: disconnects an observer and never rebuilds one. \`firstUpdated\` runs once ` +
-          'and `disconnectedCallback` runs on every move, so this is dead after a reorder.',
+        `${file}: disconnects an observer and never observes again. \`firstUpdated\` runs once ` +
+          'and `disconnectedCallback` runs on every move, so this watches nothing after a reorder. ' +
+          'Rebuilding the observer is not enough on its own: it has to be registered on something.',
       )
     }
   }
@@ -153,5 +162,5 @@ if (problems.length > 0) {
 }
 
 console.log(
-  `observers: ${watching} components tear an observer down, every one able to build another`,
+  `observers: ${watching} components tear an observer down, every one registering again on reconnect`,
 )

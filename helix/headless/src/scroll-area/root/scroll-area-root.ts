@@ -117,6 +117,23 @@ export class HelixBaseScrollArea extends HelixElement {
        and the content changing size is a data change, and a fade that only
        answered one of them was wrong every time a list was filtered. */
     this.watcher = new ResizeObserver(this.measure)
+    /* And what it watches, which was registered only in `firstUpdated`.
+     *
+     * The observer was already rebuilt here, so this looked like the one
+     * component that had the lifecycle right, and it was half right. A fresh
+     * observer watches nothing until something calls `observe`, and only
+     * `firstUpdated` did, which runs once for the life of the element. So a
+     * scroll area moved in the DOM came back with a new observer registered on
+     * no targets: the fades stopped answering a resize or a filtered list, and
+     * the component went on rendering.
+     *
+     * Guarded on `hasUpdated`, because the first connection happens before the
+     * first render and there is no scroller to find yet. `check:observers`
+     * holds it, and had to be tightened to see it: asking for `new` *or*
+     * `observe` passed this on the half that was fine. */
+    if (this.hasUpdated) {
+      this.watchContent()
+    }
   }
 
   override disconnectedCallback(): void {
@@ -127,16 +144,22 @@ export class HelixBaseScrollArea extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
+    this.watchContent()
+    this.measure()
+  }
+
+  /** Registers the box and everything slotted into it, which is what resizes. */
+  private watchContent(): void {
     const box = this.scroller
-    if (box && this.watcher) {
-      this.watcher.observe(box)
-      for (const child of box.querySelectorAll('slot')) {
-        for (const assigned of child.assignedElements({ flatten: true })) {
-          this.watcher.observe(assigned)
-        }
+    if (!box || !this.watcher) {
+      return
+    }
+    this.watcher.observe(box)
+    for (const child of box.querySelectorAll('slot')) {
+      for (const assigned of child.assignedElements({ flatten: true })) {
+        this.watcher.observe(assigned)
       }
     }
-    this.measure()
   }
 
   protected override updated(changed: PropertyValues): void {
