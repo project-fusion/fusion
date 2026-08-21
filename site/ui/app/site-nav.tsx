@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixMegamenu } from '@helix-io/web'
+import type { HelixCommand, HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -111,6 +111,33 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
   const [findOpen, setFindOpen] = useState(false)
+  const [searching, setSearching] = useState(false)
+  const palette = useRef<HelixCommand>(null)
+
+  /* **Bound here rather than as a prop, and the reason is worth keeping.**
+   *
+   * `helix-filter` is composed, so it does cross out of the palette's shadow
+   * root, but it is dispatched by the *listbox* inside it. `HelixElement`
+   * repairs a React `on` prop by reading it at the moment the element itself
+   * dispatches, which is what makes `onhelix-select` work on this same element:
+   * an event merely passing through the host on its way up never calls the
+   * host's own `dispatchEvent`, so nothing is there to do the repair and the
+   * prop is recorded and never bound. Measured: typing narrowed the list and
+   * the handler never ran.
+   *
+   * An effect is what the area rules leave for exactly this, a listener for
+   * something the component did not raise itself. */
+  useEffect(() => {
+    const node = palette.current
+    if (!node) {
+      return
+    }
+    const watch = (event: Event) => {
+      setSearching(((event as CustomEvent<{ value: string }>).detail.value ?? '').trim() !== '')
+    }
+    node.addEventListener('helix-filter', watch)
+    return () => node.removeEventListener('helix-filter', watch)
+  }, [])
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
@@ -407,7 +434,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       <helix-command
         class="siteCommand"
         label="Search"
-        onhelix-close={() => setFindOpen(false)}
+        onhelix-close={() => {
+          setFindOpen(false)
+          setSearching(false)
+        }}
         onhelix-open={() => setFindOpen(true)}
         onhelix-select={(event: { detail: { value: string } }) => {
           setFindOpen(false)
@@ -415,8 +445,21 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         }}
         open={findOpen}
         placeholder="Search the site"
+        ref={palette}
       >
-        {[...DESTINATIONS, ...findable].map((section) => (
+        {/* **The catalogue arrives when it is asked for.**
+            88 components and every article is the whole of what a palette can
+            reach and none of what it should open with: a reader summoning it
+            sees a hundred rows before typing a character, and a list nobody
+            scans is a list that has to be searched anyway. So the curated few
+            stand at rest, and everything enumerable appears on the first
+            keystroke, which is when a name is a filter rather than an
+            inventory.
+
+            `helix-filter` is the signal, dispatched by the listbox before it
+            narrows and bubbling out through the palette. Cleared on close, so a
+            second visit opens the way the first did. */}
+        {[...DESTINATIONS, ...(searching ? findable : [])].map((section) => (
           <helix-option-group key={section.group} label={section.group}>
             {section.items.map((one) => (
               <helix-option key={one.href} value={one.href}>
