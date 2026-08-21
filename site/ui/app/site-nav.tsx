@@ -99,6 +99,42 @@ const DESTINATIONS = [
  * layout around. That is also why this component owns the header rather than
  * being slotted into one, and why the header is flat by default.
  */
+/**
+ * A group with its items ordered by how well they answer what was typed.
+ *
+ * **Within a group and never across one**, which is what the component's own
+ * model allows and is also the right answer: `Listbox` filters by *hiding*
+ * rather than removing, so the order it draws is the order it is given, and
+ * lifting a component above a curated destination would mean pulling it out of
+ * the heading that says what it is. The groups the reader just gained would
+ * become decoration.
+ *
+ * Three tiers, because they are the three things "car" can mean: a label that
+ * *starts* with it is almost certainly what was meant, a word inside the label
+ * starting with it is next, and the rest is a substring that happened to match.
+ * Ties keep the order they arrived in, which for components is alphabetical and
+ * for writing is newest first, so the fallback is never arbitrary.
+ */
+const ranked =
+  (needle: string) =>
+  (section: Findable): Findable => {
+    const at = needle.toLowerCase()
+    const tier = (label: string): number => {
+      const text = label.toLowerCase()
+      if (text.startsWith(at)) {
+        return 0
+      }
+      return text.split(/[\s,]+/).some((word) => word.startsWith(at)) ? 1 : 2
+    }
+    return {
+      group: section.group,
+      items: section.items
+        .map((item, order) => ({ item, order, tier: tier(item.label) }))
+        .sort((a, b) => a.tier - b.tier || a.order - b.order)
+        .map((one) => one.item),
+    }
+  }
+
 /** A group of places the palette can go, as the layout hands them down. */
 export interface Findable {
   group: string
@@ -111,7 +147,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
   const [findOpen, setFindOpen] = useState(false)
-  const [searching, setSearching] = useState(false)
+  const [needle, setNeedle] = useState('')
   const palette = useRef<HelixCommand>(null)
 
   /* **Bound here rather than as a prop, and the reason is worth keeping.**
@@ -133,7 +169,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       return
     }
     const watch = (event: Event) => {
-      setSearching(((event as CustomEvent<{ value: string }>).detail.value ?? '').trim() !== '')
+      setNeedle(((event as CustomEvent<{ value: string }>).detail.value ?? '').trim())
     }
     node.addEventListener('helix-filter', watch)
     return () => node.removeEventListener('helix-filter', watch)
@@ -436,7 +472,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         label="Search"
         onhelix-close={() => {
           setFindOpen(false)
-          setSearching(false)
+          setNeedle('')
         }}
         onhelix-open={() => setFindOpen(true)}
         onhelix-select={(event: { detail: { value: string } }) => {
@@ -459,15 +495,17 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             `helix-filter` is the signal, dispatched by the listbox before it
             narrows and bubbling out through the palette. Cleared on close, so a
             second visit opens the way the first did. */}
-        {[...DESTINATIONS, ...(searching ? findable : [])].map((section) => (
-          <helix-option-group key={section.group} label={section.group}>
-            {section.items.map((one) => (
-              <helix-option key={one.href} value={one.href}>
-                {one.label}
-              </helix-option>
-            ))}
-          </helix-option-group>
-        ))}
+        {[...DESTINATIONS, ...(needle === '' ? [] : findable.map(ranked(needle)))].map(
+          (section) => (
+            <helix-option-group key={section.group} label={section.group}>
+              {section.items.map((one) => (
+                <helix-option key={one.href} value={one.href}>
+                  {one.label}
+                </helix-option>
+              ))}
+            </helix-option-group>
+          ),
+        )}
         {/* **Three hints, and each one is a group rather than a clause.**
             They were a single sentence with commas doing the separating, which
             asks a reader to parse punctuation to find out where one key's job
