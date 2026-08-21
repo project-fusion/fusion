@@ -4055,6 +4055,7 @@ have content past them is measured by the base class.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `label` | `label` | `string` | `''` | `HelixBaseScrollArea` | Names the region, for a reader arriving at it out of context. |
+| `scroller` | - | `HTMLElement \| null` | - | `HelixBaseScrollArea` | The box that actually scrolls, for anything that needs to move it. |
 
 #### Slots
 

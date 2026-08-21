@@ -31639,11 +31639,11 @@
             },
             {
               "kind": "field",
-              "name": "viewport",
+              "name": "scroller",
               "type": {
                 "text": "HTMLElement | null"
               },
-              "privacy": "private",
+              "description": "The box that actually scrolls, for anything that needs to move it.\n\n**Public because the alternative is silence.** Bringing a row into view\nmeans telling a scroll utility which box to scroll, and the scrolling box\nhere is inside a shadow root: a consumer holding a reference to this\nelement holds the host, which does not scroll, and `scrollBy` on it is a\nno-op that reports nothing. That is exactly how `scrollItemIntoView`'s\n`offsetParent` default fails, and the sandbox sidebar spent an afternoon\nscrolled to zero because of it.\n\nThe element rather than a method of our own, because the utilities that\nwant it already take one, and `Tree`, `Combobox` and anything windowing a\nlong list all want the same thing from it.",
               "readonly": true
             },
             {

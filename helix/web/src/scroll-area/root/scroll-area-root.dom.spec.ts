@@ -15,6 +15,17 @@ const area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
 }
 
 describe('a scroll area', () => {
+  test('hands out the box that scrolls, because the host does not', async () => {
+    /* A consumer holding a reference to this element holds the host, and the
+       host does not scroll: `scrollBy` on it is a no-op that reports nothing.
+       Anything bringing a row into view has to be told which box to move, and
+       that box is in here. */
+    const host = await area('label="Notes"')
+    const scroller = (host as HTMLElement & { scroller: HTMLElement | null }).scroller
+    expect(scroller).toBe(part(host, 'viewport') as HTMLElement)
+    expect(scroller).not.toBe(host)
+  })
+
   test('names its region only when it has a name to give', async () => {
     /* An unnamed region is an announcement with no content: a reader is told
        "region" and has learned nothing they did not already know. */

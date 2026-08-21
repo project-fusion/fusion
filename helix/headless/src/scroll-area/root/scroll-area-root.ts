@@ -60,7 +60,22 @@ export class HelixBaseScrollArea extends HelixElement {
 
   private watcher: ResizeObserver | undefined
 
-  private get viewport(): HTMLElement | null {
+  /**
+   * The box that actually scrolls, for anything that needs to move it.
+   *
+   * **Public because the alternative is silence.** Bringing a row into view
+   * means telling a scroll utility which box to scroll, and the scrolling box
+   * here is inside a shadow root: a consumer holding a reference to this
+   * element holds the host, which does not scroll, and `scrollBy` on it is a
+   * no-op that reports nothing. That is exactly how `scrollItemIntoView`'s
+   * `offsetParent` default fails, and the sandbox sidebar spent an afternoon
+   * scrolled to zero because of it.
+   *
+   * The element rather than a method of our own, because the utilities that
+   * want it already take one, and `Tree`, `Combobox` and anything windowing a
+   * long list all want the same thing from it.
+   */
+  get scroller(): HTMLElement | null {
     return this.renderRoot?.querySelector('[part="viewport"]') ?? null
   }
 
@@ -74,7 +89,7 @@ export class HelixBaseScrollArea extends HelixElement {
    * costs.
    */
   private measure = (): void => {
-    const box = this.viewport
+    const box = this.scroller
     if (!box) {
       return
     }
@@ -112,7 +127,7 @@ export class HelixBaseScrollArea extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
-    const box = this.viewport
+    const box = this.scroller
     if (box && this.watcher) {
       this.watcher.observe(box)
       for (const child of box.querySelectorAll('slot')) {
