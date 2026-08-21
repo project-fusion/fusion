@@ -22,6 +22,7 @@ import { styles } from './dialog-root.css.js'
  * @property align - Whether the panel's contents run from the start or center on it.
  * @property size - How wide the panel is allowed to be.
  *
+ * @cssproperty --dialog-scrim - The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.
  * @cssproperty --dialog-inset - Padding inside the panel.

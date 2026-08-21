@@ -126,11 +126,32 @@
  * round the whole declaration collapsed to a tenth of an alpha, which is a
  * scrim you can barely see rather than an error you can find. The same trap the
  * option's highlight hit, and it caught me twice. */
-[part="dialog"]::backdrop {
-  background-color: light-dark(
+/* **The hook, and why it can be one at all.**
+ *
+ * The paragraphs above say `::backdrop` cannot see a Helix token, and that is
+ * true of a token *referenced from inside the backdrop*: substitution happens
+ * where the `var()` is written, and there it resolves against a context the
+ * pseudo-element does not have. What the same measurement recorded and did not
+ * follow up is that a property declared on `:host` does apply.
+ *
+ * That is the seam. A custom property's own `var()`s are substituted on the
+ * element it is declared on, so `--dialog-scrim` set on the host resolves there,
+ * where every token is in scope, and `::backdrop` reads a colour rather than a
+ * reference it cannot follow. A consumer may write
+ * `--dialog-scrim: var(--helix-color-overlay)` and it works, which is the thing
+ * the literal below exists because nobody could do.
+ *
+ * The literal stays as the default, for the reason it was written: it is what
+ * the pseudo-element falls back to, and it cannot itself be a token. */
+:host {
+  --_dialog-scrim: light-dark(
     color-mix(in oklab, black 40%, transparent),
     color-mix(in oklab, black 64%, transparent)
   );
+}
+
+[part="dialog"]::backdrop {
+  background-color: var(--dialog-scrim, var(--_dialog-scrim));
 }
 
 /* The heading, whatever the consumer slotted, without a wrapper to give it a

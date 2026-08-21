@@ -1770,6 +1770,7 @@ dialog rather than being a div somebody positioned.
 
 | Property | Description |
 | --- | --- |
+| `--dialog-scrim` | The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
 | `--dialog-icon-size` | How big the mark above the title is. |
 | `--dialog-inline-size` | Width of the panel. |
 | `--dialog-inset` | Padding inside the panel. |

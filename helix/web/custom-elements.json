@@ -18615,6 +18615,10 @@
           "name": "HelixDialog",
           "cssProperties": [
             {
+              "description": "The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
+              "name": "--dialog-scrim"
+            },
+            {
               "description": "How big the mark above the title is.",
               "name": "--dialog-icon-size"
             },

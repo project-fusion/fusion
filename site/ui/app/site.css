@@ -2753,6 +2753,23 @@ helix-drawer helix-tree {
  * Through `::part()`, which is the published door into a component and the one
  * mechanism a document rule may use on one. Everything here is a departure the
  * component invited: the four parts it forwards, and the two hooks it names. */
+/* **A lighter wash than a modal's, which is what makes the glass legible.**
+ *
+ * `Dialog` scrims at 64% black because a modal replaces the page. A palette is
+ * summoned over a page the reader is still in, and at 64% the blur had a
+ * near-uniform dark field to sample rather than the content: the material was
+ * computed and invisible. Mixed down to 45% of the overlay token, the page is
+ * still there to be blurred. The alpha is what matters and `overlay` alone did
+ * not help: it is a lighter black at the same 0.64, so the field it gave the
+ * blur was as solid as before.
+ *
+ * Set on this element and inherited down to the dialog inside it. The value
+ * resolves here, where a token is in scope, which is the whole reason the hook
+ * can take one at all. */
+.siteCommand {
+  --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
+}
+
 .siteCommand::part(dialog) {
   /* **Glass, which is what a palette is: the page is still there.**
    *

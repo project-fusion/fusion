@@ -7177,6 +7177,8 @@ export type CustomCssProperties = {
   "--date-picker-selected-color"?: string;
   /** Band behind the days in a range. */
   "--date-picker-range-color"?: string;
+  /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--dialog-scrim"?: string;
   /** How big the mark above the title is. */
   "--dialog-icon-size"?: string;
   /** Width of the panel. */

@@ -16649,6 +16649,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
@@ -27727,6 +27728,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--dialog-scrim`: The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--dialog-icon-size`: How big the mark above the title is. (default: `undefined`)
    * - `--dialog-inline-size`: Width of the panel. (default: `undefined`)
    * - `--dialog-inset`: Padding inside the panel. (default: `undefined`)
@@ -36030,6 +36032,8 @@ export type CustomCssProperties = {
   "--date-picker-selected-color"?: string;
   /** Band behind the days in a range. */
   "--date-picker-range-color"?: string;
+  /** The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--dialog-scrim"?: string;
   /** How big the mark above the title is. */
   "--dialog-icon-size"?: string;
   /** Width of the panel. */
