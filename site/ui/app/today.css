@@ -22,16 +22,16 @@
 .spec {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   display: grid;
-  gap: var(--helix-space-xl) var(--helix-space-2xl);
+  gap: var(--helix-space-2xl) var(--helix-space-3xl);
   grid-template-columns: 11rem minmax(0, 1fr);
-  padding-block: var(--helix-space-3xl);
+  padding-block: calc(var(--helix-space-3xl) * 1.6);
 }
 
 @media (width < 60rem) {
   .spec {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--helix-space-md);
-    padding-block: var(--helix-space-2xl);
+    padding-block: var(--helix-space-3xl);
   }
 }
 
@@ -143,4 +143,18 @@
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   letter-spacing: 0.08em;
+}
+
+/* Air around a row, not just between the words in it. The page was dense
+   because every band was doing its spacing at the same step as its type. */
+.spec .tdRow {
+  padding-block: calc(var(--helix-space-xl) * 1.4);
+}
+
+.specDoor {
+  padding-block: var(--helix-space-xl);
+}
+
+.specHero {
+  padding-block: calc(var(--helix-space-3xl) * 1.9) var(--helix-space-3xl);
 }

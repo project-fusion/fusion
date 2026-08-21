@@ -28,28 +28,28 @@ export const metadata = { title: 'Candidate: today' }
 const STACK = [
   {
     action: { href: '/helix', label: 'Open Helix' },
-    body: 'Seventy eight component families, each with its API, a live example and a sandbox. Web components, so whatever framework you are on stays your choice, and one open tier, so there is no part of it you have to buy.',
+    body: 'Every component with its API, a live example, and a sandbox to try it in. One open tier, so there is no part of it you have to buy.',
     lede: 'Use it',
     name: 'Helix',
     stage: 'Building' as const,
   },
   {
     action: { href: '/services', label: 'See the offers' },
-    body: `An audit at ${SERVICES[0]?.price} to find out what is worth building, a design system sprint at ${SERVICES[1]?.price}, and a build from sixty thousand. Every price is on the page and most engagements start with the audit.`,
+    body: `An audit at ${SERVICES[0]?.price} to find what is worth building, then a sprint or a build. Most engagements start with the audit.`,
     lede: 'Buy it',
     name: 'The work',
     stage: 'Active' as const,
   },
   {
     action: { href: '/cortex', label: 'Read the shape' },
-    body: 'Memory and provenance for systems that have to explain themselves: what a system knows, where it learned it, and how far to trust it. The crates exist and the design is written down. Nothing has shipped.',
+    body: 'What a system knows, where it learned it, and how far to trust it. The design is written down. Nothing has shipped.',
     lede: 'Not yet',
     name: 'Cortex',
     stage: 'Building' as const,
   },
   {
     action: { href: '/energy', label: 'See the map' },
-    body: 'Committed direction with no work started. They are on the site because a roadmap that shows only the parts going well is a brochure.',
+    body: 'Committed direction, no work started. On the site because a roadmap showing only the good parts is a brochure.',
     lede: 'On the map',
     name: 'Energy and Capital',
     stage: 'Declared' as const,
@@ -59,11 +59,11 @@ const STACK = [
 /** The pairing, which is the whole reason any of this is possible now. */
 const MECHANISM = [
   {
-    body: 'What used to need an institution now runs on hardware a person can own. The cost of thinking at scale fell far enough that the question stopped being whether you can afford it and became where you want it to run.',
+    body: 'What needed an institution now runs on hardware you can own. The question stopped being whether you can afford it and became where you want it to run.',
     name: 'Intelligence got cheap',
   },
   {
-    body: "The other half, and the one people forget. A model you own is still someone else's dependency if you cannot power the machine it runs on. Both curves broke at once, and that is the part that is new.",
+    body: 'The half people forget. A model you own is still a dependency if you cannot power the machine it runs on. Both curves broke at once.',
     name: 'Energy got cheap',
   },
 ]
@@ -71,17 +71,17 @@ const MECHANISM = [
 /** The same stack at three scales, which is the argument the company is making. */
 const LADDER = [
   {
-    body: 'Your own keys, your own data, your own hardware. Nothing about your working life is recoverable by a company that changes its pricing.',
+    body: 'Your keys, your data, your hardware. Nothing recoverable by a company that changes its pricing.',
     name: 'Personal',
     rung: 'One person',
   },
   {
-    body: 'The same properties with more people and an audit trail. A company that cannot be held hostage by a vendor roadmap, because it runs the substrate and holds the data.',
+    body: 'The same, with more people and an audit trail. Not hostage to a vendor roadmap.',
     name: 'Organizational',
     rung: 'One company',
   },
   {
-    body: 'The same properties again, with the stakes that follow from a country running its capability on infrastructure it does not control. A written thesis, not a product, and we say so.',
+    body: 'The same again, at the scale where it decides things. A written thesis, not a product, and we say so.',
     name: 'National',
     rung: 'One country',
   },
@@ -105,9 +105,8 @@ export default function Page() {
           </helix-text>
 
           <helix-text as="p" class="specLede">
-            Helix is seventy eight component families under one open tier, with no part of it held
-            back for a paid plan. What we charge for is applying it to your product, which goes
-            faster because we are the people who built it.
+            Helix is open, and no part of it is held back for a paid plan. We sell the work of
+            applying it.
           </helix-text>
 
           {/* The fork made structural. It used to be two buttons a reader had
@@ -118,16 +117,14 @@ export default function Page() {
               <helix-text class="specDoorFor">If you build interfaces</helix-text>
               <helix-text appearance="title">Open Helix</helix-text>
               <helix-text appearance="caption" tone="muted">
-                Seventy eight families with their API and a live example each. Web components, so
-                whatever framework you are on stays your choice.
+                Components, tokens and a sandbox. Your framework stays your choice.
               </helix-text>
             </a>
             <a className="specDoor" href="/services">
               <helix-text class="specDoorFor">If you need the work done</helix-text>
               <helix-text appearance="title">See what it costs</helix-text>
               <helix-text appearance="caption" tone="muted">
-                An audit at $12,000, a design system sprint at $32,000, a build from sixty thousand.
-                Every price is on the page.
+                Audits from $12,000. Sprints from $32,000. Every price stated.
               </helix-text>
             </a>
           </div>
@@ -187,11 +184,6 @@ export default function Page() {
                 </helix-flex>
               ))}
             </helix-grid>
-            <helix-text as="p" class="measure" tone="muted">
-              The two things that forced a person to depend on an institution were the cost of
-              thinking at scale and the cost of power. Both are falling, which is what turns
-              sovereignty from a principle you agree with into a stack you can run.
-            </helix-text>
           </helix-flex>
         </div>
       </section>
@@ -235,16 +227,12 @@ export default function Page() {
             </helix-text>
             <helix-flex class="measure" direction="column" gap="md">
               <helix-text as="p" tone="muted">
-                Handover is a condition of the work rather than a phase at the end of it. The
-                architecture decisions are written down with their trade-offs, not just made. If an
-                engagement would leave you unable to continue without us on a retainer, it is not
-                one we will take.
+                Handover is a condition of the work, not a phase at the end. If an engagement would
+                leave you needing us on a retainer, we will not take it.
               </helix-text>
               <helix-text as="p" tone="muted">
-                That is a rule we hold ourselves to and it is worth being plain about which parts of
-                it are hard. Keeping a design system you already have is not hard. Keeping a system
-                that remembers things for you, when the memory lives somewhere else, is. That is the
-                part Cortex exists to answer, and it is the part we have not shipped yet.
+                Worth being plain about which part of that is hard. Keeping a design system is not.
+                Keeping a memory that lives somewhere else is, and that is what Cortex is for.
               </helix-text>
             </helix-flex>
           </helix-flex>
@@ -257,9 +245,7 @@ export default function Page() {
             Start with the audit.
           </helix-text>
           <helix-text as="p" class="measure" tone="muted">
-            Two weeks at a fixed price, and the honest answer at the end of it may be that you do
-            not need the larger engagement. Say plainly what you are trying to do and we will tell
-            you whether we are the right people for it.
+            Two weeks, fixed price, and the honest answer may be that you do not need the rest.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <a data-button="solid" data-button-tone="primary" href="/services">
