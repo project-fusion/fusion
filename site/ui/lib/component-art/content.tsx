@@ -38,50 +38,73 @@ import type { CSSProperties, ReactNode } from 'react'
 export const contentArt: Record<string, ReactNode> = {
   /** Rows read as a set, divided by a rule and nothing else. */
   /**
-   * A picture in a bounded box, with a horizon, a sun and two ridges.
+   * Two strands crossing inside a bloom, with a line of content over them.
    *
-   * The box is the subject rather than what is in it. What this component adds
-   * over an `<img>` is that it reserves its ground and says whether the picture
-   * arrived, so the drawing is a frame that is unmistakably a frame, holding a
-   * scene generic enough that nobody reads it as a photograph of something.
+   * **Contours, not a gradient.** The first pass drew the falloff as two
+   * `linearGradient`s of `currentColor`, which broke three rules at once: the
+   * grid is monotone and has no accent, ink has exactly three steps, and a
+   * continuous ramp is every step there is. Three nested bands at `0.12`,
+   * `0.28` and `0.55` say the same thing in the vocabulary every other card
+   * uses, and read as a diagram of a light rather than a bad photograph of one.
    *
-   * `artOpen` on the scene alone, not the frame. The frame is the part that was
-   * there all along, and the picture is the part that arrives into it, which is
-   * the whole of what the element does. Scaling the frame with it would say the
-   * box turned up too, and the box turning up is the thing this component
-   * exists to prevent.
-   */
-  /**
-   * A shaft of light behind a horizon, which is what the component is.
+   * **The bar is as much the subject as the light is.** Without it this is a
+   * picture in a bounded box, which is `image` exactly. The one thing that
+   * makes an aura an aura is that words sit on it. One bar and not a stack:
+   * two would be a layout, and this is a surface.
    *
-   * Drawn as the shape rather than as a screenshot of it: the element renders
-   * a different picture on every machine and at every size, so art that tried
-   * to be a likeness would be a lie about one of them. What is constant is the
-   * gesture, a bright core inside a wider bloom, leaning.
-   *
-   * `artOpen` on the bloom alone. The core is the part that is always there;
-   * the bloom is what arrives, which is the difference a reader is being shown
+   * `artOpen` on the bloom alone. The strands are the part that is always
+   * there; the bloom is what arrives around them, which is the difference
    * between a flat background and this one.
    */
   aura: (
     <>
       <defs>
-        <clipPath id="helixArtAuraFrame">
+        {/* The shaft runs past the plane on every side and `artOpen` scales it
+            further, so it is clipped to the plane's own radius. */}
+        <clipPath id="helixArtAuraPlane">
           <rect height="112" rx="8" width="224" x="48" y="44" />
         </clipPath>
-        <linearGradient id="helixArtAuraBloom" x1="0" x2="0.35" y1="0" y2="1">
-          <stop offset="0" stopColor="currentColor" stopOpacity="0.55" />
-          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
-        </linearGradient>
       </defs>
+
       <rect className="artSunken" height="112" rx="8" width="224" x="48" y="44" />
-      <g clipPath="url(#helixArtAuraFrame)">
-        <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
-          <path d="M128 44l72 112h-52z" fill="url(#helixArtAuraBloom)" />
-          <path d="M152 44l64 112h-40z" fill="url(#helixArtAuraBloom)" />
+
+      <g clipPath="url(#helixArtAuraPlane)">
+        {/* Leaned, because the component leans by default and a column standing
+            straight behind left-aligned words reads as a divider between them
+            and the space beside them. */}
+        <g transform="rotate(-12 160 100)">
+          <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
+            <rect className="artInk" fillOpacity="0.12" height="150" width="104" x="108" y="25" />
+            <rect className="artInk" fillOpacity="0.28" height="150" width="52" x="134" y="25" />
+          </g>
+          {/* Two strands, each bowing where the other does not, crossing three
+              times over the height: the braid the component draws when nothing
+              is chosen.
+              
+              Stroked rather than filled, because a ribbon drawn as a closed
+              path meets itself at both ends and reads as an eye. And written
+              as explicit cubics rather than with the `S` shorthand, which
+              reflects the previous control point and tied a loop at every
+              join: two filled blobs on a card whose subject is a pair of
+              curves. */}
+          <path
+            className="artStroke"
+            d="M140 25C140 42 180 58 180 75C180 92 140 108 140 125C140 142 180 158 180 175"
+            strokeOpacity="0.55"
+            strokeWidth="2.5"
+          />
+          <path
+            className="artStroke"
+            d="M180 25C180 42 140 58 140 75C140 92 180 108 180 125C180 142 140 158 140 175"
+            strokeOpacity="0.55"
+            strokeWidth="2.5"
+          />
         </g>
-        <path className="artInk" d="M138 44l26 112h-12z" fillOpacity="0.7" />
       </g>
+
+      {/* The words the light is behind. */}
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="72" x="64" y="132" />
+
       <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
     </>
   ),
@@ -293,6 +316,20 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /**
+   * A picture in a bounded box, with a horizon, a sun and two ridges.
+   *
+   * The box is the subject rather than what is in it. What this component adds
+   * over an `<img>` is that it reserves its ground and says whether the picture
+   * arrived, so the drawing is a frame that is unmistakably a frame, holding a
+   * scene generic enough that nobody reads it as a photograph of something.
+   *
+   * `artOpen` on the scene alone, not the frame. The frame is the part that was
+   * there all along, and the picture is the part that arrives into it, which is
+   * the whole of what the element does. Scaling the frame with it would say the
+   * box turned up too, and the box turning up is the thing this component
+   * exists to prevent.
+   */
   image: (
     <>
       <defs>

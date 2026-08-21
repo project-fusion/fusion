@@ -173,10 +173,8 @@ export const overlaysArt: Record<string, ReactNode> = {
         </g>
         <rect className="artEdge" height="0.5" width="192" x="64" y="75.5" />
         <path
-          className="artInk"
+          className="artStroke"
           d="M78 56.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm5 8l3 3"
-          fill="none"
-          stroke="currentColor"
           strokeOpacity="0.4"
           strokeWidth="1.5"
         />

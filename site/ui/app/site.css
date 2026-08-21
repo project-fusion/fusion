@@ -920,6 +920,25 @@ helix-drawer {
   );
 }
 
+/* Ink as a line rather than as a fill.
+ *
+ * **A `fill="none"` attribute cannot do this**, which is not obvious and had
+ * already shipped: a presentation attribute sits below every author rule in the
+ * cascade, so `.artInk`'s own `fill` wins and the path renders solid whatever
+ * the attribute says. Measured on the Aura card, where two stroked strands came
+ * out as filled blobs with `fill="none"` on both, and on Popover's magnifying
+ * glass, which is built the same way and has been filled since it was drawn.
+ *
+ * Same color as `artInk`, because it is the same ink. Opacity and width stay on
+ * the element: they are facts about the line, not about the palette. */
+.artStroke {
+  fill: none;
+  stroke: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 86%, var(--helix-color-background)),
+    var(--helix-color-foreground)
+  );
+}
+
 /* A rule drawn as a filled rect rather than a stroke, so it stays exactly one
    unit whatever the card is scaled to and never half-renders. */
 .artRule {
