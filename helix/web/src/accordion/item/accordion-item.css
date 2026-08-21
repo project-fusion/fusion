@@ -31,10 +31,6 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host([dense]) [part="trigger"] {
-  min-block-size: var(--helix-size-control-sm);
-}
-
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
    substitution. The surface stays flat and the motion carries the change.
 

@@ -1,7 +1,6 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseAccordionItem } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles } from './accordion-item.css.js'
 
 /**
@@ -35,10 +34,6 @@ import { styles } from './accordion-item.css.js'
  */
 @customElement('helix-accordion-item')
 export class HelixAccordionItem extends HelixBaseAccordionItem {
-  /** Tightens the trigger for dense layouts. */
-  @property({ reflect: true, type: Boolean })
-  dense = false
-
   static override styles: CSSResultGroup = styles
 }
 

@@ -28,16 +28,19 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 
-  /* One inset for every region, so dense narrows them together. */
-  --_card-inset: var(--card-padding, var(--helix-space-md));
+  /* One inset for every region, so they narrow together.
+   *
+   * `--helix-space-control` rather than `--helix-space-md`, which is the same
+   * value at rest and follows `data-density` on any ancestor. It was a `dense`
+   * boolean here, and measured, a card read 16px of inset in a `sm` region and
+   * 16px in an `lg` one: the region said how tight it was and the card was the
+   * one component that did not listen. Saying it twice is the fault the size
+   * rule exists to prevent, and the second channel was also the deaf one. */
+  --_card-inset: var(--card-padding, var(--helix-space-control));
   /* How wide the media column is when the card lays out sideways. Named once:
      it is both the media's own width and the room the content is pushed clear
      by, and two copies of a default drift. */
   --_card-media: var(--card-media-size, 12rem);
-}
-
-:host([dense]) {
-  --_card-inset: var(--card-padding, var(--helix-space-sm));
 }
 
 :host([appearance="elevated"]) {

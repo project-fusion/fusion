@@ -58,10 +58,6 @@ export class HelixCard extends HelixBaseCard {
   @property({ reflect: true })
   appearance?: 'outlined' | 'elevated' | 'plain'
 
-  /** Tightens the inset for dense layouts. */
-  @property({ reflect: true, type: Boolean })
-  dense = false
-
   /** Whether media sits above the content stack or beside it. */
   @property({ reflect: true })
   orientation?: 'vertical' | 'horizontal'
