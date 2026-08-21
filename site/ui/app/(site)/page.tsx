@@ -71,12 +71,11 @@ export default function Home() {
             Fusion Development Group
           </helix-text>
           <helix-text as="h1" class="heroTitle">
-            We build interface and intelligence software on tools we own.
+            Interface and intelligence engineering
           </helix-text>
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Most engagements start with a two week audit of what is worth building. The substrate
-            underneath the work is already built, which is what makes the estimates that follow real
-            numbers.
+            We build the software, and we built the tools underneath it. Most engagements start with
+            a two week audit of what is worth building, and every price is stated before you ask.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link data-button="solid" data-button-tone="primary" href="/services">

@@ -74,19 +74,19 @@ export default function Page() {
             Fusion Development Group
           </helix-text>
 
-          {/* Holding copy, and it is holding rather than finished: the claim
-              this page needs is a decision rather than a draft, and the three
-              candidates are at the end of `the internal plan`. What it
-              must not do is name a deliverable, which the previous one did:
-              "we will build yours" sold the second of three offers as the whole
-              business and sized the company as an agency. */}
+          {/* The title names the thing and argues nothing, which is the shape
+              `/helix` already uses and the one that works: a claim in a headline
+              has to be accepted before anything else is read, and a name only
+              has to be understood. Six attempts at a clever line all leaned on
+              owning the tools or on process, and both are about us rather than
+              about what a reader gets. The lede does the arguing. */}
           <helix-text as="h1" class="specHeroTitle">
-            We build interface and intelligence software on tools <em>we own</em>.
+            Interface and intelligence engineering
           </helix-text>
 
           <helix-text as="p" class="specLede">
-            Most engagements start with a two week audit of what is worth building. The substrate
-            underneath is already built, which is what makes the estimates that follow real.
+            We build the software, and we built the tools underneath it. Most engagements start with
+            a two week audit of what is worth building, and every price is stated before you ask.
           </helix-text>
 
           <div className="specDoors">
