@@ -315,104 +315,98 @@ export const FRAGMENT = `#version 300 es
     return lit;
   }
 
-  /* One beam, split into an ordered spread by whatever it passes through.
+  /* The distance to an equilateral triangle, negative inside.
+   *
+   * iq's, unchanged. The folds use abs() and sign(), which put derivative
+   * discontinuities exactly at the three corners, and a triangle is entitled to
+   * corners: the crease rule is about edges that should not be there.
+   */
+  float sdTriangle(vec2 p, float r) {
+    const float k = 1.7320508;
+    p.x = abs(p.x) - r;
+    p.y = p.y + r / k;
+    if (p.x + k * p.y > 0.0) {
+      p = vec2(p.x - k * p.y, -k * p.x - p.y) / 2.0;
+    }
+    p.x -= clamp(p.x, -2.0 * r, 0.0);
+    return -length(p) * sign(p.y);
+  }
+
+  /* One beam, an ordered spread, and the thing that did it.
    *
    * **This is the one shape that is about the token layer.** Helix derives a
    * whole accessible palette from a single brand colour, and a prism is that
    * argument as a picture: one thing goes in, an ordered set comes out, and the
-   * set is a consequence of the source rather than a list beside it. Rings in
-   * perspective, which this replaces, were pretty and said nothing.
+   * set is a consequence of the source rather than a list beside it.
    *
-   * **The cursor is the prism.** The beam runs whether or not anybody is there,
-   * and where the pointer meets it the light fans. That is a different kind of
-   * interaction from the others: not the field reacting near the cursor, but
-   * the cursor being a thing in the field's way. Moving it along the beam moves
-   * where the split happens, which is exactly what carrying a prism does.
+   * **The glass is drawn now, and that is the reimagining.** Every version
+   * before this was a beam that bent and fanned, with nothing at the corner to
+   * bend it, so it read as a fibre bundle or a searchlight: the deviation was
+   * the only evidence that anything had happened, and a deviation on its own is
+   * just a kink. Giving the wedge a rim and a faint interior turns the picture
+   * from an effect into a cause, which is the whole point being made.
    *
-   * The bands are lightness and never hue, because the palette is one hue. A
-   * rainbow here would be the one drawing on the site that contradicts the
-   * thing it is drawing.
+   * **The cursor is the prism**, literally rather than by implication. The beam
+   * runs whether or not anybody is there, and the wedge sits where the pointer
+   * is, so carrying it along the beam carries the split with it. It turns
+   * slowly at rest, about a degree a second, because an object that never moves
+   * against a field that does reads as a sticker on the glass.
    */
   float prism(vec2 q, float t, vec2 qp, float reach) {
-    vec2 dir = normalize(vec2(0.5, -1.0));
+    vec2 c = q - qp * reach;
+
+    float spin = t * 0.35;
+    mat2 turn = mat2(cos(spin), sin(spin), -sin(spin), cos(spin));
+    float body = sdTriangle(turn * c, 0.42);
+
+    /* A rim, and an interior barely above the ground. Glass is mostly the
+       edges: fill it and the wedge becomes a solid triangle sitting on the
+       field, which is a logo rather than something light passes through. */
+    /* 20, not 6.5. The rim is the drawing: at 6.5 it is half height a tenth of
+       the frame from the edge, which measured as twin peaks either side of a
+       dimmer middle and read as a blob with a hole in it. A tenth as wide and
+       the wedge has edges. */
+    float glass = falloff(body * body, 20.0) * 0.7 + smoothstep(0.03, -0.14, body) * 0.08;
+
+    vec2 dir = normalize(vec2(0.55, -1.0));
     vec2 side = vec2(-dir.y, dir.x);
+    float along = dot(c, dir);
+    float acrossIn = dot(c, side);
 
-    /* Where the split happens: under the pointer when there is one, and at the
-       centre when there is not, so the shape is whole at rest. */
-    vec2 rel = q - qp * reach;
-    float along = dot(rel, dir);
-    float across = dot(rel, side);
+    /* The entry beam, which stops at the glass rather than running through it.
+       All of the light that the fan then divides, so it is the brighter half:
+       drawn at parity the shape begins at a corner with nothing arriving. */
+    float beam = exp(-(acrossIn * acrossIn) / (2.0 * 0.038 * 0.038)) *
+      smoothstep(0.1, -0.75, along);
 
-    /* **The light bends, and that was the thing missing.** A prism deviates
-       what passes through it: the emerging fan leaves at an angle to the beam
-       that entered, and it is the deviation rather than the spread that makes
-       the drawing read as glass rather than as a beam that got wider. Spreading
-       about the original axis is what a diffuser does.
-    
-       So the outgoing frame is turned, and only what is past the split uses it.
-       Everything before keeps the entry axis, which is what puts a visible
-       corner at the prism instead of a widening. */
-    float after = smoothstep(-0.02, 0.16, along);
-    float bend = radians(21.0) * after;
+    /* Deviated, because that is what a prism does to what passes through it.
+       Spreading about the entry axis is a diffuser. */
+    float bend = radians(24.0);
     vec2 out1 = vec2(dir.x * cos(bend) - dir.y * sin(bend), dir.x * sin(bend) + dir.y * cos(bend));
-    vec2 side1 = vec2(-out1.y, out1.x);
+    vec2 sideOut = vec2(-out1.y, out1.x);
+    float alongOut = dot(c, out1);
+    float acrossOut = dot(c, sideOut);
 
-    float alongOut = dot(rel, out1);
-    float acrossOut = dot(rel, side1);
-    along = mix(along, alongOut, after);
-    across = mix(across, acrossOut, after);
+    float past = smoothstep(0.08, 0.5, alongOut);
+    float spread = 0.05 + max(alongOut, 0.0) * 0.3;
+    float fan = exp(-(acrossOut * acrossOut) / (2.0 * spread * spread)) * past;
 
-    /* Tight before, widening after, and narrower than it was: a prism throws a
-       few degrees of spread, not a floodlight. */
-    float spread = 0.035 + max(along, 0.0) * 0.22;
-    float beam = exp(-(across * across) / (2.0 * spread * spread));
+    /* Banded across the fan rather than along it, because what leaves a prism
+       is separated by angle: dividing by the spread keeps each band on its own
+       ray as the fan widens rather than letting them curve. They resolve with
+       distance, merged at the face and apart further out, which is what
+       emerging from glass looks like. */
+    float u = acrossOut / spread;
+    float cell = fract(u * 2.0 + 0.5) - 0.5;
+    float resolved = smoothstep(0.0, 0.9, max(alongOut, 0.0));
+    float bands = falloff(cell * cell, mix(1.6, 6.0, resolved));
 
-    /* The ordered set, and it only exists after the split.
-    
-       Banded across the fan rather than along it, because what comes out of a
-       prism is separated by angle: dividing by the spread keeps each band on
-       its own ray as the fan widens, rather than letting them curve. The
-       contrast has to carry, or the whole thing reads as one beam that simply
-       got wider, which is not the point being made. */
-    float u = across / spread;
-    /* Discrete bands with gaps between them, not a ripple.
-    
-       A sine across the fan is a continuous swell, and what comes out of a
-       prism is a set of separated things: the whole argument is that one input
-       becomes countable outputs. Folding the coordinate into cells and lighting
-       the middle of each gives edges to count.
-    
-       Graded across the fan as well, so the set has an order to it rather than
-       being a picket fence: the bands nearest the undeviated side are the ones
-       that bent least, and they carry more of the light. */
-    float cell = fract(u * 2.2 + 0.5) - 0.5;
-
-    /* The bands resolve with distance rather than being separate the instant
-       they leave. Light emerging from glass is one thing that becomes several,
-       so at the face the colours overlap and it is only further out that there
-       is a gap to see. Constant sharpness draws them already apart, which puts
-       the separation in the wrong place and, at k = 13, drew each one about a
-       twentieth of its own cell: wires rather than bands. */
-    float resolved = smoothstep(0.0, 0.85, max(along, 0.0));
-    float bands = falloff(cell * cell, mix(1.8, 6.5, resolved));
-
-    /* Graded across the fan, so the set has an order rather than being a picket
-       fence: what bent least carries the most light. */
     float pv = clamp(uVariance, 0.0, 1.0);
     float order = mix(mix(0.825, 1.15, pv), mix(0.825, 0.5, pv), clamp(u * 0.5 + 0.5, 0.0, 1.0));
+    fan *= mix(mix(1.01, 0.45, pv), mix(1.01, 1.6, pv), bands) * order;
 
-    /* A floor under the fan, because a prism throws a lit wedge with bands in
-       it. At 0.1 the gaps went to black and the bands read as separate beams
-       that happened to start together. */
-    float structure = mix(1.0, mix(mix(1.01, 0.42, pv), mix(1.01, 1.6, pv), bands) * order, after);
-
-    /* The entry beam is all of the light that the fan then divides, so it is
-       the brighter half. Drawn at parity it disappeared against the fan and the
-       shape began at a corner with nothing arriving at it. */
-    float carry = mix(1.7, 1.0, after);
-
-    float grain = warped(vec2(along * 1.1, across * 2.2), t * 0.45);
-    return beam * structure * carry * mix(0.65, 1.2, grain) * falloff(dot(q, q), 0.5);
+    float grain = warped(vec2(along * 1.1, acrossIn * 2.2), t * 0.45);
+    return (beam * 1.25 + fan + glass) * mix(0.7, 1.15, grain) * falloff(dot(q, q), 0.5);
   }
 
   /* Light travelling in lanes, at speed.
@@ -452,6 +446,11 @@ export const FRAGMENT = `#version 300 es
     float base = floor(laneF);
 
     float lit = 0.0;
+    /* Three lanes, which is what the widths support. The tail spreads to at
+       most 0.15 and lanes sit 0.417 apart, so one lane out carries about a
+       fiftieth and the lane that drops out of the visited set, two out, is
+       around a ten millionth. That dropped lane is where a step could appear,
+       and it is the whole reason this loop is not a single lane. */
     for (int k = -1; k <= 1; k++) {
       float id = base + float(k);
       float within = laneF - (id + 0.5);
@@ -498,42 +497,38 @@ export const FRAGMENT = `#version 300 es
       float travel = phase + t * speed * 1.8 / gap;
       float u = s.y / gap - travel;
       float w = fract(u);
-      /* Two terms rather than a product, which is what the periodic form asks
-         for: the tail hanging from the head above this fragment, and the soft
-         nose above the head below it. They hand over at each head, both
-         reaching one there, so the profile is continuous across the join.
+      /* **A streak is one solid, not a brightness curve times a fixed width.**
+         Drawn separably it is a dart, and that is what these were: along the
+         lane the light stopped over a fifth of a unit, across it the lane kept
+         its full width the whole way, and the level sets of such a product meet
+         at a point. Straight edges and an apex, which is a paper dart.
     
-         The nose is a soft one, not a cut. At 0.07 the leading edge crossed two
-         per cent of the frame, which against a bright trail on a dark field is
-         a straight line rather than the front of something moving. */
-      float trail = exp(-(1.0 - w) * gap / len) + smoothstep(0.2, 0.0, w * gap);
+         So each term carries its own width. The tail leaves the head narrow and
+         spreads as it falls behind, and the front is a round cap rather than a
+         full-width wall cut off across the lane. Together that is a teardrop,
+         which is the silhouette the thing actually has. */
+      float across = within / 2.4;
+      /* 0.06, which is what the profile it replaces actually measured. Lanes
+         sit 0.417 apart and the old exp(-|within| * 4) was half-height at 0.072
+         of a lane, so a sigma of 0.15 was two and a half times too wide: every
+         lane overlapped both neighbours and the frame came out a blue wash with
+         no streaks in it at all. */
+      float wide = mix(0.06, 0.04 + hash(vec2(id, 71.0)) * 0.05, v);
+
+      float behind = (1.0 - w) * gap;
+      float spread = min(wide * (1.0 + behind * 0.7), 0.15);
+      float tail = exp(-behind / len) * exp(-(across * across) / (2.0 * spread * spread));
+
+      /* The cap is the same sigma as the tail is where they meet, so crossing a
+         head is continuous in shape as well as in height: just under it the
+         tail stands at full and the cap is spent, just over it the reverse, and
+         at the join both are the same gaussian. */
+      float ahead = w * gap;
+      float cap = exp(-(ahead * ahead + across * across) / (2.0 * wide * wide));
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
-      trail *= mix(1.0, 0.45, near);
-
-      /* Broad across the lane, so neighbours genuinely overlap. At 9 the weight
-         was already a hundredth at the boundary, which sounds like enough and
-         is not: the two lanes either side of it are in unrelated states, so the
-         step between them lands on a dark field where a hundredth still reads.
-         At 4 the profiles cross well inside each other and there is no boundary
-         left to see. */
-      /* Width, bounded below at 4 and never broader. Broad is what makes the
-         neighbours overlap enough to leave no lane boundary to see, so the
-         variety is spent on the narrow side only: at 3 the lane two cells away
-         still carries about a hundredth as it drops out of the visited set, and
-         a hundredth on a dark field is the vertical line this loop exists to
-         remove.
-    
-         Capped as well as floored, because a property must not be able to break
-         the shape it varies. A variance of 1.6 put this at 8, which is near the
-         9 the three-lane blend was written to get away from, and measured four
-         straight edges back across the frame. */
-      float narrow = min(mix(4.0, 4.0 + hash(vec2(id, 71.0)) * 2.5, v), 6.5);
-
-      /* And a weight per lane, so they do not all sit at the same distance. */
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
-
-      lit += trail * weight * falloff(within * within, narrow);
+      lit += (tail + cap) * weight * mix(1.0, 0.45, near);
     }
     float grain = fbm(vec2(s.x * 3.0, s.y * 1.4 - t * 1.6));
     return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
