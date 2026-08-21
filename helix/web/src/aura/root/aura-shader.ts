@@ -252,13 +252,13 @@ export const FRAGMENT = `#version 300 es
        further, which is what an aurora does when it is disturbed. */
     float agitate = falloff((q.x - qp.x) * (q.x - qp.x), 1.5) * reach;
 
-    /* A curtain hangs. It does not sit.
+    /* A curtain stands. It does not hang.
     
        This was a falloff symmetric about the ridge, which is a band with a
        wavy centre line, and a band with vertical noise on it is an equaliser.
-       An aurora has a sharp top edge where the field lines end and light that
-       falls away beneath it, so the top and the bottom cannot be the same
-       function. Cut hard above, hung long below.
+       An aurora has a sharp lower border where the field lines reach their
+       lowest, and light that thins upward from it, so the top and the bottom
+       cannot be the same function. Cut hard below, drawn long above.
     
        Two of them, offset and at different depths, because a single sheet reads
        as a decal and what makes the real thing look like drapery is one curtain
@@ -276,11 +276,18 @@ export const FRAGMENT = `#version 300 es
           (noise(vec2(q.x * (1.3 + f * 0.4) + f * 9.0, t * 0.45)) - 0.5) * 0.55) *
           (1.0 + agitate * 2.0) +
         f * 0.22;
-      float depth = ridge - q.y;
+      /* **The sheet stands on the ridge rather than hanging from it, and that
+         inversion is the whole difference between an aurora and a landscape.**
+         A hard edge with mass under it is a mountain silhouette, which is
+         exactly what this drew: one unbroken ridge line across the frame with a
+         striped solid below it. The real thing is the other way up. A curtain's
+         lower border is its sharpest, brightest line, and what rises from it
+         thins and breaks into rays. Nothing else here had to change. */
+      float depth = q.y - ridge;
       /* Sharp, but not a cliff: the edge is where the light stops, and a step
          narrower than a pixel is an aliased line rather than an edge. */
       float edge = smoothstep(-0.1, 0.05, depth);
-      float hang = exp(-max(depth, 0.0) * (1.5 + f * 0.7));
+      float rise = exp(-max(depth, 0.0) * (1.5 + f * 0.7));
       /* Stretched hard along the fall, so the striations are the vertical rays
          a curtain is actually made of rather than texture on a stripe. */
       float rays = fbm(vec2(q.x * (9.0 + f * 4.0), q.y * 0.35 - t * (2.2 + f)));
@@ -291,6 +298,12 @@ export const FRAGMENT = `#version 300 es
          boundary. Wide enough to see: at k = 26 this was two pixels and might
          as well not have been there. */
       float rim = falloff(depth * depth, 7.0) * 0.45;
+
+      /* **A curtain is not the width of the sky.** Running edge to edge is what
+         made the ridge read as a horizon: a horizon is continuous and a curtain
+         is not. Broken into lengths by a slow mask, with real gaps between
+         them, it becomes some number of curtains rather than one long one. */
+      float lengths = smoothstep(0.2, 0.66, noise(vec2(q.x * 1.15 + f * 13.0, t * 0.12)));
 
       /* Rays clump. Straight fbm is evenly spaced striping, which is a picket
          fence whatever else is done to it, and the floor under it lit the sheet
@@ -310,7 +323,7 @@ export const FRAGMENT = `#version 300 es
       float av = clamp(uVariance, 0.0, 1.0);
       float bundled = mix(mix(0.85, 0.1, av), mix(0.85, 1.6, av), bundles);
       float folded = mix(mix(0.775, 0.15, av), mix(0.775, 1.4, av), foldNoise);
-      lit += edge * (hang * bundled * folded + rim) * (1.0 - f * 0.45);
+      lit += edge * lengths * (rise * bundled * folded + rim) * (1.0 - f * 0.45);
     }
     return lit;
   }
@@ -353,25 +366,42 @@ export const FRAGMENT = `#version 300 es
    * against a field that does reads as a sticker on the glass.
    */
   float prism(vec2 q, float t, vec2 qp, float reach) {
-    vec2 c = q - qp * reach;
+    /* **The glass stays put and the pointer turns it.** It used to sit at the
+       cursor, which meant the whole subject, wedge and beam and fan together,
+       translated across the frame and off the edge of it: there was nowhere to
+       stand where the shape was not moving, and no way to look at it at rest.
+       A background with no home is not a background.
+    
+       Turning it is the better half of the same idea anyway. Rotating a prism
+       is what changes the deviation, so the fan swings and the bands rearrange
+       while the object stays where it was composed. */
+    vec2 c = q;
 
-    float spin = t * 0.35;
+    float spin = t * 0.35 + qp.x * 0.55 * reach;
     mat2 turn = mat2(cos(spin), sin(spin), -sin(spin), cos(spin));
     float body = sdTriangle(turn * c, 0.42);
 
     /* A rim, and an interior barely above the ground. Glass is mostly the
        edges: fill it and the wedge becomes a solid triangle sitting on the
        field, which is a logo rather than something light passes through. */
-    /* 20, not 6.5. The rim is the drawing: at 6.5 it is half height a tenth of
-       the frame from the edge, which measured as twin peaks either side of a
-       dimmer middle and read as a blob with a hole in it. A tenth as wide and
-       the wedge has edges. */
-    float glass = falloff(body * body, 20.0) * 0.7 + smoothstep(0.03, -0.14, body) * 0.08;
+    float glassRim = falloff(body * body, 16.0);
 
     vec2 dir = normalize(vec2(0.55, -1.0));
     vec2 side = vec2(-dir.y, dir.x);
     float along = dot(c, dir);
     float acrossIn = dot(c, side);
+
+    /* **Graded, or it is a wireframe.** An outline of even weight is a vector
+       drawing of a triangle, which is what this looked like: a logo with beams
+       attached. Glass is only bright where light meets it, so the rim is lifted
+       along the beam and the far edges fall back to almost nothing.
+    
+       The interior carries a gradient rather than a flat wash, so the body has
+       somewhere thick and somewhere thin and reads as a solid the light is
+       inside of rather than a filled shape. */
+    float faceLight = mix(0.3, 1.55, smoothstep(-0.45, 0.3, along));
+    float interior = smoothstep(0.04, -0.3, body) * mix(0.05, 0.16, smoothstep(-0.3, 0.25, along));
+    float glass = glassRim * 0.72 * faceLight + interior;
 
     /* The entry beam, which stops at the glass rather than running through it.
        All of the light that the fan then divides, so it is the brighter half:
@@ -387,8 +417,10 @@ export const FRAGMENT = `#version 300 es
     float alongOut = dot(c, out1);
     float acrossOut = dot(c, sideOut);
 
+    /* The fan leaves a face, not a point. A base of 0.05 put every band through
+       one pixel at the corner, which is a starburst. */
     float past = smoothstep(0.08, 0.5, alongOut);
-    float spread = 0.05 + max(alongOut, 0.0) * 0.3;
+    float spread = 0.1 + max(alongOut, 0.0) * 0.3;
     float fan = exp(-(acrossOut * acrossOut) / (2.0 * spread * spread)) * past;
 
     /* Banded across the fan rather than along it, because what leaves a prism
@@ -397,9 +429,13 @@ export const FRAGMENT = `#version 300 es
        distance, merged at the face and apart further out, which is what
        emerging from glass looks like. */
     float u = acrossOut / spread;
-    float cell = fract(u * 2.0 + 0.5) - 0.5;
+    /* Fewer and broader. At two per unit and a falloff of 6 each band was about
+       a ninth of its own cell, which draws wires rather than colours: what
+       leaves a prism is a set of overlapping bands, and the gaps between them
+       are the last thing to appear, not the first. */
+    float cell = fract(u * 1.5 + 0.5) - 0.5;
     float resolved = smoothstep(0.0, 0.9, max(alongOut, 0.0));
-    float bands = falloff(cell * cell, mix(1.6, 6.0, resolved));
+    float bands = falloff(cell * cell, mix(1.1, 3.4, resolved));
 
     float pv = clamp(uVariance, 0.0, 1.0);
     float order = mix(mix(0.825, 1.15, pv), mix(0.825, 0.5, pv), clamp(u * 0.5 + 0.5, 0.0, 1.0));
@@ -474,7 +510,11 @@ export const FRAGMENT = `#version 300 es
       float v = clamp(uVariance, 0.0, 1.0);
       float speed = mix(1.3, 0.55 + hash(vec2(id, 11.0)) * 1.5, v);
       float phase = hash(vec2(id, 29.0));
-      float len = mix(0.8, 0.3 + hash(vec2(id, 47.0)) * 1.0, v);
+      /* Longer than they were. At 0.3 to 1.3 the tail was spent within about
+         half the gap and each streak read as a blob with a smudge behind it;
+         the thing is named for the trail, so the trail is the part that should
+         dominate the head. */
+      float len = mix(1.1, 0.5 + hash(vec2(id, 47.0)) * 1.3, v);
 
       /* **The lane is periodic, not a single streak that is put back when it
          runs out.** It was fract() over a fixed span of 3.6, so a head left the
@@ -547,11 +587,44 @@ export const FRAGMENT = `#version 300 es
    */
   float waves(vec2 q, float t, vec2 qp, float reach) {
     float pull = falloff(dot(q - qp, q - qp), 1.2) * reach;
-    float warp = warped(vec2(q.x * 0.55, q.y * 0.45), t * 0.35);
-    float phase = q.y * 1.7 + warp * 2.4 - t * 0.9 - pull * 1.6;
-    float band = sin(phase * 1.7) * 0.5 + 0.5;
-    float grain = warped(vec2(q.x * 1.3 + 6.0, q.y * 0.9), t * 0.3);
-    return pow(band, 1.7) * mix(0.5, 1.3, grain) * falloff(dot(q, q), 0.4);
+    /* **The warp was eating the waves.** At an amplitude of 2.4 against a band
+       frequency of 1.7 it swung the sine's argument by about four radians,
+       which is more than a whole period: the wavefronts were destroyed rather
+       than bent and what came out was turbulence. It read as marbled paper, and
+       at a low scale it filled the frame with near white.
+    
+       A tenth of that bends the fronts and leaves them fronts. */
+    float warp = warped(vec2(q.x * 0.5, q.y * 0.4), t * 0.3) - 0.5;
+    vec2 w = q + warp * 0.32;
+
+    /* Two systems crossing, lit where they agree, which is what the shape is
+       named for and what it had stopped doing. One sine is a corrugation; two
+       at different angles interfere, and the slow beat between them is the
+       thing worth looking at. */
+    /* **And the frequency was too low to be a wave at all.** At 2.3 the period
+       is 2.7 in shape units against a visible half height of 1, so less than
+       one crest fitted across the frame: there was nothing periodic to see, and
+       every version of this that looked like anything looked like it because
+       the warp was making clouds. Around 8 puts five crests across the frame,
+       which is a wave field rather than a single swell.
+    
+       The two are deliberately not harmonic. Close but unequal frequencies beat
+       against each other, and the slow travelling interference that produces is
+       the thing worth watching. */
+    float a = sin((w.y * 8.1 + w.x * 2.3) - t * 0.9 - pull * 1.4);
+    float b = sin((w.y * 5.3 - w.x * 3.4) + t * 0.6 + pull * 1.0);
+
+    /* **Added, these two make a lattice, not a wave field.** Equal amplitudes
+       crossing at an angle give a regular grid of lobes, which came out as
+       bubble wrap and got worse the more of it fitted on screen. Waves are
+       lines. So one system carries the fronts and the other only varies their
+       brightness along their length, which is what a real swell does: the
+       crests stay crests and are taller in some places than others. */
+    float band = a * 0.5 + 0.5;
+    band *= mix(0.45, 1.0, b * 0.5 + 0.5);
+
+    float grain = warped(vec2(w.x * 1.2 + 6.0, w.y * 0.85), t * 0.28);
+    return pow(band, 2.2) * mix(0.55, 1.2, grain) * falloff(dot(q, q), 0.4);
   }
 
   /* Luminous threads, woven to a pinch.
@@ -651,7 +724,21 @@ export const FRAGMENT = `#version 300 es
            unlike a streak lane a mote may be broader as well as tighter
            without leaving an edge anywhere. */
         float grade = mix(52.0, 52.0 * (0.62 + hash(c + 5.7) * 0.95), v);
-        lit += falloff(dot(off, off), grade) * mix(0.8, 0.35 + a * 0.9, v);
+
+        /* **Stretched along the way each mote is going.** Round dots at rest
+           are a starfield, and a starfield is the one thing in this set that
+           says nothing: stars are famously fixed. Elongating each along its own
+           drift is what makes the same field read as something in motion, and
+           it costs one normalize and a change of basis.
+    
+           Plus a halo, an order of magnitude wider and a tenth the strength, so
+           a mote sits in the field rather than on top of it. A hard little disc
+           on a dark ground is a pixel; light has a neighbourhood. */
+        vec2 way = normalize(vec2(hash(c + 3.3) - 0.5, hash(c + 8.8) - 0.5) + 0.0001);
+        vec2 streak = vec2(dot(off, way) / 2.4, dot(off, vec2(-way.y, way.x)));
+        float core = falloff(dot(streak, streak), grade);
+        float halo = falloff(dot(off, off), grade * 0.16) * 0.1;
+        lit += (core + halo) * mix(0.8, 0.35 + a * 0.9, v);
       }
     }
     return lit * falloff(dot(q, q), 0.4);
@@ -753,14 +840,42 @@ export const FRAGMENT = `#version 300 es
     /* The field is warped by itself twice over, which is what gives a liquid
        its folded look: each sample is displaced by the field's own value, so
        structure gathers into sheets rather than staying a cloud. */
-    float ink = warped(p * 1.15, t * 0.55);
-    float sheet = warped(p * 2.3 + vec2(3.1, 1.7), t * 0.35);
-    float body = mix(0.55, 1.3, ink) * mix(0.5, 1.15, sheet);
+    /* **Halved, because the detail was the problem.** At 1.15 and 2.3 every
+       octave landed small enough that the frame filled edge to edge with fine
+       crumple at one density: marbled stone, and it looked the same at every
+       scale, gain and bloom because there was no large form for any of them to
+       act on. Big shapes first, detail on top of them. */
+    float ink = warped(p * 0.55, t * 0.55);
+    float sheet = warped(p * 1.1 + vec2(3.1, 1.7), t * 0.35);
+
+    /* **Floors of 0.55 and 0.5 meant it was never dark anywhere.** The lowest
+       the field could reach was a quarter lit, so every fragment landed in the
+       same middle band and the frame came out an even swatch of texture with no
+       structure to look at. Dropping the floor gives it voids.
+    
+       And a slow large mass over the top, so the liquid is thick in places and
+       clear in others. Fine detail everywhere at one density is static; what
+       makes a fluid read is that it gathers. */
+    /* Thresholded, not just varied. A gentle modulation over a field that is
+       lit everywhere is still lit everywhere; what a liquid needs is somewhere
+       it simply is not, so the empty parts of the frame are what give the full
+       parts a shape. */
+    float mass = smoothstep(0.24, 0.72, noise(vec2(p.x * 0.45 - t * 0.1, p.y * 0.4 + t * 0.07)));
+    /* The void floor is 0.18 rather than 0.05. At a low scale the mass noise
+       varies less across the frame than the frame is wide, so a reader can land
+       inside one void and see nothing at all: empty has to mean faint, not
+       absent, or the shape can disappear entirely at a setting the property
+       explicitly allows. */
+    float body = mix(0.05, 1.4, ink) * mix(0.4, 1.2, sheet) * mix(0.18, 1.45, mass);
 
     /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
        people never see. */
-    return body * (0.5 + clamp(wake, 0.0, 1.0) * 0.38) * falloff(dot(q, q), 0.55);
+    /* 0.85 at rest, not 0.5. Halving an untouched field made sense when the
+       field had a floor under it and could not go dark; with the voids in, the
+       two together took it to a dim murk that read as wet rock. The wake still
+       lifts what it touches, from a resting level that is worth looking at. */
+    return body * (0.85 + clamp(wake, 0.0, 1.0) * 0.5) * falloff(dot(q, q), 0.55);
   }
 
   /* Two wave fields crossed, lit where they agree. */
