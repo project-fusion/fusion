@@ -45,7 +45,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 6 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
-| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 120 |
+| `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 122 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 3 |
 | `--helix-color-syntax-comment` | `light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )` | 2 |
 | `--helix-color-syntax-constant` | `light-dark( var(--_helix-syntax-constant-light), var(--_helix-syntax-constant-dark) )` | 2 |
@@ -107,7 +107,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 64 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 197 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 199 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 1 |
 | `--helix-radii-full` | `9999px` | 73 |
@@ -258,11 +258,11 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 40 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 44 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 13 |
-| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 79 |
-| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 136 |
-| `--helix-size-focus-offset` | `2px` | 112 |
+| `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 81 |
+| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 138 |
+| `--helix-size-focus-offset` | `2px` | 114 |
 
 ## layer
 
