@@ -59,6 +59,10 @@ const DESTINATIONS = [
     items: [
       { href: '/helix', label: 'Helix, the design system' },
       { href: '/cortex', label: 'Cortex, memory and provenance' },
+      /* The workbench, not the component. `Sandbox` is a family like any other
+         and the catalogue already offers its reference page; this is the tool
+         that page describes, which nothing else in the palette could reach. */
+      { href: '/helix/sandbox', label: 'Sandbox, the component workbench' },
     ],
   },
   {
