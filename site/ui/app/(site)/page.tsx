@@ -296,17 +296,18 @@ export default function Home() {
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
       <section className="band reveal showcaseBand">
-        {/* **A splitter, not a rule.** The section is an argument beside the
-            thing it is about, and where the line between them falls is a
-            judgement rather than a fact: a reader who wants to look at the
-            library can take the space from the prose. It is also the component
-            doing the job it exists for, on a page whose whole claim is that
-            these things compose.
+        {/* **No rule between them, and more room instead.** A line is one way
+            to say two things are separate and whitespace is the other, and
+            whitespace does not have to be looked past. The splitter that was
+            here made where the line falls a judgement a reader could take, and
+            it was still a line down the middle of a section whose two halves
+            already read as two halves.
     
-            `default-position` rather than a fixed share, so the split has an
-            opinion and is not held to it. */}
-        <helix-splitter class="shell showcaseSplit" default-position={34} label="Showcase">
-          <helix-flex class="showcaseProse" direction="column" gap="sm" slot="start">
+            The gap does the work at `3xl`, the widest the scale goes, which is wider than anything else on
+            the page joins with, because the two sides are not a pair of columns
+            in a layout: they are an argument and the thing it is about. */}
+        <div className="shell showcaseSplit">
+          <helix-flex class="showcaseProse" direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Helix
             </helix-text>
@@ -325,10 +326,8 @@ export default function Home() {
             </helix-flex>
           </helix-flex>
 
-          <div slot="end">
-            <Showcase />
-          </div>
-        </helix-splitter>
+          <Showcase />
+        </div>
       </section>
 
       <section className="band reveal">

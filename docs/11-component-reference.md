@@ -2881,6 +2881,7 @@ than as a ragged list.
 
 | Property | Description |
 | --- | --- |
+| `--menu-item-start` | Width of the leading column, for a row carrying more than a mark. |
 | `--menu-item-hover-color` | Fill under the pointer. |
 
 ## Meter
@@ -4499,7 +4500,7 @@ keeps it out of every other reason it might want to be bigger.
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseSparkline` | How the line gets from one reading to the next. |
 | `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
-| `plot` | `plot` | `'area' \| 'bar' \| undefined` | - | `HelixBaseSparkline` | What the readings are drawn as. |
+| `plot` | `plot` | `'area' \| 'bar' \| 'line' \| undefined` | - | `HelixBaseSparkline` | What the readings are drawn as. |
 | `terminus` | `terminus` | `'none' \| 'ring' \| 'square' \| 'triangle' \| undefined` | - | - | The shape of the mark on the last reading. |
 | `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
 | `weight` | `weight` | `'thick' \| 'thin' \| undefined` | - | - | How heavy the line is drawn. |
@@ -6557,6 +6558,7 @@ not.
 | Part | Description |
 | --- | --- |
 | `entry` | One entry in the menu. |
+| `poster` | An entry's still, where it has one. |
 | `menu` | The menu that holds the entries. |
 | `trigger` | The button that opens it. |
 
@@ -6565,4 +6567,5 @@ not.
 | Property | Description |
 | --- | --- |
 | `--video-playlist-menu-color` | Colour of the trigger, defaulting to the control bar's. |
+| `--video-playlist-menu-poster` | Width of an entry's still. |
 | `--video-playlist-menu-size` | Size of the trigger's glyph. |

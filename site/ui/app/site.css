@@ -2490,6 +2490,9 @@ helix-drawer helix-tree {
  * rem, because the heading was breaking into five lines at 24. */
 .showcaseSplit {
   block-size: 100%;
+  column-gap: var(--helix-space-3xl);
+  display: grid;
+  grid-template-columns: minmax(20rem, 30rem) minmax(0, 1fr);
   /* The split is a grid item and a grid item's automatic minimum is its
      content, so `block-size: 100%` is only a preference until this says
      otherwise: left at `auto` it measured 1199 inside a 720 band. */

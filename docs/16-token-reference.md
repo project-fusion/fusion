@@ -90,14 +90,14 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 224 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 273 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 275 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 233 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 231 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 124 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 125 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 78 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 65 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 42 |
-| `--helix-space-3xl` | `var(--_helix-scale-16)` | 19 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
+| `--helix-space-3xl` | `var(--_helix-scale-16)` | 20 |
 | `--helix-space-control` | `var(--helix-space-md)` | 6 |
 
 ## radii
@@ -107,7 +107,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-radii-none` | `0` | 64 |
-| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 199 |
+| `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 201 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 1 |
 | `--helix-radii-full` | `9999px` | 73 |
@@ -245,7 +245,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-tag-sm` | `calc(1.5rem * var(--_helix-seed-density))` | 10 |
 | `--helix-size-progress` | `calc(0.5rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-meter` | `calc(1rem * var(--_helix-seed-density))` | 2 |
-| `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 6 |
+| `--helix-size-checkbox` | `var(--helix-size-checkbox-md)` | 7 |
 | `--helix-size-checkbox-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-checkbox-md` | `calc(1.25rem * var(--_helix-seed-density))` | 3 |
 | `--helix-size-checkbox-sm` | `calc(1rem * var(--_helix-seed-density))` | 8 |
@@ -258,7 +258,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
 | `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
-| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 44 |
+| `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 46 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 13 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 81 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 138 |

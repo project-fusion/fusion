@@ -87,11 +87,18 @@ export class HelixBaseSparkline extends HelixElement {
    * *are* nearly the same. The same readings as a line fill the box and show
    * the movement, because a line is only ever claiming a shape.
    *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
+   *
    * This tier rather than the one above: a plot type is geometry and geometry
    * is markup, the same reason `curve` lives here.
    */
   @property({ reflect: true })
-  plot?: 'area' | 'bar'
+  plot?: 'area' | 'bar' | 'line'
 
   /**
    * How the line gets from one reading to the next.
@@ -198,6 +205,13 @@ export class HelixBaseSparkline extends HelixElement {
      * The floor is the smallest reading and not a true zero, because the scale
      * runs over the data's own extent. That is the part a consumer would get
      * wrong writing this themselves, and it is why the shape is built here. */
+    /* Asked positively, and it has to be. Written as `!== 'bar' && !== 'line'`
+       this read *undefined* as an area, and undefined is the resting state: the
+       property is optional, so a plain `<helix-sparkline values="...">` names no
+       plot and got a filled region under its line. Every default sparkline in
+       the library, and the spec beside this one had said so since it was
+       written. A negative test over an optional property answers for the value
+       nobody set. */
     const area =
       this.plot === 'area' && path !== ''
         ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`

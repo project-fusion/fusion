@@ -128,13 +128,25 @@ export function Showcase(): React.ReactElement {
           </helix-card>
 
           <helix-card appearance="outlined" class="showcaseCard">
-            <helix-flex align="center" gap="sm" wrap>
-              <helix-button appearance="solid" tone="primary">
-                Primary
-              </helix-button>
-              <helix-button>Secondary</helix-button>
-              <helix-button appearance="subtle">Subtle</helix-button>
-              <helix-kbd>Cmd K</helix-kbd>
+            <helix-flex direction="column" gap="md">
+              <helix-flex align="center" gap="sm" wrap>
+                <helix-button appearance="solid" tone="primary">
+                  Primary
+                </helix-button>
+                <helix-button>Secondary</helix-button>
+                <helix-button appearance="subtle">Subtle</helix-button>
+              </helix-flex>
+              <helix-flex align="center" gap="sm" wrap>
+                <helix-kbd>Cmd K</helix-kbd>
+                <helix-tag tone="primary">Tag</helix-tag>
+                <helix-badge label="3 unread" value="3">
+                  <helix-icon-button label="Notifications">
+                    <helix-icon name="bell"></helix-icon>
+                  </helix-icon-button>
+                </helix-badge>
+                <helix-loader></helix-loader>
+              </helix-flex>
+              <helix-progress label="Contrast pass" value={72}></helix-progress>
             </helix-flex>
           </helix-card>
 
@@ -230,17 +242,29 @@ export function Showcase(): React.ReactElement {
               </helix-timeline-item>
             </helix-timeline>
           </helix-card>
+
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
+              <helix-flex align="center" gap="sm" wrap>
+                <helix-tag tone="success">Passing</helix-tag>
+                <helix-tag tone="warning">Near budget</helix-tag>
+              </helix-flex>
+            </helix-flex>
+          </helix-card>
         </div>
 
         <div className="showcaseView" hidden={view !== 'surfaces'}>
-          <helix-card appearance="outlined" class="showcaseCard showcaseWide">
-            <helix-callout severity="info">
-              <helix-text appearance="body-strong" slot="title">
-                Nothing here needs us to keep running
-              </helix-text>
-              The packages install from npm and ship as custom elements.
-            </helix-callout>
-          </helix-card>
+          {/* Flat, like the code block. `Callout` already draws its own band:
+              a tinted ground, a rule and an icon down the side. A card around
+              it is a second surface a few pixels outside the first, and the two
+              edges argue about which one is the callout. */}
+          <helix-callout class="showcaseWide" severity="info">
+            <helix-text appearance="body-strong" slot="title">
+              Nothing here needs us to keep running
+            </helix-text>
+            The packages install from npm and ship as custom elements.
+          </helix-callout>
 
           <helix-code-block class="showcaseCode" label="Install Helix">
             bun add @helix-io/web
@@ -267,6 +291,24 @@ export function Showcase(): React.ReactElement {
                 <helix-tag tone="danger">Danger</helix-tag>
               </helix-flex>
               <helix-progress label="Contrast pass" value={72}></helix-progress>
+            </helix-flex>
+          </helix-card>
+
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <helix-breadcrumbs aria-label="Breadcrumb">
+                <helix-breadcrumb>
+                  <a data-link="quiet" href="/helix">
+                    Helix
+                  </a>
+                </helix-breadcrumb>
+                <helix-breadcrumb>
+                  <a data-link="quiet" href="/helix">
+                    Components
+                  </a>
+                </helix-breadcrumb>
+                <helix-breadcrumb current>Aura</helix-breadcrumb>
+              </helix-breadcrumbs>
               <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
             </helix-flex>
           </helix-card>

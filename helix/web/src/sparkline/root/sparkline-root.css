@@ -93,11 +93,11 @@
   stop-opacity: 0;
 }
 
-:host([plot="area"]) [part="area"] {
+:host(:not([plot="bar"]):not([plot="line"])) [part="area"] {
   fill: url("#sparkline-wash");
 }
 
-:host([plot="area"]) [part="wash-start"] {
+:host(:not([plot="bar"]):not([plot="line"])) [part="wash-start"] {
   stop-opacity: var(--sparkline-area-opacity, 0.45);
 }
 
@@ -109,7 +109,7 @@
  * far the other way, reading as a slab with a gradient on it rather than as a
  * fade. A ninth is the third number and the one that holds: the floor is still
  * present, and the falloff is most of the height rather than a hint. */
-:host([plot="area"]) [part="wash-end"] {
+:host(:not([plot="bar"]):not([plot="line"])) [part="wash-end"] {
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9);
 }
 
