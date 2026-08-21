@@ -238,10 +238,28 @@ export const FRAGMENT = `#version 300 es
     vec2 p = uv * 2.0 - 1.0;
     p.x *= uResolution.x / max(uResolution.y, 1.0);
 
-    /* Parallax first, so the whole field slides against the pointer rather than
-       the shape deforming toward it. A field that bends looks poked; one that
-       slides looks like it has depth. */
-    vec2 q = p - uPointer * 0.16 * uReach;
+    /* What the pointer does, and why it read as pointing somewhere else.
+
+       The response was a bare multiply by one plus the falloff. Over a lit
+       part of the field that brightens; over a dark part it multiplies nothing
+       and shows nothing, so the visible answer to moving the cursor appeared
+       wherever the shape already happened to be bright. That is not where the
+       cursor is, and no falloff tightens its way out of a response that is
+       absent half the time. The coordinate was exact the whole while, measured
+       against the shader's own arithmetic for the same pixel.
+
+       The grip term is the fix, and the first of three. It pulls the field
+       toward the pointer, so structure gathers under it. A displacement shows
+       up wherever there is pattern, lit or not, which is what makes a cursor
+       feel like it is touching a medium rather than shining on one. */
+    vec2 toPointer = p - uPointer;
+    float grip = exp(-dot(toPointer, toPointer) * 2.6) * uReach;
+
+    /* Parallax, and small on purpose. At 0.16 the whole field translated a
+       sixth of the frame between one edge of the screen and the other, which
+       reads as the background being dragged rather than as depth: a large
+       global motion answering a small input, which no time constant rescues. */
+    vec2 q = p - uPointer * 0.05 * uReach - toPointer * grip * 0.32;
 
     float a = radians(uTilt);
     q = vec2(q.x * cos(a) - q.y * sin(a), q.x * sin(a) + q.y * cos(a));
@@ -269,10 +287,11 @@ export const FRAGMENT = `#version 300 es
        that falloff and one control means the same thing in all five. */
     d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain;
 
-    /* The pointer lifts what is already lit rather than adding a glow of its
-       own. A light that follows the cursor over an unlit field is a torch. */
-    float near = exp(-length(p - uPointer) * 1.8) * uReach;
-    d *= 1.0 + near * 1.1;
+    /* Then it lifts what is lit, over a floor, so there is always something at
+       the cursor. The floor is small deliberately: a light that follows the
+       pointer across an unlit field is a torch, which is a different and much
+       cheaper idea, and a tenth says the pointer is here without becoming one. */
+    d = d * (1.0 + grip * 0.9) + grip * 0.1;
 
     d *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y));
 
