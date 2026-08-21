@@ -176,7 +176,7 @@ export class HelixBaseSparkline extends HelixElement {
   }
 
   /** The table `for` names, or null where there is no document to ask. */
-  #table(): HTMLTableElement | null {
+  #table(): Element | null {
     if (this.for === '') {
       return null
     }

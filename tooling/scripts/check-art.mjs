@@ -155,6 +155,7 @@ const folders = readdirSync('helix/web/src', { withFileTypes: true }).filter(
 ).length
 const foldersSaid = wordFor(folders)
 
+let compared = 0
 for (const file of ['index.tsx', 'core.tsx']) {
   const text = readFileSync(join(ART, file), 'utf8')
   /* Every ten-word from forty up, and the range is the whole point.
@@ -168,6 +169,7 @@ for (const file of ['index.tsx', 'core.tsx']) {
   for (const [, word] of text.matchAll(
     /\b((?:forty|fifty|sixty|seventy|eighty|ninety)(?:-[a-z]+)?)\b/g,
   )) {
+    compared += 1
     if (word !== said && word !== foldersSaid) {
       problems.push(
         `${ART}/${file}: says "${word}" where the catalog has ${families.size} families ` +
@@ -183,4 +185,6 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log(`art: ${families.size} families, every one drawn, and the prose agrees`)
+console.log(
+  `art: ${families.size} families, every one drawn, and ${compared} number words in the prose agree`,
+)

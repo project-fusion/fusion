@@ -44,10 +44,22 @@
 }
 
 /* Hollow, for a chart drawn over something busy: the ground shows through the
-   middle, so the mark reads as a ring rather than as a blot on the content. */
+   middle, so the mark reads as a ring rather than as a blot on the content.
+ *
+ * **Larger than the dot, and that is what makes it a ring at all.** At the same
+ * 5px with a 2px border on every side, the hole left in the middle is one pixel:
+ * the mark rendered as a slightly soft dot, which is what it was reported as.
+ * A ring needs its hole to be the thing you see, so it is drawn at 1.6 times
+ * the mark size, leaving a hole a little wider than the stroke around it.
+ *
+ * Bigger also because a hollow mark reads smaller than a filled one of the same
+ * size, so matching the dot's diameter would make the ring look like the
+ * quieter of the two when it is meant to be the same weight of statement. */
 :host([terminus="ring"]) [part="terminus"] {
   background-color: transparent;
+  block-size: calc(var(--chart-terminus-size, 5px) * 1.6);
   border: var(--helix-border-thick) solid currentColor;
+  inline-size: calc(var(--chart-terminus-size, 5px) * 1.6);
 }
 
 /* Pointing along the axis rather than up or down.

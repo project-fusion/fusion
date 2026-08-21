@@ -6428,7 +6428,7 @@
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "HTMLTableElement | null"
+                  "text": "Element | null"
                 }
               },
               "description": "The table `for` names, or null where there is no document to ask.",
@@ -47245,7 +47245,7 @@
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "HTMLTableElement | null"
+                  "text": "Element | null"
                 }
               },
               "description": "The table `for` names, or null where there is no document to ask.",
@@ -47467,7 +47467,7 @@
                 "slug": "from-a-table"
               },
               {
-                "description": "All eight series colours on the same readings, as a line and as a wash, since a colour at 1.5px is not the same colour as a soft field.",
+                "description": "All twenty-four series colours on identical readings: eight hues in three tones, as a line and as a wash.",
                 "slug": "palette"
               },
               {
@@ -60271,8 +60271,24 @@
               }
             },
             {
+              "description": "The line the track sits on, with whatever flanks it.",
+              "name": "row",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
               "description": "The bar the items sit in.",
               "name": "track",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "description": "The rule after an inline label, separating it from the items.",
+              "name": "divider",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"

@@ -20406,7 +20406,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `row`: The line the track sits on, with whatever flanks it.
    * - `track`: The bar the items sit in.
+   * - `divider`: The rule after an inline label, separating it from the items.
    * - `indicator`: The moving marker behind the selected item.
    */
   "helix-base-toggle-group": Partial<
@@ -30875,7 +30877,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `row`: The line the track sits on, with whatever flanks it.
    * - `track`: The bar the items sit in.
+   * - `divider`: The rule after an inline label, separating it from the items.
    * - `indicator`: The moving marker behind the selected item.
    */
   "helix-base-toggle-group": Partial<

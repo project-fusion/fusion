@@ -92,7 +92,7 @@ export class HelixBaseChartLegend extends HelixElement {
   }
 
   /** The table `for` names, or null where there is no document to ask. */
-  #table(): HTMLTableElement | null {
+  #table(): Element | null {
     if (this.for === '') {
       return null
     }
@@ -101,8 +101,17 @@ export class HelixBaseChartLegend extends HelixElement {
     /* `tagName` rather than `instanceof HTMLTableElement`, which is not a
        guard on the server: the constructor is not defined there, so naming it
        throws before the comparison can answer false. It is also the check that
-       survives a table from another document. */
-    return found?.tagName === 'TABLE' ? (found as HTMLTableElement) : null
+       survives a table from another document.
+     *
+     * A grid is accepted too, so `for` can name this library's own
+     * `helix-table` or anything else built from roles. `readSeries` decides
+     * which shape it is looking at; what is refused here is an element that is
+     * neither, so pointing `for` at a paragraph still draws nothing rather
+     * than something arbitrary. */
+    const role = found?.getAttribute('role')
+    const grid =
+      role === 'table' || role === 'grid' || /^helix-(base-)?table$/i.test(found?.tagName ?? '')
+    return found?.tagName === 'TABLE' || grid ? (found ?? null) : null
   }
 
   /** The names, in the order the chart will draw them. */

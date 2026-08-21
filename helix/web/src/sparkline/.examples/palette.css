@@ -1,13 +1,22 @@
-/* The same readings eight times, so the colour is the only thing that changes.
-   A palette judged on eight different shapes is a palette judged on eight
-   different things. */
+/* The same readings twenty-four times, so the colour is the only thing that
+   changes. A palette judged on twenty-four different shapes is a palette judged
+   on twenty-four different things. */
 .palette {
   align-items: center;
   column-gap: var(--helix-space-lg);
   display: grid;
   grid-template-columns: auto auto auto;
   justify-content: start;
-  row-gap: var(--helix-space-sm);
+  row-gap: var(--helix-space-xs);
+}
+
+.tone {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  grid-column: 1 / -1;
+  letter-spacing: var(--helix-tracking-wide);
+  margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
 }
 
 .index {
@@ -17,8 +26,8 @@
 }
 
 helix-sparkline {
-  --sparkline-block-size: 2em;
-  --sparkline-inline-size: 10em;
+  --sparkline-block-size: 1.8em;
+  --sparkline-inline-size: 9em;
 }
 
 .series-1 {
@@ -51,4 +60,68 @@ helix-sparkline {
 
 .series-8 {
   --sparkline-color: var(--helix-color-series-8);
+}
+
+.series-9 {
+  --sparkline-color: var(--helix-color-series-9);
+}
+
+.series-10 {
+  --sparkline-color: var(--helix-color-series-10);
+}
+
+.series-11 {
+  --sparkline-color: var(--helix-color-series-11);
+}
+
+.series-12 {
+  --sparkline-color: var(--helix-color-series-12);
+}
+
+.series-13 {
+  --sparkline-color: var(--helix-color-series-13);
+}
+
+.series-14 {
+  --sparkline-color: var(--helix-color-series-14);
+}
+
+.series-15 {
+  --sparkline-color: var(--helix-color-series-15);
+}
+
+.series-16 {
+  --sparkline-color: var(--helix-color-series-16);
+}
+
+.series-17 {
+  --sparkline-color: var(--helix-color-series-17);
+}
+
+.series-18 {
+  --sparkline-color: var(--helix-color-series-18);
+}
+
+.series-19 {
+  --sparkline-color: var(--helix-color-series-19);
+}
+
+.series-20 {
+  --sparkline-color: var(--helix-color-series-20);
+}
+
+.series-21 {
+  --sparkline-color: var(--helix-color-series-21);
+}
+
+.series-22 {
+  --sparkline-color: var(--helix-color-series-22);
+}
+
+.series-23 {
+  --sparkline-color: var(--helix-color-series-23);
+}
+
+.series-24 {
+  --sparkline-color: var(--helix-color-series-24);
 }

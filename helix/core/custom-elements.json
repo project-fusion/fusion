@@ -5395,11 +5395,10 @@
             {
               "name": "table",
               "type": {
-                "text": "HTMLTableElement"
+                "text": "Element"
               }
             }
-          ],
-          "description": "Reads a table as series, one per data column.\n\n**The table is the chart's accessible representation, not a fallback for\none.** Every chart here takes its numbers from real markup rather than from a\nproperty, so the page is readable with no script at all, sortable by anything\nthat sorts tables, and correct in a screen reader without a parallel\ndescription that has to be kept in step by hand. A `values` array would be\neasier to pass and would make the accessible version the thing nobody\nmaintains.\n\nThe shape is the ordinary one: a header row naming the series, a first column\nof row headers, and numbers in the rest. A single-column table has one series\nand takes its name from the caption, since a header row of one is usually\nabsent.\n\n`data-value` wins over the cell's text, because `$1.2k` is what a reader\nshould see and is not a number. `Number()` rather than `parseFloat`, because\nthe second reads `12abc` as 12: a value that is nearly a number is a mistake\nworth dropping rather than rounding off, and a dropped point is visible where\na silently truncated one is not."
+          ]
         }
       ],
       "exports": [

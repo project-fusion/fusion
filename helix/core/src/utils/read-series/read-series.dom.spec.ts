@@ -96,3 +96,78 @@ describe('reading a table as series', () => {
     expect(series[1]?.points.map((p) => p.label)).toEqual(['W1'])
   })
 })
+
+describe('reading a grid built from roles', () => {
+  /** A grid the way `helix-table` writes one, columns beside the rows. */
+  const grid = (markup: string): Element => {
+    const host = document.createElement('div')
+    host.innerHTML = markup
+    return host.firstElementChild as Element
+  }
+
+  test('this library own table is read, though its roles are in ElementInternals', () => {
+    /* The reason the selector is a tag and a role rather than either alone.
+       `helix-table` sets `role` through `ElementInternals`, which writes no
+       attribute at all, so `[role="row"]` matches a hand-rolled grid and finds
+       nothing whatsoever in ours. */
+    const series = readSeries(
+      grid(`<helix-table label="Visits">
+        <helix-table-column>Week</helix-table-column>
+        <helix-table-column>Direct</helix-table-column>
+        <helix-table-column>Search</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header>W1</helix-table-cell>
+          <helix-table-cell>120</helix-table-cell>
+          <helix-table-cell>80</helix-table-cell>
+        </helix-table-row>
+        <helix-table-row>
+          <helix-table-cell header>W2</helix-table-cell>
+          <helix-table-cell>140</helix-table-cell>
+          <helix-table-cell>96</helix-table-cell>
+        </helix-table-row>
+      </helix-table>`),
+    )
+    expect(series.map((one) => one.name)).toEqual(['Direct', 'Search'])
+    expect(series[0]?.points.map((p) => p.value)).toEqual([120, 140])
+    expect(series[0]?.points.map((p) => p.label)).toEqual(['W1', 'W2'])
+  })
+
+  test('a grid written with roles by hand is read the same way', () => {
+    const series = readSeries(
+      grid(`<div role="table" label="Plans">
+        <div role="row">
+          <span role="columnheader">Plan</span>
+          <span role="columnheader">Accounts</span>
+        </div>
+        <div role="row">
+          <span role="rowheader">Free</span>
+          <span role="cell">1840</span>
+        </div>
+      </div>`),
+    )
+    expect(series[0]?.name).toBe('Accounts')
+    expect(series[0]?.points[0]).toEqual({ label: 'Free', value: 1840 })
+  })
+
+  test('data-value wins in a grid too, because the text is for the reader', () => {
+    const series = readSeries(
+      grid(`<helix-table label="Revenue">
+        <helix-table-column>Quarter</helix-table-column>
+        <helix-table-column>Total</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header>Q1</helix-table-cell>
+          <helix-table-cell data-value="1200">$1.2k</helix-table-cell>
+        </helix-table-row>
+      </helix-table>`),
+    )
+    expect(series[0]?.points[0]?.value).toBe(1200)
+  })
+
+  test('a document table still takes the table path', () => {
+    // The two shapes stay separate; adding one did not change the other.
+    const series = readSeries(
+      table(`<table><tbody><tr><th scope="row">A</th><td>7</td></tr></tbody></table>`),
+    )
+    expect(series[0]?.points[0]?.value).toBe(7)
+  })
+})

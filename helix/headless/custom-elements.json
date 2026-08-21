@@ -3900,7 +3900,7 @@
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "HTMLTableElement | null"
+                  "text": "Element | null"
                 }
               },
               "description": "The table `for` names, or null where there is no document to ask."
@@ -34814,7 +34814,7 @@
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "HTMLTableElement | null"
+                  "text": "Element | null"
                 }
               },
               "description": "The table `for` names, or null where there is no document to ask."
@@ -45101,8 +45101,16 @@
           "name": "HelixBaseToggleGroup",
           "cssParts": [
             {
+              "description": "The line the track sits on, with whatever flanks it.",
+              "name": "row"
+            },
+            {
               "description": "The bar the items sit in.",
               "name": "track"
+            },
+            {
+              "description": "The rule after an inline label, separating it from the items.",
+              "name": "divider"
             },
             {
               "description": "The moving marker behind the selected item.",
