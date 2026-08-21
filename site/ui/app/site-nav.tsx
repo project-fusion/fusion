@@ -42,13 +42,32 @@ const SECTIONS = [
  * such thing to read at runtime and a generated one would list every preview
  * and every slug. What belongs in a palette is a judgement about what somebody
  * would go looking for.
+ *
+ * Grouped by what a reader came for rather than by where the route sits: the
+ * two substrates are things you take, the services are things you buy, and the
+ * rest is things you read. A flat list of five was scannable and said nothing
+ * about which of them were the same kind of answer.
  */
 const DESTINATIONS = [
-  { href: '/services', label: 'Services' },
-  { href: '/insights', label: 'Insights' },
-  { href: '/helix', label: 'Helix, the design system' },
-  { href: '/thesis', label: 'Thesis' },
-  { href: '/trust', label: 'Trust' },
+  {
+    group: 'Products',
+    items: [
+      { href: '/helix', label: 'Helix, the design system' },
+      { href: '/cortex', label: 'Cortex, memory and provenance' },
+    ],
+  },
+  {
+    group: 'Services',
+    items: [{ href: '/services', label: 'What you can buy today' }],
+  },
+  {
+    group: 'Reading',
+    items: [
+      { href: '/insights', label: 'Insights' },
+      { href: '/thesis', label: 'Thesis' },
+      { href: '/trust', label: 'Trust' },
+    ],
+  },
 ]
 
 /**
@@ -386,10 +405,14 @@ export function SiteNav() {
         open={findOpen}
         placeholder="Search the site"
       >
-        {DESTINATIONS.map((one) => (
-          <helix-option key={one.href} value={one.href}>
-            {one.label}
-          </helix-option>
+        {DESTINATIONS.map((section) => (
+          <helix-option-group key={section.group} label={section.group}>
+            {section.items.map((one) => (
+              <helix-option key={one.href} value={one.href}>
+                {one.label}
+              </helix-option>
+            ))}
+          </helix-option-group>
         ))}
         <helix-text slot="footer" tone="subtle">
           <helix-kbd>↑</helix-kbd>

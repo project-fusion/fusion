@@ -448,6 +448,7 @@ it is measured against.
 | --- | --- | --- | --- | --- | --- |
 | `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `gridlines` | `gridlines` | `boolean` | `false` | `HelixBaseBarChart` | Whether rules are drawn across the plot at the levels a reader would infer. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -460,7 +461,9 @@ it is measured against.
 | Part | Description |
 | --- | --- |
 | `bar` | One column. |
+| `band` | The slot the pointer is resting in. |
 | `baseline` | The rule the columns stand on. |
+| `gridline` | One rule across the plot, under `gridlines`. |
 | `group` | One category's columns, together. |
 | `label` | One category's name. |
 | `labels` | The row of category names. |
@@ -477,6 +480,8 @@ it is measured against.
 
 | Property | Description |
 | --- | --- |
+| `--bar-chart-band-color` | The slot the pointer is resting in. |
+| `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
@@ -865,6 +870,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 | Property | Description |
 | --- | --- |
 | `--carousel-block-size` | Height of a vertical track. |
+| `--carousel-bleed` | Room inside the scroller so a slide's own border or focus ring is not clipped by it. |
 | `--carousel-gap` | Space between slides. |
 
 ## Checkbox
@@ -2605,6 +2611,7 @@ answers for a shape.
 | `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `gridlines` | `gridlines` | `boolean` | `false` | `HelixBaseLineChart` | Whether rules are drawn across the plot at the levels a reader would infer. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -2618,7 +2625,9 @@ answers for a shape.
 | Part | Description |
 | --- | --- |
 | `area` | The wash under one line, where `area` is set. |
+| `band` | The slot the pointer is resting in. |
 | `baseline` | The rule at zero, where zero is inside the range. |
+| `gridline` | One rule across the plot, under `gridlines`. |
 | `guide` | A rule down the reading a pointer is resting on. |
 | `label` | One reading's name. |
 | `labels` | The row of reading names. |
@@ -2636,6 +2645,8 @@ answers for a shape.
 
 | Property | Description |
 | --- | --- |
+| `--line-chart-band-color` | The slot the pointer is resting in. |
+| `--line-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--line-chart-area-opacity` | How much of a line's colour its wash takes. |
 | `--line-chart-block-size` | Height of the drawing. |
 | `--line-chart-gap` | Space between the drawing and its labels. |

@@ -3389,6 +3389,14 @@
           "name": "HelixBarChart",
           "cssProperties": [
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "--bar-chart-band-color"
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "--bar-chart-gridline-color"
+            },
+            {
               "description": "Corner radius at the far end of a column.",
               "name": "--bar-chart-bar-radius"
             },
@@ -3520,6 +3528,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "renderPlot",
               "privacy": "protected",
@@ -3548,6 +3570,12 @@
                   }
                 },
                 {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                },
+                {
                   "name": "floor",
                   "type": {
                     "text": "number"
@@ -3561,6 +3589,70 @@
                 }
               ],
               "description": "The columns themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice.",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGridlines",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The grid, behind everything, or nothing at all.\n\nAcross the measured axis, which turns with `direction`: a rule belongs to\nthe axis the bars are measured on and not the one they are arranged on, so\ncolumns get horizontal rules and rows get vertical ones. Getting that\nbackwards draws a grid that divides the categories, which are already\ndivided by being separate bars.\n\nDrawn before the baseline, so where a gridline and zero coincide the\nbaseline is what shows: zero is a fact about the data and a gridline is a\nruler.",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderBand",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "The slot the pointer is resting in, drawn behind the columns.\n\n**The honest version of the fade.** A group under the pointer already sets\n`data-active` and the stylesheet dims the others, which says which group is\nmeant by making four of five quieter: it reads as the chart losing\nconfidence rather than as one column being pointed at. A band says the same\nthing by lighting the region the pointer is actually in, and the region is\nthe whole slot, because that is the catchment the pointer resolves against.\n\nBoth are kept. The fade separates the active group from its neighbours and\nthe band says where the neighbourhood is, and on a chart of two categories\nthe fade alone is ambiguous about which half is lit.",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -3583,7 +3675,6 @@
                   }
                 }
               ],
-              "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke.",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -3707,6 +3798,10 @@
               {
                 "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
                 "slug": "with-a-tooltip"
+              },
+              {
+                "description": "Rules across the measured axis, which turns with the direction the columns run.",
+                "slug": "with-gridlines"
               }
             ],
             "source": "helix/web/src/bar-chart"
@@ -3751,6 +3846,19 @@
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
               }
+            },
+            {
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "fieldName": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
             }
           ],
           "cssParts": [
@@ -3763,8 +3871,24 @@
               }
             },
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "band",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
               "description": "The rule the columns stand on.",
               "name": "baseline",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "gridline",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -6205,6 +6329,10 @@
             {
               "description": "Height of a vertical track.",
               "name": "--carousel-block-size"
+            },
+            {
+              "description": "Room inside the scroller so a slide's own border or focus ring is not clipped by it.",
+              "name": "--carousel-bleed"
             },
             {
               "description": "Space between slides.",
@@ -27548,6 +27676,14 @@
           "name": "HelixLineChart",
           "cssProperties": [
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "--line-chart-band-color"
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "--line-chart-gridline-color"
+            },
+            {
               "description": "How much of a line's colour its wash takes.",
               "name": "--line-chart-area-opacity"
             },
@@ -27699,6 +27835,20 @@
             },
             {
               "kind": "field",
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "zero",
               "type": {
                 "text": "boolean"
@@ -27777,6 +27927,58 @@
                 }
               ],
               "description": "The lines themselves, behind a seam the styled tier can move.\n\n`aria-hidden`, because the table it was read from is the readable version\nand a screen reader hearing both hears the same numbers twice.",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderGridlines",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "domain",
+                  "type": {
+                    "text": "[number, number]"
+                  }
+                }
+              ],
+              "description": "The grid, behind everything, or nothing at all.\n\nDrawn first so a series is never cut by a rule, and before the baseline so\nthat where the two coincide the baseline wins: zero is a fact about the\ndata and a gridline is a ruler, and the reader should see the fact.",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderBand",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The slot the pointer is resting in, drawn behind the drawing.\n\nA band and not a second rule. The guide says exactly where the reading is\nand the band says which share of the width belongs to it, which is what a\nreader is actually pointing at: the catchment is a slot wide, so a pointer\na few pixels off the line is still asking about that reading, and without\nthe band nothing on screen says so.\n\nThe same slot arithmetic the pointer controller resolves with, so the lit\nregion and the region that answers are the same region by construction\nrather than by two files agreeing.",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -28000,6 +28202,10 @@
               {
                 "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
                 "slug": "with-a-tooltip"
+              },
+              {
+                "description": "Rules at the levels a reader would infer, so a reading can be placed against one.",
+                "slug": "with-gridlines"
               }
             ],
             "source": "helix/web/src/line-chart"
@@ -28059,6 +28265,19 @@
               }
             },
             {
+              "name": "gridlines",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "fieldName": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
               "name": "zero",
               "type": {
                 "text": "boolean"
@@ -28082,8 +28301,24 @@
               }
             },
             {
+              "description": "The slot the pointer is resting in.",
+              "name": "band",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
               "description": "The rule at zero, where zero is inside the range.",
               "name": "baseline",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "One rule across the plot, under `gridlines`.",
+              "name": "gridline",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"

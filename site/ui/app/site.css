@@ -2525,9 +2525,22 @@ helix-drawer helix-tree {
  * because an overlay needs the colour behind it and this panel is not the
  * page's colour. */
 .showcaseStage {
-  background-color: var(--helix-color-surface-sunken);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* **The page's own ground, lifted rather than sunk.**
+   *
+   * `surface-sunken` is a step *away* from the background, which on a dark page
+   * is a shade of near-black and reads as depth. In the light theme the page is
+   * white and there is nothing above it to step into, so the same token came
+   * out as a grey panel with a rule around it: the showcase looked like a
+   * screenshot pasted onto the page rather than part of it.
+   *
+   * `surface` is white in the light theme and the raised step in the dark, so
+   * one token gives the right answer in both, and a shadow does the separating
+   * a border was doing. A shadow is the honest device here anyway: the panel is
+   * a thing sitting on the page, and a rule says "edge" where a shadow says
+   * "above". */
+  background-color: var(--helix-color-surface);
   border-radius: var(--helix-radii-lg);
+  box-shadow: var(--helix-shadow-lg);
   /* Same rule again one level down: the stage is a grid item too, and its
      contents are twice the height of the region it sits in. */
   min-block-size: 0;
@@ -2741,11 +2754,21 @@ helix-drawer helix-tree {
  * mechanism a document rule may use on one. Everything here is a departure the
  * component invited: the four parts it forwards, and the two hooks it names. */
 .siteCommand::part(dialog) {
-  /* The brand at the edge rather than across the panel. A tinted surface would
-     colour every row's ground and put the whole palette in a hue; a hairline
-     the brand can be seen in says the same thing once, at the boundary, where a
-     reader is already looking for where the panel ends. */
-  border: var(--helix-border-thin) solid var(--helix-color-primary-subtle);
+  /* **Glass, which is what a palette is: the page is still there.**
+   *
+   * A palette does not replace the page the way a dialog does. It is summoned
+   * over whatever was being read and dismissed back to it, so a surface that
+   * lets the page through says what the thing is before any of the copy does.
+   * The tokens are the ones the design system already keeps for this, a
+   * translucent fill over a blur, rather than an opacity invented here.
+   *
+   * The border is the material's own, not the brand's. A blue hairline was the
+   * first version and it read as a focus ring on a panel that was not focused:
+   * the eye takes a saturated outline as a state, and a palette that always
+   * looks selected has nothing left to say when a row actually is. */
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent-strong);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
   border-radius: var(--helix-radii-lg);
   /* The largest the scale has. A palette arrives over a page the reader was
      mid-way through rather than replacing it, so it has to sit clearly above
@@ -2771,6 +2794,12 @@ helix-drawer helix-tree {
    the keys do. Ours holds the product's name, quietly, because a palette is the
    one surface a reader opens from anywhere and may not remember whose it is. */
 .siteCommand::part(footer) {
+  /* **`sm`, not the `xs` the component sets, and the keys are why.** `Kbd`
+     draws its label at 0.75em of the text around it, which is right in prose
+     and compounds in a legend already at the smallest step: 12px of footer gave
+     a 9px glyph inside a 18px key, and an arrow at 9px in the mono face is a
+     smudge. One step up puts the label at 10.5px and the keys read. */
+  font-size: var(--helix-text-sm);
   justify-content: space-between;
 }
 

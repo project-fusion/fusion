@@ -989,6 +989,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   direction?: HelixBarChart["direction"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for. A chart in a card and a chart beside a figure are
+read as a shape, and a grid over one is furniture around a drawing nobody
+is measuring. A chart with an axis is read by comparing a column to a
+level, and there is nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts. They run across the
+measured axis, which turns with `direction`: down the box for columns and
+along it for rows, because the axis a rule belongs to is the one the bars
+are measured on and not the one they are arranged on.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixBarChart["gridlines"];
 };
 
 export type HelixBarChartSolidJsProps = {
@@ -1013,6 +1029,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   "prop:direction"?: HelixBarChart["direction"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for. A chart in a card and a chart beside a figure are
+read as a shape, and a grid over one is furniture around a drawing nobody
+is measuring. A chart with an axis is read by comparing a column to a
+level, and there is nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts. They run across the
+measured axis, which turns with `direction`: down the box for columns and
+along it for rows, because the axis a rule belongs to is the one the bars
+are measured on and not the one they are arranged on.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  "prop:gridlines"?: HelixBarChart["gridlines"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -5609,6 +5641,21 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixLineChart["curve"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for, which is the honest default rather than a timid one:
+a chart in a card and a chart beside a figure are read as a shape, and a
+grid over one is furniture around a drawing nobody is measuring. A chart
+with an axis is read by comparing a reading to a level, and there is
+nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts, and two charts over
+different ranges rule at the same levels.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  gridlines?: HelixLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
@@ -5660,6 +5707,21 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   "prop:curve"?: HelixLineChart["curve"];
+  /** Whether rules are drawn across the plot at the levels a reader would infer.
+
+Off unless asked for, which is the honest default rather than a timid one:
+a chart in a card and a chart beside a figure are read as a shape, and a
+grid over one is furniture around a drawing nobody is measuring. A chart
+with an axis is read by comparing a reading to a level, and there is
+nothing to compare against without this.
+
+The levels come from `ticks`, so they are round numbers anchored to the
+number line rather than to where the data starts, and two charts over
+different ranges rule at the same levels.
+
+Furniture rather than data, so the rules are inside the `aria-hidden` plot
+and reach no reader through the table. */
+  "prop:gridlines"?: HelixLineChart["gridlines"];
   /** Whether zero is forced into the range.
 
 Absent measures from the data's own extent, which is what a line is for.
@@ -14002,6 +14064,21 @@ export type CustomElements = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for. A chart in a card and a chart beside a figure are
+   * read as a shape, and a grid over one is furniture around a drawing nobody
+   * is measuring. A chart with an axis is read by comparing a column to a
+   * level, and there is nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts. They run across the
+   * measured axis, which turns with `direction`: down the box for columns and
+   * along it for rows, because the axis a rule belongs to is the one the bars
+   * are measured on and not the one they are arranged on.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -14027,6 +14104,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -14036,7 +14115,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `bar`: One column.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -14688,6 +14769,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--carousel-block-size`: Height of a vertical track. (default: `undefined`)
+   * - `--carousel-bleed`: Room inside the scroller so a slide's own border or focus ring is not clipped by it. (default: `undefined`)
    * - `--carousel-gap`: Space between slides. (default: `undefined`)
    *
    * ## CSS Parts
@@ -17813,6 +17895,20 @@ export type CustomElements = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for, which is the honest default rather than a timid one:
+   * a chart in a card and a chart beside a figure are read as a shape, and a
+   * grid over one is furniture around a drawing nobody is measuring. A chart
+   * with an axis is read by comparing a reading to a level, and there is
+   * nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts, and two charts over
+   * different ranges rule at the same levels.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -17844,6 +17940,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--line-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--line-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -17854,7 +17952,9 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The wash under one line, where `area` is set.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
@@ -24962,6 +25062,21 @@ export type CustomElementsSolidJs = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for. A chart in a card and a chart beside a figure are
+   * read as a shape, and a grid over one is furniture around a drawing nobody
+   * is measuring. A chart with an axis is read by comparing a column to a
+   * level, and there is nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts. They run across the
+   * measured axis, which turns with `direction`: down the box for columns and
+   * along it for rows, because the axis a rule belongs to is the one the bars
+   * are measured on and not the one they are arranged on.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -24987,6 +25102,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -24996,7 +25113,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `bar`: One column.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -25671,6 +25790,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--carousel-block-size`: Height of a vertical track. (default: `undefined`)
+   * - `--carousel-bleed`: Room inside the scroller so a slide's own border or focus ring is not clipped by it. (default: `undefined`)
    * - `--carousel-gap`: Space between slides. (default: `undefined`)
    *
    * ## CSS Parts
@@ -28881,6 +29001,20 @@ export type CustomElementsSolidJs = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
+   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   *
+   * Off unless asked for, which is the honest default rather than a timid one:
+   * a chart in a card and a chart beside a figure are read as a shape, and a
+   * grid over one is furniture around a drawing nobody is measuring. A chart
+   * with an axis is read by comparing a reading to a level, and there is
+   * nothing to compare against without this.
+   *
+   * The levels come from `ticks`, so they are round numbers anchored to the
+   * number line rather than to where the data starts, and two charts over
+   * different ranges rule at the same levels.
+   *
+   * Furniture rather than data, so the rules are inside the `aria-hidden` plot
+   * and reach no reader through the table.
    * - `zero`: Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -28912,6 +29046,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--line-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--line-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -28922,7 +29058,9 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `area`: The wash under one line, where `area` is set.
+   * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule at zero, where zero is inside the range.
+   * - `gridline`: One rule across the plot, under `gridlines`.
    * - `guide`: A rule down the reading a pointer is resting on.
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
@@ -35680,6 +35818,10 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** The slot the pointer is resting in. */
+  "--bar-chart-band-color"?: string;
+  /** One rule across the plot, under `gridlines`. */
+  "--bar-chart-gridline-color"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
   /** Height of the drawing. */
@@ -35730,6 +35872,8 @@ export type CustomCssProperties = {
   "--card-shadow"?: string;
   /** Height of a vertical track. */
   "--carousel-block-size"?: string;
+  /** Room inside the scroller so a slide's own border or focus ring is not clipped by it. */
+  "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
   /** Space between the boxes. */
@@ -35866,6 +36010,10 @@ export type CustomCssProperties = {
   "--legend-gap"?: string;
   /** Size of the colour patch. */
   "--legend-swatch-size"?: string;
+  /** The slot the pointer is resting in. */
+  "--line-chart-band-color"?: string;
+  /** One rule across the plot, under `gridlines`. */
+  "--line-chart-gridline-color"?: string;
   /** How much of a line's colour its wash takes. */
   "--line-chart-area-opacity"?: string;
   /** Height of the drawing. */

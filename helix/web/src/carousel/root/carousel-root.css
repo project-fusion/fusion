@@ -231,10 +231,24 @@
    own momentum all work without any of them being reimplemented. The scrollbar
    is hidden because the controls are the affordance, and the track still
    scrolls by every other means. */
+/* **A hair of padding, so a slide's own edge is not shaved by the scroller.**
+ *
+ * `overflow-x: auto` makes the other axis `auto` too, and a scroll container
+ * clips at its padding box on both. A slide flush against that edge loses
+ * whatever it draws at its own boundary: a card's border on the leading slide
+ * and a focus ring on any of them came out a pixel short down one side, which
+ * reads as a rendering fault rather than as a clip.
+ *
+ * Padding rather than a margin on the slides, because `flex-basis` is a
+ * percentage of the *content* box: the track gives the step away and the slides
+ * divide what is left, so the per-view arithmetic is untouched. The smallest
+ * step on the scale rather than the pixel or two this needs, because a raw
+ * length here is the one thing `check:tokens` is for. */
 [part="track"] {
   display: flex;
   gap: var(--_carousel-gap);
   overflow-x: auto;
+  padding: var(--carousel-bleed, var(--helix-space-2xs));
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }

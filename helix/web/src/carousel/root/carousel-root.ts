@@ -24,6 +24,7 @@ import { styles } from './carousel-root.css.js'
  *
  *
  * @cssproperty --carousel-block-size - Height of a vertical track.
+ * @cssproperty --carousel-bleed - Room inside the scroller so a slide's own border or focus ring is not clipped by it.
  * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
