@@ -7,7 +7,7 @@ import {
 } from '@helix-io/core'
 import { list } from '@helix-io/icons'
 import { html, nothing, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { HelixBaseVideoPlaylist } from '../root/video-playlist-root.js'
 import '../../menu/index.js'
@@ -85,13 +85,6 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
   @property()
   placement = 'top-end'
 
-  /* Bumped to re-read the entries. They are the playlist's light DOM rather
-     than this element's, so nothing about them schedules an update here: an
-     entry added, removed, or made current changes a tree this element only
-     looks at. */
-  @state()
-  private revision = 0
-
   #observer: MutationObserver | undefined
 
   override connectedCallback(): void {
@@ -168,8 +161,16 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
     this.reread()
   }
 
+  /* `requestUpdate` rather than a counter held in `@state`.
+   *
+   * The entries are the playlist's light DOM rather than this element's, so
+   * nothing about them schedules an update here: an entry added, removed, or
+   * made current changes a tree this element only looks at. A bumped field is
+   * the usual way to say "render again", and here it is a field nothing reads,
+   * which the linter is right to call out. Asking directly says the same thing
+   * with nothing to explain. */
   private readonly reread = (): void => {
-    this.revision += 1
+    this.requestUpdate()
   }
 
   private readonly choose = (value: string): void => {

@@ -66729,19 +66729,6 @@
             },
             {
               "kind": "field",
-              "name": "revision",
-              "type": {
-                "text": "number"
-              },
-              "privacy": "private",
-              "default": "0",
-              "inheritedFrom": {
-                "name": "HelixBaseVideoPlaylistMenu",
-                "module": "src/video-playlist/menu/video-playlist-menu.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "#observer",
               "privacy": "private",
               "type": {

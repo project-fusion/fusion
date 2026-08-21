@@ -205,15 +205,12 @@ export class HelixBaseSparkline extends HelixElement {
      * The floor is the smallest reading and not a true zero, because the scale
      * runs over the data's own extent. That is the part a consumer would get
      * wrong writing this themselves, and it is why the shape is built here. */
-    /* Asked positively, and it has to be. Written as `!== 'bar' && !== 'line'`
-       this read *undefined* as an area, and undefined is the resting state: the
-       property is optional, so a plain `<helix-sparkline values="...">` names no
-       plot and got a filled region under its line. Every default sparkline in
-       the library, and the spec beside this one had said so since it was
-       written. A negative test over an optional property answers for the value
-       nobody set. */
+    /* Asked negatively, because absent *is* an area here and the class doc
+       above says why. This is the one property in the family where the resting
+       arrangement is not the plainest thing, so the test has to answer true for
+       the value nobody set, and `=== 'area'` would answer false. */
     const area =
-      this.plot === 'area' && path !== ''
+      this.plot !== 'bar' && this.plot !== 'line' && path !== ''
         ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
         : ''
 

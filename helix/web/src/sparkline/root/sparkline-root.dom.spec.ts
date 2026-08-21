@@ -66,13 +66,22 @@ describe('sparkline', () => {
     expect(part(bare, 'svg')?.hasAttribute('role')).toBe(false)
   })
 
-  test('a line plot draws a line, an area adds the region, a bar draws neither', async () => {
+  test('absent is an area, `line` is the bare stroke, and a bar is neither', async () => {
     /* What is drawn varies by plot, which is why this is a headless property
-       and why the region is no longer drawn under everything and hidden. */
-    const line = await spark('values="1 5 9"')
-    expect(part(line, 'line')).not.toBeNull()
-    expect(part(line, 'area')).toBeNull()
-    expect(part(line, 'bar')).toBeNull()
+       and why the region is no longer drawn under everything and hidden.
+     *
+     * Absent draws the region, which is the departure the class doc argues for:
+     * at the size a sparkline is drawn, a hairline in a wide box is mostly box.
+     * This test asserted the opposite until the default moved, and read as a
+     * failing suite rather than as a stale assertion. */
+    const bare = await spark('plot="line" values="1 5 9"')
+    expect(part(bare, 'line')).not.toBeNull()
+    expect(part(bare, 'area')).toBeNull()
+    expect(part(bare, 'bar')).toBeNull()
+
+    const absent = await spark('values="1 5 9"')
+    expect(part(absent, 'line')).not.toBeNull()
+    expect(part(absent, 'area')).not.toBeNull()
 
     const area = await spark('plot="area" values="1 5 9"')
     expect(part(area, 'line')).not.toBeNull()
