@@ -2397,3 +2397,34 @@ helix-drawer helix-tree {
     columns: 1;
   }
 }
+
+/* The one filled card in the mosaic.
+ *
+ * Through `--card-background-color` and `--card-border-color`, which Card
+ * publishes for exactly this: no `::part()`, no new appearance, and nothing
+ * reaching past the component's own surface. The `color` cascades into the
+ * text, which is `color: inherit` unless it names a tone, so nothing inside
+ * needs to know it is on a filled ground. */
+.showcaseAnchor {
+  /* **Not `--helix-color-primary`, which does not carry text.** Measured with
+     `foreground-on-accent` over it in dark mode: 2.8 to 1, under the 4.5 body
+     text wants and under the 3 even large text wants. The hero's solid primary
+     button measures the same, so this is the token layer's own gap rather than
+     anything about this card, and it is filed as such: there is no "a primary
+     surface you can put on-accent text on".
+    
+     `-active` is a state name doing a surface's job, which is the honest
+     caveat, and it is the only primary in the set that carries text: 6.69 to 1,
+     and mode independent where `primary` is `light-dark()` and a mix toward the
+     background would invert in light mode and fail there instead. */
+  --card-background-color: var(--helix-color-primary-active);
+  --card-border-color: var(--helix-color-primary-active);
+
+  color: var(--helix-color-foreground-on-accent);
+}
+
+.anchorTitle {
+  font-size: var(--helix-text-xl);
+  font-weight: var(--helix-weight-semibold);
+  line-height: var(--helix-leading-tight);
+}

@@ -307,6 +307,37 @@ export default function Home() {
               The cards are `helix-card`. A showcase built from anything else
               would be making its claim in someone else's components. */}
           <div className="showcase">
+            {/* **The anchor, and it is filled through the door Card published.**
+    
+                A mosaic of six outlined cards has no first card: the eye starts
+                wherever it likes and the arrangement reads as an inventory. One
+                filled surface gives it a beginning, and the one worth filling
+                is the claim the fill itself demonstrates, since the colour on
+                it is derived from the same value everything else here is.
+    
+                `--card-background-color` and `--card-border-color` are hooks
+                the component publishes, so this needs no new API and no
+                `::part()`: Card has always been able to be any colour, and
+                nothing here reaches past its surface. `helix-text` is
+                `color: inherit`, so the words take the card's own colour as
+                long as none of them names a tone. */}
+            <helix-card class="showcaseCard showcaseAnchor">
+              <helix-flex direction="column" gap="md">
+                <helix-text appearance="label">Helix</helix-text>
+                <helix-text as="h3" class="anchorTitle">
+                  One brand colour in. A whole palette out.
+                </helix-text>
+                <helix-text>
+                  Every surface, border and text colour on this page is derived from a single value,
+                  and each one is checked against the ground it lands on. That is why nothing here
+                  had to be chosen twice, and why the dark mode is not a second set of decisions.
+                </helix-text>
+                <helix-flex>
+                  <helix-button appearance="solid">Read the derivation</helix-button>
+                </helix-flex>
+              </helix-flex>
+            </helix-card>
+
             <helix-card appearance="outlined" class="showcaseCard">
               <helix-flex direction="column" gap="md">
                 <helix-flex align="center" gap="sm" justify="between" wrap>
