@@ -16,6 +16,7 @@
   "dependencies": {
     "@helix-io/sandbox": "workspace:*",
     "@helix-io/styles": "workspace:*",
+    "@helix-io/theme": "workspace:*",
     "@helix-io/web": "workspace:*",
     "next": "^16.3.1",
     "react": "^19.0.0",

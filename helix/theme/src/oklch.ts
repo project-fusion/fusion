@@ -65,6 +65,65 @@ export const oklchToHex = (color: Oklch): string => {
   return `#${toByte(r)}${toByte(g)}${toByte(b)}`
 }
 
+const srgbToLinear = (channel: number): number => {
+  const c = clamp01(channel)
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+}
+
+/**
+ * A `#rgb` or `#rrggbb` string to OKLCH, the inverse of `oklchToHex`.
+ *
+ * **Without this the package can write a colour and not read one.** Everything
+ * here derives a palette from an OKLCH brand, and the only thing that ever
+ * hands it one is code that already thinks in OKLCH: a person picking a colour,
+ * or any control that returns one, produces hex. `deriveTheme` could not be
+ * given the output of a colour picker, which is the one input it was built to
+ * take.
+ *
+ * **Hex is the fixed point, not OKLCH.** `hexToOklch(oklchToHex(c))` returns
+ * `c` only when `c` can be rendered: `oklchToHex` clips, so a colour outside
+ * the sRGB gamut comes back as the colour that can be shown instead. Measured
+ * on an out of gamut blue, chroma 0.19 at lightness 0.7, which returns at 0.166
+ * and 0.689. That is the clipping doing its job and is what `isOutOfGamut`
+ * exists to warn about.
+ *
+ * What does hold exactly is the other direction: `oklchToHex(hexToOklch(h))`
+ * is `h` for every hex tested, in gamut or not, which is the property a colour
+ * a reader picked actually needs.
+ */
+export const hexToOklch = (hex: string): Oklch => {
+  const raw = hex.trim().replace('#', '')
+  const full =
+    raw.length === 3
+      ? raw
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : raw
+  const byte = (at: number): number => Number.parseInt(full.slice(at, at + 2), 16) / 255
+
+  const r = srgbToLinear(byte(0))
+  const g = srgbToLinear(byte(2))
+  const b = srgbToLinear(byte(4))
+
+  /* The cube roots of the LMS response, which is where Oklab starts. Coefficients
+     are Ottosson's, and are the inverse of the matrix `oklchToLinearRgb` uses. */
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+
+  const lightness = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s
+  const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+
+  const hue = (Math.atan2(bb, a) * 180) / Math.PI
+  return {
+    chroma: Math.hypot(a, bb),
+    hue: hue < 0 ? hue + 360 : hue,
+    lightness,
+  }
+}
+
 /**
  * WCAG 2.1 relative luminance. Computed from linear-light values, which we
  * already have, so no round trip through gamma-encoded sRGB is needed.

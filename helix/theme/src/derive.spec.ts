@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import { deriveTheme, toCss } from './derive.js'
-import { contrastRatio, isOutOfGamut, lightnessForContrast, type Oklch } from './oklch.js'
+import {
+  contrastRatio,
+  hexToOklch,
+  isOutOfGamut,
+  lightnessForContrast,
+  type Oklch,
+  oklchToHex,
+} from './oklch.js'
 
 const BRAND: Oklch = { chroma: 0.19, hue: 258, lightness: 0.58 }
 
@@ -179,5 +186,29 @@ describe('gamut detection', () => {
 
   test('accepts an ordinary color', () => {
     expect(isOutOfGamut({ chroma: 0.05, hue: 258, lightness: 0.6 })).toBe(false)
+  })
+})
+
+describe('hexToOklch', () => {
+  test('a hex a reader picked survives the trip out and back', () => {
+    /* The property that matters for a colour picker, and the one that holds
+       exactly: hex in, hex out. OKLCH is not the fixed point because
+       `oklchToHex` clips, so an out of gamut colour returns as the one that can
+       be rendered rather than the one that was asked for. */
+    for (const hex of ['#4b9cff', '#442323', '#48823b', '#000000', '#ffffff']) {
+      expect(oklchToHex(hexToOklch(hex))).toBe(hex)
+    }
+  })
+
+  test('and the short form is the long one', () => {
+    expect(hexToOklch('#fff')).toEqual(hexToOklch('#ffffff'))
+  })
+
+  test('clipping is visible rather than silent', () => {
+    /* Chroma 0.19 at lightness 0.7 is outside sRGB. It returns lower on both,
+       which is the clip and not an error in the inverse. */
+    const wanted = { chroma: 0.19, hue: 258, lightness: 0.7 }
+    expect(isOutOfGamut(wanted)).toBe(true)
+    expect(hexToOklch(oklchToHex(wanted)).chroma).toBeLessThan(wanted.chroma)
   })
 })

@@ -2432,10 +2432,10 @@ helix-drawer helix-tree {
      caveat, and it is the only primary in the set that carries text: 6.69 to 1,
      and mode independent where `primary` is `light-dark()` and a mix toward the
      background would invert in light mode and fail there instead. */
-  --card-background-color: var(--helix-color-primary-active);
-  --card-border-color: var(--helix-color-primary-active);
+  --card-background-color: var(--showcase-anchor-fill, var(--helix-color-primary-active));
+  --card-border-color: var(--showcase-anchor-fill, var(--helix-color-primary-active));
 
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--showcase-anchor-ink, var(--helix-color-foreground-on-accent));
 }
 
 .anchorTitle {
@@ -2568,17 +2568,39 @@ helix-drawer helix-tree {
   display: block;
 }
 
-/* The switch sits above the grid and never moves with it. A control that jumps
-   to a new position when you use it is one you have to find again each time. */
+/* The switch and the colour share a line above the grid, and neither moves with
+   it. A control that jumps to a new position when you use it is one you have to
+   find again each time. */
 .showcaseSwitch {
-  margin-block: var(--helix-space-md);
+  grid-area: switch;
+}
+
+.showcaseBrand {
+  grid-area: brand;
+  justify-self: end;
 }
 
 /* The stage stacks: the anchor, the switch, then whatever the switch is
    showing, and the grid takes the rest so the fade lands on real content. */
 .showcaseStage {
+  align-items: center;
+  column-gap: var(--helix-space-md);
   display: grid;
+  grid-template-areas:
+    "anchor anchor"
+    "switch brand"
+    "views views";
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto minmax(0, 1fr);
+  row-gap: var(--helix-space-md);
+}
+
+.showcaseAnchor {
+  grid-area: anchor;
+}
+
+.showcase {
+  grid-area: views;
 }
 
 /* A cell that wants the pair of columns: a table with a sparkline in every row

@@ -1,5 +1,12 @@
 'use client'
 
+import {
+  deriveTheme,
+  hexToOklch,
+  lightnessForContrast,
+  oklchToHex,
+  type ThemeIntent,
+} from '@helix-io/theme'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -64,6 +71,78 @@ const SERIES: Record<string, string> = {
 /** How long a view holds before the next one, when nobody is looking at it. */
 const DWELL = 7000
 
+/** What the page is derived from before anybody touches it. */
+const BRAND = '#3b82f6'
+
+/**
+ * Re-derives from one colour and puts the result on the panel.
+ *
+ * **The real engine, not a swapped variable**, and it is worth being exact
+ * about how far that goes. `deriveTheme` is what the whole system is named for
+ * and it runs here, in the browser, on whatever a reader picked. It emits
+ * *seven* tokens: background, surface, border, foreground, foreground-muted,
+ * primary and primary-foreground. The semantic layer is 135, authored in CSS
+ * against the primitives, so the other 128 are not derived by this function and
+ * do not move when it runs.
+ *
+ * Two consequences handled here rather than papered over.
+ *
+ * **The engine and the token layer disagree on one name.** It emits
+ * `color-primary-foreground`; the stylesheet reads
+ * `--helix-color-foreground-on-accent`. Bridged below, or every component that
+ * puts text on the brand keeps the old value.
+ *
+ * **And nothing emits the primary's own steps.** `hover`, `active` and
+ * `subtle` are authored, so left alone the panel would take a new brand and
+ * keep the old blue everywhere one of those is read, which is the anchor card
+ * among others: a demonstration disproving itself in the one place it is being
+ * made. They are stepped in lightness off the derived primary, with the
+ * package's own conversions rather than arithmetic invented here.
+ *
+ * Scoped to the panel rather than the document, because the rest of the page is
+ * not the demonstration.
+ */
+const restyle = (node: HTMLElement, hex: string, scheme: ThemeIntent['scheme']): void => {
+  const theme = deriveTheme({ brand: hexToOklch(hex), scheme })
+
+  for (const token of theme.tokens) {
+    node.style.setProperty(`--helix-${token.name}`, token.hex)
+    if (token.name === 'color-primary-foreground') {
+      node.style.setProperty('--helix-color-foreground-on-accent', token.hex)
+    }
+  }
+
+  const primary = theme.tokens.find((one) => one.name === 'color-primary')
+  if (!primary) {
+    return
+  }
+
+  const base = hexToOklch(primary.hex)
+  const step = (lightness: number): string =>
+    oklchToHex({ chroma: base.chroma, hue: base.hue, lightness })
+
+  node.style.setProperty('--helix-color-primary-hover', step(base.lightness - 0.06))
+  node.style.setProperty('--helix-color-primary-active', step(base.lightness - 0.12))
+  node.style.setProperty('--helix-color-primary-subtle', step(scheme === 'light' ? 0.95 : 0.24))
+
+  /* **The anchor gets a pair solved for its own fill, not a borrowed one.**
+     The engine guarantees `primary-foreground` against `primary` and measured
+     4.52 doing it, but the anchor is filled with the stepped `active`, and
+     darkening a ground without re-solving the text on it throws the guarantee
+     away: measured 2.73 the first time, on a card whose whole subject is that
+     the colours are checked. `lightnessForContrast` is the solver the engine
+     itself uses, so the fill and the ink here are checked the same way
+     everything else is rather than by arithmetic invented on the page. */
+  const fill = hexToOklch(step(base.lightness - 0.12))
+  /* 4.7 asked for, 4.5 wanted. The solve is in OKLCH and the paint is eight
+     bits a channel, so a target met exactly comes back a hundredth under:
+     measured at 4.48 and 4.49 on two brands of four. The headroom is what
+     `derive.ts` means about passing in theory and failing in practice. */
+  const ink = lightnessForContrast({ chroma: 0.01, hue: base.hue }, fill, 4.7)
+  node.style.setProperty('--showcase-anchor-fill', oklchToHex(fill))
+  node.style.setProperty('--showcase-anchor-ink', oklchToHex(ink))
+}
+
 export function Showcase(): React.ReactElement {
   const [view, setView] = useState<View>('controls')
 
@@ -82,7 +161,22 @@ export function Showcase(): React.ReactElement {
    * preference changes rather than only at mount.
    */
   const [held, setHeld] = useState(false)
+  const [brand, setBrand] = useState(BRAND)
   const stage = useRef<HTMLDivElement>(null)
+
+  /* Derived on the client only. The server has no reader and no preference, so
+     it renders the page's own tokens and this arrives afterwards. */
+  useEffect(() => {
+    const node = stage.current
+    if (!node) {
+      return
+    }
+    const dark = window.matchMedia('(prefers-color-scheme: dark)')
+    const paint = (): void => restyle(node, brand, dark.matches ? 'dark' : 'light')
+    paint()
+    dark.addEventListener('change', paint)
+    return () => dark.removeEventListener('change', paint)
+  }, [brand])
 
   /* **Listened for on the node rather than bound in the markup.** A panel that
      pauses when a pointer arrives is not an interactive element: it has no
@@ -181,6 +275,19 @@ export function Showcase(): React.ReactElement {
           </helix-toggle>
         ))}
       </helix-toggle-group>
+
+      {/* On the switch's own line, because it belongs to the panel rather than
+          to any one view: changing the colour with Data showing and finding the
+          control gone would be the same fault the switch avoids. */}
+      <helix-color-input
+        class="showcaseBrand"
+        default-value={BRAND}
+        label="Brand"
+        name="brand"
+        onhelix-change={(event: CustomEvent<{ value: string }>) => {
+          setBrand(event.detail.value)
+        }}
+      ></helix-color-input>
 
       <div className="showcase">
         <div className="showcaseView" hidden={view !== 'controls'}>

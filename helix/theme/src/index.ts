@@ -7,6 +7,7 @@ export {
 } from './derive.js'
 export {
   contrastRatio,
+  hexToOklch,
   isOutOfGamut,
   lightnessForContrast,
   type Oklch,

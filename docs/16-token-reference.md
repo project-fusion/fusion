@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-151 semantic tokens in 15 categories, every one in exactly
+161 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
+Currently unread anywhere: `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
 
 ## color
 
@@ -45,6 +45,8 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 6 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
+| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 2 |
+| `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 2 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 122 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 3 |
 | `--helix-color-syntax-comment` | `light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )` | 2 |
@@ -82,6 +84,14 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-success` | `light-dark(var(--_helix-success-600), var(--_helix-success-400))` | 29 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-600), var(--_helix-warning-400))` | 22 |
 | `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 133 |
+| `--helix-color-danger-surface` | `var(--_helix-danger-600)` | 2 |
+| `--helix-color-danger-surface-hover` | `var(--_helix-danger-700)` | 2 |
+| `--helix-color-info-surface` | `var(--_helix-info-600)` | 0 |
+| `--helix-color-info-surface-hover` | `var(--_helix-info-700)` | 0 |
+| `--helix-color-success-surface` | `var(--_helix-success-600)` | 0 |
+| `--helix-color-success-surface-hover` | `var(--_helix-success-700)` | 0 |
+| `--helix-color-warning-surface` | `var(--_helix-warning-600)` | 0 |
+| `--helix-color-warning-surface-hover` | `var(--_helix-warning-700)` | 0 |
 
 ## space
 
@@ -93,7 +103,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 275 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 233 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 231 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 125 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 126 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 78 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 65 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
