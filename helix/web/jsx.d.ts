@@ -4,6 +4,7 @@ import type {
   HelixAccordionItem,
   HelixAnnouncement,
   HelixAppHeader,
+  HelixAura,
   HelixAvatar,
   HelixAvatarGroup,
   HelixBadge,
@@ -120,6 +121,8 @@ import type {
   HelixToggleGroup,
   HelixToolbar,
   HelixTooltip,
+  HelixTour,
+  HelixTourStop,
   HelixTree,
   HelixTreeItem,
   HelixVideo,
@@ -334,8 +337,6 @@ export type HelixAccordionItemHelixCloseElementEvent =
   HelixAccordionItemElementEvent<HelixCloseEvent>;
 
 export type HelixAccordionItemProps = {
-  /** Tightens the trigger for dense layouts. */
-  dense?: HelixAccordionItem["dense"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -389,8 +390,6 @@ have two. */
 };
 
 export type HelixAccordionItemSolidJsProps = {
-  /** Tightens the trigger for dense layouts. */
-  "prop:dense"?: HelixAccordionItem["dense"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -713,6 +712,89 @@ the wordmark and the actions happen to measure.
 
 `start` is the opt-out, for a header whose navigation trails the brand. */
   "prop:navAlign"?: HelixAppHeader["navAlign"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixAuraProps = {
+  /** Which form the light takes. Absent is `braid`.
+
+Reflected because the fallback gradient selects on it, and given no default
+for the same reason every axis here has none: a default on a reflected
+property writes the attribute onto every host anybody renders. */
+  shape?: HelixAura["shape"];
+  /** How far the settings wander on their own, `0` still and `1` restless.
+
+**One property rather than a range on each of the five.** A range per axis
+is five more things to author and four more chances to write a pair that
+fights another; the reason to want any of it is the same reason in every
+case, which is that a fixed field is legibly a loop. So this is an amount,
+and each axis is given its own span and its own period.
+
+The periods are irrational multiples of each other, so no two axes come
+back into phase and the field has no cycle a reader can count. That is the
+difference between a background that breathes and one that is obviously on
+a timer. */
+  drift?: HelixAura["drift"];
+  /** Whether the pointer shifts and lifts the field.
+
+Reflected because the stylesheet selects on it: a background is not
+hit-testable at rest, or it would swallow clicks meant for what is over it,
+and an element that is not hit-testable never receives the `pointermove`
+this listens for. Asking for the pointer is asking for the hit test. */
+  interactive?: HelixAura["interactive"];
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  bloom?: HelixAura["bloom"];
+  /** Overall brightness, as a multiplier on the field. */
+  gain?: HelixAura["gain"];
+  /** Feature size, as a multiplier on the sampled coordinates. */
+  scale?: HelixAura["scale"];
+  /** How fast it drifts, as a multiplier on time. */
+  speed?: HelixAura["speed"];
+  /** The field's rotation, in degrees. */
+  tilt?: HelixAura["tilt"];
+};
+
+export type HelixAuraSolidJsProps = {
+  /** Which form the light takes. Absent is `braid`.
+
+Reflected because the fallback gradient selects on it, and given no default
+for the same reason every axis here has none: a default on a reflected
+property writes the attribute onto every host anybody renders. */
+  "prop:shape"?: HelixAura["shape"];
+  /** How far the settings wander on their own, `0` still and `1` restless.
+
+**One property rather than a range on each of the five.** A range per axis
+is five more things to author and four more chances to write a pair that
+fights another; the reason to want any of it is the same reason in every
+case, which is that a fixed field is legibly a loop. So this is an amount,
+and each axis is given its own span and its own period.
+
+The periods are irrational multiples of each other, so no two axes come
+back into phase and the field has no cycle a reader can count. That is the
+difference between a background that breathes and one that is obviously on
+a timer. */
+  "prop:drift"?: HelixAura["drift"];
+  /** Whether the pointer shifts and lifts the field.
+
+Reflected because the stylesheet selects on it: a background is not
+hit-testable at rest, or it would swallow clicks meant for what is over it,
+and an element that is not hit-testable never receives the `pointermove`
+this listens for. Asking for the pointer is asking for the hit test. */
+  "prop:interactive"?: HelixAura["interactive"];
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  "prop:bloom"?: HelixAura["bloom"];
+  /** Overall brightness, as a multiplier on the field. */
+  "prop:gain"?: HelixAura["gain"];
+  /** Feature size, as a multiplier on the sampled coordinates. */
+  "prop:scale"?: HelixAura["scale"];
+  /** How fast it drifts, as a multiplier on time. */
+  "prop:speed"?: HelixAura["speed"];
+  /** The field's rotation, in degrees. */
+  "prop:tilt"?: HelixAura["tilt"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1236,8 +1318,6 @@ export type HelixCardProps = {
   is the surface. For a card inside something already bounded, where a
   second box adds a line and no meaning. */
   appearance?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  dense?: HelixCard["dense"];
   /** Whether media sits above the content stack or beside it. */
   orientation?: HelixCard["orientation"];
 };
@@ -1255,8 +1335,6 @@ export type HelixCardSolidJsProps = {
   is the surface. For a card inside something already bounded, where a
   second box adds a line and no meaning. */
   "prop:appearance"?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  "prop:dense"?: HelixCard["dense"];
   /** Whether media sits above the content stack or beside it. */
   "prop:orientation"?: HelixCard["orientation"];
 
@@ -6179,6 +6257,15 @@ what a reader wants from a whole key. */
   "read-only"?: HelixNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixNumberInput["readOnly"];
+  /** Whether a grip is shown that changes the value when it is dragged.
+
+The label is what is dragged, so this adds no chrome at all. Still opt-in,
+because it changes what a press on the label does and a reader who drags
+across a word expecting to select it should get that everywhere it has not
+been asked for. Where it earns its place is a value a reader tunes rather
+than states: a duration, a weight, a count they are looking for rather than
+one they already know. */
+  scrub?: HelixNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
   "decrement-label"?: HelixNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
@@ -6272,6 +6359,15 @@ what a reader wants from a whole key. */
   "bool:read-only"?: HelixNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   "prop:readOnly"?: HelixNumberInput["readOnly"];
+  /** Whether a grip is shown that changes the value when it is dragged.
+
+The label is what is dragged, so this adds no chrome at all. Still opt-in,
+because it changes what a press on the label does and a reader who drags
+across a word expecting to select it should get that everywhere it has not
+been asked for. Where it earns its place is a value a reader tunes rather
+than states: a duration, a weight, a count they are looking for rather than
+one they already know. */
+  "prop:scrub"?: HelixNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
   "attr:decrement-label"?: HelixNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
@@ -11247,6 +11343,169 @@ keyboard reader arriving on a control has already committed to it. */
   textContent?: string | number;
 };
 
+/** `HelixTour` component event */
+export type HelixTourElementEvent<E = Event> = TypedEvent<HelixTour, E>;
+/** `helix-change` event type */
+export type HelixTourHelixChangeElementEvent =
+  HelixTourElementEvent<HelixChangeEvent>;
+/** `helix-complete` event type */
+export type HelixTourHelixCompleteElementEvent =
+  HelixTourElementEvent<HelixCompleteEvent>;
+/** `helix-close` event type */
+export type HelixTourHelixCloseElementEvent =
+  HelixTourElementEvent<HelixCloseEvent>;
+
+export type HelixTourProps = {
+  /** Whether the tour is running. */
+  open?: HelixTour["open"];
+  /** Which stop the reader is on. */
+  index?: HelixTour["index"];
+  /** Accessible name for the run, such as "Getting started". */
+  label?: HelixTour["label"];
+  /** Space left around the target when it is lit, in pixels. */
+  "spotlight-padding"?: HelixTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  spotlightPadding?: HelixTour["spotlightPadding"];
+  /** Label for the control that goes back, handed to every stop. */
+  "back-label"?: HelixTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  backLabel?: HelixTour["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTour["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixTour["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixTour["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixTour["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixTour["skipLabel"];
+
+  /** Fired when the current stop moves, carrying the new index. */
+  "onhelix-change"?: (e: HelixTourHelixChangeElementEvent) => void;
+  /** Fired when the last stop is finished. */
+  "onhelix-complete"?: (e: HelixTourHelixCompleteElementEvent) => void;
+  /** Fired when the reader leaves early. */
+  "onhelix-close"?: (e: HelixTourHelixCloseElementEvent) => void;
+};
+
+export type HelixTourSolidJsProps = {
+  /** Whether the tour is running. */
+  "prop:open"?: HelixTour["open"];
+  /** Which stop the reader is on. */
+  "prop:index"?: HelixTour["index"];
+  /** Accessible name for the run, such as "Getting started". */
+  "prop:label"?: HelixTour["label"];
+  /** Space left around the target when it is lit, in pixels. */
+  "attr:spotlight-padding"?: HelixTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  "prop:spotlightPadding"?: HelixTour["spotlightPadding"];
+  /** Label for the control that goes back, handed to every stop. */
+  "attr:back-label"?: HelixTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  "prop:backLabel"?: HelixTour["backLabel"];
+  /** Label for the control that goes on. */
+  "attr:next-label"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on. */
+  "prop:nextLabel"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "attr:done-label"?: HelixTour["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "prop:doneLabel"?: HelixTour["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "attr:skip-label"?: HelixTour["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  "prop:skipLabel"?: HelixTour["skipLabel"];
+  /** Fired when the current stop moves, carrying the new index. */
+  "on:helix-change"?: (e: HelixTourHelixChangeElementEvent) => void;
+  /** Fired when the last stop is finished. */
+  "on:helix-complete"?: (e: HelixTourHelixCompleteElementEvent) => void;
+  /** Fired when the reader leaves early. */
+  "on:helix-close"?: (e: HelixTourHelixCloseElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixTourStopProps = {
+  /** The id of the element this stop is about. */
+  for?: HelixTourStop["for"];
+  /** Which side of the target the panel prefers. */
+  placement?: HelixTourStop["placement"];
+  /** Whether this is the stop the reader is on.
+
+Written by the root rather than by a consumer, which is the one place this
+family writes onto markup it does not own. It is acceptable here for a
+reason that did not hold for the trail or the avatar group: a tour starts
+closed, so there is no server state to get wrong. The server renders a
+closed tour, a closed tour shows nothing, and nothing can disagree. */
+  current?: HelixTourStop["current"];
+  /** Whether this is the last stop, so the control says Done. */
+  last?: HelixTourStop["last"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  first?: HelixTourStop["first"];
+  /** Label for the control that goes back. */
+  "back-label"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  backLabel?: HelixTourStop["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixTourStop["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixTourStop["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixTourStop["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixTourStop["skipLabel"];
+};
+
+export type HelixTourStopSolidJsProps = {
+  /** The id of the element this stop is about. */
+  "prop:for"?: HelixTourStop["for"];
+  /** Which side of the target the panel prefers. */
+  "prop:placement"?: HelixTourStop["placement"];
+  /** Whether this is the stop the reader is on.
+
+Written by the root rather than by a consumer, which is the one place this
+family writes onto markup it does not own. It is acceptable here for a
+reason that did not hold for the trail or the avatar group: a tour starts
+closed, so there is no server state to get wrong. The server renders a
+closed tour, a closed tour shows nothing, and nothing can disagree. */
+  "prop:current"?: HelixTourStop["current"];
+  /** Whether this is the last stop, so the control says Done. */
+  "prop:last"?: HelixTourStop["last"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  "prop:first"?: HelixTourStop["first"];
+  /** Label for the control that goes back. */
+  "attr:back-label"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  "prop:backLabel"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes on. */
+  "attr:next-label"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  "prop:nextLabel"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "attr:done-label"?: HelixTourStop["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "prop:doneLabel"?: HelixTourStop["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "attr:skip-label"?: HelixTourStop["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  "prop:skipLabel"?: HelixTourStop["skipLabel"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixTreeItem` component event */
 export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;
 /** `helix-select` event type */
@@ -12148,7 +12407,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `dense`: Tightens the trigger for dense layouts.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -12430,6 +12688,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--app-header-background`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-backdrop`: The filter behind it. `none` to pair it with a panel. (default: `undefined`)
    * - `--app-header-border-color`: The line under the bar. None by default. (default: `undefined`)
    * - `--app-header-height`: Height of the banner. (default: `undefined`)
    * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
@@ -12447,6 +12706,87 @@ export type CustomElements = {
   "helix-app-header": Partial<
     HelixAppHeaderProps & BaseProps<HelixAppHeader> & BaseEvents
   >;
+
+  /**
+   * One fragment shader over a full-screen triangle, with the palette read from
+   * the tokens rather than given as colors. That is the whole reason this belongs
+   * in a design system instead of in a page: a background written with hex values
+   * is an asset that has to be re-cut when the brand moves, and one written
+   * against `--helix-color-primary` is a consequence of it.
+   *
+   * **Every shape ramps through four token stops**, and the token layer inverts
+   * each of them: the page's own background, `primary-subtle`, `primary`, and
+   * then a peak. The peak is the foreground on a dark page and `primary-active`
+   * on a light one, because mixing a saturated hue toward near-black takes the
+   * chroma out of exactly the pixels carrying the most of it. Which way the page
+   * runs is not asked of the mode, which is a private token: it is read off the
+   * ground's own luminance, which the shader already has.
+   *
+   * **No dependency, and no scene graph.** The geometry is three vertices derived
+   * from `gl_VertexID`, so there is no attribute, no buffer and no upload. The
+   * common implementations of this reach for a 3D library to draw one quad, which
+   * is a camera and a material system for four vertices that never move.
+   *
+   * **It stops when nobody is looking**, off screen and in a background tab, and
+   * `prefers-reduced-motion` gets one still frame rather than an empty box: the
+   * composition is the point and the drift is a garnish.
+   *
+   * **A layer over an interactive aura has to let the pointer through.** The
+   * element is hit-testable only when `interactive` is set, because a background
+   * that swallows clicks is worse than one that does nothing, but a scrim or an
+   * overlay a consumer paints on top will absorb the move before it arrives. Any
+   * decorative layer above this wants `pointer-events: none`. It has already
+   * caught this repository's own bench once.
+   *
+   * **The fallback needs no detection.** Where WebGL is refused the canvas never
+   * paints and is transparent, and the host carries a gradient of the same tokens
+   * underneath. Nothing has to ask whether it worked.
+   *
+   * Presentation only, so there is no headless tier: the split exists to keep
+   * behavior separate from styling, and there is no structure or semantics here
+   * to separate. Decorative, so the host is hidden from assistive technology and
+   * takes no pointer events.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `shape`: Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   * - `drift`: How far the settings wander on their own, `0` still and `1` restless.
+   *
+   * **One property rather than a range on each of the five.** A range per axis
+   * is five more things to author and four more chances to write a pair that
+   * fights another; the reason to want any of it is the same reason in every
+   * case, which is that a fixed field is legibly a loop. So this is an amount,
+   * and each axis is given its own span and its own period.
+   *
+   * The periods are irrational multiples of each other, so no two axes come
+   * back into phase and the field has no cycle a reader can count. That is the
+   * difference between a background that breathes and one that is obviously on
+   * a timer.
+   * - `interactive`: Whether the pointer shifts and lifts the field.
+   *
+   * Reflected because the stylesheet selects on it: a background is not
+   * hit-testable at rest, or it would swallow clicks meant for what is over it,
+   * and an element that is not hit-testable never receives the `pointermove`
+   * this listens for. Asking for the pointer is asking for the hit test.
+   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
+   * - `gain`: Overall brightness, as a multiplier on the field.
+   * - `scale`: Feature size, as a multiplier on the sampled coordinates.
+   * - `speed`: How fast it drifts, as a multiplier on time.
+   * - `tilt`: The field's rotation, in degrees.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `canvas`: The surface the shader draws into.
+   */
+  "helix-aura": Partial<HelixAuraProps & BaseProps<HelixAura> & BaseEvents>;
 
   /**
    * They overlap by a step of space, which is enough to read as a stack without
@@ -12993,7 +13333,6 @@ export type CustomElements = {
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
-   * - `dense`: Tightens the inset for dense layouts.
    * - `orientation`: Whether media sits above the content stack or beside it.
    *
    * ## Slots
@@ -16116,6 +16455,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
@@ -16556,6 +16897,14 @@ export type CustomElements = {
    * what a reader wants from a whole key.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
+   *
+   * The label is what is dragged, so this adds no chrome at all. Still opt-in,
+   * because it changes what a press on the label does and a reader who drags
+   * across a word expecting to select it should get that everywhere it has not
+   * been asked for. Where it earns its place is a value a reader tunes rather
+   * than states: a duration, a weight, a count they are looking for rather than
+   * one they already know.
    * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
    * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
    * - `disabled`: Whether the control is non-interactive.
@@ -16646,6 +16995,7 @@ export type CustomElements = {
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
    * - `increment`: The control that steps up.
+   * - `label`: The name over the field, which is also the scrub grip.
    */
   "helix-number-input": Partial<
     HelixNumberInputProps & BaseProps<HelixNumberInput> & BaseEvents
@@ -19086,6 +19436,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
+   * - `--steps-connector-inset`: Air either side of a mark, before the rail. (default: `undefined`)
    * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
    * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
    * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
@@ -20734,6 +21085,116 @@ export type CustomElements = {
   > & HelixTooltipControlled;
 
   /**
+   * The styled tier of `BaseTour`. It draws the light and nothing else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the tour is running.
+   * - `index`: Which stop the reader is on.
+   * - `label`: Accessible name for the run, such as "Getting started".
+   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
+   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `stops`: The stops, in the order they were written. (property only) (readonly)
+   * - `length`: How many stops there are. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the current stop moves, carrying the new index.
+   * - `helix-complete`: Fired when the last stop is finished.
+   * - `helix-close`: Fired when the reader leaves early.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The stops, in the order they should be visited.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `next() => void`: Goes on, and finishes the run on the last stop.
+   * - `back() => void`: Goes back, and does nothing on the first stop.
+   * - `skip() => void`: Leaves the run early, which is a close rather than a completion.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tour-scrim-color`: The darkness outside the lit box. (default: `undefined`)
+   * - `--tour-spotlight-radius`: Corner radius of the lit box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `spotlight`: The box over the current target, which paints the scrim.
+   */
+  "helix-tour": Partial<HelixTourProps & BaseProps<HelixTour> & BaseEvents> & HelixTourControlled;
+
+  /**
+   * The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
+   * name, on purpose.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the element this stop is about.
+   * - `placement`: Which side of the target the panel prefers.
+   * - `current`: Whether this is the stop the reader is on.
+   *
+   * Written by the root rather than by a consumer, which is the one place this
+   * family writes onto markup it does not own. It is acceptable here for a
+   * reason that did not hold for the trail or the avatar group: a tour starts
+   * closed, so there is no server state to get wrong. The server renders a
+   * closed tour, a closed tour shows nothing, and nothing can disagree.
+   * - `last`: Whether this is the last stop, so the control says Done.
+   * - `first`: Whether this is the first stop, so there is nowhere back to.
+   * - `back-label`/`backLabel`: Label for the control that goes back.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What this stop says. A card, a heading and a line, anything.
+   * - `actions`: Replaces the controls, which are Back, Next and Skip.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
+   * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
+   * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bubble`: The panel that points at the target.
+   * - `content`: The region holding the slotted content.
+   * - `actions`: The row the controls sit in.
+   * - `back`: The control that goes to the previous stop.
+   * - `next`: The control that goes on, and finishes on the last stop.
+   * - `skip`: The control that leaves the tour.
+   */
+  "helix-tour-stop": Partial<
+    HelixTourStopProps & BaseProps<HelixTourStop> & BaseEvents
+  >;
+
+  /**
    * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
    * node moved to another depth re-indents without any nested selector. Nesting
    * selectors by depth is the usual approach and stops working at whatever depth
@@ -21219,6 +21680,8 @@ export type CustomElements = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: `<source>` and `<track>` elements, which are copied into the video.
+   * - `back`: Top left over the frame, for a way out of a set.
+   * - `controls`: Added to the control bar, before fullscreen.
    * - `poster`: Shown over the video until it starts.
    *
    * ## Methods
@@ -21254,6 +21717,7 @@ export type CustomElements = {
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
+   * - `back`: The region top left, for a way out of a set.
    * - `failure`: What is said when the source will not play.
    * - `loading`: What is said while the picture waits for more of itself.
    * - `loading-mark`: The part of that which spins.
@@ -21266,6 +21730,9 @@ export type CustomElements = {
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
+   * - `captions-menu`: The language menu, where there is more than one.
+   * - `rewind`: The control that goes back ten seconds.
+   * - `forward`: The control that goes on ten seconds.
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
@@ -21293,7 +21760,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `dense`: Tightens the trigger for dense layouts.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -21584,6 +22050,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--app-header-background`: Fill behind the banner. (default: `undefined`)
+   * - `--app-header-backdrop`: The filter behind it. `none` to pair it with a panel. (default: `undefined`)
    * - `--app-header-border-color`: The line under the bar. None by default. (default: `undefined`)
    * - `--app-header-height`: Height of the banner. (default: `undefined`)
    * - `--app-header-inset`: Inline padding of the banner. (default: `undefined`)
@@ -21603,6 +22070,89 @@ export type CustomElementsSolidJs = {
       HelixAppHeaderSolidJsProps &
       BaseProps<HelixAppHeader> &
       BaseEvents
+  >;
+
+  /**
+   * One fragment shader over a full-screen triangle, with the palette read from
+   * the tokens rather than given as colors. That is the whole reason this belongs
+   * in a design system instead of in a page: a background written with hex values
+   * is an asset that has to be re-cut when the brand moves, and one written
+   * against `--helix-color-primary` is a consequence of it.
+   *
+   * **Every shape ramps through four token stops**, and the token layer inverts
+   * each of them: the page's own background, `primary-subtle`, `primary`, and
+   * then a peak. The peak is the foreground on a dark page and `primary-active`
+   * on a light one, because mixing a saturated hue toward near-black takes the
+   * chroma out of exactly the pixels carrying the most of it. Which way the page
+   * runs is not asked of the mode, which is a private token: it is read off the
+   * ground's own luminance, which the shader already has.
+   *
+   * **No dependency, and no scene graph.** The geometry is three vertices derived
+   * from `gl_VertexID`, so there is no attribute, no buffer and no upload. The
+   * common implementations of this reach for a 3D library to draw one quad, which
+   * is a camera and a material system for four vertices that never move.
+   *
+   * **It stops when nobody is looking**, off screen and in a background tab, and
+   * `prefers-reduced-motion` gets one still frame rather than an empty box: the
+   * composition is the point and the drift is a garnish.
+   *
+   * **A layer over an interactive aura has to let the pointer through.** The
+   * element is hit-testable only when `interactive` is set, because a background
+   * that swallows clicks is worse than one that does nothing, but a scrim or an
+   * overlay a consumer paints on top will absorb the move before it arrives. Any
+   * decorative layer above this wants `pointer-events: none`. It has already
+   * caught this repository's own bench once.
+   *
+   * **The fallback needs no detection.** Where WebGL is refused the canvas never
+   * paints and is transparent, and the host carries a gradient of the same tokens
+   * underneath. Nothing has to ask whether it worked.
+   *
+   * Presentation only, so there is no headless tier: the split exists to keep
+   * behavior separate from styling, and there is no structure or semantics here
+   * to separate. Decorative, so the host is hidden from assistive technology and
+   * takes no pointer events.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `shape`: Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   * - `drift`: How far the settings wander on their own, `0` still and `1` restless.
+   *
+   * **One property rather than a range on each of the five.** A range per axis
+   * is five more things to author and four more chances to write a pair that
+   * fights another; the reason to want any of it is the same reason in every
+   * case, which is that a fixed field is legibly a loop. So this is an amount,
+   * and each axis is given its own span and its own period.
+   *
+   * The periods are irrational multiples of each other, so no two axes come
+   * back into phase and the field has no cycle a reader can count. That is the
+   * difference between a background that breathes and one that is obviously on
+   * a timer.
+   * - `interactive`: Whether the pointer shifts and lifts the field.
+   *
+   * Reflected because the stylesheet selects on it: a background is not
+   * hit-testable at rest, or it would swallow clicks meant for what is over it,
+   * and an element that is not hit-testable never receives the `pointermove`
+   * this listens for. Asking for the pointer is asking for the hit test.
+   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
+   * - `gain`: Overall brightness, as a multiplier on the field.
+   * - `scale`: Feature size, as a multiplier on the sampled coordinates.
+   * - `speed`: How fast it drifts, as a multiplier on time.
+   * - `tilt`: The field's rotation, in degrees.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `canvas`: The surface the shader draws into.
+   */
+  "helix-aura": Partial<
+    HelixAuraProps & HelixAuraSolidJsProps & BaseProps<HelixAura> & BaseEvents
   >;
 
   /**
@@ -22179,7 +22729,6 @@ export type CustomElementsSolidJs = {
    * - `plain` has no frame at all: the card is a layout and whatever it sits in
    *   is the surface. For a card inside something already bounded, where a
    *   second box adds a line and no meaning.
-   * - `dense`: Tightens the inset for dense layouts.
    * - `orientation`: Whether media sits above the content stack or beside it.
    *
    * ## Slots
@@ -25394,6 +25943,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--megamenu-background`: The panel's own fill. (default: `undefined`)
+   * - `--megamenu-backdrop`: A filter behind the panel, for glass. (default: `undefined`)
    * - `--megamenu-size`: How wide the panel may get. (default: `undefined`)
    * - `--megamenu-column-size`: The narrowest a column goes before the grid wraps. (default: `undefined`)
    * - `--megamenu-full-size`: How wide the band's contents may get, centred in it. (default: `undefined`)
@@ -25850,6 +26401,14 @@ export type CustomElementsSolidJs = {
    * what a reader wants from a whole key.
    * - `placeholder`: Shown while the field is empty. Not a label: it goes when typing starts.
    * - `read-only`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `scrub`: Whether a grip is shown that changes the value when it is dragged.
+   *
+   * The label is what is dragged, so this adds no chrome at all. Still opt-in,
+   * because it changes what a press on the label does and a reader who drags
+   * across a word expecting to select it should get that everywhere it has not
+   * been asked for. Where it earns its place is a value a reader tunes rather
+   * than states: a duration, a weight, a count they are looking for rather than
+   * one they already know.
    * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
    * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
    * - `disabled`: Whether the control is non-interactive.
@@ -25940,6 +26499,7 @@ export type CustomElementsSolidJs = {
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
    * - `increment`: The control that steps up.
+   * - `label`: The name over the field, which is also the scrub grip.
    */
   "helix-number-input": Partial<
     HelixNumberInputProps &
@@ -28473,6 +29033,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--steps-gap`: Space between one step and the next. (default: `undefined`)
+   * - `--steps-connector-inset`: Air either side of a mark, before the rail. (default: `undefined`)
    * - `--steps-marker-size`: Size of the mark, glyph or digit. (default: `undefined`)
    * - `--steps-connector-color`: The rule running through the steps. (default: `undefined`)
    * - `--steps-complete-color`: The mark on a finished step. (default: `undefined`)
@@ -30192,6 +30753,121 @@ export type CustomElementsSolidJs = {
   > & HelixTooltipControlledSolidJs;
 
   /**
+   * The styled tier of `BaseTour`. It draws the light and nothing else.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `open`: Whether the tour is running.
+   * - `index`: Which stop the reader is on.
+   * - `label`: Accessible name for the run, such as "Getting started".
+   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
+   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `stops`: The stops, in the order they were written. (property only) (readonly)
+   * - `length`: How many stops there are. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-change`: Fired when the current stop moves, carrying the new index.
+   * - `helix-complete`: Fired when the last stop is finished.
+   * - `helix-close`: Fired when the reader leaves early.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: The stops, in the order they should be visited.
+   *
+   * ## Methods
+   *
+   * Methods that can be called to access component functionality.
+   *
+   * - `next() => void`: Goes on, and finishes the run on the last stop.
+   * - `back() => void`: Goes back, and does nothing on the first stop.
+   * - `skip() => void`: Leaves the run early, which is a close rather than a completion.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tour-scrim-color`: The darkness outside the lit box. (default: `undefined`)
+   * - `--tour-spotlight-radius`: Corner radius of the lit box. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `spotlight`: The box over the current target, which paints the scrim.
+   */
+  "helix-tour": Partial<
+    HelixTourProps & HelixTourSolidJsProps & BaseProps<HelixTour> & BaseEvents
+  > & HelixTourControlledSolidJs;
+
+  /**
+   * The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
+   * name, on purpose.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `for`: The id of the element this stop is about.
+   * - `placement`: Which side of the target the panel prefers.
+   * - `current`: Whether this is the stop the reader is on.
+   *
+   * Written by the root rather than by a consumer, which is the one place this
+   * family writes onto markup it does not own. It is acceptable here for a
+   * reason that did not hold for the trail or the avatar group: a tour starts
+   * closed, so there is no server state to get wrong. The server renders a
+   * closed tour, a closed tour shows nothing, and nothing can disagree.
+   * - `last`: Whether this is the last stop, so the control says Done.
+   * - `first`: Whether this is the first stop, so there is nowhere back to.
+   * - `back-label`/`backLabel`: Label for the control that goes back.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What this stop says. A card, a heading and a line, anything.
+   * - `actions`: Replaces the controls, which are Back, Next and Skip.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--tour-bubble-size`: How wide the panel may grow. (default: `undefined`)
+   * - `--tour-padding`: Inset inside the panel. (default: `undefined`)
+   * - `--tour-surface-color`: The panel's own surface. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `bubble`: The panel that points at the target.
+   * - `content`: The region holding the slotted content.
+   * - `actions`: The row the controls sit in.
+   * - `back`: The control that goes to the previous stop.
+   * - `next`: The control that goes on, and finishes on the last stop.
+   * - `skip`: The control that leaves the tour.
+   */
+  "helix-tour-stop": Partial<
+    HelixTourStopProps &
+      HelixTourStopSolidJsProps &
+      BaseProps<HelixTourStop> &
+      BaseEvents
+  >;
+
+  /**
    * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
    * node moved to another depth re-indents without any nested selector. Nesting
    * selectors by depth is the usual approach and stops working at whatever depth
@@ -30688,6 +31364,8 @@ export type CustomElementsSolidJs = {
    * Areas where markup can be added to the component.
    *
    * - `(default)`: `<source>` and `<track>` elements, which are copied into the video.
+   * - `back`: Top left over the frame, for a way out of a set.
+   * - `controls`: Added to the control bar, before fullscreen.
    * - `poster`: Shown over the video until it starts.
    *
    * ## Methods
@@ -30723,6 +31401,7 @@ export type CustomElementsSolidJs = {
    * - `stage`: The box holding the picture and its controls, and the focus target the keys are bound to.
    * - `video`: The video itself.
    * - `poster`: What covers it before it plays.
+   * - `back`: The region top left, for a way out of a set.
    * - `failure`: What is said when the source will not play.
    * - `loading`: What is said while the picture waits for more of itself.
    * - `loading-mark`: The part of that which spins.
@@ -30735,6 +31414,9 @@ export type CustomElementsSolidJs = {
    * - `mute`: Sound on and off.
    * - `volume`: How loud.
    * - `captions`: Subtitles on and off.
+   * - `captions-menu`: The language menu, where there is more than one.
+   * - `rewind`: The control that goes back ten seconds.
+   * - `forward`: The control that goes on ten seconds.
    * - `remote`: Play on another device, where one is available.
    * - `speed`: Playback speed, where it was asked for.
    * - `pip`: Picture in picture, where it was asked for and exists.
@@ -30765,6 +31447,8 @@ export type CustomCssProperties = {
   "--announcement-inset"?: string;
   /** Fill behind the banner. */
   "--app-header-background"?: string;
+  /** The filter behind it. `none` to pair it with a panel. */
+  "--app-header-backdrop"?: string;
   /** The line under the bar. None by default. */
   "--app-header-border-color"?: string;
   /** Height of the banner. */
@@ -30969,6 +31653,10 @@ export type CustomCssProperties = {
   "--loader-color"?: string;
   /** Color of the circle behind it. */
   "--loader-track-color"?: string;
+  /** The panel's own fill. */
+  "--megamenu-background"?: string;
+  /** A filter behind the panel, for glass. */
+  "--megamenu-backdrop"?: string;
   /** How wide the panel may get. */
   "--megamenu-size"?: string;
   /** The narrowest a column goes before the grid wraps. */
@@ -31153,6 +31841,8 @@ export type CustomCssProperties = {
   "--stat-value-size"?: string;
   /** Space between one step and the next. */
   "--steps-gap"?: string;
+  /** Air either side of a mark, before the rail. */
+  "--steps-connector-inset"?: string;
   /** Size of the mark, glyph or digit. */
   "--steps-marker-size"?: string;
   /** The rule running through the steps. */
@@ -31213,6 +31903,16 @@ export type CustomCssProperties = {
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */
   "--tooltip-max-inline-size"?: string;
+  /** The darkness outside the lit box. */
+  "--tour-scrim-color"?: string;
+  /** Corner radius of the lit box. */
+  "--tour-spotlight-radius"?: string;
+  /** How wide the panel may grow. */
+  "--tour-bubble-size"?: string;
+  /** Inset inside the panel. */
+  "--tour-padding"?: string;
+  /** The panel's own surface. */
+  "--tour-surface-color"?: string;
   /** Indent added per level. */
   "--tree-indent"?: string;
   /** Size of the chevron, and the gutter a leaf reserves. */
@@ -32606,6 +33306,39 @@ type HelixTooltipControlledSolidJs =
         ref: BaseProps<HelixTooltip>["ref"];
       }
     | { open?: undefined }
+  );
+
+/**
+ * helix-tour: a controlled `index` announces and waits, so the handler comes with it.
+ */
+type HelixTourControlled =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        index: HelixTour["index"];
+        "onhelix-change": (event: HelixTourHelixChangeElementEvent) => void;
+      }
+    | {
+        /** Declared, and answered imperatively: a ref is the only route to `addEventListener`. */
+        index: HelixTour["index"];
+        ref: import('react').Ref<HelixTour>;
+      }
+    | { index?: undefined }
+  );
+
+/** helix-tour, in Solid's dialect: `on:` and the event name. */
+type HelixTourControlledSolidJs =
+  (
+    | {
+        /** Declared, so the consumer owns it and answers `helix-change`. */
+        index: HelixTour["index"];
+        "on:helix-change": (event: HelixTourHelixChangeElementEvent) => void;
+      }
+    | {
+        index: HelixTour["index"];
+        ref: BaseProps<HelixTour>["ref"];
+      }
+    | { index?: undefined }
   );
 
 /**

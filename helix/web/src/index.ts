@@ -3,6 +3,7 @@
  * a hand-kept list drifts, and it drifts silently until a component happens to
  * declare a public member with a type nobody forwarded yet.
  */
+
 export * from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './announcement/index.js'
@@ -81,6 +82,7 @@ export * from './toast/index.js'
 export * from './toggle/index.js'
 export * from './toolbar/index.js'
 export * from './tooltip/index.js'
+export * from './tour/index.js'
 export * from './tree/index.js'
 export * from './video/index.js'
 export * from './video-playlist/index.js'

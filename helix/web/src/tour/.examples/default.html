@@ -1,0 +1,77 @@
+<!-- @summary A run through three controls, with a card at each stop. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<helix-flex
+  align="center"
+  data-density="lg"
+  gap="sm"
+>
+  <helix-button
+    appearance="solid"
+    id="save"
+    tone="primary"
+  >Save</helix-button>
+  <helix-button
+    appearance="outlined"
+    id="share"
+  >Share</helix-button>
+  <helix-icon-button
+    id="more"
+    label="More"
+  >
+    <helix-icon name="dots-three"></helix-icon>
+  </helix-icon-button>
+</helix-flex>
+
+<helix-button
+  class="start"
+  id="begin"
+>Take the tour</helix-button>
+
+<helix-tour
+  id="tour"
+  label="Getting started"
+>
+  <helix-tour-stop for="save">
+    <helix-card appearance="plain">
+      <h3>Save as you go</h3>
+      <p>Everything is written the moment you stop typing.</p>
+    </helix-card>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="share"
+    placement="bottom"
+  >
+    <helix-card appearance="plain">
+      <h3>Share a link</h3>
+      <p>Anyone with it can read. Nobody can edit unless you say so.</p>
+    </helix-card>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="more"
+    placement="bottom-end"
+  >
+    <helix-card appearance="plain">
+      <h3>The rest lives here</h3>
+      <p>Export, history, and everything you will want once.</p>
+    </helix-card>
+  </helix-tour-stop>
+</helix-tour>
+
+<script type="module">
+  /* Preview frame: a real page would remember that it had been taken. The tour
+     owns the order and the light; opening it is the page's business, the same
+     way a dialog's is. */
+  const tour = document.querySelector('#tour')
+  document.querySelector('#begin').addEventListener('click', () => {
+    tour.index = 0
+    tour.open = true
+  })
+  tour.addEventListener('helix-change', (event) => {
+    tour.index = Number(event.detail.value)
+  })
+</script>

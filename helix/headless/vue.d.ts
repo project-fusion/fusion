@@ -98,6 +98,8 @@ import type {
   HelixBaseToggle,
   HelixBaseToolbar,
   HelixBaseTooltip,
+  HelixBaseTour,
+  HelixBaseTourStop,
   HelixBaseTreeItem,
   HelixBaseTree,
   HelixBaseVideoPlaylistItem,
@@ -2822,6 +2824,15 @@ what a reader wants from a whole key. */
   "read-only"?: HelixBaseNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixBaseNumberInput["readOnly"];
+  /** Whether a grip is shown that changes the value when it is dragged.
+
+The label is what is dragged, so this adds no chrome at all. Still opt-in,
+because it changes what a press on the label does and a reader who drags
+across a word expecting to select it should get that everywhere it has not
+been asked for. Where it earns its place is a value a reader tunes rather
+than states: a duration, a weight, a count they are looking for rather than
+one they already know. */
+  scrub?: HelixBaseNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
   "decrement-label"?: HelixBaseNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
@@ -5191,6 +5202,93 @@ export type HelixBaseTooltipVueEvents = {
   "helix-close": HelixBaseTooltipHelixCloseElementEvent;
 };
 
+/** `HelixBaseTour` component event */
+export type HelixBaseTourElementEvent<E = Event> = TypedEvent<HelixBaseTour, E>;
+/** `helix-change` event type */
+export type HelixBaseTourHelixChangeElementEvent =
+  HelixBaseTourElementEvent<HelixChangeEvent>;
+/** `helix-complete` event type */
+export type HelixBaseTourHelixCompleteElementEvent =
+  HelixBaseTourElementEvent<HelixCompleteEvent>;
+/** `helix-close` event type */
+export type HelixBaseTourHelixCloseElementEvent =
+  HelixBaseTourElementEvent<HelixCloseEvent>;
+
+export type HelixBaseTourVueProps = {
+  /** Whether the tour is running. */
+  open?: HelixBaseTour["open"];
+  /** Which stop the reader is on. */
+  index?: HelixBaseTour["index"];
+  /** Accessible name for the run, such as "Getting started". */
+  label?: HelixBaseTour["label"];
+  /** Space left around the target when it is lit, in pixels. */
+  "spotlight-padding"?: HelixBaseTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  spotlightPadding?: HelixBaseTour["spotlightPadding"];
+  /** Label for the control that goes back, handed to every stop. */
+  "back-label"?: HelixBaseTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  backLabel?: HelixBaseTour["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixBaseTour["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixBaseTour["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixBaseTour["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixBaseTour["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixBaseTour["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixBaseTour["skipLabel"];
+};
+
+export type HelixBaseTourVueEvents = {
+  /** Fired when the current stop moves, carrying the new index. */
+  "helix-change": HelixBaseTourHelixChangeElementEvent;
+  /** Fired when the last stop is finished. */
+  "helix-complete": HelixBaseTourHelixCompleteElementEvent;
+  /** Fired when the reader leaves early. */
+  "helix-close": HelixBaseTourHelixCloseElementEvent;
+};
+
+export type HelixBaseTourStopVueProps = {
+  /** The id of the element this stop is about. */
+  for?: HelixBaseTourStop["for"];
+  /** Which side of the target the panel prefers. */
+  placement?: HelixBaseTourStop["placement"];
+  /** Whether this is the stop the reader is on.
+
+Written by the root rather than by a consumer, which is the one place this
+family writes onto markup it does not own. It is acceptable here for a
+reason that did not hold for the trail or the avatar group: a tour starts
+closed, so there is no server state to get wrong. The server renders a
+closed tour, a closed tour shows nothing, and nothing can disagree. */
+  current?: HelixBaseTourStop["current"];
+  /** Whether this is the last stop, so the control says Done. */
+  last?: HelixBaseTourStop["last"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  first?: HelixBaseTourStop["first"];
+  /** Label for the control that goes back. */
+  "back-label"?: HelixBaseTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  backLabel?: HelixBaseTourStop["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixBaseTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixBaseTourStop["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixBaseTourStop["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixBaseTourStop["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixBaseTourStop["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixBaseTourStop["skipLabel"];
+};
+
+export type HelixBaseTourStopVueEvents = {};
+
 /** `HelixBaseTreeItem` component event */
 export type HelixBaseTreeItemElementEvent<E = Event> = TypedEvent<
   HelixBaseTreeItem,
@@ -5647,7 +5745,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseAppHeaderVueProps,
     HelixBaseAppHeaderVueEvents
   >;
-  /** A part of 'Avatar' rather than a family of its own: it arranges avatars and is about nothing else, and its member is a complete 'Avatar' the group did not have to explain.  **The overflow count is the group's, not a slot.** Which avatars are hidden is a fact the group works out from 'max' and how many it was given, so a consumer writing the "+3" themselves would be writing a number that has to agree with a list they do not control.  **Hidden, not removed.** Past 'max', the extra avatars stay in the DOM and stop being shown, so nothing re-renders when 'max' changes and the accessible name can still be built from all of them. The count is what a sighted reader gets; the group's own name is what everyone else gets, and "Seven people" is more useful than seven names read in a row.  **It is a list.** A row of faces is a set of separate people, and a group with no role announces as one run of text. 'role="list"' needs its children to be 'listitem', which they cannot be told to become without writing an attribute onto a consumer's element, so the group carries 'role="group"' and its name instead: one announcement, correct, and nothing written to anyone else's markup. */
+  /** A part of 'Avatar' rather than a family of its own: it arranges avatars and is about nothing else, and its member is a complete 'Avatar' the group did not have to explain.  **The overflow count is the group's, not a slot.** Which avatars are hidden is a fact the group works out from 'max' and how many it was given, so a consumer writing the "+3" themselves would be writing a number that has to agree with a list they do not control.  **Hidden, not removed.** Past 'max', the extra avatars stay in the DOM and stop being shown, so nothing re-renders when 'max' changes and the accessible name can still be built from all of them. The count is what a sighted reader gets; the group's own name is what everyone else gets, and "Seven people" is more useful than seven names read in a row.  **And hidden by the stylesheet, not by this class.** It wrote 'data-overflow' onto each avatar from 'updated', which is one update too late and one element too far out: Lit renders on a microtask, so an avatar appended past the limit was laid out and painted before anything ran to hide it, and the group was writing attributes onto markup a consumer owns to do it. Measured in Chrome 148, appending two past 'max="3"' and reading before yielding: five 'flex', folding to three on the next update. The styled tier now does it with ':host([max="N"]) ::slotted(:nth-child(n + N+1))', which is right at the first style resolution and writes nothing.  **The fold is finite, and the count agrees with it.** 'An+B' takes a literal, so there is one selector per value of 'max' and the range stops at twelve. Past that the group shows everyone, counts nothing and says so, because showing everyone is a defensible answer and showing everyone beside a "+5" is not. 'max' above twelve is a list the consumer should be slicing themselves.  **It is a list.** A row of faces is a set of separate people, and a group with no role announces as one run of text. 'role="list"' needs its children to be 'listitem', which they cannot be told to become without writing an attribute onto a consumer's element, so the group carries 'role="group"' and its name instead: one announcement, correct, and nothing written to anyone else's markup. */
   "helix-base-avatar-group": DefineCustomElement<
     HelixBaseAvatarGroup,
     HelixBaseAvatarGroupVueProps,
@@ -6175,11 +6273,23 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseToolbarVueProps,
     HelixBaseToolbarVueEvents
   >;
-  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once. Same shape as 'requestControlledChange' warning about a controlled property nothing answered.  It shows on hover and on focus, and hides on leave, on blur, and on Escape. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-open' and 'helix-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
+  /** The trigger is slotted and stays the consumer's own element. The bubble is rendered here, in the top layer through the popover API, so it clears any ancestor with 'overflow: hidden' without a 'z-index' anywhere.  Position comes from 'FloatingController', which flips to another side when the preferred one does not fit and slides along it to stay in view.  **Two forms, and they are not equivalent for a screen reader.**  Wrapping is the convenience form and is right where the bubble decorates a control that already says what it is. The trigger stays the consumer's own element, slotted, and nothing here can describe it: an IDREF cannot cross a shadow boundary, an element reference is valid only into the same tree or a shadow-including *ancestor* (the bubble's tree is neither, it is inward), and a string on the trigger means writing to markup the consumer server-rendered. All three measured.  'for' is the form that works. The tooltip sits *beside* the trigger in the consumer's own tree and names it by id, so both are in one tree and an IDREF between them is legal in the ordinary way:  '''html <helix-button id="save" aria-describedby="save-tip">Save</helix-button> <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip> '''  Note that the reference points at *this host*, not at the bubble inside its shadow root: the description is computed from the flat tree, which descends into shadow content on its own.  **The consumer writes that 'aria-describedby', and nothing here writes it for them.** WebAwesome and Spectrum Web Components both do write it, with 'setAttribute' on the trigger at runtime, which is the one thing this library declines everywhere: React rendered that element on the server without the attribute and reports a mismatch it will not patch up. Two ids in the markup is the whole cost of the version that is correct before any JavaScript runs.  Because it is the consumer's line to write, it is also theirs to forget, so 'for' audits itself on first open and says so once. Same shape as 'requestControlledChange' warning about a controlled property nothing answered.  It shows on hover and on focus, and hides on leave, on blur, on Escape, and once the trigger has been activated: the hint is spent when the control has been used. A tooltip that answers only the pointer is one a keyboard reader never sees.  The pointer waits out 'delay' first, or sweeping a row of controls flashes a tooltip for each of them. Focus does not wait: a keyboard reader landing on a control has already committed to it.  Open state comes from 'MixinControllerOpen', so it announces 'helix-open' and 'helix-close' like every other overlay here, and a consumer can drive it with 'open' where they need to. */
   "helix-base-tooltip": DefineCustomElement<
     HelixBaseTooltip,
     HelixBaseTooltipVueProps,
     HelixBaseTooltipVueEvents
+  >;
+  /** The root owns the order and nothing else. Which stop is current, what Next and Back mean, when the run is finished; the stops own where they point, and the consumer owns every word.  **The spotlight is a shadow, not a hole.** The scrim is a box the size of the current target with an enormous spread on its 'box-shadow', so the darkness is what the shadow paints and the target is simply where the box is. A 'clip-path' on a full-screen scrim is the other way to do it and is worse here: it needs the viewport in the same coordinate space as the cut, which stops being true the moment anything between them is transformed.  **It measures, and this is a case where measuring is the only option.** The target is an element somewhere else on the page whose position nothing can know statically. That is different from a trail folding by width, where the design rule was expressible and the measurement was answering a question nobody had asked. Here the question is "where is that button", and there is no other way to ask it.  **Nothing is measured on the server and nothing needs to be.** A tour starts closed and a closed tour draws nothing, so the server renders the stops as inert markup and the first frame is correct. This is also what makes it acceptable for the root to write 'current' onto stops it does not own: there is no server state for the write to disagree with.  **Focus is not trapped.** A reader has to be able to look at, and reach, the thing being pointed at. 'Escape' leaves, which is the one binding a tour needs and the one every reader already tries. */
+  "helix-base-tour": DefineCustomElement<
+    HelixBaseTour,
+    HelixBaseTourVueProps,
+    HelixBaseTourVueEvents
+  >;
+  /** A stop names a target with 'for' and holds whatever the consumer puts in it. It owns no content of its own, which is the whole shape of this family: the tour abstracts the three things that are genuinely hard, and the words are the consumer's.  What it does own:  - **Where the panel goes.** Anchored to the target through the same floating   pass every other overlay here uses. - **That it is on top.** A popover, so it is in the top layer. A tour points   at things inside dialogs, inside scrollers, inside anything with a stacking   context, and a panel in the ordinary flow loses to all three. - **When it shows.** Which is 'current', and which the root decides.  What it does not own is the heading, the paragraph, the picture and the layout. Slot a 'helix-card', or a heading and a line of prose, or anything else. This was written the other way first, with 'title' and 'body' parts and a fixed arrangement, which is a component deciding what a tour is allowed to say.  **The buttons are slot fallback, so the common case costs nothing and the uncommon one is possible.** Write nothing and get Back, Next and Skip already wired. Slot 'actions' and they are yours, driven by 'next()', 'back()' and 'skip()' on the root, which are public for exactly that.  **'for' is an id, the same as 'Tooltip''s.** The target is elsewhere on the page, and an id is the one reference a consumer can write in markup without holding an element. Resolved against the root node, so a stop inside a shadow tree points at a target in that tree. */
+  "helix-base-tour-stop": DefineCustomElement<
+    HelixBaseTourStop,
+    HelixBaseTourStopVueProps,
+    HelixBaseTourStopVueEvents
   >;
   /** **'open', on 'MixinControllerOpen', where it was a bare 'expanded' boolean.** A branch showing its children is the same state a disclosure holds, and 'AccordionItem' has been on that mixin all along. Written here by hand it had neither half of what the mixin gives: 'this.expanded = !this.expanded' announced nothing, so a consumer could not know a branch had opened, and could not own the state either. 'aria-expanded' is still what the row renders, because that is the attribute a tree uses; the property is what changed, not the semantics.  An element rather than a slot because it owns state: whether it is open, whether it is selected, and whether it is the one holding focus.  A branch is any item with something slotted into 'children', detected in 'firstUpdated' rather than declared by the consumer. That is a client-side enhancement by necessity, since the server cannot inspect children, so the server renders the node as a leaf and the twisty appears on hydration. It appears rather than disappearing, which is the harmless direction. */
   "helix-base-tree-item": DefineCustomElement<

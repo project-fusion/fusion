@@ -1290,6 +1290,129 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/virtualize-controller/virtualize-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Works out which slice of a long set is worth rendering.\n\n**A controller and not an element, which is the whole reason it is here.**\nTable, Listbox, Combobox and Tree each need windowing *inside* themselves,\nand an element would make each of them nest one in its own shadow root: a\nlistbox whose options are inside a `<helix-virtual-list>` is a listbox whose\noptions are no longer its children, so its own keyboard, its own selection\nand its own ARIA all have a stranger in the middle of them.\n\n**A windowed set still reports its true length, and each row its true\nposition.** This is the part virtualization usually gets wrong and the reason\nthe arithmetic lives somewhere shared. A reader on row 4,000 of 10,000 must\nhear \"4,000 of 10,000\", so `aria-setsize` is the count and `aria-posinset` is\nthe real index, never the position within the rendered slice. The window is a\nrendering decision and the set is a fact, and a component that lets the first\noverwrite the second has told a screen reader the list is twelve long.\n\n**The spacers are what make the scrollbar honest.** Rendering twelve rows in\na box that should scroll for ten thousand gives a thumb the size of the\ntrack, so the room the absent rows would have taken is left as padding before\nand after. A reader dragging that thumb is dragging against the real length.\n\n**What it does not do, because the platform will not let it here.** True\nvirtualization means never creating the rows that are not on screen, and that\nneeds the set as *data*. Neither channel is open: a consumer's items arrive\nas light-DOM children, which exist by the time this could decide not to\ncreate them, and an `items` property cannot survive React hydration, which\nskips every property it would have to apply imperatively (see\n`bindReactHandler`, and the note in the rules that objects and functions have\nthat bug and are not fixed).\n\nSo what this buys is the expensive half rather than all of it: the rows\noutside the window are not laid out and not painted, which is where the time\ngoes in a long list, and the node count stays. That is worth having and it is\nnot worth calling something it is not. An element that windows children it\nwas handed is not a virtual list, whatever it is named.\n\n**One estimate, not per-row measurement.** Measuring every row to place it is\nhow a virtual list ends up reading the layout it is trying to avoid, and it\nis what makes them jump: a row taller than its estimate shifts everything\nafter it at the moment it renders. A fixed estimate is a straight line\nbetween scroll offset and index, which never disagrees with itself. Rows of\ngenuinely different heights are a different component and a harder one.",
+          "name": "VirtualizeController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "host",
+              "type": {
+                "text": "ReactiveControllerHost"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "VirtualizeOptions"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "options"
+            },
+            {
+              "kind": "field",
+              "name": "observer",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "watching",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "window",
+              "type": {
+                "text": "Window"
+              },
+              "default": "{ after: 0, before: 0, first: 0, last: 0 }",
+              "description": "The slice to render, recomputed on scroll and on resize."
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Attaches to the box the first time there is one to attach to."
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reads the scroll offset and settles the window.\n\nAsks for an update only when the slice actually moved. A scroll fires many\nevents per frame and most of them land inside the row already at the top,\nso requesting one per event would re-render the list for every pixel."
+            }
+          ],
+          "helix": {}
+        },
+        {
+          "kind": "variable",
+          "name": "first"
+        },
+        {
+          "kind": "variable",
+          "name": "last"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "VirtualizeController",
+          "declaration": {
+            "name": "VirtualizeController",
+            "module": "src/controllers/virtualize-controller/virtualize-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events/events.ts",
       "declarations": [
         {
@@ -2377,6 +2500,30 @@
           "declaration": {
             "name": "TokenColorController",
             "module": "./controllers/token-color-controller/token-color-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VirtualizeController",
+          "declaration": {
+            "name": "VirtualizeController",
+            "module": "./controllers/virtualize-controller/virtualize-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VirtualizeOptions",
+          "declaration": {
+            "name": "VirtualizeOptions",
+            "module": "./controllers/virtualize-controller/virtualize-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VirtualizeWindow",
+          "declaration": {
+            "name": "Window",
+            "module": "./controllers/virtualize-controller/virtualize-controller.js"
           }
         },
         {
@@ -5213,8 +5360,7 @@
                 "text": "ScrollItemOptions"
               }
             }
-          ],
-          "description": "Brings an item into view inside its own scroller, and moves nothing else.\n\n**Not `Element.scrollIntoView`, and the difference is the whole reason this\nexists.** That method walks every scrollable ancestor and scrolls all of\nthem, so bringing the current item into a tree also scrolls the page the tree\nsits on, and on a phone it takes the address bar with it. A reader who\npressed Down in a sidebar did not ask the document to move.\n\nIt also does nothing when the item is already visible, where `scrollIntoView`\nwith `block: 'nearest'` still nudges. Nudging on every keypress is what makes\na long list feel like it is fighting the reader.\n\nBoth axes, because the components that need this do not agree on one: a\ncarousel scrolls sideways and a tree scrolls down, and a menu that has run\nout of room does both.\n\n`smooth` is a request rather than an instruction. Animating a scroll the\nreader triggered by pressing a key means the list is still moving when the\nnext press arrives, so this follows `prefers-reduced-motion` and is off by\ndefault for exactly that case."
+          ]
         }
       ],
       "exports": [

@@ -5810,6 +5810,116 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `--tooltip-background-color` | Fill of the bubble. |
 | `--tooltip-max-inline-size` | Widest the bubble grows before wrapping. |
 
+## Tour
+
+### Root — `helix-tour`
+
+A guided run through an interface, one stop at a time.
+
+Extends `HelixBaseTour`.
+
+The styled tier of `BaseTour`. It draws the light and nothing else.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `backLabel` | `back-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes back, handed to every stop. |
+| `doneLabel` | `done-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on from the last stop. |
+| `index` | `index` | `number` | `0` | `HelixBaseTour` | Which stop the reader is on. |
+| `label` | `label` | `string` | `''` | `HelixBaseTour` | Accessible name for the run, such as "Getting started". |
+| `length` | - | `number` | - | `HelixBaseTour` | How many stops there are. |
+| `nextLabel` | `next-label` | `string` | `''` | `HelixBaseTour` | Label for the control that goes on. |
+| `open` | `open` | `boolean` | `false` | `HelixBaseTour` | Whether the tour is running. |
+| `skipLabel` | `skip-label` | `string` | `''` | `HelixBaseTour` | Label for the control that leaves the tour. |
+| `spotlightPadding` | `spotlight-padding` | `number` | `8` | `HelixBaseTour` | Space left around the target when it is lit, in pixels. |
+| `stops` | - | `HelixBaseTourStop[]` | - | `HelixBaseTour` | The stops, in the order they were written. |
+
+#### Methods
+
+| Method | From | Description |
+| --- | --- | --- |
+| `back()` | `HelixBaseTour` | Goes back, and does nothing on the first stop. |
+| `next()` | `HelixBaseTour` | Goes on, and finishes the run on the last stop. |
+| `skip()` | `HelixBaseTour` | Leaves the run early, which is a close rather than a completion. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-change` | `HelixChangeEvent` | Fired when the current stop moves, carrying the new index. |
+| `helix-complete` | `HelixCompleteEvent` | Fired when the last stop is finished. |
+| `helix-close` | `HelixCloseEvent` | Fired when the reader leaves early. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | The stops, in the order they should be visited. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `spotlight` | The box over the current target, which paints the scrim. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--tour-scrim-color` | The darkness outside the lit box. |
+| `--tour-spotlight-radius` | Corner radius of the lit box. |
+
+### Stop — `helix-tour-stop`
+
+One stop on a tour: what it points at, and a panel to say it in.
+
+Extends `HelixBaseTourStop`.
+
+The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
+name, on purpose.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `backLabel` | `back-label` | `string` | `'Back'` | `HelixBaseTourStop` | Label for the control that goes back. |
+| `current` | `current` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the stop the reader is on. |
+| `doneLabel` | `done-label` | `string` | `'Done'` | `HelixBaseTourStop` | Label for the control that goes on from the last stop. |
+| `first` | `first` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the first stop, so there is nowhere back to. |
+| `for` | `for` | `string` | `''` | `HelixBaseTourStop` | The id of the element this stop is about. |
+| `last` | `last` | `boolean` | `false` | `HelixBaseTourStop` | Whether this is the last stop, so the control says Done. |
+| `nextLabel` | `next-label` | `string` | `'Next'` | `HelixBaseTourStop` | Label for the control that goes on. |
+| `placement` | `placement` | `Placement` | `'bottom'` | `HelixBaseTourStop` | Which side of the target the panel prefers. |
+| `skipLabel` | `skip-label` | `string` | `'Skip'` | `HelixBaseTourStop` | Label for the control that leaves the tour. |
+| `target` | - | `HTMLElement \| null` | - | `HelixBaseTourStop` | The element this stop is about, or null where the id resolves to nothing. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | What this stop says. A card, a heading and a line, anything. |
+| `actions` | Replaces the controls, which are Back, Next and Skip. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `bubble` | The panel that points at the target. |
+| `content` | The region holding the slotted content. |
+| `actions` | The row the controls sit in. |
+| `back` | The control that goes to the previous stop. |
+| `next` | The control that goes on, and finishes on the last stop. |
+| `skip` | The control that leaves the tour. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--tour-bubble-size` | How wide the panel may grow. |
+| `--tour-padding` | Inset inside the panel. |
+| `--tour-surface-color` | The panel's own surface. |
+
 ## Tree
 
 ### Root — `helix-tree`

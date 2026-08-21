@@ -17790,6 +17790,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/tour/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/tree/index.js"
           }
         },
@@ -46245,6 +46253,860 @@
           "declaration": {
             "name": "HelixBaseTooltip",
             "module": "src/tooltip/root/tooltip-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tour/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tour/root/tour-root.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/tour/stop/tour-stop.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tour/root/tour-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The root owns the order and nothing else. Which stop is current, what Next\nand Back mean, when the run is finished; the stops own where they point, and\nthe consumer owns every word.\n\n**The spotlight is a shadow, not a hole.** The scrim is a box the size of the\ncurrent target with an enormous spread on its `box-shadow`, so the darkness\nis what the shadow paints and the target is simply where the box is. A\n`clip-path` on a full-screen scrim is the other way to do it and is worse\nhere: it needs the viewport in the same coordinate space as the cut, which\nstops being true the moment anything between them is transformed.\n\n**It measures, and this is a case where measuring is the only option.** The\ntarget is an element somewhere else on the page whose position nothing can\nknow statically. That is different from a trail folding by width, where the\ndesign rule was expressible and the measurement was answering a question\nnobody had asked. Here the question is \"where is that button\", and there is\nno other way to ask it.\n\n**Nothing is measured on the server and nothing needs to be.** A tour starts\nclosed and a closed tour draws nothing, so the server renders the stops as\ninert markup and the first frame is correct. This is also what makes it\nacceptable for the root to write `current` onto stops it does not own: there\nis no server state for the write to disagree with.\n\n**Focus is not trapped.** A reader has to be able to look at, and reach, the\nthing being pointed at. `Escape` leaves, which is the one binding a tour\nneeds and the one every reader already tries.",
+          "name": "HelixBaseTour",
+          "cssParts": [
+            {
+              "description": "The box over the current target, which paints the scrim.",
+              "name": "spotlight"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The stops, in the order they should be visited.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tour is running.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "index",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Which stop the reader is on.",
+              "attribute": "index",
+              "helix": {
+                "controlled": [
+                  "helix-change"
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the run, such as \"Getting started\".",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "spotlightPadding",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Space left around the target when it is lit, in pixels.",
+              "attribute": "spotlight-padding"
+            },
+            {
+              "kind": "field",
+              "name": "backLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes back, handed to every stop.",
+              "attribute": "back-label"
+            },
+            {
+              "kind": "field",
+              "name": "nextLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes on.",
+              "attribute": "next-label"
+            },
+            {
+              "kind": "field",
+              "name": "doneLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes on from the last stop.",
+              "attribute": "done-label"
+            },
+            {
+              "kind": "field",
+              "name": "skipLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that leaves the tour.",
+              "attribute": "skip-label"
+            },
+            {
+              "kind": "field",
+              "name": "assigned",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "spot",
+              "type": {
+                "text": "{ height: number; left: number; top: number; width: number } | undefined"
+              },
+              "privacy": "private",
+              "description": "Where the light falls, read from the current target."
+            },
+            {
+              "kind": "field",
+              "name": "stops",
+              "type": {
+                "text": "HelixBaseTourStop[]"
+              },
+              "description": "The stops, in the order they were written.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "length",
+              "type": {
+                "text": "number"
+              },
+              "description": "How many stops there are.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "next",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Goes on, and finishes the run on the last stop.",
+              "type": {
+                "text": "next() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "back",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Goes back, and does nothing on the first stop.",
+              "type": {
+                "text": "back() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "skip",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Leaves the run early, which is a close rather than a completion.",
+              "type": {
+                "text": "skip() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finish",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "move",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "to",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "handleAsk",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleKeydown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleViewport",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "settle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Tells each stop where it is in the run.\n\nWritten onto the stops, which is the one outward write in this family and\nis argued for on the class above. The labels go with it, and only where the\nroot was given one, so a stop keeps its own default unless somebody has\nlocalised the tour."
+            },
+            {
+              "kind": "method",
+              "name": "light",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reads the current target's box, which is where the light falls."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixChangeEvent"
+              },
+              "description": "Fired when the current stop moves, carrying the new index.",
+              "name": "helix-change",
+              "reactProp": "onhelix-change"
+            },
+            {
+              "type": {
+                "text": "HelixCompleteEvent"
+              },
+              "description": "Fired when the last stop is finished.",
+              "name": "helix-complete",
+              "reactProp": "onhelix-complete"
+            },
+            {
+              "type": {
+                "text": "HelixCloseEvent"
+              },
+              "description": "Fired when the reader leaves early.",
+              "name": "helix-close",
+              "reactProp": "onhelix-close"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tour is running.",
+              "fieldName": "open"
+            },
+            {
+              "name": "index",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Which stop the reader is on.",
+              "fieldName": "index"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the run, such as \"Getting started\".",
+              "fieldName": "label"
+            },
+            {
+              "name": "spotlight-padding",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Space left around the target when it is lit, in pixels.",
+              "fieldName": "spotlightPadding"
+            },
+            {
+              "name": "back-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes back, handed to every stop.",
+              "fieldName": "backLabel"
+            },
+            {
+              "name": "next-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes on.",
+              "fieldName": "nextLabel"
+            },
+            {
+              "name": "done-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that goes on from the last stop.",
+              "fieldName": "doneLabel"
+            },
+            {
+              "name": "skip-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Label for the control that leaves the tour.",
+              "fieldName": "skipLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A guided run through an interface, one stop at a time.",
+          "helix": {
+            "category": "overlays",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tour",
+            "aliases": [
+              "Coachmark",
+              "Product tour",
+              "Walkthrough",
+              "Onboarding"
+            ],
+            "tier": "headless",
+            "group": "BaseTour",
+            "part": "Root",
+            "source": "helix/headless/src/tour"
+          },
+          "tagName": "helix-base-tour",
+          "customElement": true,
+          "modulePath": "src/tour/root/tour-root.ts",
+          "definitionPath": "src/tour/root/tour-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTour",
+          "declaration": {
+            "name": "HelixBaseTour",
+            "module": "src/tour/root/tour-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tour",
+          "declaration": {
+            "name": "HelixBaseTour",
+            "module": "src/tour/root/tour-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tour/stop/tour-stop.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A stop names a target with `for` and holds whatever the consumer puts in it.\nIt owns no content of its own, which is the whole shape of this family: the\ntour abstracts the three things that are genuinely hard, and the words are\nthe consumer's.\n\nWhat it does own:\n\n- **Where the panel goes.** Anchored to the target through the same floating\n  pass every other overlay here uses.\n- **That it is on top.** A popover, so it is in the top layer. A tour points\n  at things inside dialogs, inside scrollers, inside anything with a stacking\n  context, and a panel in the ordinary flow loses to all three.\n- **When it shows.** Which is `current`, and which the root decides.\n\nWhat it does not own is the heading, the paragraph, the picture and the\nlayout. Slot a `helix-card`, or a heading and a line of prose, or anything\nelse. This was written the other way first, with `title` and `body` parts and\na fixed arrangement, which is a component deciding what a tour is allowed to\nsay.\n\n**The buttons are slot fallback, so the common case costs nothing and the\nuncommon one is possible.** Write nothing and get Back, Next and Skip already\nwired. Slot `actions` and they are yours, driven by `next()`, `back()` and\n`skip()` on the root, which are public for exactly that.\n\n**`for` is an id, the same as `Tooltip`'s.** The target is elsewhere on the\npage, and an id is the one reference a consumer can write in markup without\nholding an element. Resolved against the root node, so a stop inside a shadow\ntree points at a target in that tree.",
+          "name": "HelixBaseTourStop",
+          "cssParts": [
+            {
+              "description": "The panel that points at the target.",
+              "name": "bubble"
+            },
+            {
+              "description": "The region holding the slotted content.",
+              "name": "content"
+            },
+            {
+              "description": "The row the controls sit in.",
+              "name": "actions"
+            },
+            {
+              "description": "The control that goes to the previous stop.",
+              "name": "back"
+            },
+            {
+              "description": "The control that goes on, and finishes on the last stop.",
+              "name": "next"
+            },
+            {
+              "description": "The control that leaves the tour.",
+              "name": "skip"
+            }
+          ],
+          "slots": [
+            {
+              "description": "What this stop says. A card, a heading and a line, anything.",
+              "name": ""
+            },
+            {
+              "description": "Replaces the controls, which are Back, Next and Skip.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this stop is about.",
+              "attribute": "for"
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'bottom'",
+              "description": "Which side of the target the panel prefers.",
+              "attribute": "placement"
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the stop the reader is on.\n\nWritten by the root rather than by a consumer, which is the one place this\nfamily writes onto markup it does not own. It is acceptable here for a\nreason that did not hold for the trail or the avatar group: a tour starts\nclosed, so there is no server state to get wrong. The server renders a\nclosed tour, a closed tour shows nothing, and nothing can disagree.",
+              "attribute": "current",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "last",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the last stop, so the control says Done.",
+              "attribute": "last",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "first",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the first stop, so there is nowhere back to.",
+              "attribute": "first",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "backLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Back'",
+              "description": "Label for the control that goes back.",
+              "attribute": "back-label"
+            },
+            {
+              "kind": "field",
+              "name": "nextLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next'",
+              "description": "Label for the control that goes on.",
+              "attribute": "next-label"
+            },
+            {
+              "kind": "field",
+              "name": "doneLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Done'",
+              "description": "Label for the control that goes on from the last stop.",
+              "attribute": "done-label"
+            },
+            {
+              "kind": "field",
+              "name": "skipLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip'",
+              "description": "Label for the control that leaves the tour.",
+              "attribute": "skip-label"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "description": "The element this stop is about, or null where the id resolves to nothing.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "floating",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new PopoverController(this, { anchor: () => this.target, /* A press outside does not end a tour, and this is the decision rather than a stub. Everywhere else a surface closes on an outside press because pressing elsewhere means the reader is finished with it. Here elsewhere is the thing being pointed at: the scrim lets the pointer through on purpose, so the first press a reader makes on the button the tour is describing would be the press that ends the tour. Leaving is the skip control and `Escape`, both of which say so. */ onDismiss: () => {}, placement: () => this.placement, surface: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"bubble\"]'), })"
+            },
+            {
+              "kind": "method",
+              "name": "ask",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "what",
+                  "type": {
+                    "text": "'back' | 'next' | 'skip'"
+                  }
+                }
+              ],
+              "description": "Says what the reader pressed and lets the root decide.\n\nA stop cannot move a tour: it does not know what is after it, and a stop\nthat reached up to its parent to find out would be a stop that only works\ninside one. Composed, so the root hears it through its own slot."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [],
+          "attributes": [
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the element this stop is about.",
+              "fieldName": "for"
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "Placement"
+              },
+              "default": "'bottom'",
+              "description": "Which side of the target the panel prefers.",
+              "fieldName": "placement"
+            },
+            {
+              "name": "current",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the stop the reader is on.\n\nWritten by the root rather than by a consumer, which is the one place this\nfamily writes onto markup it does not own. It is acceptable here for a\nreason that did not hold for the trail or the avatar group: a tour starts\nclosed, so there is no server state to get wrong. The server renders a\nclosed tour, a closed tour shows nothing, and nothing can disagree.",
+              "fieldName": "current"
+            },
+            {
+              "name": "last",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the last stop, so the control says Done.",
+              "fieldName": "last"
+            },
+            {
+              "name": "first",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether this is the first stop, so there is nowhere back to.",
+              "fieldName": "first"
+            },
+            {
+              "name": "back-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Back'",
+              "description": "Label for the control that goes back.",
+              "fieldName": "backLabel"
+            },
+            {
+              "name": "next-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Next'",
+              "description": "Label for the control that goes on.",
+              "fieldName": "nextLabel"
+            },
+            {
+              "name": "done-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Done'",
+              "description": "Label for the control that goes on from the last stop.",
+              "fieldName": "doneLabel"
+            },
+            {
+              "name": "skip-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Skip'",
+              "description": "Label for the control that leaves the tour.",
+              "fieldName": "skipLabel"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "One stop on a tour: what it points at, and a panel to say it in.",
+          "helix": {
+            "category": "overlays",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/tour",
+            "tier": "headless",
+            "group": "BaseTour",
+            "part": "Stop"
+          },
+          "tagName": "helix-base-tour-stop",
+          "customElement": true,
+          "modulePath": "src/tour/stop/tour-stop.ts",
+          "definitionPath": "src/tour/stop/tour-stop.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseTourStop",
+          "declaration": {
+            "name": "HelixBaseTourStop",
+            "module": "src/tour/stop/tour-stop.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-tour-stop",
+          "declaration": {
+            "name": "HelixBaseTourStop",
+            "module": "src/tour/stop/tour-stop.ts"
           }
         }
       ]

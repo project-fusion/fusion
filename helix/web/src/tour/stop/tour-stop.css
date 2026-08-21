@@ -1,0 +1,50 @@
+:host {
+  display: contents;
+}
+
+/* The panel, which is `Popover`'s panel by another name and is deliberately the
+   same shape: a tour bubble that looked like a different kind of surface would
+   be a second answer to a question the library has already answered. */
+[part="bubble"] {
+  background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-lg);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+  inline-size: max-content;
+  margin: var(--helix-space-none);
+  max-inline-size: var(--tour-bubble-size, 22rem);
+  padding: var(--tour-padding, var(--helix-space-md));
+  position: fixed;
+}
+
+/* The guard, said the way `Megamenu` learned to say it: an author rule beats
+   the user agent's `[hidden] { display: none }` at any specificity, so a panel
+   given a `display` here keeps it while closed unless something outranks the
+   rule that gave it one. */
+:host [part="bubble"][hidden] {
+  display: none;
+}
+
+[part="content"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+}
+
+/* Trailing, and the skip pushed away from the other two, because leaving is
+   not the same kind of choice as going on. */
+[part="actions"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+  justify-content: flex-end;
+}
+
+[part="skip"] {
+  margin-inline-end: auto;
+}

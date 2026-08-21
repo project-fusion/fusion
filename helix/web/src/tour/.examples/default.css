@@ -1,0 +1,5 @@
+/* Room under the row for the panel to open into, and a starting point that is
+   not on top of the things being pointed at. */
+.start {
+  margin-block-start: var(--helix-space-2xl);
+}

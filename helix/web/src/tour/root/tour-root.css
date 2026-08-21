@@ -1,0 +1,36 @@
+/* The root draws one thing: the light. Everything else is a stop's or a
+   consumer's, which is the whole shape of this family. */
+:host {
+  display: contents;
+}
+
+/* The spotlight, which paints the scrim rather than being cut out of one.
+ *
+ * An enormous spread on the shadow is the darkness, and this box is simply
+ * where it is not. The other way round is a full-screen scrim with a
+ * `clip-path` cut in it, which needs the viewport and the cut in the same
+ * coordinate space, and that stops being true the moment anything between them
+ * is transformed. A shadow has no such requirement: it is painted relative to
+ * this box and nothing else.
+ *
+ * `pointer-events: none` because a tour must not take the page away. A reader
+ * has to be able to reach the thing being pointed at, which is the same
+ * argument as the one against trapping focus. */
+[part="spotlight"] {
+  border-radius: var(--tour-spotlight-radius, var(--helix-radii-md));
+  box-shadow: 0 0 0 100vmax var(--tour-scrim-color, var(--helix-color-overlay));
+  pointer-events: none;
+  position: fixed;
+  transition:
+    inset-block-start var(--helix-duration-normal) var(--helix-easing-standard),
+    inset-inline-start var(--helix-duration-normal) var(--helix-easing-standard),
+    block-size var(--helix-duration-normal) var(--helix-easing-standard),
+    inline-size var(--helix-duration-normal) var(--helix-easing-standard);
+  z-index: var(--helix-layer-overlay);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="spotlight"] {
+    transition: none;
+  }
+}

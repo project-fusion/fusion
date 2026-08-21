@@ -3,6 +3,7 @@ import type {
   HelixAccordion,
   HelixAnnouncement,
   HelixAppHeader,
+  HelixAura,
   HelixAvatarGroup,
   HelixAvatar,
   HelixBadge,
@@ -101,6 +102,8 @@ import type {
   HelixToggle,
   HelixToolbar,
   HelixTooltip,
+  HelixTour,
+  HelixTourStop,
   HelixTreeItem,
   HelixTree,
   HelixVideoPlaylistItem,
@@ -176,8 +179,6 @@ export type HelixAccordionItemHelixCloseElementEvent =
   HelixAccordionItemElementEvent<HelixCloseEvent>;
 
 export type HelixAccordionItemVueProps = {
-  /** Tightens the trigger for dense layouts. */
-  dense?: HelixAccordionItem["dense"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -371,6 +372,47 @@ the wordmark and the actions happen to measure.
 };
 
 export type HelixAppHeaderVueEvents = {};
+
+export type HelixAuraVueProps = {
+  /** Which form the light takes. Absent is `braid`.
+
+Reflected because the fallback gradient selects on it, and given no default
+for the same reason every axis here has none: a default on a reflected
+property writes the attribute onto every host anybody renders. */
+  shape?: HelixAura["shape"];
+  /** How far the settings wander on their own, `0` still and `1` restless.
+
+**One property rather than a range on each of the five.** A range per axis
+is five more things to author and four more chances to write a pair that
+fights another; the reason to want any of it is the same reason in every
+case, which is that a fixed field is legibly a loop. So this is an amount,
+and each axis is given its own span and its own period.
+
+The periods are irrational multiples of each other, so no two axes come
+back into phase and the field has no cycle a reader can count. That is the
+difference between a background that breathes and one that is obviously on
+a timer. */
+  drift?: HelixAura["drift"];
+  /** Whether the pointer shifts and lifts the field.
+
+Reflected because the stylesheet selects on it: a background is not
+hit-testable at rest, or it would swallow clicks meant for what is over it,
+and an element that is not hit-testable never receives the `pointermove`
+this listens for. Asking for the pointer is asking for the hit test. */
+  interactive?: HelixAura["interactive"];
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  bloom?: HelixAura["bloom"];
+  /** Overall brightness, as a multiplier on the field. */
+  gain?: HelixAura["gain"];
+  /** Feature size, as a multiplier on the sampled coordinates. */
+  scale?: HelixAura["scale"];
+  /** How fast it drifts, as a multiplier on time. */
+  speed?: HelixAura["speed"];
+  /** The field's rotation, in degrees. */
+  tilt?: HelixAura["tilt"];
+};
+
+export type HelixAuraVueEvents = {};
 
 export type HelixAvatarGroupVueProps = {
   /** Accessible name for the set, such as "Reviewers". */
@@ -634,8 +676,6 @@ export type HelixCardVueProps = {
   is the surface. For a card inside something already bounded, where a
   second box adds a line and no meaning. */
   appearance?: HelixCard["appearance"];
-  /** Tightens the inset for dense layouts. */
-  dense?: HelixCard["dense"];
   /** Whether media sits above the content stack or beside it. */
   orientation?: HelixCard["orientation"];
 };
@@ -3224,6 +3264,15 @@ what a reader wants from a whole key. */
   "read-only"?: HelixNumberInput["readOnly"];
   /** Whether the field refuses input while still submitting its value. */
   readOnly?: HelixNumberInput["readOnly"];
+  /** Whether a grip is shown that changes the value when it is dragged.
+
+The label is what is dragged, so this adds no chrome at all. Still opt-in,
+because it changes what a press on the label does and a reader who drags
+across a word expecting to select it should get that everywhere it has not
+been asked for. Where it earns its place is a value a reader tunes rather
+than states: a duration, a weight, a count they are looking for rather than
+one they already know. */
+  scrub?: HelixNumberInput["scrub"];
   /** Accessible name for the control that steps down. */
   "decrement-label"?: HelixNumberInput["decrementLabel"];
   /** Accessible name for the control that steps down. */
@@ -5837,6 +5886,93 @@ export type HelixTooltipVueEvents = {
   "helix-close": HelixTooltipHelixCloseElementEvent;
 };
 
+/** `HelixTour` component event */
+export type HelixTourElementEvent<E = Event> = TypedEvent<HelixTour, E>;
+/** `helix-change` event type */
+export type HelixTourHelixChangeElementEvent =
+  HelixTourElementEvent<HelixChangeEvent>;
+/** `helix-complete` event type */
+export type HelixTourHelixCompleteElementEvent =
+  HelixTourElementEvent<HelixCompleteEvent>;
+/** `helix-close` event type */
+export type HelixTourHelixCloseElementEvent =
+  HelixTourElementEvent<HelixCloseEvent>;
+
+export type HelixTourVueProps = {
+  /** Whether the tour is running. */
+  open?: HelixTour["open"];
+  /** Which stop the reader is on. */
+  index?: HelixTour["index"];
+  /** Accessible name for the run, such as "Getting started". */
+  label?: HelixTour["label"];
+  /** Space left around the target when it is lit, in pixels. */
+  "spotlight-padding"?: HelixTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  spotlightPadding?: HelixTour["spotlightPadding"];
+  /** Label for the control that goes back, handed to every stop. */
+  "back-label"?: HelixTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  backLabel?: HelixTour["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTour["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixTour["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixTour["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixTour["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixTour["skipLabel"];
+};
+
+export type HelixTourVueEvents = {
+  /** Fired when the current stop moves, carrying the new index. */
+  "helix-change": HelixTourHelixChangeElementEvent;
+  /** Fired when the last stop is finished. */
+  "helix-complete": HelixTourHelixCompleteElementEvent;
+  /** Fired when the reader leaves early. */
+  "helix-close": HelixTourHelixCloseElementEvent;
+};
+
+export type HelixTourStopVueProps = {
+  /** The id of the element this stop is about. */
+  for?: HelixTourStop["for"];
+  /** Which side of the target the panel prefers. */
+  placement?: HelixTourStop["placement"];
+  /** Whether this is the stop the reader is on.
+
+Written by the root rather than by a consumer, which is the one place this
+family writes onto markup it does not own. It is acceptable here for a
+reason that did not hold for the trail or the avatar group: a tour starts
+closed, so there is no server state to get wrong. The server renders a
+closed tour, a closed tour shows nothing, and nothing can disagree. */
+  current?: HelixTourStop["current"];
+  /** Whether this is the last stop, so the control says Done. */
+  last?: HelixTourStop["last"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  first?: HelixTourStop["first"];
+  /** Label for the control that goes back. */
+  "back-label"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  backLabel?: HelixTourStop["backLabel"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on from the last stop. */
+  "done-label"?: HelixTourStop["doneLabel"];
+  /** Label for the control that goes on from the last stop. */
+  doneLabel?: HelixTourStop["doneLabel"];
+  /** Label for the control that leaves the tour. */
+  "skip-label"?: HelixTourStop["skipLabel"];
+  /** Label for the control that leaves the tour. */
+  skipLabel?: HelixTourStop["skipLabel"];
+};
+
+export type HelixTourStopVueEvents = {};
+
 /** `HelixTreeItem` component event */
 export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;
 /** `helix-select` event type */
@@ -6315,6 +6451,8 @@ export type CustomCssProperties = {
   "--announcement-inset"?: string;
   /** Fill behind the banner. */
   "--app-header-background"?: string;
+  /** The filter behind it. `none` to pair it with a panel. */
+  "--app-header-backdrop"?: string;
   /** The line under the bar. None by default. */
   "--app-header-border-color"?: string;
   /** Height of the banner. */
@@ -6519,6 +6657,10 @@ export type CustomCssProperties = {
   "--loader-color"?: string;
   /** Color of the circle behind it. */
   "--loader-track-color"?: string;
+  /** The panel's own fill. */
+  "--megamenu-background"?: string;
+  /** A filter behind the panel, for glass. */
+  "--megamenu-backdrop"?: string;
   /** How wide the panel may get. */
   "--megamenu-size"?: string;
   /** The narrowest a column goes before the grid wraps. */
@@ -6703,6 +6845,8 @@ export type CustomCssProperties = {
   "--stat-value-size"?: string;
   /** Space between one step and the next. */
   "--steps-gap"?: string;
+  /** Air either side of a mark, before the rail. */
+  "--steps-connector-inset"?: string;
   /** Size of the mark, glyph or digit. */
   "--steps-marker-size"?: string;
   /** The rule running through the steps. */
@@ -6763,6 +6907,16 @@ export type CustomCssProperties = {
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */
   "--tooltip-max-inline-size"?: string;
+  /** The darkness outside the lit box. */
+  "--tour-scrim-color"?: string;
+  /** Corner radius of the lit box. */
+  "--tour-spotlight-radius"?: string;
+  /** How wide the panel may grow. */
+  "--tour-bubble-size"?: string;
+  /** Inset inside the panel. */
+  "--tour-padding"?: string;
+  /** The panel's own surface. */
+  "--tour-surface-color"?: string;
   /** Indent added per level. */
   "--tree-indent"?: string;
   /** Size of the chevron, and the gutter a leaf reserves. */
@@ -6826,6 +6980,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixAppHeader,
     HelixAppHeaderVueProps,
     HelixAppHeaderVueEvents
+  >;
+  /** One fragment shader over a full-screen triangle, with the palette read from the tokens rather than given as colors. That is the whole reason this belongs in a design system instead of in a page: a background written with hex values is an asset that has to be re-cut when the brand moves, and one written against '--helix-color-primary' is a consequence of it.  **Every shape ramps through four token stops**, and the token layer inverts each of them: the page's own background, 'primary-subtle', 'primary', and then a peak. The peak is the foreground on a dark page and 'primary-active' on a light one, because mixing a saturated hue toward near-black takes the chroma out of exactly the pixels carrying the most of it. Which way the page runs is not asked of the mode, which is a private token: it is read off the ground's own luminance, which the shader already has.  **No dependency, and no scene graph.** The geometry is three vertices derived from 'gl_VertexID', so there is no attribute, no buffer and no upload. The common implementations of this reach for a 3D library to draw one quad, which is a camera and a material system for four vertices that never move.  **It stops when nobody is looking**, off screen and in a background tab, and 'prefers-reduced-motion' gets one still frame rather than an empty box: the composition is the point and the drift is a garnish.  **A layer over an interactive aura has to let the pointer through.** The element is hit-testable only when 'interactive' is set, because a background that swallows clicks is worse than one that does nothing, but a scrim or an overlay a consumer paints on top will absorb the move before it arrives. Any decorative layer above this wants 'pointer-events: none'. It has already caught this repository's own bench once.  **The fallback needs no detection.** Where WebGL is refused the canvas never paints and is transparent, and the host carries a gradient of the same tokens underneath. Nothing has to ask whether it worked.  Presentation only, so there is no headless tier: the split exists to keep behavior separate from styling, and there is no structure or semantics here to separate. Decorative, so the host is hidden from assistive technology and takes no pointer events. */
+  "helix-aura": DefineCustomElement<
+    HelixAura,
+    HelixAuraVueProps,
+    HelixAuraVueEvents
   >;
   /** They overlap by a step of space, which is enough to read as a stack without the faces occluding each other. Each carries a ring in the page's own background color, because a stack with no separation between its members reads as one shape rather than several: the ring is what makes the edge of each avatar visible against the one behind it.  Each avatar is drawn over the one before it, which falls out of document order and needs no 'z-index'. The familiar trick for putting the *first* avatar on top is 'row-reverse', and it also reverses the row: the person written first appears last. A facepile whose reading order is the reverse of its markup is the worse trade of the two. */
   "helix-avatar-group": DefineCustomElement<
@@ -7413,6 +7573,18 @@ export interface WcToolkitVueGlobalComponents {
     HelixTooltip,
     HelixTooltipVueProps,
     HelixTooltipVueEvents
+  >;
+  /** The styled tier of 'BaseTour'. It draws the light and nothing else. */
+  "helix-tour": DefineCustomElement<
+    HelixTour,
+    HelixTourVueProps,
+    HelixTourVueEvents
+  >;
+  /** The styled tier of 'BaseTourStop'. The panel is 'Popover''s panel by another name, on purpose. */
+  "helix-tour-stop": DefineCustomElement<
+    HelixTourStop,
+    HelixTourStopVueProps,
+    HelixTourStopVueEvents
   >;
   /** Indent comes from the 'level' the tree sets, as a multiple of one hook, so a node moved to another depth re-indents without any nested selector. Nesting selectors by depth is the usual approach and stops working at whatever depth nobody wrote a rule for.  The twisty rotates rather than swapping glyphs, so opening a branch is a short movement instead of a substitution. Motion carries the state change; the row itself stays flat. */
   "helix-tree-item": DefineCustomElement<

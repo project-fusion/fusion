@@ -7,6 +7,7 @@
  * the type a public property is declared with. Forwarding the module has
  * nothing to keep in step.
  */
+
 export * from '@helix-io/core'
 export * from './accordion/index.js'
 export * from './announcement/index.js'
@@ -80,6 +81,7 @@ export * from './toast/index.js'
 export * from './toggle/index.js'
 export * from './toolbar/index.js'
 export * from './tooltip/index.js'
+export * from './tour/index.js'
 export * from './tree/index.js'
 export * from './video/index.js'
 export * from './video-playlist/index.js'

@@ -100,6 +100,8 @@ declare module 'svelte/elements' {
     'helix-base-toggle': CustomElements['helix-base-toggle']
     'helix-base-toolbar': CustomElements['helix-base-toolbar']
     'helix-base-tooltip': CustomElements['helix-base-tooltip']
+    'helix-base-tour': CustomElements['helix-base-tour']
+    'helix-base-tour-stop': CustomElements['helix-base-tour-stop']
     'helix-base-tree-item': CustomElements['helix-base-tree-item']
     'helix-base-tree': CustomElements['helix-base-tree']
     'helix-base-video-playlist-item': CustomElements['helix-base-video-playlist-item']

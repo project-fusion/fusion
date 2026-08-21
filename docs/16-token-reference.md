@@ -28,11 +28,11 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 97 |
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 47 |
-| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 28 |
+| `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 30 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 43 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 82 |
-| `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 13 |
-| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 288 |
+| `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
+| `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 155 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 113 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 33 |
@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 167 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 169 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 153 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -65,14 +65,14 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 212 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 214 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 267 |
-| `--helix-space-xs` | `var(--_helix-scale-2)` | 223 |
+| `--helix-space-xs` | `var(--_helix-scale-2)` | 227 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 217 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 114 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 118 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 73 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 62 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 38 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 39 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 19 |
 | `--helix-space-control` | `var(--helix-space-md)` | 6 |
 
@@ -84,7 +84,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 |---|---|---|
 | `--helix-radii-none` | `0` | 60 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 195 |
-| `--helix-radii-md` | `var(--_helix-seed-radii)` | 13 |
+| `--helix-radii-md` | `var(--_helix-seed-radii)` | 17 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
 | `--helix-radii-full` | `9999px` | 71 |
 
@@ -149,7 +149,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 186 |
+| `--helix-border-thin` | `1px` | 188 |
 | `--helix-border-thick` | `2px` | 49 |
 
 ## shadow
@@ -161,7 +161,7 @@ Elevation.
 | `--helix-shadow-none` | `none` | 2 |
 | `--helix-shadow-sm` | `0 1px 2px color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent)` | 16 |
 | `--helix-shadow-md` | `0 4px 12px color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent)` | 22 |
-| `--helix-shadow-lg` | `0 12px 32px color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent)` | 28 |
+| `--helix-shadow-lg` | `0 12px 32px color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent)` | 30 |
 
 ## material
 
@@ -184,8 +184,8 @@ How long something takes.
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 4 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 331 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 97 |
-| `--helix-duration-slow` | `var(--_helix-ms-320)` | 19 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 107 |
+| `--helix-duration-slow` | `var(--_helix-ms-320)` | 21 |
 
 ## easing
 
@@ -193,9 +193,9 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 289 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 299 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 65 |
-| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 27 |
+| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 28 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |
 
@@ -249,5 +249,5 @@ Position in the stack. Positional, never named after a component.
 | `--helix-layer-base` | `0` | 8 |
 | `--helix-layer-raised` | `10` | 32 |
 | `--helix-layer-sticky` | `100` | 5 |
-| `--helix-layer-overlay` | `1000` | 2 |
+| `--helix-layer-overlay` | `1000` | 4 |
 | `--helix-layer-toast` | `1200` | 2 |
