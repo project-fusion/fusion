@@ -1,0 +1,56 @@
+/* The shaft, and the hero it sits behind.
+   
+   Scoped to this route rather than added to the site's stylesheet: it is a
+   candidate, and a background is the one decision on a page that everything
+   else has to be legible against. */
+
+.pillarHero {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-block-size: min(88svh, 54rem);
+  overflow: clip;
+  background: var(--helix-color-background);
+}
+
+/* Behind the words and out of the accessibility tree. `inset: 0` rather than a
+   size, so it tracks the hero through every breakpoint without a second copy of
+   the hero's dimensions living here. */
+.pillarCanvasFrame {
+  position: absolute;
+  inset: 0;
+}
+
+.pillarCanvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  /* `screen`, so the shaft adds light to the page rather than painting over it:
+     a beam that can darken what is behind it is not a beam. */
+  mix-blend-mode: screen;
+}
+
+/* The floor the text stands on. Without it the shaft's brightest filaments run
+   straight under the lede, and a 0.19-chroma blue behind body copy is the one
+   place this composition can fail an audit rather than just look busy. */
+.pillarScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    var(--helix-color-background) 0%,
+    color-mix(in oklab, var(--helix-color-background) 72%, transparent) 38%,
+    transparent 68%
+  );
+}
+
+/* Positioned, and that is the whole of the stacking.
+   
+   Three `z-index` values would need three layer tokens, and the scale has two
+   that fit: `base` and `raised`. Positioned elements with no `z-index` stack in
+   tree order, and the tree already says what the order is, canvas then scrim
+   then words. So the rule that would have needed a number nobody could name is
+   the absence of one. */
+.pillarShell {
+  position: relative;
+}
