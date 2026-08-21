@@ -93,19 +93,23 @@ export default function Home() {
               which is the one fact the title does not carry. */}
           <helix-flex align="center" data-density="sm" gap="sm" wrap>
             <helix-tag>Fusion Development Group</helix-tag>
-            <helix-text appearance="label" tone="subtle">
-              Two substrates, and the work built on them
-            </helix-text>
           </helix-flex>
           <helix-text as="h1" class="heroTitle">
             Interface and intelligence engineering
           </helix-text>
-          {/* One sentence. Three was a paragraph before the reader had decided
-              to read anything: the licence, the engagement and the pricing
-              policy all arrived above the fold and none of them is the reason
-              anybody stays. Each has a page, and the page says it better. */}
+          {/* **Not a sentence about us.** "We build the software, and we built
+              the tools underneath it" is two clauses of who we are, offered to
+              a reader who has not yet been given a reason to care who we are.
+              What they can do with the page is the thing worth saying first,
+              and it happens to be the shortest way to say that this is two
+              audiences: one takes the tools and never talks to us, the other
+              hires the people who wrote them.
+    
+              One sentence. Three was a paragraph before anybody had decided to
+              read one, and the licence, the engagement and the pricing policy
+              each have a page that says it better. */}
           <helix-text as="p" class="heroLede measure" tone="muted">
-            We build the software, and we built the tools underneath it.
+            Take the tools, or hire the people who built them.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link
@@ -130,7 +134,7 @@ export default function Home() {
               What we offer
             </helix-text>
             <helix-text as="h2" class="sectionTitle measure">
-              Two substrates, and the work built on them
+              Take the substrates. Hire the work.
             </helix-text>
             {/* **The licence is not the argument, and it used to lead.** Whether
                 a package is MIT matters to about one reader in fifty and to
@@ -292,12 +296,6 @@ export default function Home() {
           says there is more, which there is. */}
       <section className="band reveal showcaseBand">
         <div className="shell showcaseSplit">
-          {/* Rules top and bottom, and one down the middle. Three dividers turn
-              the band into a bounded region rather than a passage through the
-              page: the section has a top and a bottom the way a table does, and
-              the stage fills its half of that region edge to edge. */}
-          <helix-divider class="showcaseRule"></helix-divider>
-
           <helix-flex class="showcaseProse" direction="column" gap="sm">
             <helix-text appearance="label" tone="subtle">
               Helix
@@ -476,8 +474,6 @@ export default function Home() {
               </helix-card>
             </div>
           </div>
-
-          <helix-divider class="showcaseRule"></helix-divider>
         </div>
       </section>
 

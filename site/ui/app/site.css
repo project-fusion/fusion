@@ -2456,9 +2456,18 @@ helix-drawer helix-tree {
    far taller than the window, ended up below the fold. A window has a size.
    `align-content: stretch` overrides the centring every other band wants, so
    the rows actually divide the height rather than clustering in the middle. */
+/* **A screen means a screen you can see, not a screen's worth of pixels.**
+   The masthead is sticky and takes a row in flow, so a band of exactly 100svh
+   starts below it and ends the same distance past the fold: measured at 57 to
+   777 against a 720 window, which is a full viewport tall and not once visible
+   all at once. Subtracting the header is what makes it fit.
+ 
+   `align-content: stretch` on this band alone, overriding the centring every
+   other band wants, or its rows cluster in the middle instead of dividing the
+   height. */
 .showcaseBand {
   align-content: stretch;
-  block-size: 100svh;
+  block-size: calc(100svh - var(--helix-size-header));
 }
 
 /* Prose, rule, stage. The prose column is clamped rather than fractional: a
@@ -2491,13 +2500,6 @@ helix-drawer helix-tree {
   min-block-size: 0;
   display: grid;
   grid-template-columns: minmax(20rem, 30rem) auto minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto;
-}
-
-/* The horizontal rules span everything, including the column gap, so the region
-   reads as one bounded thing rather than two boxes with lids. */
-.showcaseRule {
-  grid-column: 1 / -1;
 }
 
 .showcaseProse {
@@ -2513,13 +2515,12 @@ helix-drawer helix-tree {
  * fade says there is more, which there is. `mask-image` and not a gradient
  * overlay, because an overlay would need the page's own background colour and
  * this panel is not that colour. */
-/* The stage fills the divided area rather than floating inside it.
+/* The stage is a panel again, with its own edges.
  *
- * No border and no radius: the rules above, below and beside it *are* its
- * edges, and a second edge drawn a pixel inside them is a box in a frame. No
- * height cap either, because the row it sits in is already the height of the
- * region, and capping it would leave a gap under it that the bottom rule would
- * then be nowhere near.
+ * The rules top and bottom are gone, so nothing else is drawing them: a border
+ * and a radius are what say where the recess stops, and rounded is what the
+ * rest of this page is. It still fills the height beside the prose, so the
+ * middle rule runs its full length.
  *
  * Masked at the foot rather than cut. A hard edge says the layout ran out; a
  * fade says there is more, which there is. `mask-image` and not an overlay,
@@ -2527,6 +2528,8 @@ helix-drawer helix-tree {
  * page's colour. */
 .showcaseStage {
   background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
   /* Same rule again one level down: the stage is a grid item too, and its
      contents are twice the height of the region it sits in. */
   min-block-size: 0;
@@ -2545,7 +2548,6 @@ helix-drawer helix-tree {
 
   .showcaseSplit {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
   }
 
   .showcaseSplit helix-divider {
