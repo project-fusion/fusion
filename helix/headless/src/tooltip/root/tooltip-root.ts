@@ -59,7 +59,9 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * `requestControlledChange` warning about a controlled property nothing
  * answered.
  *
- * It shows on hover and on focus, and hides on leave, on blur, and on Escape.
+ * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
+ * once the trigger has been activated: the hint is spent when the control has
+ * been used.
  * A tooltip that answers only the pointer is one a keyboard reader never sees.
  *
  * The pointer waits out `delay` first, or sweeping a row of controls flashes a
@@ -366,6 +368,31 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
+   * Activating the trigger closes the bubble, which nothing was doing.
+   *
+   * A tooltip is a hint about what a control will do, and once the control has
+   * been used the hint is spent. Nothing else was going to take it down either:
+   * `pointerleave` cannot fire while the pointer is still on the button it just
+   * pressed, and `focusout` does not fire when activation leaves focus where it
+   * was. So a gear that opened a drawer left its own label floating over the
+   * drawer until the reader moved the mouse away.
+   *
+   * `click` rather than `pointerdown`, because it is the one event both a mouse
+   * and a keyboard produce: Enter and Space on a focused button raise it, and a
+   * hint that outlived activation for keyboard readers alone would be the same
+   * bug with a smaller audience.
+   *
+   * Holds are cleared as well as hiding, the same as Escape. Leaving them set
+   * means the pointer is still recorded as being over the trigger, so the next
+   * `focusout` anywhere releases nothing and the bubble comes back on a
+   * `release` it should have been dropped from.
+   */
+  private readonly handleActivate = (): void => {
+    this.holds.clear()
+    this.hide()
+  }
+
+  /**
    * Escape closes the bubble from wherever the reader is.
    *
    * On the document, not on the host, which is where it was: a tooltip opened
@@ -416,12 +443,14 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
     // committed to it, where a pointer crossing one has not.
     target.addEventListener('focusin', this.showNow)
     target.addEventListener('focusout', this.releaseFocus)
+    target.addEventListener('click', this.handleActivate)
     this.bound = target
   }
 
   private unbind(): void {
     this.bound?.removeEventListener('pointerenter', this.showLater)
     this.bound?.removeEventListener('pointerleave', this.hideLater)
+    this.bound?.removeEventListener('click', this.handleActivate)
     this.bound?.removeEventListener('focusin', this.showNow)
     this.bound?.removeEventListener('focusout', this.releaseFocus)
     this.bound = undefined

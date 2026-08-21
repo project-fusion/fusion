@@ -249,4 +249,32 @@ describe('tooltip for', () => {
     }
     expect(warnings).toEqual([])
   })
+
+  test('activating the trigger takes the hint down', async () => {
+    /* Nothing else would. `pointerleave` cannot fire while the pointer is still
+       on the button it just pressed, and `focusout` does not fire when
+       activation leaves focus where it was, so a gear that opened a drawer left
+       its own label floating over the drawer.
+
+       Holds are cleared with it: left set, the pointer stays recorded as being
+       over the trigger and the next release anywhere brings the bubble back. */
+    const host = (await mount(
+      '<helix-tooltip content="Preferences"><button type="button">gear</button></helix-tooltip>',
+    )) as HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
+    await host.updateComplete
+
+    host.dispatchEvent(new Event('focusin', { bubbles: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+
+    const trigger = host.querySelector('button') as HTMLButtonElement
+    trigger.click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+
+    // And it stays down: a focusout now must not release it back open.
+    host.dispatchEvent(new Event('focusout', { bubbles: true }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
 })
