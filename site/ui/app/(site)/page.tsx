@@ -168,9 +168,11 @@ export default function Home() {
             ))}
           </helix-grid>
 
-          <Link data-link href="/services">
-            See what each one includes, and what it costs
-          </Link>
+          <helix-flex data-density="lg">
+            <Link data-button href="/services">
+              See what each one costs
+            </Link>
+          </helix-flex>
         </helix-flex>
       </section>
 
@@ -200,9 +202,11 @@ export default function Home() {
                 <helix-text as="p" tone="muted">
                   {product.body}
                 </helix-text>
-                <a data-link href={product.href}>
-                  Read more
-                </a>
+                <helix-flex data-density="sm">
+                  <a data-button="subtle" href={product.href}>
+                    Read more
+                  </a>
+                </helix-flex>
               </helix-flex>
             ))}
           </helix-grid>
@@ -244,9 +248,11 @@ export default function Home() {
                   </helix-flex>
                   <helix-text tone="muted">{vertical.summary}</helix-text>
                 </helix-flex>
-                <a data-link="quiet" href={vertical.href}>
-                  Open
-                </a>
+                <helix-flex data-density="sm">
+                  <a data-button href={vertical.href}>
+                    Open
+                  </a>
+                </helix-flex>
               </helix-flex>
             ))}
           </helix-flex>
@@ -285,7 +291,7 @@ export default function Home() {
                 The arguments, written down
               </helix-text>
             </helix-flex>
-            <Link data-link href="/insights">
+            <Link data-button href="/insights">
               Read all
             </Link>
           </helix-flex>
@@ -337,12 +343,12 @@ export default function Home() {
             take the work we take. Energy and hardware are further out and we say so. Behind all of
             it is one rule: nothing we build should create a dependency you cannot leave.
           </helix-text>
-          <helix-flex data-density="sm" gap="lg" wrap>
-            <Link data-link href="/thesis">
+          <helix-flex data-density="lg" gap="sm" wrap>
+            <Link data-button href="/thesis">
               Read the thesis
             </Link>
-            <Link data-link href="/trust">
-              What has to be true before anything ships
+            <Link data-button href="/trust">
+              The trust bar
             </Link>
           </helix-flex>
         </helix-flex>
