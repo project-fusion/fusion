@@ -53,4 +53,22 @@ describe('aura', () => {
     expect(host.getAttribute('shape')).toBe('aurora')
     expect(host.getAttribute('speed')).toBeNull()
   })
+  test('takes no pointer events at rest, and takes them when asked', async () => {
+    /* The two halves are one decision. A background that is hit-testable
+       swallows clicks meant for what is laid over it; one that is not never
+       receives the `pointermove` the pointer feature is built on. Measured on a
+       real gesture before this: the host reported `pointer-events: none` and
+       not one mark reached the wake, while synthetic events kept passing
+       because dispatching skips hit-testing entirely. */
+    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+      interactive: boolean
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+    expect(host.hasAttribute('interactive')).toBe(false)
+
+    host.interactive = true
+    await host.updateComplete
+    expect(host.hasAttribute('interactive')).toBe(true)
+  })
 })

@@ -258,10 +258,11 @@ takes no pointer events.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `bloom` | `bloom` | `number` | `0.5` | - | How soft the falloff is, `0` tight and `1` diffuse. |
+| `drift` | `drift` | `number` | `0` | - | How far the settings wander on their own, `0` still and `1` restless. |
 | `gain` | `gain` | `number` | `1` | - | Overall brightness, as a multiplier on the field. |
 | `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
-| `shape` | `shape` | `'aurora' \| 'braid' \| 'orbit' \| 'rays' \| 'weave' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
+| `shape` | `shape` | `'aurora' \| 'braid' \| 'flow' \| 'orbit' \| 'rays' \| 'weave' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
 | `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
 | `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
 

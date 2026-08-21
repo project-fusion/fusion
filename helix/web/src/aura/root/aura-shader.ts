@@ -4,7 +4,7 @@
  * Exported so the component can turn a property into the integer the uniform
  * takes without a second list to keep in step.
  */
-export const SHAPES = ['braid', 'rays', 'aurora', 'orbit', 'weave'] as const
+export const SHAPES = ['braid', 'rays', 'aurora', 'orbit', 'weave', 'flow'] as const
 
 /** Which form the light takes. */
 export type AuraShape = (typeof SHAPES)[number]
@@ -50,10 +50,22 @@ export const FRAGMENT = `#version 300 es
   uniform vec2 uPointer;
   uniform float uReach;
   uniform float uTilt;
-  uniform float uSpeed;
   uniform float uScale;
   uniform float uBloom;
   uniform float uGain;
+  /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
+     was left to 1 when it has faded, so a spent slot costs a compare.
+
+     **This is what a fluid gets from a framebuffer, bought for eight vec3s.** A
+     real solver advects a dye texture and reads it back the next frame, which
+     needs render targets, a ping-pong pair and about six passes. What a reader
+     actually perceives from that is one thing: the cursor leaves a wake that
+     outlives it. A short history of where it went reproduces that in the single
+     pass this component already makes, at a fixed cost that does not grow with
+     how long the page has been open. What it cannot do is conserve anything, so
+     there is no diffusion and no pressure: the wake decays rather than
+     spreading. Worth knowing before this is asked to be a simulation. */
+  uniform vec3 uTrail[8];
   uniform vec3 uGround;
   uniform vec3 uHaze;
   uniform vec3 uGlow;
@@ -149,6 +161,44 @@ export const FRAGMENT = `#version 300 es
     return pow(rings, 4.0) * mix(0.45, 1.45, grain) * exp(-r * 1.05);
   }
 
+  /* Ink in a viscous medium, stirred by where the pointer has been.
+   *
+   * The field is warped by itself twice over, which is what gives a liquid its
+   * unhurried, folded look: each sample is displaced by the field's own value,
+   * so structure gathers into sheets rather than staying a cloud.
+   *
+   * Every trail point adds a vortex, rotating the sample around it by the
+   * perpendicular of the offset. Rotating the *coordinate* rather than adding a
+   * blob is what makes it read as stirring: the pattern that was there is
+   * carried around the point instead of being painted over. */
+  float flow(vec2 q, float t) {
+    vec2 p = q * 0.9;
+    float stirred = 0.0;
+
+    for (int i = 0; i < 8; i++) {
+      vec3 mark = uTrail[i];
+      if (mark.z >= 1.0) {
+        continue;
+      }
+      vec2 d = p - mark.xy;
+      float r = length(d);
+      /* Squared falloff of age, so a wake thins as it dies rather than
+         switching off, and an exponential in distance so the swirl is local. */
+      float life = (1.0 - mark.z) * (1.0 - mark.z);
+      float swirl = life * exp(-r * 2.4);
+      p += vec2(-d.y, d.x) * swirl * 0.75;
+      stirred += swirl;
+    }
+
+    /* The resting state matters more than the stirred one: most readers never
+       move the pointer, and a shape that is dark until touched is a shape most
+       people never see. */
+    float ink = warped(p * 1.15, t * 0.55);
+    float sheet = warped(p * 2.3 + vec2(3.1, 1.7), t * 0.35);
+    float body = mix(0.55, 1.3, ink) * mix(0.5, 1.15, sheet);
+    return body * (0.42 + clamp(stirred, 0.0, 1.6) * 0.75) * exp(-length(q) * 0.5);
+  }
+
   /* Two wave fields crossed, lit where they agree. */
   float weave(vec2 q, float t) {
     float a = 0.62;
@@ -172,7 +222,7 @@ export const FRAGMENT = `#version 300 es
     q = vec2(q.x * cos(a) - q.y * sin(a), q.x * sin(a) + q.y * cos(a));
     q *= uScale;
 
-    float t = uTime * 0.06 * uSpeed;
+    float t = uTime * 0.06;
 
     float d = 0.0;
     if (uShape == 0) {
@@ -183,8 +233,10 @@ export const FRAGMENT = `#version 300 es
       d = aurora(q, t);
     } else if (uShape == 3) {
       d = orbit(q, t);
-    } else {
+    } else if (uShape == 4) {
       d = weave(q, t);
+    } else {
+      d = flow(q, t);
     }
 
     /* Bloom as an exponent on the field rather than a term inside each shape.

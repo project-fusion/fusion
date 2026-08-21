@@ -61,10 +61,34 @@ export class HelixAura extends HelixElement {
    * property writes the attribute onto every host anybody renders.
    */
   @property({ reflect: true })
-  shape?: 'aurora' | 'braid' | 'orbit' | 'rays' | 'weave'
+  shape?: 'aurora' | 'braid' | 'flow' | 'orbit' | 'rays' | 'weave'
 
-  /** Whether the pointer shifts and lifts the field. */
-  @property({ type: Boolean })
+  /**
+   * How far the settings wander on their own, `0` still and `1` restless.
+   *
+   * **One property rather than a range on each of the five.** A range per axis
+   * is five more things to author and four more chances to write a pair that
+   * fights another; the reason to want any of it is the same reason in every
+   * case, which is that a fixed field is legibly a loop. So this is an amount,
+   * and each axis is given its own span and its own period.
+   *
+   * The periods are irrational multiples of each other, so no two axes come
+   * back into phase and the field has no cycle a reader can count. That is the
+   * difference between a background that breathes and one that is obviously on
+   * a timer.
+   */
+  @property({ type: Number })
+  drift = 0
+
+  /**
+   * Whether the pointer shifts and lifts the field.
+   *
+   * Reflected because the stylesheet selects on it: a background is not
+   * hit-testable at rest, or it would swallow clicks meant for what is over it,
+   * and an element that is not hit-testable never receives the `pointermove`
+   * this listens for. Asking for the pointer is asking for the hit test.
+   */
+  @property({ reflect: true, type: Boolean })
   interactive = false
 
   /** How soft the falloff is, `0` tight and `1` diffuse. */
@@ -100,6 +124,16 @@ export class HelixAura extends HelixElement {
   private last = 0
   private width = 0
   private height = 0
+
+  /**
+   * Where the pointer has been, as flat triples of x, y and age.
+   *
+   * A ring rather than a queue: the oldest slot is overwritten, so nothing is
+   * allocated and the cost is the same on the first second and the thousandth.
+   */
+  private readonly trail = new Float32Array(8 * 3).fill(1)
+  private trailNext = 0
+  private trailLeft = 0
 
   /** Where the pointer is, and where the field has got to. The gap is weight. */
   private readonly target = { reach: 0, x: 0, y: 0 }
@@ -157,9 +191,9 @@ export class HelixAura extends HelixElement {
       'uResolution',
       'uScale',
       'uShape',
-      'uSpeed',
       'uTilt',
       'uTime',
+      'uTrail',
     ]) {
       this.uniforms[name] = this.gl.getUniformLocation(this.program, name)
     }
@@ -291,11 +325,14 @@ export class HelixAura extends HelixElement {
 
     gl.uniform1f(uniforms.uTime ?? null, this.elapsed)
     gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.shape ?? 'braid'))
-    gl.uniform1f(uniforms.uTilt ?? null, this.tilt)
-    gl.uniform1f(uniforms.uSpeed ?? null, this.speed)
-    gl.uniform1f(uniforms.uScale ?? null, this.scale)
-    gl.uniform1f(uniforms.uBloom ?? null, this.bloom)
-    gl.uniform1f(uniforms.uGain ?? null, this.gain)
+    /* Each axis wanders on its own period. The seeds are deliberately not
+       simple ratios of each other: two axes on periods that divide would come
+       back into phase and give the whole field a beat. */
+    gl.uniform1f(uniforms.uTilt ?? null, this.drifted(this.tilt, 14, 0.037))
+    gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
+    gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
+    gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
+    gl.uniform3fv(uniforms.uTrail ?? null, this.trail)
     gl.uniform2f(uniforms.uPointer ?? null, this.eased.x, this.eased.y)
     gl.uniform1f(uniforms.uReach ?? null, this.eased.reach)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -322,7 +359,7 @@ export class HelixAura extends HelixElement {
        every pause means a reader who switched tabs and came back finds the
        field snapped to its opening frame, which is the one thing a background
        must never do. */
-    this.elapsed += delta
+    this.elapsed += delta * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
 
     /* Frame-rate independent easing. A fixed factor per frame ties the feel to
        the refresh rate, so a 120Hz display would chase twice as eagerly. */
@@ -333,6 +370,7 @@ export class HelixAura extends HelixElement {
     this.eased.x += (this.target.x - this.eased.x) * k
     this.eased.y += (this.target.y - this.eased.y) * k
     this.eased.reach += (this.target.reach - this.eased.reach) * k
+    this.age(delta)
 
     this.resize()
     this.paint()
@@ -356,6 +394,37 @@ export class HelixAura extends HelixElement {
     this.last = 0
   }
 
+  /**
+   * One axis, wandering around its set value.
+   *
+   * Two sines at an irrational ratio rather than one, so a single axis has no
+   * period of its own either. Bounded by construction: the weights sum to one,
+   * so the value never leaves `base` plus or minus `span`.
+   */
+  private drifted(base: number, span: number, seed: number): number {
+    if (!this.drift) {
+      return base
+    }
+    const t = this.elapsed
+    const wave = Math.sin(t * seed) * 0.6 + Math.sin(t * seed * 1.618 + 2.1) * 0.4
+    return base + span * this.drift * wave
+  }
+
+  /** Ages the wake, and drops a fresh mark where the pointer has moved far. */
+  private age(delta: number): void {
+    /* Two seconds to fade. Long enough that a wake outlives the gesture that
+       made it, which is the whole effect, and short enough that a page left
+       alone settles rather than keeping a drawing nobody made. */
+    for (let i = 2; i < this.trail.length; i += 3) {
+      const next = (this.trail[i] ?? 1) + delta / 2
+      this.trail[i] = next > 1 ? 1 : next
+    }
+    if (this.trailLeft <= 0) {
+      return
+    }
+    this.trailLeft -= delta
+  }
+
   private readonly handlePointer = (event: PointerEvent): void => {
     if (this.motion?.matches) {
       return
@@ -365,6 +434,19 @@ export class HelixAura extends HelixElement {
     this.target.x = ((event.clientX - box.left) / box.width - 0.5) * 2 * aspect
     this.target.y = -((event.clientY - box.top) / box.height - 0.5) * 2
     this.target.reach = this.interactive ? 1 : 0
+
+    /* Marks are dropped on a clock rather than on every move. A pointer emits
+       far more events than eight slots can hold, so unthrottled the whole wake
+       is the last few milliseconds of a gesture and none of its shape. */
+    if (this.trailLeft > 0 || !this.interactive) {
+      return
+    }
+    this.trailLeft = 0.05
+    const at = this.trailNext * 3
+    this.trail[at] = this.target.x
+    this.trail[at + 1] = this.target.y
+    this.trail[at + 2] = 0
+    this.trailNext = (this.trailNext + 1) % 8
   }
 
   private readonly handleLeave = (): void => {

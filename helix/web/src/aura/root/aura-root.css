@@ -19,14 +19,25 @@
   );
 }
 
-/* Decorative, and out of the way of everything.
+/* Decorative, and out of the way of everything it is behind.
  *
- * `pointer-events: none` on the host rather than on the canvas: the element is
- * a background, so a control laid over it must stay clickable, and a consumer
- * who wants the pointer to drive it gets that through the element's own
- * listener rather than by taking hit-testing away from their page. */
+ * **Conditional, and it was not.** A background must not swallow clicks meant
+ * for what is laid over it, so the resting state is untouchable. But the
+ * element listens for `pointermove` on itself, and an element that is not
+ * hit-testable never receives one: measured with a real gesture across it, the
+ * host reported `pointer-events: none` and not a single mark reached the wake.
+ * Synthetic events hid it completely, because dispatching bypasses hit-testing,
+ * so every test of the feature passed while the feature did nothing.
+ *
+ * So `interactive` reflects, which is the one thing that justifies reflecting
+ * it: reflection exists so a selector can reach a value, and this is the
+ * selector. A consumer who asks for the pointer is asking for the hit test. */
 :host {
   pointer-events: none;
+}
+
+:host([interactive]) {
+  pointer-events: auto;
 }
 
 [part="canvas"] {

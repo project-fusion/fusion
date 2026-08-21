@@ -18,6 +18,10 @@ const SHAPES = [
     body: 'Two wave fields crossed, lit only where they agree. A lattice that breathes.',
     name: 'weave',
   },
+  {
+    body: 'Ink in a viscous medium. Move the pointer and the wake outlives the gesture.',
+    name: 'flow',
+  },
 ] as const
 
 /** Every knob, and the grain that is useful for what it does. */
@@ -27,11 +31,19 @@ const KNOBS = [
   { key: 'scale', label: 'Scale', max: 3, min: 0.3, step: 0.05 },
   { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
   { key: 'gain', label: 'Gain', max: 2.5, min: 0.2, step: 0.05 },
+  { key: 'drift', label: 'Drift', max: 1, min: 0, step: 0.05 },
 ] as const
 
 type Knob = (typeof KNOBS)[number]['key']
 
-const RESTING: Record<Knob, number> = { bloom: 0.5, gain: 1, scale: 1, speed: 1, tilt: 14 }
+const RESTING: Record<Knob, number> = {
+  bloom: 0.5,
+  drift: 0,
+  gain: 1,
+  scale: 1,
+  speed: 1,
+  tilt: 14,
+}
 
 /**
  * The bench, now driving `helix-aura` rather than a second copy of it.
@@ -60,6 +72,7 @@ export function ShapeLab(): React.ReactElement {
       <div className="shapeCanvasFrame">
         <helix-aura
           bloom={knobs.bloom}
+          drift={knobs.drift}
           gain={knobs.gain}
           interactive={interactive || undefined}
           scale={knobs.scale}
