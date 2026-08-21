@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { createTokenReader } from '../../../../lib/token-color'
 
 /**
  * A volumetric shaft of light, drawn as one fragment shader.
@@ -258,53 +259,17 @@ export function LightPillar(): React.ReactElement {
     const uDeep = gl.getUniformLocation(program, 'uDeep')
     const uInk = gl.getUniformLocation(program, 'uInk')
 
-    /* The token layer's answer, whatever it currently is. `getComputedStyle` on
-       a probe is the only way to see a resolved color at all: the custom
-       property's own value is the unevaluated function text. */
-    const probe = document.createElement('span')
-    probe.style.display = 'none'
-    document.body.appendChild(probe)
-
-    /* A 1x1 canvas is what converts it, and parsing the string is what this did
-       until it was measured.
-
-       `getComputedStyle().color` is not `rgb()`. The palette derives from an
-       `oklch()` seed and Chrome answers `lab(100 0 0)` for white, which a
-       regular expression for numbers reads as the three channels 100, 0 and 0.
-       Divided by 255 that is a dark red, so `--helix-color-foreground` arrived
-       as one: measured as a warm streak down the right of the shaft in dark
-       mode, and as a black half-hero in light mode, where the background token
-       resolved to the same shape and handed the shader a ground it then painted
-       everything against.
-
-       Filling a pixel and reading it back asks the browser to do the
-       conversion, so it holds for `lab()`, `oklch()`, `color-mix()` and
-       whatever a token is written in next. */
-    const swatch = document.createElement('canvas')
-    swatch.width = 1
-    swatch.height = 1
-    const ctx = swatch.getContext('2d', { willReadFrequently: true })
-
-    const readColor = (token: string, fallback: [number, number, number]) => {
-      if (!ctx) {
-        return fallback
-      }
-      probe.style.color = `var(${token})`
-      /* Reset first. An unparseable value leaves `fillStyle` where it was,
-         which would silently hand back the previous token's color. */
-      ctx.fillStyle = '#000000'
-      ctx.fillStyle = getComputedStyle(probe).color
-      ctx.fillRect(0, 0, 1, 1)
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
-      return [(r ?? 0) / 255, (g ?? 0) / 255, (b ?? 0) / 255] as [number, number, number]
-    }
+    /* Extracted to `lib/token-color`, because the `lab()` trap it closes is not
+       a fact about this shader. Two shaders read the palette now and a third
+       will, and a copy of that reasoning in each is a copy that can rot. */
+    const tokens = createTokenReader()
 
     const applyColors = () => {
-      gl.uniform3fv(uGround, readColor('--helix-color-background', [0, 0, 0]))
-      gl.uniform3fv(uHaze, readColor('--helix-color-primary-subtle', [0.05, 0.09, 0.28]))
-      gl.uniform3fv(uGlow, readColor('--helix-color-primary', [0.24, 0.36, 0.9]))
-      gl.uniform3fv(uDeep, readColor('--helix-color-primary-active', [0.1, 0.2, 0.55]))
-      gl.uniform3fv(uInk, readColor('--helix-color-foreground', [1, 1, 1]))
+      gl.uniform3fv(uGround, tokens.read('--helix-color-background', [0, 0, 0]))
+      gl.uniform3fv(uHaze, tokens.read('--helix-color-primary-subtle', [0.05, 0.09, 0.28]))
+      gl.uniform3fv(uGlow, tokens.read('--helix-color-primary', [0.24, 0.36, 0.9]))
+      gl.uniform3fv(uDeep, tokens.read('--helix-color-primary-active', [0.1, 0.2, 0.55]))
+      gl.uniform3fv(uInk, tokens.read('--helix-color-foreground', [1, 1, 1]))
     }
     applyColors()
 
@@ -315,7 +280,7 @@ export function LightPillar(): React.ReactElement {
     const repaint = () => {
       applyColors()
       if (!frame) {
-        draw(0)
+        draw(elapsed)
       }
     }
 
@@ -354,13 +319,20 @@ export function LightPillar(): React.ReactElement {
     }
 
     let frame = 0
-    let start = 0
+    let elapsed = 0
+    let last = 0
+    /* Elapsed time accumulates across pauses rather than being measured from a
+       start stamp. `start` was reset on every stop, so a reader who switched
+       tabs and came back found the shaft snapped to its opening frame, which is
+       the one thing a background must never do. */
     const loop = (now: number) => {
-      if (!start) {
-        start = now
+      if (!last) {
+        last = now
       }
+      elapsed += Math.min((now - last) / 1000, 0.05)
+      last = now
       resize()
-      draw((now - start) / 1000)
+      draw(elapsed)
       frame = requestAnimationFrame(loop)
     }
 
@@ -372,6 +344,9 @@ export function LightPillar(): React.ReactElement {
         cancelAnimationFrame(frame)
         frame = 0
       }
+      /* `last` alone is cleared, so the next frame measures no delta against a
+         stale stamp. `elapsed` is deliberately kept. */
+      last = 0
     }
     const play = () => {
       if (!frame && !motion.matches && !document.hidden) {
@@ -401,13 +376,13 @@ export function LightPillar(): React.ReactElement {
        the composition rather than the animation, so the right answer is the
        picture without the drift, not an empty box. */
     resize()
-    draw(0)
+    draw(elapsed)
     play()
 
     const onResize = () => {
       resize()
       if (motion.matches) {
-        draw(0)
+        draw(elapsed)
       }
     }
     window.addEventListener('resize', onResize)
@@ -419,7 +394,7 @@ export function LightPillar(): React.ReactElement {
       scheme.removeEventListener('change', repaint)
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', onResize)
-      probe.remove()
+      tokens.dispose()
       gl.deleteProgram(program)
       gl.deleteShader(vs)
       gl.deleteShader(fs)
