@@ -73,9 +73,43 @@ export class HelixFormElement extends HelixElement {
     return this.disabled || this.formDisabled
   }
 
-  /** The platform's notice that an ancestor fieldset changed. */
+  /**
+   * The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   */
   formDisabledCallback(disabled: boolean): void {
-    this.formDisabled = disabled
+    this.formDisabled = disabled && !this.disabled
   }
 
   protected override willUpdate(changed: PropertyValues): void {

@@ -12,6 +12,53 @@ const marksOf = (host: HTMLElement): string[] =>
   )
 
 describe('slider', () => {
+  test('a control that was disabled can be enabled again', async () => {
+    /* Re-enabling is the only way this shows. Reflecting `disabled` to the host
+       attribute makes the UA call formDisabledCallback synchronously from
+       inside Lit's update(), and a reactive write there is a change-in-update
+       Lit does not re-render for, so `formDisabled` ran one update behind: the
+       host went correct, `:disabled` stopped matching, and the inner control
+       kept the attribute for good. Every form control in the library, and
+       invisible to anything that only ever disables.
+    
+       **The callback is invoked here rather than awaited.** happy-dom does not
+       implement form-associated disabling, so a spec that only sets `disabled`
+       passes whether or not the bug is present: verified by putting the old
+       one-liner back into the built output, where it still went green. What the
+       UA contributes is this call, so the spec makes it. */
+    const host = (await mount(
+      '<helix-slider label="A" max="1" min="0" step="0.05"></helix-slider>',
+    )) as Updatable & { disabled: boolean; formDisabledCallback: (off: boolean) => void }
+    const control = () => part(host, 'control') as HTMLInputElement
+
+    host.disabled = true
+    host.formDisabledCallback(true)
+    await host.updateComplete
+    expect(control().disabled).toBe(true)
+
+    host.disabled = false
+    await host.updateComplete
+    expect(control().disabled).toBe(false)
+  })
+
+  test('and a fieldset still holds it down when it was never disabled itself', async () => {
+    /* The other half of the same line: what the fieldset adds is still recorded,
+       or the fix would be "ignore the platform" rather than "take only the part
+       that is not already ours". */
+    const host = (await mount(
+      '<helix-slider label="A" max="1" min="0"></helix-slider>',
+    )) as Updatable & { disabled: boolean; formDisabledCallback: (off: boolean) => void }
+    const control = () => part(host, 'control') as HTMLInputElement
+
+    host.formDisabledCallback(true)
+    await host.updateComplete
+    expect(control().disabled).toBe(true)
+
+    host.formDisabledCallback(false)
+    await host.updateComplete
+    expect(control().disabled).toBe(false)
+  })
+
   test('an unset range starts in the middle, where the platform puts the thumb', async () => {
     /* Seeded before the first render so the value the form would submit matches
        the thumb from the start rather than from the first drag. */
