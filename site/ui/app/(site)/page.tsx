@@ -74,8 +74,9 @@ export default function Home() {
             Interface and intelligence engineering
           </helix-text>
           <helix-text as="p" class="heroLede measure" tone="muted">
-            We build the software, and we built the tools underneath it. Most engagements start with
-            a two week audit of what is worth building, and every price is stated before you ask.
+            We build the software, and we built the tools underneath it. Helix is MIT and yours to
+            take without talking to us. If you would rather we did the work, it starts with a two
+            week audit and every price is stated before you ask.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link
@@ -90,6 +91,83 @@ export default function Home() {
               Open Helix
             </Link>
           </helix-flex>
+        </helix-flex>
+      </section>
+
+      <section className="band reveal">
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" tone="subtle">
+              Two substrates
+            </helix-text>
+            <helix-text as="h2" class="sectionTitle measure">
+              Everything else is built on these
+            </helix-text>
+            {/* Written for the reader who is not buying anything.
+                
+                `docs/18` records why this band moved above the selling: an
+                engineer evaluating a design system had to scroll past three
+                bands of offer to learn there was one, and what they found was a
+                paragraph. What they want is whether they may use it, how they
+                get it, and what happens to them if we stop. Three sentences,
+                and none of them mention an engagement. */}
+            <helix-text as="p" class="measure" tone="muted">
+              Take them and go. Helix is MIT, it installs from npm, and it ships as custom elements
+              so the framework above it stays your choice. Nothing here needs us to keep running,
+              which is the whole point of building it this way.
+            </helix-text>
+          </helix-flex>
+
+          <helix-grid gap="xl" min="22rem">
+            {PRODUCTS.map((product) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={product.name}>
+                <helix-flex align="center" data-density="sm" gap="sm">
+                  <helix-text appearance="label" tone="subtle">
+                    {product.role}
+                  </helix-text>
+                  <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
+                </helix-flex>
+                <helix-text as="h3" class="substrateName">
+                  {product.name}
+                </helix-text>
+                <helix-text as="p" tone="muted">
+                  {product.body}
+                </helix-text>
+
+                {/* The command, where there is one, and the honest sentence
+                    where there is not. A `Building` product with an install
+                    line would be the stage label saying one thing and the page
+                    another. */}
+                {product.install ? (
+                  <helix-flex direction="column" gap="sm">
+                    <helix-code-block label={`Install ${product.name}`}>
+                      {product.install}
+                    </helix-code-block>
+                    <helix-flex align="center" data-density="sm" gap="sm" wrap>
+                      <a data-button="subtle" href={product.href}>
+                        Open the components
+                      </a>
+                      <helix-text appearance="caption" tone="subtle">
+                        {product.license} licensed
+                      </helix-text>
+                    </helix-flex>
+                  </helix-flex>
+                ) : (
+                  <helix-flex direction="column" gap="sm">
+                    <helix-text appearance="caption" tone="subtle">
+                      Nothing to install yet. The shape is written down and the crates are in the
+                      open.
+                    </helix-text>
+                    <helix-flex data-density="sm">
+                      <a data-button="subtle" href={product.href}>
+                        Read the shape
+                      </a>
+                    </helix-flex>
+                  </helix-flex>
+                )}
+              </helix-flex>
+            ))}
+          </helix-grid>
         </helix-flex>
       </section>
 
@@ -173,43 +251,6 @@ export default function Home() {
               See what each one costs
             </Link>
           </helix-flex>
-        </helix-flex>
-      </section>
-
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
-              Two substrates
-            </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
-              Everything else is built on these
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="xl" min="22rem">
-            {PRODUCTS.map((product) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={product.name}>
-                <helix-flex align="center" data-density="sm" gap="sm">
-                  <helix-text appearance="label" tone="subtle">
-                    {product.role}
-                  </helix-text>
-                  <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
-                </helix-flex>
-                <helix-text as="h3" class="substrateName">
-                  {product.name}
-                </helix-text>
-                <helix-text as="p" tone="muted">
-                  {product.body}
-                </helix-text>
-                <helix-flex data-density="sm">
-                  <a data-button="subtle" href={product.href}>
-                    Read more
-                  </a>
-                </helix-flex>
-              </helix-flex>
-            ))}
-          </helix-grid>
         </helix-flex>
       </section>
 

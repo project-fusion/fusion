@@ -61,6 +61,22 @@ export interface Product {
    */
   href: string
   /**
+   * How a reader takes it, as the command they would run.
+   *
+   * Absent where there is nothing to install, which is the honest state for
+   * anything still `Building` with no package behind it. The landing page says
+   * so in words rather than showing an empty box, so a reader learns what is
+   * ready by reading the same field either way.
+   */
+  install?: string
+  /**
+   * The license the package ships under, for the reader who is deciding whether
+   * they may use it rather than whether to buy anything. Beside `install`,
+   * because the two questions arrive together and neither is answered by prose
+   * further down the page.
+   */
+  license?: string
+  /**
    * The evocative name, which is what the masthead says.
    */
   name: string
@@ -102,7 +118,7 @@ export const PRODUCTS: Product[] = [
       {
         href: '/helix',
         icon: 'atom',
-        summary: 'Sixty-five families, each with its API and a running example.',
+        summary: 'Every family, with its API and a running example.',
         title: 'Components',
       },
       {
@@ -113,6 +129,8 @@ export const PRODUCTS: Product[] = [
       },
     ],
     href: '/helix',
+    install: 'bun add @helix-io/web',
+    license: 'MIT',
     name: 'Helix',
     role: 'The DNA',
     stage: 'Building',
