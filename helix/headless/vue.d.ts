@@ -403,6 +403,27 @@ of many thin bars, where the eye has stopped counting.
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
   gridlines?: HelixBaseBarChart["gridlines"];
+  /** Which series are drawn as a line instead of as columns, by name.
+
+Space separated, matched against the column headings the table gives, so a
+chart says `lines="Margin"` rather than counting columns. Names because
+they are what the table already carries and what the legend already shows:
+an index is a fourth place the column order is written down and the first
+one to go stale when somebody moves a column.
+
+**A combination chart is one scale, and that is the honest half of it.**
+Both marks are measured against the same domain, so a line here says
+something comparable to the columns beside it. The usual reason to reach
+for a combination chart is the other thing, a count against a percentage on
+a second axis, and that is deliberately not this: two scales on one frame
+let the author put any two shapes in any relation by choosing the ranges,
+and the reader has no way to see it happening.
+
+A line among columns still measures from zero, because the columns do and
+they share the axis. That is the trade for comparability, and it is why
+this is a bar chart that can carry a line rather than a line chart that can
+carry columns. */
+  lines?: HelixBaseBarChart["lines"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's

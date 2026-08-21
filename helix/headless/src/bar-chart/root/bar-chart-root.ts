@@ -4,6 +4,7 @@ import {
   extent,
   HelixElement,
   linear,
+  linePath,
   MixinChartSource,
   type Series,
   seriesIndex,
@@ -50,6 +51,7 @@ const HEIGHT = 100
  * @csspart band - The slot the pointer is resting in.
  * @csspart baseline - The rule the columns stand on.
  * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart line - A series drawn as a line rather than as columns, under `lines`.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
@@ -98,6 +100,41 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    */
   @property()
   gridlines?: 'both' | 'category' | 'value'
+
+  /**
+   * Which series are drawn as a line instead of as columns, by name.
+   *
+   * Space separated, matched against the column headings the table gives, so a
+   * chart says `lines="Margin"` rather than counting columns. Names because
+   * they are what the table already carries and what the legend already shows:
+   * an index is a fourth place the column order is written down and the first
+   * one to go stale when somebody moves a column.
+   *
+   * **A combination chart is one scale, and that is the honest half of it.**
+   * Both marks are measured against the same domain, so a line here says
+   * something comparable to the columns beside it. The usual reason to reach
+   * for a combination chart is the other thing, a count against a percentage on
+   * a second axis, and that is deliberately not this: two scales on one frame
+   * let the author put any two shapes in any relation by choosing the ranges,
+   * and the reader has no way to see it happening.
+   *
+   * A line among columns still measures from zero, because the columns do and
+   * they share the axis. That is the trade for comparability, and it is why
+   * this is a bar chart that can carry a line rather than a line chart that can
+   * carry columns.
+   */
+  @property()
+  lines?: string
+
+  /** The series names drawn as a line, lowercased and trimmed for matching. */
+  private get lined(): Set<string> {
+    return new Set(
+      (this.lines ?? '')
+        .split(/\s+/)
+        .map((name) => name.trim().toLowerCase())
+        .filter(Boolean),
+    )
+  }
 
   /** Whether the levels are ruled, which is every value but `category`. */
   protected get rulesValue(): boolean {
@@ -176,7 +213,25 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
   ): TemplateResult {
     const sideways = this.direction === 'horizontal'
     const slot = 100 / categories.length
-    const thickness = (slot * 0.72) / Math.max(series.length, 1)
+    /* Split first, because the columns share the slot between themselves and a
+       line takes none of it. Sized by every series instead, a chart of two
+       columns and one line drew both columns two thirds as wide and left a
+       third of every slot empty, for a mark that is not in the slot at all. */
+    const lined = this.lined
+    /* Kept with the index it has among *all* the series, because a column needs
+       two different numbers and they stopped being the same the moment one
+       series could be a line. `depth` is its place in the slot, so the columns
+       stand shoulder to shoulder with no gap where a line was; `tone` is its
+       place in the palette, so it keeps the colour the legend gives it.
+     *
+       Passing the first for both is what the first version did, and it was
+       visible: with `Target` drawn as a line, `Forecast` moved up into its slot
+       *and* into its colour, so a chart of four series painted three columns in
+       the first three colours and the line in the third one as well. */
+    const columns = series
+      .map((one, index) => ({ one, tone: index }))
+      .filter(({ one }) => !lined.has(one.name.trim().toLowerCase()))
+    const thickness = (slot * 0.72) / Math.max(columns.length, 1)
 
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
        it.** The first version turned the whole plot with `rotate: 90deg`, which
@@ -188,14 +243,14 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
      * Swapping the two axes here costs one branch and keeps every other fact
      * about the chart the same. `value` runs along x when the bars are
      * sideways and along y otherwise; `category` takes the other one. */
-    const bar = (value: number, index: number, depth: number): TemplateResult => {
+    const bar = (value: number, index: number, depth: number, tone: number): TemplateResult => {
       const at = y(value)
       const along = Math.min(floor, at)
       const size = Math.abs(floor - at)
       const across = index * slot + slot * 0.14 + depth * thickness
       return sideways
         ? svg`<rect
-            data-series=${seriesIndex(depth)}
+            data-series=${seriesIndex(tone)}
             height=${thickness}
             part="bar"
             width=${size}
@@ -203,7 +258,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
             y=${across}
           />`
         : svg`<rect
-            data-series=${seriesIndex(depth)}
+            data-series=${seriesIndex(tone)}
             height=${size}
             part="bar"
             width=${thickness}
@@ -232,9 +287,20 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
                makes a reader match its heading against the row of names to find
                out which columns it means. */
             svg`<g data-active=${this.pointer.at === index ? '' : nothing} part="group">
-              ${series.map((one, depth) => bar(one.points[index]?.value ?? 0, index, depth))}
+              ${columns.map(({ one, tone }, depth) => bar(one.points[index]?.value ?? 0, index, depth, tone))}
             </g>`,
         )}
+        ${
+          /* After the groups, so a line is never drawn under the columns it is
+             meant to be read against. Outside them too: a group is one
+             category and a line crosses all of them, so it belongs to the plot
+             rather than to any one slot. */
+          series.map((one) =>
+            lined.has(one.name.trim().toLowerCase())
+              ? this.renderLine(one, series.indexOf(one), slot, y, sideways)
+              : nothing,
+          )
+        }
       </svg>
       ${this.renderTooltip()}
     </div>`
@@ -318,6 +384,44 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     return html`<div aria-hidden="true" part="labels">
       ${categories.map((one) => html`<span part="label">${one}</span>`)}
     </div>`
+  }
+
+  /**
+   * One series drawn as a line across the categories, behind a seam.
+   *
+   * Through the middle of each slot, which is where the group stands, so a
+   * point sits over its own columns rather than over the gap between two of
+   * them. The same arithmetic the category gridlines use, and for the same
+   * reason: the reading is the thing, the boundary is only where the pointer
+   * changes its mind.
+   *
+   * `data-series` keeps the index the series has among *all* of them, not among
+   * the lines, so the colour a line takes is the colour the legend gives it and
+   * moving a column between marks does not repaint the chart.
+   */
+  protected renderLine(
+    one: Series,
+    depth: number,
+    slot: number,
+    y: (value: number) => number,
+    sideways: boolean,
+  ): TemplateResult {
+    const points = one.points.map((point, index): [number, number] => {
+      const across = index * slot + slot / 2
+      const along = y(point.value)
+      return sideways ? [along, across] : [across, along]
+    })
+    /* Straight between the category centres, and no `curve` property to change
+       it. A bar chart's other axis is categorical: there is nothing between
+       Gateway and Billing, so a curve through them draws values at positions
+       that do not exist and bulges past the readings on the way. `LineChart`
+       offers the choice because its axis is continuous and the shape between
+       two readings is a claim somebody may legitimately want to make. */
+    return svg`<path
+      d=${linePath(points, 'straight')}
+      data-series=${seriesIndex(depth)}
+      part="line"
+    />`
   }
 
   /**

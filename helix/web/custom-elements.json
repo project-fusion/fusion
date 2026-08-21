@@ -3427,6 +3427,14 @@
               "name": "--bar-chart-band-color"
             },
             {
+              "description": "A `lines` series, overriding its series colour.",
+              "name": "--bar-chart-line-color"
+            },
+            {
+              "description": "Thickness of a `lines` series.",
+              "name": "--bar-chart-line-width"
+            },
+            {
               "description": "One rule across the plot, under `gridlines`.",
               "name": "--bar-chart-gridline-color"
             },
@@ -3569,6 +3577,33 @@
               },
               "description": "Which rules are drawn across the plot, if any.\n\nAbsent draws none. `value` rules the axis the columns are *measured* on,\n`category` rules the axis they are *arranged* on with one through each\ngroup, and `both` draws both. Which of those is horizontal turns with\n`direction`, because a rule belongs to an axis and not to a screen edge.\n\n**A bare `gridlines` means `value`**, and so does anything unrecognised: an\nunrecognised value that draws nothing is indistinguishable from the\nattribute being absent, which is the one thing a reader cannot debug.\n\n`category` is the quieter half of this on a bar chart and is here for\ncompleteness rather than because it is usually right: columns already\ndivide the categories by being separate columns, and a rule through each\none is a second statement of the same fact. It earns its place on a chart\nof many thin bars, where the eye has stopped counting.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
               "attribute": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "lines",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as a line instead of as columns, by name.\n\nSpace separated, matched against the column headings the table gives, so a\nchart says `lines=\"Margin\"` rather than counting columns. Names because\nthey are what the table already carries and what the legend already shows:\nan index is a fourth place the column order is written down and the first\none to go stale when somebody moves a column.\n\n**A combination chart is one scale, and that is the honest half of it.**\nBoth marks are measured against the same domain, so a line here says\nsomething comparable to the columns beside it. The usual reason to reach\nfor a combination chart is the other thing, a count against a percentage on\na second axis, and that is deliberately not this: two scales on one frame\nlet the author put any two shapes in any relation by choosing the ranges,\nand the reader has no way to see it happening.\n\nA line among columns still measures from zero, because the columns do and\nthey share the axis. That is the trade for comparability, and it is why\nthis is a bar chart that can carry a line rather than a line chart that can\ncarry columns.",
+              "attribute": "lines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "lined",
+              "type": {
+                "text": "Set<string>"
+              },
+              "privacy": "private",
+              "description": "The series names drawn as a line, lowercased and trimmed for matching.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -3749,6 +3784,53 @@
             },
             {
               "kind": "method",
+              "name": "renderLine",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "one",
+                  "type": {
+                    "text": "Series"
+                  }
+                },
+                {
+                  "name": "depth",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "slot",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
+                  "name": "sideways",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "One series drawn as a line across the categories, behind a seam.\n\nThrough the middle of each slot, which is where the group stands, so a\npoint sits over its own columns rather than over the gap between two of\nthem. The same arithmetic the category gridlines use, and for the same\nreason: the reading is the thing, the boundary is only where the pointer\nchanges its mind.\n\n`data-series` keeps the index the series has among *all* of them, not among\nthe lines, so the colour a line takes is the colour the legend gives it and\nmoving a column between marks does not repaint the chart.",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "renderTooltip",
               "privacy": "protected",
               "return": {
@@ -3863,6 +3945,10 @@
                 "slug": "horizontal"
               },
               {
+                "description": "Two series as columns and a third as a line, all measured against one axis.",
+                "slug": "with-a-line"
+              },
+              {
                 "description": "A pointer resting on a reading, showing the whole row including a column nothing plotted.",
                 "slug": "with-a-tooltip"
               },
@@ -3925,6 +4011,18 @@
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
               }
+            },
+            {
+              "name": "lines",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Which series are drawn as a line instead of as columns, by name.\n\nSpace separated, matched against the column headings the table gives, so a\nchart says `lines=\"Margin\"` rather than counting columns. Names because\nthey are what the table already carries and what the legend already shows:\nan index is a fourth place the column order is written down and the first\none to go stale when somebody moves a column.\n\n**A combination chart is one scale, and that is the honest half of it.**\nBoth marks are measured against the same domain, so a line here says\nsomething comparable to the columns beside it. The usual reason to reach\nfor a combination chart is the other thing, a count against a percentage on\na second axis, and that is deliberately not this: two scales on one frame\nlet the author put any two shapes in any relation by choosing the ranges,\nand the reader has no way to see it happening.\n\nA line among columns still measures from zero, because the columns do and\nthey share the axis. That is the trade for comparability, and it is why\nthis is a bar chart that can carry a line rather than a line chart that can\ncarry columns.",
+              "fieldName": "lines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
             }
           ],
           "cssParts": [
@@ -3955,6 +4053,14 @@
             {
               "description": "One rule across the plot, under `gridlines`.",
               "name": "gridline",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "A series drawn as a line rather than as columns, under `lines`.",
+              "name": "line",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"

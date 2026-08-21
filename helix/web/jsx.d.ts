@@ -1049,6 +1049,27 @@ of many thin bars, where the eye has stopped counting.
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
   gridlines?: HelixBarChart["gridlines"];
+  /** Which series are drawn as a line instead of as columns, by name.
+
+Space separated, matched against the column headings the table gives, so a
+chart says `lines="Margin"` rather than counting columns. Names because
+they are what the table already carries and what the legend already shows:
+an index is a fourth place the column order is written down and the first
+one to go stale when somebody moves a column.
+
+**A combination chart is one scale, and that is the honest half of it.**
+Both marks are measured against the same domain, so a line here says
+something comparable to the columns beside it. The usual reason to reach
+for a combination chart is the other thing, a count against a percentage on
+a second axis, and that is deliberately not this: two scales on one frame
+let the author put any two shapes in any relation by choosing the ranges,
+and the reader has no way to see it happening.
+
+A line among columns still measures from zero, because the columns do and
+they share the axis. That is the trade for comparability, and it is why
+this is a bar chart that can carry a line rather than a line chart that can
+carry columns. */
+  lines?: HelixBarChart["lines"];
 };
 
 export type HelixBarChartSolidJsProps = {
@@ -1093,6 +1114,27 @@ of many thin bars, where the eye has stopped counting.
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
   "prop:gridlines"?: HelixBarChart["gridlines"];
+  /** Which series are drawn as a line instead of as columns, by name.
+
+Space separated, matched against the column headings the table gives, so a
+chart says `lines="Margin"` rather than counting columns. Names because
+they are what the table already carries and what the legend already shows:
+an index is a fourth place the column order is written down and the first
+one to go stale when somebody moves a column.
+
+**A combination chart is one scale, and that is the honest half of it.**
+Both marks are measured against the same domain, so a line here says
+something comparable to the columns beside it. The usual reason to reach
+for a combination chart is the other thing, a count against a percentage on
+a second axis, and that is deliberately not this: two scales on one frame
+let the author put any two shapes in any relation by choosing the ranges,
+and the reader has no way to see it happening.
+
+A line among columns still measures from zero, because the columns do and
+they share the axis. That is the trade for comparability, and it is why
+this is a bar chart that can carry a line rather than a line chart that can
+carry columns. */
+  "prop:lines"?: HelixBarChart["lines"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14212,6 +14254,26 @@ export type CustomElements = {
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
+   * - `lines`: Which series are drawn as a line instead of as columns, by name.
+   *
+   * Space separated, matched against the column headings the table gives, so a
+   * chart says `lines="Margin"` rather than counting columns. Names because
+   * they are what the table already carries and what the legend already shows:
+   * an index is a fourth place the column order is written down and the first
+   * one to go stale when somebody moves a column.
+   *
+   * **A combination chart is one scale, and that is the honest half of it.**
+   * Both marks are measured against the same domain, so a line here says
+   * something comparable to the columns beside it. The usual reason to reach
+   * for a combination chart is the other thing, a count against a percentage on
+   * a second axis, and that is deliberately not this: two scales on one frame
+   * let the author put any two shapes in any relation by choosing the ranges,
+   * and the reader has no way to see it happening.
+   *
+   * A line among columns still measures from zero, because the columns do and
+   * they share the axis. That is the trade for comparability, and it is why
+   * this is a bar chart that can carry a line rather than a line chart that can
+   * carry columns.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -14238,6 +14300,8 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--bar-chart-line-color`: A `lines` series, overriding its series colour. (default: `undefined`)
+   * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
@@ -14251,6 +14315,7 @@ export type CustomElements = {
    * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
+   * - `line`: A series drawn as a line rather than as columns, under `lines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -25265,6 +25330,26 @@ export type CustomElementsSolidJs = {
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
+   * - `lines`: Which series are drawn as a line instead of as columns, by name.
+   *
+   * Space separated, matched against the column headings the table gives, so a
+   * chart says `lines="Margin"` rather than counting columns. Names because
+   * they are what the table already carries and what the legend already shows:
+   * an index is a fourth place the column order is written down and the first
+   * one to go stale when somebody moves a column.
+   *
+   * **A combination chart is one scale, and that is the honest half of it.**
+   * Both marks are measured against the same domain, so a line here says
+   * something comparable to the columns beside it. The usual reason to reach
+   * for a combination chart is the other thing, a count against a percentage on
+   * a second axis, and that is deliberately not this: two scales on one frame
+   * let the author put any two shapes in any relation by choosing the ranges,
+   * and the reader has no way to see it happening.
+   *
+   * A line among columns still measures from zero, because the columns do and
+   * they share the axis. That is the trade for comparability, and it is why
+   * this is a bar chart that can carry a line rather than a line chart that can
+   * carry columns.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -25291,6 +25376,8 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--bar-chart-band-color`: The slot the pointer is resting in. (default: `undefined`)
+   * - `--bar-chart-line-color`: A `lines` series, overriding its series colour. (default: `undefined`)
+   * - `--bar-chart-line-width`: Thickness of a `lines` series. (default: `undefined`)
    * - `--bar-chart-gridline-color`: One rule across the plot, under `gridlines`. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
@@ -25304,6 +25391,7 @@ export type CustomElementsSolidJs = {
    * - `band`: The slot the pointer is resting in.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
+   * - `line`: A series drawn as a line rather than as columns, under `lines`.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
@@ -36040,6 +36128,10 @@ export type CustomCssProperties = {
   "--badge-ring-color"?: string;
   /** The slot the pointer is resting in. */
   "--bar-chart-band-color"?: string;
+  /** A `lines` series, overriding its series colour. */
+  "--bar-chart-line-color"?: string;
+  /** Thickness of a `lines` series. */
+  "--bar-chart-line-width"?: string;
   /** One rule across the plot, under `gridlines`. */
   "--bar-chart-gridline-color"?: string;
   /** Corner radius at the far end of a column. */

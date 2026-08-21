@@ -20,6 +20,8 @@ import '../../tooltip/index.js'
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
+ * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series colour.
+ * @cssproperty --bar-chart-line-width - Thickness of a `lines` series.
  * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
  * @cssproperty --bar-chart-block-size - Height of the drawing.

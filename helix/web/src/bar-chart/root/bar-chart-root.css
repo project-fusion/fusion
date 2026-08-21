@@ -60,6 +60,7 @@
  * right, so it is the second and third. */
 [part="bar"] {
   clip-path: inset(0 round var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0);
+  fill: var(--_bar-chart-series, var(--helix-color-series-1));
 }
 
 :host([direction="horizontal"]) [part="bar"] {
@@ -129,101 +130,131 @@
 }
 
 /* Index to colour, the same twenty-four the legend maps. An attribute cannot
-   select a token, so it is one rule per series. */
-[part="bar"][data-series="1"] {
-  fill: var(--helix-color-series-1);
+   select a token, so it is one rule per series.
+ *
+ * **They name a colour rather than painting one**, because a column fills with
+ * it and a line strokes with it, and twenty-four rules doubled to forty-eight
+ * the moment a series could be either. The two marks read the same property in
+ * the two places below, so a series is one colour by construction and not by
+ * two lists agreeing. */
+[part="bar"][data-series="1"],
+[part="line"][data-series="1"] {
+  --_bar-chart-series: var(--helix-color-series-1);
 }
 
-[part="bar"][data-series="2"] {
-  fill: var(--helix-color-series-2);
+[part="bar"][data-series="2"],
+[part="line"][data-series="2"] {
+  --_bar-chart-series: var(--helix-color-series-2);
 }
 
-[part="bar"][data-series="3"] {
-  fill: var(--helix-color-series-3);
+[part="bar"][data-series="3"],
+[part="line"][data-series="3"] {
+  --_bar-chart-series: var(--helix-color-series-3);
 }
 
-[part="bar"][data-series="4"] {
-  fill: var(--helix-color-series-4);
+[part="bar"][data-series="4"],
+[part="line"][data-series="4"] {
+  --_bar-chart-series: var(--helix-color-series-4);
 }
 
-[part="bar"][data-series="5"] {
-  fill: var(--helix-color-series-5);
+[part="bar"][data-series="5"],
+[part="line"][data-series="5"] {
+  --_bar-chart-series: var(--helix-color-series-5);
 }
 
-[part="bar"][data-series="6"] {
-  fill: var(--helix-color-series-6);
+[part="bar"][data-series="6"],
+[part="line"][data-series="6"] {
+  --_bar-chart-series: var(--helix-color-series-6);
 }
 
-[part="bar"][data-series="7"] {
-  fill: var(--helix-color-series-7);
+[part="bar"][data-series="7"],
+[part="line"][data-series="7"] {
+  --_bar-chart-series: var(--helix-color-series-7);
 }
 
-[part="bar"][data-series="8"] {
-  fill: var(--helix-color-series-8);
+[part="bar"][data-series="8"],
+[part="line"][data-series="8"] {
+  --_bar-chart-series: var(--helix-color-series-8);
 }
 
-[part="bar"][data-series="9"] {
-  fill: var(--helix-color-series-9);
+[part="bar"][data-series="9"],
+[part="line"][data-series="9"] {
+  --_bar-chart-series: var(--helix-color-series-9);
 }
 
-[part="bar"][data-series="10"] {
-  fill: var(--helix-color-series-10);
+[part="bar"][data-series="10"],
+[part="line"][data-series="10"] {
+  --_bar-chart-series: var(--helix-color-series-10);
 }
 
-[part="bar"][data-series="11"] {
-  fill: var(--helix-color-series-11);
+[part="bar"][data-series="11"],
+[part="line"][data-series="11"] {
+  --_bar-chart-series: var(--helix-color-series-11);
 }
 
-[part="bar"][data-series="12"] {
-  fill: var(--helix-color-series-12);
+[part="bar"][data-series="12"],
+[part="line"][data-series="12"] {
+  --_bar-chart-series: var(--helix-color-series-12);
 }
 
-[part="bar"][data-series="13"] {
-  fill: var(--helix-color-series-13);
+[part="bar"][data-series="13"],
+[part="line"][data-series="13"] {
+  --_bar-chart-series: var(--helix-color-series-13);
 }
 
-[part="bar"][data-series="14"] {
-  fill: var(--helix-color-series-14);
+[part="bar"][data-series="14"],
+[part="line"][data-series="14"] {
+  --_bar-chart-series: var(--helix-color-series-14);
 }
 
-[part="bar"][data-series="15"] {
-  fill: var(--helix-color-series-15);
+[part="bar"][data-series="15"],
+[part="line"][data-series="15"] {
+  --_bar-chart-series: var(--helix-color-series-15);
 }
 
-[part="bar"][data-series="16"] {
-  fill: var(--helix-color-series-16);
+[part="bar"][data-series="16"],
+[part="line"][data-series="16"] {
+  --_bar-chart-series: var(--helix-color-series-16);
 }
 
-[part="bar"][data-series="17"] {
-  fill: var(--helix-color-series-17);
+[part="bar"][data-series="17"],
+[part="line"][data-series="17"] {
+  --_bar-chart-series: var(--helix-color-series-17);
 }
 
-[part="bar"][data-series="18"] {
-  fill: var(--helix-color-series-18);
+[part="bar"][data-series="18"],
+[part="line"][data-series="18"] {
+  --_bar-chart-series: var(--helix-color-series-18);
 }
 
-[part="bar"][data-series="19"] {
-  fill: var(--helix-color-series-19);
+[part="bar"][data-series="19"],
+[part="line"][data-series="19"] {
+  --_bar-chart-series: var(--helix-color-series-19);
 }
 
-[part="bar"][data-series="20"] {
-  fill: var(--helix-color-series-20);
+[part="bar"][data-series="20"],
+[part="line"][data-series="20"] {
+  --_bar-chart-series: var(--helix-color-series-20);
 }
 
-[part="bar"][data-series="21"] {
-  fill: var(--helix-color-series-21);
+[part="bar"][data-series="21"],
+[part="line"][data-series="21"] {
+  --_bar-chart-series: var(--helix-color-series-21);
 }
 
-[part="bar"][data-series="22"] {
-  fill: var(--helix-color-series-22);
+[part="bar"][data-series="22"],
+[part="line"][data-series="22"] {
+  --_bar-chart-series: var(--helix-color-series-22);
 }
 
-[part="bar"][data-series="23"] {
-  fill: var(--helix-color-series-23);
+[part="bar"][data-series="23"],
+[part="line"][data-series="23"] {
+  --_bar-chart-series: var(--helix-color-series-23);
 }
 
-[part="bar"][data-series="24"] {
-  fill: var(--helix-color-series-24);
+[part="bar"][data-series="24"],
+[part="line"][data-series="24"] {
+  --_bar-chart-series: var(--helix-color-series-24);
 }
 
 /* The mark the bubble is anchored to, and the bubble's own content.
@@ -485,4 +516,28 @@
 
 [part="band"] {
   fill: var(--bar-chart-band-color, var(--helix-color-surface-sunken));
+}
+
+/* A series drawn as a line across the columns, under `lines`.
+ *
+ * Its own series colour through `data-series`, the same channel a column takes,
+ * so the legend and the tooltip agree with it without a second rule to keep in
+ * step. Heavier than a line chart's line and with round joins, because it is
+ * read *against* a field of solid columns rather than on an empty plot: at the
+ * line chart's weight it reads as a gridline that wandered.
+ *
+ * `non-scaling-stroke` for the reason every stroke here has it: the view box is
+ * stretched to the element, so without it the same line is a hairline in a
+ * narrow chart and a rule in a wide one.
+ *
+ * `fill: none` matters more than it looks. A `<path>` fills by default, so the
+ * first version painted the area under the line in the series colour at full
+ * opacity and buried the columns it was drawn to be compared against. */
+[part="line"] {
+  fill: none;
+  stroke: var(--bar-chart-line-color, var(--_bar-chart-series, var(--helix-color-series-1)));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--bar-chart-line-width, 2.5px);
+  vector-effect: non-scaling-stroke;
 }

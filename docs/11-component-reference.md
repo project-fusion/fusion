@@ -451,6 +451,7 @@ it is measured against.
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `lines` | `lines` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are drawn as a line instead of as columns, by name. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -465,6 +466,7 @@ it is measured against.
 | `band` | The slot the pointer is resting in. |
 | `baseline` | The rule the columns stand on. |
 | `gridline` | One rule across the plot, under `gridlines`. |
+| `line` | A series drawn as a line rather than as columns, under `lines`. |
 | `group` | One category's columns, together. |
 | `label` | One category's name. |
 | `labels` | The row of category names. |
@@ -482,6 +484,8 @@ it is measured against.
 | Property | Description |
 | --- | --- |
 | `--bar-chart-band-color` | The slot the pointer is resting in. |
+| `--bar-chart-line-color` | A `lines` series, overriding its series colour. |
+| `--bar-chart-line-width` | Thickness of a `lines` series. |
 | `--bar-chart-gridline-color` | One rule across the plot, under `gridlines`. |
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-block-size` | Height of the drawing. |
