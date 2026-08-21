@@ -459,37 +459,57 @@
     oklch(from var(--_helix-seed-brand) 0.6 0.145 calc(h + var(--_helix-series-hue-8))),
     oklch(from var(--_helix-seed-brand) 0.78 0.135 calc(h + var(--_helix-series-hue-8)))
   );
+  /* The quiet eight, and the chroma is 0.07 rather than the 0.05 they shipped
+     with.
+   *
+   * **Muted is a treatment, not a licence to be indistinguishable.** At 0.05 the
+   * closest pair of the eight measured 0.070 in OKLab in light and 0.064 in
+   * dark, against 0.091 and 0.142 for the vivid eight and 0.113 and 0.129 for
+   * the balanced eight. Half the separation of either, for a band meant to
+   * carry the same eight things, and eight hues at that little chroma are eight
+   * greys with an opinion.
+   *
+   * 0.07 puts them at 0.095 and 0.096, which is above the vivid band's own
+   * worst pair, so the quiet set is now at least as separable as the loud one.
+   * Contrast against the three surfaces is unmoved at 3.45 light and 5.13 dark,
+   * both over the 3:1 a graphic needs.
+   *
+   * **And it is still the quiet band**, which is the constraint that stopped
+   * this going further: the balanced eight run 0.105 to 0.145, so there is real
+   * room between the two and there would not be at 0.08, where the gain flattens
+   * anyway (0.100 and 0.099, against 0.104 at 0.09). Measured across
+   * 0.046 to 0.10 in both modes. */
   --helix-color-series-17: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-1))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-1)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.07 calc(h + var(--_helix-series-hue-1))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.07 calc(h + var(--_helix-series-hue-1)))
   );
   --helix-color-series-18: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-2))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-2)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.07 calc(h + var(--_helix-series-hue-2))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.07 calc(h + var(--_helix-series-hue-2)))
   );
   --helix-color-series-19: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-3))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-3)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.07 calc(h + var(--_helix-series-hue-3))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.07 calc(h + var(--_helix-series-hue-3)))
   );
   --helix-color-series-20: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-4))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-4)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.07 calc(h + var(--_helix-series-hue-4))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.07 calc(h + var(--_helix-series-hue-4)))
   );
   --helix-color-series-21: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-5))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-5)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.07 calc(h + var(--_helix-series-hue-5))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.07 calc(h + var(--_helix-series-hue-5)))
   );
   --helix-color-series-22: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-6))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-6)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.07 calc(h + var(--_helix-series-hue-6))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.07 calc(h + var(--_helix-series-hue-6)))
   );
   --helix-color-series-23: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.05 calc(h + var(--_helix-series-hue-7))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.046 calc(h + var(--_helix-series-hue-7)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.07 calc(h + var(--_helix-series-hue-7))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.07 calc(h + var(--_helix-series-hue-7)))
   );
   --helix-color-series-24: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.05 calc(h + var(--_helix-series-hue-8))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.046 calc(h + var(--_helix-series-hue-8)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.07 calc(h + var(--_helix-series-hue-8))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.07 calc(h + var(--_helix-series-hue-8)))
   );
 
   --helix-color-info: light-dark(var(--_helix-info-600), var(--_helix-info-400));
