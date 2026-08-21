@@ -270,7 +270,7 @@ takes no pointer events.
 | `gain` | `gain` | `number` | `1` | - | Overall brightness, as a multiplier on the field. |
 | `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
-| `shape` | `shape` | `'aurora' \| 'braid' \| 'flow' \| 'orbit' \| 'rays' \| 'weave' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
+| `shape` | `shape` | `'aurora' \| 'braid' \| 'flow' \| 'prism' \| 'rays' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
 | `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
 | `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
 
@@ -5906,6 +5906,7 @@ name, on purpose.
 | Part | Description |
 | --- | --- |
 | `bubble` | The panel that points at the target. |
+| `arrow` | The point, which the floating pass places against the target. |
 | `content` | The region holding the slotted content. |
 | `actions` | The row the controls sit in. |
 | `back` | The control that goes to the previous stop. |
@@ -5916,6 +5917,7 @@ name, on purpose.
 
 | Property | Description |
 | --- | --- |
+| `--tour-arrow-size` | The point's box, before it is rotated. |
 | `--tour-bubble-size` | How wide the panel may grow. |
 | `--tour-padding` | Inset inside the panel. |
 | `--tour-surface-color` | The panel's own surface. |
