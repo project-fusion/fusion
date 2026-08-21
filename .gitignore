@@ -37,6 +37,10 @@ sandbox/ui/dist/
 .vercel
 .env*
 
+# Generated vision film. Recapture with `bun tooling/scripts/capture-scale-film.mjs`.
+site/ui/public/media/sovereignty.jpg
+site/ui/public/media/sovereignty.webm
+
 # Generated icon set, built from raw/.
 helix/icons/src/generated.ts
 
@@ -53,3 +57,6 @@ site/ui/public/sandbox
 # tracking it would track everything twice and linting it collides with this
 # tree's own root config.
 .claude/worktrees/
+
+# Measurement scratch: pages written to probe layout and paint, never shipped.
+site/ui/public/.probe/
