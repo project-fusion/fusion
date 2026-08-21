@@ -175,21 +175,25 @@
   opacity: 0;
 }
 
-/* `download` and `more` join the list. The first is an `<a>` and the second the
-   trigger of a menu, and neither is a reason for a control on this bar to be a
-   different size or a different shape from the ones beside it. `all: unset`
-   takes the anchor's underline with everything else. */
-[part="play"],
-[part="mute"],
-[part="captions"],
-[part="speed"],
-[part="pip"],
-[part="remote"],
-[part="download"],
-[part="previous"],
-[part="next"],
-[part="more"],
-[part="fullscreen"] {
+/* Every control on the bar, asked for by where it is rather than by name.
+ *
+ * This was eleven part names written out, and its own comment recorded that
+ * `download` and `more` had already had to be remembered once. `rewind` and
+ * `forward` were not remembered: they rendered as raw `<button>`, measured at
+ * 36x29 with a grey fill and a 2px border, beside 24x24 transparent for every
+ * control next to them. Nothing caught it, and nothing could: `check:selectors`
+ * asks whether a selector has a part, which is the other direction.
+ *
+ * A list that has to be joined is a list that will be forgotten, so the
+ * question is now "is it a control on this bar", which the next one will answer
+ * without anybody adding a line. `:where()` keeps the weight at (0,1,0), the
+ * same as the names it replaces, so `[part="speed"]` and the rest still win by
+ * source order exactly as they did.
+ *
+ * `a` as well as `button` because `download` is an anchor, and `all: unset`
+ * takes its underline with everything else. The scrubber and the volume are
+ * `<input>` and are deliberately not caught: a slider is not this shape. */
+[part="controls"] :where(a, button) {
   all: unset;
   --icon-size: var(--helix-size-icon-sm);
 
@@ -205,17 +209,7 @@
   min-inline-size: var(--helix-size-icon-lg);
 }
 
-[part="play"]:focus-visible,
-[part="mute"]:focus-visible,
-[part="captions"]:focus-visible,
-[part="speed"]:focus-visible,
-[part="pip"]:focus-visible,
-[part="remote"]:focus-visible,
-[part="download"]:focus-visible,
-[part="previous"]:focus-visible,
-[part="next"]:focus-visible,
-[part="more"]:focus-visible,
-[part="fullscreen"]:focus-visible,
+[part="controls"] :where(a, button):focus-visible,
 [part="scrubber"]:focus-visible,
 [part="volume"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
