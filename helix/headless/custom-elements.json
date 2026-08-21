@@ -32907,7 +32907,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A real `<input type=\"range\">`, so the drag, the arrow keys, Home and End, the\npage keys and the touch target are all the platform's. Every one of those is\na thing a hand-built slider gets wrong, and the last is the one nobody\nnotices: a native range has a hit area larger than its thumb, sized by the\nplatform for a finger.\n\n**The value is a string, like every other form control's.** A range submits\ntext and `MixinControllerValue` holds text, so the number is a reading of the\nvalue rather than the value itself. `valueAsNumber` is there for anything\ndoing arithmetic on it.\n\n**Marks are drawn rather than left to `<datalist>`**, which was the first\nanswer and is the wrong one. A datalist's ticks cannot be styled at all, and\nFirefox does not render them for a range at all, so the platform's version is\na mark that looks like someone else's design where it appears and no mark\nwhere it does not. Drawing them costs the semantics nothing, because a mark\nis decoration: what a reader can actually land on is `step`, which the input\nenforces whether or not anything is drawn.\n\n`markers` is a count rather than a flag tied to `step`. A flag reads well\nuntil a slider from zero to a hundred stepping by one asks for a hundred and\none ticks, and then it is either noise or a silent refusal to draw. A number\nis what the reader sees, so it cannot surprise anyone.",
+          "description": "A real `<input type=\"range\">`, so the drag, the arrow keys, Home and End, the\npage keys and the touch target are all the platform's. Every one of those is\na thing a hand-built slider gets wrong, and the last is the one nobody\nnotices: a native range has a hit area larger than its thumb, sized by the\nplatform for a finger.\n\n**The value is a string, like every other form control's.** A range submits\ntext and `MixinControllerValue` holds text, so the number is a reading of the\nvalue rather than the value itself. `valueAsNumber` is there for anything\ndoing arithmetic on it.\n\n**Marks are drawn rather than left to `<datalist>`**, which was the first\nanswer and is the wrong one. A datalist's ticks cannot be styled at all, and\nFirefox does not render them for a range at all, so the platform's version is\na mark that looks like someone else's design where it appears and no mark\nwhere it does not. Drawing them costs the semantics nothing, because a mark\nis decoration: what a reader can actually land on is `step`, which the input\nenforces whether or not anything is drawn.\n\n`markers` is a count rather than a flag tied to `step`. A flag reads well\nuntil a slider from zero to a hundred stepping by one asks for a hundred and\none ticks, and then it is either noise or a silent refusal to draw. A number\nis what the reader sees, so it cannot surprise anyone.\n\n**A range is two of them, not a hand-built one.** There is no native\ntwo-thumb range, and the answer is not to stop using the platform's: it is to\nstack two of them on one track, so each thumb keeps its own drag, its own\narrow keys, its own Home and End and its own finger-sized hit area. Rebuilding\nwould throw away every argument this component is made of, to gain a second\nhandle.\n\nCrossing is stopped in the handler rather than by the bounds, and that is not\nthe obvious way round. Giving the lower input `max` of the upper reads well\nand breaks the drawing: an input's thumb sits at a fraction of *its own*\nrange, so a lower thumb bounded at the upper one paints against a shorter\ntrack and the two stop lining up. Both inputs span the whole range and the\nvalues are clamped against each other on the way in.",
           "name": "HelixBaseSlider",
           "cssParts": [
             {
@@ -32950,6 +32950,17 @@
                 "name": "MixinControllerValue",
                 "module": "src/mixins/mixin-controller-value/mixin-controller-value.ts"
               }
+            },
+            {
+              "kind": "field",
+              "name": "range",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether there are two thumbs and the value is a pair.\n\nThe pair is one string, `\"10,50\"`, which is what a form submits and what\n`MixinControllerValue` already holds. `valueAsNumber` reads the lower of\nthe two, since a range has no single number.",
+              "attribute": "range",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -33050,6 +33061,35 @@
               "static": true,
               "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
               "description": "Focus is delegated to the control, so the host is never the target."
+            },
+            {
+              "kind": "field",
+              "name": "bounds",
+              "type": {
+                "text": "[number, number]"
+              },
+              "privacy": "private",
+              "description": "The pair, as numbers, in order.\n\nFalls back to the whole range rather than to zero, so a range slider given\nno value opens fully wide instead of pinned shut at its own minimum, which\nis what a filter with nothing filtered out looks like.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "along",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Where one value sits along the track, as a fraction of it."
             },
             {
               "kind": "field",
@@ -33688,6 +33728,15 @@
             }
           ],
           "attributes": [
+            {
+              "name": "range",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether there are two thumbs and the value is a pair.\n\nThe pair is one string, `\"10,50\"`, which is what a form submits and what\n`MixinControllerValue` already holds. `valueAsNumber` reads the lower of\nthe two, since a range has no single number.",
+              "fieldName": "range"
+            },
             {
               "name": "max",
               "type": {

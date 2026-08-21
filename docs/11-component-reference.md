@@ -4199,6 +4199,7 @@ the thumb being dragged.
 | `max` | `max` | `number` | `100` | `HelixBaseSlider` | The largest value the reader can choose. |
 | `min` | `min` | `number` | `0` | `HelixBaseSlider` | The smallest value the reader can choose. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
+| `range` | `range` | `boolean` | `false` | `HelixBaseSlider` | Whether there are two thumbs and the value is a pair. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseSlider` | Focus is delegated to the control, so the host is never the target. |

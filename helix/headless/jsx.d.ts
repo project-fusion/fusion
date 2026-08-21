@@ -7302,6 +7302,12 @@ export type HelixBaseSliderHelixInputElementEvent =
   HelixBaseSliderElementEvent<HelixInputEvent>;
 
 export type HelixBaseSliderProps = {
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  range?: HelixBaseSlider["range"];
   /** The largest value the reader can choose. */
   max?: HelixBaseSlider["max"];
   /** The smallest value the reader can choose. */
@@ -7421,6 +7427,12 @@ reflected none of them. */
 };
 
 export type HelixBaseSliderSolidJsProps = {
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  "prop:range"?: HelixBaseSlider["range"];
   /** The largest value the reader can choose. */
   "prop:max"?: HelixBaseSlider["max"];
   /** The smallest value the reader can choose. */
@@ -16670,10 +16682,29 @@ export type CustomElements = {
    * one ticks, and then it is either noise or a silent refusal to draw. A number
    * is what the reader sees, so it cannot surprise anyone.
    *
+   * **A range is two of them, not a hand-built one.** There is no native
+   * two-thumb range, and the answer is not to stop using the platform's: it is to
+   * stack two of them on one track, so each thumb keeps its own drag, its own
+   * arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding
+   * would throw away every argument this component is made of, to gain a second
+   * handle.
+   *
+   * Crossing is stopped in the handler rather than by the bounds, and that is not
+   * the obvious way round. Giving the lower input `max` of the upper reads well
+   * and breaks the drawing: an input's thumb sits at a fraction of *its own*
+   * range, so a lower thumb bounded at the upper one paints against a shorter
+   * track and the two stop lining up. Both inputs span the whole range and the
+   * values are clamped against each other on the way in.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
@@ -25763,10 +25794,29 @@ export type CustomElementsSolidJs = {
    * one ticks, and then it is either noise or a silent refusal to draw. A number
    * is what the reader sees, so it cannot surprise anyone.
    *
+   * **A range is two of them, not a hand-built one.** There is no native
+   * two-thumb range, and the answer is not to stop using the platform's: it is to
+   * stack two of them on one track, so each thumb keeps its own drag, its own
+   * arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding
+   * would throw away every argument this component is made of, to gain a second
+   * handle.
+   *
+   * Crossing is stopped in the handler rather than by the bounds, and that is not
+   * the obvious way round. Giving the lower input `max` of the upper reads well
+   * and breaks the drawing: an input's thumb sits at a fraction of *its own*
+   * range, so a lower thumb bounded at the upper one paints against a shorter
+   * track and the two stop lining up. Both inputs span the whole range and the
+   * values are clamped against each other on the way in.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.

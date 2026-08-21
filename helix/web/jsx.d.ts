@@ -8568,6 +8568,12 @@ being four of a kind rather than four of three kinds. */
   label?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixSlider["required"];
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  range?: HelixSlider["range"];
   /** The largest value the reader can choose. */
   max?: HelixSlider["max"];
   /** The smallest value the reader can choose. */
@@ -8687,6 +8693,12 @@ being four of a kind rather than four of three kinds. */
   "prop:label"?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixSlider["required"];
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  "prop:range"?: HelixSlider["range"];
   /** The largest value the reader can choose. */
   "prop:max"?: HelixSlider["max"];
   /** The smallest value the reader can choose. */
@@ -18469,6 +18481,11 @@ export type CustomElements = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
@@ -27794,6 +27811,11 @@ export type CustomElementsSolidJs = {
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
    * - `max`: The largest value the reader can choose.
    * - `min`: The smallest value the reader can choose.
    * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.

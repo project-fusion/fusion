@@ -36,6 +36,21 @@ import { property } from 'lit/decorators.js'
  * one ticks, and then it is either noise or a silent refusal to draw. A number
  * is what the reader sees, so it cannot surprise anyone.
  *
+ * **A range is two of them, not a hand-built one.** There is no native
+ * two-thumb range, and the answer is not to stop using the platform's: it is to
+ * stack two of them on one track, so each thumb keeps its own drag, its own
+ * arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding
+ * would throw away every argument this component is made of, to gain a second
+ * handle.
+ *
+ * Crossing is stopped in the handler rather than by the bounds, and that is not
+ * the obvious way round. Giving the lower input `max` of the upper reads well
+ * and breaks the drawing: an input's thumb sits at a fraction of *its own*
+ * range, so a lower thumb bounded at the upper one paints against a shorter
+ * track and the two stop lining up. Both inputs span the whole range and the
+ * values are clamped against each other on the way in.
+ *
+ *
  * @since 0.1.0
  * @status experimental
  * @category forms
@@ -56,6 +71,16 @@ import { property } from 'lit/decorators.js'
 export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
+
+  /**
+   * Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
+   */
+  @property({ reflect: true, type: Boolean })
+  range = false
 
   /** The largest value the reader can choose. */
   @property({ type: Number })
@@ -160,8 +185,59 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
     delegatesFocus: true,
   }
 
+  /**
+   * The pair, as numbers, in order.
+   *
+   * Falls back to the whole range rather than to zero, so a range slider given
+   * no value opens fully wide instead of pinned shut at its own minimum, which
+   * is what a filter with nothing filtered out looks like.
+   */
+  private get bounds(): [number, number] {
+    /* A lone number is not a range, so it is not read as one.
+     *
+     * An untouched range slider does not hold an empty string: the native input
+     * reports its own midpoint and the mixin takes it, so `value` came back as
+     * "50" on a slider from 10 to 90 and reading that as the lower thumb put a
+     * filter half shut before anyone touched it. Only a pair is a pair, and
+     * anything else opens fully wide, which is what "nothing filtered out"
+     * looks like. */
+    const parts = this.value.split(',')
+    const from = Number.parseFloat(parts[0] ?? '')
+    const to = Number.parseFloat(parts[1] ?? '')
+    if (!Number.isFinite(from) || !Number.isFinite(to)) {
+      return [this.min, this.max]
+    }
+    return [Math.min(from, to), Math.max(from, to)]
+  }
+
+  /** Where one value sits along the track, as a fraction of it. */
+  private along(at: number): number {
+    const span = this.max - this.min
+    if (span === 0) {
+      return 0
+    }
+    return Math.min(1, Math.max(0, (at - this.min) / span))
+  }
+
   private readonly handleInput = (event: Event): void => {
     const control = event.target as HTMLInputElement
+    if (this.range) {
+      const [start, end] = this.bounds
+      const moved = Number(control.value)
+      /* Clamped against the other thumb rather than bounded by it, for the
+         reason the class says: bounding shortens the input's own range and the
+         two thumbs stop sharing a track. */
+      const pair =
+        control.dataset.thumb === 'start'
+          ? [Math.min(moved, end), end]
+          : [start, Math.max(moved, start)]
+      this.requestValue(pair.join(','))
+      restoreValue(
+        control,
+        String(control.dataset.thumb === 'start' ? this.bounds[0] : this.bounds[1]),
+      )
+      return
+    }
     const next = control.value
     /* Through the mixin, like the other native-backed controls. The thumb has
        already moved either way, so wherever the answer does not follow it has
@@ -241,23 +317,54 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
    * handle is the platform's reading of the input's own clamped value. Every
    * slider with a max above 100 had it, and the fill being right is what made it
    * read as a drawing bug rather than a value one. */
-    return html`${this.renderLabel()}
-    <div part="field" data-markers=${this.markerValues.length > 0 ? '' : nothing}>
-      <input
+    const [start, end] = this.bounds
+
+    /* One input per thumb, each spanning the whole range so both read against
+       the same track. The lower one paints the fill and the upper one's track
+       is transparent, because two stacked tracks would paint the ramp twice. */
+    const thumb = (which: 'end' | 'start', at: number): TemplateResult => html`<input
         part="control"
-        id="control"
+        data-thumb=${which}
         type="range"
-        style="--_slider-fraction: ${this.fraction}"
+        style="--_slider-from: ${this.along(start)}; --_slider-to: ${this.along(end)}"
         min=${this.min}
         max=${this.max}
         step=${this.step}
-        .value=${this.value}
-        name=${this.name || nothing}
+        .value=${String(at)}
+        aria-label=${`${this.label} ${which === 'start' ? 'minimum' : 'maximum'}`}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.isDisabled}
         @input=${this.handleInput}
         @change=${this.handleChange}
-      />
+      />`
+
+    return html`${this.renderLabel()}
+    <div
+      part="field"
+      data-markers=${this.markerValues.length > 0 ? '' : nothing}
+      data-range=${this.range ? '' : nothing}
+    >
+      ${this.range ? thumb('start', start) : nothing}
+      ${this.range ? thumb('end', end) : nothing}
+      ${
+        this.range
+          ? nothing
+          : html`<input
+              part="control"
+              id="control"
+              type="range"
+              style="--_slider-fraction: ${this.fraction}"
+              min=${this.min}
+              max=${this.max}
+              step=${this.step}
+              .value=${this.value}
+              name=${this.name || nothing}
+              aria-describedby=${this.describedBy ?? nothing}
+              ?disabled=${this.isDisabled}
+              @input=${this.handleInput}
+              @change=${this.handleChange}
+            />`
+      }
       ${
         this.markers > 1
           ? html`<div part="markers" aria-hidden="true">
@@ -283,7 +390,9 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
          * 10 to 60 heard both twice, fifty times. It repeats what the control
          * already reports, which is the definition of decoration. */
         this.showValue
-          ? html`<output part="output" for="control" aria-hidden="true">${this.value}</output>`
+          ? html`<output part="output" for="control" aria-hidden="true"
+              >${this.range ? `${start} to ${end}` : this.value}</output
+            >`
           : nothing
       }
     </div>

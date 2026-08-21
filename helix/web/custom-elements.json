@@ -44405,6 +44405,21 @@
             },
             {
               "kind": "field",
+              "name": "range",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether there are two thumbs and the value is a pair.\n\nThe pair is one string, `\"10,50\"`, which is what a form submits and what\n`MixinControllerValue` already holds. `valueAsNumber` reads the lower of\nthe two, since a range has no single number.",
+              "attribute": "range",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "max",
               "type": {
                 "text": "number"
@@ -44538,6 +44553,43 @@
               "static": true,
               "default": "{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }",
               "description": "Focus is delegated to the control, so the host is never the target.",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "bounds",
+              "type": {
+                "text": "[number, number]"
+              },
+              "privacy": "private",
+              "description": "The pair, as numbers, in order.\n\nFalls back to the whole range rather than to zero, so a range slider given\nno value opens fully wide instead of pinned shut at its own minimum, which\nis what a filter with nothing filtered out looks like.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "along",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Where one value sits along the track, as a fraction of it.",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
                 "module": "src/slider/root/slider-root.ts"
@@ -44817,6 +44869,10 @@
                 "slug": "markers"
               },
               {
+                "description": "Two thumbs on one track, for a span rather than a point.",
+                "slug": "range"
+              },
+              {
                 "slug": "stepped"
               }
             ],
@@ -44900,6 +44956,19 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "range",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether there are two thumbs and the value is a pair.\n\nThe pair is one string, `\"10,50\"`, which is what a form submits and what\n`MixinControllerValue` already holds. `valueAsNumber` reads the lower of\nthe two, since a range has no single number.",
+              "fieldName": "range",
+              "inheritedFrom": {
+                "name": "HelixBaseSlider",
+                "module": "src/slider/root/slider-root.ts"
               }
             },
             {

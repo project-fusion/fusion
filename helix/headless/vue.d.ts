@@ -3810,6 +3810,12 @@ export type HelixBaseSliderHelixInputElementEvent =
   HelixBaseSliderElementEvent<HelixInputEvent>;
 
 export type HelixBaseSliderVueProps = {
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  range?: HelixBaseSlider["range"];
   /** The largest value the reader can choose. */
   max?: HelixBaseSlider["max"];
   /** The smallest value the reader can choose. */
@@ -6005,7 +6011,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseSkeletonVueProps,
     HelixBaseSkeletonVueEvents
   >;
-  /** A real '<input type="range">', so the drag, the arrow keys, Home and End, the page keys and the touch target are all the platform's. Every one of those is a thing a hand-built slider gets wrong, and the last is the one nobody notices: a native range has a hit area larger than its thumb, sized by the platform for a finger.  **The value is a string, like every other form control's.** A range submits text and 'MixinControllerValue' holds text, so the number is a reading of the value rather than the value itself. 'valueAsNumber' is there for anything doing arithmetic on it.  **Marks are drawn rather than left to '<datalist>'**, which was the first answer and is the wrong one. A datalist's ticks cannot be styled at all, and Firefox does not render them for a range at all, so the platform's version is a mark that looks like someone else's design where it appears and no mark where it does not. Drawing them costs the semantics nothing, because a mark is decoration: what a reader can actually land on is 'step', which the input enforces whether or not anything is drawn.  'markers' is a count rather than a flag tied to 'step'. A flag reads well until a slider from zero to a hundred stepping by one asks for a hundred and one ticks, and then it is either noise or a silent refusal to draw. A number is what the reader sees, so it cannot surprise anyone. */
+  /** A real '<input type="range">', so the drag, the arrow keys, Home and End, the page keys and the touch target are all the platform's. Every one of those is a thing a hand-built slider gets wrong, and the last is the one nobody notices: a native range has a hit area larger than its thumb, sized by the platform for a finger.  **The value is a string, like every other form control's.** A range submits text and 'MixinControllerValue' holds text, so the number is a reading of the value rather than the value itself. 'valueAsNumber' is there for anything doing arithmetic on it.  **Marks are drawn rather than left to '<datalist>'**, which was the first answer and is the wrong one. A datalist's ticks cannot be styled at all, and Firefox does not render them for a range at all, so the platform's version is a mark that looks like someone else's design where it appears and no mark where it does not. Drawing them costs the semantics nothing, because a mark is decoration: what a reader can actually land on is 'step', which the input enforces whether or not anything is drawn.  'markers' is a count rather than a flag tied to 'step'. A flag reads well until a slider from zero to a hundred stepping by one asks for a hundred and one ticks, and then it is either noise or a silent refusal to draw. A number is what the reader sees, so it cannot surprise anyone.  **A range is two of them, not a hand-built one.** There is no native two-thumb range, and the answer is not to stop using the platform's: it is to stack two of them on one track, so each thumb keeps its own drag, its own arrow keys, its own Home and End and its own finger-sized hit area. Rebuilding would throw away every argument this component is made of, to gain a second handle.  Crossing is stopped in the handler rather than by the bounds, and that is not the obvious way round. Giving the lower input 'max' of the upper reads well and breaks the drawing: an input's thumb sits at a fraction of *its own* range, so a lower thumb bounded at the upper one paints against a shorter track and the two stop lining up. Both inputs span the whole range and the values are clamped against each other on the way in. */
   "helix-base-slider": DefineCustomElement<
     HelixBaseSlider,
     HelixBaseSliderVueProps,

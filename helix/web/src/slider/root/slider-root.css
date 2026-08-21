@@ -326,3 +326,76 @@
 :host([data-invalid]) [part="control"]::-moz-range-thumb {
   box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
 }
+
+/* Two thumbs on one track.
+ *
+ * The inputs are stacked rather than laid out beside each other, so both read
+ * their position against the same track and the pair can be dragged past one
+ * another without either of them changing size. `grid` with one cell is what
+ * puts them there: absolute positioning would take them out of the row and the
+ * field would collapse to the height of its label. */
+:host([range]) [part="field"] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+/* Both thumbs in the one cell, and the readout beside them rather than under.
+   A grid with nothing placed stacks its children in rows, which put "20 to 70"
+   on a line of its own below the track. */
+:host([range]) [part="control"] {
+  grid-area: 1 / 1;
+}
+
+:host([range]) [part="output"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* The lower one paints the ramp for both, and the upper one's track is clear.
+ *
+ * Two stacked native tracks would paint the gradient twice, and the second one
+ * is opaque, so the first would never be seen. Three stops rather than two: the
+ * fill is the span *between* the thumbs, which is the whole difference between
+ * a range and a slider that happens to have two handles. */
+:host([range]) [part="control"][data-thumb="start"] {
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      to right,
+      var(--_slider-track-color) calc(var(--_slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-to, 1) * 100%),
+      var(--_slider-track-color) calc(var(--_slider-to, 1) * 100%)
+    )
+  );
+}
+
+:host([range]) [part="control"][data-thumb="end"]::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+:host([range]) [part="control"][data-thumb="end"]::-moz-range-track {
+  background: transparent;
+}
+
+/* The pointer reaches whichever thumb it is over, rather than always the upper
+ * input.
+ *
+ * Two inputs covering the same box means the one painted last takes every
+ * press, including presses on the other one's handle. Turning pointer events
+ * off on the input and back on at the thumb is what lets a reader grab either.
+ *
+ * The cost is stated rather than hidden: a press on the bare track moves
+ * nothing in this appearance, where a single slider would jump to it. Both
+ * thumbs still take the keyboard, which is the path that has to work. */
+:host([range]) [part="control"] {
+  pointer-events: none;
+}
+
+:host([range]) [part="control"]::-webkit-slider-thumb {
+  pointer-events: auto;
+}
+
+:host([range]) [part="control"]::-moz-range-thumb {
+  pointer-events: auto;
+}
