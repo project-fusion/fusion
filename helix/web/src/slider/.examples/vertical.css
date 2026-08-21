@@ -1,5 +1,9 @@
 /* A vertical track has no length of its own the way a horizontal one takes the
-   width of its row, so `--slider-length` is the number. Nine rem by default. */
+   width of its row, so `--slider-length` is the number. Nine rem by default.
+
+   On the group rather than on a slider: it is a custom property, so it
+   inherits, and a length set once for a row is a row whose members cannot
+   disagree about how tall they are. */
 .tall {
   --slider-length: 14rem;
 }

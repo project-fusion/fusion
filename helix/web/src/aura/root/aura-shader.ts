@@ -1004,13 +1004,24 @@ export const FRAGMENT = `#version 300 es
         noise(p * 1.1 - vec2(0.0, t * 0.36 + f * 7.0))
       ) * 0.85;
 
-      float sum = sin(w.x * 3.1 + t * 0.7 + drop * 5.0) + sin(w.y * 2.7 - t * 0.55 - drop * 4.0);
+      float sum = sin(w.x * 3.1 + t * 0.7 + drop * 6.0) + sin(w.y * 2.7 - t * 0.55 - drop * 5.0);
       float fold = 1.0 - clamp(abs(sum) * 0.5, 0.0, 1.0);
       lit += pow(fold, 7.0) * (1.0 - f * 0.22);
     }
 
+    /* **The pool has a lit part and a dark part.** Three layers of folds at one
+       density fill the frame edge to edge and every version of it looks the
+       same: bright everywhere carries the same amount of information as dark
+       everywhere. A slow depth over the top decides where the light is getting
+       through, so the web has somewhere to be faint and the eye somewhere to
+       start. */
+    float pool = smoothstep(0.2, 0.78, noise(vec2(q.x * 0.55 - t * 0.09, q.y * 0.5 + t * 0.06)));
+
+    /* And the stone brightens what it disturbs as well as bending it, or the
+       only evidence of a pointer is a phase shift nobody can see. */
     float dim = warped(q * 0.7, t * 0.2);
-    return lit * mix(0.55, 1.25, dim) * falloff(dot(q, q), 0.4);
+    return lit * mix(0.55, 1.25, dim) * mix(0.25, 1.25, pool) *
+      (1.0 + drop * 0.9) * falloff(dot(q, q), 0.4);
   }
 
   /* A lattice in perspective, lit at its nodes.
@@ -1032,24 +1043,37 @@ export const FRAGMENT = `#version 300 es
     vec2 away = q - qp;
     float near = falloff(dot(away, away), 1.8) * reach;
 
-    float ang = t * 0.12;
-    mat2 spin = mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
-    vec2 p = spin * q;
-
-    float depth = 1.0 / (1.0 + abs(p.y) * 0.85);
-    vec2 g = vec2(p.x, p.y) * (2.6 + near * 1.6) * depth * 3.0;
+    /* **A ground plane, not a mirrored one.** Dividing by abs(p.y) makes two
+       floors meeting along y = 0, which reads as a bowtie with a crease down
+       the middle rather than as anything receding. Dividing by the distance
+       below a horizon is the actual projection: one plane, cells shrinking as
+       they approach it, and nothing above it to fold back.
+    
+       It travels as well, so the structure arrives rather than sitting still.
+       Perspective and motion together are what say the plane is a plane. */
+    float below = max(1.45 - q.y, 0.14);
+    float depth = 1.0 / below;
+    vec2 g = vec2(
+      q.x * depth * (2.3 + near * 1.4),
+      depth * 1.6 + t * 0.28
+    );
     vec2 cell = fract(g) - 0.5;
 
     /* The rails, thinner the further back they are, so the grid does not turn
        into a solid sheet at the horizon. */
     float rail = min(abs(cell.x), abs(cell.y));
-    float lines = falloff(rail * rail, 26.0 / max(depth, 0.25)) * depth;
+    float lines = falloff(rail * rail, 24.0);
 
-    /* The joints, which is where a lattice is actually a lattice. */
-    float node = falloff(dot(cell, cell), 30.0) * (0.6 + near * 0.8);
+    /* The joints, which is where a lattice is actually a lattice, and brighter
+       than the rails between them: a grid of even weight is graph paper. */
+    float node = falloff(dot(cell, cell), 26.0) * 2.1 * (0.6 + near * 0.9);
 
-    float dust = warped(p * 0.9, t * 0.25);
-    return (lines * 0.55 + node) * mix(0.7, 1.2, dust) * falloff(dot(q, q), 0.5);
+    /* Faded toward the horizon, or the cells pile into a solid sheet exactly
+       where they are smallest. */
+    float far = smoothstep(0.0, 0.55, below) * smoothstep(3.4, 1.3, below);
+
+    float dust = warped(q * 0.9, t * 0.25);
+    return (lines * 0.5 + node) * far * mix(0.7, 1.2, dust) * falloff(dot(q, q), 0.42);
   }
 
   /* Cells, lit along the seams between them.
@@ -1098,10 +1122,18 @@ export const FRAGMENT = `#version 300 es
     }
 
     float wall = second - first;
-    float seam = falloff(wall * wall, 11.0);
+    float seam = falloff(wall * wall, 17.0);
+
+    /* **Not every seam is lit the same.** At one brightness the field is a
+       mosaic of equal cells, which is a texture; what makes a set of
+       territories read is that some borders are contested and most are not. A
+       slow field decides which, and the dark stretches give the lit ones a
+       shape. */
+    float contested = smoothstep(0.24, 0.8, noise(vec2(q.x * 0.6 + t * 0.07, q.y * 0.55 - t * 0.05)));
 
     float grain = warped(q * 1.3, t * 0.3);
-    return seam * mix(0.6, 1.25, grain) * falloff(dot(q, q), 0.42);
+    return seam * mix(0.6, 1.25, grain) * mix(0.18, 1.3, contested) *
+      falloff(dot(q, q), 0.42);
   }
 
   /* Two wave fields crossed, lit where they agree. */

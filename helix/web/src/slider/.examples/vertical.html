@@ -40,21 +40,31 @@
     ></helix-slider>
   </helix-flex>
 
-  <!-- A length of its own, on a row of its own.
+  <!-- **The length belongs to the row, not to one slider in it.**
 
-       Beside the others it was the odd one out in a way that reads as a
-       mistake: bottom aligned, the tracks share a foot, so the taller one's
-       label floats eighty pixels above its neighbours' and the row of names
-       comes out ragged. Faders in a row are the same height, and a different
-       height is a different row. -->
+       `--slider-length` is a custom property, so it inherits: set on the group
+       it reaches every slider inside and they cannot disagree. Set on one
+       child, that child is taller than its neighbours, the tracks still share a
+       foot, and its label floats above theirs, which is a ragged row of names
+       that no amount of aligning the row fixes. The hook is the fix, put where
+       a length actually belongs. -->
   <helix-flex
     align="end"
+    class="tall"
     gap="2xl"
   >
     <helix-slider
-      class="tall"
-      default-value="60"
-      label="Long"
+      default-value="80"
+      label="Left"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
+
+    <helix-slider
+      default-value="35"
+      label="Right"
       max="100"
       min="0"
       orientation="vertical"
