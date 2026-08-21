@@ -13,6 +13,20 @@
    * its own value down and the numbers in a row stopped meeting. Packed to the
    * start, the extra collects at the bottom where nothing is. */
   align-content: start;
+  /* The unit on the number's baseline, which takes both of them saying so.
+   *
+   * `align-self: baseline` on the unit alone did nothing, and it was on the
+   * unit alone for a long time. Baseline alignment is relative: an item is
+   * aligned against the others in its baseline-sharing group, and one item is
+   * not a group, so it fell back to start and the unit rendered at the top of
+   * the number like a superscript. Measured at 14px: the unit's bottom sat
+   * 32.5px above the number's, and 5.5px after this, which is the descender.
+   *
+   * Both readings of the value are fixed by the same line. A value written as
+   * bare text becomes an anonymous grid item, which has no element to carry
+   * `align-self` at all; one wrapped in a span was broken too, and looked like
+   * it should have worked, which is why this went unnoticed. */
+  align-items: baseline;
   display: grid;
   gap: var(--helix-space-2xs);
   grid-template-columns: auto 1fr;
@@ -42,10 +56,9 @@ slot:not([name]) {
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
-/* On the value's baseline rather than centered against it, so the unit reads as
-   part of the figure instead of floating beside it. */
+/* Quieter and smaller than the number it qualifies. The baseline it sits on is
+   set by `align-items` above, since one item cannot baseline-align alone. */
 slot[name="unit"]::slotted(*) {
-  align-self: baseline;
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);

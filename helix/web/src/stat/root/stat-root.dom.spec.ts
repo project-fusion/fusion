@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, slotted } from '@fusion-io/testing/dom'
+import { hasLayout, mount, registerDom, slotted } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -62,3 +62,53 @@ describe('stat direction', () => {
     expect(slotted(stat, 'detail')).toHaveLength(0)
   })
 })
+
+if (hasLayout()) {
+  describe('stat unit geometry', () => {
+    /* The unit read as a superscript, and `align-self: baseline` was already on
+       it, which is why nobody looked twice. Baseline alignment is relative: an
+       item aligns against the others in its baseline-sharing group, and one
+       item is not a group, so it fell back to start and sat at the top of the
+       number. `align-items: baseline` on the grid puts the value in the group
+       too, and both readings of the value need it.
+
+       Asserted as a distance rather than an equality, because the two are on a
+       shared baseline and not a shared bottom edge: the smaller type has the
+       shallower descender, so its box ends a few pixels above the number's. Off
+       the baseline it was 32.5px out at 14px, which is half the number's own
+       height, so the band is wide enough to be robust and far from the bug. */
+    const unitAbove = (host: HTMLElement): number => {
+      const value = [...host.childNodes].find(
+        (node) =>
+          (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) ||
+          (node.nodeType === Node.ELEMENT_NODE && !(node as Element).getAttribute('slot')),
+      ) as Node
+      let box: DOMRect
+      if (value.nodeType === Node.ELEMENT_NODE) {
+        box = (value as Element).getBoundingClientRect()
+      } else {
+        const range = document.createRange()
+        range.selectNodeContents(value)
+        box = range.getBoundingClientRect()
+      }
+      const unit = host.querySelector('[slot="unit"]') as HTMLElement
+      return box.bottom - unit.getBoundingClientRect().bottom
+    }
+
+    test('the unit sits on the value baseline, not above it', async () => {
+      const bare = await mount(
+        '<helix-stat>212<span slot="label">p99</span><span slot="unit">ms</span></helix-stat>',
+      )
+      expect(unitAbove(bare)).toBeLessThan(12)
+    })
+
+    test('and does so whether the value is bare text or wrapped', async () => {
+      // A bare value is an anonymous grid item with no element to carry
+      // `align-self`; a wrapped one has the element and was broken anyway.
+      const wrapped = await mount(
+        '<helix-stat><span>212</span><span slot="label">p99</span><span slot="unit">ms</span></helix-stat>',
+      )
+      expect(unitAbove(wrapped)).toBeLessThan(12)
+    })
+  })
+}
