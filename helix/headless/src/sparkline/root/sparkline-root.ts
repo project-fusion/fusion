@@ -1,4 +1,13 @@
-import { customElement, extent, HelixElement, linear, readSeries } from '@helix-io/core'
+import {
+  type Curve,
+  customElement,
+  extent,
+  HelixElement,
+  linear,
+  linePath,
+  type Point,
+  readSeries,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -51,11 +60,30 @@ const readValues = (input: string): number[] =>
  *
  * @csspart area - The region between the line and the bottom of its range.
  * @csspart line - The path itself.
- * @csspart point - The mark on the last value.
  * @csspart svg - The drawing.
+ * @csspart terminus - The mark on the last value.
+ * @csspart wash-end - The far stop of the area's gradient.
+ * @csspart wash-start - The stop of the area's gradient that meets the line.
  */
 @customElement('helix-base-sparkline')
 export class HelixBaseSparkline extends HelixElement {
+  /**
+   * How the line gets from one reading to the next.
+   *
+   * Absent joins them and claims nothing in between, which is why it is the
+   * default. `smooth` is easier to follow across a long series and invents the
+   * values between the readings, so it is a reading aid rather than a neutral
+   * one; it is monotone cubic, so what it invents never leaves the band the
+   * data sets. `step` claims the opposite, that a reading holds until the next.
+   *
+   * This tier and not the one above, though it is a drawing decision: a curve
+   * is expressed as path data, and path data is markup. `linePath` in
+   * `helix/core` is the shared implementation, so every chart that draws a line
+   * offers the same three and draws them the same way.
+   */
+  @property({ reflect: true })
+  curve?: Curve
+
   /**
    * The id of a table to read instead, when there is one behind the line.
    *
@@ -151,10 +179,8 @@ export class HelixBaseSparkline extends HelixElement {
        so the empty case is stated here rather than left to look like a bug. */
     const x = linear([0, Math.max(points.length - 1, 1)], [0, BOX.width])
     const y = linear(extent(points.length > 0 ? points : [0]), [BOX.height, 0])
-    const path =
-      points.length < 2
-        ? ''
-        : points.map((value, index) => `${index === 0 ? 'M' : 'L'}${x(index)},${y(value)}`).join('')
+    const coordinates: Point[] = points.map((value, index) => [x(index), y(value)])
+    const path = linePath(coordinates, this.curve)
 
     /* The same line closed down to the floor of its own range, which is where
        the fill goes. Drawn always and painted only by `appearance`: the shape
@@ -176,6 +202,20 @@ export class HelixBaseSparkline extends HelixElement {
         role=${this.label === '' ? nothing : 'img'}
         viewBox="0 0 ${BOX.width} ${BOX.height}"
       >
+        ${
+          /* The ramp the area is poured with, drawn here because a gradient is
+             an element and elements are this tier's business, and coloured
+             above because a colour is not. Measured rather than assumed: a
+             fragment id inside a shadow root resolves within that root, so two
+             sparklines on a page carrying the same id stay independent, and CSS
+             `fill: url(#...)` reaches it as readily as the attribute does. */
+          svg`<defs>
+            <linearGradient id="sparkline-wash" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" part="wash-start" />
+              <stop offset="1" part="wash-end" />
+            </linearGradient>
+          </defs>`
+        }
         ${
           /* `svg` and not `html`, because a nested template is parsed on its
              own and this one has no `<svg>` around it to be parsed inside.
@@ -203,8 +243,8 @@ export class HelixBaseSparkline extends HelixElement {
           ? nothing
           : html`<span
               aria-hidden="true"
-              part="point"
-              style="--_sparkline-x: 100%; --_sparkline-y: ${
+              part="terminus"
+              style="--_chart-terminus-x: 100%; --_chart-terminus-y: ${
                 (y(points[points.length - 1] as number) / BOX.height) * 100
               }%"
             ></span>`

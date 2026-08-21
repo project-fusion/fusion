@@ -54,7 +54,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
-| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 8 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 4 |
 | `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 2 |
 | `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 2 |
 | `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 2 |
@@ -90,7 +90,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-radii-none` | `0` | 60 |
+| `--helix-radii-none` | `0` | 64 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 197 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
 | `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
@@ -158,7 +158,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 208 |
-| `--helix-border-thick` | `2px` | 57 |
+| `--helix-border-thick` | `2px` | 59 |
 
 ## shadow
 

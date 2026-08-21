@@ -34478,15 +34478,33 @@
               "name": "line"
             },
             {
-              "description": "The mark on the last value.",
-              "name": "point"
-            },
-            {
               "description": "The drawing.",
               "name": "svg"
+            },
+            {
+              "description": "The mark on the last value.",
+              "name": "terminus"
+            },
+            {
+              "description": "The far stop of the area's gradient.",
+              "name": "wash-end"
+            },
+            {
+              "description": "The stop of the area's gradient that meets the line.",
+              "name": "wash-start"
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "curve",
+              "type": {
+                "text": "Curve | undefined"
+              },
+              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings, so it is a reading aid rather than a neutral\none; it is monotone cubic, so what it invents never leaves the band the\ndata sets. `step` claims the opposite, that a reading holds until the next.\n\nThis tier and not the one above, though it is a drawing decision: a curve\nis expressed as path data, and path data is markup. `linePath` in\n`helix/core` is the shared implementation, so every chart that draws a line\noffers the same three and draws them the same way.",
+              "attribute": "curve",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "for",
@@ -34629,6 +34647,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "curve",
+              "type": {
+                "text": "Curve | undefined"
+              },
+              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings, so it is a reading aid rather than a neutral\none; it is monotone cubic, so what it invents never leaves the band the\ndata sets. `step` claims the opposite, that a reading holds until the next.\n\nThis tier and not the one above, though it is a drawing decision: a curve\nis expressed as path data, and path data is markup. `linePath` in\n`helix/core` is the shared implementation, so every chart that draws a line\noffers the same three and draws them the same way.",
+              "fieldName": "curve"
+            },
             {
               "name": "for",
               "type": {

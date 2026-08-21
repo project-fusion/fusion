@@ -7607,6 +7607,19 @@ reflected none of them. */
 };
 
 export type HelixBaseSparklineProps = {
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between, which is why it is the
+default. `smooth` is easier to follow across a long series and invents the
+values between the readings, so it is a reading aid rather than a neutral
+one; it is monotone cubic, so what it invents never leaves the band the
+data sets. `step` claims the opposite, that a reading holds until the next.
+
+This tier and not the one above, though it is a drawing decision: a curve
+is expressed as path data, and path data is markup. `linePath` in
+`helix/core` is the shared implementation, so every chart that draws a line
+offers the same three and draws them the same way. */
+  curve?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -7634,6 +7647,19 @@ does not. */
 };
 
 export type HelixBaseSparklineSolidJsProps = {
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between, which is why it is the
+default. `smooth` is easier to follow across a long series and invents the
+values between the readings, so it is a reading aid rather than a neutral
+one; it is monotone cubic, so what it invents never leaves the band the
+data sets. `step` claims the opposite, that a reading holds until the next.
+
+This tier and not the one above, though it is a drawing decision: a curve
+is expressed as path data, and path data is markup. `linePath` in
+`helix/core` is the shared implementation, so every chart that draws a line
+offers the same three and draws them the same way. */
+  "prop:curve"?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -17934,6 +17960,18 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `curve`: How the line gets from one reading to the next.
+   *
+   * Absent joins them and claims nothing in between, which is why it is the
+   * default. `smooth` is easier to follow across a long series and invents the
+   * values between the readings, so it is a reading aid rather than a neutral
+   * one; it is monotone cubic, so what it invents never leaves the band the
+   * data sets. `step` claims the opposite, that a reading holds until the next.
+   *
+   * This tier and not the one above, though it is a drawing decision: a curve
+   * is expressed as path data, and path data is markup. `linePath` in
+   * `helix/core` is the shared implementation, so every chart that draws a line
+   * offers the same three and draws them the same way.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -17962,8 +18000,10 @@ export type CustomElements = {
    *
    * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
-   * - `point`: The mark on the last value.
    * - `svg`: The drawing.
+   * - `terminus`: The mark on the last value.
+   * - `wash-end`: The far stop of the area's gradient.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps & BaseProps<HelixBaseSparkline> & BaseEvents
@@ -28256,6 +28296,18 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `curve`: How the line gets from one reading to the next.
+   *
+   * Absent joins them and claims nothing in between, which is why it is the
+   * default. `smooth` is easier to follow across a long series and invents the
+   * values between the readings, so it is a reading aid rather than a neutral
+   * one; it is monotone cubic, so what it invents never leaves the band the
+   * data sets. `step` claims the opposite, that a reading holds until the next.
+   *
+   * This tier and not the one above, though it is a drawing decision: a curve
+   * is expressed as path data, and path data is markup. `linePath` in
+   * `helix/core` is the shared implementation, so every chart that draws a line
+   * offers the same three and draws them the same way.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -28284,8 +28336,10 @@ export type CustomElementsSolidJs = {
    *
    * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
-   * - `point`: The mark on the last value.
    * - `svg`: The drawing.
+   * - `terminus`: The mark on the last value.
+   * - `wash-end`: The far stop of the area's gradient.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps &

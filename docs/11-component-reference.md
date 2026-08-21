@@ -4423,13 +4423,19 @@ lets one drawing fill a 60px slot and a 600px one, and without
 `vector-effect: non-scaling-stroke` the same line comes out hairline in the
 first and heavy in the second.
 
+One colour on the host, read by the line, the wash and the mark alike, so
+moving `--sparkline-color` cannot leave three parts of one drawing
+disagreeing.
+
 #### Properties
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'area' \| undefined` | - | - | Whether the region under the line is filled. |
+| `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseSparkline` | How the line gets from one reading to the next. |
 | `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
+| `terminus` | `terminus` | `'none' \| 'ring' \| 'square' \| 'triangle' \| undefined` | - | - | The shape of the mark on the last reading. |
 | `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
 
 #### Parts
@@ -4438,18 +4444,20 @@ first and heavy in the second.
 | --- | --- |
 | `area` | The region between the line and the bottom of its range. |
 | `line` | The path itself. |
-| `point` | The mark on the last value. |
 | `svg` | The drawing. |
+| `terminus` | The mark on the last value. |
+| `wash-end` | The far stop of the area's gradient. |
+| `wash-start` | The stop of the area's gradient that meets the line. |
 
 #### Custom properties
 
 | Property | Description |
 | --- | --- |
-| `--sparkline-area-opacity` | How much of the line's colour the fill takes. |
+| `--chart-terminus-size` | Size of the mark on the last reading. |
+| `--sparkline-area-opacity` | How much of the line's colour the wash takes where it meets the line. |
 | `--sparkline-block-size` | Height of the drawing. |
-| `--sparkline-color` | Colour of the line and the mark. |
+| `--sparkline-color` | Colour of the line, the wash and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |
-| `--sparkline-point-size` | Diameter of the mark on the last value. |
 | `--sparkline-width` | Thickness of the line. |
 
 ## Speed Dial

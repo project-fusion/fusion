@@ -8991,14 +8991,43 @@ export type HelixSparklineProps = {
   /** Whether the region under the line is filled.
 
 Absent is the line alone, which is the sparkline that sits in a line of
-text. `area` fills the region beneath it, which reads as a silhouette and
+text. `area` washes the region beneath it, which reads as a silhouette and
 carries better at small sizes and from further away, at the cost of the
 exact path being harder to follow where two of them are compared.
 
-The fill is a wash of the line's own colour rather than a second one, so a
-consumer setting `--sparkline-color` moves both and cannot end up with a
-fill that disagrees with the line above it. */
+The wash is a ramp of the line's own colour, strongest where it meets the
+line and gone by the floor of the box. Not a flat fill, because the floor
+is the edge of the data's own range rather than a true zero, and a fill of
+even weight down to it draws a hard edge along a number that means nothing. */
   appearance?: HelixSparkline["appearance"];
+  /** The shape of the mark on the last reading.
+
+Absent is a dot, which is how a sparkline is usually ended, and absent
+rather than defaulted because a reflecting property with a default writes
+its attribute onto a host the consumer rendered, which React reports as a
+hydration mismatch.
+
+`none` lets the line stop on its own, which suits a series read as a shape
+rather than for where it finished. `ring` lets the ground through, for a
+chart drawn over something busy. `triangle` points along the axis and reads
+as "and onward" rather than as a second claim about the data.
+
+The shapes come from `chart/terminus.css`, shared with every other chart
+that ends a line, so the set is the same wherever one appears. */
+  terminus?: HelixSparkline["terminus"];
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between, which is why it is the
+default. `smooth` is easier to follow across a long series and invents the
+values between the readings, so it is a reading aid rather than a neutral
+one; it is monotone cubic, so what it invents never leaves the band the
+data sets. `step` claims the opposite, that a reading holds until the next.
+
+This tier and not the one above, though it is a drawing decision: a curve
+is expressed as path data, and path data is markup. `linePath` in
+`helix/core` is the shared implementation, so every chart that draws a line
+offers the same three and draws them the same way. */
+  curve?: HelixSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -9029,14 +9058,43 @@ export type HelixSparklineSolidJsProps = {
   /** Whether the region under the line is filled.
 
 Absent is the line alone, which is the sparkline that sits in a line of
-text. `area` fills the region beneath it, which reads as a silhouette and
+text. `area` washes the region beneath it, which reads as a silhouette and
 carries better at small sizes and from further away, at the cost of the
 exact path being harder to follow where two of them are compared.
 
-The fill is a wash of the line's own colour rather than a second one, so a
-consumer setting `--sparkline-color` moves both and cannot end up with a
-fill that disagrees with the line above it. */
+The wash is a ramp of the line's own colour, strongest where it meets the
+line and gone by the floor of the box. Not a flat fill, because the floor
+is the edge of the data's own range rather than a true zero, and a fill of
+even weight down to it draws a hard edge along a number that means nothing. */
   "prop:appearance"?: HelixSparkline["appearance"];
+  /** The shape of the mark on the last reading.
+
+Absent is a dot, which is how a sparkline is usually ended, and absent
+rather than defaulted because a reflecting property with a default writes
+its attribute onto a host the consumer rendered, which React reports as a
+hydration mismatch.
+
+`none` lets the line stop on its own, which suits a series read as a shape
+rather than for where it finished. `ring` lets the ground through, for a
+chart drawn over something busy. `triangle` points along the axis and reads
+as "and onward" rather than as a second claim about the data.
+
+The shapes come from `chart/terminus.css`, shared with every other chart
+that ends a line, so the set is the same wherever one appears. */
+  "prop:terminus"?: HelixSparkline["terminus"];
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between, which is why it is the
+default. `smooth` is easier to follow across a long series and invents the
+values between the readings, so it is a reading aid rather than a neutral
+one; it is monotone cubic, so what it invents never leaves the band the
+data sets. `step` claims the opposite, that a reading holds until the next.
+
+This tier and not the one above, though it is a drawing decision: a curve
+is expressed as path data, and path data is markup. `linePath` in
+`helix/core` is the shared implementation, so every chart that draws a line
+offers the same three and draws them the same way. */
+  "prop:curve"?: HelixSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -19913,6 +19971,10 @@ export type CustomElements = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
+   * One colour on the host, read by the line, the wash and the mark alike, so
+   * moving `--sparkline-color` cannot leave three parts of one drawing
+   * disagreeing.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -19920,13 +19982,40 @@ export type CustomElements = {
    * - `appearance`: Whether the region under the line is filled.
    *
    * Absent is the line alone, which is the sparkline that sits in a line of
-   * text. `area` fills the region beneath it, which reads as a silhouette and
+   * text. `area` washes the region beneath it, which reads as a silhouette and
    * carries better at small sizes and from further away, at the cost of the
    * exact path being harder to follow where two of them are compared.
    *
-   * The fill is a wash of the line's own colour rather than a second one, so a
-   * consumer setting `--sparkline-color` moves both and cannot end up with a
-   * fill that disagrees with the line above it.
+   * The wash is a ramp of the line's own colour, strongest where it meets the
+   * line and gone by the floor of the box. Not a flat fill, because the floor
+   * is the edge of the data's own range rather than a true zero, and a fill of
+   * even weight down to it draws a hard edge along a number that means nothing.
+   * - `terminus`: The shape of the mark on the last reading.
+   *
+   * Absent is a dot, which is how a sparkline is usually ended, and absent
+   * rather than defaulted because a reflecting property with a default writes
+   * its attribute onto a host the consumer rendered, which React reports as a
+   * hydration mismatch.
+   *
+   * `none` lets the line stop on its own, which suits a series read as a shape
+   * rather than for where it finished. `ring` lets the ground through, for a
+   * chart drawn over something busy. `triangle` points along the axis and reads
+   * as "and onward" rather than as a second claim about the data.
+   *
+   * The shapes come from `chart/terminus.css`, shared with every other chart
+   * that ends a line, so the set is the same wherever one appears.
+   * - `curve`: How the line gets from one reading to the next.
+   *
+   * Absent joins them and claims nothing in between, which is why it is the
+   * default. `smooth` is easier to follow across a long series and invents the
+   * values between the readings, so it is a reading aid rather than a neutral
+   * one; it is monotone cubic, so what it invents never leaves the band the
+   * data sets. `step` claims the opposite, that a reading holds until the next.
+   *
+   * This tier and not the one above, though it is a drawing decision: a curve
+   * is expressed as path data, and path data is markup. `linePath` in
+   * `helix/core` is the shared implementation, so every chart that draws a line
+   * offers the same three and draws them the same way.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -19953,11 +20042,11 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--sparkline-area-opacity`: How much of the line's colour the fill takes. (default: `undefined`)
+   * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
+   * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line, the wash and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
-   * - `--sparkline-point-size`: Diameter of the mark on the last value. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
    *
    * ## CSS Parts
@@ -19966,8 +20055,10 @@ export type CustomElements = {
    *
    * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
-   * - `point`: The mark on the last value.
    * - `svg`: The drawing.
+   * - `terminus`: The mark on the last value.
+   * - `wash-end`: The far stop of the area's gradient.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents
@@ -30466,6 +30557,10 @@ export type CustomElementsSolidJs = {
    * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
    * first and heavy in the second.
    *
+   * One colour on the host, read by the line, the wash and the mark alike, so
+   * moving `--sparkline-color` cannot leave three parts of one drawing
+   * disagreeing.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -30473,13 +30568,40 @@ export type CustomElementsSolidJs = {
    * - `appearance`: Whether the region under the line is filled.
    *
    * Absent is the line alone, which is the sparkline that sits in a line of
-   * text. `area` fills the region beneath it, which reads as a silhouette and
+   * text. `area` washes the region beneath it, which reads as a silhouette and
    * carries better at small sizes and from further away, at the cost of the
    * exact path being harder to follow where two of them are compared.
    *
-   * The fill is a wash of the line's own colour rather than a second one, so a
-   * consumer setting `--sparkline-color` moves both and cannot end up with a
-   * fill that disagrees with the line above it.
+   * The wash is a ramp of the line's own colour, strongest where it meets the
+   * line and gone by the floor of the box. Not a flat fill, because the floor
+   * is the edge of the data's own range rather than a true zero, and a fill of
+   * even weight down to it draws a hard edge along a number that means nothing.
+   * - `terminus`: The shape of the mark on the last reading.
+   *
+   * Absent is a dot, which is how a sparkline is usually ended, and absent
+   * rather than defaulted because a reflecting property with a default writes
+   * its attribute onto a host the consumer rendered, which React reports as a
+   * hydration mismatch.
+   *
+   * `none` lets the line stop on its own, which suits a series read as a shape
+   * rather than for where it finished. `ring` lets the ground through, for a
+   * chart drawn over something busy. `triangle` points along the axis and reads
+   * as "and onward" rather than as a second claim about the data.
+   *
+   * The shapes come from `chart/terminus.css`, shared with every other chart
+   * that ends a line, so the set is the same wherever one appears.
+   * - `curve`: How the line gets from one reading to the next.
+   *
+   * Absent joins them and claims nothing in between, which is why it is the
+   * default. `smooth` is easier to follow across a long series and invents the
+   * values between the readings, so it is a reading aid rather than a neutral
+   * one; it is monotone cubic, so what it invents never leaves the band the
+   * data sets. `step` claims the opposite, that a reading holds until the next.
+   *
+   * This tier and not the one above, though it is a drawing decision: a curve
+   * is expressed as path data, and path data is markup. `linePath` in
+   * `helix/core` is the shared implementation, so every chart that draws a line
+   * offers the same three and draws them the same way.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -30506,11 +30628,11 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--sparkline-area-opacity`: How much of the line's colour the fill takes. (default: `undefined`)
+   * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
+   * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
-   * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
+   * - `--sparkline-color`: Colour of the line, the wash and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
-   * - `--sparkline-point-size`: Diameter of the mark on the last value. (default: `undefined`)
    * - `--sparkline-width`: Thickness of the line. (default: `undefined`)
    *
    * ## CSS Parts
@@ -30519,8 +30641,10 @@ export type CustomElementsSolidJs = {
    *
    * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
-   * - `point`: The mark on the last value.
    * - `svg`: The drawing.
+   * - `terminus`: The mark on the last value.
+   * - `wash-end`: The far stop of the area's gradient.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps &
@@ -33996,16 +34120,16 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
-  /** How much of the line's colour the fill takes. */
+  /** Size of the mark on the last reading. */
+  "--chart-terminus-size"?: string;
+  /** How much of the line's colour the wash takes where it meets the line. */
   "--sparkline-area-opacity"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
-  /** Colour of the line and the mark. */
+  /** Colour of the line, the wash and the mark. */
   "--sparkline-color"?: string;
   /** Width of the drawing. */
   "--sparkline-inline-size"?: string;
-  /** Diameter of the mark on the last value. */
-  "--sparkline-point-size"?: string;
   /** Thickness of the line. */
   "--sparkline-width"?: string;
   /** Edge length of the mark. */

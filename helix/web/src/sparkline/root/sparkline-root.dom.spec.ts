@@ -46,7 +46,7 @@ describe('sparkline', () => {
   test('one value is not a trend and no values is not a line', async () => {
     expect(path(await spark('values="4"'))).toBeNull()
     expect(path(await spark('values=""'))).toBeNull()
-    expect(part(await spark('values="4"'), 'point')).toBeNull()
+    expect(part(await spark('values="4"'), 'terminus')).toBeNull()
   })
 
   test('a word among the numbers is dropped rather than plotted as NaN', async () => {
@@ -82,11 +82,43 @@ describe('sparkline', () => {
     expect(part(await spark('values="4"'), 'area')).toBeNull()
   })
 
+  test('a curve changes the path and nothing else about the reading', async () => {
+    /* This tier and not the styled one, though it is a drawing decision: a
+       curve is expressed as path data and path data is markup. `linePath` in
+       `helix/core` is the implementation, specced there, so what is asserted
+       here is only that the property reaches it. */
+    const straight = path(await spark('values="1 5 2 6"')) ?? ''
+    const smooth = path(await spark('curve="smooth" values="1 5 2 6"')) ?? ''
+    const stepped = path(await spark('curve="step" values="1 5 2 6"')) ?? ''
+    expect(straight).toContain('L')
+    expect(smooth).toContain('C')
+    expect(stepped).toContain('H')
+    /* All three start on the first reading and finish on the last. The step
+       path says so in its own idiom: `H` carries only an x, because the y was
+       already set by the `V` before it, so it ends `V0H100` where the other two
+       end `100,0`. Asserting one spelling for all three is what the first
+       version of this did, and it reported a path that was correct. */
+    for (const drawn of [straight, smooth, stepped]) {
+      expect(drawn.startsWith('M0,32')).toBe(true)
+    }
+    expect(straight.endsWith('L100,0')).toBe(true)
+    expect(smooth.endsWith('100,0')).toBe(true)
+    expect(stepped.endsWith('V0H100')).toBe(true)
+  })
+
+  test('the area follows whatever curve the line took', async () => {
+    // Otherwise the fill and the line disagree about where the top edge is.
+    const host = await spark('curve="smooth" values="1 5 2 6"')
+    expect(part(host, 'area')?.getAttribute('d')).toContain(
+      part(host, 'line')?.getAttribute('d') ?? 'no line',
+    )
+  })
+
   test('the mark sits on the last value', async () => {
     const host = await spark('values="9 5 1"')
     // Last value is the smallest, so the bottom of the box.
-    expect(part(host, 'point')?.getAttribute('style')).toContain('--_sparkline-y: 100%')
-    expect(part(host, 'point')?.getAttribute('style')).toContain('--_sparkline-x: 100%')
+    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--_chart-terminus-y: 100%')
+    expect(part(host, 'terminus')?.getAttribute('style')).toContain('--_chart-terminus-x: 100%')
   })
 })
 
@@ -192,7 +224,7 @@ if (hasLayout()) {
          ></helix-sparkline>`,
       )
       const line = part(host, 'line') as SVGPathElement
-      const mark = (part(host, 'point') as HTMLElement).getBoundingClientRect()
+      const mark = (part(host, 'terminus') as HTMLElement).getBoundingClientRect()
       expect(getComputedStyle(line).vectorEffect).toBe('non-scaling-stroke')
       expect(Math.abs(mark.width - mark.height)).toBeLessThan(0.5)
       expect(Math.abs(host.getBoundingClientRect().width - 400)).toBeLessThan(1)

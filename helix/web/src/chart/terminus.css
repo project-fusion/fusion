@@ -1,0 +1,63 @@
+/* The mark on where a series ended, shared by every chart that draws one.
+ *
+ * Here rather than in the sparkline for the reason the field stylesheets are
+ * shared: a line chart's terminus and a sparkline's are the same mark on the
+ * same kind of thing, and two copies drift. A chart takes this sheet, renders
+ * `part="terminus"` positioned by its own two custom properties, and gets the
+ * shapes with it.
+ *
+ * An element rather than a shape inside the drawing, and that is not a
+ * preference. A chart that fills its box uses `preserveAspectRatio="none"`,
+ * which stretches its whole coordinate space: a `<circle>` in there is an
+ * ellipse whose squash depends on how wide the consumer made the chart, and
+ * `vector-effect` cannot help, because it takes the stroke out of the transform
+ * and leaves the geometry in it. Out here nothing is stretched and a dot is
+ * round at every size.
+ *
+ * `currentColor` throughout, so a chart sets `color` on its host once and the
+ * line, the mark and anything else agree without a second hook to keep in step.
+ */
+[part="terminus"] {
+  background-color: currentColor;
+  block-size: var(--chart-terminus-size, 5px);
+  inline-size: var(--chart-terminus-size, 5px);
+  inset-block-start: var(--_chart-terminus-y);
+  inset-inline-start: var(--_chart-terminus-x);
+  position: absolute;
+  /* Centred on the reading rather than hanging below and right of it. */
+  translate: -50% -50%;
+}
+
+/* A dot is the base case, so it is the shape an absent attribute draws. A
+   reflecting property with a default would write its attribute onto a host the
+   consumer rendered, which React reports as a hydration mismatch. */
+[part="terminus"] {
+  border-radius: var(--helix-radii-full);
+}
+
+:host([terminus="none"]) [part="terminus"] {
+  display: none;
+}
+
+:host([terminus="square"]) [part="terminus"] {
+  border-radius: var(--helix-radii-none);
+}
+
+/* Hollow, for a chart drawn over something busy: the ground shows through the
+   middle, so the mark reads as a ring rather than as a blot on the content. */
+:host([terminus="ring"]) [part="terminus"] {
+  background-color: transparent;
+  border: var(--helix-border-thick) solid currentColor;
+}
+
+/* Pointing along the axis rather than up or down.
+ *
+ * An arrowhead at the end of a line says "and onward", which is what a terminus
+ * means. Pointing it at the last movement instead would make it a second
+ * statement about the data, and a triangle aimed up beside a falling line is
+ * the kind of thing a reader has to stop and work out. */
+:host([terminus="triangle"]) [part="terminus"] {
+  background-color: currentColor;
+  border-radius: var(--helix-radii-none);
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}

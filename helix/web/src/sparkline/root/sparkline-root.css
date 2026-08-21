@@ -1,5 +1,8 @@
 :host {
   block-size: var(--sparkline-block-size, 2.5em);
+  /* Set once and read by the line, the wash and the terminus, so a consumer
+     moving `--sparkline-color` cannot end up with three that disagree. */
+  color: var(--sparkline-color, var(--helix-color-series-1));
   /* The mark is positioned against this box, so the box has to be one. */
   position: relative;
 
@@ -30,7 +33,7 @@
    in the dark, where a graphic needs 3. */
 [part="line"] {
   fill: none;
-  stroke: var(--sparkline-color, var(--helix-color-series-1));
+  stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: var(--sparkline-width, 1.5px);
@@ -46,54 +49,47 @@
 }
 
 /* Nothing until `appearance` says otherwise. The region is always drawn, since
-   the shape is the tier below's business; whether it is painted is this one's.
+ * the shape is the tier below's business; whether it is painted is this one's.
  *
- * A wash of the line's own colour rather than a colour of its own, so a
- * consumer setting `--sparkline-color` moves both and cannot end up with a fill
- * that disagrees with the line over it. `color-mix` in oklab rather than an
- * `opacity` on the element: opacity would fade the whole path including where
- * the fill meets the stroke, and this leaves the line at full strength.
+ * A ramp rather than a flat wash, so the fill reads as belonging to the line
+ * above it and thins toward the floor, which is the edge of the data's own
+ * range and not a true zero: a fill of even weight down to it draws a hard edge
+ * along a number that means nothing. Stops rather than an `opacity` on the
+ * path, since opacity would fade the stroke along with the fill and
+ * `stop-opacity` leaves the line at full strength over it.
+ *
+ * **The ramp is keyed to the box and not to the line, and the difference shows
+ * on a series with a deep trough.** `objectBoundingBox` is the default, so the
+ * gradient runs the height of the area's own bounding box: full at the top,
+ * gone at the floor. The wash is therefore fullest under the highest reading
+ * and already thinning where the line dips, rather than being equally strong
+ * just beneath it everywhere. A ramp that followed the line would need a
+ * different one per column, which is not something a single fill can be, and
+ * every charting library draws it this way for that reason.
+ *
+ * `currentColor` in the stops, so the wash is the line's own colour and a
+ * consumer cannot end up with a fill that disagrees with what it sits under.
  *
  * Decorative, and stated as such: the line carries the series and the wash says
  * only which side of it is under. There is no contrast floor for it to clear,
- * so the number was picked by measuring the tint against the surface it sits
- * on, per mode:
- *
- *     16%  dark 1.28  light 1.25
- *     20%  dark 1.39  light 1.33
- *     24%  dark 1.50  light 1.41
- *
- * 20 rather than 16, which read faint at the default size, and not 24, which
- * starts competing with the line it is meant to sit under. The pairs matter
- * more than the numbers: the wash lands within a twentieth of the same weight
- * in both modes at every step, so a page does not get a heavier fill for being
- * dark. */
+ * so the number was measured against the surface it sits on. The flat fill this
+ * replaced was 20%, reading 1.39 in the dark and 1.33 in the light; a ramp from
+ * 32 to nothing averages about the same weight over the height while being
+ * present where it matters, which is at the line. */
 [part="area"] {
   fill: none;
-  stroke: none;
+}
+
+[part="wash-start"],
+[part="wash-end"] {
+  stop-color: currentColor;
+  stop-opacity: 0;
 }
 
 :host([appearance="area"]) [part="area"] {
-  fill: color-mix(
-    in oklab,
-    var(--sparkline-color, var(--helix-color-series-1)) var(--sparkline-area-opacity, 20%),
-    transparent
-  );
+  fill: url("#sparkline-wash");
 }
 
-/* Where the series ended, which is the one point a reader looks for.
- *
- * An element rather than a `<circle>`, because a circle inside a stretched
- * coordinate space is an ellipse. `vector-effect` cannot help: it takes the
- * stroke out of the transform and leaves the geometry in it. */
-[part="point"] {
-  background-color: var(--sparkline-color, var(--helix-color-series-1));
-  block-size: var(--sparkline-point-size, 4px);
-  border-radius: var(--helix-radii-full);
-  inline-size: var(--sparkline-point-size, 4px);
-  inset-block-start: var(--_sparkline-y);
-  inset-inline-start: var(--_sparkline-x);
-  position: absolute;
-  /* Centred on the point rather than hanging below and right of it. */
-  translate: -50% -50%;
+:host([appearance="area"]) [part="wash-start"] {
+  stop-opacity: var(--sparkline-area-opacity, 0.32);
 }

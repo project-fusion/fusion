@@ -3008,6 +3008,30 @@
         },
         {
           "kind": "js",
+          "name": "Curve",
+          "declaration": {
+            "name": "Curve",
+            "module": "./utils/line-path/line-path.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "linePath",
+          "declaration": {
+            "name": "linePath",
+            "module": "./utils/line-path/line-path.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Point",
+          "declaration": {
+            "name": "Point",
+            "module": "./utils/line-path/line-path.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "onUnlessFalse",
           "declaration": {
             "name": "onUnlessFalse",
@@ -5247,6 +5271,47 @@
           "declaration": {
             "name": "forgetDisabled",
             "module": "src/utils/inherit-disabled/inherit-disabled.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/line-path/line-path.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "linePath",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "points",
+              "type": {
+                "text": "readonly Point[]"
+              }
+            },
+            {
+              "name": "curve",
+              "default": "'straight'",
+              "type": {
+                "text": "Curve"
+              }
+            }
+          ],
+          "description": "Builds an SVG path through a set of points.\n\nShared by every chart that draws a line, so the choice of curve is one\nimplementation rather than one per chart. Pure: it takes points and returns a\nstring, and knows nothing about elements or lifecycles.\n\n`straight` joins the readings and claims nothing between them, which is why\nit is the default. `smooth` is easier to follow across a long series and\ninvents the values in between, so it is a reading aid rather than a neutral\none. `step` claims the opposite, that a reading holds until the next one, and\nchanges at the midpoint rather than at either end, since a chart's x axis is\nan order and neither neighbour has a better claim on the moment it moved.\n\nFewer than two points is an empty string rather than a partial path: one\nreading is not a line, and `M0,0` alone draws nothing while still being a\npath element that looks like it should."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "linePath",
+          "declaration": {
+            "name": "linePath",
+            "module": "src/utils/line-path/line-path.ts"
           }
         }
       ]

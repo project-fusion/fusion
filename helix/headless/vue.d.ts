@@ -3965,6 +3965,19 @@ export type HelixBaseSliderVueEvents = {
 };
 
 export type HelixBaseSparklineVueProps = {
+  /** How the line gets from one reading to the next.
+
+Absent joins them and claims nothing in between, which is why it is the
+default. `smooth` is easier to follow across a long series and invents the
+values between the readings, so it is a reading aid rather than a neutral
+one; it is monotone cubic, so what it invents never leaves the band the
+data sets. `step` claims the opposite, that a reading holds until the next.
+
+This tier and not the one above, though it is a drawing decision: a curve
+is expressed as path data, and path data is markup. `linePath` in
+`helix/core` is the shared implementation, so every chart that draws a line
+offers the same three and draws them the same way. */
+  curve?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
