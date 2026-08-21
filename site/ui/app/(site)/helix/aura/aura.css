@@ -156,3 +156,11 @@
 :root:has(.auraStage) .siteFooter {
   display: none;
 }
+
+/* Held to the right whether or not the row wrapped. `justify-content: between`
+   only distributes within a line, so once the switch and the reset drop to a
+   line of their own they are that line's only item and it puts them at its
+   start. An auto inline margin pushes them over in both cases. */
+.auraActions {
+  margin-inline-start: auto;
+}

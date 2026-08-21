@@ -254,9 +254,13 @@ export function SiteNav() {
                       href={destination.href}
                       key={destination.href}
                     >
+                      {/* One line, not two. A panel of two line rows is a list
+                          of paragraphs to read before choosing, and the titles
+                          already say where each one goes: Components, Sandbox,
+                          Overview. The summary stays on the product type,
+                          because the product pages do want it. */}
                       <helix-icon name={destination.icon}></helix-icon>
                       <strong>{destination.title}</strong>
-                      <span>{destination.summary}</span>
                     </Link>
                   ))}
                 </div>

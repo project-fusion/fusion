@@ -8,7 +8,7 @@ import {
   MixinControllerValue,
   MixinField,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
 
@@ -51,7 +51,9 @@ import { HelixBaseToggle } from '../root/toggle-root.js'
  *
  * @slot - The group's items.
  *
+ * @csspart row - The line the track sits on, with whatever flanks it.
  * @csspart track - The bar the items sit in.
+ * @csspart divider - The rule after an inline label, separating it from the items.
  * @csspart indicator - The moving marker behind the selected item.
  *
  * @event {HelixChangeEvent} helix-change - Fired before the answer moves, and cancelable. The only way to refuse one.
@@ -253,10 +255,19 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
        too, and with the track on the host they were flex items in the same row
        as the segments. The track also owns the box the indicator is measured
        against, which is why `place` reads it rather than `this`. */
-    return html`${this.renderGroupLabel()}
+    /* **Inside the track when it is placed at the start, not beside it.** A
+       label sitting outside reads as a field's label that happens to be on one
+       line; inside, with a rule after it, the group reads as one control that
+       says what it is for. The divider is what makes that legible: without it
+       the word is a first segment that cannot be pressed. */
+    const inside = this.labelPlacement === 'start'
+    const label = this.renderGroupLabel()
+
+    return html`${inside ? nothing : label}
       <div part="row">
         <slot name="start"></slot>
         <div part="track">
+        ${inside ? html`${label}<div part="divider" aria-hidden="true"></div>` : nothing}
         <div part="indicator" aria-hidden="true"></div>
         <slot
           @slotchange=${() => {

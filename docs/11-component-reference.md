@@ -5820,7 +5820,9 @@ corner radius, which is worse than the exception.
 | Part | Description |
 | --- | --- |
 | `indicator` | The moving marker behind the selected item. |
+| `row` | The line the track sits on, with whatever flanks it. |
 | `track` | The bar the items sit in. |
+| `divider` | The rule after an inline label, separating it from the items. |
 
 #### Custom properties
 

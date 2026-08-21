@@ -147,8 +147,22 @@ export function AuraLab(): React.ReactElement {
           is what somebody looking rather than tuning wants, and the material
           stays either way so the light still reads through the strip. */}
       <div className="auraBar" data-open={open ? '' : undefined}>
-        <helix-flex align="center" class="auraHandle" data-density="sm" gap="lg" justify="between">
-          <helix-flex align="center" gap="lg" wrap>
+        <helix-flex
+          align="center"
+          class="auraHandle"
+          data-density="sm"
+          gap="lg"
+          justify="between"
+          wrap
+        >
+          {/* The pair does not split. Together they are 1029 wide against the
+              bar's 1184, so they fit; what does not fit is the pair plus the
+              switch and the reset, which need another 246. Wrapping the pair
+              put Shape on one line and Pointer on the next with a gap beside
+              each, which reads as a mistake. Wrapping the row instead drops the
+              switch and the reset to a line of their own until there is room,
+              and they are still the first row of controls. */}
+          <helix-flex align="center" gap="lg">
             {/* Shape and pointer share a line. Nine toggles and five are two
                 short rows rather than one long one, and the shape group is
                 sized to its content instead of the full width so the pointer
@@ -193,17 +207,34 @@ export function AuraLab(): React.ReactElement {
             </helix-toggle-group>
           </helix-flex>
 
-          {/* The label carries the state, not aria-expanded. The attribute would
-              sit on the host while the button it describes is in the shadow
-              root, so it would announce nothing; a label that says which way
-              the press goes is the part that reaches a reader. */}
-          <helix-icon-button
-            class="auraCollapse"
-            label={open ? 'Collapse the parameters' : 'Expand the parameters'}
-            onClick={() => setOpen((was) => !was)}
-          >
-            <helix-icon name="caret-down"></helix-icon>
-          </helix-icon-button>
+          <helix-flex align="center" class="auraActions" data-density="sm" gap="lg">
+            <helix-switch
+              checked={interactive}
+              label="Follow"
+              onhelix-toggle={(event: CustomEvent<{ checked: boolean }>) => {
+                setInteractive(event.detail.checked)
+              }}
+            ></helix-switch>
+
+            <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
+              Reset
+            </button>
+
+            {/* The label carries the state, not aria-expanded. The attribute
+                would sit on the host while the button it describes is in the
+                shadow root, so it would announce nothing; a label that says
+                which way the press goes is the part that reaches a reader, and
+                the tooltip shows the same words to everybody else. */}
+            <helix-tooltip content={open ? 'Collapse the parameters' : 'Expand the parameters'}>
+              <helix-icon-button
+                class="auraCollapse"
+                label={open ? 'Collapse the parameters' : 'Expand the parameters'}
+                onClick={() => setOpen((was) => !was)}
+              >
+                <helix-icon name="caret-down"></helix-icon>
+              </helix-icon-button>
+            </helix-tooltip>
+          </helix-flex>
         </helix-flex>
 
         {/* The collapsing half. `grid-template-rows` from 1fr to 0fr is what
@@ -213,20 +244,6 @@ export function AuraLab(): React.ReactElement {
             and `allow-discrete` is what lets a discrete property take part. */}
         <div className="auraPanel">
           <helix-flex class="auraPanelInner" direction="column" gap="md">
-            <helix-flex align="center" data-density="sm" gap="lg" justify="end" wrap>
-              <helix-switch
-                checked={interactive}
-                label="Follow"
-                onhelix-toggle={(event: CustomEvent<{ checked: boolean }>) => {
-                  setInteractive(event.detail.checked)
-                }}
-              ></helix-switch>
-
-              <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
-                Reset
-              </button>
-            </helix-flex>
-
             {/* 7.5rem, not 8.5: eight knobs have to fit one row. At 1280 the
                 grid is 1184 wide and auto-fit gave seven tracks of 148.57, so
                 variance wrapped and the bar grew from 235 to 302. Eight tracks

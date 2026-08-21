@@ -5,44 +5,60 @@
 
 <!-- @summary A track standing on end, for a level rather than a quantity. -->
 <helix-flex
-  align="end"
+  direction="column"
   gap="2xl"
 >
-  <helix-slider
-    default-value="70"
-    label="Low"
-    max="100"
-    min="0"
-    orientation="vertical"
-    show-value
-  ></helix-slider>
+  <helix-flex
+    align="end"
+    gap="2xl"
+  >
+    <helix-slider
+      default-value="70"
+      label="Low"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
 
-  <helix-slider
-    default-value="45"
-    label="Mid"
-    max="100"
-    min="0"
-    orientation="vertical"
-    show-value
-  ></helix-slider>
+    <helix-slider
+      default-value="45"
+      label="Mid"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
 
-  <helix-slider
-    default-value="20"
-    label="High"
-    max="100"
-    min="0"
-    orientation="vertical"
-    show-value
-  ></helix-slider>
+    <helix-slider
+      default-value="20"
+      label="High"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
+  </helix-flex>
 
-  <!-- Taller than the nine rem a vertical track takes by default. -->
-  <helix-slider
-    class="tall"
-    default-value="60"
-    label="Long"
-    max="100"
-    min="0"
-    orientation="vertical"
-    show-value
-  ></helix-slider>
+  <!-- A length of its own, on a row of its own.
+
+       Beside the others it was the odd one out in a way that reads as a
+       mistake: bottom aligned, the tracks share a foot, so the taller one's
+       label floats eighty pixels above its neighbours' and the row of names
+       comes out ragged. Faders in a row are the same height, and a different
+       height is a different row. -->
+  <helix-flex
+    align="end"
+    gap="2xl"
+  >
+    <helix-slider
+      class="tall"
+      default-value="60"
+      label="Long"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
+  </helix-flex>
 </helix-flex>
