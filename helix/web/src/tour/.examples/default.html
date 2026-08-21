@@ -1,71 +1,110 @@
-<!-- @summary A run through three controls, with a card at each stop. -->
+<!-- @summary Four stops across an app shell, each holding a card. -->
 <link
   href="styles.css"
   rel="stylesheet"
 >
-<helix-flex
-  align="center"
-  data-density="lg"
-  gap="sm"
->
-  <helix-button
-    appearance="solid"
-    id="save"
-    tone="primary"
-  >Save</helix-button>
-  <helix-button
-    appearance="outlined"
-    id="share"
-  >Share</helix-button>
-  <helix-icon-button
-    id="more"
-    label="More"
+<div class="app">
+  <aside
+    class="rail"
+    id="rail"
   >
-    <helix-icon name="dots-three"></helix-icon>
-  </helix-icon-button>
-</helix-flex>
+    <helix-text
+      appearance="label"
+      tone="subtle"
+    >Project</helix-text>
+    <helix-text>Drafts</helix-text>
+    <helix-text>Published</helix-text>
+    <helix-text>Archive</helix-text>
+  </aside>
 
-<helix-button
-  class="start"
-  id="begin"
->Take the tour</helix-button>
+  <div class="main">
+    <header class="bar">
+      <helix-button
+        appearance="solid"
+        id="publish"
+        tone="primary"
+      >Publish</helix-button>
+      <helix-button
+        appearance="outlined"
+        id="preview"
+      >Preview</helix-button>
+      <helix-icon-button
+        id="settings"
+        label="Settings"
+      >
+        <helix-icon name="gear"></helix-icon>
+      </helix-icon-button>
+    </header>
+
+    <section
+      class="sheet"
+      id="sheet"
+    >
+      <helix-text as="h2">Quarterly review</helix-text>
+      <helix-text tone="muted">
+        A draft nobody has read yet. Everything below this line is the part you
+        are still writing.
+      </helix-text>
+    </section>
+  </div>
+</div>
+
+<helix-button id="begin">Take the tour</helix-button>
 
 <helix-tour
   id="tour"
   label="Getting started"
 >
-  <helix-tour-stop for="save">
+  <helix-tour-stop
+    for="rail"
+    placement="right-start"
+  >
     <helix-card appearance="plain">
-      <h3>Save as you go</h3>
-      <p>Everything is written the moment you stop typing.</p>
+      <helix-text as="h3">Everything lives here</helix-text>
+      <helix-text tone="muted">
+        Drafts, published work and the archive. Nothing is ever deleted.
+      </helix-text>
+    </helix-card>
+  </helix-tour-stop>
+
+  <helix-tour-stop for="sheet">
+    <helix-card appearance="plain">
+      <helix-text as="h3">Write in the open</helix-text>
+      <helix-text tone="muted">
+        Saved as you type. There is no save button because there is nothing to
+        press.
+      </helix-text>
     </helix-card>
   </helix-tour-stop>
 
   <helix-tour-stop
-    for="share"
+    for="preview"
     placement="bottom"
   >
     <helix-card appearance="plain">
-      <h3>Share a link</h3>
-      <p>Anyone with it can read. Nobody can edit unless you say so.</p>
+      <helix-text as="h3">See it as a reader would</helix-text>
+      <helix-text tone="muted">
+        Opens the same page anybody with the link gets.
+      </helix-text>
     </helix-card>
   </helix-tour-stop>
 
   <helix-tour-stop
-    for="more"
-    placement="bottom-end"
+    for="publish"
+    placement="bottom-start"
   >
     <helix-card appearance="plain">
-      <h3>The rest lives here</h3>
-      <p>Export, history, and everything you will want once.</p>
+      <helix-text as="h3">And when it is ready</helix-text>
+      <helix-text tone="muted">
+        Publishing is reversible. The archive keeps every version you ever had.
+      </helix-text>
     </helix-card>
   </helix-tour-stop>
 </helix-tour>
 
 <script type="module">
-  /* Preview frame: a real page would remember that it had been taken. The tour
-     owns the order and the light; opening it is the page's business, the same
-     way a dialog's is. */
+  /* Preview frame: a real page would remember it had been taken. Opening is the
+     page's business, the way a dialog's is. */
   const tour = document.querySelector('#tour')
   document.querySelector('#begin').addEventListener('click', () => {
     tour.index = 0

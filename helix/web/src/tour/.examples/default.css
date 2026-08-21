@@ -1,5 +1,35 @@
-/* Room under the row for the panel to open into, and a starting point that is
-   not on top of the things being pointed at. */
-.start {
-  margin-block-start: var(--helix-space-2xl);
+/* A shell to point at. Nothing here is the component: a tour needs an interface
+   to be a tour of, and an example with three buttons in a row shows the anchor
+   logic and none of the reason it exists. */
+.app {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  margin-block-end: var(--helix-space-lg);
+  overflow: hidden;
+}
+
+.rail {
+  background-color: var(--helix-color-surface-sunken);
+  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  padding: var(--helix-space-md);
+}
+
+.bar {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+  padding: var(--helix-space-lg) var(--helix-space-md);
 }

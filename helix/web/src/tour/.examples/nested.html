@@ -1,0 +1,126 @@
+<!-- @summary A path that opens a menu and a drawer to point at what is inside them. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<div class="bar">
+  <helix-menu
+    id="actions"
+    label="Actions"
+  >
+    <helix-button
+      id="actions-trigger"
+      slot="trigger"
+    >Actions</helix-button>
+    <helix-menu-item value="duplicate">Duplicate</helix-menu-item>
+    <helix-menu-item
+      id="export"
+      value="export"
+    >Export</helix-menu-item>
+    <helix-menu-item value="delete">Delete</helix-menu-item>
+  </helix-menu>
+
+  <helix-button
+    appearance="outlined"
+    command="--show"
+    commandfor="settings"
+  >Settings</helix-button>
+</div>
+
+<helix-drawer
+  id="settings"
+  label="Settings"
+  placement="end"
+>
+  <helix-flex
+    direction="column"
+    gap="md"
+  >
+    <helix-switch id="autosave">Autosave</helix-switch>
+    <helix-switch>Send me a weekly digest</helix-switch>
+  </helix-flex>
+</helix-drawer>
+
+<helix-button id="begin">Take the tour</helix-button>
+
+<helix-tour
+  id="tour"
+  label="Where things are"
+>
+  <helix-tour-stop
+    for="actions-trigger"
+    placement="bottom-start"
+  >
+    <helix-card appearance="plain">
+      <helix-text as="h3">Everything you can do to a file</helix-text>
+      <helix-text tone="muted">Behind one control, so the bar stays short.</helix-text>
+    </helix-card>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="export"
+    placement="right"
+  >
+    <helix-card appearance="plain">
+      <helix-text as="h3">Export lives in here</helix-text>
+      <helix-text tone="muted">
+        The tour opened the menu to show you. It closes again on the way out.
+      </helix-text>
+    </helix-card>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="autosave"
+    placement="left"
+  >
+    <helix-card appearance="plain">
+      <helix-text as="h3">And this is on by default</helix-text>
+      <helix-text tone="muted">
+        Inside a drawer the tour opened, over a page it did not have to know
+        about.
+      </helix-text>
+    </helix-card>
+  </helix-tour-stop>
+</helix-tour>
+
+<script type="module">
+  /* Preview frame, and the point of this example.
+
+     The tour owns the order and the light. What it deliberately does not know
+     is that stop two is inside a menu and stop three is inside a drawer, which
+     is the consumer's own state and stays theirs: `helix-change` says where the
+     reader now is, and this decides what has to be open for that to make sense.
+
+     Written as "what should be open at index N" rather than as a list of things
+     to do on the way. A tour can be walked backwards, so anything phrased as a
+     transition has to be written twice and one of the two is always the one
+     nobody tested. */
+  const tour = document.querySelector('#tour')
+  const menu = document.querySelector('#actions')
+  const drawer = document.querySelector('#settings')
+
+  const arrange = (index) => {
+    menu.open = index === 1
+    drawer.open = index === 2
+  }
+
+  document.querySelector('#begin').addEventListener('click', () => {
+    tour.index = 0
+    arrange(0)
+    tour.open = true
+  })
+
+  tour.addEventListener('helix-change', (event) => {
+    const index = Number(event.detail.value)
+    tour.index = index
+    arrange(index)
+  })
+
+  /* Leaving puts the page back the way it was found. */
+  const shut = () => {
+    menu.open = false
+    drawer.open = false
+  }
+  tour.addEventListener('helix-close', shut)
+  tour.addEventListener('helix-complete', shut)
+</script>

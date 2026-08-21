@@ -1,0 +1,6 @@
+.bar {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+  margin-block-end: var(--helix-space-xl);
+}

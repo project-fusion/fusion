@@ -1,0 +1,137 @@
+<!-- @summary Controls of your own, with a count of where the reader is. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<div class="bar">
+  <helix-button
+    appearance="solid"
+    id="compose"
+    tone="primary"
+  >Compose</helix-button>
+  <helix-button
+    appearance="outlined"
+    id="filter"
+  >Filter</helix-button>
+  <helix-icon-button
+    id="refresh"
+    label="Refresh"
+  >
+    <helix-icon name="arrow-clockwise"></helix-icon>
+  </helix-icon-button>
+</div>
+
+<helix-button id="begin">Take the tour</helix-button>
+
+<helix-tour
+  id="tour"
+  label="The three you will use"
+>
+  <helix-tour-stop
+    for="compose"
+    placement="bottom-start"
+  >
+    <helix-text as="h3">Start something</helix-text>
+    <helix-text tone="muted">The only control here that makes anything new.</helix-text>
+    <helix-flex
+      align="center"
+      slot="actions"
+    >
+      <helix-text
+        appearance="caption"
+        tone="subtle"
+      ><span class="count"></span></helix-text>
+      <helix-button
+        appearance="solid"
+        class="on"
+        tone="primary"
+      >Next</helix-button>
+    </helix-flex>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="filter"
+    placement="bottom"
+  >
+    <helix-text as="h3">Narrow it down</helix-text>
+    <helix-text tone="muted">Filters stack, and the set says how many are on.</helix-text>
+    <helix-flex
+      align="center"
+      slot="actions"
+    >
+      <helix-text
+        appearance="caption"
+        tone="subtle"
+      ><span class="count"></span></helix-text>
+      <helix-button
+        appearance="ghost"
+        class="off"
+      >Back</helix-button>
+      <helix-button
+        appearance="solid"
+        class="on"
+        tone="primary"
+      >Next</helix-button>
+    </helix-flex>
+  </helix-tour-stop>
+
+  <helix-tour-stop
+    for="refresh"
+    placement="bottom-end"
+  >
+    <helix-text as="h3">And when you want it now</helix-text>
+    <helix-text tone="muted">It refreshes itself, but not while you are reading.</helix-text>
+    <helix-flex
+      align="center"
+      slot="actions"
+    >
+      <helix-text
+        appearance="caption"
+        tone="subtle"
+      ><span class="count"></span></helix-text>
+      <helix-button
+        appearance="ghost"
+        class="off"
+      >Back</helix-button>
+      <helix-button
+        appearance="solid"
+        class="on"
+        tone="primary"
+      >Got it</helix-button>
+    </helix-flex>
+  </helix-tour-stop>
+</helix-tour>
+
+<script type="module">
+  /* Preview frame. Slotting `actions` replaces the controls the stop draws, so
+     wiring them is the price of having written them. `next()`, `back()` and
+     `skip()` are public for exactly this, and a count of where the reader is
+     needs `index` and `length`, which are both on the root. */
+  const tour = document.querySelector('#tour')
+  const label = () => {
+    for (const one of tour.querySelectorAll('.count')) {
+      one.textContent = `${tour.index + 1} of ${tour.length}`
+    }
+  }
+
+  tour.addEventListener('click', (event) => {
+    const on = event.target.closest?.('.on')
+    const off = event.target.closest?.('.off')
+    if (on) {
+      tour.next()
+    } else if (off) {
+      tour.back()
+    }
+  })
+
+  tour.addEventListener('helix-change', (event) => {
+    tour.index = Number(event.detail.value)
+    label()
+  })
+
+  document.querySelector('#begin').addEventListener('click', () => {
+    tour.index = 0
+    tour.open = true
+    label()
+  })
+</script>
