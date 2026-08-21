@@ -36,6 +36,55 @@ import type { CSSProperties, ReactNode } from 'react'
  * was scaling the whole drawing instead of the rule that is its subject.
  */
 export const contentArt: Record<string, ReactNode> = {
+  /** Rows read as a set, divided by a rule and nothing else. */
+  /**
+   * A picture in a bounded box, with a horizon, a sun and two ridges.
+   *
+   * The box is the subject rather than what is in it. What this component adds
+   * over an `<img>` is that it reserves its ground and says whether the picture
+   * arrived, so the drawing is a frame that is unmistakably a frame, holding a
+   * scene generic enough that nobody reads it as a photograph of something.
+   *
+   * `artOpen` on the scene alone, not the frame. The frame is the part that was
+   * there all along, and the picture is the part that arrives into it, which is
+   * the whole of what the element does. Scaling the frame with it would say the
+   * box turned up too, and the box turning up is the thing this component
+   * exists to prevent.
+   */
+  /**
+   * A shaft of light behind a horizon, which is what the component is.
+   *
+   * Drawn as the shape rather than as a screenshot of it: the element renders
+   * a different picture on every machine and at every size, so art that tried
+   * to be a likeness would be a lie about one of them. What is constant is the
+   * gesture, a bright core inside a wider bloom, leaning.
+   *
+   * `artOpen` on the bloom alone. The core is the part that is always there;
+   * the bloom is what arrives, which is the difference a reader is being shown
+   * between a flat background and this one.
+   */
+  aura: (
+    <>
+      <defs>
+        <clipPath id="helixArtAuraFrame">
+          <rect height="112" rx="8" width="224" x="48" y="44" />
+        </clipPath>
+        <linearGradient id="helixArtAuraBloom" x1="0" x2="0.35" y1="0" y2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0.55" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <rect className="artSunken" height="112" rx="8" width="224" x="48" y="44" />
+      <g clipPath="url(#helixArtAuraFrame)">
+        <g className="artMotion artOpen" style={{ transformOrigin: 'center' } as CSSProperties}>
+          <path d="M128 44l72 112h-52z" fill="url(#helixArtAuraBloom)" />
+          <path d="M152 44l64 112h-40z" fill="url(#helixArtAuraBloom)" />
+        </g>
+        <path className="artInk" d="M138 44l26 112h-12z" fillOpacity="0.7" />
+      </g>
+      <rect className="artEdge" height="111" rx="8" width="223" x="48.5" y="44.5" />
+    </>
+  ),
   /**
    * One avatar, and what is in it when there is no image.
    *
@@ -244,21 +293,6 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** Rows read as a set, divided by a rule and nothing else. */
-  /**
-   * A picture in a bounded box, with a horizon, a sun and two ridges.
-   *
-   * The box is the subject rather than what is in it. What this component adds
-   * over an `<img>` is that it reserves its ground and says whether the picture
-   * arrived, so the drawing is a frame that is unmistakably a frame, holding a
-   * scene generic enough that nobody reads it as a photograph of something.
-   *
-   * `artOpen` on the scene alone, not the frame. The frame is the part that was
-   * there all along, and the picture is the part that arrives into it, which is
-   * the whole of what the element does. Scaling the frame with it would say the
-   * box turned up too, and the box turning up is the thing this component
-   * exists to prevent.
-   */
   image: (
     <>
       <defs>

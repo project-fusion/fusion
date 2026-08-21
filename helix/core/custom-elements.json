@@ -1179,6 +1179,117 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/token-color-controller/token-color-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Reads a design token as the sRGB triple a shader or a 2D canvas can take, and\ntells the host when the palette underneath it moves.\n\n**Two hops, and both are load-bearing.** A custom property's own value is the\nunevaluated function text, so `getComputedStyle` on a probe is the only way\nto see what it resolves to. And what it resolves to is not `rgb()`: the\npalette derives from an `oklch()` seed, and Chrome answers `lab(100 0 0)` for\nwhite. Parsing that with a regular expression for numbers reads the three\nchannels as 100, 0 and 0, which divided by 255 is a dark red.\n\nThat is not hypothetical. It shipped, and `--helix-color-foreground` arrived\nas a dark red that painted a warm streak down a shader for an afternoon. It\nsurvived review because a warm cast on a saturated gradient is also what a\nscreenshot's chroma subsampling produces, so the picture agreed with the bug.\n\nThe conversion is therefore the browser's own: fill a pixel and read it back.\nThat holds for `lab()`, `oklch()`, `color-mix()` and whatever a token is\nwritten in next, which is the property worth having in a design system whose\npalette is derived rather than listed.\n\n**A controller and not a mixin**, by this repository's own line: it adds no\nproperty or method a consumer sets. It reacts to lifecycle, holding a probe\nthat has to be created after the host connects and removed when it leaves,\nand it watches for the color mode changing so the host can repaint.\n\n**Client only, and that is the contract rather than a limitation.** There is\nno computed style on a server and no canvas to convert with, so `read`\nanswers the fallback there. Every caller is drawing into a canvas, which does\nnot exist on a server either.",
+          "name": "TokenColorController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "context",
+              "type": {
+                "text": "CanvasRenderingContext2D | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Where a resolved color is converted, one pixel at a time."
+            },
+            {
+              "kind": "field",
+              "name": "modes",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private",
+              "description": "Watches the document for `data-color-mode`."
+            },
+            {
+              "kind": "field",
+              "name": "probe",
+              "type": {
+                "text": "HTMLSpanElement | undefined"
+              },
+              "privacy": "private",
+              "description": "The hidden element a token is resolved against."
+            },
+            {
+              "kind": "field",
+              "name": "scheme",
+              "type": {
+                "text": "MediaQueryList | undefined"
+              },
+              "privacy": "private",
+              "description": "Watches the operating system's answer, where nothing overrides it."
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "return": {
+                "type": {
+                  "text": "TokenColor"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "token",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The custom property's name, including its leading dashes."
+                },
+                {
+                  "name": "fallback",
+                  "type": {
+                    "text": "TokenColor"
+                  },
+                  "description": "What to answer on a server, or where the token is unset."
+                }
+              ],
+              "description": "The token's current value, or the fallback where it cannot be resolved."
+            },
+            {
+              "kind": "field",
+              "name": "announce",
+              "privacy": "private",
+              "readonly": true
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TokenColorController",
+          "declaration": {
+            "name": "TokenColorController",
+            "module": "src/controllers/token-color-controller/token-color-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/events/events.ts",
       "declarations": [
         {
@@ -2250,6 +2361,22 @@
           "declaration": {
             "name": "PopoverOptions",
             "module": "./controllers/popover-controller/popover-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TokenColor",
+          "declaration": {
+            "name": "TokenColor",
+            "module": "./controllers/token-color-controller/token-color-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TokenColorController",
+          "declaration": {
+            "name": "TokenColorController",
+            "module": "./controllers/token-color-controller/token-color-controller.js"
           }
         },
         {

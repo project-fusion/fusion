@@ -122,17 +122,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the trigger for dense layouts.",
-              "attribute": "dense",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "open",
               "type": {
                 "text": "boolean"
@@ -427,16 +416,27 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseAccordionItem",
+            "package": "@helix-io/headless"
+          },
+          "summary": "One collapsible section of an accordion.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/accordion",
+            "aliases": [
+              "Collapsible",
+              "Expander",
+              "Disclosure"
+            ],
+            "tier": "styled",
+            "group": "Accordion",
+            "part": "Item"
+          },
+          "tagName": "helix-accordion-item",
+          "customElement": true,
           "attributes": [
-            {
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the trigger for dense layouts.",
-              "fieldName": "dense"
-            },
             {
               "name": "open",
               "type": {
@@ -475,26 +475,6 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseAccordionItem",
-            "package": "@helix-io/headless"
-          },
-          "summary": "One collapsible section of an accordion.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/accordion",
-            "aliases": [
-              "Collapsible",
-              "Expander",
-              "Disclosure"
-            ],
-            "tier": "styled",
-            "group": "Accordion",
-            "part": "Item"
-          },
-          "tagName": "helix-accordion-item",
-          "customElement": true,
           "modulePath": "src/accordion/item/accordion-item.ts",
           "definitionPath": "src/accordion/item/accordion-item.ts"
         }
@@ -1474,6 +1454,600 @@
           "declaration": {
             "name": "HelixAppHeader",
             "module": "src/app-header/root/app-header-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/aura/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/aura/root/aura-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/aura/root/aura-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/aura/root/aura-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/aura/root/aura-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "One fragment shader over a full-screen triangle, with the palette read from\nthe tokens rather than given as colors. That is the whole reason this belongs\nin a design system instead of in a page: a background written with hex values\nis an asset that has to be re-cut when the brand moves, and one written\nagainst `--helix-color-primary` is a consequence of it.\n\n**Every shape ramps through four token stops**, and the token layer inverts\neach of them: the page's own background, `primary-subtle`, `primary`, and\nthen a peak. The peak is the foreground on a dark page and `primary-active`\non a light one, because mixing a saturated hue toward near-black takes the\nchroma out of exactly the pixels carrying the most of it. Which way the page\nruns is not asked of the mode, which is a private token: it is read off the\nground's own luminance, which the shader already has.\n\n**No dependency, and no scene graph.** The geometry is three vertices derived\nfrom `gl_VertexID`, so there is no attribute, no buffer and no upload. The\ncommon implementations of this reach for a 3D library to draw one quad, which\nis a camera and a material system for four vertices that never move.\n\n**It stops when nobody is looking**, off screen and in a background tab, and\n`prefers-reduced-motion` gets one still frame rather than an empty box: the\ncomposition is the point and the drift is a garnish.\n\n**The fallback needs no detection.** Where WebGL is refused the canvas never\npaints and is transparent, and the host carries a gradient of the same tokens\nunderneath. Nothing has to ask whether it worked.\n\nPresentation only, so there is no headless tier: the split exists to keep\nbehavior separate from styling, and there is no structure or semantics here\nto separate. Decorative, so the host is hidden from assistive technology and\ntakes no pointer events.",
+          "name": "HelixAura",
+          "cssParts": [
+            {
+              "description": "The surface the shader draws into.",
+              "name": "canvas"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "shape",
+              "type": {
+                "text": "'aurora' | 'braid' | 'orbit' | 'rays' | 'weave' | undefined"
+              },
+              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.",
+              "attribute": "shape",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the pointer shifts and lifts the field.",
+              "attribute": "interactive"
+            },
+            {
+              "kind": "field",
+              "name": "bloom",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "How soft the falloff is, `0` tight and `1` diffuse.",
+              "attribute": "bloom"
+            },
+            {
+              "kind": "field",
+              "name": "gain",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Overall brightness, as a multiplier on the field.",
+              "attribute": "gain"
+            },
+            {
+              "kind": "field",
+              "name": "scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Feature size, as a multiplier on the sampled coordinates.",
+              "attribute": "scale"
+            },
+            {
+              "kind": "field",
+              "name": "speed",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How fast it drifts, as a multiplier on time.",
+              "attribute": "speed"
+            },
+            {
+              "kind": "field",
+              "name": "tilt",
+              "type": {
+                "text": "number"
+              },
+              "default": "14",
+              "description": "The field's rotation, in degrees.",
+              "attribute": "tilt"
+            },
+            {
+              "kind": "field",
+              "name": "tokens",
+              "privacy": "private",
+              "readonly": true,
+              "default": "new TokenColorController(this, () => this.paintOnce())",
+              "description": "Repaints when the palette moves, which no re-render would do on its own."
+            },
+            {
+              "kind": "field",
+              "name": "canvas",
+              "type": {
+                "text": "HTMLCanvasElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "gl",
+              "type": {
+                "text": "WebGL2RenderingContext | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "program",
+              "type": {
+                "text": "WebGLProgram | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "uniforms",
+              "type": {
+                "text": "Record<string, WebGLUniformLocation | null>"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "elapsed",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "last",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "height",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "object"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "{ reach: 0, x: 0, y: 0 }",
+              "description": "Where the pointer is, and where the field has got to. The gap is weight."
+            },
+            {
+              "kind": "field",
+              "name": "eased",
+              "type": {
+                "text": "object"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "default": "{ reach: 0, x: 0, y: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "motion",
+              "type": {
+                "text": "MediaQueryList | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "visible",
+              "type": {
+                "text": "IntersectionObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "link",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "WebGLProgram | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "vertex",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "fragment",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "resize",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "paint",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "paintOnce",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "One frame, now, for a change that has to show while the loop is stopped."
+            },
+            {
+              "kind": "field",
+              "name": "tick",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "play",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handlePointer",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleLeave",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleVisibility",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleResize",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "shape",
+              "type": {
+                "text": "'aurora' | 'braid' | 'orbit' | 'rays' | 'weave' | undefined"
+              },
+              "description": "Which form the light takes. Absent is `braid`.\n\nReflected because the fallback gradient selects on it, and given no default\nfor the same reason every axis here has none: a default on a reflected\nproperty writes the attribute onto every host anybody renders.",
+              "fieldName": "shape"
+            },
+            {
+              "name": "interactive",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the pointer shifts and lifts the field.",
+              "fieldName": "interactive"
+            },
+            {
+              "name": "bloom",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "How soft the falloff is, `0` tight and `1` diffuse.",
+              "fieldName": "bloom"
+            },
+            {
+              "name": "gain",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Overall brightness, as a multiplier on the field.",
+              "fieldName": "gain"
+            },
+            {
+              "name": "scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Feature size, as a multiplier on the sampled coordinates.",
+              "fieldName": "scale"
+            },
+            {
+              "name": "speed",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "How fast it drifts, as a multiplier on time.",
+              "fieldName": "speed"
+            },
+            {
+              "name": "tilt",
+              "type": {
+                "text": "number"
+              },
+              "default": "14",
+              "description": "The field's rotation, in degrees.",
+              "fieldName": "tilt"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A lit, drifting background, drawn from the token layer.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/aura",
+            "aliases": [
+              "Backdrop",
+              "Background",
+              "Atmosphere",
+              "Gradient"
+            ],
+            "tier": "styled",
+            "group": "Aura",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A braided shaft of light, sized by the box it is put in.",
+                "slug": "default"
+              },
+              {
+                "description": "Rays from a source above the frame, following the pointer.",
+                "slug": "rays"
+              }
+            ],
+            "source": "helix/web/src/aura"
+          },
+          "tagName": "helix-aura",
+          "customElement": true,
+          "modulePath": "src/aura/root/aura-root.ts",
+          "definitionPath": "src/aura/root/aura-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixAura",
+          "declaration": {
+            "name": "HelixAura",
+            "module": "src/aura/root/aura-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-aura",
+          "declaration": {
+            "name": "HelixAura",
+            "module": "src/aura/root/aura-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/aura/root/aura-shader.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "SHAPES",
+          "type": {
+            "text": "['braid', 'rays', 'aurora', 'orbit', 'weave']"
+          },
+          "default": "['braid', 'rays', 'aurora', 'orbit', 'weave']",
+          "description": "The shapes, in the order the shader branches on them.\n\nExported so the component can turn a property into the integer the uniform\ntakes without a second list to keep in step."
+        },
+        {
+          "kind": "variable",
+          "name": "VERTEX",
+          "default": "`#version 300 es out vec2 uv; void main() { vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2); uv = p; gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0); } `",
+          "description": "Three vertices from `gl_VertexID`, covering the screen with one triangle.\n\nNo attribute, no buffer and no upload, and one triangle rather than two, so\nthere is no seam down the diagonal where a quad's halves meet."
+        },
+        {
+          "kind": "variable",
+          "name": "FRAGMENT",
+          "default": "`#version 300 es precision highp float; in vec2 uv; out vec4 color; uniform vec2 uResolution; uniform float uTime; uniform int uShape; uniform vec2 uPointer; uniform float uReach; uniform float uTilt; uniform float uSpeed; uniform float uScale; uniform float uBloom; uniform float uGain; uniform vec3 uGround; uniform vec3 uHaze; uniform vec3 uGlow; uniform vec3 uPeak; float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); } float noise(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); /* Quintic rather than cubic. Cubic smoothstep leaves a second derivative discontinuity at every cell edge, which four octaves of lighting turn into a faint square lattice: visible on a large soft field and exactly the artifact that reads as cheap. */ vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0); return mix( mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y ); } /* Each octave is rotated as well as scaled. Doubling alone stacks every octave on the same axes, so value noise keeps its grid however many are summed. An irrational angle means no two octaves ever line up again. */ const mat2 TURN = mat2(0.8, 0.6, -0.6, 0.8); float fbm(vec2 p) { float sum = 0.0; float amp = 0.5; for (int i = 0; i < 5; i++) { sum += amp * noise(p); p = TURN * p * 2.03; amp *= 0.5; } return sum; } /* Domain warping: the field is sampled at coordinates another field bends. This is the single largest difference between noise that reads as organic and noise that reads as television static, and it costs two more fbm calls rather than a different algorithm. */ float warped(vec2 p, float t) { vec2 q = vec2(fbm(p + vec2(0.0, t)), fbm(p + vec2(5.2, 1.3 - t))); vec2 r = vec2(fbm(p + 4.0 * q + vec2(1.7, 9.2)), fbm(p + 4.0 * q + vec2(8.3, 2.8))); return fbm(p + 4.0 * r); } /* Two strands half a turn apart, inside a wider volume. */ float braid(vec2 q, float t) { float lit = 0.0; for (int i = 0; i < 2; i++) { float phase = float(i) * 3.14159265; float x = q.x - 0.34 * sin(q.y * 1.6 + t * 1.4 + phase); lit += 0.8 * exp(-abs(x) * 13.0); } float volume = exp(-abs(q.x) * 2.6); /* Compressed hard across the shaft and stretched along it. The same octaves sampled square read as haze; this way they read as filaments. */ float streak = fbm(vec2(q.x * 9.0, q.y * 0.55 - t * 2.4)); float haze = warped(vec2(q.x * 0.8 + 4.0, q.y * 0.45), t * 0.5); return lit * mix(0.35, 1.65, streak) + volume * 0.3 * mix(0.35, 1.05, haze); } /* A fan from a source above the frame, cut into filaments by angle. */ float rays(vec2 q, float t) { vec2 o = vec2(0.0, 1.45); vec2 v = q - o; float dist = length(v); float ang = atan(v.x, -v.y); float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8)); float dust = warped(vec2(ang * 2.0, dist * 0.7), t * 0.4); float spread = smoothstep(0.85, 0.05, abs(ang)); return spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * exp(-dist * 0.8); } /* Curtains on a drifting horizon. */ float aurora(vec2 q, float t) { float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * 1.3; float band = exp(-abs(q.y - ridge) * 3.2); float fall = fbm(vec2(q.x * 7.0, q.y * 0.7 - t * 2.6)); return band * mix(0.3, 1.6, fall); } /* Rings in perspective, travelling out. */ float orbit(vec2 q, float t) { vec2 e = vec2(q.x, q.y * 2.3); float r = length(e); float rings = sin(r * 8.0 - t * 5.0) * 0.5 + 0.5; float grain = warped(vec2(atan(e.y, e.x) * 1.5, r * 1.2), t * 0.6); return pow(rings, 4.0) * mix(0.45, 1.45, grain) * exp(-r * 1.05); } /* Two wave fields crossed, lit where they agree. */ float weave(vec2 q, float t) { float a = 0.62; float u1 = q.x * cos(a) + q.y * sin(a); float u2 = q.x * cos(-a) + q.y * sin(-a); float w = sin(u1 * 9.0 + t * 2.2) * sin(u2 * 9.0 - t * 1.7); float grain = warped(vec2(q.x * 1.5, q.y * 1.5), t * 0.5); return pow(max(w, 0.0), 2.2) * mix(0.5, 1.4, grain) * exp(-length(q) * 0.85); } void main() { vec2 p = uv * 2.0 - 1.0; p.x *= uResolution.x / max(uResolution.y, 1.0); /* Parallax first, so the whole field slides against the pointer rather than the shape deforming toward it. A field that bends looks poked; one that slides looks like it has depth. */ vec2 q = p - uPointer * 0.16 * uReach; float a = radians(uTilt); q = vec2(q.x * cos(a) - q.y * sin(a), q.x * sin(a) + q.y * cos(a)); q *= uScale; float t = uTime * 0.06 * uSpeed; float d = 0.0; if (uShape == 0) { d = braid(q, t); } else if (uShape == 1) { d = rays(q, t); } else if (uShape == 2) { d = aurora(q, t); } else if (uShape == 3) { d = orbit(q, t); } else { d = weave(q, t); } /* Bloom as an exponent on the field rather than a term inside each shape. Every shape is a density that falls off, so a power tightens or spreads that falloff and one control means the same thing in all five. */ d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain; /* The pointer lifts what is already lit rather than adding a glow of its own. A light that follows the cursor over an unlit field is a torch. */ float near = exp(-length(p - uPointer) * 1.8) * uReach; d *= 1.0 + near * 1.1; d *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y)); /* Rolled off rather than clipped. A hard clamp flattens the core into a plateau of one value, which is what makes a bright shader look like a sticker; this compresses toward one and keeps the gradient inside it. */ float lift = 1.0 - exp(-max(d, 0.0) * 1.15); vec3 rgb = mix(uGround, uHaze, smoothstep(0.0, 0.16, lift)); rgb = mix(rgb, uGlow, smoothstep(0.10, 0.46, lift)); rgb = mix(rgb, uPeak, smoothstep(0.40, 0.72, lift) * 0.6); /* Dithered before the buffer quantizes. A falloff this soft spans a few hundred 8-bit steps across a screen, and without a sub-step of noise it paints as visible rings. */ float dither = (hash(gl_FragCoord.xy) - 0.5) / 255.0; color = vec4(rgb + dither, 1.0); } `",
+          "description": "One program, branching on a uniform, for all five shapes.\n\nA branch on a uniform is uniform across the whole draw, so every lane takes\nthe same path and it costs a jump rather than divergence. Five programs would\nmean compiling and linking on a property change, which is the one moment a\nreader is watching.\n\n**No backticks anywhere inside this string, including in comments.** One ends\nthe template literal early, and what follows is parsed as JavaScript: it has\nsilently stripped every brace out of a shader and left the driver reporting a\nsyntax error two hundred lines from the cause. `bun run check:shaders` fails\nthe build on it."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SHAPES",
+          "declaration": {
+            "name": "SHAPES",
+            "module": "src/aura/root/aura-shader.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VERTEX",
+          "declaration": {
+            "name": "VERTEX",
+            "module": "src/aura/root/aura-shader.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FRAGMENT",
+          "declaration": {
+            "name": "FRAGMENT",
+            "module": "src/aura/root/aura-shader.ts"
           }
         }
       ]
@@ -4487,17 +5061,6 @@
             },
             {
               "kind": "field",
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "attribute": "dense",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "orientation",
               "type": {
                 "text": "'vertical' | 'horizontal' | undefined"
@@ -4584,15 +5147,6 @@
               },
               "description": "How the card separates itself from the page.\n\n- `outlined` is the default, and a hairline is usually enough. It costs\n  less attention than a shadow: a screen of shadowed cards reads as a stack\n  of things floating, none of them settled.\n- `elevated` is lifted off the page instead of framed, for a card on a\n  colored or busy background, where a line has to compete with whatever is\n  behind it and a shadow does not.\n- `plain` has no frame at all: the card is a layout and whatever it sits in\n  is the surface. For a card inside something already bounded, where a\n  second box adds a line and no meaning.",
               "fieldName": "appearance"
-            },
-            {
-              "name": "dense",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Tightens the inset for dense layouts.",
-              "fieldName": "dense"
             },
             {
               "name": "orientation",
@@ -22450,6 +23004,14 @@
           "declaration": {
             "name": "*",
             "module": "src/app-header/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/aura/index.js"
           }
         },
         {

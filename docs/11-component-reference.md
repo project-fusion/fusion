@@ -63,7 +63,6 @@ Usable on its own as a disclosure, with no accordion around it.
 | --- | --- | --- | --- | --- | --- |
 | `chevronPlacement` | `chevron-placement` | `'auto' \| 'start' \| 'end' \| 'none' \| undefined` | - | `HelixBaseAccordionItem` | Where the open indicator sits, or whether there is one. |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
-| `dense` | `dense` | `boolean` | `false` | - | Tightens the trigger for dense layouts. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 
 #### Methods
@@ -213,6 +212,64 @@ no shadow: the rule is the whole of it.
 | `--app-header-height` | Height of the banner. |
 | `--app-header-inset` | Inline padding of the banner. |
 | `--app-header-max-inline-size` | Width the content is centered in. |
+
+## Aura
+
+### Root — `helix-aura`
+
+A lit, drifting background, drawn from the token layer.
+
+Extends `HelixElement`.
+
+One fragment shader over a full-screen triangle, with the palette read from
+the tokens rather than given as colors. That is the whole reason this belongs
+in a design system instead of in a page: a background written with hex values
+is an asset that has to be re-cut when the brand moves, and one written
+against `--helix-color-primary` is a consequence of it.
+
+**Every shape ramps through four token stops**, and the token layer inverts
+each of them: the page's own background, `primary-subtle`, `primary`, and
+then a peak. The peak is the foreground on a dark page and `primary-active`
+on a light one, because mixing a saturated hue toward near-black takes the
+chroma out of exactly the pixels carrying the most of it. Which way the page
+runs is not asked of the mode, which is a private token: it is read off the
+ground's own luminance, which the shader already has.
+
+**No dependency, and no scene graph.** The geometry is three vertices derived
+from `gl_VertexID`, so there is no attribute, no buffer and no upload. The
+common implementations of this reach for a 3D library to draw one quad, which
+is a camera and a material system for four vertices that never move.
+
+**It stops when nobody is looking**, off screen and in a background tab, and
+`prefers-reduced-motion` gets one still frame rather than an empty box: the
+composition is the point and the drift is a garnish.
+
+**The fallback needs no detection.** Where WebGL is refused the canvas never
+paints and is transparent, and the host carries a gradient of the same tokens
+underneath. Nothing has to ask whether it worked.
+
+Presentation only, so there is no headless tier: the split exists to keep
+behavior separate from styling, and there is no structure or semantics here
+to separate. Decorative, so the host is hidden from assistive technology and
+takes no pointer events.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `bloom` | `bloom` | `number` | `0.5` | - | How soft the falloff is, `0` tight and `1` diffuse. |
+| `gain` | `gain` | `number` | `1` | - | Overall brightness, as a multiplier on the field. |
+| `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
+| `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
+| `shape` | `shape` | `'aurora' \| 'braid' \| 'orbit' \| 'rays' \| 'weave' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
+| `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
+| `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `canvas` | The surface the shader draws into. |
 
 ## Avatar
 
@@ -638,7 +695,6 @@ element you slotted, not a wrapper around it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'outlined' \| 'elevated' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
-| `dense` | `dense` | `boolean` | `false` | - | Tightens the inset for dense layouts. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
 
 #### Slots

@@ -1,59 +1,73 @@
 'use client'
 
 import { useState } from 'react'
-import { DEFAULT_PARAMS, SHAPES, ShapeField, type ShapeParams } from './shape-field'
 
-/**
- * One knob, described where the control is built rather than where it is used.
- *
- * `step` is authored per knob rather than derived from the range, because the
- * useful grain is a property of what the knob does: a degree of tilt is a
- * degree, and a hundredth of a bloom is not worth dragging through.
- */
-interface Knob {
-  key: keyof ShapeParams
-  label: string
-  max: number
-  min: number
-  step: number
-}
+/** The shapes on the bench, in the order the switcher lists them. */
+const SHAPES = [
+  {
+    body: 'Two strands half a turn out of phase. A shaft at rest, a helix if you look.',
+    name: 'braid',
+  },
+  {
+    body: 'A fan from a source above the frame, broken into filaments by the same noise.',
+    name: 'rays',
+  },
+  { body: 'Horizontal curtains, drifting. The one shape here that is a horizon.', name: 'aurora' },
+  { body: 'Concentric rings squashed into perspective, travelling outward.', name: 'orbit' },
+  {
+    body: 'Two wave fields crossed, lit only where they agree. A lattice that breathes.',
+    name: 'weave',
+  },
+] as const
 
-const KNOBS: Knob[] = [
+/** Every knob, and the grain that is useful for what it does. */
+const KNOBS = [
   { key: 'tilt', label: 'Tilt', max: 90, min: -90, step: 1 },
   { key: 'speed', label: 'Speed', max: 3, min: 0, step: 0.05 },
   { key: 'scale', label: 'Scale', max: 3, min: 0.3, step: 0.05 },
   { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
   { key: 'gain', label: 'Gain', max: 2.5, min: 0.2, step: 0.05 },
-  { key: 'pointer', label: 'Pointer', max: 1, min: 0, step: 0.05 },
-]
+] as const
+
+type Knob = (typeof KNOBS)[number]['key']
+
+const RESTING: Record<Knob, number> = { bloom: 0.5, gain: 1, scale: 1, speed: 1, tilt: 14 }
 
 /**
- * The bench: a shape switcher, six knobs, and the field they drive.
+ * The bench, now driving `helix-aura` rather than a second copy of it.
+ *
+ * The shader moved into `helix/web`, so this page is a consumer like any other
+ * and the knobs are the component's own properties. That is the point of moving
+ * it: tuning happens against the published surface, and anything awkward here
+ * is awkward for everyone.
  *
  * **The new value comes from `event.detail`, never from the element.** Every
- * control here declares `value` or `checked`, which is a claim of ownership:
- * the element announces the change and applies nothing until it is answered, so
- * at the moment it dispatches, its own property still holds the *old* value.
- * Reading `event.target.value` set the state to what it already was, and the
- * bench looked as though clicking a shape did nothing at all.
+ * control declares `value` or `checked`, which is a claim of ownership: the
+ * element announces and applies nothing until answered, so at dispatch its own
+ * property still holds the old value.
  *
- * **Slider announces `helix-input`, not `helix-change`.** It is one of the five
- * continuous controls, so it reports every edit rather than a committed step,
- * which is what a knob driving a live shader wants: the field moves under the
- * thumb instead of when it is let go.
- *
- * A client component because the choice is state, and the smallest one that can
- * be: the page around it stays a server component.
+ * Slider announces `helix-input` rather than `helix-change`, being one of the
+ * five continuous controls, so the field moves under the thumb.
  */
 export function ShapeLab(): React.ReactElement {
   const [shape, setShape] = useState(0)
   const [interactive, setInteractive] = useState(true)
-  const [params, setParams] = useState<ShapeParams>(DEFAULT_PARAMS)
+  const [knobs, setKnobs] = useState(RESTING)
   const current = SHAPES[shape]
 
   return (
     <section className="shapeStage">
-      <ShapeField interactive={interactive} params={params} shape={shape} />
+      <div className="shapeCanvasFrame">
+        <helix-aura
+          bloom={knobs.bloom}
+          gain={knobs.gain}
+          interactive={interactive || undefined}
+          scale={knobs.scale}
+          shape={current?.name}
+          speed={knobs.speed}
+          tilt={knobs.tilt}
+        ></helix-aura>
+      </div>
       <div className="shapeScrim" />
 
       <helix-flex class="shell shapeShell" direction="column" gap="xl">
@@ -107,17 +121,17 @@ export function ShapeLab(): React.ReactElement {
                 min={knob.min}
                 onhelix-input={(event: CustomEvent<{ value: string }>) => {
                   const next = Number(event.detail.value)
-                  setParams((held) => ({ ...held, [knob.key]: next }))
+                  setKnobs((held) => ({ ...held, [knob.key]: next }))
                 }}
                 show-value
                 step={knob.step}
-                value={String(params[knob.key])}
+                value={String(knobs[knob.key])}
               ></helix-slider>
             ))}
           </helix-grid>
 
           <helix-flex data-density="sm" slot="footer">
-            <button data-button="subtle" onClick={() => setParams(DEFAULT_PARAMS)} type="button">
+            <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
               Reset
             </button>
           </helix-flex>

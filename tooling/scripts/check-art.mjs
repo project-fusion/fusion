@@ -124,6 +124,11 @@ const WORDS = [
   'seventy-eight',
   'seventy-nine',
   'eighty',
+  'eighty-one',
+  'eighty-two',
+  'eighty-three',
+  'eighty-four',
+  'eighty-five',
 ]
 const wordFor = (count) => {
   const word = WORDS[count - 49]

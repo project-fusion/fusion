@@ -1,0 +1,36 @@
+:host {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+
+  /* The fallback, and it needs no detection.
+   *
+   * A reader with no WebGL, or on a machine that refused a context, gets a
+   * canvas that never paints, which is transparent. So the host carries a ramp
+   * of the same tokens the shader ramps between, and the canvas paints over it
+   * when it can. Nothing has to ask whether it worked: the answer is what is
+   * already showing. Same shape as slot fallback, one layer down. */
+  background-image: radial-gradient(
+    120% 90% at 62% 12%,
+    var(--helix-color-primary) 0%,
+    var(--helix-color-primary-subtle) 38%,
+    var(--helix-color-background) 78%
+  );
+}
+
+/* Decorative, and out of the way of everything.
+ *
+ * `pointer-events: none` on the host rather than on the canvas: the element is
+ * a background, so a control laid over it must stay clickable, and a consumer
+ * who wants the pointer to drive it gets that through the element's own
+ * listener rather than by taking hit-testing away from their page. */
+:host {
+  pointer-events: none;
+}
+
+[part="canvas"] {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
