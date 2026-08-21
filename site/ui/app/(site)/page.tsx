@@ -294,50 +294,129 @@ export default function Home() {
             </helix-text>
           </helix-flex>
 
-          <helix-flex class="showcase" direction="column" gap="lg">
-            <helix-flex align="center" gap="sm" wrap>
-              <helix-button appearance="solid" tone="primary">
-                Primary
-              </helix-button>
-              <helix-button>Secondary</helix-button>
-              <helix-button appearance="subtle">Subtle</helix-button>
-              <helix-icon-button label="Copy">
-                <helix-icon name="copy"></helix-icon>
-              </helix-icon-button>
-              <helix-tag tone="primary">Tag</helix-tag>
-              <helix-badge>7</helix-badge>
-              <helix-kbd>Cmd K</helix-kbd>
-            </helix-flex>
+          {/* **A mosaic of surfaces, not a row of parts.**
+    
+              A line of controls at rest shows that the library has a switch. It
+              does not show what a switch is for, and it is the arrangement every
+              component gallery already uses. What a reader is deciding is
+              whether these things compose, so each card here is a small real
+              surface built out of several of them, and the cards are laid out
+              in columns that flow rather than a grid that pads every row to its
+              tallest cell.
+    
+              The cards are `helix-card`. A showcase built from anything else
+              would be making its claim in someone else's components. */}
+          <div className="showcase">
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-flex direction="column" gap="md">
+                <helix-flex align="center" gap="sm" justify="between" wrap>
+                  <helix-flex align="center" gap="sm">
+                    <helix-avatar name="Ada Whitfield"></helix-avatar>
+                    <helix-flex direction="column" gap="2xs">
+                      <helix-text appearance="body-strong">Ada Whitfield</helix-text>
+                      <helix-text appearance="caption" tone="muted">
+                        Derive the dark palette
+                      </helix-text>
+                    </helix-flex>
+                  </helix-flex>
+                  <helix-tag tone="primary">In review</helix-tag>
+                </helix-flex>
+                <helix-progress label="Contrast pass" value={72}></helix-progress>
+              </helix-flex>
+            </helix-card>
 
-            <helix-flex align="center" gap="xl" wrap>
-              {/* `default-checked`, not `checked`. Declaring `checked` is a claim
-                  of ownership: the element then announces and applies nothing
-                  until a handler answers it, so a showcase written that way is
-                  a row of controls that cannot be pressed. The generated types
-                  refuse it, which is the check working. */}
-              <helix-switch default-checked label="Switch"></helix-switch>
-              <helix-checkbox default-checked label="Checkbox"></helix-checkbox>
-              <helix-slider
-                default-value="60"
-                label="Slider"
-                max={100}
-                min={0}
-                show-value
-              ></helix-slider>
-              <helix-meter class="showcaseBar" label="Meter" max={100} value={72}></helix-meter>
-            </helix-flex>
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-flex direction="column" gap="lg">
+                <helix-flex align="center" gap="lg" justify="between" wrap>
+                  <helix-switch default-checked label="Reduced motion"></helix-switch>
+                  {/* The badge wraps what it marks. `value` is the count and the
+                      child is the thing being counted on, which is the whole
+                      reason it is an element rather than a number in a span. */}
+                  <helix-badge label="3 unread" value="3">
+                    <helix-icon-button label="Notifications">
+                      <helix-icon name="bell"></helix-icon>
+                    </helix-icon-button>
+                  </helix-badge>
+                </helix-flex>
+                <helix-checkbox default-checked label="Ship with the audit"></helix-checkbox>
+                <helix-slider
+                  default-value="60"
+                  label="Bloom"
+                  markers={5}
+                  max={100}
+                  min={0}
+                  show-value
+                ></helix-slider>
+                <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
+              </helix-flex>
+            </helix-card>
 
-            <helix-flex align="center" gap="xl" wrap>
-              <helix-avatar name="Fusion"></helix-avatar>
-              <helix-loader></helix-loader>
-              <helix-progress
-                class="showcaseBar"
-                label="Progress"
-                max={100}
-                value={45}
-              ></helix-progress>
-            </helix-flex>
-          </helix-flex>
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-flex direction="column" gap="md">
+                <helix-stat-group divided>
+                  <helix-stat>
+                    1,284
+                    <span slot="label">Installs</span>
+                  </helix-stat>
+                  <helix-stat>
+                    99.98
+                    <span slot="label">Uptime</span>
+                    <span slot="unit">%</span>
+                  </helix-stat>
+                </helix-stat-group>
+                <helix-sparkline
+                  label="Installs rose from 1,240 to 1,284 over seven days"
+                  values="1240 1318 1102 1291 1244 1180 1284"
+                ></helix-sparkline>
+              </helix-flex>
+            </helix-card>
+
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-code-block label="Install Helix">bun add @helix-io/web</helix-code-block>
+            </helix-card>
+
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-table label="Packages">
+                <helix-table-column width="9rem">Package</helix-table-column>
+                <helix-table-column>Size</helix-table-column>
+                <helix-table-column>State</helix-table-column>
+
+                <helix-table-row>
+                  <helix-table-cell header>web</helix-table-cell>
+                  <helix-table-cell>118 kB</helix-table-cell>
+                  <helix-table-cell>
+                    <helix-tag tone="success">Passing</helix-tag>
+                  </helix-table-cell>
+                </helix-table-row>
+                <helix-table-row>
+                  <helix-table-cell header>headless</helix-table-cell>
+                  <helix-table-cell>74 kB</helix-table-cell>
+                  <helix-table-cell>
+                    <helix-tag tone="success">Passing</helix-tag>
+                  </helix-table-cell>
+                </helix-table-row>
+                <helix-table-row>
+                  <helix-table-cell header>styles</helix-table-cell>
+                  <helix-table-cell>12 kB</helix-table-cell>
+                  <helix-table-cell>
+                    <helix-tag>Building</helix-tag>
+                  </helix-table-cell>
+                </helix-table-row>
+              </helix-table>
+            </helix-card>
+
+            <helix-card appearance="outlined" class="showcaseCard">
+              <helix-flex align="center" gap="sm" wrap>
+                <helix-button appearance="solid" tone="primary">
+                  Primary
+                </helix-button>
+                <helix-button>Secondary</helix-button>
+                <helix-button appearance="subtle">Subtle</helix-button>
+                <helix-kbd>Cmd K</helix-kbd>
+                <helix-loader></helix-loader>
+              </helix-flex>
+            </helix-card>
+          </div>
 
           <helix-flex data-density="lg">
             <Link data-button href="/helix">

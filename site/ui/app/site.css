@@ -2368,3 +2368,32 @@ helix-drawer helix-tree {
 .showcaseBar {
   inline-size: 10rem;
 }
+
+/* **Columns, not a grid.**
+ *
+ * A grid pads every row to its tallest cell, so a card with a table in it sets
+ * the height of the card beside it and the short one floats in a box of its own
+ * empty space. CSS columns let each card be its own height and the flow fill
+ * around them, which is what a mosaic is and what makes an assortment of
+ * different surfaces read as one arrangement.
+ *
+ * `break-inside: avoid` is what stops a card being cut in half at the column
+ * boundary, and it has to be on the card rather than the container. */
+.showcase {
+  column-gap: var(--helix-space-lg);
+  columns: 2;
+}
+
+.showcaseCard {
+  break-inside: avoid;
+  display: block;
+  margin-block-end: var(--helix-space-lg);
+}
+
+/* One column where two would be a pair of narrow strips. The cards hold tables
+   and sliders, and neither survives being halved. */
+@media (width < 56rem) {
+  .showcase {
+    columns: 1;
+  }
+}
