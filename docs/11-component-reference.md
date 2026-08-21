@@ -244,6 +244,13 @@ is a camera and a material system for four vertices that never move.
 `prefers-reduced-motion` gets one still frame rather than an empty box: the
 composition is the point and the drift is a garnish.
 
+**A layer over an interactive aura has to let the pointer through.** The
+element is hit-testable only when `interactive` is set, because a background
+that swallows clicks is worse than one that does nothing, but a scrim or an
+overlay a consumer paints on top will absorb the move before it arrives. Any
+decorative layer above this wants `pointer-events: none`. It has already
+caught this repository's own bench once.
+
 **The fallback needs no detection.** Where WebGL is refused the canvas never
 paints and is transparent, and the host carries a gradient of the same tokens
 underneath. Nothing has to ask whether it worked.

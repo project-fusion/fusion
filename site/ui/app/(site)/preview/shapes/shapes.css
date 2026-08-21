@@ -23,10 +23,17 @@
 
 /* The floor the words stand on. One color at three alphas, mixed in sRGB, so
    the hue cannot drift: a bare `transparent` is transparent *black* and drags
-   every stop before it toward black rather than toward nothing. */
+   every stop before it toward black rather than toward nothing.
+   
+   `pointer-events: none`, or it eats the pointer the aura underneath is
+   listening for. Measured: hovering the field, the element received zero
+   `pointermove` events and `elementFromPoint` answered `shapeScrim` every
+   time. The component had already been given the hit test back for exactly
+   this feature, and a decorative wash one layer up took it away again. */
 .shapeScrim {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: linear-gradient(
     to right,
     color-mix(in srgb, var(--helix-color-background) 100%, transparent) 0%,
