@@ -305,7 +305,7 @@ export function Showcase(): React.ReactElement {
                 checkbox, a slider and an unlabelled bar stacked at even
                 spacing, which is a pile of controls rather than a thing anybody
                 would fill in. Fields first, then the two that are settings. */}
-          <helix-card appearance="outlined" class="showcaseCard">
+          <helix-card appearance="outlined" class="showcaseCard showcaseTall">
             <helix-flex direction="column" gap="md">
               <helix-select default-value="dark" label="Colour mode" name="mode">
                 <helix-icon name="caret-down" slot="indicator"></helix-icon>
@@ -347,6 +347,25 @@ export function Showcase(): React.ReactElement {
                 <helix-loader></helix-loader>
               </helix-flex>
               <helix-progress label="Contrast pass" value={72}></helix-progress>
+            </helix-flex>
+          </helix-card>
+
+          {/* **The hole under the shorter card, which is why the form spans two
+              rows rather than this being appended.** The two cards above are
+              312 and 154, and the grid aligns to the start, so the right column
+              ended in 158px of nothing. Auto-placement would have put a fourth
+              card under the *taller* one and left the gap exactly where it was;
+              spanning the form is what makes the short column the one that
+              takes another item.
+
+              Two controls that appear nowhere else in this view: a pin is the
+              one field that is several boxes and one value, and a rating is a
+              scale that reports a number rather than a mood, which is the thing
+              the faces below deliberately are not. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <helix-pin-input label="Verification code" length={4}></helix-pin-input>
+              <helix-rating default-value={4} label="Documentation"></helix-rating>
             </helix-flex>
           </helix-card>
 
@@ -413,26 +432,43 @@ export function Showcase(): React.ReactElement {
             ></helix-sparkline>
           </helix-card>
 
-          <helix-card appearance="outlined" class="showcaseCard showcaseWide">
-            <helix-table label="Packages">
-              <helix-table-column width="7rem">Package</helix-table-column>
-              <helix-table-column>Seven days</helix-table-column>
-              <helix-table-column width="5rem">Size</helix-table-column>
-
-              {Object.entries(SERIES).map(([name, values]) => (
-                <helix-table-row key={name}>
-                  <helix-table-cell header>{name}</helix-table-cell>
-                  <helix-table-cell>
-                    <helix-sparkline
-                      class="showcaseRowLine"
-                      label={`${name} over seven days`}
-                      values={values}
-                    ></helix-sparkline>
-                  </helix-table-cell>
-                  <helix-table-cell>{values.split(' ').at(-1)} kB</helix-table-cell>
-                </helix-table-row>
-              ))}
-            </helix-table>
+          {/* **The empty cell beside the figures, which is the only hole in
+              this view that anybody sees.** The table below is full width, so
+              the first row had one card in it and 352px of nothing beside it.
+              A ring is the right thing to put there: it answers a different
+              question from the line above it, shares rather than trend, so the
+              two are not the same chart drawn twice. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <table data-hidden-visually id="showcase-sources">
+                <caption>Downloads by source</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col">Downloads</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">npm</th>
+                    <td data-value="4200">4,200</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">jsDelivr</th>
+                    <td data-value="3100">3,100</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">unpkg</th>
+                    <td data-value="1800">1,800</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Git</th>
+                    <td data-value="900">900</td>
+                  </tr>
+                </tbody>
+              </table>
+              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
+            </helix-flex>
           </helix-card>
 
           <helix-card appearance="outlined" class="showcaseCard">
@@ -488,6 +524,28 @@ export function Showcase(): React.ReactElement {
             </helix-flex>
           </helix-card>
 
+          <helix-card appearance="outlined" class="showcaseCard showcaseWide">
+            <helix-table label="Packages">
+              <helix-table-column width="7rem">Package</helix-table-column>
+              <helix-table-column>Seven days</helix-table-column>
+              <helix-table-column width="5rem">Size</helix-table-column>
+
+              {Object.entries(SERIES).map(([name, values]) => (
+                <helix-table-row key={name}>
+                  <helix-table-cell header>{name}</helix-table-cell>
+                  <helix-table-cell>
+                    <helix-sparkline
+                      class="showcaseRowLine"
+                      label={`${name} over seven days`}
+                      values={values}
+                    ></helix-sparkline>
+                  </helix-table-cell>
+                  <helix-table-cell>{values.split(' ').at(-1)} kB</helix-table-cell>
+                </helix-table-row>
+              ))}
+            </helix-table>
+          </helix-card>
+
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
               <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
@@ -536,6 +594,25 @@ export function Showcase(): React.ReactElement {
                 <helix-tag tone="danger">Danger</helix-tag>
               </helix-flex>
             </helix-flex>
+          </helix-card>
+
+          {/* The fourth cell, which was empty because the view had three items
+              after the callout and the grid has two columns. An accordion is
+              the one surface here that is a surface *and* a control: it is the
+              only thing in this view a reader can open, so it says something
+              the tags and the avatars beside it cannot. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-accordion>
+              <helix-accordion-item>
+                <span slot="summary">What ships</span>
+                Custom elements, a stylesheet, and the types. No runtime beyond the components
+                themselves.
+              </helix-accordion-item>
+              <helix-accordion-item>
+                <span slot="summary">What it needs</span>A browser. The elements upgrade on import
+                and render on a server without one.
+              </helix-accordion-item>
+            </helix-accordion>
           </helix-card>
 
           <helix-card appearance="outlined" class="showcaseCard">

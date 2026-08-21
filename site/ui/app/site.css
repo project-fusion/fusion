@@ -2565,8 +2565,16 @@ helix-drawer helix-tree {
 }
 
 /* The code block sits in the mosaic on its own, so it needs to be a block and
-   nothing else: it brings its own surface. */
+   nothing else: it brings its own surface.
+
+   **Stretched, unlike the cards.** The view aligns its items to the start,
+   which is right for a card whose height is its content, and wrong for the one
+   item in the row that is a slab: a 74px block beside a 158px card reads as a
+   figure that failed to load rather than as a short snippet. `align-self` is
+   the departure and the block fills what it is given. */
 .showcaseCode {
+  align-self: stretch;
+  block-size: 100%;
   display: block;
 }
 
@@ -2635,6 +2643,15 @@ helix-drawer helix-tree {
    is unreadable at half the panel. */
 .showcaseWide {
   grid-column: 1 / -1;
+}
+
+/* **Two rows, so the short column is the one that takes another card.**
+   Auto-placement fills row by row, so a fourth item lands under the *tallest*
+   card and leaves the gap under the short one exactly where it was. Spanning
+   the tall card is what turns the empty space into a cell something can go in.
+   Measured before: 312 against 154 in the same row, and 158px of nothing. */
+.showcaseTall {
+  grid-row: span 2;
 }
 
 /* Sparklines take the width they are given and none by default. The one under

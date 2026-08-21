@@ -254,3 +254,12 @@
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }
+
+/* Whatever is at either end keeps its size, so the text is what gives way when
+   the field is narrow. The same rule Input carries, because a consumer putting
+   the same icon or the same caption into both should not get two results. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+}

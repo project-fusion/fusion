@@ -46,6 +46,8 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @aliases ColorField, ColourInput, InputColor
  * @documentation https://helix.fusion.dev/components/color-input
  *
+ * @slot start - Content at the leading end of the field, inside its border.
+ * @slot end - Content at the trailing end, before the trigger.
  * @slot trigger - The mark on the field saying a panel opens.
  * @slot hint - Help under the field.
  * @slot feedback - What is wrong with it.
@@ -346,6 +348,14 @@ export class HelixBaseColorInput extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
+        <!-- The same pair Input carries, in the same places: leading content
+             before the text, trailing content after it and before the trigger.
+             A label wanting to sit inside the field rather than over it goes
+             here, which is what the toggle group's own label-placement does and
+             what this had no way to express. Backticks stay out of this
+             comment: it is inside a tagged template, so one would end the
+             literal and the error lands on a line further down. -->
+        <slot name="start"></slot>
         ${
           this.appearance === 'swatch'
             ? nothing
@@ -364,6 +374,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
           @input=${this.handleInput}
         />`
         }
+        <slot name="end"></slot>
         <button
           part="trigger"
           id=${this.appearance === 'swatch' ? 'control' : nothing}
