@@ -118,13 +118,13 @@ export const PRODUCTS: Product[] = [
       {
         href: '/helix',
         icon: 'atom',
-        summary: 'Every family, with its API and a running example.',
+        summary: 'Every family, with its API and an example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
         icon: 'microscope',
-        summary: 'Edit an example and watch it render, with the source beside it.',
+        summary: 'Edit an example with the source beside it.',
         title: 'Sandbox',
       },
     ],
@@ -143,7 +143,7 @@ export const PRODUCTS: Product[] = [
       {
         href: '/cortex',
         icon: 'pulse',
-        summary: 'What a system knows, where it learned it, and how far to trust it.',
+        summary: 'What a system knows, and how far to trust it.',
         title: 'Overview',
       },
     ],

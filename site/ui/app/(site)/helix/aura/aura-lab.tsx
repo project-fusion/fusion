@@ -37,6 +37,18 @@ const SHAPES = [
     body: 'Ink in a viscous medium. Move the pointer and the wake outlives the gesture.',
     name: 'flow',
   },
+  {
+    body: 'Light through moving water, focused into a web where the surface folds.',
+    name: 'caustics',
+  },
+  {
+    body: 'A structure in perspective, lit at its joints. The one shape here that is not weather.',
+    name: 'lattice',
+  },
+  {
+    body: 'Territories, lit only where two of them meet. Nothing is drawn but the disagreements.',
+    name: 'fracture',
+  },
 ] as const
 
 /** What the pointer can be asked to do instead of the shape's own answer. */

@@ -71,7 +71,10 @@ export class HelixAura extends HelixElement {
   shape?:
     | 'aurora'
     | 'braid'
+    | 'caustics'
     | 'flow'
+    | 'fracture'
+    | 'lattice'
     | 'particles'
     | 'prism'
     | 'rays'

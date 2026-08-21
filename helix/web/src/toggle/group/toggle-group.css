@@ -18,6 +18,13 @@
 :host([label-placement="start"]) [part="label"] {
   align-self: center;
   margin-block: 0;
+  /* **The padding is what was holding the word up, not the margin.** A field
+     label carries four pixels under it as its gap to the control below, and
+     centring the label's *box* against the track then leaves its text half that
+     above the segments' text: measured at 2.1 pixels, which is plainly visible
+     and is what a box-to-box check misses. Centre the text by leaving the box
+     nothing to be lopsided about. */
+  padding-block: 0;
   padding-inline-start: var(--helix-space-xs);
   white-space: nowrap;
 }

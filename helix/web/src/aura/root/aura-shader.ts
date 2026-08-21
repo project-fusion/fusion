@@ -14,6 +14,9 @@ export const SHAPES = [
   'threads',
   'particles',
   'flow',
+  'caustics',
+  'lattice',
+  'fracture',
 ] as const
 
 /** Which form the light takes. */
@@ -970,6 +973,137 @@ export const FRAGMENT = `#version 300 es
     return body * (0.85 + clamp(wake, 0.0, 1.0) * 0.5) * falloff(dot(q, q), 0.55);
   }
 
+  /* Light through moving water, focused into a web.
+   *
+   * **A caustic is where a wavefront folds, not where it is bright.** Sampling
+   * a noise field and lighting the high parts gives clouds; what makes the
+   * pattern on a pool floor is that the surface bends light and neighbouring
+   * rays land on the same spot. The cheap stand-in for that is the *zero* of a
+   * displaced wave sum rather than its peak: 1 - |sum| is thin and bright
+   * exactly where the sum crosses, which is the fold.
+   *
+   * abs() puts a derivative discontinuity along each of those lines, and here
+   * that is the drawing rather than a fault: a caustic edge is genuinely sharp,
+   * which is the whole reason it reads as light rather than as fog.
+   */
+  float caustics(vec2 q, float t, vec2 qp, float reach) {
+    /* The pointer is a stone in the water: the surface it disturbs is a ring
+       of extra phase, so the web tightens around it rather than brightening. */
+    float dropD = length(q - qp);
+    float drop = falloff(dropD * dropD, 1.4) * reach;
+
+    float lit = 0.0;
+    for (int i = 0; i < 3; i++) {
+      float f = float(i);
+      vec2 p = q * (1.5 + f * 0.55);
+
+      /* Warped by the field's own value, so the wavefronts bend the way a
+         surface does rather than sliding as a rigid pattern. */
+      vec2 w = p + vec2(
+        noise(p * 1.25 + vec2(t * 0.42 + f * 4.0, 0.0)),
+        noise(p * 1.1 - vec2(0.0, t * 0.36 + f * 7.0))
+      ) * 0.85;
+
+      float sum = sin(w.x * 3.1 + t * 0.7 + drop * 5.0) + sin(w.y * 2.7 - t * 0.55 - drop * 4.0);
+      float fold = 1.0 - clamp(abs(sum) * 0.5, 0.0, 1.0);
+      lit += pow(fold, 7.0) * (1.0 - f * 0.22);
+    }
+
+    float dim = warped(q * 0.7, t * 0.2);
+    return lit * mix(0.55, 1.25, dim) * falloff(dot(q, q), 0.4);
+  }
+
+  /* A lattice in perspective, lit at its nodes.
+   *
+   * **The one shape here that is not weather.** Everything else in this set is
+   * a fluid, a light or a sky, and a design system is none of those: it is a
+   * structure, regular, with the interesting part at the joints. So this is
+   * drawn rather than simulated, and it is the only one with straight lines in
+   * it on purpose.
+   *
+   * Perspective is a divide, not a matrix. Scaling the grid by 1 / (1 + depth)
+   * makes the cells shrink with distance and the whole thing recede, which is
+   * the entire trick and costs one division.
+   */
+  float lattice(vec2 q, float t, vec2 qp, float reach) {
+    /* The pointer lifts the plane nearest it, so the lattice crowds where a
+       reader is looking. A structure answers by changing its spacing, which is
+       the only thing about a lattice that can move without breaking it. */
+    vec2 away = q - qp;
+    float near = falloff(dot(away, away), 1.8) * reach;
+
+    float ang = t * 0.12;
+    mat2 spin = mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
+    vec2 p = spin * q;
+
+    float depth = 1.0 / (1.0 + abs(p.y) * 0.85);
+    vec2 g = vec2(p.x, p.y) * (2.6 + near * 1.6) * depth * 3.0;
+    vec2 cell = fract(g) - 0.5;
+
+    /* The rails, thinner the further back they are, so the grid does not turn
+       into a solid sheet at the horizon. */
+    float rail = min(abs(cell.x), abs(cell.y));
+    float lines = falloff(rail * rail, 26.0 / max(depth, 0.25)) * depth;
+
+    /* The joints, which is where a lattice is actually a lattice. */
+    float node = falloff(dot(cell, cell), 30.0) * (0.6 + near * 0.8);
+
+    float dust = warped(p * 0.9, t * 0.25);
+    return (lines * 0.55 + node) * mix(0.7, 1.2, dust) * falloff(dot(q, q), 0.5);
+  }
+
+  /* Cells, lit along the seams between them.
+   *
+   * **Provenance as a picture.** A Voronoi field is a set of territories, each
+   * one everything nearer to its own point than to any other, and the drawing
+   * is not the cells but the boundaries: where two claims meet is exactly
+   * what Trace is about. Nothing here is lit except the disagreements.
+   *
+   * The wall is the second nearest distance minus the nearest, which is zero
+   * on the boundary and grows into the interior. It is a genuine distance, so
+   * it needs no epsilon and produces no crease.
+   */
+  float fracture(vec2 q, float t, vec2 qp, float reach) {
+    vec2 g = q * 2.1;
+    vec2 base = floor(g);
+    vec2 f = g - base;
+
+    float first = 9.0;
+    float second = 9.0;
+    for (int j = -1; j <= 1; j++) {
+      for (int i = -1; i <= 1; i++) {
+        vec2 o = vec2(float(i), float(j));
+        vec2 id = base + o;
+
+        /* Each site drifts on its own small orbit, so the seams breathe rather
+           than the whole field sliding. */
+        float a = hash(id) * 6.2831853;
+        float b = hash(id + 41.7) * 6.2831853;
+        vec2 site = o + 0.5 + 0.42 * vec2(sin(t * 0.5 + a), cos(t * 0.42 + b));
+
+        /* Sites near the pointer are pushed away from it, which opens the
+           cells there: a territory answers by giving ground. */
+        vec2 world = (id + 0.5) / 2.1;
+        vec2 shove = world - qp;
+        site += normalize(shove + 0.0001) * falloff(dot(shove, shove), 2.4) * reach * 0.5;
+
+        float d = length(site - f);
+        if (d < first) {
+          second = first;
+          first = d;
+        } else if (d < second) {
+          second = d;
+        }
+      }
+    }
+
+    float wall = second - first;
+    float seam = falloff(wall * wall, 11.0);
+
+    float grain = warped(q * 1.3, t * 0.3);
+    return seam * mix(0.6, 1.25, grain) * falloff(dot(q, q), 0.42);
+  }
+
   /* Two wave fields crossed, lit where they agree. */
   void main() {
     vec2 p = uv * 2.0 - 1.0;
@@ -1048,8 +1182,14 @@ export const FRAGMENT = `#version 300 es
       d = threads(q, t, qp, own);
     } else if (uShape == 7) {
       d = particles(q, t, qp, own);
-    } else {
+    } else if (uShape == 8) {
       d = flow(q, t, turn, uPointer * 0.05 * uReach);
+    } else if (uShape == 9) {
+      d = caustics(q, t, qp, own);
+    } else if (uShape == 10) {
+      d = lattice(q, t, qp, own);
+    } else {
+      d = fracture(q, t, qp, own);
     }
 
     /* Bloom as an exponent on the field rather than a term inside each shape.
