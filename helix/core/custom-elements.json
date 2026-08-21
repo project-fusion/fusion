@@ -109,6 +109,16 @@
             },
             {
               "kind": "field",
+              "name": "watching",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the container is being watched yet. See `watch`."
+            },
+            {
+              "kind": "field",
               "name": "widths",
               "privacy": "private",
               "default": "new WeakMap<HTMLElement, number>()",
@@ -145,6 +155,17 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Starts watching the container, once there is one.\n\n**Connecting is too early, which is why this is called again.** A host\nconnects before it renders, so the container lives in a shadow root that\ndoes not exist yet and `container()` answers null: the observer was made,\ngiven nothing to observe, and watched nothing for the rest of the element's\nlife. The trail therefore measured once, on the frame it first laid out,\nand never again. Measured: a collapsed trail grown from 26rem to 900\npixels kept every hidden crumb hidden, and one narrowed to 14rem hid no\nmore.\n\nIdempotent, because `measure` calls it on every pass and `observe` on an\nelement already observed would otherwise stack up callbacks."
             },
             {
               "kind": "method",

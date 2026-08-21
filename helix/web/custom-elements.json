@@ -3081,6 +3081,10 @@
             {
               "description": "Space between items and separators.",
               "name": "--breadcrumbs-gap"
+            },
+            {
+              "description": "How tall the control in the gap may be.",
+              "name": "--breadcrumbs-overflow-size"
             }
           ],
           "cssParts": [

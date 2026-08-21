@@ -14,3 +14,25 @@
   margin: var(--helix-space-none);
   padding: var(--helix-space-none);
 }
+
+/* The overflow control sits in the row rather than growing it.
+ *
+ * Whatever a consumer slots there is a control, and a control's own height is
+ * a control's: measured against a trail whose crumbs are 28 pixels, an
+ * `IconButton` at the medium control size made that crumb 48 and the whole line
+ * stepped around it. The trail owns its rhythm, so it says how tall the thing
+ * in the gap may be, and `IconButton` already reads a hook for exactly that.
+ *
+ * Named on the slotted crumb rather than set on the control directly, because
+ * the control is inside it and `::slotted()` reaches one level. A custom
+ * property inherits the rest of the way. */
+::slotted([overflow]) {
+  /* The icon's own size, so the control is the mark and the crumb's padding is
+     the same padding every other crumb has: 20 inside 8 is the 28 a text crumb
+     comes out at, exactly. A control size here made it 40 against their 28 and
+     the line stepped around it. */
+  --icon-button-size: var(--breadcrumbs-overflow-size, var(--helix-size-icon-md));
+
+  align-items: center;
+  display: inline-flex;
+}

@@ -35,14 +35,21 @@ if (hasLayout()) {
          what "the overflow is not showing" looked like from the outside, the
          other half being an icon name that did not exist. */
       const host = await trail()
+      /* Settled first, so the listener is not attached mid-measure and the
+         change it hears is the one this test causes. */
+      await new Promise((settled) => {
+        setTimeout(settled, 400)
+      })
       const heard: string[] = []
       host.addEventListener('helix-change', (event) => {
         heard.push((event as CustomEvent<{ property: string; value: string }>).detail.property)
       })
 
+      /* Long enough for the resize observer, the frame it retries on, and the
+         update that follows. Two hundred caught it mid-flight. */
       host.style.inlineSize = '900px'
       await new Promise((settled) => {
-        setTimeout(settled, 200)
+        setTimeout(settled, 700)
       })
       await host.updateComplete
 

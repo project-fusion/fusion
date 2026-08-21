@@ -48,6 +48,9 @@ export interface CollapseOptions {
 export class CollapseController implements ReactiveController {
   private observer: ResizeObserver | undefined
 
+  /** Whether the container is being watched yet. See `watch`. */
+  private watching = false
+
   /**
    * Each item's width, taken while every item was showing.
    *
@@ -88,19 +91,44 @@ export class CollapseController implements ReactiveController {
       return
     }
     this.observer = new ResizeObserver(() => this.measure())
-    const box = this.options.container()
-    if (box) {
-      this.observer.observe(box)
-    }
+    this.watch()
   }
 
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
+    this.watching = false
     if (this.retry !== undefined) {
       cancelAnimationFrame(this.retry)
       this.retry = undefined
     }
+  }
+
+  /**
+   * Starts watching the container, once there is one.
+   *
+   * **Connecting is too early, which is why this is called again.** A host
+   * connects before it renders, so the container lives in a shadow root that
+   * does not exist yet and `container()` answers null: the observer was made,
+   * given nothing to observe, and watched nothing for the rest of the element's
+   * life. The trail therefore measured once, on the frame it first laid out,
+   * and never again. Measured: a collapsed trail grown from 26rem to 900
+   * pixels kept every hidden crumb hidden, and one narrowed to 14rem hid no
+   * more.
+   *
+   * Idempotent, because `measure` calls it on every pass and `observe` on an
+   * element already observed would otherwise stack up callbacks.
+   */
+  private watch(): void {
+    if (this.watching) {
+      return
+    }
+    const box = this.options.container()
+    if (!box || !this.observer) {
+      return
+    }
+    this.observer.observe(box)
+    this.watching = true
   }
 
   /**
@@ -110,6 +138,7 @@ export class CollapseController implements ReactiveController {
    * or leaving changes the answer and no resize accompanies it.
    */
   measure(): void {
+    this.watch()
     const box = this.options.container()
     const items = this.options.items()
     if (!box || items.length === 0) {
@@ -138,7 +167,21 @@ export class CollapseController implements ReactiveController {
       }
       return this.widths.get(item) ?? 0
     })
-    const total = widths.reduce((sum, width) => sum + width, 0)
+    /* The space between them counts too, and it was not counted.
+     *
+     * A row laid out with `gap` puts that space between every pair, and no
+     * item's `offsetWidth` includes any of it. A breadcrumb trail of five at an
+     * 8 pixel gap is 32 pixels this arithmetic could not see, so it concluded a
+     * trail fitted, hid nothing, and let the row wrap instead: measured, five
+     * crumbs summing 468 inside 544, laid out at 500 and still wrapping because
+     * the reading was 468.
+     *
+     * Read from the container rather than passed in, because the container is
+     * the thing that has it and a number handed over here would be a second
+     * copy of a stylesheet's decision. */
+    const gap = Number.parseFloat(getComputedStyle(box).columnGap) || 0
+    const between = (count: number): number => Math.max(0, count - 1) * gap
+    const total = widths.reduce((sum, width) => sum + width, 0) + between(widths.length)
 
     /* Nothing has a width yet, which is not the same as everything fitting.
        Concluding "it fits" from an unlaid-out tree is how this reported a full
@@ -159,13 +202,15 @@ export class CollapseController implements ReactiveController {
 
     /* Room for the trigger comes off the top, since it will be showing in every
        branch below this one. */
-    const budget = available - (this.options.trigger()?.offsetWidth ?? 0)
+    const trigger = this.options.trigger()?.offsetWidth ?? 0
+    /* The trigger brings a gap of its own, being one more thing in the row. */
+    const budget = available - trigger - gap
 
     let used = 0
     let count = 0
     for (let index = items.length - 1; index >= 0; index--) {
       const width = widths[index] ?? 0
-      if (used + width > budget) {
+      if (used + width + between(count + 1) > budget) {
         break
       }
       used += width

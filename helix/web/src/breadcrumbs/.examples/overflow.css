@@ -1,0 +1,9 @@
+/* Narrow on purpose, because the trail only collapses when it has to.
+ *
+ * Without a width the example fits, nothing is hidden, and the control this
+ * example exists to show is correctly not drawn: it demonstrated the absence of
+ * itself. A width forces the case. */
+helix-breadcrumbs {
+  display: block;
+  inline-size: 26rem;
+}
