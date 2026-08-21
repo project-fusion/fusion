@@ -185,8 +185,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
     return html`${this.renderPlot(shares, named)}
-      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}
-      ${this.renderTooltip()}`
+      ${this.hole === 'none' ? nothing : html`<div part="centre"><slot></slot></div>`}`
   }
 
   /**
@@ -211,6 +210,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
         />
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
+      ${this.renderTooltip()}
     </div>`
   }
 

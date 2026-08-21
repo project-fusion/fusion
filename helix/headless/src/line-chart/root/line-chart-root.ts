@@ -149,8 +149,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
 
     const named = this.named
 
-    return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}
-      ${this.renderTooltip()}`
+    return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}`
   }
 
   /**
@@ -185,6 +184,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
         ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
+      ${this.renderTooltip()}
     </div>`
   }
 

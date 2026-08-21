@@ -100,8 +100,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const named = this.named
 
     return html`${this.renderPlot(series, categories, y, floor, named)}
-      ${this.renderLabels(categories)}
-      ${this.renderTooltip()}`
+      ${this.renderLabels(categories)}`
   }
 
   /**
@@ -177,6 +176,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
             </g>`,
         )}
       </svg>
+      ${this.renderTooltip()}
     </div>`
   }
 

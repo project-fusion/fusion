@@ -6,7 +6,19 @@
   gap: var(--bar-chart-gap, var(--helix-space-2xs));
 }
 
+/* The tooltip's containing block, and it has to be this one.
+ *
+ * The chart computes where a reading is as a percentage of *the plot*, and the
+ * tooltip was positioned against the host, which is the plot plus a gap plus the
+ * row of labels. Measured: the percentages were right at every reading and the
+ * box landed too low at all of them, worst at the bottom of the range, because
+ * they were being resolved against a taller box than the one they describe.
+ *
+ * Positioned inside the plot, the two agree by construction rather than by a
+ * correction that would have to be kept in step with the layout. */
 [part="plot"] {
+  position: relative;
+
   block-size: var(--bar-chart-block-size, 12em);
 }
 
