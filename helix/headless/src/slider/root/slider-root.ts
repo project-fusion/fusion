@@ -329,6 +329,21 @@ export class HelixBaseSlider extends MixinControllerValue(MixinField(HelixFormEl
     this.sync()
   }
 
+  /**
+   * Which way the track runs, `vertical` standing it on end.
+   *
+   * For a level rather than a quantity: a fader, a channel, anything a reader
+   * pictures as high and low rather than as less and more. Absent is
+   * horizontal, which is what almost every slider in a form wants.
+   *
+   * **A vertical track has no length of its own**, the way a horizontal one
+   * takes the width of the row it is in. `--slider-length` is that number and
+   * defaults to nine rem, so one dropped into a layout is a usable height
+   * rather than a thumb sitting on nothing.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
   protected override render(): TemplateResult {
     /* The range's bounds are written before its value below, and that order is
        the whole of this element's correctness on a wide scale. Lit commits

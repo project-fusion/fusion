@@ -432,3 +432,80 @@
 :host([range]) [part="control"]::-moz-range-thumb {
   pointer-events: auto;
 }
+
+/* Standing the track on end.
+ *
+ * **Which end is the maximum was measured, not assumed.** `writing-mode:
+ * vertical-lr` on a native range puts the maximum at the *bottom*: rendered at
+ * value 100 the thumb sits at the foot of the track, and at 0 it sits at the
+ * head. `vertical-rl` does the same. That is the opposite of what a vertical
+ * slider means to anybody who has used a fader, so `direction: rtl` turns the
+ * axis over and the maximum is at the top where a reader expects it.
+ *
+ * The logical properties are what make the rest of this nearly free. With the
+ * control in a vertical writing mode its own block axis is horizontal, so
+ * `block-size` goes on meaning the track's thickness and `inline-size` goes on
+ * meaning its length, and every rule above that uses them keeps working. */
+:host([orientation="vertical"]) [part="field"] {
+  flex-direction: column;
+}
+
+:host([orientation="vertical"]) [part="field"][data-markers] {
+  grid-template-columns: none;
+  grid-template-rows: 1fr auto;
+}
+
+:host([orientation="vertical"]) [part="control"] {
+  direction: rtl;
+  inline-size: var(--slider-length, 9rem);
+  margin-block: calc(var(--_slider-thumb) / 2);
+  margin-inline: 0;
+  writing-mode: vertical-lr;
+
+  /* Bottom to top, to match the axis the line above turned over. A gradient
+     takes no logical keyword, so this is the one declaration that has to be
+     restated rather than inherited from the horizontal rule. */
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      to top,
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--_slider-fraction, 0) * 100%),
+      var(--_slider-track-color) calc(var(--_slider-fraction, 0) * 100%)
+    )
+  );
+}
+
+/* The marks turn with the track: their length becomes the track's thickness,
+   their thickness stays a hairline, and they are placed from the foot because
+   that is now where the minimum is. */
+:host([orientation="vertical"]) [part="marker"] {
+  block-size: var(--helix-border-thick);
+  inline-size: var(--_slider-track);
+  inset-block-end: var(--_marker-at, 0%);
+  inset-block-start: auto;
+  inset-inline-start: 0;
+  translate: 0 50%;
+}
+
+/* The value goes under the track rather than beside it, and the marker overlay
+   turns with it.
+ *
+ * The overlay is not in the control's writing mode, only the control is, so its
+ * own logical properties still mean the horizontal thing: what was the track's
+ * thickness as a `block-size` is an `inline-size` here, and the half thumb that
+ * kept the end marks reachable moves from the inline margin to the block one.
+ * Sized by `align-self: stretch` rather than a length, so it matches whatever
+ * `--slider-length` the consumer set without being told the number twice. */
+:host([orientation="vertical"]) [part="field"][data-markers] [part="output"] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+:host([orientation="vertical"]) [part="markers"] {
+  align-self: stretch;
+  block-size: auto;
+  inline-size: var(--_slider-track);
+  justify-self: center;
+  margin-block: calc(var(--_slider-thumb) / 2);
+  margin-inline: 0;
+}
