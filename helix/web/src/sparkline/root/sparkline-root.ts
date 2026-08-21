@@ -77,7 +77,7 @@ export class HelixSparkline extends HelixBaseSparkline {
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.
    *
-   * The shapes come from `chart/terminus.css`, shared with every other chart
+   * The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.
    */
   @property({ reflect: true })

@@ -9036,7 +9036,7 @@ as "and onward" rather than as a second claim about the data.
 A `bar` plot draws none of them: the last column already is the last
 reading, and a mark on top of it would say the same thing twice.
 
-The shapes come from `chart/terminus.css`, shared with every other chart
+The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
 that ends a line, so the set is the same wherever one appears. */
   terminus?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
@@ -9136,7 +9136,7 @@ as "and onward" rather than as a second claim about the data.
 A `bar` plot draws none of them: the last column already is the last
 reading, and a mark on top of it would say the same thing twice.
 
-The shapes come from `chart/terminus.css`, shared with every other chart
+The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
 that ends a line, so the set is the same wherever one appears. */
   "prop:terminus"?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
@@ -20169,7 +20169,7 @@ export type CustomElements = {
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.
    *
-   * The shapes come from `chart/terminus.css`, shared with every other chart
+   * The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.
    * - `plot`: What the readings are drawn as.
    *
@@ -30820,7 +30820,7 @@ export type CustomElementsSolidJs = {
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.
    *
-   * The shapes come from `chart/terminus.css`, shared with every other chart
+   * The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
    * that ends a line, so the set is the same wherever one appears.
    * - `plot`: What the readings are drawn as.
    *
