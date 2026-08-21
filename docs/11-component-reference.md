@@ -4672,6 +4672,7 @@ second name for it here would be a second thing to keep in step.
 | Property | Description |
 | --- | --- |
 | `--steps-gap` | Space between one step and the next. |
+| `--steps-connector-inset` | Air either side of a mark, before the rail. |
 | `--steps-marker-size` | Size of the mark, glyph or digit. |
 | `--steps-connector-color` | The rule running through the steps. |
 | `--steps-complete-color` | The mark on a finished step. |

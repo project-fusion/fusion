@@ -23,6 +23,7 @@ import { styles } from './steps-root.css.js'
  * @documentation https://helix.fusion.dev/components/steps
  *
  * @cssproperty --steps-gap - Space between one step and the next.
+ * @cssproperty --steps-connector-inset - Air either side of a mark, before the rail.
  * @cssproperty --steps-marker-size - Size of the mark, glyph or digit.
  * @cssproperty --steps-connector-color - The rule running through the steps.
  * @cssproperty --steps-complete-color - The mark on a finished step.
