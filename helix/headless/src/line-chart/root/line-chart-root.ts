@@ -73,15 +73,24 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
   /**
    * How the line gets from one reading to the next.
    *
-   * Absent joins them and claims nothing in between. `smooth` is easier to
-   * follow across a long series and invents the values between the readings; it
-   * is monotone cubic, so what it invents never leaves the band the data sets.
-   * `step` claims the opposite, that a reading holds until the next.
+   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
+   * argument this comment used to make.* Joining the readings claims nothing in
+   * between, which is true and is why `straight` still exists: a straight
+   * segment asserts nothing about the values between two readings, and a curve
+   * invents them. What settles it the other way is that the invention is
+   * bounded. The interpolation is monotone cubic, so it never leaves the band
+   * the data sets and never introduces a peak or a trough the series does not
+   * have, and within that bound the smoothed line is the easier one to follow
+   * across a long series. `straight` becomes the deliberate claim.
    *
-   * Absent rather than defaulted to `straight`, because a reflecting property
-   * with a default writes its attribute onto every host anybody renders,
-   * including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
-   * the host carries only what the consumer wrote, and caught it.
+   * **Still absent rather than defaulted on the property**, because a
+   * reflecting property with a default writes its attribute onto every host
+   * anybody renders, including the ones nobody configured.
+   * `line-chart-root.ssr.spec.ts` asserts the host carries only what the
+   * consumer wrote, and caught that the first time. The default therefore lives
+   * where the path is built, as `curve ?? 'smooth'`.
+   *
+   * `step` claims the opposite of both, that a reading holds until the next.
    */
   @property({ reflect: true })
   curve?: Curve
@@ -172,7 +181,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
     y: (value: number) => number,
   ): TemplateResult {
     const points: Point[] = one.points.map((point, index) => [x(index), y(point.value)])
-    const path = linePath(points, this.curve)
+    const path = linePath(points, this.curve ?? 'smooth')
     if (path === '') {
       return html`${nothing}`
     }

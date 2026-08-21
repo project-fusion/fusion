@@ -140,11 +140,34 @@ export function Showcase(): React.ReactElement {
     if (!node) {
       return
     }
-    const dark = window.matchMedia('(prefers-color-scheme: dark)')
-    const paint = (): void => restyle(node, brand, dark.matches ? 'dark' : 'light')
+    /* **Two signals, because the preference has three states.** The drawer
+       writes `data-color-mode` for an explicit choice and *deletes* it for
+       "system", so the media query alone answers only the third of them. Watched
+       rather than read once: the drawer is on this page, so the mode can change
+       while the panel is on screen.
+
+       Left unwatched, the panel kept the tokens it was painted with and the page
+       around it changed: measured at `#030407` behind text the page had turned
+       black, which is not a section that failed to follow the mode so much as
+       one that cannot be read. */
+    const root = document.documentElement
+    const query = window.matchMedia('(prefers-color-scheme: dark)')
+    const scheme = (): ThemeIntent['scheme'] => {
+      const chosen = root.dataset.colorMode
+      if (chosen === 'dark' || chosen === 'light') {
+        return chosen
+      }
+      return query.matches ? 'dark' : 'light'
+    }
+    const paint = (): void => restyle(node, brand, scheme())
     paint()
-    dark.addEventListener('change', paint)
-    return () => dark.removeEventListener('change', paint)
+    query.addEventListener('change', paint)
+    const watch = new MutationObserver(paint)
+    watch.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
+    return () => {
+      query.removeEventListener('change', paint)
+      watch.disconnect()
+    }
   }, [brand])
 
   /* **Listened for on the node rather than bound in the markup.** A panel that
