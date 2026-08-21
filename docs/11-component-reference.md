@@ -872,6 +872,7 @@ custom property set inline would be the headless tier naming a colour.
 | --- | --- | --- | --- | --- | --- |
 | `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixBaseChartLegend` | Which way to read the table. |
 | `for` | `for` | `string` | `''` | `HelixBaseChartLegend` | The id of the table to take the names from. |
+| `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
 
 #### Parts
 
@@ -4505,6 +4506,7 @@ keeps it out of every other reason it might want to be bigger.
 
 | Property | Description |
 | --- | --- |
+| `--chart-terminus-hole` | What shows through a `ring` terminus. |
 | `--chart-terminus-size` | Size of the mark on the last reading. |
 | `--sparkline-area-opacity` | How much of the line's colour the wash takes where it meets the line. |
 | `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |

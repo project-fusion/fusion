@@ -56,7 +56,19 @@
  * size, so matching the dot's diameter would make the ring look like the
  * quieter of the two when it is meant to be the same weight of statement. */
 :host([terminus="ring"]) [part="terminus"] {
-  background-color: transparent;
+  /* The ground, not transparency, so the line stops at the ring's edge.
+   *
+   * Transparent was the first version and it read as a target: a sparkline's
+   * line ends *at* its last reading, which is the ring's centre, so the stroke
+   * ran through the hole and out the other side. Filling the hole with the
+   * surface hides the last fraction of the line behind the mark, which is what
+   * a ring terminus is supposed to look like.
+   *
+   * The cost is that it is now opaque, so a ring over a picture or a coloured
+   * card shows a disc of the page's surface rather than the picture.
+   * `--chart-terminus-hole` is there for exactly that, and taking `transparent`
+   * gets the old behaviour back. */
+  background-color: var(--chart-terminus-hole, var(--helix-color-surface));
   block-size: calc(var(--chart-terminus-size, 5px) * 1.6);
   border: var(--helix-border-thick) solid currentColor;
   inline-size: calc(var(--chart-terminus-size, 5px) * 1.6);

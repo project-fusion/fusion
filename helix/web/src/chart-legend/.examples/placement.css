@@ -1,0 +1,8 @@
+/* The consumer places the legend and the legend lays itself out. Two jobs,
+   because a sibling cannot position itself against something it is not in. */
+.beside {
+  align-items: center;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: 1fr auto;
+}

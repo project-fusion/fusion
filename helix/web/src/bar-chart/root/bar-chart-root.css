@@ -58,27 +58,47 @@
 /* Categories down the side, for names that are words rather than dates.
  *
  * A row of long names either overlaps or turns on its side, and neither reads
- * as well as putting them down the left where they are read normally. The
- * drawing is rotated rather than recomputed, because the geometry is the same
- * question asked along the other axis and two code paths would be two things to
- * keep in step. */
+ * as well as putting them down the left where they are read normally.
+ *
+ * **The drawing is not rotated.** It was, with `rotate: 90deg`, which is the
+ * shorter CSS and produced a chart with one column floating beside a list of
+ * names: a rotation turns about the element's own centre, so the plot left its
+ * grid cell, and the labels are a separate row that stayed exactly where they
+ * were. The tier below computes the geometry along the other axis instead, and
+ * all this does is put the names on the left and stack them. */
 :host([direction="horizontal"]) {
   grid-template-columns: auto 1fr;
 }
 
-:host([direction="horizontal"]) [part="plot"] {
-  block-size: var(--bar-chart-block-size, 12em);
-  order: 1;
-  rotate: 90deg;
-  scale: 1 -1;
+/* Placed by column rather than reordered.
+ *
+ * The template renders the plot first, because that is the reading order a
+ * screen reader would take if either were in the tree, and in a row the names
+ * belong on the left. `order` moves one of them and leaves the other wherever
+ * the auto-placer put it, which is how the first version ended up with the
+ * bars on the left and their names floating in the middle of the space beside
+ * them. Naming both columns says the whole arrangement in two lines. */
+:host([direction="horizontal"]) [part="labels"] {
+  grid-column: 1;
+  grid-row: 1;
 }
 
+:host([direction="horizontal"]) [part="plot"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Each name sits against its own bar, which takes a grid of the same rows
+   rather than a guess: the plot is one column of the outer grid and the labels
+   are the other, so the two share a height and divide it the same way. */
 :host([direction="horizontal"]) [part="labels"] {
   grid-auto-columns: auto;
   grid-auto-flow: row;
+  grid-auto-rows: 1fr;
 }
 
 :host([direction="horizontal"]) [part="label"] {
+  align-self: center;
   text-align: end;
 }
 

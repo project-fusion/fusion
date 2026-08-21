@@ -34,6 +34,7 @@ import { styles } from './sparkline-root.css.js'
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline
  *
+ * @cssproperty --chart-terminus-hole - What shows through a `ring` terminus.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
  * @cssproperty --sparkline-area-opacity - How much of the line's colour the wash takes where it meets the line.
  * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.

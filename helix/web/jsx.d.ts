@@ -1871,6 +1871,23 @@ want. */
 };
 
 export type HelixChartLegendProps = {
+  /** Where the legend sits and which way its entries run.
+
+Absent is a wrapping row, which is what sits under a chart. `start` and
+`end` stack the entries in a column, for a legend beside one.
+
+**This says which way the entries run and not where the element is**, which
+is the honest limit of a component that is a sibling of the chart rather
+than part of it. A legend cannot place itself relative to something it is
+not inside, so the consumer still puts it above, below or beside; this
+makes it lay out correctly once it is there, which was the part that
+previously took a custom property nobody would guess at.
+
+The alternative was a `legend` slot on every chart, so a chart could place
+its own. That is worse: it makes the legend's position a fact about the
+chart, so two charts sharing one legend becomes impossible, and it puts a
+list inside a drawing that is `aria-hidden`. */
+  placement?: HelixChartLegend["placement"];
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
@@ -1887,6 +1904,23 @@ shadow root names a table in that root rather than in the document.
 };
 
 export type HelixChartLegendSolidJsProps = {
+  /** Where the legend sits and which way its entries run.
+
+Absent is a wrapping row, which is what sits under a chart. `start` and
+`end` stack the entries in a column, for a legend beside one.
+
+**This says which way the entries run and not where the element is**, which
+is the honest limit of a component that is a sibling of the chart rather
+than part of it. A legend cannot place itself relative to something it is
+not inside, so the consumer still puts it above, below or beside; this
+makes it lay out correctly once it is there, which was the part that
+previously took a custom property nobody would guess at.
+
+The alternative was a `legend` slot on every chart, so a chart could place
+its own. That is worse: it makes the legend's position a fact about the
+chart, so two charts sharing one legend becomes impossible, and it puts a
+list inside a drawing that is `aria-hidden`. */
+  "prop:placement"?: HelixChartLegend["placement"];
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
@@ -14139,6 +14173,22 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `placement`: Where the legend sits and which way its entries run.
+   *
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside; this
+   * makes it lay out correctly once it is there, which was the part that
+   * previously took a custom property nobody would guess at.
+   *
+   * The alternative was a `legend` slot on every chart, so a chart could place
+   * its own. That is worse: it makes the legend's position a fact about the
+   * chart, so two charts sharing one legend becomes impossible, and it puts a
+   * list inside a drawing that is `aria-hidden`.
    * - `entries`: Which way to read the table.
    *
    * Absent is `series`, one entry per data column. `categories` reads one entry
@@ -20356,6 +20406,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-terminus-hole`: What shows through a `ring` terminus. (default: `undefined`)
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
@@ -24667,6 +24718,22 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `placement`: Where the legend sits and which way its entries run.
+   *
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside; this
+   * makes it lay out correctly once it is there, which was the part that
+   * previously took a custom property nobody would guess at.
+   *
+   * The alternative was a `legend` slot on every chart, so a chart could place
+   * its own. That is worse: it makes the legend's position a fact about the
+   * chart, so two charts sharing one legend becomes impossible, and it puts a
+   * list inside a drawing that is `aria-hidden`.
    * - `entries`: Which way to read the table.
    *
    * Absent is `series`, one entry per data column. `categories` reads one entry
@@ -31069,6 +31136,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-terminus-hole`: What shows through a `ring` terminus. (default: `undefined`)
    * - `--chart-terminus-size`: Size of the mark on the last reading. (default: `undefined`)
    * - `--sparkline-area-opacity`: How much of the line's colour the wash takes where it meets the line. (default: `undefined`)
    * - `--sparkline-bar-radius`: Corner radius on a column, under `plot="bar"`. (default: `undefined`)
@@ -34593,6 +34661,8 @@ export type CustomCssProperties = {
   "--slider-track-image"?: string;
   /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
   "--slider-length"?: string;
+  /** What shows through a `ring` terminus. */
+  "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
   "--chart-terminus-size"?: string;
   /** How much of the line's colour the wash takes where it meets the line. */

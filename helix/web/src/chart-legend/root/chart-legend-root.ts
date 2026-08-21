@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseChartLegend } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './chart-legend-root.css.js'
 
 /**
@@ -29,6 +30,27 @@ import { styles } from './chart-legend-root.css.js'
 @customElement('helix-chart-legend')
 export class HelixChartLegend extends HelixBaseChartLegend {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * Where the legend sits and which way its entries run.
+   *
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside; this
+   * makes it lay out correctly once it is there, which was the part that
+   * previously took a custom property nobody would guess at.
+   *
+   * The alternative was a `legend` slot on every chart, so a chart could place
+   * its own. That is worse: it makes the legend's position a fact about the
+   * chart, so two charts sharing one legend becomes impossible, and it puts a
+   * list inside a drawing that is `aria-hidden`.
+   */
+  @property({ reflect: true })
+  placement?: 'end' | 'start'
 }
 
 declare global {

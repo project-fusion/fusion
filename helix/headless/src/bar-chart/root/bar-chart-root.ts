@@ -146,7 +146,18 @@ export class HelixBaseBarChart extends HelixElement {
        two charts sharing a picture. */
     const values = series.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(values.length > 0 ? values : [0])
-    const y = linear([Math.min(0, low), Math.max(0, high)], [HEIGHT, 0])
+    /* **The range is inverted for columns and not for bars**, which is the
+       whole of what makes the two directions different arithmetic rather than
+       one drawing turned on its side. SVG counts down from the top, so a column
+       growing upward needs `[HEIGHT, 0]`; a bar growing rightward is already
+       going the way x counts, so it takes `[0, HEIGHT]`.
+     *
+     * Reusing the inverted scale for both was the first version. It put the
+       longest bar at x=0 and every shorter one hard against the right edge,
+       growing away from the baseline instead of out of it. */
+    const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
+    const y =
+      this.direction === 'horizontal' ? linear(domain, [0, HEIGHT]) : linear(domain, [HEIGHT, 0])
     const floor = y(0)
 
     const named = this.label || source?.querySelector('caption')?.textContent?.trim() || ''
@@ -168,8 +179,43 @@ export class HelixBaseBarChart extends HelixElement {
     floor: number,
     named: string,
   ): TemplateResult {
+    const sideways = this.direction === 'horizontal'
     const slot = 100 / categories.length
-    const width = (slot * 0.72) / Math.max(series.length, 1)
+    const thickness = (slot * 0.72) / Math.max(series.length, 1)
+
+    /* **The geometry is computed for the axis it is drawn on, not rotated onto
+       it.** The first version turned the whole plot with `rotate: 90deg`, which
+       is the shorter CSS and does not work: a rotation is about the element's
+       own centre, so the drawing left its grid cell entirely and the labels,
+       which are a separate row, stayed where they were. What it produced was
+       one column floating beside a list of names.
+     *
+     * Swapping the two axes here costs one branch and keeps every other fact
+     * about the chart the same. `value` runs along x when the bars are
+     * sideways and along y otherwise; `category` takes the other one. */
+    const bar = (value: number, index: number, depth: number): TemplateResult => {
+      const at = y(value)
+      const along = Math.min(floor, at)
+      const size = Math.abs(floor - at)
+      const across = index * slot + slot * 0.14 + depth * thickness
+      return sideways
+        ? svg`<rect
+            data-series=${(depth % PALETTE) + 1}
+            height=${thickness}
+            part="bar"
+            width=${size}
+            x=${along}
+            y=${across}
+          />`
+        : svg`<rect
+            data-series=${(depth % PALETTE) + 1}
+            height=${size}
+            part="bar"
+            width=${thickness}
+            x=${across}
+            y=${along}
+          />`
+    }
 
     return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
       <svg
@@ -177,28 +223,15 @@ export class HelixBaseBarChart extends HelixElement {
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${svg`<line
-          part="baseline"
-          x1="0"
-          x2="100"
-          y1=${floor}
-          y2=${floor}
-        />`}
+        ${
+          sideways
+            ? svg`<line part="baseline" x1=${floor} x2=${floor} y1="0" y2="100" />`
+            : svg`<line part="baseline" x1="0" x2="100" y1=${floor} y2=${floor} />`
+        }
         ${categories.map(
           (_, index) =>
             svg`<g part="group">
-              ${series.map((one, depth) => {
-                const value = one.points[index]?.value ?? 0
-                const at = y(value)
-                return svg`<rect
-                  data-series=${(depth % PALETTE) + 1}
-                  height=${Math.abs(floor - at)}
-                  part="bar"
-                  width=${width}
-                  x=${index * slot + slot * 0.14 + depth * width}
-                  y=${Math.min(floor, at)}
-                />`
-              })}
+              ${series.map((one, depth) => bar(one.points[index]?.value ?? 0, index, depth))}
             </g>`,
         )}
       </svg>

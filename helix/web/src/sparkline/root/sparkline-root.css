@@ -105,10 +105,12 @@
  *
  * At zero the ramp had spent itself well before the floor and the lower half of
  * the region was doing no work: the fill read as a smudge under the peak rather
- * than as a filled area. Holding a tenth at the bottom keeps the whole region
- * present and still lets the top read as the denser end. */
+ * than as a filled area. A quarter held at the bottom fixed that and went too
+ * far the other way, reading as a slab with a gradient on it rather than as a
+ * fade. A ninth is the third number and the one that holds: the floor is still
+ * present, and the falloff is most of the height rather than a hint. */
 :host([plot="area"]) [part="wash-end"] {
-  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 4);
+  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9);
 }
 
 /* Three steps, and the hook still wins over all of them. */
