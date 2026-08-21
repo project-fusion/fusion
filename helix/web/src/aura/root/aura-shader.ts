@@ -590,30 +590,44 @@ export const FRAGMENT = `#version 300 es
          for that is proportion rather than another change of profile. */
       float wide = mix(0.045, 0.03 + hash(vec2(id, 71.0)) * 0.04, v);
 
-      /* **The nose is the narrow end.** A round cap the full width of the body,
-         with the body then widening behind it, draws a bulb on a shaft. That is
-         the silhouette this had, and it is not one to ship on a landing page.
+      /* **A comet is a nucleus with a coma, and a plume behind it.** Neither of
+         the two shapes this has been was that. A round cap the width of the
+         body with the body widening behind it drew a bulb on a shaft; tapering
+         the front instead drew a hairline that reads as a scratch. The fault
+         common to both is that the head glow was computed from the distance
+         *in front of* a head only, so there was never a round bright thing at
+         the head at all, just where the profile happened to start.
     
-         Tapering the front to a fraction of the width and letting it open out
-         backwards makes the bright end the thin end, which is also what a
-         streak of light actually looks like: the luminous part is the point,
-         and what widens behind it is the part that is fading. */
-      float nose = wide * 0.38;
-
+         The glow is centred on the head now, measured to whichever head is
+         nearer along the lane, so it is symmetric about the nucleus the way a
+         coma is. */
       float behind = (1.0 - w) * gap;
-      float spread = min(nose + wide * behind * 0.85, 0.15);
-      float tail = exp(-behind / len) * exp(-(across * across) / (2.0 * spread * spread));
-
-      /* The cap is the same sigma as the tail is where they meet, so crossing a
-         head is continuous in shape as well as in height: just under it the
-         tail stands at full and the cap is spent, just over it the reverse, and
-         at the join both are the same gaussian. */
       float ahead = w * gap;
-      float cap = exp(-(ahead * ahead + across * across) / (2.0 * nose * nose));
+      float toHead = min(ahead, behind);
+      float nose = wide * 0.5;
+
+      float near2 = toHead * toHead + across * across;
+      float nucleus = exp(-near2 / (2.0 * nose * nose));
+      float coma = exp(-near2 / (2.0 * (nose * 3.0) * (nose * 3.0))) * 0.42;
+
+      /* The plume opens fast and fades fast, and is never as bright as the
+         head. A tail that holds its brightness for its whole length is a
+         streak of paint; what makes a comet read is that almost all of the
+         light is in the first tenth of it.
+    
+         The onset is what keeps it continuous across a head. The plume exists
+         only behind, so its value would step from nothing to something at the
+         nucleus; ramping it in over a seventh of its own length puts that
+         transition under the brightest part of the coma, where there is nothing
+         left to see. */
+      float onset = 1.0 - exp(-behind / (0.15 * len));
+      float spread = min(nose * (1.0 + behind * 3.0), 0.16);
+      float tail = exp(-behind / len) * onset *
+        exp(-(across * across) / (2.0 * spread * spread)) * 0.75;
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
-      lit += (tail + cap) * alive * weight * mix(1.0, 0.45, near);
+      lit += (nucleus + coma + tail) * alive * weight * mix(1.0, 0.45, near);
     }
     float grain = fbm(vec2(s.x * 3.0, s.y * 1.4 - t * 1.6));
     return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
@@ -770,18 +784,19 @@ export const FRAGMENT = `#version 300 es
            without leaving an edge anywhere. */
         float grade = mix(52.0, 52.0 * (0.62 + hash(c + 5.7) * 0.95), v);
 
-        /* **Stretched along the way each mote is going.** Round dots at rest
-           are a starfield, and a starfield is the one thing in this set that
-           says nothing: stars are famously fixed. Elongating each along its own
-           drift is what makes the same field read as something in motion, and
-           it costs one normalize and a change of basis.
+        /* **Round, because a particle is round.** These were stretched two and a
+           half times along a direction drawn per mote, on the reasoning that a
+           starfield says nothing because stars are fixed. That was a problem
+           nobody had, and the cure was worse: a fixed axis per mote is not
+           motion, it is orientation, so a field of them reads as grains of rice
+           pointing every which way rather than as particles at all. Motion, if
+           it is ever wanted here, has to come from the direction each mote is
+           actually travelling, and that is the wander below rather than a hash.
     
-           Plus a halo, an order of magnitude wider and a tenth the strength, so
-           a mote sits in the field rather than on top of it. A hard little disc
-           on a dark ground is a pixel; light has a neighbourhood. */
-        vec2 way = normalize(vec2(hash(c + 3.3) - 0.5, hash(c + 8.8) - 0.5) + 0.0001);
-        vec2 streak = vec2(dot(off, way) / 2.4, dot(off, vec2(-way.y, way.x)));
-        float core = falloff(dot(streak, streak), grade);
+           The halo stays. An order of magnitude wider and a tenth the strength,
+           so a mote sits in the field rather than on top of it: a hard little
+           disc on a dark ground is a pixel, and light has a neighbourhood. */
+        float core = falloff(dot(off, off), grade);
         float halo = falloff(dot(off, off), grade * 0.16) * 0.1;
         lit += (core + halo) * mix(0.8, 0.35 + a * 0.9, v);
       }
