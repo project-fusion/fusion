@@ -199,7 +199,7 @@ export const formsArt: Record<string, ReactNode> = {
      below. Three rows of dots rather than a real month: at card scale the
      shapes are all a reader can see anyway, and drawing seven columns of
      numbers would be a picture of text. */
-  /**
+  /*
    * A field with a chip of the color at its trailing end, and the three tracks
    * it opens below.
    *
@@ -285,7 +285,7 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
+  /*
    * Square at the control height, and the glyph is all of it.
    *
    * The glyph was three stacked bars, which is not a glyph, it is *the* menu

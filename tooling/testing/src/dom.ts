@@ -53,7 +53,7 @@ const shimTableSections = (): void => {
   })
 }
 
-/**
+/*
  * Fills in `attachInternals`, which happy-dom does not implement.
  *
  * Lit's server shim does implement it, so this gap is the test double's alone

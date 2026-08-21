@@ -8,7 +8,7 @@ export interface ScrollItemOptions {
   smooth?: boolean
 }
 
-/**
+/*
  * Brings an item into view inside its own scroller, and moves nothing else.
  *
  * **Not `Element.scrollIntoView`, and the difference is the whole reason this

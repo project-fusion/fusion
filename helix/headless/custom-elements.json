@@ -6364,8 +6364,7 @@
                 "type": {
                   "text": "void"
                 }
-              },
-              "description": "Puts the field back where the answer differs from what was typed.\n\n`requestValue` announces and decides; this is the other half, which Input\nand Date Input both need for the same reason: the native control has already\nchanged, so wherever the answer does not follow it, it has to be restored."
+              }
             },
             {
               "kind": "method",
@@ -15914,8 +15913,7 @@
               "kind": "field",
               "name": "handleDragOver",
               "privacy": "private",
-              "readonly": true,
-              "description": "Takes a drop, which a bare file input can only do on itself.\n\nThe input is invisible here, so the field is the target and the files are\nput into the input afterwards: that keeps one source of truth, and it is\nwhat makes a dropped file and a picked file indistinguishable to a form.\n\n`preventDefault` on dragover as well as on drop, because without it the\nbrowser navigates to the file and the page is gone."
+              "readonly": true
             },
             {
               "kind": "field",

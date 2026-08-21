@@ -164,7 +164,7 @@ export interface DismissDetail {
   label: string
 }
 
-/**
+/*
  * Fired when an element asks to be taken away.
  *
  * A request rather than a notification: the element does not remove itself,
@@ -543,7 +543,7 @@ export interface SelectDetail {
   value: string
 }
 
-/**
+/*
  * Fired when the reader selects an item in a set.
  *
  * Bubbles and is composed, because this is how a set coordinates: a tree, a
@@ -577,7 +577,7 @@ export interface CompleteDetail {
   value: string
 }
 
-/**
+/*
  * Fired when a control that fills up has filled.
  *
  * The moment a code entry exists for: a six-character field is worth submitting

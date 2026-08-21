@@ -37,7 +37,7 @@ const matched = new Map<Element, Range[]>()
 /** What the marks are called in `CSS.highlights`, and in `base.css`. */
 const HIGHLIGHT = 'helix-filter-match'
 
-/**
+/*
  * Marks what the filter matched, without touching what it matched it in.
  *
  * The words are the consumer's own light DOM, slotted through as many as two
@@ -616,7 +616,7 @@ export class HelixBaseListbox extends MixinCollection(
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
   }
 
-  /**
+  /*
    * Points the focused list at the option the keyboard is on.
    *
    * **The gap this closes.** Focus stays on `[part="items"]` while a highlight

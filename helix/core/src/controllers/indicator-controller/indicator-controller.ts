@@ -90,7 +90,7 @@ export class IndicatorController implements ReactiveController {
     this.place()
   }
 
-  /**
+  /*
    * Measures and writes, or gives up without writing anything.
    *
    * Public because `slotchange` is not an update: children arriving is exactly

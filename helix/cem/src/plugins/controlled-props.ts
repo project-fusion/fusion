@@ -31,7 +31,7 @@ export interface ControlledPropsOptions {
   fileName?: string
 }
 
-/**
+/*
  * Makes a controlled property a type error unless its change is answered.
  *
  * **This is the library's most-hit trap, and it is the one thing the compiler

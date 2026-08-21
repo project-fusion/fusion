@@ -263,7 +263,7 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
     this.announce()
   }
 
-  /**
+  /*
    * Takes a drop, which a bare file input can only do on itself.
    *
    * The input is invisible here, so the field is the target and the files are

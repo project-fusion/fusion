@@ -219,14 +219,14 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
     this.hide()
   }
 
-  /**
+  /*
    * Moves over the page, in the direction the key points.
    *
    * The arrows wrap, because a menu is a ring rather than a list with ends:
    * pressing down on the last item to reach the first is what every menu on
    * every platform does.
    */
-  /**
+  /*
    * Focuses an item and brings it into the surface, which is not the same act.
    *
    * A menu long enough to scroll had the tree's problem: the arrow keys moved

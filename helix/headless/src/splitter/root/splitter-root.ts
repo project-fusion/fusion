@@ -365,7 +365,7 @@ export class HelixBaseSplitter extends HelixElement {
     }
   }
 
-  /**
+  /*
    * The collapse a settled position amounts to, if any.
    *
    * So that a pane dragged shut and a pane shut by a consumer's button are the

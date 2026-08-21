@@ -1,6 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
-/**
+/*
  * The element that actually has focus, through any number of shadow roots.
  *
  * `document.activeElement` stops at the outermost host: focus inside a shadow

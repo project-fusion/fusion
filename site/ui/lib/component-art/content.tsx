@@ -444,7 +444,7 @@ export const contentArt: Record<string, ReactNode> = {
     </g>
   ),
 
-  /**
+  /*
    * A track and how far along it something is, at the eight pixel progress
    * height. Two shapes, and the second is the point: `progress` is `slider`
    * with the thumb taken off. One reports, the other takes a value.
@@ -572,12 +572,12 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
+  /*
    * One measurement at `text-3xl`, and the `text-xs` word for what it measures.
    * The pair behind a rule is the group, which is what stops one bar over
    * another from reading as `text`.
    */
-  /**
+  /*
    * Two panes and the divider between them, which is the whole component.
    *
    * The panes are surfaces rather than the ink bars the rest of this group uses
@@ -839,7 +839,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
+  /*
    * A frame with a bar across the bottom of it, which is the whole of what this
    * component replaces: the picture is the platform's and the controls are
    * ours. So the card draws the bar, and leaves the picture as a field.

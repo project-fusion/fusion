@@ -1214,7 +1214,7 @@ export class HelixBaseVideo extends HelixElement {
     </button>`
   }
 
-  /**
+  /*
    * The same control as a row in the overflow menu.
    *
    * The label is words rather than a mark, which is the difference between a

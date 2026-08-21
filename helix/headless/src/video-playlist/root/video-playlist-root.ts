@@ -57,7 +57,7 @@ export class HelixBaseVideoPlaylist extends MixinControllerActive(HelixElement) 
     )
   }
 
-  /**
+  /*
    * The player, whichever tag the consumer slotted.
    *
    * Asked of the slot rather than matched by tag name: the headless tier's

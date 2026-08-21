@@ -214,7 +214,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
     this.requestOpen(true)
   }
 
-  /**
+  /*
    * Puts the field back where the answer differs from what was typed.
    *
    * `requestValue` announces and decides; this is the other half, which Input

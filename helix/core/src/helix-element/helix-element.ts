@@ -142,7 +142,7 @@ const auditReactProps = (host: EventTarget, props: Record<string, unknown>): voi
   }
 }
 
-/**
+/*
  * Binds the handler React is holding for this event, if it has not bound it.
  *
  * **React attaches no custom element listener while hydrating.** Measured in

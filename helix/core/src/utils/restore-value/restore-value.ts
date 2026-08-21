@@ -1,7 +1,7 @@
 /** A control whose text the element may have to put back. */
 type TextControl = HTMLInputElement | HTMLTextAreaElement
 
-/**
+/*
  * Puts a value back into a text control without moving the reader's caret.
  *
  * A controlled input has to restore what the element holds whenever the native

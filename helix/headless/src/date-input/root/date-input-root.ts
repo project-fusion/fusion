@@ -245,7 +245,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
     return held.length > 0 && held.every(isIso) ? held.join(',') : ''
   }
 
-  /**
+  /*
    * What the field shows, which is the value in every mode but one.
    *
    * A range reads `2026-08-04 – 2026-08-11`, because two dates separated by a
@@ -475,7 +475,7 @@ export class HelixBaseDateInput extends MixinControllerOpen(
     }
   }
 
-  /**
+  /*
    * Focusing the field opens the calendar.
    *
    * A reader who reaches this control is choosing a date, and making them find
