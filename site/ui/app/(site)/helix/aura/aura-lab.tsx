@@ -62,10 +62,11 @@ const KNOBS = [
 
 /**
  * Which shapes read `variance`, so the bench can say so rather than offering a
- * control that silently does nothing on seven of the nine. It is the shapes
- * made of a population: lanes, and motes.
+ * control that silently does nothing. The shapes made of many similar things,
+ * counted or continuous: lanes, motes, a fan, bundles, bands. The four left out
+ * are the three with a single subject and `threads`, which is even on purpose.
  */
-const VARIES = new Set(['particles', 'streaks'])
+const VARIES = new Set(['aurora', 'particles', 'prism', 'rays', 'streaks'])
 
 type Knob = (typeof KNOBS)[number]['key']
 

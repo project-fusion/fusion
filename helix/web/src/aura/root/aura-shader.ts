@@ -83,11 +83,13 @@ export const FRAGMENT = `#version 300 es
   uniform float uGain;
 
   /* How much the members of a population differ from one another, 1 being the
-     resting amount and 0 a set that is uniform. Only the shapes that are made
-     of many similar things read it: streaks has lanes and particles has motes.
-     A shape with a single subject has no population to vary, and threads is
-     deliberately even, so on the other seven this is inert by design rather
-     than unimplemented. */
+     resting amount and 0 a set that is uniform. Read by the shapes made of many
+     similar things, whether those are counted or continuous: streaks has lanes,
+     particles has motes, rays has a fan, aurora has bundles and folds, prism
+     has bands. Braid, waves and flow have a single subject and nothing to vary.
+     Threads is the deliberate exception, being even on purpose: a pass had
+     already given its strands their own hashes and produced a scatter rather
+     than a set. */
   uniform float uVariance;
   /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
      was left to 1 when it has faded, so a spent slot costs a compare.
@@ -231,7 +233,13 @@ export const FRAGMENT = `#version 300 es
     float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8));
     float dust = warped(vec2(ang * 2.0, dist * 0.7), t * 0.4);
     float spread = smoothstep(0.85, 0.05, abs(ang));
-    float lit = spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
+    /* The fan is a population too, even though it is continuous rather than
+       counted: how far apart its light and dark run is how much one ray differs
+       from the next. Both ends travel toward the midpoint, so a variance of 0
+       is an even wash and a variance of 1 is exactly the pair this always had. */
+    float rv = clamp(uVariance, 0.0, 1.0);
+    float lit = spread * mix(mix(0.85, 0.2, rv), mix(0.85, 1.5, rv), fan) *
+      mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
     return lit * (1.0 - shadow * 0.82);
   }
 
@@ -294,9 +302,15 @@ export const FRAGMENT = `#version 300 es
       /* The curtain is a draped sheet, so it is bright where a fold turns edge
          on and nearly out where it faces us. A narrow range here is a band of
          even brightness, which is the other half of what made it read flat. */
-      float fold = mix(0.15, 1.4, noise(vec2(q.x * 1.5 + f * 7.0, t * 0.25)));
+      float foldNoise = noise(vec2(q.x * 1.5 + f * 7.0, t * 0.25));
 
-      lit += edge * (hang * mix(0.1, 1.6, bundles) * fold + rim) * (1.0 - f * 0.45);
+      /* Bundles and folds are what a curtain is made many of, so both answer
+         variance about their own midpoint: at 0 an even sheet, at 1 the
+         clumping and the deep folds this was tuned to. */
+      float av = clamp(uVariance, 0.0, 1.0);
+      float bundled = mix(mix(0.85, 0.1, av), mix(0.85, 1.6, av), bundles);
+      float folded = mix(mix(0.775, 0.15, av), mix(0.775, 1.4, av), foldNoise);
+      lit += edge * (hang * bundled * folded + rim) * (1.0 - f * 0.45);
     }
     return lit;
   }
@@ -384,12 +398,13 @@ export const FRAGMENT = `#version 300 es
 
     /* Graded across the fan, so the set has an order rather than being a picket
        fence: what bent least carries the most light. */
-    float order = mix(1.15, 0.5, clamp(u * 0.5 + 0.5, 0.0, 1.0));
+    float pv = clamp(uVariance, 0.0, 1.0);
+    float order = mix(mix(0.825, 1.15, pv), mix(0.825, 0.5, pv), clamp(u * 0.5 + 0.5, 0.0, 1.0));
 
     /* A floor under the fan, because a prism throws a lit wedge with bands in
        it. At 0.1 the gaps went to black and the bands read as separate beams
        that happened to start together. */
-    float structure = mix(1.0, mix(0.42, 1.6, bands) * order, after);
+    float structure = mix(1.0, mix(mix(1.01, 0.42, pv), mix(1.01, 1.6, pv), bands) * order, after);
 
     /* The entry beam is all of the light that the fan then divides, so it is
        the brighter half. Drawn at parity it disappeared against the fan and the
@@ -460,15 +475,38 @@ export const FRAGMENT = `#version 300 es
       float v = clamp(uVariance, 0.0, 1.0);
       float speed = mix(1.3, 0.55 + hash(vec2(id, 11.0)) * 1.5, v);
       float phase = hash(vec2(id, 29.0));
-      float head = fract(phase + t * speed * 0.5) * 3.6 - 1.8;
-
-      float ahead = s.y - head;
-      float behind = max(-ahead, 0.0);
       float len = mix(0.8, 0.3 + hash(vec2(id, 47.0)) * 1.0, v);
-      /* The head is a soft nose, not a cut. At 0.07 the leading edge crossed
-         two per cent of the frame, which against a bright trail on a dark field
-         is a straight line rather than the front of something moving. */
-      float trail = exp(-behind / len) * smoothstep(0.2, 0.0, max(ahead, 0.0));
+
+      /* **The lane is periodic, not a single streak that is put back when it
+         runs out.** It was fract() over a fixed span of 3.6, so a head left the
+         top at 1.8 and was moved to -1.8, taking whatever of its tail was still
+         on screen with it. That span is only off screen while the frame is
+         small enough to sit inside it, and the visible half-extent is
+         (|sin tilt| * aspect + |cos tilt|) * scale, which reaches 1.97 at a
+         tilt of 45 and 2.0 at a scale of 2. Past that the removal happens in
+         plain view, which is the popping.
+    
+         Making the field periodic in y removes the event rather than moving it
+         out of sight: heads sit at every integer of u and the whole rank slides
+         through, so there is no frame in which one is created or destroyed and
+         no scale or tilt at which that becomes visible.
+    
+         P is the gap between successive heads in a lane, and it is what density
+         is now made of. It varies too: lanes that are alike in spacing read as
+         a grid however much else about them differs. */
+      float gap = mix(3.0, 2.2 + hash(vec2(id, 59.0)) * 1.8, v);
+      float travel = phase + t * speed * 1.8 / gap;
+      float u = s.y / gap - travel;
+      float w = fract(u);
+      /* Two terms rather than a product, which is what the periodic form asks
+         for: the tail hanging from the head above this fragment, and the soft
+         nose above the head below it. They hand over at each head, both
+         reaching one there, so the profile is continuous across the join.
+    
+         The nose is a soft one, not a cut. At 0.07 the leading edge crossed two
+         per cent of the frame, which against a bright trail on a dark field is
+         a straight line rather than the front of something moving. */
+      float trail = exp(-(1.0 - w) * gap / len) + smoothstep(0.2, 0.0, w * gap);
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
       trail *= mix(1.0, 0.45, near);
