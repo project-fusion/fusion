@@ -34,7 +34,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 161 |
-| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 113 |
+| `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 114 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 33 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 12 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
@@ -54,14 +54,14 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
-| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 4 |
-| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 2 |
-| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 2 |
-| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 2 |
-| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-5))) )` | 2 |
-| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-6))) )` | 2 |
-| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-7))) )` | 2 |
-| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-8))) )` | 2 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 5 |
+| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 3 |
+| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 3 |
+| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 3 |
+| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-5))) )` | 3 |
+| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-6))) )` | 3 |
+| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-7))) )` | 3 |
+| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-8))) )` | 3 |
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 29 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
@@ -76,9 +76,9 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-none` | `var(--_helix-scale-0)` | 222 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 271 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 228 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 228 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 231 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 123 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 75 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 76 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 64 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 40 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 19 |
@@ -112,7 +112,7 @@ Font size.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-text-xs` | `var(--_helix-size-12)` | 90 |
+| `--helix-text-xs` | `var(--_helix-size-12)` | 91 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 116 |
 | `--helix-text-md` | `var(--_helix-size-14)` | 43 |
 | `--helix-text-lg` | `var(--_helix-size-18)` | 19 |

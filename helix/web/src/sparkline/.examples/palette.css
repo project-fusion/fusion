@@ -1,0 +1,54 @@
+/* The same readings eight times, so the colour is the only thing that changes.
+   A palette judged on eight different shapes is a palette judged on eight
+   different things. */
+.palette {
+  align-items: center;
+  column-gap: var(--helix-space-lg);
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: start;
+  row-gap: var(--helix-space-sm);
+}
+
+.index {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+helix-sparkline {
+  --sparkline-block-size: 2em;
+  --sparkline-inline-size: 10em;
+}
+
+.series-1 {
+  --sparkline-color: var(--helix-color-series-1);
+}
+
+.series-2 {
+  --sparkline-color: var(--helix-color-series-2);
+}
+
+.series-3 {
+  --sparkline-color: var(--helix-color-series-3);
+}
+
+.series-4 {
+  --sparkline-color: var(--helix-color-series-4);
+}
+
+.series-5 {
+  --sparkline-color: var(--helix-color-series-5);
+}
+
+.series-6 {
+  --sparkline-color: var(--helix-color-series-6);
+}
+
+.series-7 {
+  --sparkline-color: var(--helix-color-series-7);
+}
+
+.series-8 {
+  --sparkline-color: var(--helix-color-series-8);
+}
