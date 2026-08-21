@@ -1836,16 +1836,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "attribute": "for"
-            },
-            {
-              "kind": "field",
               "name": "direction",
               "type": {
                 "text": "'horizontal' | undefined"
@@ -1853,23 +1843,6 @@
               "description": "Whether the categories run down the side rather than along the bottom.\n\nAbsent is columns. `horizontal` is the one to reach for when the category\nnames are words rather than dates: a row of long names either overlaps or\nturns on its side, and neither is as readable as putting them down the left\nwhere they read normally.",
               "attribute": "direction",
               "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "What the chart is, in a sentence, for the drawing's accessible name.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords already written once.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "source",
-              "privacy": "protected",
-              "readonly": true,
-              "default": "new SourceController(this)"
             },
             {
               "kind": "method",
@@ -1932,6 +1905,72 @@
                 }
               ],
               "description": "The category names, as HTML beside the drawing rather than inside it.\n\nInside, they would scale with the box: an `<svg>` that fills its container\nscales its type along with everything else, and there is no non-scaling\nequivalent for a font the way `vector-effect` is one for a stroke."
+            },
+            {
+              "kind": "field",
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)",
+              "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "series",
+              "type": {
+                "text": "Series[]"
+              },
+              "description": "The columns of the table, one series each, or none if there is no table.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "string"
+              },
+              "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
             },
             {
               "kind": "field",
@@ -2005,15 +2044,6 @@
           ],
           "attributes": [
             {
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "fieldName": "for"
-            },
-            {
               "name": "direction",
               "type": {
                 "text": "'horizontal' | undefined"
@@ -2022,13 +2052,36 @@
               "fieldName": "direction"
             },
             {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
               "name": "label",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "What the chart is, in a sentence, for the drawing's accessible name.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords already written once.",
-              "fieldName": "label"
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            }
+          ],
+          "mixins": [
+            {
+              "name": "MixinChartSource",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {
@@ -3496,7 +3549,7 @@
           "name": "HelixBaseCard",
           "slots": [
             {
-              "description": "Image or video that runs edge to edge, outside the inset.",
+              "description": "Image, video, or chart that runs edge to edge, outside the inset.",
               "name": "media"
             },
             {
@@ -3513,6 +3566,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "mediaPlacement",
+              "type": {
+                "text": "'end' | undefined"
+              },
+              "description": "Puts the media after the content instead of before it.\n\n**A figure that concludes a card is the same region as one that opens it**,\nand the only thing that differs is which edge it is flush against. Media is\nthe one region that escapes the inset, so a chart wanting to span the card\nhas nowhere else to be: slotted into the content it keeps the padding on\nboth sides, and there is no second bleeding region to add without saying\ntwice what this says once.\n\nReflected and undefaulted, so a card that has not asked reads as a card\nwith no attribute on it and the stylesheet only describes the departure.",
+              "attribute": "media-placement",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "internals",
@@ -3581,6 +3644,16 @@
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
               }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "media-placement",
+              "type": {
+                "text": "'end' | undefined"
+              },
+              "description": "Puts the media after the content instead of before it.\n\n**A figure that concludes a card is the same region as one that opens it**,\nand the only thing that differs is which edge it is flush against. Media is\nthe one region that escapes the inset, so a chart wanting to span the card\nhas nowhere else to be: slotted into the content it keeps the padding on\nboth sides, and there is no second bleeding region to add without saying\ntwice what this says once.\n\nReflected and undefaulted, so a card that has not asked reads as a card\nwith no attribute on it and the stylesheet only describes the departure.",
+              "fieldName": "mediaPlacement"
             }
           ],
           "superclass": {
@@ -14367,33 +14440,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "source",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new SourceController(this)"
-            },
-            {
-              "kind": "field",
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "attribute": "for"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
               "name": "shares",
               "type": {
                 "text": "{ fraction: number; start: number }[]"
@@ -14451,6 +14497,72 @@
                 }
               ],
               "description": "One slice, as a dash the length of its share."
+            },
+            {
+              "kind": "field",
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)",
+              "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "series",
+              "type": {
+                "text": "Series[]"
+              },
+              "description": "The columns of the table, one series each, or none if there is no table.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "string"
+              },
+              "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
             },
             {
               "kind": "field",
@@ -14522,24 +14634,10 @@
               }
             }
           ],
-          "attributes": [
+          "mixins": [
             {
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "fieldName": "for"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
-              "fieldName": "label"
+              "name": "MixinChartSource",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {
@@ -14564,6 +14662,34 @@
           },
           "tagName": "helix-base-donut-chart",
           "customElement": true,
+          "attributes": [
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            }
+          ],
           "modulePath": "src/donut-chart/root/donut-chart-root.ts",
           "definitionPath": "src/donut-chart/root/donut-chart-root.ts"
         }
@@ -20228,13 +20354,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "source",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new SourceController(this)"
-            },
-            {
-              "kind": "field",
               "name": "area",
               "type": {
                 "text": "boolean"
@@ -20253,26 +20372,6 @@
               "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between. `smooth` is easier to\nfollow across a long series and invents the values between the readings; it\nis monotone cubic, so what it invents never leaves the band the data sets.\n`step` claims the opposite, that a reading holds until the next.\n\nAbsent rather than defaulted to `straight`, because a reflecting property\nwith a default writes its attribute onto every host anybody renders,\nincluding the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts\nthe host carries only what the consumer wrote, and caught it.",
               "attribute": "curve",
               "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "attribute": "for"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
-              "attribute": "label"
             },
             {
               "kind": "field",
@@ -20386,6 +20485,72 @@
             },
             {
               "kind": "field",
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)",
+              "description": "Resolves `for` and re-renders when the table behind it changes.",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "series",
+              "type": {
+                "text": "Series[]"
+              },
+              "description": "The columns of the table, one series each, or none if there is no table.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "named",
+              "type": {
+                "text": "string"
+              },
+              "description": "What to call the drawing, the consumer's word or the table's own.\n\nThe fallback is the reason this is shared rather than copied: a caption is\nalready written, already the right words, and already the thing a reader\nof the table sees. A chart that made the consumer say it twice would be\nasking for the second one to drift.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -20473,13 +20638,26 @@
               "fieldName": "curve"
             },
             {
+              "name": "zero",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether zero is forced into the range.\n\nAbsent measures from the data's own extent, which is what a line is for.\nSet it where the distance from nothing is the point rather than the shape,\nand accept that a series which never approaches zero becomes a flat rule\nnear the top of the box.",
+              "fieldName": "zero"
+            },
+            {
               "name": "for",
               "type": {
                 "text": "string"
               },
               "default": "''",
               "description": "The id of the table to read.\n\nResolved through `getRootNode()`, so a chart inside another component's\nshadow root names a table in that root rather than in the document. A\n`<table>` or anything built from grid roles, including `helix-table`.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "fieldName": "for"
+              "fieldName": "for",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
             },
             {
               "name": "label",
@@ -20488,16 +20666,17 @@
               },
               "default": "''",
               "description": "The drawing's name, for a pointer resting on it.\n\nAbsent falls back to the table's own caption, which is usually the right\nwords and is already written.",
-              "fieldName": "label"
-            },
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "MixinChartSource",
+                "module": "src/mixins/mixin-chart-source/mixin-chart-source.ts"
+              }
+            }
+          ],
+          "mixins": [
             {
-              "name": "zero",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether zero is forced into the range.\n\nAbsent measures from the data's own extent, which is what a line is for.\nSet it where the distance from nothing is the point rather than the shape,\nand accept that a series which never approaches zero becomes a flat rule\nnear the top of the box.",
-              "fieldName": "zero"
+              "name": "MixinChartSource",
+              "package": "@helix-io/core"
             }
           ],
           "superclass": {

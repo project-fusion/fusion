@@ -719,6 +719,13 @@ export type HelixBaseBadgeSolidJsProps = {
 };
 
 export type HelixBaseBarChartProps = {
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  direction?: HelixBaseBarChart["direction"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -728,21 +735,21 @@ shadow root names a table in that root rather than in the document. A
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
   for?: HelixBaseBarChart["for"];
+  /** The drawing's name, for a pointer resting on it.
+
+Absent falls back to the table's own caption, which is usually the right
+words and is already written. */
+  label?: HelixBaseBarChart["label"];
+};
+
+export type HelixBaseBarChartSolidJsProps = {
   /** Whether the categories run down the side rather than along the bottom.
 
 Absent is columns. `horizontal` is the one to reach for when the category
 names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
-  direction?: HelixBaseBarChart["direction"];
-  /** What the chart is, in a sentence, for the drawing's accessible name.
-
-Absent falls back to the table's own caption, which is usually the right
-words already written once. */
-  label?: HelixBaseBarChart["label"];
-};
-
-export type HelixBaseBarChartSolidJsProps = {
+  "prop:direction"?: HelixBaseBarChart["direction"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -752,17 +759,10 @@ shadow root names a table in that root rather than in the document. A
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
   "prop:for"?: HelixBaseBarChart["for"];
-  /** Whether the categories run down the side rather than along the bottom.
-
-Absent is columns. `horizontal` is the one to reach for when the category
-names are words rather than dates: a row of long names either overlaps or
-turns on its side, and neither is as readable as putting them down the left
-where they read normally. */
-  "prop:direction"?: HelixBaseBarChart["direction"];
-  /** What the chart is, in a sentence, for the drawing's accessible name.
+  /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
-words already written once. */
+words and is already written. */
   "prop:label"?: HelixBaseBarChart["label"];
 
   /** Set the innerHTML of the element */
@@ -1013,9 +1013,59 @@ export type HelixBaseCalloutSolidJsProps = {
   textContent?: string | number;
 };
 
-export type HelixBaseCardProps = {};
+export type HelixBaseCardProps = {
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  "media-placement"?: HelixBaseCard["mediaPlacement"];
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  mediaPlacement?: HelixBaseCard["mediaPlacement"];
+};
 
 export type HelixBaseCardSolidJsProps = {
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  "attr:media-placement"?: HelixBaseCard["mediaPlacement"];
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  "prop:mediaPlacement"?: HelixBaseCard["mediaPlacement"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -4499,6 +4549,13 @@ with a default writes its attribute onto every host anybody renders,
 including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
 the host carries only what the consumer wrote, and caught it. */
   curve?: HelixBaseLineChart["curve"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  zero?: HelixBaseLineChart["zero"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -4513,13 +4570,6 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   label?: HelixBaseLineChart["label"];
-  /** Whether zero is forced into the range.
-
-Absent measures from the data's own extent, which is what a line is for.
-Set it where the distance from nothing is the point rather than the shape,
-and accept that a series which never approaches zero becomes a flat rule
-near the top of the box. */
-  zero?: HelixBaseLineChart["zero"];
 };
 
 export type HelixBaseLineChartSolidJsProps = {
@@ -4541,6 +4591,13 @@ with a default writes its attribute onto every host anybody renders,
 including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
 the host carries only what the consumer wrote, and caught it. */
   "prop:curve"?: HelixBaseLineChart["curve"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  "prop:zero"?: HelixBaseLineChart["zero"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -4555,13 +4612,6 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   "prop:label"?: HelixBaseLineChart["label"];
-  /** Whether zero is forced into the range.
-
-Absent measures from the data's own extent, which is what a line is for.
-Set it where the distance from nothing is the point rather than the shape,
-and accept that a series which never approaches zero becomes a flat rule
-near the top of the box. */
-  "prop:zero"?: HelixBaseLineChart["zero"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11959,6 +12009,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -11967,16 +12023,17 @@ export type CustomElements = {
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   * - `direction`: Whether the categories run down the side rather than along the bottom.
-   *
-   * Absent is columns. `horizontal` is the one to reach for when the category
-   * names are words rather than dates: a row of long names either overlaps or
-   * turns on its side, and neither is as readable as putting them down the left
-   * where they read normally.
-   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   * - `label`: The drawing's name, for a pointer resting on it.
    *
    * Absent falls back to the table's own caption, which is usually the right
-   * words already written once.
+   * words and is already written.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -12391,11 +12448,27 @@ export type CustomElements = {
    * naming that survives server rendering: reading a title out of the light DOM
    * needs a DOM, and the server has none.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
+   *
+   * **A figure that concludes a card is the same region as one that opens it**,
+   * and the only thing that differs is which edge it is flush against. Media is
+   * the one region that escapes the inset, so a chart wanting to span the card
+   * has nowhere else to be: slotted into the content it keeps the padding on
+   * both sides, and there is no second bleeding region to add without saying
+   * twice what this says once.
+   *
+   * Reflected and undefaulted, so a card that has not asked reads as a card
+   * with no attribute on it and the stylesheet only describes the departure.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
    * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
@@ -14456,6 +14529,13 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## Slots
    *
@@ -15538,6 +15618,12 @@ export type CustomElements = {
    * with a default writes its attribute onto every host anybody renders,
    * including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
    * the host carries only what the consumer wrote, and caught it.
+   * - `zero`: Whether zero is forced into the range.
+   *
+   * Absent measures from the data's own extent, which is what a line is for.
+   * Set it where the distance from nothing is the point rather than the shape,
+   * and accept that a series which never approaches zero becomes a flat rule
+   * near the top of the box.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -15550,12 +15636,13 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
-   * - `zero`: Whether zero is forced into the range.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
-   * Absent measures from the data's own extent, which is what a line is for.
-   * Set it where the distance from nothing is the point rather than the shape,
-   * and accept that a series which never approaches zero becomes a flat rule
-   * near the top of the box.
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -22461,6 +22548,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `direction`: Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -22469,16 +22562,17 @@ export type CustomElementsSolidJs = {
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   * - `direction`: Whether the categories run down the side rather than along the bottom.
-   *
-   * Absent is columns. `horizontal` is the one to reach for when the category
-   * names are words rather than dates: a row of long names either overlaps or
-   * turns on its side, and neither is as readable as putting them down the left
-   * where they read normally.
-   * - `label`: What the chart is, in a sentence, for the drawing's accessible name.
+   * - `label`: The drawing's name, for a pointer resting on it.
    *
    * Absent falls back to the table's own caption, which is usually the right
-   * words already written once.
+   * words and is already written.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## CSS Parts
    *
@@ -22914,11 +23008,27 @@ export type CustomElementsSolidJs = {
    * naming that survives server rendering: reading a title out of the light DOM
    * needs a DOM, and the server has none.
    *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
+   *
+   * **A figure that concludes a card is the same region as one that opens it**,
+   * and the only thing that differs is which edge it is flush against. Media is
+   * the one region that escapes the inset, so a chart wanting to span the card
+   * has nowhere else to be: slotted into the content it keeps the padding on
+   * both sides, and there is no second bleeding region to add without saying
+   * twice what this says once.
+   *
+   * Reflected and undefaulted, so a card that has not asked reads as a card
+   * with no attribute on it and the stylesheet only describes the departure.
+   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
    *
-   * - `media`: Image or video that runs edge to edge, outside the inset.
+   * - `media`: Image, video, or chart that runs edge to edge, outside the inset.
    * - `header`: Title and any actions for the whole card.
    * - `(default)`: The card's main content.
    * - `footer`: Actions that conclude the card.
@@ -25024,6 +25134,13 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
+   *
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## Slots
    *
@@ -26142,6 +26259,12 @@ export type CustomElementsSolidJs = {
    * with a default writes its attribute onto every host anybody renders,
    * including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
    * the host carries only what the consumer wrote, and caught it.
+   * - `zero`: Whether zero is forced into the range.
+   *
+   * Absent measures from the data's own extent, which is what a line is for.
+   * Set it where the distance from nothing is the point rather than the shape,
+   * and accept that a series which never approaches zero becomes a flat rule
+   * near the top of the box.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -26154,12 +26277,13 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
-   * - `zero`: Whether zero is forced into the range.
+   * - `series`: The columns of the table, one series each, or none if there is no table. (property only) (readonly)
+   * - `named`: What to call the drawing, the consumer's word or the table's own.
    *
-   * Absent measures from the data's own extent, which is what a line is for.
-   * Set it where the distance from nothing is the point rather than the shape,
-   * and accept that a series which never approaches zero becomes a flat rule
-   * near the top of the box.
+   * The fallback is the reason this is shared rather than copied: a caption is
+   * already written, already the right words, and already the thing a reader
+   * of the table sees. A chart that made the consumer say it twice would be
+   * asking for the second one to drift. (property only) (readonly)
    *
    * ## CSS Parts
    *

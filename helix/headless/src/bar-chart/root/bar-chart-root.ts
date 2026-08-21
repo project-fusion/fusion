@@ -3,18 +3,15 @@ import {
   extent,
   HelixElement,
   linear,
-  readSeries,
+  MixinChartSource,
   type Series,
-  SourceController,
+  seriesIndex,
 } from '@helix-io/core'
-import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
+import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /** The drawing's own coordinates. Height only: the width is the element's. */
 const HEIGHT = 100
-
-/** How many colours the series palette has, and so where it starts over. */
-const PALETTE = 24
 
 /**
  * @summary Categories as columns, read from a table.
@@ -54,20 +51,7 @@ const PALETTE = 24
  * @csspart plot - The drawing.
  */
 @customElement('helix-base-bar-chart')
-export class HelixBaseBarChart extends HelixElement {
-  /**
-   * The id of the table to read.
-   *
-   * Resolved through `getRootNode()`, so a chart inside another component's
-   * shadow root names a table in that root rather than in the document. A
-   * `<table>` or anything built from grid roles, including `helix-table`.
-   *
-   * **In React this arrives as a property and not as an attribute**, the way
-   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   */
-  @property()
-  for = ''
-
+export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
   /**
    * Whether the categories run down the side rather than along the bottom.
    *
@@ -79,29 +63,8 @@ export class HelixBaseBarChart extends HelixElement {
   @property({ reflect: true })
   direction?: 'horizontal'
 
-  /**
-   * What the chart is, in a sentence, for the drawing's accessible name.
-   *
-   * Absent falls back to the table's own caption, which is usually the right
-   * words already written once.
-   */
-  @property()
-  label = ''
-
-  /* One controller rather than the resolve-and-watch each chart had written
-     out for itself. Three copies had already drifted into two names for the
-     same lookup. */
-  protected readonly source = new SourceController(this)
-
-  protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has('for')) {
-      this.source.watch()
-    }
-  }
-
   protected override render(): TemplateResult {
-    const source = this.source.element
-    const series: Series[] = source ? readSeries(source) : []
+    const series = this.series
     const categories = series[0]?.points.map((point) => point.label) ?? []
     if (categories.length === 0) {
       return html`<div part="plot"></div>`
@@ -127,7 +90,7 @@ export class HelixBaseBarChart extends HelixElement {
       this.direction === 'horizontal' ? linear(domain, [0, HEIGHT]) : linear(domain, [HEIGHT, 0])
     const floor = y(0)
 
-    const named = this.label || source?.querySelector('caption')?.textContent?.trim() || ''
+    const named = this.named
 
     return html`${this.renderPlot(series, categories, y, floor, named)}
       ${this.renderLabels(categories)}`
@@ -167,7 +130,7 @@ export class HelixBaseBarChart extends HelixElement {
       const across = index * slot + slot * 0.14 + depth * thickness
       return sideways
         ? svg`<rect
-            data-series=${(depth % PALETTE) + 1}
+            data-series=${seriesIndex(depth)}
             height=${thickness}
             part="bar"
             width=${size}
@@ -175,7 +138,7 @@ export class HelixBaseBarChart extends HelixElement {
             y=${across}
           />`
         : svg`<rect
-            data-series=${(depth % PALETTE) + 1}
+            data-series=${seriesIndex(depth)}
             height=${size}
             part="bar"
             width=${thickness}

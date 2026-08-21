@@ -376,6 +376,13 @@ export type HelixBaseBadgeVueProps = {
 export type HelixBaseBadgeVueEvents = {};
 
 export type HelixBaseBarChartVueProps = {
+  /** Whether the categories run down the side rather than along the bottom.
+
+Absent is columns. `horizontal` is the one to reach for when the category
+names are words rather than dates: a row of long names either overlaps or
+turns on its side, and neither is as readable as putting them down the left
+where they read normally. */
+  direction?: HelixBaseBarChart["direction"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -385,17 +392,10 @@ shadow root names a table in that root rather than in the document. A
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
   for?: HelixBaseBarChart["for"];
-  /** Whether the categories run down the side rather than along the bottom.
-
-Absent is columns. `horizontal` is the one to reach for when the category
-names are words rather than dates: a row of long names either overlaps or
-turns on its side, and neither is as readable as putting them down the left
-where they read normally. */
-  direction?: HelixBaseBarChart["direction"];
-  /** What the chart is, in a sentence, for the drawing's accessible name.
+  /** The drawing's name, for a pointer resting on it.
 
 Absent falls back to the table's own caption, which is usually the right
-words already written once. */
+words and is already written. */
   label?: HelixBaseBarChart["label"];
 };
 
@@ -519,7 +519,32 @@ export type HelixBaseCalloutVueProps = {
 
 export type HelixBaseCalloutVueEvents = {};
 
-export type HelixBaseCardVueProps = {};
+export type HelixBaseCardVueProps = {
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  "media-placement"?: HelixBaseCard["mediaPlacement"];
+  /** Puts the media after the content instead of before it.
+
+**A figure that concludes a card is the same region as one that opens it**,
+and the only thing that differs is which edge it is flush against. Media is
+the one region that escapes the inset, so a chart wanting to span the card
+has nowhere else to be: slotted into the content it keeps the padding on
+both sides, and there is no second bleeding region to add without saying
+twice what this says once.
+
+Reflected and undefaulted, so a card that has not asked reads as a card
+with no attribute on it and the stylesheet only describes the departure. */
+  mediaPlacement?: HelixBaseCard["mediaPlacement"];
+};
 
 export type HelixBaseCardVueEvents = {};
 
@@ -2359,6 +2384,13 @@ with a default writes its attribute onto every host anybody renders,
 including the ones nobody configured. `line-chart-root.ssr.spec.ts` asserts
 the host carries only what the consumer wrote, and caught it. */
   curve?: HelixBaseLineChart["curve"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  zero?: HelixBaseLineChart["zero"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -2373,13 +2405,6 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   label?: HelixBaseLineChart["label"];
-  /** Whether zero is forced into the range.
-
-Absent measures from the data's own extent, which is what a line is for.
-Set it where the distance from nothing is the point rather than the shape,
-and accept that a series which never approaches zero becomes a flat rule
-near the top of the box. */
-  zero?: HelixBaseLineChart["zero"];
 };
 
 export type HelixBaseLineChartVueEvents = {};

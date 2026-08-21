@@ -1,12 +1,5 @@
-import {
-  customElement,
-  HelixElement,
-  readSeries,
-  type Series,
-  SourceController,
-} from '@helix-io/core'
+import { customElement, HelixElement, MixinChartSource, seriesIndex } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
 
 /** The drawing's own coordinates, square because the shape has to stay round. */
 const BOX = 100
@@ -15,9 +8,6 @@ const CENTRE = BOX / 2
 /** Where the ring is drawn, leaving room for the stroke on either side. */
 const RADIUS = 40
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
-
-/** How many colours the series palette has, and so where it starts over. */
-const PALETTE = 24
 
 /**
  * @summary Parts of a whole as a ring, read from a table.
@@ -62,35 +52,10 @@ const PALETTE = 24
  * @slot - Goes in the middle of the ring. A total, usually.
  */
 @customElement('helix-base-donut-chart')
-export class HelixBaseDonutChart extends HelixElement {
-  private readonly source = new SourceController(this)
-
-  /**
-   * The id of the table to read.
-   *
-   * Resolved through `getRootNode()`, so a chart inside another component's
-   * shadow root names a table in that root rather than in the document. A
-   * `<table>` or anything built from grid roles, including `helix-table`.
-   *
-   * **In React this arrives as a property and not as an attribute**, the way
-   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   */
-  @property()
-  for = ''
-
-  /**
-   * The drawing's name, for a pointer resting on it.
-   *
-   * Absent falls back to the table's own caption, which is usually the right
-   * words and is already written.
-   */
-  @property()
-  label = ''
-
+export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
   /** The slices, in table order, with anything negative dropped. */
   private get shares(): { fraction: number; start: number }[] {
-    const source = this.source.element
-    const series: Series[] = source ? readSeries(source) : []
+    const series = this.series
     const values = (series[0]?.points ?? [])
       .map((point) => point.value)
       .map((value) => (Number.isFinite(value) && value > 0 ? value : 0))
@@ -108,9 +73,8 @@ export class HelixBaseDonutChart extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const source = this.source.element
     const shares = this.shares
-    const named = this.label || source?.querySelector('caption')?.textContent?.trim() || ''
+    const named = this.named
     return html`${this.renderPlot(shares, named)}
       <div part="centre"><slot></slot></div>`
   }
@@ -146,7 +110,7 @@ export class HelixBaseDonutChart extends HelixElement {
     return svg`<circle
       cx=${CENTRE}
       cy=${CENTRE}
-      data-series=${(index % PALETTE) + 1}
+      data-series=${seriesIndex(index)}
       fill="none"
       part="segment"
       r=${RADIUS}

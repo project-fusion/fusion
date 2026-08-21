@@ -5,10 +5,10 @@ import {
   HelixElement,
   linear,
   linePath,
+  MixinChartSource,
   type Point,
-  readSeries,
   type Series,
-  SourceController,
+  seriesIndex,
 } from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -16,9 +16,6 @@ import { property } from 'lit/decorators.js'
 /** The drawing's own coordinates. */
 const WIDTH = 100
 const HEIGHT = 100
-
-/** How many colours the series palette has, and so where it starts over. */
-const PALETTE = 24
 
 /**
  * @summary A series over time as a line, read from a table.
@@ -62,9 +59,7 @@ const PALETTE = 24
  * @csspart plot - The drawing.
  */
 @customElement('helix-base-line-chart')
-export class HelixBaseLineChart extends HelixElement {
-  private readonly source = new SourceController(this)
-
+export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
   /**
    * Whether a wash is drawn under each line.
    *
@@ -92,28 +87,6 @@ export class HelixBaseLineChart extends HelixElement {
   curve?: Curve
 
   /**
-   * The id of the table to read.
-   *
-   * Resolved through `getRootNode()`, so a chart inside another component's
-   * shadow root names a table in that root rather than in the document. A
-   * `<table>` or anything built from grid roles, including `helix-table`.
-   *
-   * **In React this arrives as a property and not as an attribute**, the way
-   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   */
-  @property()
-  for = ''
-
-  /**
-   * The drawing's name, for a pointer resting on it.
-   *
-   * Absent falls back to the table's own caption, which is usually the right
-   * words and is already written.
-   */
-  @property()
-  label = ''
-
-  /**
    * Whether zero is forced into the range.
    *
    * Absent measures from the data's own extent, which is what a line is for.
@@ -125,8 +98,7 @@ export class HelixBaseLineChart extends HelixElement {
   zero = false
 
   protected override render(): TemplateResult {
-    const source = this.source.element
-    const series: Series[] = source ? readSeries(source) : []
+    const series = this.series
     const readings = series[0]?.points.map((point) => point.label) ?? []
     if (readings.length === 0) {
       return html`<div part="plot"></div>`
@@ -153,7 +125,7 @@ export class HelixBaseLineChart extends HelixElement {
     const slot = WIDTH / readings.length
     const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, WIDTH - slot / 2])
 
-    const named = this.label || source?.querySelector('caption')?.textContent?.trim() || ''
+    const named = this.named
 
     return html`${this.renderPlot(series, x, y, domain, named)} ${this.renderLabels(readings)}`
   }
@@ -204,7 +176,7 @@ export class HelixBaseLineChart extends HelixElement {
     if (path === '') {
       return html`${nothing}`
     }
-    const index = (depth % PALETTE) + 1
+    const index = seriesIndex(depth)
     /* Closed along the floor of the box and back, which is what makes it
        fillable: a `<path>` is filled between its own ends, so an open line
        fills the region between the stroke and the straight line joining its

@@ -447,8 +447,10 @@ it is measured against.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
-| `for` | `for` | `string` | `''` | `HelixBaseBarChart` | The id of the table to read. |
-| `label` | `label` | `string` | `''` | `HelixBaseBarChart` | What the chart is, in a sentence, for the drawing's accessible name. |
+| `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 
 #### Parts
 
@@ -745,7 +747,9 @@ no wrapper markup at all.
 
 `media` runs edge to edge and clips to the card's corners, so an image needs
 no inset correction. Set `orientation="horizontal"` to move it alongside the
-header, content, and footer stack rather than above it.
+header, content, and footer stack rather than above it, or
+`media-placement="end"` to put it under the content instead of over it, which
+is what a chart concluding a card wants.
 
 Regions are bare slots with no wrapper element, so an omitted one occupies no
 space without the card having to detect that it is missing. Style slotted
@@ -757,13 +761,14 @@ element you slotted, not a wrapper around it.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `appearance` | `appearance` | `'outlined' \| 'elevated' \| 'plain' \| undefined` | - | - | How the card separates itself from the page. |
+| `mediaPlacement` | `media-placement` | `'end' \| undefined` | - | `HelixBaseCard` | Puts the media after the content instead of before it. |
 | `orientation` | `orientation` | `'vertical' \| 'horizontal' \| undefined` | - | - | Whether media sits above the content stack or beside it. |
 
 #### Slots
 
 | Slot | Description |
 | --- | --- |
-| `media` | Image or video that runs edge to edge, outside the inset. |
+| `media` | Image, video, or chart that runs edge to edge, outside the inset. |
 | `header` | Title and any actions for the whole card. |
 | *(default)* | The card's main content. |
 | `footer` | Actions that conclude the card. |
@@ -1807,8 +1812,10 @@ still reads as a ring with a gap rather than as a broken arc.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `for` | `for` | `string` | `''` | `HelixBaseDonutChart` | The id of the table to read. |
-| `label` | `label` | `string` | `''` | `HelixBaseDonutChart` | The drawing's name, for a pointer resting on it. |
+| `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 
 #### Slots
 
@@ -2554,8 +2561,10 @@ answers for a shape.
 | --- | --- | --- | --- | --- | --- |
 | `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
-| `for` | `for` | `string` | `''` | `HelixBaseLineChart` | The id of the table to read. |
-| `label` | `label` | `string` | `''` | `HelixBaseLineChart` | The drawing's name, for a pointer resting on it. |
+| `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
+| `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
+| `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
+| `series` | - | `Series[]` | - | `MixinChartSource` | The columns of the table, one series each, or none if there is no table. |
 | `zero` | `zero` | `boolean` | `false` | `HelixBaseLineChart` | Whether zero is forced into the range. |
 
 #### Parts
