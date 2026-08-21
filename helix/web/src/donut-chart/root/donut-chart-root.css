@@ -88,10 +88,28 @@
  * Overflow is left visible on purpose. Clipping a total that does not fit would
  * hide the problem rather than show it, and a consumer who wants a bigger hole
  * has the thickness hook. */
-/* Slotted content inherits through the slot, so this is where the hole's own
-   size reaches it. */
+/* The hole tells its contents how big it is, twice, because one number cannot
+   say it to everything.
+ *
+ * **`font-size` is what plain content comes out at.** Anything slotted that
+ * does not resize itself, a number in a span, a word, is drawn at this and
+ * scales with the ring.
+ *
+ * **`--stat-value-size` is what a `Stat` comes out at**, and it has to be said
+ * separately because a `Stat` multiplies what it inherits by a little over
+ * three. One base tuned to that multiplier was the previous version, and it
+ * sized a `Stat` correctly and everything else at a third of what it should be:
+ * measured, plain text at 14px in a 179px hole, which reads as type that does
+ * not scale at all. A component naming another component's hook is explicit
+ * where a magic base is not, and `Stat` is what the examples put here.
+ *
+ * The two are different numbers because they are different jobs: a total is the
+ * figure a reader looks at, and plain text in a hole is more often a word beside
+ * one. */
 [part="centre"] slot {
-  font-size: 8cqi;
+  --stat-value-size: 24cqi;
+
+  font-size: 13cqi;
 }
 
 [part="centre"] {
