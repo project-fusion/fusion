@@ -48,7 +48,23 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const STYLES = 'helix/styles/src'
+/* **The base layer and the site, because both are document stylesheets.**
+ *
+ * This scanned `helix/styles` alone, on the reading that the base layer is where
+ * a document rule naming a `helix-*` tag comes from. An app is the other place,
+ * and it turns out to be the more likely one: a consumer writing a rule for a
+ * component they are using has no reason to know that it beats the component's
+ * own, whatever the specificity and whatever the layer.
+ *
+ * Three landed in `site/ui` in a single session and each looked like something
+ * else. `.showcaseCard { display: block }` beat `:host { display: grid }`, so
+ * every card in the panel was a block and the region gap did nothing.
+ * `.showcaseTrendLine { inline-size: 100% }` would have held a full-bleed chart
+ * to the content width. `.reelAura { pointer-events: none }` overruled
+ * `:host([interactive])`, so an aura asked for the pointer and reported that it
+ * refused it. None of the three errored, and the check that exists for exactly
+ * this was not looking. */
+const STYLES = ['helix/styles/src', 'site/ui/app']
 /** Every `.css` under a directory, skipping the generated `.css.ts` beside it. */
 const stylesheets = (dir) => {
   const found = []
@@ -117,7 +133,7 @@ const problems = []
 
 /* The document side: every rule in the styles tier that names a component. */
 const documentRules = []
-for (const path of stylesheets(STYLES)) {
+for (const path of STYLES.flatMap((dir) => stylesheets(dir))) {
   for (const rule of rules(readFileSync(path, 'utf8'))) {
     const hit = reaches(rule.selector)
     if (hit) {
@@ -128,7 +144,21 @@ for (const path of stylesheets(STYLES)) {
 
 /* The component side: what each stylesheet declares for its host and its slots. */
 for (const path of stylesheets('helix/web/src')) {
-  const family = path.split('/').at(-3)
+  /* **The element this file styles, not the family it lives in.**
+   *
+   * This read the family from the directory and compared every stylesheet in it
+   * against a rule naming `helix-<family>`, so a document rule for the root was
+   * held against each of the family's parts. Harmless while only the base layer
+   * was scanned and wrong the moment the site was: `.workbenchMain
+   * helix-sandbox` setting `block-size` was reported against
+   * `sandbox-toolbar.css`, whose `:host` is `helix-sandbox-toolbar` and which
+   * the rule cannot reach.
+   *
+   * A part's tag is its file name, which is how the composition plugin reads
+   * this tree too: `sandbox/root/sandbox-root.css` is `helix-sandbox` and
+   * `sandbox/toolbar/sandbox-toolbar.css` is `helix-sandbox-toolbar`. */
+  const [family, part] = path.split('/').slice(-3, -1)
+  const tag = part === 'root' ? `helix-${family}` : `helix-${family}-${part}`
   const owned = new Set()
   for (const rule of rules(readFileSync(path, 'utf8'))) {
     if (!/::slotted\(|:host/.test(rule.selector)) {
@@ -139,7 +169,7 @@ for (const path of stylesheets('helix/web/src')) {
     }
   }
   for (const rule of documentRules) {
-    if (rule.tag !== `helix-${family}`) {
+    if (rule.tag !== tag) {
       continue
     }
     const dead = [...rule.properties].filter((property) => owned.has(property))
