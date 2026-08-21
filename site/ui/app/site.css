@@ -2738,6 +2738,23 @@ helix-drawer helix-tree {
  * `auto` rather than a length would push it to the far edge, which is what a
  * toolbar does with a trailing control and is wrong for a button: the two would
  * stop being one object as soon as the button was wider than its content. */
+/* **The same glass as the panel it opens.**
+ *
+ * A trigger and the thing it summons reading as one material is what makes the
+ * palette feel like it came out of the button rather than over it. The tokens
+ * are the panel's, not a second set tuned by eye: `translucent` at the same 72%
+ * and the same blur, so if the material ever moves both move together.
+ *
+ * `--button-background-color` is `Button`'s own hook, so this is a fill the
+ * component was built to take rather than a document rule reaching past it. The
+ * blur has to be set directly, there being no hook for a filter and no reason
+ * for one: it is a property of this surface rather than of buttons. */
+.siteFind {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+
+  --button-background-color: var(--helix-material-translucent);
+}
+
 .siteFind helix-kbd {
   margin-inline-start: var(--helix-space-sm);
 }
