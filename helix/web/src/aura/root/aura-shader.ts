@@ -81,6 +81,14 @@ export const FRAGMENT = `#version 300 es
   uniform float uScale;
   uniform float uBloom;
   uniform float uGain;
+
+  /* How much the members of a population differ from one another, 1 being the
+     resting amount and 0 a set that is uniform. Only the shapes that are made
+     of many similar things read it: streaks has lanes and particles has motes.
+     A shape with a single subject has no population to vary, and threads is
+     deliberately even, so on the other seven this is inert by design rather
+     than unimplemented. */
+  uniform float uVariance;
   /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
      was left to 1 when it has faded, so a spent slot costs a compare.
 
@@ -433,13 +441,30 @@ export const FRAGMENT = `#version 300 es
       float id = base + float(k);
       float within = laneF - (id + 0.5);
 
-      float speed = 0.55 + hash(vec2(id, 11.0)) * 1.5;
+      /* Speed and length were already drawn per lane, and measure a little over
+         four times and seventy times across a frame. What was not drawn was
+         width, which came out flat at 47 to 53 pixels on every lane, so a set
+         that moved variously was still a set of identical objects.
+    
+         All four now scale from a common resting value, so a variance of 0 is a
+         rank of equal streaks at one speed rather than a special case. Phase is
+         never scaled: lanes sharing a phase march in lockstep, which is not a
+         uniform population but a broken one. */
+      /* Clamped, and the upper half of that is not defensive tidying. These
+         are mix() calls, so a value past 1 extrapolates rather than
+         exaggerating: at 1.6 the length term reaches zero and beyond it goes
+         negative, which makes exp(-behind / len) grow instead of decay and the
+         lane becomes a full-height white bar. Measured at 2, the frame held 93
+         apparent lanes and six straight edges. There is nothing above 1 worth
+         reaching, the resting spread already being fourfold in speed. */
+      float v = clamp(uVariance, 0.0, 1.0);
+      float speed = mix(1.3, 0.55 + hash(vec2(id, 11.0)) * 1.5, v);
       float phase = hash(vec2(id, 29.0));
       float head = fract(phase + t * speed * 0.5) * 3.6 - 1.8;
 
       float ahead = s.y - head;
       float behind = max(-ahead, 0.0);
-      float len = 0.3 + hash(vec2(id, 47.0)) * 1.0;
+      float len = mix(0.8, 0.3 + hash(vec2(id, 47.0)) * 1.0, v);
       /* The head is a soft nose, not a cut. At 0.07 the leading edge crossed
          two per cent of the frame, which against a bright trail on a dark field
          is a straight line rather than the front of something moving. */
@@ -454,7 +479,23 @@ export const FRAGMENT = `#version 300 es
          step between them lands on a dark field where a hundredth still reads.
          At 4 the profiles cross well inside each other and there is no boundary
          left to see. */
-      lit += trail * falloff(within * within, 4.0);
+      /* Width, bounded below at 4 and never broader. Broad is what makes the
+         neighbours overlap enough to leave no lane boundary to see, so the
+         variety is spent on the narrow side only: at 3 the lane two cells away
+         still carries about a hundredth as it drops out of the visited set, and
+         a hundredth on a dark field is the vertical line this loop exists to
+         remove.
+    
+         Capped as well as floored, because a property must not be able to break
+         the shape it varies. A variance of 1.6 put this at 8, which is near the
+         9 the three-lane blend was written to get away from, and measured four
+         straight edges back across the frame. */
+      float narrow = min(mix(4.0, 4.0 + hash(vec2(id, 71.0)) * 2.5, v), 6.5);
+
+      /* And a weight per lane, so they do not all sit at the same distance. */
+      float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
+
+      lit += trail * weight * falloff(within * within, narrow);
     }
     float grain = fbm(vec2(s.x * 3.0, s.y * 1.4 - t * 1.6));
     return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
@@ -559,15 +600,25 @@ export const FRAGMENT = `#version 300 es
         vec2 c = cell + vec2(float(i), float(j));
         float a = hash(c);
         float b = hash(c + 17.3);
+        float v = clamp(uVariance, 0.0, 1.0);
         vec2 at = (c + 0.5 + (vec2(a, b) - 0.5) * 0.85) / 2.6;
-        at += vec2(sin(t * (0.5 + a) + b * 6.28), cos(t * (0.42 + b) + a * 6.28)) * 0.07;
+        at += vec2(
+          sin(t * mix(1.0, 0.5 + a, v) + b * 6.28),
+          cos(t * mix(1.0, 0.42 + b, v) + a * 6.28)
+        ) * 0.07;
 
         vec2 away = at - qp;
         float push = falloff(dot(away, away), 2.2) * reach;
         at += away * push * 0.55;
 
         vec2 off = q - at;
-        lit += falloff(dot(off, off), 52.0) * (0.35 + a * 0.9);
+        /* Size, which was flat at 52 for every mote, so a field whose members
+           already differed in brightness and in how fast they wandered was
+           still made of one object repeated. Nine cells are visited here, so
+           unlike a streak lane a mote may be broader as well as tighter
+           without leaving an edge anywhere. */
+        float grade = mix(52.0, 52.0 * (0.62 + hash(c + 5.7) * 0.95), v);
+        lit += falloff(dot(off, off), grade) * mix(0.8, 0.35 + a * 0.9, v);
       }
     }
     return lit * falloff(dot(q, q), 0.4);

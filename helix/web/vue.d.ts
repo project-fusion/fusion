@@ -428,6 +428,18 @@ this listens for. Asking for the pointer is asking for the hit test. */
   speed?: HelixAura["speed"];
   /** The field's rotation, in degrees. */
   tilt?: HelixAura["tilt"];
+  /** How much the members of a population differ from one another, `0` a set
+that is uniform and `1` the resting amount. Clamped to that range: these
+are interpolations, so a larger number extrapolates rather than
+exaggerating, and a streak whose length has passed through zero is drawn
+as a bar across the whole frame.
+
+Read only by the shapes that are made of many similar things: `streaks`,
+whose lanes draw a speed, a length, a width and a weight apiece, and
+`particles`, whose motes draw a size, a brightness and a wander. A shape
+with one subject has no population to vary, and `threads` is even on
+purpose, so on the remaining seven this is inert. */
+  variance?: HelixAura["variance"];
 };
 
 export type HelixAuraVueEvents = {};

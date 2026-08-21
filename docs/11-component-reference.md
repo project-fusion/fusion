@@ -283,6 +283,7 @@ takes no pointer events.
     \| 'waves' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
 | `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
 | `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
+| `variance` | `variance` | `number` | `1` | - | How much the members of a population differ from one another, `0` a set that is uniform and `1` the resting amount. Clamped to that range: these are interpolations, so a larger number extrapolates rather than exaggerating, and a streak whose length has passed through zero is drawn as a bar across the whole frame. |
 
 #### Parts
 

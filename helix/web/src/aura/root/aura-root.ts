@@ -153,6 +153,22 @@ export class HelixAura extends HelixElement {
   @property({ type: Number })
   tilt = 14
 
+  /**
+   * How much the members of a population differ from one another, `0` a set
+   * that is uniform and `1` the resting amount. Clamped to that range: these
+   * are interpolations, so a larger number extrapolates rather than
+   * exaggerating, and a streak whose length has passed through zero is drawn
+   * as a bar across the whole frame.
+   *
+   * Read only by the shapes that are made of many similar things: `streaks`,
+   * whose lanes draw a speed, a length, a width and a weight apiece, and
+   * `particles`, whose motes draw a size, a brightness and a wander. A shape
+   * with one subject has no population to vary, and `threads` is even on
+   * purpose, so on the remaining seven this is inert.
+   */
+  @property({ type: Number })
+  variance = 1
+
   /** Repaints when the palette moves, which no re-render would do on its own. */
   private readonly tokens = new TokenColorController(this, () => {
     this.readPalette()
@@ -294,6 +310,7 @@ export class HelixAura extends HelixElement {
       'uTilt',
       'uTime',
       'uTrail',
+      'uVariance',
     ]) {
       this.uniforms[name] = this.gl.getUniformLocation(this.program, name)
     }
@@ -468,6 +485,7 @@ export class HelixAura extends HelixElement {
     gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
     gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
     gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
+    gl.uniform1f(uniforms.uVariance ?? null, this.variance)
     /* Unrolled oldest first, with the live head appended last. `trailNext` is
        the next slot to be written and so the oldest again, now that the head no
        longer lives in the ring. */

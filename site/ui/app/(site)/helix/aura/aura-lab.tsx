@@ -54,7 +54,18 @@ const KNOBS = [
   { key: 'gain', label: 'Gain', max: 2.5, min: 0.2, step: 0.05 },
   { key: 'drift', label: 'Drift', max: 1, min: 0, step: 0.05 },
   { key: 'reach', label: 'Reach', max: 2, min: 0, step: 0.05 },
+  /* Capped at 1, which is the property's own range: past it the shader is
+     extrapolating between a resting value and a random one rather than
+     exaggerating, and a streak's length crosses zero. */
+  { key: 'variance', label: 'Variance', max: 1, min: 0, step: 0.05 },
 ] as const
+
+/**
+ * Which shapes read `variance`, so the bench can say so rather than offering a
+ * control that silently does nothing on seven of the nine. It is the shapes
+ * made of a population: lanes, and motes.
+ */
+const VARIES = new Set(['particles', 'streaks'])
 
 type Knob = (typeof KNOBS)[number]['key']
 
@@ -66,6 +77,7 @@ const RESTING: Record<Knob, number> = {
   scale: 1,
   speed: 1,
   tilt: 14,
+  variance: 1,
 }
 
 /**
@@ -105,6 +117,7 @@ export function AuraLab(): React.ReactElement {
           shape={current?.name}
           speed={knobs.speed}
           tilt={knobs.tilt}
+          variance={knobs.variance}
         ></helix-aura>
       </div>
       <div className="auraScrim" />
@@ -184,9 +197,17 @@ export function AuraLab(): React.ReactElement {
             </helix-flex>
           </helix-flex>
 
-          <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="8.5rem">
+          {/* 7.5rem, not 8.5: the bar is one flat row and an eighth knob has to fit
+              in it. At 1280 the grid is 1184 wide and auto-fit gave seven tracks
+              of 148.57, so variance wrapped and the bar grew from 235 to 302.
+              Eight tracks and seven 24px gaps leave 127 apiece, so the floor has
+              to sit under that. */}
+          <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="7.5rem">
             {KNOBS.map((knob) => (
               <helix-slider
+                disabled={
+                  (knob.key === 'variance' && !VARIES.has(current?.name ?? '')) || undefined
+                }
                 key={knob.key}
                 label={knob.label}
                 max={knob.max}
