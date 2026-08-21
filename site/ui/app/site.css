@@ -2833,6 +2833,31 @@ helix-drawer helix-tree {
   justify-content: space-between;
 }
 
+/* **The hints, spaced as groups.**
+ *
+ * A row of them, each holding its keys and the word for what they do. The gap
+ * between groups is the larger of the two so the grouping is visible before any
+ * of it is read: `sm` inside a hint, `lg` between hints. Read as one sentence
+ * with commas, three hints and six words needed punctuation to be told apart,
+ * which is work a layout can do for free.
+ *
+ * The keys keep their own `Kbd` margin against the word beside them, which the
+ * trigger in the masthead already sets, so a key and its label are one object
+ * in both places. */
+.siteCommandHints {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-lg);
+}
+
+.siteCommandHints span {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
 .siteCommandMark {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-display);

@@ -425,15 +425,31 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             ))}
           </helix-option-group>
         ))}
-        <helix-text slot="footer" tone="subtle">
-          <helix-kbd>↑</helix-kbd>
-          <helix-kbd>↓</helix-kbd>
-          to move,
-          <helix-kbd>↵</helix-kbd>
-          to go,
-          <helix-kbd>Esc</helix-kbd>
-          to close
-        </helix-text>
+        {/* **Three hints, and each one is a group rather than a clause.**
+            They were a single sentence with commas doing the separating, which
+            asks a reader to parse punctuation to find out where one key's job
+            ends and the next begins. A key and the word for what it does are
+            one object; the space between objects is what says so, and a comma
+            in a legend of six words is the wrong instrument for it.
+
+            The verb alone, too: "to move" reads as prose and "Move" reads as a
+            label, and a footer under a list of commands is labelling, not
+            narrating. */}
+        <div className="siteCommandHints" slot="footer">
+          <span>
+            <helix-kbd>↑</helix-kbd>
+            <helix-kbd>↓</helix-kbd>
+            Move
+          </span>
+          <span>
+            <helix-kbd>↵</helix-kbd>
+            Go
+          </span>
+          <span>
+            <helix-kbd>Esc</helix-kbd>
+            Close
+          </span>
+        </div>
         <helix-text appearance="caption" class="siteCommandMark" slot="footer">
           Fusion
         </helix-text>
