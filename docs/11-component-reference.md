@@ -807,6 +807,7 @@ The track scroll-snaps, so a drag and a trackpad swipe move it with the
 browser's own momentum and the controls only have to scroll.
 
 Slides take the full track by default. `per-view` fits more than one across,
+up to five,
 which is what a run of cards wants rather than a run of full-width panels.
 
 #### Properties
@@ -6111,9 +6112,10 @@ still points at the trigger after the bubble has slid along to stay in view.
 | `delayOut` | `delay-out` | `number` | `100` | `HelixBaseTooltip` | How long the bubble stays after the pointer leaves, in milliseconds. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseTooltip` | Whether the tooltip never shows. |
 | `for` | `for` | `string` | `''` | `HelixBaseTooltip` | The id of the element this describes, in this tooltip's own tree. |
-| `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the bubble, in pixels. |
+| `offset` | `offset` | `number` | `8` | `HelixBaseTooltip` | Space between the trigger and the point of the bubble, in pixels. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `Placement` | `'top'` | `HelixBaseTooltip` | Preferred side. It moves if that side does not fit. |
+| `within` | `within` | `string` | `''` | `HelixBaseTooltip` | The id of a box to keep the bubble inside, instead of the viewport. |
 
 #### Methods
 

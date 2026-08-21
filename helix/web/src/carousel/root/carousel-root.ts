@@ -12,6 +12,7 @@ import { styles } from './carousel-root.css.js'
  * browser's own momentum and the controls only have to scroll.
  *
  * Slides take the full track by default. `per-view` fits more than one across,
+ * up to five,
  * which is what a run of cards wants rather than a run of full-width panels.
  *
  * @since 0.1.0

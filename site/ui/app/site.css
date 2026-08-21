@@ -2711,3 +2711,79 @@ helix-drawer helix-tree {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------------------------------------------------------- palette ----- */
+
+/* **The search in the masthead, and the space between its two halves.**
+ *
+ * A button's `gap` is one number for everything it holds, which is right when
+ * the parts are a mark and a word. Here the last part is a *key*, and a key
+ * pressed to open the thing is not the next word in the label: at the button's
+ * own gap it read as "Search ⌘K" in one breath. The margin is on the key alone,
+ * so the magnifier stays tucked against the word it belongs to.
+ *
+ * `auto` rather than a length would push it to the far edge, which is what a
+ * toolbar does with a trailing control and is wrong for a button: the two would
+ * stop being one object as soon as the button was wider than its content. */
+.siteFind helix-kbd {
+  margin-inline-start: var(--helix-space-sm);
+}
+
+/* **The palette, dressed as ours.**
+ *
+ * The component already decides everything about how a palette behaves and most
+ * of how it looks: pinned near the top so the field does not walk up the screen
+ * as the list narrows, one text column down the panel, rows at a reading inset.
+ * What is left for the site is the part a design system should not decide for
+ * anybody, which is what the surface says about whose product it is.
+ *
+ * Through `::part()`, which is the published door into a component and the one
+ * mechanism a document rule may use on one. Everything here is a departure the
+ * component invited: the four parts it forwards, and the two hooks it names. */
+.siteCommand::part(dialog) {
+  /* The brand at the edge rather than across the panel. A tinted surface would
+     colour every row's ground and put the whole palette in a hue; a hairline
+     the brand can be seen in says the same thing once, at the boundary, where a
+     reader is already looking for where the panel ends. */
+  border: var(--helix-border-thin) solid var(--helix-color-primary-subtle);
+  border-radius: var(--helix-radii-lg);
+  /* The largest the scale has. A palette arrives over a page the reader was
+     mid-way through rather than replacing it, so it has to sit clearly above
+     the thing it did not close. */
+  box-shadow: var(--helix-shadow-lg);
+}
+
+/* The mark in the search row takes the brand, which is the one place a small
+   amount of colour reads as identity rather than as decoration: it is the thing
+   the eye lands on first and it is already the panel's subject. */
+.siteCommand::part(search) {
+  color: var(--helix-color-primary);
+}
+
+.siteCommand::part(search-field) {
+  /* The field carries the panel's voice. `display` is the face the masthead and
+     the section titles are set in, so a palette opening over them is the same
+     product rather than a control that happens to be on the page. */
+  font-family: var(--helix-font-display);
+}
+
+/* The row under the keyboard, which the component leaves to whoever knows what
+   the keys do. Ours holds the product's name, quietly, because a palette is the
+   one surface a reader opens from anywhere and may not remember whose it is. */
+.siteCommand::part(footer) {
+  justify-content: space-between;
+}
+
+.siteCommandMark {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-display);
+  letter-spacing: var(--helix-tracking-wide);
+}
+
+/* The row the keyboard is on, in the brand's own subtle ground rather than the
+   neutral wash a select uses. A palette is driven by the arrow keys, so this is
+   the only thing on screen that says where the reader is. */
+.siteCommand {
+  --option-active-color: var(--helix-color-primary-subtle);
+  --option-radii: var(--helix-radii-sm);
+}

@@ -409,8 +409,14 @@ export default function Home() {
               No `autoplay`. Everything here is prose a reader chooses to
               start, and copy that slides away mid-sentence is the reason
               carousels have the reputation they do. `loop` because the set is
-              small and reaching the end of eight is not a wall worth hitting. */}
-          <helix-carousel label="Insights" loop>
+              small and reaching the end of eight is not a wall worth hitting.
+
+              Four across, so the row reads as a shelf of arguments rather than
+              one card with space either side of it. The card narrows to about a
+              quarter of the shell, which is why its summary is clamped: a
+              three-line teaser under a title is a card, and an unclamped
+              paragraph at that width is a column. */}
+          <helix-carousel class="insightReel" label="Insights" loop per-view={4}>
             {INSIGHTS.map((insight) => (
               <Link
                 aria-label={insight.title}

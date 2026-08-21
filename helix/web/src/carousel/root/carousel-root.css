@@ -294,6 +294,14 @@
   --_carousel-per-view: 4;
 }
 
+/* Five is the last step, and the ceiling is a judgement rather than a limit of
+   the arithmetic. A track divided six ways gives each slide under a sixth of
+   the page, which is a column of headlines rather than a card, and a carousel
+   whose slides cannot hold their own content is a scroller with dots. */
+:host([per-view="5"]) {
+  --_carousel-per-view: 5;
+}
+
 /* The track is not what moves.
  *
  * This block asserted `scroll-behavior: auto` on the scroller, which restates

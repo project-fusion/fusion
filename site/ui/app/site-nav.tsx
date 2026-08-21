@@ -375,6 +375,7 @@ export function SiteNav() {
           forgets it, which is what a command is. Routing is the consumer's job,
           so the value is the href and this is the only thing that knows it. */}
       <helix-command
+        class="siteCommand"
         label="Search"
         onhelix-close={() => setFindOpen(false)}
         onhelix-open={() => setFindOpen(true)}
@@ -391,8 +392,16 @@ export function SiteNav() {
           </helix-option>
         ))}
         <helix-text slot="footer" tone="subtle">
+          <helix-kbd>↑</helix-kbd>
+          <helix-kbd>↓</helix-kbd>
+          to move,
+          <helix-kbd>↵</helix-kbd>
+          to go,
           <helix-kbd>Esc</helix-kbd>
           to close
+        </helix-text>
+        <helix-text appearance="caption" class="siteCommandMark" slot="footer">
+          Fusion
         </helix-text>
       </helix-command>
 
