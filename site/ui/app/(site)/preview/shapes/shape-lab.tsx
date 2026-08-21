@@ -1,35 +1,59 @@
 'use client'
 
 import { useState } from 'react'
-import { SHAPES, ShapeField } from './shape-field'
+import { DEFAULT_PARAMS, SHAPES, ShapeField, type ShapeParams } from './shape-field'
 
 /**
- * The switcher and the field it drives.
+ * One knob, described where the control is built rather than where it is used.
  *
- * **The new value comes from `event.detail`, never from the element.** Both
- * controls declare `value` and `checked`, which is a claim of ownership: the
- * element announces the change and applies nothing until it is answered, so at
- * the moment it dispatches, its own property still holds the *old* value.
- * Reading `event.target.value` therefore set the state to what it already was,
- * and the bench looked as though clicking a shape did nothing at all.
+ * `step` is authored per knob rather than derived from the range, because the
+ * useful grain is a property of what the knob does: a degree of tilt is a
+ * degree, and a hundredth of a bloom is not worth dragging through.
+ */
+interface Knob {
+  key: keyof ShapeParams
+  label: string
+  max: number
+  min: number
+  step: number
+}
+
+const KNOBS: Knob[] = [
+  { key: 'tilt', label: 'Tilt', max: 90, min: -90, step: 1 },
+  { key: 'speed', label: 'Speed', max: 3, min: 0, step: 0.05 },
+  { key: 'scale', label: 'Scale', max: 3, min: 0.3, step: 0.05 },
+  { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
+  { key: 'gain', label: 'Gain', max: 2.5, min: 0.2, step: 0.05 },
+  { key: 'pointer', label: 'Pointer', max: 1, min: 0, step: 0.05 },
+]
+
+/**
+ * The bench: a shape switcher, six knobs, and the field they drive.
+ *
+ * **The new value comes from `event.detail`, never from the element.** Every
+ * control here declares `value` or `checked`, which is a claim of ownership:
+ * the element announces the change and applies nothing until it is answered, so
+ * at the moment it dispatches, its own property still holds the *old* value.
+ * Reading `event.target.value` set the state to what it already was, and the
+ * bench looked as though clicking a shape did nothing at all.
+ *
+ * **Slider announces `helix-input`, not `helix-change`.** It is one of the five
+ * continuous controls, so it reports every edit rather than a committed step,
+ * which is what a knob driving a live shader wants: the field moves under the
+ * thumb instead of when it is let go.
  *
  * A client component because the choice is state, and the smallest one that can
- * be: the page around it stays a server component and this holds a number and a
- * boolean.
- *
- * `onhelix-change` as a prop rather than an effect. React records the handler
- * and attaches no listener while hydrating, which is why this used to need an
- * effect; `HelixElement.dispatchEvent` now reads the prop off the node and
- * binds it immediately before announcing.
+ * be: the page around it stays a server component.
  */
 export function ShapeLab(): React.ReactElement {
   const [shape, setShape] = useState(0)
   const [interactive, setInteractive] = useState(true)
+  const [params, setParams] = useState<ShapeParams>(DEFAULT_PARAMS)
   const current = SHAPES[shape]
 
   return (
     <section className="shapeStage">
-      <ShapeField interactive={interactive} shape={shape} />
+      <ShapeField interactive={interactive} params={params} shape={shape} />
       <div className="shapeScrim" />
 
       <helix-flex class="shell shapeShell" direction="column" gap="xl">
@@ -72,6 +96,32 @@ export function ShapeLab(): React.ReactElement {
             }}
           ></helix-switch>
         </helix-flex>
+
+        <helix-card appearance="outlined" class="shapeKnobs">
+          <helix-grid gap="lg" min="13rem">
+            {KNOBS.map((knob) => (
+              <helix-slider
+                key={knob.key}
+                label={knob.label}
+                max={knob.max}
+                min={knob.min}
+                onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                  const next = Number(event.detail.value)
+                  setParams((held) => ({ ...held, [knob.key]: next }))
+                }}
+                show-value
+                step={knob.step}
+                value={String(params[knob.key])}
+              ></helix-slider>
+            ))}
+          </helix-grid>
+
+          <helix-flex data-density="sm" slot="footer">
+            <button data-button="subtle" onClick={() => setParams(DEFAULT_PARAMS)} type="button">
+              Reset
+            </button>
+          </helix-flex>
+        </helix-card>
       </helix-flex>
     </section>
   )

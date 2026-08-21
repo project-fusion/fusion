@@ -21,9 +21,50 @@ export const SHAPES = [
   },
 ] as const
 
+/**
+ * The knobs, all six of which mean the same thing in every shape.
+ *
+ * Deliberately generic rather than per-shape. A bench whose controls change
+ * when the shape changes cannot answer the question it exists for, which is
+ * which shape is better: two shapes tuned on different axes are not being
+ * compared, they are being described.
+ */
+export interface ShapeParams {
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  bloom: number
+
+  /** Overall brightness, as a multiplier on the field. */
+  gain: number
+
+  /** How far the pointer moves and lifts the field, `0` to `1`. */
+  pointer: number
+
+  /** Feature size, as a multiplier on the sampled coordinates. */
+  scale: number
+
+  /** How fast it drifts, as a multiplier on time. */
+  speed: number
+
+  /** The field's rotation, in degrees. */
+  tilt: number
+}
+
+/** Where every knob rests, and the shape each was tuned against. */
+export const DEFAULT_PARAMS: ShapeParams = {
+  bloom: 0.5,
+  gain: 1,
+  pointer: 1,
+  scale: 1,
+  speed: 1,
+  tilt: 14,
+}
+
 export interface ShapeFieldProps {
-  /** Whether the pointer moves the field. */
+  /** Whether the pointer moves the field at all. */
   interactive: boolean
+
+  /** The knobs. */
+  params: ShapeParams
 
   /** Which shape to draw, as an index into `SHAPES`. */
   shape: number
@@ -48,10 +89,11 @@ export interface ShapeFieldProps {
  * the parallax rather than a still frame. `prefers-reduced-motion` gets the
  * still frame and no pointer response at all.
  */
-export function ShapeField({ interactive, shape }: ShapeFieldProps): React.ReactElement {
+export function ShapeField({ interactive, params, shape }: ShapeFieldProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const shapeRef = useRef(shape)
   const interactiveRef = useRef(interactive)
+  const paramsRef = useRef(params)
 
   /* A still redraw, published by the effect that owns the context.
      
@@ -66,6 +108,7 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
      point of one program with a branch is that switching costs a uniform. */
   shapeRef.current = shape
   interactiveRef.current = interactive
+  paramsRef.current = params
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -103,6 +146,11 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
       uniform int uShape;
       uniform vec2 uPointer;
       uniform float uReach;
+      uniform float uTilt;
+      uniform float uSpeed;
+      uniform float uScale;
+      uniform float uBloom;
+      uniform float uGain;
       uniform vec3 uGround;
       uniform vec3 uHaze;
       uniform vec3 uGlow;
@@ -197,10 +245,11 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
            is being poked; one that slides looks like it has depth. */
         vec2 q = p - uPointer * 0.16 * uReach;
 
-        float a = radians(14.0);
+        float a = radians(uTilt);
         q = vec2(q.x * cos(a) - q.y * sin(a), q.x * sin(a) + q.y * cos(a));
+        q *= uScale;
 
-        float t = uTime * 0.06;
+        float t = uTime * 0.06 * uSpeed;
 
         float d = 0.0;
         if (uShape == 0) {
@@ -218,6 +267,13 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
         /* The pointer lifts what is already there rather than adding a blob of
            its own. A light that follows the cursor over an unlit field is a
            torch, which is a different and much cheaper idea. */
+        /* Bloom as an exponent on the field rather than a term inside each
+           shape. Every shape here is a density that falls off, so raising it to
+           a power tightens or spreads that falloff, and one control then means
+           the same thing in all five. A per-shape softness would be five
+           controls wearing one label. */
+        d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain;
+
         float near = exp(-length(p - uPointer) * 1.8) * uReach;
         d *= 1.0 + near * 1.1;
 
@@ -275,6 +331,11 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
     const uShape = at('uShape')
     const uPointer = at('uPointer')
     const uReach = at('uReach')
+    const uTilt = at('uTilt')
+    const uSpeed = at('uSpeed')
+    const uScale = at('uScale')
+    const uBloom = at('uBloom')
+    const uGain = at('uGain')
 
     const tokens = createTokenReader()
     const applyColors = () => {
@@ -301,7 +362,7 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
       const aspect = box.width / Math.max(box.height, 1)
       target.x = ((event.clientX - box.left) / box.width - 0.5) * 2 * aspect
       target.y = -((event.clientY - box.top) / box.height - 0.5) * 2
-      target.reach = interactiveRef.current ? 1 : 0
+      target.reach = interactiveRef.current ? paramsRef.current.pointer : 0
     }
     const onLeave = () => {
       target.reach = 0
@@ -332,8 +393,14 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
     }
 
     const draw = (seconds: number) => {
+      const knobs = paramsRef.current
       gl.uniform1f(uTime, seconds)
       gl.uniform1i(uShape, shapeRef.current)
+      gl.uniform1f(uTilt, knobs.tilt)
+      gl.uniform1f(uSpeed, knobs.speed)
+      gl.uniform1f(uScale, knobs.scale)
+      gl.uniform1f(uBloom, knobs.bloom)
+      gl.uniform1f(uGain, knobs.gain)
       gl.uniform2f(uPointer, eased.x, eased.y)
       gl.uniform1f(uReach, eased.reach)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -457,10 +524,12 @@ export function ShapeField({ interactive, shape }: ShapeFieldProps): React.React
     }
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the ref is the channel, the shape is the trigger
+  /* Every knob redraws when the loop is stopped, for the same reason the shape
+     does: with no motion there is one frame, and it has to be the current one. */
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the ref is the channel, the values are the trigger
   useEffect(() => {
     redrawRef.current?.()
-  }, [shape])
+  }, [shape, params.bloom, params.gain, params.pointer, params.scale, params.speed, params.tilt])
 
   return (
     <div aria-hidden="true" className="shapeCanvasFrame">
