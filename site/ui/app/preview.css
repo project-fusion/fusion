@@ -217,147 +217,298 @@
 
 /* ==================================== candidate: scale (cinematic) ======= */
 
-/* The reference is carried by six 4K videos. There is no WebGL in it and no
- * three.js: the look is a production asset rather than a technique, and
- * matching it means commissioning footage rather than adding a library.
- *
- * So the atmosphere here is generated, and it is generated from the two things
- * the company actually is. The light is a sun, because cheap energy is half the
- * thesis and Fusion Energy is the literal one. The field it rises over is the
- * lattice this site already draws, opened to four times its pitch.
- *
- * **One backdrop for the whole page, and that is the point of it.** Each band
- * used to paint its own glow, so every section boundary was a seam where the
- * light restarted. Fixed to the viewport, there is nothing to break: the sun
- * sits behind the entire document and the bands scroll over it.
- */
-.scStage {
-  isolation: isolate;
-  position: relative;
+/* Terafab's hero is a produced film with type sitting on it. Fusion cannot fill
+   that treatment with shipped-product footage, so the picture is original
+   plates of the thing the thesis actually names: water, the sun, lights at
+   three distances. The CSS here is the frame those plates sit in, not a fake
+   sky meant to stand in for a camera.
+
+   Painted rather than laid out, which is why the worlds are plain elements:
+   there is no Helix component for a surface that draws light, and `Flex` would
+   be claiming this is a layout. */
+
+html:has(.scTheater),
+html:has(.scTheater) body,
+html:has(.scCinematic) {
+  background-color: var(--helix-color-background);
+  color-scheme: dark;
 }
 
-/* Decorative and painted rather than laid out, which is why this is a plain
-   element: there is no Helix component for a surface that draws light, and
-   `Flex` would be claiming it is a layout. */
-/* Sticky rather than fixed, and the difference is what makes the sun move.
- *
- * A `position: fixed` element is not scrolled by the root scroller, so a scroll
- * timeline naming that scroller is inactive for anything inside it: measured,
- * the animation was attached to a `ScrollTimeline`, reported `running`, and had
- * a `currentTime` of null at the top, the middle and the bottom of the page. It
- * looked wired up and was not.
- *
- * Sticky is in flow, pinned to the top of the viewport, and its descendants do
- * participate. The negative end margin pulls the bands back over it so the sky
- * occupies no height of its own. */
-.scSky {
-  block-size: 100svh;
-  inset-block-start: 0;
-  margin-block-end: -100svh;
-  overflow: clip;
-  pointer-events: none;
-  position: sticky;
-  z-index: var(--helix-layer-base);
+.scCinematic {
+  background-color: var(--helix-color-background);
+  color: var(--helix-color-foreground);
 }
 
-/* The sun rises through the ladder.
- *
- * It starts low and small under the hero and ends high and wide by the last
- * rung, which is the argument the page is making rendered as light: the same
- * stack at a larger scale each time. Driven by the document's own scroll, so it
- * costs no JavaScript and cannot fall out of step with the reading position.
- *
- * `translate` and `scale` rather than the gradient's own stops, so the movement
- * is composited and needs no `@property` registration to be animatable. */
-.scSun {
-  background-image: radial-gradient(
-    ellipse at 50% 50%,
-    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 0%,
-    color-mix(in oklab, var(--helix-color-primary) 12%, transparent) 38%,
-    transparent 68%
-  );
-  block-size: 120%;
-  inset-block-start: 62%;
-  inset-inline: -25%;
-  position: absolute;
-}
-
-/* The field it rises over. */
-.scField {
-  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
-  background-position: center;
-  background-size: calc(var(--site-lattice-pitch) * 4) calc(var(--site-lattice-pitch) * 4);
+.scGrain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   inset: 0;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 92%, #000 0%, transparent 74%);
+  mix-blend-mode: overlay;
+  opacity: 0.1;
+  pointer-events: none;
   position: absolute;
 }
 
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .scSun {
-      animation: scSunRise linear both;
-      /* `root`, named rather than left to default.
-       
-         `scroll()` alone means the nearest scroll container in the block axis,
-         and this element sits inside a `position: fixed` parent, which the
-         document scroller does not scroll. The timeline resolved to something
-         that never advances: the animation was attached, which looks like
-         success, and the computed `scale` and `translate` were identical at the
-         top, the middle and the bottom of the page. */
-      animation-timeline: scroll(root block);
-    }
-  }
-}
-
-/* Interior-free: one move, from where it rests to where it ends, so a reader
-   who never scrolls sees the resting state rather than a frame of a loop. */
-@keyframes scSunRise {
-  to {
-    scale: 1.45;
-    translate: 0 -24%;
-  }
-}
-
-.scBand {
-  align-items: center;
-  display: flex;
-  min-block-size: 88svh;
-  padding-block: var(--helix-space-3xl);
-  position: relative;
-  z-index: var(--helix-layer-raised);
-}
-
-.scInner {
-  inline-size: 100%;
-}
-
-/* The rung, set at the size the claim deserves and no smaller. */
-.scTitle {
-  font-family: var(--helix-font-display);
-  font-size: clamp(var(--helix-text-3xl), 9vw, 8rem);
-  font-weight: var(--helix-weight-medium);
-  letter-spacing: -0.045em;
-  line-height: 0.92;
-  text-wrap: balance;
-}
-
-/* Sentence case. An eyebrow in capitals is shouting a word the reader has not
-   agreed to hear loudly, and the tracking already says it is a label. */
-.scRung {
+.scKicker {
   color: var(--helix-color-primary);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-sm);
   letter-spacing: 0.14em;
 }
 
-.scLede {
+/* The header is sticky, so the hero would otherwise begin under it. Negative
+   start margin pulls the picture up by the bar's height; padding on the copy
+   puts the type back where it was. Same structure as `.pageHero`. */
+.scHero {
+  isolation: isolate;
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  min-block-size: 100svh;
+  overflow: clip;
+  position: relative;
+}
+
+.scHeroWorld {
+  inset: 0;
+  position: absolute;
+}
+
+.scLive {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  inset: 0;
+  position: absolute;
+}
+
+.scHeroStill {
+  animation: scKen 42s linear infinite alternate;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+  transform-origin: 50% 42%;
+}
+
+@keyframes scKen {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scHeroStill {
+    animation: none;
+  }
+}
+
+.scHeroScrim {
+  background-image:
+    linear-gradient(90deg, rgb(0 0 0 / 0.5) 0%, rgb(0 0 0 / 0.16) 34%, transparent 62%),
+    linear-gradient(0deg, rgb(0 0 0 / 0.55) 0%, transparent 36%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.scHeroCopy {
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding-block: 0 var(--helix-space-3xl);
+  position: absolute;
+  z-index: var(--helix-layer-raised);
+}
+
+.scHeroName {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 18vw, 16rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.055em;
+  line-height: 0.86;
+  margin: 0;
+}
+
+.scHeroClaim {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 3.2vw, 2.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0;
+  max-inline-size: 18ch;
+}
+
+.scLadder {
+  display: grid;
+  grid-template-columns: minmax(18rem, 34rem) 1fr;
+  isolation: isolate;
+  min-block-size: 100svh;
+}
+
+.scLadderCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xl);
+  padding-block: var(--helix-space-3xl);
+  padding-inline: var(--site-inset);
+}
+
+.scRungs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scRungItem {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  opacity: 0.42;
+  padding-block: var(--helix-space-xl);
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.scRungItem[data-active] {
+  opacity: 1;
+}
+
+.scRungButton {
+  align-items: baseline;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--helix-space-md);
+  padding: 0;
+  text-align: start;
+}
+
+.scRungIndex {
+  color: var(--helix-color-primary);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  letter-spacing: 0.14em;
+}
+
+.scRungName {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, 3.25rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.scRungBody {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  margin-block: var(--helix-space-md) 0;
+  margin-inline: 0;
+  max-inline-size: 42ch;
+}
+
+.scLadderStage {
+  block-size: 100svh;
+  isolation: isolate;
+  overflow: clip;
+  position: sticky;
+  top: 0;
+}
+
+.scLadderPlate {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  object-fit: cover;
+  opacity: 0;
+  position: absolute;
+  transition: opacity var(--helix-duration-slow) var(--helix-easing-standard);
+}
+
+.scLadderPlate[data-active] {
+  opacity: 1;
+}
+
+@media (max-width: 64rem) {
+  .scLadder {
+    grid-template-columns: 1fr;
+  }
+
+  .scLadderStage {
+    block-size: 56svh;
+    order: -1;
+    position: relative;
+    top: auto;
+  }
+}
+
+.scScene {
+  isolation: isolate;
+  min-block-size: 100svh;
+  overflow: clip;
+  position: relative;
+}
+
+.scSceneWorld {
+  inset: 0;
+  position: absolute;
+}
+
+.scScenePlate {
+  animation: scKen 48s linear infinite alternate;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scScenePlate {
+    animation: none;
+  }
+}
+
+.scSceneScrim {
+  background-image: linear-gradient(
+    90deg,
+    rgb(0 0 0 / 0.62) 0%,
+    rgb(0 0 0 / 0.22) 40%,
+    transparent 70%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.scSceneCopy {
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding-block: 0 var(--helix-space-3xl);
+  position: absolute;
+  z-index: var(--helix-layer-raised);
+}
+
+.scSceneTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 7vw, 5.5rem);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.scSceneLede {
   color: var(--helix-color-foreground-muted);
   font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-xl));
+  margin: 0;
   max-inline-size: 44ch;
 }
 
-/* The counted row. Real quantities only: this page has no eight million
-   vehicles to report and will not imply that it does. */
+.scBand {
+  padding-block: var(--helix-space-3xl);
+}
+
 .scFigure {
   font-family: var(--helix-font-display);
   font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
@@ -365,9 +516,95 @@
   line-height: 1;
 }
 
-/* The bands over the sky, which have to sit above it and carry no ground of
-   their own or the light behind them is hidden. */
-.scStage > .band {
+.scTheater {
+  background-color: var(--helix-color-background);
+  background-image: url("/media/scale/ocean-sun.jpg");
+  background-position: 50% 42%;
+  background-size: cover;
+  block-size: 100svh;
+  color: var(--helix-color-foreground);
+  isolation: isolate;
+  overflow: clip;
   position: relative;
-  z-index: var(--helix-layer-raised);
+}
+
+.scTheaterCanvas {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+}
+
+.scTheaterScrim {
+  background-image: linear-gradient(0deg, rgb(0 0 0 / 0.55) 0%, transparent 36%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.scTheaterClose {
+  color: color-mix(in oklab, var(--helix-color-foreground) 72%, transparent);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  inset-block-start: var(--helix-space-xl);
+  inset-inline-end: var(--site-inset);
+  letter-spacing: 0.12em;
+  position: absolute;
+  text-decoration: none;
+  z-index: var(--helix-layer-sticky);
+}
+
+.scTheaterClose:hover {
+  color: var(--helix-color-foreground);
+}
+
+.scTheaterTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 14vw, 10rem);
+  font-weight: var(--helix-weight-medium);
+  inset-block-end: 18vh;
+  inset-inline-start: var(--site-inset);
+  letter-spacing: -0.055em;
+  line-height: 0.86;
+  margin: 0;
+  position: absolute;
+}
+
+.scTheaterTitle[data-tone="quiet"] {
+  opacity: 0.28;
+}
+
+.scTheaterCaption {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 3vw, 2.5rem);
+  inset-block-end: 12vh;
+  inset-inline-start: var(--site-inset);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0;
+  max-inline-size: 22ch;
+  position: absolute;
+  text-wrap: balance;
+}
+
+.scFilmProgress {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  block-size: 2px;
+  inset-block-end: 0;
+  inset-inline: 0;
+  position: absolute;
+}
+
+.scFilmProgress > i {
+  animation-name: scProgress;
+  animation-timing-function: linear;
+  background-color: var(--helix-color-foreground);
+  block-size: 100%;
+  display: block;
+  inline-size: 0;
+}
+
+@keyframes scProgress {
+  to {
+    inline-size: 100%;
+  }
 }

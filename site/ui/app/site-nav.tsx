@@ -69,11 +69,10 @@ export function SiteNav() {
 
   const within = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
-  /* Exactly the two galleries, not everything under them:
-     `/helix/components/card` and `/insights/the-sovereignty-constraint` are
-     normal pages with a white top. Both heroes run up behind the masthead, so
-     the bar has nothing to separate itself from until the page moves. */
-  const onHero = pathname === '/helix' || pathname === '/insights'
+  /* Gallery heroes and the scale candidate run up behind the masthead, so the
+     bar has nothing to separate itself from until the page moves. Component
+     pages under `/helix` keep a white top. */
+  const onHero = pathname === '/helix' || pathname === '/insights' || pathname === '/preview/scale'
 
   /* Products is current wherever a product or a vertical is, which is what the
      panel actually contains. Checked against the verticals rather than the
@@ -108,6 +107,7 @@ export function SiteNav() {
           without either being told about the other. */}
       <helix-app-header
         appearance={onHero ? 'transparent' : undefined}
+        data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
         style={
           panelDown ? { '--app-header-background': 'var(--helix-color-background)' } : undefined

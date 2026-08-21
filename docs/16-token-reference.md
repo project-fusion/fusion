@@ -55,7 +55,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
-| `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 25 |
+| `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 27 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
 | `--helix-color-danger` | `light-dark(var(--_helix-danger-600), var(--_helix-danger-400))` | 131 |
 
@@ -66,10 +66,10 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 210 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 259 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 261 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 227 |
-| `--helix-space-sm` | `var(--_helix-scale-3)` | 213 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 116 |
+| `--helix-space-sm` | `var(--_helix-scale-3)` | 215 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 118 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 75 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 62 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 38 |

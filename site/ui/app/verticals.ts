@@ -49,6 +49,12 @@ export interface Vertical {
  * Declared is committed direction with no work started. Nothing here softens
  * them.
  *
+ * **Studio leads, because it is the only one that can be bought.** The order
+ * used to run Design first on the grounds that it was the one with something to
+ * show. It still is, but a reader meeting this list wants to know what is for
+ * sale before what is being built, and the practice was the one thing on the
+ * site belonging to no vertical at all.
+ *
  * **Design and Mind point at their product's route, and that is the collapse
  * rather than an oversight.** A vertical is how the company is organized and a
  * product is what a reader uses, and where exactly one product fills a
@@ -57,6 +63,15 @@ export interface Vertical {
  * Energy and Capital have no product, so their pages are the vertical.
  */
 export const VERTICALS: Vertical[] = [
+  {
+    body: 'The practice. Interface and intelligence work, delivered into your repository under your license. It is the only part of Fusion that can be bought today, and the engagements it takes are chosen for whether their deliverable feeds Helix or Cortex.',
+    href: '/services',
+    icon: 'briefcase',
+    label: 'Studio',
+    name: 'Fusion Studio',
+    stage: 'Active',
+    summary: 'The work. Three offers, every price stated.',
+  },
   {
     body: 'Helix is the design system: web components with a token layer that derives an accessible palette from a brand color rather than from a spreadsheet of hexes. Components ship as custom elements, so the framework above them stays a choice.',
     href: '/helix',

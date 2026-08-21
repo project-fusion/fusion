@@ -1,49 +1,21 @@
 import { stageAppearance, VERTICALS } from '../../../verticals'
+import { CinematicMode } from './cinematic-mode'
+import { ScaleLadder } from './ladder'
+import { OceanWorld } from './ocean-world'
 import '../../../preview.css'
 
 export const metadata = { title: 'Candidate: scale' }
 
 /**
- * A cinematic reading, drawn from the reference and cut where it cannot be told
- * honestly.
+ * A cinematic reading of the thesis, built the way the reference is built.
  *
- * **What the reference does that we can do.** It gives a scale ladder the whole
- * page: three rungs, one band each, the same claim restated larger. Fusion has
- * exactly that ladder already, and it is the thesis rather than a device
- * borrowed to look like one. It also states an enormous ambition in enormous
- * type, and ambition stated as ambition is honest at any size.
- *
- * **What it does that we cannot.** Its scale section rests on eight million
- * vehicles delivered and ninety percent of global mass to orbit. That is a
- * track record, and it is what earns the treatment. Fusion has no shipped
- * product, no closed engagement and no clients, so the same layout filled with
- * our numbers would be a company performing a scale it does not have, which is
- * the exact failure the stage labels exist to prevent. The counted row here
- * holds only things that are true and it is deliberately small.
- *
- * **The film above is a different picture.** The page looks at a horizon. The
- * piece starts inside Helix and falls through to energy, which is why the
- * company is named Fusion. It does not restage the rungs.
+ * Terafab puts a produced picture in the hero and lets type sit on it. Fusion
+ * cannot fill that treatment with shipped-product footage, and will not borrow
+ * a factory it does not run. The plates are original: water, the sun, and the
+ * same light at three distances. The water and the sun move. The ladder is the
+ * thesis rather than a device borrowed to look like one. The counted row holds
+ * only things that are true.
  */
-
-/** The ladder, which is the thesis and not a borrowed device. */
-const RUNGS = [
-  {
-    body: 'Your own keys, your own data, your own hardware. The model runs where you put it and the memory it accumulates is a file you hold. Nothing about your working life is recoverable by a company that changes its pricing.',
-    rung: 'Rung one',
-    title: 'Personal',
-  },
-  {
-    body: 'The same properties with more people and an audit trail. A company that cannot be held hostage by a vendor roadmap, because the substrate is one it runs and the data is one it holds.',
-    rung: 'Rung two',
-    title: 'Organizational',
-  },
-  {
-    body: 'The same properties again, with the stakes that follow from a country running its capability on infrastructure it does not control. This rung is a written thesis and not a product, and we say so.',
-    rung: 'Rung three',
-    title: 'National',
-  },
-]
 
 /** Only quantities that are true today. */
 const COUNTED = [
@@ -55,65 +27,102 @@ const COUNTED = [
 
 export default function Page() {
   return (
-    <>
-      {/* One stage, so the sky behind it is continuous. Every band used to paint
-          its own glow, which put a seam at every section boundary. */}
-      <div className="scStage">
-        {/* Painted, not laid out, which is why these are plain elements: there is
-            no Helix component for a surface that draws light, and `Flex` would be
-            claiming this is a layout. */}
-        <div aria-hidden="true" className="scSky">
-          <div className="scField" />
-          <div className="scSun" />
-        </div>
-
-        <section className="scBand">
-          <helix-flex class="scInner shell" direction="column" gap="xl">
-            <helix-text appearance="label" class="scRung">
+    <CinematicMode>
+      <div className="scCinematic" data-color-mode="dark">
+        <section className="scHero">
+          <div aria-hidden="true" className="scHeroWorld">
+            {/* biome-ignore lint/performance/noImgElement: fallback if the live world fails */}
+            <img
+              alt=""
+              className="scHeroStill"
+              decoding="async"
+              fetchPriority="high"
+              src="/media/scale/ocean-sun.jpg"
+            />
+            <OceanWorld shot="sea" />
+            <div className="scHeroScrim" />
+          </div>
+          <helix-flex class="scHeroCopy shell" direction="column" gap="lg">
+            <helix-text appearance="label" class="scKicker">
               Fusion Development Group
             </helix-text>
-            <helix-text as="h1" class="scTitle">
-              Sovereignty
-              <br />
-              at every scale.
-            </helix-text>
-            <helix-text as="p" class="scLede">
-              Cheap intelligence and cheap energy arrived together. That pairing is what moves
-              sovereignty from a principle you agree with to a stack you can run, and the same
-              argument runs from one person to one country.
-            </helix-text>
+            <h1 className="scHeroName">Fusion</h1>
+            <p className="scHeroClaim">Sovereignty at every scale.</p>
             <helix-flex data-density="lg" gap="sm" wrap>
-              <a data-button="solid" data-button-tone="primary" href="/services">
-                See what is buyable
+              <a data-button="solid" data-button-tone="primary" href="/preview/scale/film">
+                Watch
               </a>
-              <a data-button href="/helix">
-                Open Helix
+              <a data-button href="/services">
+                See what is buyable
               </a>
             </helix-flex>
           </helix-flex>
         </section>
 
-        {RUNGS.map((rung) => (
-          <section className="scBand" key={rung.title}>
-            <helix-flex class="scInner shell" direction="column" gap="lg">
-              <helix-text appearance="label" class="scRung">
-                {rung.rung}
-              </helix-text>
-              <helix-text as="h2" class="scTitle">
-                {rung.title}
-              </helix-text>
-              <helix-text as="p" class="scLede">
-                {rung.body}
-              </helix-text>
-            </helix-flex>
-          </section>
-        ))}
+        <ScaleLadder />
 
-        {/* The counted row, held to what is true. Four small numbers where the
-            reference has eight million vehicles, and one of them is a zero. */}
-        <section className="band">
+        <section className="scScene">
+          <div aria-hidden="true" className="scSceneWorld">
+            {/* biome-ignore lint/performance/noImgElement: fallback if the live world fails */}
+            <img alt="" className="scScenePlate" decoding="async" src="/media/scale/sun.jpg" />
+            <OceanWorld shot="sun" />
+            <div className="scSceneScrim" />
+          </div>
+          <helix-flex class="scSceneCopy shell" direction="column" gap="lg">
+            <helix-text appearance="label" class="scKicker">
+              The floor
+            </helix-text>
+            <helix-text as="h2" class="scSceneTitle">
+              Energy is the missing floor.
+            </helix-text>
+            <p className="scSceneLede">
+              Every layer above this presumed power. Fusion is the terminal form of sovereign
+              energy: fuel from seawater, no import, no cartel, no grid dependency. The name is the
+              destination.
+            </p>
+          </helix-flex>
+        </section>
+
+        <section className="scScene">
+          <div aria-hidden="true" className="scSceneWorld">
+            {/* biome-ignore lint/performance/noImgElement: fallback if the live world fails */}
+            <img alt="" className="scScenePlate" decoding="async" src="/media/scale/seawater.jpg" />
+            <OceanWorld shot="under" />
+            <div className="scSceneScrim" />
+          </div>
+          <helix-flex class="scSceneCopy shell" direction="column" gap="lg">
+            <helix-text appearance="label" class="scKicker">
+              The name
+            </helix-text>
+            <helix-text as="h2" class="scSceneTitle">
+              Fuel from seawater.
+            </helix-text>
+            <p className="scSceneLede">
+              Intelligence got cheap. Energy is next. The pairing is what moves sovereignty from a
+              principle you agree with to a stack you can run, and the same argument runs from one
+              person to one country.
+            </p>
+          </helix-flex>
+        </section>
+
+        <section className="scBand">
           <helix-flex class="shell" direction="column" gap="xl">
-            <helix-text appearance="label" class="dvMono" tone="subtle">
+            <helix-text appearance="label" class="scKicker">
+              The constraint
+            </helix-text>
+            <helix-text as="h2" class="scSceneTitle measure">
+              No product may create a dependency its user cannot exit.
+            </helix-text>
+            <p className="scSceneLede">
+              The user holds their own keys, data, and hardware. Fusion may operate a control plane,
+              never a chokepoint. If Fusion shut down tomorrow, the thing would still be yours.
+            </p>
+          </helix-flex>
+        </section>
+
+        <section className="scBand">
+          <helix-flex class="shell" direction="column" gap="xl">
+            <helix-text appearance="label" class="scKicker">
               Counted honestly
             </helix-text>
             <helix-grid gap="xl" min="14rem">
@@ -129,9 +138,9 @@ export default function Page() {
           </helix-flex>
         </section>
 
-        <section className="band">
+        <section className="scBand">
           <helix-flex class="shell" direction="column" gap="xl">
-            <helix-text as="h2" class="sectionTitle measure">
+            <helix-text as="h2" class="scSceneTitle measure">
               The map, including the empty parts
             </helix-text>
             <helix-flex direction="column" gap="none">
@@ -155,6 +164,6 @@ export default function Page() {
           </helix-flex>
         </section>
       </div>
-    </>
+    </CinematicMode>
   )
 }
