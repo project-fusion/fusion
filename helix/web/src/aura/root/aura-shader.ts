@@ -4,7 +4,7 @@
  * Exported so the component can turn a property into the integer the uniform
  * takes without a second list to keep in step.
  */
-export const SHAPES = ['braid', 'rays', 'aurora', 'orbit', 'weave', 'flow'] as const
+export const SHAPES = ['braid', 'rays', 'aurora', 'prism', 'flow'] as const
 
 /** Which form the light takes. */
 export type AuraShape = (typeof SHAPES)[number]
@@ -213,23 +213,52 @@ export const FRAGMENT = `#version 300 es
     return band * mix(0.3, 1.6, fall);
   }
 
-  /* Rings in perspective, travelling out. */
-  float orbit(vec2 q, float t, vec2 qp, float reach) {
-    vec2 e = vec2(q.x, q.y * 2.3);
-    float r = length(e);
-    /* A second source of rings, centred on the pointer.
+  /* One beam, split into an ordered spread by whatever it passes through.
+   *
+   * **This is the one shape that is about the token layer.** Helix derives a
+   * whole accessible palette from a single brand colour, and a prism is that
+   * argument as a picture: one thing goes in, an ordered set comes out, and the
+   * set is a consequence of the source rather than a list beside it. Rings in
+   * perspective, which this replaces, were pretty and said nothing.
+   *
+   * **The cursor is the prism.** The beam runs whether or not anybody is there,
+   * and where the pointer meets it the light fans. That is a different kind of
+   * interaction from the others: not the field reacting near the cursor, but
+   * the cursor being a thing in the field's way. Moving it along the beam moves
+   * where the split happens, which is exactly what carrying a prism does.
+   *
+   * The bands are lightness and never hue, because the palette is one hue. A
+   * rainbow here would be the one drawing on the site that contradicts the
+   * thing it is drawing.
+   */
+  float prism(vec2 q, float t, vec2 qp, float reach) {
+    vec2 dir = normalize(vec2(0.5, -1.0));
+    vec2 side = vec2(-dir.y, dir.x);
+
+    /* Where the split happens: under the pointer when there is one, and at the
+       centre when there is not, so the shape is whole at rest. */
+    vec2 rel = q - qp * reach;
+    float along = dot(rel, dir);
+    float across = dot(rel, side);
+
+    /* Tight before, widening after. The spread is what a prism does, so it is
+       the only thing that changes across the split. */
+    float spread = 0.04 + max(along, 0.0) * 0.38;
+    float beam = exp(-(across * across) / (2.0 * spread * spread));
+
+    /* The ordered set, and it only exists after the split.
     
-       Crowding the existing ones was a phase shift, which reads as a smear
-       rather than as anything happening. What rings are is something spreading
-       from a point, so the honest answer to a pointer is another point: near
-       the cursor the field becomes its own set travelling outward, blending
-       back into the first as it goes. A second stone in the same pond. */
-    vec2 ep = vec2(q.x - qp.x, (q.y - qp.y) * 2.3);
-    float drop = sin(length(ep) * 9.0 - t * 6.0) * 0.5 + 0.5;
-    float near = falloff(dot(q - qp, q - qp), 1.8) * reach;
-    float rings = mix(sin(r * 8.0 - t * 5.0) * 0.5 + 0.5, drop, near);
-    float grain = warped(vec2(atan(e.y, e.x) * 1.5, r * 1.2), t * 0.6);
-    return pow(rings, 4.0) * mix(0.45, 1.45, grain) * falloff(dot(e, e), 1.05);
+       Banded across the fan rather than along it, because what comes out of a
+       prism is separated by angle: dividing by the spread keeps each band on
+       its own ray as the fan widens, rather than letting them curve. The
+       contrast has to carry, or the whole thing reads as one beam that simply
+       got wider, which is not the point being made. */
+    float bands = 0.5 + 0.5 * sin(across / spread * 6.5 - t * 1.1);
+    float after = smoothstep(-0.02, 0.22, along);
+    float structure = mix(1.0, mix(0.18, 1.55, bands), after);
+
+    float grain = warped(vec2(along * 1.1, across * 2.2), t * 0.45);
+    return beam * structure * mix(0.65, 1.2, grain) * falloff(dot(q, q), 0.5);
   }
 
   /* Ink in a viscous medium, drawn through by where the pointer went.
@@ -325,19 +354,6 @@ export const FRAGMENT = `#version 300 es
   }
 
   /* Two wave fields crossed, lit where they agree. */
-  float weave(vec2 q, float t, vec2 qp, float reach) {
-    float a = 0.62;
-    float u1 = q.x * cos(a) + q.y * sin(a);
-    float u2 = q.x * cos(-a) + q.y * sin(-a);
-    /* The two fields are pushed out of step near the pointer, so the lattice
-       shears there rather than lighting up: what a weave is made of is where
-       its two halves agree, and disagreement is the only thing it can say. */
-    float shear = exp(-dot(q - qp, q - qp) * 2.6) * reach * 2.4;
-    float w = sin(u1 * 9.0 + t * 2.2 + shear) * sin(u2 * 9.0 - t * 1.7 - shear);
-    float grain = warped(vec2(q.x * 1.5, q.y * 1.5), t * 0.5);
-    return pow(max(w, 0.0), 2.2) * mix(0.5, 1.4, grain) * falloff(dot(q, q), 0.85);
-  }
-
   void main() {
     vec2 p = uv * 2.0 - 1.0;
     p.x *= uResolution.x / max(uResolution.y, 1.0);
@@ -390,9 +406,7 @@ export const FRAGMENT = `#version 300 es
     } else if (uShape == 2) {
       d = aurora(q, t, qp, uReach);
     } else if (uShape == 3) {
-      d = orbit(q, t, qp, uReach);
-    } else if (uShape == 4) {
-      d = weave(q, t, qp, uReach);
+      d = prism(q, t, qp, uReach);
     } else {
       d = flow(q, t, turn, uPointer * 0.05 * uReach);
     }

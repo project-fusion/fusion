@@ -13,10 +13,9 @@ const SHAPES = [
     name: 'rays',
   },
   { body: 'Horizontal curtains, drifting. The one shape here that is a horizon.', name: 'aurora' },
-  { body: 'Concentric rings squashed into perspective, travelling outward.', name: 'orbit' },
   {
-    body: 'Two wave fields crossed, lit only where they agree. A lattice that breathes.',
-    name: 'weave',
+    body: 'One beam split into an ordered spread. The pointer is the prism.',
+    name: 'prism',
   },
   {
     body: 'Ink in a viscous medium. Move the pointer and the wake outlives the gesture.',
