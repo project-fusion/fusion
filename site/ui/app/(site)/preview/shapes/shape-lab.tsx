@@ -18,6 +18,22 @@ const SHAPES = [
     name: 'prism',
   },
   {
+    body: 'Light travelling in lanes, at speed. The pointer is an obstacle to bow around.',
+    name: 'streaks',
+  },
+  {
+    body: 'Broad bands rolling under a warp. The pointer drags the crests.',
+    name: 'waves',
+  },
+  {
+    body: 'Five curves woven to a pinch, and the pointer is the pinch.',
+    name: 'threads',
+  },
+  {
+    body: 'Points adrift on their own orbits, pushed aside by the pointer.',
+    name: 'particles',
+  },
+  {
     body: 'Ink in a viscous medium. Move the pointer and the wake outlives the gesture.',
     name: 'flow',
   },

@@ -1,0 +1,5 @@
+/* Aura fills the box it is given, the way an image does, so an example has to
+   give it one. A hero is the real case and is taller than a preview wants. */
+.stage {
+  block-size: 20rem;
+}

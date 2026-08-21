@@ -270,7 +270,15 @@ takes no pointer events.
 | `gain` | `gain` | `number` | `1` | - | Overall brightness, as a multiplier on the field. |
 | `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
-| `shape` | `shape` | `'aurora' \| 'braid' \| 'flow' \| 'prism' \| 'rays' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
+| `shape` | `shape` | `\| 'aurora'
+    \| 'braid'
+    \| 'flow'
+    \| 'particles'
+    \| 'prism'
+    \| 'rays'
+    \| 'streaks'
+    \| 'threads'
+    \| 'waves' \| undefined` | - | - | Which form the light takes. Absent is `braid`. |
 | `speed` | `speed` | `number` | `1` | - | How fast it drifts, as a multiplier on time. |
 | `tilt` | `tilt` | `number` | `14` | - | The field's rotation, in degrees. |
 

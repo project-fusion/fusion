@@ -68,7 +68,16 @@ export class HelixAura extends HelixElement {
    * property writes the attribute onto every host anybody renders.
    */
   @property({ reflect: true })
-  shape?: 'aurora' | 'braid' | 'flow' | 'prism' | 'rays'
+  shape?:
+    | 'aurora'
+    | 'braid'
+    | 'flow'
+    | 'particles'
+    | 'prism'
+    | 'rays'
+    | 'streaks'
+    | 'threads'
+    | 'waves'
 
   /**
    * How far the settings wander on their own, `0` still and `1` restless.

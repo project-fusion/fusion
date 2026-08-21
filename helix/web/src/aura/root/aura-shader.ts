@@ -4,7 +4,17 @@
  * Exported so the component can turn a property into the integer the uniform
  * takes without a second list to keep in step.
  */
-export const SHAPES = ['braid', 'rays', 'aurora', 'prism', 'flow'] as const
+export const SHAPES = [
+  'braid',
+  'rays',
+  'aurora',
+  'prism',
+  'streaks',
+  'waves',
+  'threads',
+  'particles',
+  'flow',
+] as const
 
 /** Which form the light takes. */
 export type AuraShape = (typeof SHAPES)[number]
@@ -261,6 +271,126 @@ export const FRAGMENT = `#version 300 es
     return beam * structure * mix(0.65, 1.2, grain) * falloff(dot(q, q), 0.5);
   }
 
+  /* Light travelling in lanes, at speed.
+   *
+   * The one shape here that is about motion rather than about a form. Each lane
+   * carries a trail with its own speed, length and phase, so the field reads as
+   * something passing rather than something standing: the streaks the earlier
+   * ground plane wanted and never got.
+   *
+   * The wrap is deliberately outside the frame. A trail restarting is a pop, so
+   * the travel runs to plus and minus 1.8 while the visible field ends nearer
+   * 1.2, and the reset happens where nobody is looking.
+   *
+   * The pointer is an obstacle: lanes bow around it and slow through it, the way
+   * anything moving past a body does. Pushed outward in proportion to the offset
+   * rather than by its sign, because a sign is a discontinuity and a
+   * discontinuity in a displacement is a crease.
+   */
+  float streaks(vec2 q, float t, vec2 qp, float reach) {
+    float near = falloff(dot(q - qp, q - qp), 1.6) * reach;
+    vec2 s = q + vec2((q.x - qp.x) * near * 1.1, 0.0);
+
+    float lane = s.x * 2.4;
+    float id = floor(lane);
+    float within = fract(lane) - 0.5;
+
+    float speed = 0.55 + hash(vec2(id, 11.0)) * 1.5;
+    float phase = hash(vec2(id, 29.0));
+    float head = fract(phase + t * speed * 0.5) * 3.6 - 1.8;
+
+    float ahead = s.y - head;
+    float behind = max(-ahead, 0.0);
+    float len = 0.3 + hash(vec2(id, 47.0)) * 1.0;
+    float trail = exp(-behind / len) * smoothstep(0.07, 0.0, max(ahead, 0.0));
+
+    /* Slowed where the pointer is, which is the other half of an obstacle. */
+    trail *= mix(1.0, 0.45, near);
+
+    float lit = trail * falloff(within * within, 9.0);
+    float grain = fbm(vec2(s.x * 3.0, s.y * 1.4 - t * 1.6));
+    return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
+  }
+
+  /* Broad bands rolling under a warp.
+   *
+   * The softest shape here, and the only one with no filaments in it at all:
+   * where braid and threads are made of lines, this is made of gradients. The
+   * warp is what stops it sliding: bands moved by phase alone travel sideways
+   * like a barcode, and bands moved through a warped domain roll.
+   *
+   * The pointer drags them. Bowing the phase toward it bends the crests without
+   * changing how many there are, which is what a surface does when something
+   * pulls across it.
+   */
+  float waves(vec2 q, float t, vec2 qp, float reach) {
+    float pull = falloff(dot(q - qp, q - qp), 1.2) * reach;
+    float warp = warped(vec2(q.x * 0.55, q.y * 0.45), t * 0.35);
+    float phase = q.y * 1.7 + warp * 2.4 - t * 0.9 - pull * 1.6;
+    float band = sin(phase * 1.7) * 0.5 + 0.5;
+    float grain = warped(vec2(q.x * 1.3 + 6.0, q.y * 0.9), t * 0.3);
+    return pow(band, 1.7) * mix(0.5, 1.3, grain) * falloff(dot(q, q), 0.4);
+  }
+
+  /* Luminous threads, woven to a pinch.
+   *
+   * Five curves at different frequencies and speeds, each a thin bright line
+   * rather than a band: what makes this read as woven is that they cross, and
+   * what makes it read as one object rather than five is the pinch, where every
+   * amplitude narrows at once and the whole weave gathers.
+   *
+   * The pointer is the pinch, which is the interaction this shape is for.
+   * Carrying it along drags the gathering point with it and the threads open
+   * behind and close ahead.
+   */
+  float threads(vec2 q, float t, vec2 qp, float reach) {
+    float pinchAt = mix(0.0, qp.x, reach);
+    float gather = 1.0 - falloff((q.x - pinchAt) * (q.x - pinchAt), 1.1) * 0.88;
+
+    float lit = 0.0;
+    for (int i = 0; i < 5; i++) {
+      float f = float(i);
+      float amp = (0.3 + hash(vec2(f, 3.0)) * 0.45) * gather;
+      float y = sin(q.x * (1.2 + f * 0.28) + t * (0.5 + f * 0.22) + f * 1.7) * amp;
+      lit += falloff((q.y - y) * (q.y - y), 20.0) * (0.55 + hash(vec2(f, 9.0)) * 0.7);
+    }
+    float grain = fbm(vec2(q.x * 2.2, q.y * 2.2 - t));
+    return lit * mix(0.7, 1.2, grain) * falloff(dot(q, q), 0.4);
+  }
+
+  /* Points adrift, and pushed aside.
+   *
+   * One per cell of a coarse lattice, jittered off centre so the lattice never
+   * shows, and drifting on its own small orbit. Nine cells are visited because a
+   * point near a boundary has to be drawn by its neighbours too, which is what
+   * stops them popping in and out at the seams.
+   *
+   * The pointer repels. Pushing along the offset rather than by its sign keeps
+   * the displacement smooth, and it is the one response here where the reader
+   * is plainly moving things rather than lighting them.
+   */
+  float particles(vec2 q, float t, vec2 qp, float reach) {
+    float lit = 0.0;
+    vec2 cell = floor(q * 2.6);
+    for (int j = -1; j <= 1; j++) {
+      for (int i = -1; i <= 1; i++) {
+        vec2 c = cell + vec2(float(i), float(j));
+        float a = hash(c);
+        float b = hash(c + 17.3);
+        vec2 at = (c + 0.5 + (vec2(a, b) - 0.5) * 0.85) / 2.6;
+        at += vec2(sin(t * (0.5 + a) + b * 6.28), cos(t * (0.42 + b) + a * 6.28)) * 0.07;
+
+        vec2 away = at - qp;
+        float push = falloff(dot(away, away), 2.2) * reach;
+        at += away * push * 0.55;
+
+        vec2 off = q - at;
+        lit += falloff(dot(off, off), 52.0) * (0.35 + a * 0.9);
+      }
+    }
+    return lit * falloff(dot(q, q), 0.4);
+  }
+
   /* Ink in a viscous medium, drawn through by where the pointer went.
    *
    * **The wake is one stroke, not eight marks.** Each trail point used to add a
@@ -309,9 +439,23 @@ export const FRAGMENT = `#version 300 es
       }
       float t = clamp(dot(at - pa, ab) / len2, 0.0, 1.0);
       vec2 off = at - (pa + ab * t);
+
+      /* Elongated along the stroke, not round about it.
+      
+         A circular falloff makes the wake a tube of even thickness, which is
+         what a pipe looks like and not what a stirred medium does. Ink pulled
+         through a liquid smears the way the hand went: it reaches further along
+         the direction of travel than across it. Weighting the along component
+         down stretches the ellipse into that direction, and costs one dot
+         product. */
+      vec2 tangent = ab * inversesqrt(len2);
+      float alongOff = dot(off, tangent);
+      float acrossOff = dot(off, vec2(-tangent.y, tangent.x));
+      float shaped = acrossOff * acrossOff + alongOff * alongOff * 0.3;
+
       /* Squared, so a wake thins as it dies rather than switching off. */
       float life = 1.0 - mix(a.z, b.z, t);
-      float w = life * life * falloff(dot(off, off), 3.2);
+      float w = life * life * falloff(shaped, 3.2);
       wake += w;
       push += (ab * inversesqrt(len2)) * w;
     }
@@ -407,6 +551,14 @@ export const FRAGMENT = `#version 300 es
       d = aurora(q, t, qp, uReach);
     } else if (uShape == 3) {
       d = prism(q, t, qp, uReach);
+    } else if (uShape == 4) {
+      d = streaks(q, t, qp, uReach);
+    } else if (uShape == 5) {
+      d = waves(q, t, qp, uReach);
+    } else if (uShape == 6) {
+      d = threads(q, t, qp, uReach);
+    } else if (uShape == 7) {
+      d = particles(q, t, qp, uReach);
     } else {
       d = flow(q, t, turn, uPointer * 0.05 * uReach);
     }
