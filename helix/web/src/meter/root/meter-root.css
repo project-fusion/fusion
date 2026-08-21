@@ -231,16 +231,22 @@
 
 /* A tick is a segment of the same circle rather than a mark placed on it: one
    unit of a hundred, pushed round to where the threshold falls. No trigonometry,
-   and it stays right at any radius and any thickness. Drawn in the page's own
-   ground rather than a line color, so it reads as a gap in the groove, which is
-   what a scale mark on a dial is. */
+   and it stays right at any radius and any thickness. Drawn in the ground's own
+   colour rather than a line color, so it reads as a gap in the groove, which is
+   what a scale mark on a dial is.
+
+   `--meter-tick-color` is the same hook the bar's tick takes, so the two shapes
+   answer to one property rather than one of them being correctable and the
+   other not. It was a bare `--helix-color-background` until 21 Aug 2026, which
+   made the arc the only shape whose marks could not be told what the meter had
+   been put on. */
 :host([shape="arc"]) [part="tick"],
 :host([shape="ring"]) [part="tick"] {
   /* The bar's tick is a positioned span; on a circle none of that applies and
      the inline offset would move the whole drawing. */
   inset-inline-start: auto;
   position: static;
-  stroke: var(--helix-color-background);
+  stroke: var(--meter-tick-color, var(--helix-color-background));
   stroke-dasharray: 1 99;
   stroke-dashoffset: calc(var(--_meter-along) * -1);
 }

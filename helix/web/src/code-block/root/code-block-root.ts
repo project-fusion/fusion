@@ -16,6 +16,8 @@ import '../../copy-button/index.js'
  * @status experimental
  * @category content
  * @documentation https://helix.fusion.dev/components/code-block
+ *
+ * @cssproperty --code-block-background - The ground behind the code, for a block that is not on the page.
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixBaseCodeBlock {

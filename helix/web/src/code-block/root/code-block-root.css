@@ -80,8 +80,14 @@
   /* The page's own ground, not a sunken panel. `surface-sunken` is a step away
      from the background, so a block of code read as a well cut into the page
      when what it is is the page with a line around it. On a dark theme that
-     step is the difference between black and not-quite. */
-  background-color: var(--helix-color-background);
+     step is the difference between black and not-quite.
+
+     Which is an argument about a block of code *on a page*, and a block of code
+     inside a card or a drawer is a slab of the page's colour sitting on
+     something else. `--code-block-background` is how that is said, and the
+     reasoning above is why the page stays the default rather than becoming a
+     `transparent` that would take the border's meaning with it. */
+  background-color: var(--code-block-background, var(--helix-color-background));
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   margin: var(--helix-space-none);

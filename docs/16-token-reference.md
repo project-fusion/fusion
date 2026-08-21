@@ -27,7 +27,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 103 |
-| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 49 |
+| `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 47 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 32 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 39 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 86 |
@@ -184,7 +184,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 219 |
-| `--helix-border-thick` | `2px` | 61 |
+| `--helix-border-thick` | `2px` | 63 |
 
 ## shadow
 

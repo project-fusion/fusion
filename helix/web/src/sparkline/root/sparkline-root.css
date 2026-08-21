@@ -134,3 +134,41 @@
   fill: currentColor;
   rx: var(--sparkline-bar-radius, 0.5);
 }
+
+/* The hole in the ring, cut out of the drawing so it is one.
+ *
+ * A `ring` terminus is a window onto whatever the chart is drawn over, and the
+ * line ends at the reading, which is the window's centre. Something has to give
+ * way, and until 21 Aug 2026 it was the window: the middle was painted with the
+ * page's surface, which hid the stroke and also hid the card, the photograph or
+ * the panel the chart was actually sitting on. Measured on a purple card, the
+ * mark came out a disc of the page colour.
+ *
+ * So the drawing gives way instead. `mask-image` on the `<svg>` takes out a
+ * disc of exactly the radius the ring leaves open, centred on the same two
+ * percentages the mark is placed with, and the stroke genuinely stops at the
+ * ring's inner edge.
+ *
+ * **On the `<svg>` and not on `[part="line"]`, which is the whole trick.** The
+ * ring is an HTML element in CSS pixels and the line is in a coordinate space
+ * `preserveAspectRatio="none"` stretches, so a radius means two different
+ * things in the two places and no mask written inside the view box can agree
+ * with the mark. The `<svg>` element itself is an ordinary replaced box whose
+ * border box is in CSS pixels, which is the one surface where both are
+ * measured the same way. It is the same reason the mark is a `<span>` rather
+ * than a `<circle>`.
+ *
+ * Everything removed is inside the ring's own hole, so nothing else changes:
+ * the wash and any column under the mark are covered by the border in the
+ * annulus and only visible through the middle, where the point is to see past
+ * them. The half pixel is a feather, since a hard stop on a curved edge aliases.
+ *
+ * A consumer who wants the old lid back sets `--chart-terminus-hole` to a
+ * colour: the disc is still cut, and an opaque middle covers the cut. */
+:host([terminus="ring"]) [part="svg"] {
+  mask-image: radial-gradient(
+    circle at var(--_chart-terminus-x) var(--_chart-terminus-y),
+    #0000 calc(var(--_chart-terminus-inner) - 0.5px),
+    #000 var(--_chart-terminus-inner)
+  );
+}

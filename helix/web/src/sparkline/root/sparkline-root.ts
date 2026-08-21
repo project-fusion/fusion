@@ -34,7 +34,7 @@ import { styles } from './sparkline-root.css.js'
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline
  *
- * @cssproperty --chart-terminus-hole - What shows through a `ring` terminus.
+ * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
  * @cssproperty --sparkline-area-opacity - How much of the line's colour the wash takes where it meets the line.
  * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.
@@ -79,7 +79,11 @@ export class HelixSparkline extends HelixBaseSparkline {
    * reading, and a mark on top of it would say the same thing twice.
    *
    * The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
-   * that ends a line, so the set is the same wherever one appears.
+   * that ends a line, so the set is the same wherever one appears. `ring` is the
+   * one that asks anything of the drawing: the disc it leaves open is masked out
+   * of the `<svg>`, so the line stops at the ring's inner edge rather than
+   * running on to the reading at its centre, and the middle shows whatever the
+   * chart is drawn over rather than a guess at it.
    */
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'

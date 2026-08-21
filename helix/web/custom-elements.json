@@ -8943,6 +8943,12 @@
           "kind": "class",
           "description": "The header sits above the code rather than floating on it. Overlaid, which is\nthe usual build, the copy button covers the first line, which is the one line\nof a snippet a reader is most likely to be reading.",
           "name": "HelixCodeBlock",
+          "cssProperties": [
+            {
+              "description": "The ground behind the code, for a block that is not on the page.",
+              "name": "--code-block-background"
+            }
+          ],
           "members": [
             {
               "kind": "field",
@@ -48087,6 +48093,10 @@
               "name": "--slider-thumb-color"
             },
             {
+              "description": "The fence separating the handle from the track, for a slider that is not on the page.",
+              "name": "--slider-thumb-ring-color"
+            },
+            {
               "description": "The part not yet chosen.",
               "name": "--slider-track-color"
             },
@@ -49389,7 +49399,7 @@
           "name": "HelixSparkline",
           "cssProperties": [
             {
-              "description": "What shows through a `ring` terminus.",
+              "description": "A fill for the middle of a `ring` terminus, which is otherwise open.",
               "name": "--chart-terminus-hole"
             },
             {
@@ -49438,7 +49448,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its centre, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "attribute": "terminus",
               "reflects": true
             },
@@ -49622,7 +49632,7 @@
               "type": {
                 "text": "'none' | 'ring' | 'square' | 'triangle' | undefined"
               },
-              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears.",
+              "description": "The shape of the mark on the last reading.\n\nAbsent is a dot, which is how a line is usually ended, and absent rather\nthan defaulted because a reflecting property with a default writes its\nattribute onto a host the consumer rendered, which React reports as a\nhydration mismatch.\n\n`none` lets the line stop on its own, which suits a series read as a shape\nrather than for where it finished. `ring` lets the ground through, for a\nchart drawn over something busy. `triangle` points along the axis and reads\nas \"and onward\" rather than as a second claim about the data.\n\nA `bar` plot draws none of them: the last column already is the last\nreading, and a mark on top of it would say the same thing twice.\n\nThe shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart\nthat ends a line, so the set is the same wherever one appears. `ring` is the\none that asks anything of the drawing: the disc it leaves open is masked out\nof the `<svg>`, so the line stops at the ring's inner edge rather than\nrunning on to the reading at its centre, and the middle shows whatever the\nchart is drawn over rather than a guess at it.",
               "fieldName": "terminus"
             },
             {

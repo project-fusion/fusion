@@ -1080,6 +1080,12 @@ of a snippet a reader is most likely to be reading.
 | `copy` | The copy button. |
 | `label` | The file name or language, where one is given. |
 
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--code-block-background` | The ground behind the code, for a block that is not on the page. |
+
 ## Color Input
 
 ### Root — `helix-color-input`
@@ -4613,6 +4619,7 @@ the thumb being dragged.
 | Property | Description |
 | --- | --- |
 | `--slider-thumb-color` | The handle. |
+| `--slider-thumb-ring-color` | The fence separating the handle from the track, for a slider that is not on the page. |
 | `--slider-track-color` | The part not yet chosen. |
 | `--slider-fill-color` | The part behind the thumb. |
 | `--slider-marker-color` | The ticks along the track. |
@@ -4674,7 +4681,7 @@ keeps it out of every other reason it might want to be bigger.
 
 | Property | Description |
 | --- | --- |
-| `--chart-terminus-hole` | What shows through a `ring` terminus. |
+| `--chart-terminus-hole` | A fill for the middle of a `ring` terminus, which is otherwise open. |
 | `--chart-terminus-size` | Size of the mark on the last reading. |
 | `--sparkline-area-opacity` | How much of the line's colour the wash takes where it meets the line. |
 | `--sparkline-bar-radius` | Corner radius on a column, under `plot="bar"`. |

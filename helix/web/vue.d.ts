@@ -4916,7 +4916,11 @@ A `bar` plot draws none of them: the last column already is the last
 reading, and a mark on top of it would say the same thing twice.
 
 The shapes come from `helix/web/src/chart/terminus.css`, shared with every other chart
-that ends a line, so the set is the same wherever one appears. */
+that ends a line, so the set is the same wherever one appears. `ring` is the
+one that asks anything of the drawing: the disc it leaves open is masked out
+of the `<svg>`, so the line stops at the ring's inner edge rather than
+running on to the reading at its centre, and the middle shows whatever the
+chart is drawn over rather than a guess at it. */
   terminus?: HelixSparkline["terminus"];
   /** What the readings are drawn as.
 
@@ -7033,6 +7037,8 @@ export type CustomCssProperties = {
   "--checkbox-card-background-color"?: string;
   /** Edge around one. */
   "--checkbox-card-border-color"?: string;
+  /** The ground behind the code, for a block that is not on the page. */
+  "--code-block-background"?: string;
   /** The fragment's size. Defaults to `text-sm`. */
   "--code-size"?: string;
   /** Fill behind the field. */
@@ -7329,6 +7335,8 @@ export type CustomCssProperties = {
   "--skeleton-size"?: string;
   /** The handle. */
   "--slider-thumb-color"?: string;
+  /** The fence separating the handle from the track, for a slider that is not on the page. */
+  "--slider-thumb-ring-color"?: string;
   /** The part not yet chosen. */
   "--slider-track-color"?: string;
   /** The part behind the thumb. */
@@ -7339,7 +7347,7 @@ export type CustomCssProperties = {
   "--slider-track-image"?: string;
   /** How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row. */
   "--slider-length"?: string;
-  /** What shows through a `ring` terminus. */
+  /** A fill for the middle of a `ring` terminus, which is otherwise open. */
   "--chart-terminus-hole"?: string;
   /** Size of the mark on the last reading. */
   "--chart-terminus-size"?: string;

@@ -44,7 +44,7 @@
 }
 
 /* Hollow, for a chart drawn over something busy: the ground shows through the
-   middle, so the mark reads as a ring rather than as a blot on the content.
+ * middle, so the mark reads as a ring rather than as a blot on the content.
  *
  * **Larger than the dot, and that is what makes it a ring at all.** At the same
  * 5px with a 2px border on every side, the hole left in the middle is one pixel:
@@ -54,24 +54,35 @@
  *
  * Bigger also because a hollow mark reads smaller than a filled one of the same
  * size, so matching the dot's diameter would make the ring look like the
- * quieter of the two when it is meant to be the same weight of statement. */
+ * quieter of the two when it is meant to be the same weight of statement.
+ *
+ * **The hole is a hole, and the chart is what makes it one.** It was filled
+ * with `--helix-color-surface` until 21 Aug 2026, because a line ends *at* its
+ * last reading, which is the ring's centre, so a transparent middle showed the
+ * stroke running into it and the mark read as a target. Filling it hid the
+ * stroke and hid everything else with it: measured on a purple card, the ring
+ * came out a disc of the page's colour, which is the same mistake `Timeline`'s
+ * marker was making and the reason both are in one queue row.
+ *
+ * Colour cannot fix it, because no element can ask what is painted behind it.
+ * Geometry can: the drawing has this exact disc taken out of it, so the stroke
+ * genuinely stops at the ring's inner edge and the middle is free to show
+ * whatever is there. The rule that does it belongs to the component that owns
+ * the drawing, because only that component knows what to cut. */
 :host([terminus="ring"]) [part="terminus"] {
-  /* The ground, not transparency, so the line stops at the ring's edge.
-   *
-   * Transparent was the first version and it read as a target: a sparkline's
-   * line ends *at* its last reading, which is the ring's centre, so the stroke
-   * ran through the hole and out the other side. Filling the hole with the
-   * surface hides the last fraction of the line behind the mark, which is what
-   * a ring terminus is supposed to look like.
-   *
-   * The cost is that it is now opaque, so a ring over a picture or a coloured
-   * card shows a disc of the page's surface rather than the picture.
-   * `--chart-terminus-hole` is there for exactly that, and taking `transparent`
-   * gets the old behaviour back. */
-  background-color: var(--chart-terminus-hole, var(--helix-color-surface));
+  background-color: var(--chart-terminus-hole, transparent);
   block-size: calc(var(--chart-terminus-size, 5px) * 1.6);
   border: var(--helix-border-thick) solid currentColor;
   inline-size: calc(var(--chart-terminus-size, 5px) * 1.6);
+}
+
+/* What the ring leaves open, as a radius, for the drawing to cut to.
+ *
+ * Declared here beside the size it is derived from rather than restated by each
+ * chart, which is what would drift. Outer radius less the border it is drawn
+ * with, so the disc removed is exactly the disc the reader can see through. */
+:host([terminus="ring"]) {
+  --_chart-terminus-inner: calc(var(--chart-terminus-size, 5px) * 0.8 - var(--helix-border-thick));
 }
 
 /* Pointing along the axis rather than up or down.

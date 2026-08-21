@@ -257,12 +257,29 @@ export class HelixBaseSparkline extends HelixElement {
           }))
         : []
 
+    /* Where the series ended, as percentages of the box.
+     *
+     * Read twice, by the mark and by the drawing, which is why it is a local
+     * rather than two literals. The mark sits on it; the drawing has the same
+     * disc taken out of it, so a `ring` is a hole rather than a lid. A custom
+     * property would be the tidier channel and there is nowhere to put one:
+     * they inherit down and never sideways, the two elements are siblings, and
+     * the host cannot be styled from a template without a wrapper element that
+     * carries nothing else. */
+    const end =
+      points.length < 2
+        ? undefined
+        : `--_chart-terminus-x: 100%; --_chart-terminus-y: ${
+            (y(points[points.length - 1] as number) / BOX.height) * 100
+          }%`
+
     return html`<svg
         aria-hidden=${this.label === '' ? 'true' : nothing}
         aria-label=${this.label === '' ? nothing : this.label}
         part="svg"
         preserveAspectRatio="none"
         role=${this.label === '' ? nothing : 'img'}
+        style=${end ?? nothing}
         viewBox="0 0 ${BOX.width} ${BOX.height}"
       >
         ${
@@ -318,13 +335,7 @@ export class HelixBaseSparkline extends HelixElement {
            dot on top of it would be a second mark saying the same thing. */
         points.length < 2 || this.plot === 'bar'
           ? nothing
-          : html`<span
-              aria-hidden="true"
-              part="terminus"
-              style="--_chart-terminus-x: 100%; --_chart-terminus-y: ${
-                (y(points[points.length - 1] as number) / BOX.height) * 100
-              }%"
-            ></span>`
+          : html`<span aria-hidden="true" part="terminus" style=${end ?? nothing}></span>`
       }`
   }
 }

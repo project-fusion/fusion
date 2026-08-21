@@ -317,16 +317,26 @@
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--helix-radii-full);
-  /* A ring of the page's own colour, so the thumb reads against whichever
+  /* A ring of the ground's own colour, so the thumb reads against whichever
      half of the track it is over.
-     
+
      Contrast against the track is 11.25 and against the fill is 2.57, which is
      under the three to one non-text contrast wants: the thumb sits on the
      boundary between the two and at the end of its travel it is over the fill
      alone. A ring separates it from both without tinting it, and it inverts
-     with the mode for free because it is the ground either sits on. */
+     with the mode for free because it is the ground either sits on.
+
+     **The page is the guess, and `--slider-thumb-ring-color` is how a consumer
+     says otherwise.** A separating ring has to match what the slider was put
+     on, and no element can ask what is painted behind it: on a card this comes
+     out as a ring of the page's colour, which is the failure `Timeline`'s
+     marker and the sparkline's ring terminus both had. Neither of those could
+     be fixed with a hook, because a mark that means "a gap in the thing behind
+     me" should be cut rather than filled. This one is different and the hook is
+     the right answer: the ring is not a gap, it is a fence, and it has to be
+     opaque or the thumb merges into the fill again. */
   box-shadow:
-    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
@@ -335,7 +345,7 @@
 [part="control"]:focus-visible::-webkit-slider-thumb,
 [part="control"]:active::-webkit-slider-thumb {
   box-shadow:
-    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md),
     0 0 0 var(--helix-space-2xs) var(--_slider-halo);
 }
@@ -343,7 +353,7 @@
 [part="control"]:focus-visible::-moz-range-thumb,
 [part="control"]:active::-moz-range-thumb {
   box-shadow:
-    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md),
     0 0 0 var(--helix-space-2xs) var(--_slider-halo);
 }
@@ -355,16 +365,26 @@
      border, so leaving the declaration out leaves a border rather than none. */
   border: none;
   border-radius: var(--helix-radii-full);
-  /* A ring of the page's own colour, so the thumb reads against whichever
+  /* A ring of the ground's own colour, so the thumb reads against whichever
      half of the track it is over.
-     
+
      Contrast against the track is 11.25 and against the fill is 2.57, which is
      under the three to one non-text contrast wants: the thumb sits on the
      boundary between the two and at the end of its travel it is over the fill
      alone. A ring separates it from both without tinting it, and it inverts
-     with the mode for free because it is the ground either sits on. */
+     with the mode for free because it is the ground either sits on.
+
+     **The page is the guess, and `--slider-thumb-ring-color` is how a consumer
+     says otherwise.** A separating ring has to match what the slider was put
+     on, and no element can ask what is painted behind it: on a card this comes
+     out as a ring of the page's colour, which is the failure `Timeline`'s
+     marker and the sparkline's ring terminus both had. Neither of those could
+     be fixed with a hook, because a mark that means "a gap in the thing behind
+     me" should be cut rather than filled. This one is different and the hook is
+     the right answer: the ring is not a gap, it is a fence, and it has to be
+     opaque or the thumb merges into the fill again. */
   box-shadow:
-    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
 }

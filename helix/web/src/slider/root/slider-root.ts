@@ -26,6 +26,7 @@ import { styles } from './slider-root.css.js'
  * @documentation https://helix.fusion.dev/components/slider
  *
  * @cssproperty --slider-thumb-color - The handle.
+ * @cssproperty --slider-thumb-ring-color - The fence separating the handle from the track, for a slider that is not on the page.
  * @cssproperty --slider-track-color - The part not yet chosen.
  * @cssproperty --slider-fill-color - The part behind the thumb.
  * @cssproperty --slider-marker-color - The ticks along the track.
