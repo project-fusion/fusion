@@ -200,8 +200,24 @@
  * `align-items: center` for the same reason the inline label uses it: the track
  * is a control with padding and a border, so anything beside it that is only
  * text would otherwise sit on a different optical line. */
+/* **`flex`, not `inline-flex`, and the track grows inside it.**
+ *
+ * The row was added between the host and the track, and an inline-flex box
+ * shrink wraps: a group stretched to its column, which is what a field in a
+ * drawer is, had a full width host with a shrink wrapped row inside it and a
+ * track that could no longer reach the edges. The track used to be the host's
+ * own child and inherited the stretch for free.
+ *
+ * A block level row fills whatever the host has, and the track is told to take
+ * what is left after the slots either side, so a group is exactly as wide as it
+ * was before the row existed in both cases: shrink wrapped when the host is
+ * auto, full width when something stretched it. */
 [part="row"] {
   align-items: center;
-  display: inline-flex;
+  display: flex;
   gap: var(--helix-space-sm);
+}
+
+[part="row"] [part="track"] {
+  flex: 1 1 auto;
 }

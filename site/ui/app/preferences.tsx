@@ -114,7 +114,12 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
       open={open}
       placement="end"
     >
-      <helix-flex align="start" direction="column" gap="lg">
+      {/* No `align="start"`. It shrink wrapped every child to its own content,
+          so each toggle group was as wide as its three words and the drawer had
+          a column of ragged little controls in it. Stretch is the default and
+          is what a column of fields wants: they share an edge, and a group that
+          fills its column has segments wide enough to read. */}
+      <helix-flex direction="column" gap="lg">
         <helix-text appearance="subheading" as="h2">
           Preferences
         </helix-text>
@@ -126,7 +131,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             the group was named twice, once visibly and once through
             `aria-label`. */}
         <helix-toggle-group
-          hint="System follows your operating system, and keeps following it."
+          hint="System keeps following your device."
           label="Color mode"
           onhelix-change={(event) => choose(event.detail.value as ColorMode)}
           value={mode}
@@ -137,7 +142,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         </helix-toggle-group>
 
         <helix-toggle-group
-          hint="Styled extends base, so its API is the larger of the two."
+          hint="Styled extends base, so it shows more."
           label="API reference"
           onhelix-change={(event) => chooseTier(event.detail.value as ApiTier)}
           value={tier}
