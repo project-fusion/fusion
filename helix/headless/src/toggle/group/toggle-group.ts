@@ -9,6 +9,7 @@ import {
   MixinField,
 } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 import { HelixBaseToggle } from '../root/toggle-root.js'
 
 /**
@@ -213,6 +214,25 @@ export class HelixBaseToggleGroup extends MixinControllerValue(MixinField(HelixF
   private validate(): void {
     this.reportRequired(this.value === '', 'Choose one to continue.', 'track')
   }
+
+  /**
+   * Where the group's label sits, `start` putting it on the track's line.
+   *
+   * Absent is above, which is what a field looks like and what almost every
+   * group wants. `start` is for a row of controls that are labelled rather than
+   * a form of fields: a toolbar reads as one line, and a label stacked over
+   * every group in it turns one row into two.
+   *
+   * **A placement rather than a slot, and that is the whole point of it.** A
+   * `start` slot would let a consumer put the word there, and would also let
+   * them put it there *instead of* setting `label`, which is the group's
+   * accessible name: the set would then be named for nobody using a screen
+   * reader while looking correct to everybody else. Worse, setting both draws
+   * it twice. One property moves the label the consumer already has to give,
+   * and cannot be used to remove it.
+   */
+  @property({ attribute: 'label-placement', reflect: true })
+  labelPlacement?: 'start'
 
   protected override render(): TemplateResult {
     /* The track is an element now, where it used to be the host itself.

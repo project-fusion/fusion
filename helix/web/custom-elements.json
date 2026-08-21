@@ -47106,6 +47106,10 @@
                 "slug": "from-a-table"
               },
               {
+                "description": "All eight series colours on the same readings, as a line and as a wash, since a colour at 1.5px is not the same colour as a soft field.",
+                "slug": "palette"
+              },
+              {
                 "description": "Five ways to end a line. The shapes are shared with every other chart that draws one.",
                 "slug": "termini"
               }
@@ -60323,6 +60327,20 @@
             },
             {
               "kind": "field",
+              "name": "labelPlacement",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the group's label sits, `start` putting it on the track's line.\n\nAbsent is above, which is what a field looks like and what almost every\ngroup wants. `start` is for a row of controls that are labelled rather than\na form of fields: a toolbar reads as one line, and a label stacked over\nevery group in it turns one row into two.\n\n**A placement rather than a slot, and that is the whole point of it.** A\n`start` slot would let a consumer put the word there, and would also let\nthem put it there *instead of* setting `label`, which is the group's\naccessible name: the set would then be named for nobody using a screen\nreader while looking correct to everybody else. Worse, setting both draws\nit twice. One property moves the label the consumer already has to give,\nand cannot be used to remove it.",
+              "attribute": "label-placement",
+              "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "formAssociated",
               "type": {
                 "text": "boolean"
@@ -60598,6 +60616,18 @@
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "name": "label-placement",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the group's label sits, `start` putting it on the track's line.\n\nAbsent is above, which is what a field looks like and what almost every\ngroup wants. `start` is for a row of controls that are labelled rather than\na form of fields: a toolbar reads as one line, and a label stacked over\nevery group in it turns one row into two.\n\n**A placement rather than a slot, and that is the whole point of it.** A\n`start` slot would let a consumer put the word there, and would also let\nthem put it there *instead of* setting `label`, which is the group's\naccessible name: the set would then be named for nobody using a screen\nreader while looking correct to everybody else. Worse, setting both draws\nit twice. One property moves the label the consumer already has to give,\nand cannot be used to remove it.",
+              "fieldName": "labelPlacement",
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
               }
             },
             {

@@ -551,7 +551,21 @@ export class HelixAura extends HelixElement {
        Frame-rate independent, written as a time constant rather than a
        per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
        display would chase twice as eagerly as a 60Hz one. */
-    const follow = 1 - Math.exp(-delta / 0.028)
+    /* **The constant scales with the gap, because one constant cannot do both
+       jobs.** A fixed 28 milliseconds leaves a moving pointer a distance v * t
+       behind it for as long as it keeps moving: about 56 pixels at a 2000
+       pixel per second flick and twice that at twice the speed, which is what
+       reads as the field being unable to keep up. Lowering it for everyone
+       would give the jitter of a resting hand straight back to the shader,
+       which is the only thing the smoothing was ever there for.
+    
+       Jitter is small and a flick is large, so the size of the gap is the
+       signal that tells them apart. At rest this still eases over about 25
+       milliseconds; a gap of one shape unit closes over nine, and two over
+       five. Nothing to tune per shape and nothing to measure per frame beyond
+       a distance already implied by the two points. */
+    const drift = Math.hypot(this.target.x - this.eased.x, this.target.y - this.eased.y)
+    const follow = 1 - Math.exp(-delta / (0.028 / (1 + drift * 2.4)))
     if (!this.interactive) {
       this.target.presence = 0
     }

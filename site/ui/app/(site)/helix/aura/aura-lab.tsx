@@ -157,6 +157,7 @@ export function AuraLab(): React.ReactElement {
               appearance="filled"
               class="auraShapes"
               label="Shape"
+              label-placement="start"
               onhelix-change={(event: CustomEvent<{ value: string }>) => {
                 const next = SHAPES.findIndex((entry) => entry.name === event.detail.value)
                 if (next >= 0) {
@@ -175,6 +176,7 @@ export function AuraLab(): React.ReactElement {
             <helix-toggle-group
               appearance="filled"
               label="Pointer"
+              label-placement="start"
               onhelix-change={(event: CustomEvent<{ value: string }>) => {
                 const next = INTERACTIONS.find((one) => one === event.detail.value)
                 if (next) {

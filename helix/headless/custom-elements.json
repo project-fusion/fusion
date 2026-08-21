@@ -44829,6 +44829,16 @@
             },
             {
               "kind": "field",
+              "name": "labelPlacement",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the group's label sits, `start` putting it on the track's line.\n\nAbsent is above, which is what a field looks like and what almost every\ngroup wants. `start` is for a row of controls that are labelled rather than\na form of fields: a toolbar reads as one line, and a label stacked over\nevery group in it turns one row into two.\n\n**A placement rather than a slot, and that is the whole point of it.** A\n`start` slot would let a consumer put the word there, and would also let\nthem put it there *instead of* setting `label`, which is the group's\naccessible name: the set would then be named for nobody using a screen\nreader while looking correct to everybody else. Worse, setting both draws\nit twice. One property moves the label the consumer already has to give,\nand cannot be used to remove it.",
+              "attribute": "label-placement",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "defaultValue",
               "type": {
                 "text": "string"
@@ -45444,38 +45454,15 @@
               "reactProp": "onhelix-select"
             }
           ],
-          "mixins": [
-            {
-              "name": "MixinControllerValue",
-              "package": "@helix-io/core"
-            },
-            {
-              "name": "MixinField",
-              "package": "@helix-io/core"
-            }
-          ],
-          "superclass": {
-            "name": "HelixFormElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "A row of options with the selection marked by a moving indicator.",
-          "helix": {
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/toggle-group",
-            "aliases": [
-              "SegmentedControl",
-              "Segmented",
-              "Navigation",
-              "Switcher"
-            ],
-            "tier": "headless",
-            "group": "BaseToggle",
-            "part": "Group"
-          },
-          "tagName": "helix-base-toggle-group",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "label-placement",
+              "type": {
+                "text": "'start' | undefined"
+              },
+              "description": "Where the group's label sits, `start` putting it on the track's line.\n\nAbsent is above, which is what a field looks like and what almost every\ngroup wants. `start` is for a row of controls that are labelled rather than\na form of fields: a toolbar reads as one line, and a label stacked over\nevery group in it turns one row into two.\n\n**A placement rather than a slot, and that is the whole point of it.** A\n`start` slot would let a consumer put the word there, and would also let\nthem put it there *instead of* setting `label`, which is the group's\naccessible name: the set would then be named for nobody using a screen\nreader while looking correct to everybody else. Worse, setting both draws\nit twice. One property moves the label the consumer already has to give,\nand cannot be used to remove it.",
+              "fieldName": "labelPlacement"
+            },
             {
               "name": "default-value",
               "type": {
@@ -45580,6 +45567,37 @@
               }
             }
           ],
+          "mixins": [
+            {
+              "name": "MixinControllerValue",
+              "package": "@helix-io/core"
+            },
+            {
+              "name": "MixinField",
+              "package": "@helix-io/core"
+            }
+          ],
+          "superclass": {
+            "name": "HelixFormElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A row of options with the selection marked by a moving indicator.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/toggle-group",
+            "aliases": [
+              "SegmentedControl",
+              "Segmented",
+              "Navigation",
+              "Switcher"
+            ],
+            "tier": "headless",
+            "group": "BaseToggle",
+            "part": "Group"
+          },
+          "tagName": "helix-base-toggle-group",
+          "customElement": true,
           "modulePath": "src/toggle/group/toggle-group.ts",
           "definitionPath": "src/toggle/group/toggle-group.ts"
         }

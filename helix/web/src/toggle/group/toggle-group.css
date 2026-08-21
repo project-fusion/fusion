@@ -8,6 +8,21 @@
   gap: var(--helix-space-2xs);
 }
 
+/* The label on the track's line rather than over it.
+ *
+ * `baseline` would be the obvious alignment and is the wrong one: the track is
+ * a control with padding and a border, so its first line box sits lower than a
+ * bare label's and the word rides high against it. Centre is what puts the two
+ * on the same optical line.
+ *
+ * The row gap is `sm` rather than the stack's `2xs`, because horizontal space
+ * between two different things has to read as a gap and four pixels does not. */
+:host([label-placement="start"]) {
+  align-items: center;
+  flex-direction: row;
+  gap: var(--helix-space-sm);
+}
+
 [part="track"] {
   display: inline-flex;
   position: relative;

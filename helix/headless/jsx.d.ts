@@ -9694,6 +9694,36 @@ export type HelixBaseToggleGroupHelixSelectElementEvent =
   HelixBaseToggleGroupElementEvent<HelixSelectEvent>;
 
 export type HelixBaseToggleGroupProps = {
+  /** Where the group's label sits, `start` putting it on the track's line.
+
+Absent is above, which is what a field looks like and what almost every
+group wants. `start` is for a row of controls that are labelled rather than
+a form of fields: a toolbar reads as one line, and a label stacked over
+every group in it turns one row into two.
+
+**A placement rather than a slot, and that is the whole point of it.** A
+`start` slot would let a consumer put the word there, and would also let
+them put it there *instead of* setting `label`, which is the group's
+accessible name: the set would then be named for nobody using a screen
+reader while looking correct to everybody else. Worse, setting both draws
+it twice. One property moves the label the consumer already has to give,
+and cannot be used to remove it. */
+  "label-placement"?: HelixBaseToggleGroup["labelPlacement"];
+  /** Where the group's label sits, `start` putting it on the track's line.
+
+Absent is above, which is what a field looks like and what almost every
+group wants. `start` is for a row of controls that are labelled rather than
+a form of fields: a toolbar reads as one line, and a label stacked over
+every group in it turns one row into two.
+
+**A placement rather than a slot, and that is the whole point of it.** A
+`start` slot would let a consumer put the word there, and would also let
+them put it there *instead of* setting `label`, which is the group's
+accessible name: the set would then be named for nobody using a screen
+reader while looking correct to everybody else. Worse, setting both draws
+it twice. One property moves the label the consumer already has to give,
+and cannot be used to remove it. */
+  labelPlacement?: HelixBaseToggleGroup["labelPlacement"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixBaseToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -9755,6 +9785,36 @@ reflected none of them. */
 };
 
 export type HelixBaseToggleGroupSolidJsProps = {
+  /** Where the group's label sits, `start` putting it on the track's line.
+
+Absent is above, which is what a field looks like and what almost every
+group wants. `start` is for a row of controls that are labelled rather than
+a form of fields: a toolbar reads as one line, and a label stacked over
+every group in it turns one row into two.
+
+**A placement rather than a slot, and that is the whole point of it.** A
+`start` slot would let a consumer put the word there, and would also let
+them put it there *instead of* setting `label`, which is the group's
+accessible name: the set would then be named for nobody using a screen
+reader while looking correct to everybody else. Worse, setting both draws
+it twice. One property moves the label the consumer already has to give,
+and cannot be used to remove it. */
+  "attr:label-placement"?: HelixBaseToggleGroup["labelPlacement"];
+  /** Where the group's label sits, `start` putting it on the track's line.
+
+Absent is above, which is what a field looks like and what almost every
+group wants. `start` is for a row of controls that are labelled rather than
+a form of fields: a toolbar reads as one line, and a label stacked over
+every group in it turns one row into two.
+
+**A placement rather than a slot, and that is the whole point of it.** A
+`start` slot would let a consumer put the word there, and would also let
+them put it there *instead of* setting `label`, which is the group's
+accessible name: the set would then be named for nobody using a screen
+reader while looking correct to everybody else. Worse, setting both draws
+it twice. One property moves the label the consumer already has to give,
+and cannot be used to remove it. */
+  "prop:labelPlacement"?: HelixBaseToggleGroup["labelPlacement"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixBaseToggleGroup["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -20065,6 +20125,20 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
+   *
+   * Absent is above, which is what a field looks like and what almost every
+   * group wants. `start` is for a row of controls that are labelled rather than
+   * a form of fields: a toolbar reads as one line, and a label stacked over
+   * every group in it turns one row into two.
+   *
+   * **A placement rather than a slot, and that is the whole point of it.** A
+   * `start` slot would let a consumer put the word there, and would also let
+   * them put it there *instead of* setting `label`, which is the group's
+   * accessible name: the set would then be named for nobody using a screen
+   * reader while looking correct to everybody else. Worse, setting both draws
+   * it twice. One property moves the label the consumer already has to give,
+   * and cannot be used to remove it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -30473,6 +30547,20 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
+   *
+   * Absent is above, which is what a field looks like and what almost every
+   * group wants. `start` is for a row of controls that are labelled rather than
+   * a form of fields: a toolbar reads as one line, and a label stacked over
+   * every group in it turns one row into two.
+   *
+   * **A placement rather than a slot, and that is the whole point of it.** A
+   * `start` slot would let a consumer put the word there, and would also let
+   * them put it there *instead of* setting `label`, which is the group's
+   * accessible name: the set would then be named for nobody using a screen
+   * reader while looking correct to everybody else. Worse, setting both draws
+   * it twice. One property moves the label the consumer already has to give,
+   * and cannot be used to remove it.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
