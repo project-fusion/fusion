@@ -178,7 +178,6 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   // target. That is what preserves brand identity while guaranteeing contrast.
   const rawPrimary = solveForAll({ chroma: brand.chroma, hue: brand.hue }, contrastTarget)
   const primary = fitToGamut(rawPrimary)
-  const onAccent = lightnessForContrast({ chroma: 0, hue: 0 }, primary, contrastTarget)
 
   /* **The primary's own steps, because components read them and nothing made
      them.** `hover` and `active` are the same colour under a pointer and under
@@ -195,6 +194,31 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     hue: brand.hue,
     lightness: rawPrimary.lightness + by * toward,
   })
+  /* **A brand surface, which `primary` cannot also be.** `primary` is solved to
+     be *legible on* the background, so in a dark theme it comes out light by
+     construction, and a card filled with it carries dark text. A filled brand
+     panel with light text needs the opposite: dark enough that the ink clears
+     it.
+
+     `primary-surface` is the stylesheet's own name for this, added there for
+     the same reason and with the measurements to match. The engine takes the
+     name rather than inventing one, which is the rule that settled the last
+     two of these. */
+  const primarySurface = lightnessForContrast(
+    { chroma: brand.chroma, hue: brand.hue },
+    fitToGamut({ chroma: 0, hue: 0, lightness: 0.98 }),
+    contrastTarget,
+    { darker: true },
+  )
+
+  /* Solved against the surface it actually lands on. A brand fill is what
+     carries this text, and `primary` is not that fill. */
+  const onAccent = lightnessForContrast(
+    { chroma: 0, hue: 0 },
+    fitToGamut(primarySurface),
+    contrastTarget,
+  )
+
   const rawSubtle: Oklch = {
     chroma: Math.min(brand.chroma, 0.06),
     hue: brand.hue,
@@ -218,10 +242,11 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
        were naming the same colour differently and a themed page kept the stock
        one. The token layer has 135 names and this has a handful, so the
        handful moved. */
-    token('color-foreground-on-accent', onAccent, primary),
+    token('color-foreground-on-accent', onAccent, primarySurface),
     token('color-primary-hover', step(0.05)),
     token('color-primary-active', step(0.1)),
     token('color-primary-subtle', rawSubtle),
+    token('color-primary-surface', primarySurface),
   ]
 
   // Pairings are declared explicitly rather than inferred from token names.
@@ -233,7 +258,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     ['foreground-muted on background', foregroundMuted, background],
     ['foreground-muted on surface', foregroundMuted, surface],
     ['primary on background', primary, background],
-    ['foreground-on-accent on primary', onAccent, primary],
+    ['foreground-on-accent on primary-surface', onAccent, fitToGamut(primarySurface)],
     ['foreground on surface-raised', foreground, fitToGamut(rawRaised)],
     ['foreground on surface-overlay', foreground, fitToGamut(rawOverlay)],
     ['foreground on surface-sunken', foreground, fitToGamut(rawSunken)],

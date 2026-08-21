@@ -75,7 +75,7 @@ const BRAND = '#3b82f6'
  * engine emitted and the stylesheet did not read, step the primary's hover,
  * active and subtle by hand because nothing produced them, and solve the anchor
  * its own contrast-checked pair. Every one of those was a consumer covering for
- * a gap, and every one of them is gone: `deriveTheme` emits thirteen tokens
+ * a gap, and every one of them is gone: `deriveTheme` emits fourteen tokens
  * under the names the stylesheet actually reads, including the three surfaces a
  * dropdown, a recess and a raised card sit on.
  *
@@ -86,6 +86,30 @@ const restyle = (node: HTMLElement, hex: string, scheme: ThemeIntent['scheme']):
   for (const token of deriveTheme({ brand: hexToOklch(hex), scheme }).tokens) {
     node.style.setProperty(`--helix-${token.name}`, token.hex)
   }
+
+  /* **The seed as well, and it is what moves the charts.**
+
+     There are two derivations here and they do not talk to each other.
+     `deriveTheme` computes tokens in JavaScript. The series ramp the charts use
+     computes itself in CSS, `oklch(from var(--_helix-seed-brand) ...)`, so every
+     sparkline and every bar is a hue rotation off that primitive and off
+     nothing else. Setting the semantic tokens moved the buttons, the tags and
+     the surfaces, and left every chart on the page the original blue.
+
+     **Setting the seed alone does not fix it either, and that is the part worth
+     knowing.** A `var()` inside a custom property is substituted on the element
+     the property is *declared* on, so the ramp had already resolved at `:root`
+     and a seed on this panel was read by nothing. `data-helix-theme` is the
+     scope that re-runs those declarations here, and it is why the attribute is
+     set before the value.
+
+     `helix/styles` owns the primitives and nothing outside is meant to touch
+     them, which is the rule and is right. It is written to here because the
+     ramp has no other input, and that is the seam rather than an exception: a
+     theming solution has to drive the seed and let the CSS derive from it. The
+     name is the thing to revisit, not the direction. */
+  node.dataset.helixTheme = ''
+  node.style.setProperty('--_helix-seed-brand', hex)
 }
 
 export function Showcase(): React.ReactElement {

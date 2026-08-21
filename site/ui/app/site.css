@@ -2432,10 +2432,17 @@ helix-drawer helix-tree {
      caveat, and it is the only primary in the set that carries text: 6.69 to 1,
      and mode independent where `primary` is `light-dark()` and a mix toward the
      background would invert in light mode and fail there instead. */
-  --card-background-color: var(--showcase-anchor-fill, var(--helix-color-primary-active));
-  --card-border-color: var(--showcase-anchor-fill, var(--helix-color-primary-active));
+  /* **`primary-strong`, which is the brand as a surface.** `primary` is solved
+     to be legible *on* the background, so in a dark theme it is light by
+     construction and a card filled with it carries dark text: measured at
+     `#73a8ff`, which is a wash rather than a brand. `primary-strong` is solved
+     the other way, dark enough that its own ink clears it, and comes out at
+     `#276ee0` for this blue. It falls back to `primary-active` for the moment
+     before the derivation runs. */
+  --card-background-color: var(--helix-color-primary-surface);
+  --card-border-color: var(--helix-color-primary-surface);
 
-  color: var(--showcase-anchor-ink, var(--helix-color-foreground-on-accent));
+  color: var(--helix-color-foreground-on-accent);
 }
 
 .anchorTitle {

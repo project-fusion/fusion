@@ -26,7 +26,21 @@
  * Values resolve to primitives from `primitives.css`, which is internal.
  */
 
-:root {
+/* **`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to
+ * be on the block rather than anywhere else.**
+ *
+ * A `var()` inside a custom property is substituted on the element the property
+ * is *declared* on, not on the element that consumes it. Measured in Chrome
+ * 148: a leaf reading an overridden `--seed` still painted the root's colour,
+ * because the derived token had already been resolved at the root. So setting
+ * `--_helix-seed-brand` on a section changes nothing, and cannot, unless the
+ * declarations that read it are re-run there. Naming the scope in the selector
+ * list is what re-runs them.
+ *
+ * The cost is one extra copy of the block per scoped subtree, which is what a
+ * theme scope is. */
+:root,
+[data-helix-theme] {
   /* One declaration per token, both modes inside it. Which half resolves is
      decided by `color-scheme` and nothing else, so the color mode is a single
      attribute on the root and no token has to be restated to honor it.
