@@ -26,6 +26,7 @@ import { styles } from './drawer-root.css.js'
  *
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  *
+ * @cssproperty --drawer-scrim - The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --drawer-radii - Corner radius on the edges that face the page.
  * @cssproperty --drawer-size - Width or height of the panel.
  * @cssproperty --drawer-inset - Padding inside the panel.

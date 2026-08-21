@@ -1944,6 +1944,7 @@ rest is flat and the movement is what says something happened.
 
 | Property | Description |
 | --- | --- |
+| `--drawer-scrim` | The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. |
 | `--drawer-radii` | Corner radius on the edges that face the page. |
 | `--drawer-size` | Width or height of the panel. |
 | `--drawer-inset` | Padding inside the panel. |

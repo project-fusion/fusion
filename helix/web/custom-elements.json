@@ -20150,6 +20150,10 @@
           "name": "HelixDrawer",
           "cssProperties": [
             {
+              "description": "The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.",
+              "name": "--drawer-scrim"
+            },
+            {
               "description": "Corner radius on the edges that face the page.",
               "name": "--drawer-radii"
             },

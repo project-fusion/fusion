@@ -7199,6 +7199,8 @@ export type CustomCssProperties = {
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */
   "--donut-chart-track-color"?: string;
+  /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--drawer-scrim"?: string;
   /** Corner radius on the edges that face the page. */
   "--drawer-radii"?: string;
   /** Width or height of the panel. */

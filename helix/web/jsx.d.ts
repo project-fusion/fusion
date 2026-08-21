@@ -16927,6 +16927,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
@@ -28015,6 +28016,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-scrim`: The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. (default: `undefined`)
    * - `--drawer-radii`: Corner radius on the edges that face the page. (default: `undefined`)
    * - `--drawer-size`: Width or height of the panel. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
@@ -36054,6 +36056,8 @@ export type CustomCssProperties = {
   "--donut-chart-size"?: string;
   /** Colour of the ring under the slices. */
   "--donut-chart-track-color"?: string;
+  /** The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one. */
+  "--drawer-scrim"?: string;
   /** Corner radius on the edges that face the page. */
   "--drawer-radii"?: string;
   /** Width or height of the panel. */

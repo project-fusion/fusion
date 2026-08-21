@@ -38,8 +38,27 @@
  *
  * `[open]` rather than a bare rule, so this reads the same as Dialog's, which
  * was written second and got it right. */
+/* **The scrim, and the hook is an addition rather than a repair.**
+ *
+ * `Dialog`'s stylesheet records that a token referenced from inside
+ * `::backdrop` resolves to nothing, and this rule read
+ * `var(--helix-color-overlay)` directly. It was measured before being changed
+ * and it painted correctly, `oklab(0.15 0 0 / 0.64)`, so whatever `Dialog` hit
+ * does not reproduce here. **That discrepancy is unexplained and worth a look
+ * rather than a guess**: the two differ in which part carries the pseudo-
+ * element and in when the element enters the top layer, and either could
+ * matter.
+ *
+ * What the indirection buys is the override, not the default. A property
+ * declared on `:host` is substituted *there*, where every token is in scope, so
+ * a consumer may write `--drawer-scrim: var(--helix-color-overlay)` and have it
+ * resolve, which is the thing that cannot be written inside the rule below. */
+:host {
+  --_drawer-scrim: var(--helix-color-overlay);
+}
+
 [part="panel"]::backdrop {
-  background-color: var(--helix-color-overlay);
+  background-color: var(--drawer-scrim, var(--_drawer-scrim));
   opacity: 0;
   transition:
     opacity var(--helix-duration-normal) var(--helix-easing-standard),
