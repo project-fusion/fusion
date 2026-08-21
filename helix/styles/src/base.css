@@ -1005,12 +1005,27 @@ helix-toggle[disabled]::part(item) {
    the shape of a name: `API` and `Api` come out the same, and a product with a
    capital in the middle loses it. Small and subtle already say "label". */
 [data-megamenu-heading] {
+  align-items: center;
   color: var(--helix-color-foreground-subtle);
+  display: flex;
+  gap: var(--helix-space-2xs);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   margin: var(--helix-space-none) var(--helix-space-none) var(--helix-space-xs);
   padding-inline: var(--helix-space-sm);
+}
+
+/* The product's own mark, where the product is named.
+ *
+ * At the label's size rather than a row's: this marks a column, and a mark as
+ * large as the ones down the rows would read as a fourth destination sitting
+ * above the three real ones. Full strength against the subtle text beside it,
+ * because a brand mark drawn in the label's grey is a brand mark apologising. */
+[data-megamenu-heading] > :where(helix-icon, img, svg) {
+  --icon-size: var(--helix-size-icon-sm);
+
+  flex: 0 0 auto;
 }
 
 /* A destination with a name and a sentence about it.

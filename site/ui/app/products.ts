@@ -77,6 +77,14 @@ export interface Product {
    */
   license?: string
   /**
+   * The product's own mark, from `helix/icons`, drawn for it rather than picked
+   * from Phosphor. A product is a name a reader is meant to carry away, and the
+   * marks down its rows describe destinations rather than the thing they belong
+   * to. `helix` and `cortex` are siblings of `fusion`: flat, gradient filled,
+   * and drawn to survive the 20 pixels a column label gives them.
+   */
+  mark: string
+  /**
    * The evocative name, which is what the masthead says.
    */
   name: string
@@ -131,6 +139,7 @@ export const PRODUCTS: Product[] = [
     href: '/helix',
     install: 'bun add @helix-io/web',
     license: 'MIT',
+    mark: 'helix',
     name: 'Helix',
     role: 'The DNA',
     stage: 'Building',
@@ -148,6 +157,7 @@ export const PRODUCTS: Product[] = [
       },
     ],
     href: '/cortex',
+    mark: 'cortex',
     name: 'Cortex',
     role: 'The mind',
     stage: 'Building',

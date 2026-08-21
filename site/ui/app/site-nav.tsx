@@ -188,6 +188,7 @@ export function SiteNav() {
               {PRODUCTS.map((product) => (
                 <div data-megamenu-group key={product.name}>
                   <h3 data-megamenu-heading>
+                    <helix-icon name={product.mark}></helix-icon>
                     {product.name}. {product.role}
                   </h3>
                   {product.destinations.map((destination) => (

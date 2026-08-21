@@ -99,3 +99,5 @@ warning
 warning-fill
 x
 x-circle-fill
+helix
+cortex

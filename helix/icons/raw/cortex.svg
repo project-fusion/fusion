@@ -1,0 +1,29 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" fill="none" role="img" aria-label="Cortex">
+  <title>Cortex</title>
+  <!-- A core, and the context held around it, open on one side.
+       Two shapes and no more: at the 24 pixels this is drawn at in a menu row,
+       a third element is the one that turns a mark into a smudge. Candidates
+       with three layers were measured beside it and read as a signal meter and
+       as text alignment; this one is still itself at 24. The opening is load
+       bearing rather than decorative, since what Cortex holds is reached from
+       somewhere and a closed ring says nothing goes in or out. -->
+  <path
+    d="M76 62A84 84 0 1 1 76 194"
+    stroke="url(#cortex-grad-context)"
+    stroke-linecap="round"
+    stroke-width="28"
+  />
+  <circle cx="112" cy="128" fill="url(#cortex-grad-core)" r="34" />
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" id="cortex-grad-context"
+      x1="128" x2="128" y1="44" y2="212">
+      <stop stop-color="var(--logo-color-from, var(--helix-color-primary))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" id="cortex-grad-core"
+      x1="78" x2="146" y1="128" y2="128">
+      <stop stop-color="var(--logo-color-mid, var(--helix-color-primary-hover))" />
+      <stop offset="1" stop-color="var(--logo-color-to, var(--helix-color-primary-active))" />
+    </linearGradient>
+  </defs>
+</svg>
