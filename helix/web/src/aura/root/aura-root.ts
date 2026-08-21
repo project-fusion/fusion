@@ -3,7 +3,7 @@ import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './aura-root.css.js'
-import { FRAGMENT, SHAPES, VERTEX } from './aura-shader.js'
+import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from './aura-shader.js'
 
 /**
  * @summary A lit, drifting background, drawn from the token layer.
@@ -95,6 +95,32 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   drift = 0
+
+  /**
+   * What the pointer does, where the shape's own answer is not wanted.
+   *
+   * Absent is `native`, which is each shape answering in the terms it is made
+   * of: braid leans, rays are occluded, threads pinch, particles scatter. The
+   * named options are generic, and are a deliberate step down in meaning. A
+   * response made of the same material as the shape says something about that
+   * shape; a lamp following the cursor says the same nothing on all nine.
+   *
+   * They exist because a consumer may want the quieter, more conventional
+   * answer, and because `none` is a real requirement. Not because any of them
+   * is the better default.
+   */
+  @property()
+  interaction?: 'light' | 'none' | 'ripple' | 'shadow'
+
+  /**
+   * How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
+   */
+  @property({ type: Number })
+  reach = 1
 
   /**
    * Whether the pointer shifts and lifts the field.
@@ -192,8 +218,10 @@ export class HelixAura extends HelixElement {
   private readonly head = { x: 1, y: 1 }
 
   /** Where the pointer is, and where the field has got to. The gap is weight. */
-  private readonly target = { reach: 0, x: 0, y: 0 }
-  private readonly eased = { reach: 0, x: 0, y: 0 }
+  /* `presence`, not `reach`: the eased value is how far the pointer has faded
+     in, and `reach` is now the consumer's amplitude. The two multiply. */
+  private readonly target = { presence: 0, x: 0, y: 0 }
+  private readonly eased = { presence: 0, x: 0, y: 0 }
 
   private motion: MediaQueryList | undefined
   private visible: IntersectionObserver | undefined
@@ -256,6 +284,7 @@ export class HelixAura extends HelixElement {
       'uGround',
       'uHaze',
       'uInk',
+      'uInteraction',
       'uPeak',
       'uPointer',
       'uReach',
@@ -455,7 +484,11 @@ export class HelixAura extends HelixElement {
 
     gl.uniform3fv(uniforms.uTrail ?? null, this.ordered)
     gl.uniform2f(uniforms.uPointer ?? null, this.eased.x, this.eased.y)
-    gl.uniform1f(uniforms.uReach ?? null, this.eased.reach)
+    gl.uniform1f(uniforms.uReach ?? null, this.eased.presence * Math.max(0, this.reach))
+    gl.uniform1i(
+      uniforms.uInteraction ?? null,
+      Math.max(0, INTERACTIONS.indexOf(this.interaction ?? 'native')),
+    )
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
 
@@ -500,7 +533,7 @@ export class HelixAura extends HelixElement {
        display would chase twice as eagerly as a 60Hz one. */
     const follow = 1 - Math.exp(-delta / 0.028)
     if (!this.interactive) {
-      this.target.reach = 0
+      this.target.presence = 0
     }
     this.eased.x += (this.target.x - this.eased.x) * follow
     this.eased.y += (this.target.y - this.eased.y) * follow
@@ -512,9 +545,9 @@ export class HelixAura extends HelixElement {
        happens, and by the time it does they have decided the page is slow.
        Rising in 115 milliseconds it answers immediately; falling over half a
        second it lets go without the field flinching as the cursor crosses out. */
-    const rising = this.target.reach > this.eased.reach
+    const rising = this.target.presence > this.eased.presence
     const fade = 1 - Math.exp(-delta / (rising ? 0.05 : 0.22))
-    this.eased.reach += (this.target.reach - this.eased.reach) * fade
+    this.eased.presence += (this.target.presence - this.eased.presence) * fade
     this.age(delta)
     this.advanceWake()
 
@@ -574,7 +607,7 @@ export class HelixAura extends HelixElement {
     const aspect = width / height
     this.target.x = ((event.clientX - left) / width - 0.5) * 2 * aspect
     this.target.y = -((event.clientY - top) / height - 0.5) * 2
-    this.target.reach = this.interactive ? 1 : 0
+    this.target.presence = this.interactive ? 1 : 0
   }
 
   /**
@@ -640,7 +673,7 @@ export class HelixAura extends HelixElement {
   }
 
   private readonly handleLeave = (): void => {
-    this.target.reach = 0
+    this.target.presence = 0
   }
 
   private readonly handleVisibility = (): void => {

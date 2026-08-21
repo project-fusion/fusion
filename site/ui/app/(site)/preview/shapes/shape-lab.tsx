@@ -39,6 +39,9 @@ const SHAPES = [
   },
 ] as const
 
+/** What the pointer can be asked to do instead of the shape's own answer. */
+const INTERACTIONS = ['native', 'light', 'shadow', 'ripple', 'none'] as const
+
 /** Every knob, and the grain that is useful for what it does. */
 const KNOBS = [
   { key: 'tilt', label: 'Tilt', max: 90, min: -90, step: 1 },
@@ -47,6 +50,7 @@ const KNOBS = [
   { key: 'bloom', label: 'Bloom', max: 1, min: 0, step: 0.02 },
   { key: 'gain', label: 'Gain', max: 2.5, min: 0.2, step: 0.05 },
   { key: 'drift', label: 'Drift', max: 1, min: 0, step: 0.05 },
+  { key: 'reach', label: 'Reach', max: 2, min: 0, step: 0.05 },
 ] as const
 
 type Knob = (typeof KNOBS)[number]['key']
@@ -55,6 +59,7 @@ const RESTING: Record<Knob, number> = {
   bloom: 0.5,
   drift: 0,
   gain: 1,
+  reach: 1,
   scale: 1,
   speed: 1,
   tilt: 14,
@@ -80,6 +85,7 @@ export function ShapeLab(): React.ReactElement {
   const [shape, setShape] = useState(0)
   const [interactive, setInteractive] = useState(true)
   const [knobs, setKnobs] = useState(RESTING)
+  const [interaction, setInteraction] = useState<(typeof INTERACTIONS)[number]>('native')
   const current = SHAPES[shape]
 
   return (
@@ -89,7 +95,9 @@ export function ShapeLab(): React.ReactElement {
           bloom={knobs.bloom}
           drift={knobs.drift}
           gain={knobs.gain}
+          interaction={interaction === 'native' ? undefined : interaction}
           interactive={interactive || undefined}
+          reach={knobs.reach}
           scale={knobs.scale}
           shape={current?.name}
           speed={knobs.speed}
@@ -126,6 +134,24 @@ export function ShapeLab(): React.ReactElement {
             {SHAPES.map((entry) => (
               <helix-toggle key={entry.name} value={entry.name}>
                 {entry.name}
+              </helix-toggle>
+            ))}
+          </helix-toggle-group>
+
+          <helix-toggle-group
+            appearance="filled"
+            label="Pointer"
+            onhelix-change={(event: CustomEvent<{ value: string }>) => {
+              const next = INTERACTIONS.find((one) => one === event.detail.value)
+              if (next) {
+                setInteraction(next)
+              }
+            }}
+            value={interaction}
+          >
+            {INTERACTIONS.map((one) => (
+              <helix-toggle key={one} value={one}>
+                {one}
               </helix-toggle>
             ))}
           </helix-toggle-group>

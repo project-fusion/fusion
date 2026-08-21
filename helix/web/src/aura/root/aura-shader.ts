@@ -20,6 +20,23 @@ export const SHAPES = [
 export type AuraShape = (typeof SHAPES)[number]
 
 /**
+ * What the pointer does, in the order the shader branches on them.
+ *
+ * `native` is the shape's own, and is what absence means: braid leans, rays are
+ * occluded, threads pinch. The rest are generic, and deliberately few.
+ *
+ * **The generics are the thing this component spent a day removing**, so they
+ * are opt-in and never a default. A response made of the same material as the
+ * shape says something about that shape; a lamp that follows the cursor says
+ * the same nothing on all nine. They are here because a consumer may want the
+ * quieter, more conventional answer, not because it is the better one.
+ */
+export const INTERACTIONS = ['native', 'light', 'shadow', 'ripple', 'none'] as const
+
+/** How the field answers the pointer. */
+export type AuraInteraction = (typeof INTERACTIONS)[number]
+
+/**
  * Three vertices from `gl_VertexID`, covering the screen with one triangle.
  *
  * No attribute, no buffer and no upload, and one triangle rather than two, so
@@ -59,6 +76,7 @@ export const FRAGMENT = `#version 300 es
   uniform int uShape;
   uniform vec2 uPointer;
   uniform float uReach;
+  uniform int uInteraction;
   uniform float uTilt;
   uniform float uScale;
   uniform float uBloom;
@@ -519,7 +537,10 @@ export const FRAGMENT = `#version 300 es
        sixth of the frame between one edge of the screen and the other, which
        reads as the background being dragged rather than as depth: a large
        global motion answering a small input, which no time constant rescues. */
-    vec2 q = p - uPointer * 0.05 * uReach;
+    /* Turning the response off turns all of it off, parallax included: a
+       consumer asking for none is not asking for a quieter one. */
+    float shift = uInteraction == 4 ? 0.0 : uReach;
+    vec2 q = p - uPointer * 0.05 * shift;
 
     float a = radians(uTilt);
     mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a));
@@ -542,23 +563,29 @@ export const FRAGMENT = `#version 300 es
        can swell. Rings are made of spacing and can crowd. A weave is made of
        agreement and can shear. Flow is stirred, and had the only one of these
        that was ever about its own material. */
+    /* A shape answers for itself only when nothing else has been asked for.
+       Given a generic response, its own is switched off rather than layered
+       under: two answers to one gesture is how the zoom and the glow got here
+       in the first place. */
+    float own = uInteraction == 0 ? uReach : 0.0;
+
     float d = 0.0;
     if (uShape == 0) {
-      d = braid(q, t, qp, uReach);
+      d = braid(q, t, qp, own);
     } else if (uShape == 1) {
-      d = rays(q, t, qp, uReach);
+      d = rays(q, t, qp, own);
     } else if (uShape == 2) {
-      d = aurora(q, t, qp, uReach);
+      d = aurora(q, t, qp, own);
     } else if (uShape == 3) {
-      d = prism(q, t, qp, uReach);
+      d = prism(q, t, qp, own);
     } else if (uShape == 4) {
-      d = streaks(q, t, qp, uReach);
+      d = streaks(q, t, qp, own);
     } else if (uShape == 5) {
-      d = waves(q, t, qp, uReach);
+      d = waves(q, t, qp, own);
     } else if (uShape == 6) {
-      d = threads(q, t, qp, uReach);
+      d = threads(q, t, qp, own);
     } else if (uShape == 7) {
-      d = particles(q, t, qp, uReach);
+      d = particles(q, t, qp, own);
     } else {
       d = flow(q, t, turn, uPointer * 0.05 * uReach);
     }
@@ -567,6 +594,28 @@ export const FRAGMENT = `#version 300 es
        Every shape is a density that falls off, so a power tightens or spreads
        that falloff and one control means the same thing in all five. */
     d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain;
+
+    /* The generic answers, for a consumer who has asked for one.
+    
+       All three are functions of distance from the pointer and nothing else,
+       which is exactly what makes them generic and exactly what makes them say
+       less. The light option lifts what is lit and puts a floor under itself so
+       there is something at the cursor over a dark field. The shadow option is
+       that gesture inverted, which suits a bright field where a lamp would be
+       invisible. The ripple option is the one with a clock in it, so it keeps
+       moving after the pointer has stopped. */
+    if (uInteraction != 0 && uInteraction != 4) {
+      vec2 toCursor = p - uPointer;
+      float near = falloff(dot(toCursor, toCursor), 3.0) * uReach;
+      if (uInteraction == 1) {
+        d = d * (1.0 + near * 1.2) + near * 0.08;
+      } else if (uInteraction == 2) {
+        d *= 1.0 - near * 0.85;
+      } else {
+        float rings = sin(length(toCursor) * 13.0 - uTime * 3.2);
+        d *= 1.0 + rings * near * 0.75;
+      }
+    }
 
     d *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y));
 
