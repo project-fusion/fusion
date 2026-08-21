@@ -1525,3 +1525,35 @@ helix-toast:not([data-color-mode]) {
     color-mix(in oklab, var(--helix-color-primary) 32%, transparent)
   );
 }
+
+/* ====================================================== visually hidden === */
+
+/* Present to a screen reader, absent to an eye.
+ *
+ * The clip, and not `display: none` or `visibility: hidden`, which is the whole
+ * reason this exists as a helper rather than as three lines a consumer writes
+ * from memory: both of those remove the element from the accessibility tree as
+ * well as from the page, so the thing you were hiding *because* it is the
+ * accessible representation stops being one. Charts are the case that forced
+ * it, where a table is the numbers and the drawing is decoration over them, but
+ * it is the same clip every skip link and every form legend wants.
+ *
+ * `clip-path` rather than the older `clip`, which is deprecated and needs
+ * `position: absolute` to work at all. The `1px` box with `overflow: hidden`
+ * stays because a zero-sized element is skipped by some screen readers, and
+ * `white-space: nowrap` stops a long string wrapping into a tall thin column
+ * that pushes layout around before it is clipped.
+ *
+ * Not `:where()`. A consumer writing this attribute is asking for one specific
+ * thing and a stray `display` from somewhere else winning would be silent. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: var(--helix-space-none);
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: var(--helix-space-none);
+  position: absolute;
+  white-space: nowrap;
+}

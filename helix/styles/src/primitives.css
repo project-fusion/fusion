@@ -133,6 +133,37 @@
   --_helix-neutral-900: oklch(0.21 var(--_helix-neutral-cast));
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
+  /* ------------------------------------------------------ series ------ */
+  /* Eight colours for eight things that are not each other.
+   *
+   * Hue rotates off the brand seed, so a theme that moves its brand moves these
+   * with it. **Lightness does not.** The first attempt offset it from the seed,
+   * `calc(l + 0.14)` on every other step, and measured against a light
+   * background two of the eight came out at 1.04 and 1.00 contrast: the same
+   * colour as the paper. A hue rotation changes how light a colour *looks* at a
+   * fixed L, and yellow at 0.72 on white is nothing at all.
+   *
+   * So lightness is stated per mode and held in a band that clears 3:1 against
+   * the surface it is drawn on, and the alternation that keeps adjacent pairs
+   * apart happens inside that band rather than around the seed.
+   *
+   * **Hue alone is not enough, which is the other half.** Around one in twelve
+   * men cannot separate the red and green ends, so two series differing only in
+   * hue are two some readers cannot tell apart. Every other step also moves in
+   * lightness, so an adjacent pair differs on two axes and survives losing one.
+   *
+   * The rotations are not evenly spaced. Even spacing puts the second series 45
+   * degrees from the first, and one and two are the pair most often next to
+   * each other, so the early steps take the large jumps. */
+  --_helix-series-hue-1: 0;
+  --_helix-series-hue-2: 150;
+  --_helix-series-hue-3: 65;
+  --_helix-series-hue-4: 275;
+  --_helix-series-hue-5: 205;
+  --_helix-series-hue-6: 30;
+  --_helix-series-hue-7: 110;
+  --_helix-series-hue-8: 320;
+
   /* ------------------------------------------------------- brand ------- */
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);

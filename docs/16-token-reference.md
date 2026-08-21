@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-127 semantic tokens in 15 categories, every one in exactly
+135 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-radii-lg`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
+Currently unread anywhere: `--helix-color-series-1`, `--helix-color-series-2`, `--helix-color-series-3`, `--helix-color-series-4`, `--helix-color-series-5`, `--helix-color-series-6`, `--helix-color-series-7`, `--helix-color-series-8`, `--helix-radii-lg`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
 
 ## color
 
@@ -26,17 +26,17 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 97 |
+| `--helix-color-background` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))` | 105 |
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 47 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 32 |
-| `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 43 |
+| `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 39 |
 | `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 83 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 155 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))` | 113 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 33 |
-| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 8 |
+| `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 12 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
@@ -54,6 +54,14 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 0 |
+| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 0 |
+| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 0 |
+| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 0 |
+| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-5))) )` | 0 |
+| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-6))) )` | 0 |
+| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-7))) )` | 0 |
+| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-8))) )` | 0 |
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 27 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
@@ -65,7 +73,7 @@ The spacing scale, used for gaps, padding and margins alike.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-space-none` | `var(--_helix-scale-0)` | 214 |
+| `--helix-space-none` | `var(--_helix-scale-0)` | 218 |
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 267 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 228 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 222 |
@@ -150,7 +158,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 208 |
-| `--helix-border-thick` | `2px` | 49 |
+| `--helix-border-thick` | `2px` | 57 |
 
 ## shadow
 
