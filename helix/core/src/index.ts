@@ -128,6 +128,7 @@ export {
   forgetDisabled,
   inheritDisabled,
 } from './utils/inherit-disabled/inherit-disabled.js'
+export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,

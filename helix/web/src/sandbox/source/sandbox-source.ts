@@ -1,4 +1,4 @@
-import { customElement, HelixChangeEvent, HelixElement } from '@helix-io/core'
+import { customElement, HelixChangeEvent, HelixElement, onUnlessFalse } from '@helix-io/core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -51,7 +51,7 @@ export class HelixSandboxSource extends HelixElement {
   fieldLabel = 'Example source'
 
   /** Whether Tab indents rather than moving focus. */
-  @property({ attribute: 'tab-indents', type: Boolean })
+  @property({ attribute: 'tab-indents', converter: onUnlessFalse })
   tabIndents = true
 
   /** Set by Escape, so the next Tab leaves the field. */

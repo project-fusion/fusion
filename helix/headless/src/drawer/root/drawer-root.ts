@@ -1,4 +1,10 @@
-import { CommandController, customElement, HelixElement, MixinControllerOpen } from '@helix-io/core'
+import {
+  CommandController,
+  customElement,
+  HelixElement,
+  MixinControllerOpen,
+  onUnlessFalse,
+} from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -83,7 +89,7 @@ export class HelixBaseDrawer extends MixinControllerOpen(HelixElement) {
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
    */
-  @property({ type: Boolean })
+  @property({ converter: onUnlessFalse })
   modal = true
 
   /** The panel, which is a real `<dialog>`. */

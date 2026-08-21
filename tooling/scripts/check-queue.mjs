@@ -52,6 +52,39 @@ for (const [index, line] of lines.entries()) {
   }
 }
 
+/* And in order, in the main table.
+ *
+ * Twice now a row has gone in beside a number rather than after the last one,
+ * and both times the file looked fine from where the edit was made. Ascending
+ * order is what makes "the next number" a thing you can see rather than a thing
+ * you have to trust, so it is checked rather than hoped for.
+ *
+ * The sweeps below are deliberately *not* in numeric order: that section says
+ * it is ordered by what unblocks what, which is a real ordering and a more
+ * useful one there. So this looks at the first table only, which is the one
+ * that runs from the header row to the first blank line after it. */
+const header = lines.findIndex((line) => /^\|\s*-+\s*\|/.test(line))
+if (header !== -1) {
+  const table = []
+  for (let at = header + 1; at < lines.length; at += 1) {
+    const found = row.exec(lines[at])
+    if (!found) {
+      break
+    }
+    table.push({ at: at + 1, number: Number(found[1]) })
+  }
+  for (const [index, entry] of table.entries()) {
+    const previous = table[index - 1]
+    if (previous && entry.number < previous.number) {
+      problems.push(
+        `${FILE}:${entry.at}: #${entry.number} comes after #${previous.number}. The table ` +
+          'reads in order, which is what makes the next free number visible instead of ' +
+          'remembered.',
+      )
+    }
+  }
+}
+
 /* A row that is not in a table is not in the queue, however much it looks like
    one. A table ends at the first blank line, so anything after that and before
    the next header row is loose text. */

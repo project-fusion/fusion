@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixNextEvent, HelixPreviousEvent } from '@helix-io/core'
+import {
+  customElement,
+  HelixElement,
+  HelixNextEvent,
+  HelixPreviousEvent,
+  onUnlessFalse,
+} from '@helix-io/core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../icon/index.js'
@@ -183,7 +189,7 @@ export class HelixBaseVideo extends HelixElement {
   muted = false
 
   /** Whether it plays where it sits rather than taking over the screen. */
-  @property({ attribute: 'plays-inline', type: Boolean })
+  @property({ attribute: 'plays-inline', converter: onUnlessFalse })
   playsInline = true
 
   /**
