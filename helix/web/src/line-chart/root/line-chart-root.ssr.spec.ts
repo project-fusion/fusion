@@ -32,4 +32,14 @@ describe('line chart server output', () => {
     const markup = ssr(html`<helix-line-chart curve="smooth" for="s"></helix-line-chart>`)
     expect(hostAttributes(markup, 'helix-line-chart')).toEqual(['curve', 'for'])
   })
+
+  /* The id `within` on the tooltip resolves against, so the bubble is clamped
+     to the drawing rather than to the viewport. A refactor that drops it breaks
+     nothing loudly: `getElementById` returns null, the boundary falls back to
+     the viewport, and the bubble goes back to hanging past the plot with no
+     error anywhere. */
+  test('the plot is named, which is what the tooltip is kept inside', () => {
+    const markup = withoutStyles(ssr(html`<helix-line-chart for="sessions"></helix-line-chart>`))
+    expect(markup).toContain('id="helix-chart-plot"')
+  })
 })

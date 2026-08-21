@@ -28,6 +28,16 @@ export interface PopoverOptions {
   offset?: number | (() => number)
 
   /**
+   * A box to keep the surface inside, instead of the viewport.
+   *
+   * Not `boundary` above, and the two are easy to confuse: that one decides
+   * what counts as inside for a *press*, and this one decides what counts as
+   * inside for the *placement*. A tooltip on a chart wants the second and has
+   * no use for the first.
+   */
+  within?: () => Element | null | undefined
+
+  /**
    * Whether to measure the anchor and place the surface against it.
    *
    * On unless said otherwise, which is every surface that hangs off something:
@@ -114,6 +124,7 @@ export class PopoverController implements ReactiveController {
       floating: options.surface,
       ...(options.offset === undefined ? {} : { offset: options.offset }),
       ...(options.placement === undefined ? {} : { placement: options.placement }),
+      ...(options.within === undefined ? {} : { within: options.within }),
     })
     this.dismisser = new DismissController(host, {
       boundary: options.boundary ?? options.surface,

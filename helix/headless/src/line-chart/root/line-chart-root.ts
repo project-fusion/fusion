@@ -127,7 +127,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
     const series = this.series
     const readings = series[0]?.points.map((point) => point.label) ?? []
     if (readings.length === 0) {
-      return html`<div part="plot"></div>`
+      return html`<div id="helix-chart-plot" part="plot"></div>`
     }
 
     const domain = this.range(series)
@@ -172,7 +172,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
        box wearing the zero line's clothes, and a reader takes it for one. */
     const floor = domain[0] <= 0 && domain[1] >= 0 ? y(0) : undefined
 
-    return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
+    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot" title=${named || nothing}>
       <svg
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"

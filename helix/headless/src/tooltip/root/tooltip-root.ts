@@ -127,16 +127,34 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
   placement: Placement = 'top'
 
   /**
-   * Space between the trigger and the bubble, in pixels.
+   * Space between the trigger and the point of the bubble, in pixels.
    *
-   * Eight, which used to be the size of the arrow the styled tier drew so the
-   * point could reach the trigger while the bubble did not. **The arrow is
-   * gone**, and the number stays: it is now simply the gap, and eight is what
-   * reads as beside rather than attached at every placement. Nothing depends on
-   * it any more, so a consumer changing it changes the gap and nothing else.
+   * **Measured from the point, which is what the arrow being back changed.**
+   * The arrow is drawn half outside the bubble, so a gap measured to the
+   * bubble's edge is a smaller gap to the tip: at the default it left the point
+   * two pixels off the trigger, which reads as touching. The controller is
+   * given this plus however far the arrow actually protrudes, so eight means
+   * eight from whatever is nearest, arrow or edge, and a consumer who changes
+   * it changes the visible gap rather than a number the arrow then eats into.
    */
   @property({ type: Number })
   offset = 8
+
+  /**
+   * The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centred on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
+   */
+  @property()
+  within = ''
 
   /** Whether the tooltip never shows. */
   @property({ reflect: true, type: Boolean })
@@ -238,11 +256,43 @@ export class HelixBaseTooltip extends MixinControllerOpen(HelixElement) {
        `this`, whose own type depends on this controller, and TypeScript stops
        at the cycle. */
     boundary: (): readonly (Element | null)[] => [this, this.named],
-    offset: () => this.offset,
+    /* The declared gap plus the arrow's own reach, so the gap is to the point.
+     *
+     * A square of side `n` rotated forty-five degrees about its own centre
+     * reaches `n / sqrt(2)` from that centre, and the arrow is placed with its
+     * centre on the bubble's edge, so that is exactly how far past the edge the
+     * tip goes. Read from the element rather than assumed, because
+     * `--tooltip-arrow-size` is a hook and a theme may have moved it.
+     *
+     * `offsetWidth` and not `getBoundingClientRect`, which reports the rotated
+     * box and would count the reach twice. Zero while the bubble is closed and
+     * unrendered, which is right: there is nothing to place then either. */
+    offset: () => {
+      const point = this.renderRoot.querySelector<HTMLElement>('[part="arrow"]')
+      return this.offset + (point?.offsetWidth ?? 0) / Math.SQRT2
+    },
     onDismiss: () => this.hide(),
     placement: () => this.placement,
     surface: () => this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]'),
+    within: () => this.enclosure,
   })
+
+  /**
+   * The element `within` names, or null.
+   *
+   * Same resolution as `named`, and separate from it because they answer
+   * different questions: one is what the bubble points at and the other is what
+   * it must stay inside, and a component often has one and not the other.
+   */
+  private get enclosure(): Element | null {
+    if (this.within === '') {
+      return null
+    }
+    const root = this.getRootNode()
+    return root instanceof Document || root instanceof ShadowRoot
+      ? root.getElementById(this.within)
+      : null
+  }
 
   private get bubble(): HTMLElement | null {
     return this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]')

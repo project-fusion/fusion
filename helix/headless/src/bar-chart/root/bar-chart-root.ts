@@ -76,7 +76,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     const series = this.series
     const categories = series[0]?.points.map((point) => point.label) ?? []
     if (categories.length === 0) {
-      return html`<div part="plot"></div>`
+      return html`<div id="helix-chart-plot" part="plot"></div>`
     }
 
     /* Zero at both ends, so a series that goes negative gets a baseline inside
@@ -156,7 +156,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
           />`
     }
 
-    return html`<div aria-hidden="true" part="plot" title=${named || nothing}>
+    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot" title=${named || nothing}>
       <svg
         preserveAspectRatio="none"
         viewBox="0 0 100 ${HEIGHT}"

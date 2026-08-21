@@ -213,6 +213,7 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
      * mistake. */
     return html`<div
       aria-hidden="true"
+      id="helix-chart-plot"
       part="plot"
       style="--_donut-thickness: ${this.thickness}"
       title=${named || nothing}

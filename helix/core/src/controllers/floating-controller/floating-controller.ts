@@ -64,6 +64,22 @@ export interface FloatingOptions {
 
   /** Whether to slide along the side to stay in view. On by default. */
   shift?: boolean
+
+  /**
+   * A box to keep the surface inside, instead of the viewport.
+   *
+   * Applied to `shift` and to nothing else, which is the whole of the design.
+   * `shift` slides the surface along the axis it is *not* placed on, so for a
+   * bubble above its anchor this clamps x and leaves y alone, and a chart can
+   * say "stay within my own width" without also saying "stay within my own
+   * height", which would jam the bubble inside the drawing.
+   *
+   * Giving the same box to `flip` or `size` says the second thing. A tooltip
+   * above a reading almost never fits above it *within the chart*, so `flip`
+   * would send every one of them below the point, and `size` would compute an
+   * available height of nearly nothing and squash the box. Both were tried.
+   */
+  within?: () => Element | null | undefined
 }
 
 /**
@@ -136,7 +152,8 @@ export class FloatingController implements ReactiveController {
       middleware.push(flip())
     }
     if (this.options.shift !== false) {
-      middleware.push(shift({ padding: 8 }))
+      const inside = this.options.within?.()
+      middleware.push(shift({ padding: 8, ...(inside ? { boundary: inside } : {}) }))
     }
     if (this.options.resize !== false) {
       middleware.push(

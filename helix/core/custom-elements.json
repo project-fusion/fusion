@@ -1218,7 +1218,7 @@
               },
               "privacy": "private",
               "readonly": true,
-              "default": "new FloatingController(host, { anchor: options.anchor, ...(options.arrow === undefined ? {} : { arrow: options.arrow }), floating: options.surface, ...(options.offset === undefined ? {} : { offset: options.offset }), ...(options.placement === undefined ? {} : { placement: options.placement }), })"
+              "default": "new FloatingController(host, { anchor: options.anchor, ...(options.arrow === undefined ? {} : { arrow: options.arrow }), floating: options.surface, ...(options.offset === undefined ? {} : { offset: options.offset }), ...(options.placement === undefined ? {} : { placement: options.placement }), ...(options.within === undefined ? {} : { within: options.within }), })"
             },
             {
               "kind": "field",

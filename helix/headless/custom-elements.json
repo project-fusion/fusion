@@ -48164,8 +48164,18 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which used to be the size of the arrow the styled tier drew so the\npoint could reach the trigger while the bubble did not. **The arrow is\ngone**, and the number stays: it is now simply the gap, and eight is what\nreads as beside rather than attached at every placement. Nothing depends on\nit any more, so a consumer changing it changes the gap and nothing else.",
+              "description": "Space between the trigger and the point of the bubble, in pixels.\n\n**Measured from the point, which is what the arrow being back changed.**\nThe arrow is drawn half outside the bubble, so a gap measured to the\nbubble's edge is a smaller gap to the tip: at the default it left the point\ntwo pixels off the trigger, which reads as touching. The controller is\ngiven this plus however far the arrow actually protrudes, so eight means\neight from whatever is nearest, arrow or edge, and a consumer who changes\nit changes the visible gap rather than a number the arrow then eats into.",
               "attribute": "offset"
+            },
+            {
+              "kind": "field",
+              "name": "within",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of a box to keep the bubble inside, instead of the viewport.\n\nResolved the way `for` is, so an id in the same tree, which is what lets a\ncomponent name a box in its own shadow root. A chart does: its bubble is\ncentred on a reading, and the first and last readings sit at the ends of\nthe plot, so half the box hangs past the drawing and, measured on a chart\nin a 320px card, three pixels past the card itself.\n\nClamping is on the cross axis only, which is what makes this safe to point\nat a box the bubble genuinely does not fit inside. See `within` on\n`FloatingController` for what happens if it is applied to the rest.",
+              "attribute": "within"
             },
             {
               "kind": "field",
@@ -48252,7 +48262,17 @@
               "name": "bubbleLayer",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })"
+              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], /* The declared gap plus the arrow's own reach, so the gap is to the point. * * A square of side `n` rotated forty-five degrees about its own centre * reaches `n / sqrt(2)` from that centre, and the arrow is placed with its * centre on the bubble's edge, so that is exactly how far past the edge the * tip goes. Read from the element rather than assumed, because * `--tooltip-arrow-size` is a hook and a theme may have moved it. * * `offsetWidth` and not `getBoundingClientRect`, which reports the rotated * box and would count the reach twice. Zero while the bubble is closed and * unrendered, which is right: there is nothing to place then either. */ offset: () => { const point = this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]') return this.offset + (point?.offsetWidth ?? 0) / Math.SQRT2 }, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), within: () => this.enclosure, })"
+            },
+            {
+              "kind": "field",
+              "name": "enclosure",
+              "type": {
+                "text": "Element | null"
+              },
+              "privacy": "private",
+              "description": "The element `within` names, or null.\n\nSame resolution as `named`, and separate from it because they answer\ndifferent questions: one is what the bubble points at and the other is what\nit must stay inside, and a component often has one and not the other.",
+              "readonly": true
             },
             {
               "kind": "field",
@@ -48656,8 +48676,17 @@
                 "text": "number"
               },
               "default": "8",
-              "description": "Space between the trigger and the bubble, in pixels.\n\nEight, which used to be the size of the arrow the styled tier drew so the\npoint could reach the trigger while the bubble did not. **The arrow is\ngone**, and the number stays: it is now simply the gap, and eight is what\nreads as beside rather than attached at every placement. Nothing depends on\nit any more, so a consumer changing it changes the gap and nothing else.",
+              "description": "Space between the trigger and the point of the bubble, in pixels.\n\n**Measured from the point, which is what the arrow being back changed.**\nThe arrow is drawn half outside the bubble, so a gap measured to the\nbubble's edge is a smaller gap to the tip: at the default it left the point\ntwo pixels off the trigger, which reads as touching. The controller is\ngiven this plus however far the arrow actually protrudes, so eight means\neight from whatever is nearest, arrow or edge, and a consumer who changes\nit changes the visible gap rather than a number the arrow then eats into.",
               "fieldName": "offset"
+            },
+            {
+              "name": "within",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of a box to keep the bubble inside, instead of the viewport.\n\nResolved the way `for` is, so an id in the same tree, which is what lets a\ncomponent name a box in its own shadow root. A chart does: its bubble is\ncentred on a reading, and the first and last readings sit at the ends of\nthe plot, so half the box hangs past the drawing and, measured on a chart\nin a 320px card, three pixels past the card itself.\n\nClamping is on the cross axis only, which is what makes this safe to point\nat a box the bubble genuinely does not fit inside. See `within` on\n`FloatingController` for what happens if it is applied to the rest.",
+              "fieldName": "within"
             },
             {
               "name": "disabled",

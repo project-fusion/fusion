@@ -109,6 +109,7 @@ export const drawTooltip = (
       open
       part="tooltip-anchor"
       placement=${place.placement}
+      within="helix-chart-plot"
     >
       <div aria-hidden="true" slot="content">
         <span part="tooltip-label">${row.label}</span>

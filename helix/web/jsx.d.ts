@@ -12084,14 +12084,28 @@ why this does not reflect and nothing styles on it. */
   for?: HelixTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   placement?: HelixTooltip["placement"];
-  /** Space between the trigger and the bubble, in pixels.
+  /** Space between the trigger and the point of the bubble, in pixels.
 
-Eight, which used to be the size of the arrow the styled tier drew so the
-point could reach the trigger while the bubble did not. **The arrow is
-gone**, and the number stays: it is now simply the gap, and eight is what
-reads as beside rather than attached at every placement. Nothing depends on
-it any more, so a consumer changing it changes the gap and nothing else. */
+**Measured from the point, which is what the arrow being back changed.**
+The arrow is drawn half outside the bubble, so a gap measured to the
+bubble's edge is a smaller gap to the tip: at the default it left the point
+two pixels off the trigger, which reads as touching. The controller is
+given this plus however far the arrow actually protrudes, so eight means
+eight from whatever is nearest, arrow or edge, and a consumer who changes
+it changes the visible gap rather than a number the arrow then eats into. */
   offset?: HelixTooltip["offset"];
+  /** The id of a box to keep the bubble inside, instead of the viewport.
+
+Resolved the way `for` is, so an id in the same tree, which is what lets a
+component name a box in its own shadow root. A chart does: its bubble is
+centred on a reading, and the first and last readings sit at the ends of
+the plot, so half the box hangs past the drawing and, measured on a chart
+in a 320px card, three pixels past the card itself.
+
+Clamping is on the cross axis only, which is what makes this safe to point
+at a box the bubble genuinely does not fit inside. See `within` on
+`FloatingController` for what happens if it is applied to the rest. */
+  within?: HelixTooltip["within"];
   /** Whether the tooltip never shows. */
   disabled?: HelixTooltip["disabled"];
   /** How long the pointer must rest before the bubble appears, in milliseconds.
@@ -12165,14 +12179,28 @@ why this does not reflect and nothing styles on it. */
   "prop:for"?: HelixTooltip["for"];
   /** Preferred side. It moves if that side does not fit. */
   "prop:placement"?: HelixTooltip["placement"];
-  /** Space between the trigger and the bubble, in pixels.
+  /** Space between the trigger and the point of the bubble, in pixels.
 
-Eight, which used to be the size of the arrow the styled tier drew so the
-point could reach the trigger while the bubble did not. **The arrow is
-gone**, and the number stays: it is now simply the gap, and eight is what
-reads as beside rather than attached at every placement. Nothing depends on
-it any more, so a consumer changing it changes the gap and nothing else. */
+**Measured from the point, which is what the arrow being back changed.**
+The arrow is drawn half outside the bubble, so a gap measured to the
+bubble's edge is a smaller gap to the tip: at the default it left the point
+two pixels off the trigger, which reads as touching. The controller is
+given this plus however far the arrow actually protrudes, so eight means
+eight from whatever is nearest, arrow or edge, and a consumer who changes
+it changes the visible gap rather than a number the arrow then eats into. */
   "prop:offset"?: HelixTooltip["offset"];
+  /** The id of a box to keep the bubble inside, instead of the viewport.
+
+Resolved the way `for` is, so an id in the same tree, which is what lets a
+component name a box in its own shadow root. A chart does: its bubble is
+centred on a reading, and the first and last readings sit at the ends of
+the plot, so half the box hangs past the drawing and, measured on a chart
+in a 320px card, three pixels past the card itself.
+
+Clamping is on the cross axis only, which is what makes this safe to point
+at a box the bubble genuinely does not fit inside. See `within` on
+`FloatingController` for what happens if it is applied to the rest. */
+  "prop:within"?: HelixTooltip["within"];
   /** Whether the tooltip never shows. */
   "prop:disabled"?: HelixTooltip["disabled"];
   /** How long the pointer must rest before the bubble appears, in milliseconds.
@@ -14470,6 +14498,7 @@ export type CustomElements = {
    * browser's own momentum and the controls only have to scroll.
    *
    * Slides take the full track by default. `per-view` fits more than one across,
+   * up to five,
    * which is what a run of cards wants rather than a run of full-width panels.
    *
    * ## Attributes & Properties
@@ -23395,13 +23424,26 @@ export type CustomElements = {
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
-   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
-   * Eight, which used to be the size of the arrow the styled tier drew so the
-   * point could reach the trigger while the bubble did not. **The arrow is
-   * gone**, and the number stays: it is now simply the gap, and eight is what
-   * reads as beside rather than attached at every placement. Nothing depends on
-   * it any more, so a consumer changing it changes the gap and nothing else.
+   * **Measured from the point, which is what the arrow being back changed.**
+   * The arrow is drawn half outside the bubble, so a gap measured to the
+   * bubble's edge is a smaller gap to the tip: at the default it left the point
+   * two pixels off the trigger, which reads as touching. The controller is
+   * given this plus however far the arrow actually protrudes, so eight means
+   * eight from whatever is nearest, arrow or edge, and a consumer who changes
+   * it changes the visible gap rather than a number the arrow then eats into.
+   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centred on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *
@@ -25422,6 +25464,7 @@ export type CustomElementsSolidJs = {
    * browser's own momentum and the controls only have to scroll.
    *
    * Slides take the full track by default. `per-view` fits more than one across,
+   * up to five,
    * which is what a run of cards wants rather than a run of full-width panels.
    *
    * ## Attributes & Properties
@@ -34626,13 +34669,26 @@ export type CustomElementsSolidJs = {
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
    * - `placement`: Preferred side. It moves if that side does not fit.
-   * - `offset`: Space between the trigger and the bubble, in pixels.
+   * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
-   * Eight, which used to be the size of the arrow the styled tier drew so the
-   * point could reach the trigger while the bubble did not. **The arrow is
-   * gone**, and the number stays: it is now simply the gap, and eight is what
-   * reads as beside rather than attached at every placement. Nothing depends on
-   * it any more, so a consumer changing it changes the gap and nothing else.
+   * **Measured from the point, which is what the arrow being back changed.**
+   * The arrow is drawn half outside the bubble, so a gap measured to the
+   * bubble's edge is a smaller gap to the tip: at the default it left the point
+   * two pixels off the trigger, which reads as touching. The controller is
+   * given this plus however far the arrow actually protrudes, so eight means
+   * eight from whatever is nearest, arrow or edge, and a consumer who changes
+   * it changes the visible gap rather than a number the arrow then eats into.
+   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centred on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
    * - `disabled`: Whether the tooltip never shows.
    * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
    *
