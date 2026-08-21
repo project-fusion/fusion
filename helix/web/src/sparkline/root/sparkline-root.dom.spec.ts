@@ -150,10 +150,17 @@ describe('sparkline', () => {
        curve is expressed as path data and path data is markup. `linePath` in
        `helix/core` is the implementation, specced there, so what is asserted
        here is only that the property reaches it. */
-    const straight = path(await spark('values="1 5 2 6"')) ?? ''
+    const resting = path(await spark('values="1 5 2 6"')) ?? ''
+    const straight = path(await spark('curve="straight" values="1 5 2 6"')) ?? ''
     const smooth = path(await spark('curve="smooth" values="1 5 2 6"')) ?? ''
     const stepped = path(await spark('curve="step" values="1 5 2 6"')) ?? ''
+    // Saying nothing gets the smooth curve, and saying `straight` is what opts
+    // out of it. Asserted as the same path rather than merely as one containing
+    // a cubic, so this fails if the resting curve ever quietly becomes a third
+    // thing that happens to be curved.
+    expect(resting).toBe(smooth)
     expect(straight).toContain('L')
+    expect(straight).not.toContain('C')
     expect(smooth).toContain('C')
     expect(stepped).toContain('H')
     /* All three start on the first reading and finish on the last. The step
@@ -161,7 +168,7 @@ describe('sparkline', () => {
        already set by the `V` before it, so it ends `V0H100` where the other two
        end `100,0`. Asserting one spelling for all three is what the first
        version of this did, and it reported a path that was correct. */
-    for (const drawn of [straight, smooth, stepped]) {
+    for (const drawn of [resting, straight, smooth, stepped]) {
       expect(drawn.startsWith('M0,32')).toBe(true)
     }
     expect(straight.endsWith('L100,0')).toBe(true)

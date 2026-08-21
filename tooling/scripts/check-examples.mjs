@@ -147,6 +147,20 @@ for (const family of families) {
      link with no stylesheet is a promise to a file that is not there. */
   for (const file of files) {
     const markup = readFileSync(join(dir, file), 'utf8')
+    /* Every example describes itself in one line.
+     *
+     * `helix-examples` reads `@summary` into the manifest and the reference
+     * page prints it in the Examples table, so an example without one is a row
+     * with a slug and a blank. **279 of 344 were blank**, which is four fifths
+     * of the library documented by a plugin that was built, documented, and
+     * used by sixty-five files. Nothing said so, because a missing description
+     * renders as an empty cell and an empty cell looks like a layout. */
+    if (!/<!--\s*@summary\s+\S/.test(markup)) {
+      problems.push(
+        `${family}/${file}: has no \`<!-- @summary … -->\`. The Examples table will print its ` +
+          'slug against a blank.',
+      )
+    }
     const link = /<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>/is.exec(markup)
     const sheet = entries.includes(file.replace(/\.html$/, '.css'))
     if (sheet && !link) {

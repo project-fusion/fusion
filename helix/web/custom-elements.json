@@ -705,15 +705,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Sections that open one at a time or together, with the first already open.",
                 "slug": "default"
               },
               {
+                "description": "A hairline around the set, for a panel that needs an edge against the page.",
                 "slug": "outlined"
               },
               {
+                "description": "No border and no fill, for sections inside something that already has both.",
                 "slug": "plain"
               },
               {
+                "description": "One section open at a time, so opening the next closes the last.",
                 "slug": "single"
               }
             ],
@@ -989,12 +993,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A dismissible bar across the top of a page, tone and all.",
                 "slug": "default"
               },
               {
+                "description": "The four tones side by side, from neutral notice to danger.",
                 "slug": "tones"
               },
               {
+                "description": "A bar carrying its own buttons, for a notice a reader can act on.",
                 "slug": "with-actions"
               }
             ],
@@ -1435,18 +1442,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A brand, a navigation, and actions on the right.",
                 "slug": "default"
               },
               {
+                "description": "No shadow and no blur, for a header that sits on the page rather than over it.",
                 "slug": "flat"
               },
               {
+                "description": "Blurred over what scrolls beneath it.",
                 "slug": "material"
               },
               {
+                "description": "Held at the top while the page moves under it.",
                 "slug": "sticky"
               },
               {
+                "description": "Over a dark hero, taking its own colour mode.",
                 "slug": "transparent"
               }
             ],
@@ -2925,15 +2937,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Initials derived from a name, which is the fallback every avatar has.",
                 "slug": "default"
               },
               {
+                "description": "A source that fails, falling back to initials rather than a broken image.",
                 "slug": "broken-image"
               },
               {
+                "description": "Overlapped faces with a count for the rest.",
                 "slug": "group"
               },
               {
+                "description": "A photograph, at the three sizes an avatar comes in.",
                 "slug": "image"
               }
             ],
@@ -3265,15 +3281,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A count over the thing it counts.",
                 "slug": "default"
               },
               {
+                "description": "The badge drawn as a count, a dot, and a standalone tag.",
                 "slug": "appearances"
               },
               {
+                "description": "A count past its maximum, which reads as a ceiling rather than a number.",
                 "slug": "capped"
               },
               {
+                "description": "A mark with no number, for unread rather than how many.",
                 "slug": "dot"
               }
             ],
@@ -3919,6 +3939,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A quotation with its source cited.",
                 "slug": "default"
               }
             ],
@@ -4484,6 +4505,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "The path to the current page, the last crumb being where the reader is.",
                 "slug": "default"
               },
               {
@@ -4718,12 +4740,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Buttons joined into one control, sharing their edges.",
                 "slug": "default"
               },
               {
+                "description": "The same set with the buttons kept apart.",
                 "slug": "spaced"
               },
               {
+                "description": "A group of icon buttons, for a toolbar-shaped choice.",
                 "slug": "with-icons"
               }
             ],
@@ -5369,6 +5394,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "The appearances and tones together, showing which two axes a button has.",
                 "slug": "default"
               },
               {
@@ -5376,12 +5402,15 @@
                 "slug": "appearances"
               },
               {
+                "description": "A button that navigates, which is an anchor wearing a button's clothes.",
                 "slug": "as-link"
               },
               {
+                "description": "Disabled across the appearances, so the difference is visible in each.",
                 "slug": "disabled"
               },
               {
+                "description": "A button that takes the width it is given rather than the width of its label.",
                 "slug": "fill"
               },
               {
@@ -5389,9 +5418,11 @@
                 "slug": "variants"
               },
               {
+                "description": "Buttons in a narrow column, where the label decides whether it wraps.",
                 "slug": "width"
               },
               {
+                "description": "An icon before the label, and an icon after it.",
                 "slug": "with-icon"
               }
             ],
@@ -5654,9 +5685,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A note set apart from the prose around it.",
                 "slug": "default"
               },
               {
+                "description": "The severities together, from a plain note to a danger.",
                 "slug": "severities"
               }
             ],
@@ -5958,21 +5991,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A heading, some prose, and a footer, in the resting appearance.",
                 "slug": "default"
               },
               {
+                "description": "Lifted off the page with a shadow rather than an outline.",
                 "slug": "elevated"
               },
               {
+                "description": "Media beside the words rather than above them.",
                 "slug": "horizontal"
               },
               {
+                "description": "A whole card that navigates, with the heading carrying the link.",
                 "slug": "linked"
               },
               {
+                "description": "A hairline and no fill.",
                 "slug": "outlined"
               },
               {
+                "description": "Neither border nor shadow, for a card inside something that has both.",
                 "slug": "plain"
               }
             ],
@@ -6664,24 +6703,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Slides with controls and indicators, one at a time.",
                 "slug": "default"
               },
               {
+                "description": "Full-bleed slides with the controls over the picture.",
                 "slug": "hero"
               },
               {
+                "description": "The indicators moved to each of the places they can sit.",
                 "slug": "indicator-placement"
               },
               {
+                "description": "Controls and indicators aligned to the start, centre and end.",
                 "slug": "placement-align"
               },
               {
+                "description": "Advancing on its own, and stopping when a pointer rests on it.",
                 "slug": "rotating"
               },
               {
+                "description": "More than one slide in view, which is what a shelf of cards wants.",
                 "slug": "several-across"
               },
               {
+                "description": "Slides stacked and scrolled downward.",
                 "slug": "vertical"
               }
             ],
@@ -7531,18 +7577,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Several checkboxes under one label, each submitting itself.",
                 "slug": "default"
               },
               {
+                "description": "A whole group disabled, and one member disabled inside a live group.",
                 "slug": "disabled"
               },
               {
+                "description": "The members in a row rather than a column.",
                 "slug": "horizontal"
               },
               {
+                "description": "The group reporting a fault that belongs to the set rather than to a member.",
                 "slug": "invalid"
               },
               {
+                "description": "A group that wants at least one answer.",
                 "slug": "required"
               }
             ],
@@ -8604,9 +8655,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "One checkbox with a label and a hint under it.",
                 "slug": "default"
               },
               {
+                "description": "Checkboxes drawn as cards, for options that need room to explain themselves.",
                 "slug": "cards"
               },
               {
@@ -8614,12 +8667,15 @@
                 "slug": "controlled"
               },
               {
+                "description": "Disabled checked and unchecked, since the two look different.",
                 "slug": "disabled"
               },
               {
+                "description": "A checkbox reporting why it is not acceptable.",
                 "slug": "invalid"
               },
               {
+                "description": "Required marked on the label, and what the browser says when it is skipped.",
                 "slug": "required"
               }
             ],
@@ -10324,21 +10380,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A field with a swatch that opens a picker.",
                 "slug": "default"
               },
               {
+                "description": "A colour with an opacity, in a syntax that can carry one.",
                 "slug": "alpha"
               },
               {
+                "description": "Disabled, with the swatch still showing the value.",
                 "slug": "disabled"
               },
               {
+                "description": "A colour the field will not accept, and what it says about it.",
                 "slug": "invalid"
               },
               {
+                "description": "The swatch alone, for a toolbar with no room for a field.",
                 "slug": "swatch"
               },
               {
+                "description": "A set of colours offered before the picker.",
                 "slug": "swatches"
               }
             ],
@@ -11524,21 +11586,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "The area, the hue rail, and the value in a field.",
                 "slug": "default"
               },
               {
+                "description": "The picker with no syntax control, for where the format is decided already.",
                 "slug": "bare"
               },
               {
+                "description": "Disabled, which is a picker that shows a colour and does not move.",
                 "slug": "disabled"
               },
               {
+                "description": "The picker reporting a value it cannot use.",
                 "slug": "invalid"
               },
               {
+                "description": "Prepared colours under the picker, with opacity on.",
                 "slug": "swatches"
               },
               {
+                "description": "The same colour written in each syntax the picker speaks.",
                 "slug": "syntaxes"
               }
             ],
@@ -13180,15 +13248,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Type to narrow a list, and choose from what is left.",
                 "slug": "default"
               },
               {
+                "description": "Opening with a value already chosen, which is what an edit form does.",
                 "slug": "chosen"
               },
               {
+                "description": "Typing something that is not on the list and keeping it.",
                 "slug": "creatable"
               },
               {
+                "description": "Disabled with a value, so the value is still readable.",
                 "slug": "disabled"
               },
               {
@@ -13196,6 +13268,7 @@
                 "slug": "empty"
               },
               {
+                "description": "A choice the field will not accept, and why.",
                 "slug": "invalid"
               },
               {
@@ -13203,12 +13276,15 @@
                 "slug": "max-tags"
               },
               {
+                "description": "Several choices at once, each shown as a tag.",
                 "slug": "multiple"
               },
               {
+                "description": "A choice that has to be made before the form will submit.",
                 "slug": "required"
               },
               {
+                "description": "The rest of the match filled in ahead of the cursor as it is typed.",
                 "slug": "suggest"
               }
             ],
@@ -14072,12 +14148,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A command palette open, with its list already filtered by what is typed.",
                 "slug": "default"
               },
               {
+                "description": "Opened by a key from anywhere on the page.",
                 "slug": "hotkey"
               },
               {
+                "description": "The palette as it looks the moment it opens, before anything is typed.",
                 "slug": "open"
               }
             ],
@@ -16326,27 +16405,35 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A field that takes a typed date or one from the calendar it opens.",
                 "slug": "default"
               },
               {
+                "description": "A date within a window, with weekends refused.",
                 "slug": "bounded"
               },
               {
+                "description": "Disabled with a date in it.",
                 "slug": "disabled"
               },
               {
+                "description": "The same date written long, medium and short.",
                 "slug": "formatted"
               },
               {
+                "description": "A date before the earliest allowed, and what the field says about it.",
                 "slug": "invalid"
               },
               {
+                "description": "Two months side by side, which suits picking across a boundary.",
                 "slug": "months"
               },
               {
+                "description": "Several dates in one field, each as a tag.",
                 "slug": "multiple"
               },
               {
+                "description": "A start and an end, chosen as one gesture.",
                 "slug": "range"
               }
             ],
@@ -17786,24 +17873,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A month, with a day already chosen.",
                 "slug": "default"
               },
               {
+                "description": "A calendar that only goes as far as it is allowed.",
                 "slug": "bounded"
               },
               {
+                "description": "Disabled, showing its date and refusing to move.",
                 "slug": "disabled"
               },
               {
+                "description": "The calendar reporting a date it cannot accept.",
                 "slug": "invalid"
               },
               {
+                "description": "Several days chosen in one calendar, in a locale that starts on Monday.",
                 "slug": "multiple"
               },
               {
+                "description": "A start and an end across two months.",
                 "slug": "range"
               },
               {
+                "description": "Named days and whole weekdays taken out of an otherwise open month.",
                 "slug": "restricted"
               }
             ],
@@ -18672,18 +18766,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A dialog opened by a button, with actions in its footer.",
                 "slug": "default"
               },
               {
+                "description": "A dialog whose content sits centred, for a short confirmation.",
                 "slug": "centered"
               },
               {
+                "description": "Filling the viewport, for something that needs the whole screen.",
                 "slug": "full"
               },
               {
+                "description": "Wider, for a form that will not fit the resting width.",
                 "slug": "large"
               },
               {
+                "description": "Narrow, which suits a question with two answers.",
                 "slug": "small"
               }
             ],
@@ -19009,12 +19108,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A rule between two blocks of prose.",
                 "slug": "default"
               },
               {
+                "description": "Rules that stop short of the edge, for a divider inside a padded box.",
                 "slug": "inset"
               },
               {
+                "description": "A word set into the rule, which is how a form says or.",
                 "slug": "with-content"
               }
             ],
@@ -19922,9 +20024,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A panel from the edge, opened by a button.",
                 "slug": "default"
               },
               {
+                "description": "The four edges a drawer can arrive from.",
                 "slug": "placements"
               }
             ],
@@ -20846,6 +20950,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A menu that replaces itself rather than opening sideways, for a narrow screen.",
                 "slug": "default"
               }
             ],
@@ -21156,6 +21261,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Nothing to show, with a heading, an explanation and a way forward.",
                 "slug": "default"
               }
             ],
@@ -22126,15 +22232,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A drop zone that also takes a click, accepting several files.",
                 "slug": "default"
               },
               {
+                "description": "Disabled, which is a drop zone that refuses a drop.",
                 "slug": "disabled"
               },
               {
+                "description": "A file the field will not take, and what it says about it.",
                 "slug": "invalid"
               },
               {
+                "description": "One file of a named type, which is what an avatar upload wants.",
                 "slug": "single"
               }
             ],
@@ -22708,9 +22818,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A row with a gap and its items centred.",
                 "slug": "default"
               },
               {
+                "description": "A column with a gap, which is most of what a page needs.",
                 "slug": "column"
               }
             ],
@@ -22966,9 +23078,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Columns that fit themselves to the width, no count given.",
                 "slug": "default"
               },
               {
+                "description": "A named number of columns, for a layout that must not reflow.",
                 "slug": "fixed-columns"
               }
             ],
@@ -23622,6 +23736,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A button that is a glyph, with the label read rather than shown.",
                 "slug": "default"
               },
               {
@@ -23853,9 +23968,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "One glyph at the resting size.",
                 "slug": "default"
               },
               {
+                "description": "The same glyph at each step of the icon scale.",
                 "slug": "sizes"
               }
             ],
@@ -24355,6 +24472,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A picture with an aspect ratio held and its corners rounded.",
                 "slug": "default"
               },
               {
@@ -26159,24 +26277,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A text field with a label, a placeholder and a hint.",
                 "slug": "default"
               },
               {
+                "description": "A field with a control to empty it.",
                 "slug": "clearable"
               },
               {
+                "description": "Disabled, filled and empty, since the two read differently.",
                 "slug": "disabled"
               },
               {
+                "description": "A field reporting what is wrong with what is in it.",
                 "slug": "invalid"
               },
               {
+                "description": "A value that can be read and copied but not changed.",
                 "slug": "read-only"
               },
               {
+                "description": "Required marked on the label, and what the browser says when it is skipped.",
                 "slug": "required"
               },
               {
+                "description": "A password with a control to show what was typed.",
                 "slug": "reveal"
               }
             ],
@@ -26662,6 +26787,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A key, and a chord of keys, as a reader would see them written.",
                 "slug": "default"
               }
             ],
@@ -28072,12 +28198,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Rows with rules between them.",
                 "slug": "default"
               },
               {
+                "description": "The list as plain rows, as rows with rules, and as separate cards.",
                 "slug": "kinds"
               },
               {
+                "description": "Rows that navigate, each whole row being the target.",
                 "slug": "linked"
               }
             ],
@@ -29383,21 +29512,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A list to choose one from, always open.",
                 "slug": "default"
               },
               {
+                "description": "A whole list disabled, and one option disabled inside a live list.",
                 "slug": "disabled"
               },
               {
+                "description": "A field over the list that narrows it as it is typed.",
                 "slug": "filtered"
               },
               {
+                "description": "The list reporting that no choice was made.",
                 "slug": "invalid"
               },
               {
+                "description": "Several options chosen at once.",
                 "slug": "multiple"
               },
               {
+                "description": "A list that wants an answer before the form will submit.",
                 "slug": "required"
               }
             ],
@@ -29967,15 +30102,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A spinner with a label read aloud rather than shown.",
                 "slug": "default"
               },
               {
+                "description": "A pulse rather than a spin, for a wait inside a small space.",
                 "slug": "pulse"
               },
               {
+                "description": "The loader at each size it comes in.",
                 "slug": "sizes"
               },
               {
+                "description": "A glyph in the middle of the ring, for a wait with a subject.",
                 "slug": "with-icon"
               }
             ],
@@ -30684,6 +30823,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A navigation whose items open a full-width panel of columns.",
                 "slug": "default"
               },
               {
@@ -32135,6 +32275,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A menu with items, a submenu, and a separator.",
                 "slug": "default"
               },
               {
@@ -32857,21 +32998,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A measurement in a known range, with its value shown.",
                 "slug": "default"
               },
               {
+                "description": "A reading inside its good band, drawn as good.",
                 "slug": "band"
               },
               {
+                "description": "The same reading against low, high and optimum, which is what moves its colour.",
                 "slug": "bands"
               },
               {
+                "description": "A value past the maximum, which clamps rather than overflows.",
                 "slug": "beyond"
               },
               {
+                "description": "A reading that says its own number, in words the reader chose.",
                 "slug": "counted"
               },
               {
+                "description": "The reading drawn as a ring rather than a bar.",
                 "slug": "round"
               }
             ],
@@ -33264,6 +33411,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Links with the current page marked, and a mark that travels.",
                 "slug": "default"
               }
             ],
@@ -34493,15 +34641,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A number with buttons to step it.",
                 "slug": "default"
               },
               {
+                "description": "A number in a range, and a number with a step.",
                 "slug": "bounded"
               },
               {
+                "description": "Disabled, with and without a value.",
                 "slug": "disabled"
               },
               {
+                "description": "A number outside its range, and what the field says.",
                 "slug": "invalid"
               },
               {
@@ -34509,6 +34661,7 @@
                 "slug": "scrub"
               },
               {
+                "description": "A unit set beside the number rather than typed into it.",
                 "slug": "units"
               }
             ],
@@ -35238,9 +35391,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "One option, chosen, as a listbox or select holds it.",
                 "slug": "default"
               },
               {
+                "description": "Options under headings, for a list long enough to need them.",
                 "slug": "grouped"
               }
             ],
@@ -35814,9 +35969,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Headings on a page, with the one in view marked as the page scrolls.",
                 "slug": "default"
               },
               {
+                "description": "The same outline, scrolling smoothly and stopping clear of a sticky header.",
                 "slug": "smooth"
               }
             ],
@@ -36779,18 +36936,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Numbered pages with the current one marked.",
                 "slug": "default"
               },
               {
+                "description": "Just the arrows and a count, for a footer with no room.",
                 "slug": "compact"
               },
               {
+                "description": "Pagination sitting in a table footer beside a total.",
                 "slug": "footer"
               },
               {
+                "description": "Pages as real links, so each is a URL a reader can keep.",
                 "slug": "links"
               },
               {
+                "description": "How many numbers show either side of the current page.",
                 "slug": "window"
               }
             ],
@@ -38819,6 +38981,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A code across separate boxes, one character each.",
                 "slug": "default"
               },
               {
@@ -38826,15 +38989,19 @@
                 "slug": "complete"
               },
               {
+                "description": "Disabled, with the code still readable.",
                 "slug": "disabled"
               },
               {
+                "description": "A code the field will not accept.",
                 "slug": "invalid"
               },
               {
+                "description": "Four boxes and six, which are the two codes anybody sends.",
                 "slug": "lengths"
               },
               {
+                "description": "The characters hidden as they are typed, for a code that is a secret.",
                 "slug": "masked"
               }
             ],
@@ -39544,12 +39711,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A panel anchored to what opened it.",
                 "slug": "default"
               },
               {
+                "description": "A popover opened by a button through the command attributes.",
                 "slug": "commanded"
               },
               {
+                "description": "No arrow and no fill, for a panel that supplies its own.",
                 "slug": "plain"
               }
             ],
@@ -39910,15 +40080,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "How far along a task is, with the number shown.",
                 "slug": "default"
               },
               {
+                "description": "A bar that says its own number, in words the reader chose.",
                 "slug": "counted"
               },
               {
+                "description": "A task with no known length, which is a bar that travels.",
                 "slug": "indeterminate"
               },
               {
+                "description": "The same progress drawn as a ring.",
                 "slug": "ring"
               }
             ],
@@ -40327,24 +40501,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A URL as a code.",
                 "slug": "default"
               },
               {
+                "description": "A code in a brand colour, over a ground that keeps it scannable.",
                 "slug": "colored"
               },
               {
+                "description": "The four correction levels, which trade size against damage tolerance.",
                 "slug": "correction"
               },
               {
+                "description": "The three corner marks drawn in each shape they take.",
                 "slug": "finders"
               },
               {
+                "description": "A mark in the middle, which is what the highest correction level buys.",
                 "slug": "logo"
               },
               {
+                "description": "The modules drawn as squares, dots and rounded blocks.",
                 "slug": "shapes"
               },
               {
+                "description": "The same code at the sizes a print and a screen want.",
                 "slug": "size"
               }
             ],
@@ -40625,6 +40806,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A pulled quotation with its attribution.",
                 "slug": "default"
               }
             ],
@@ -41981,9 +42163,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "One answer from several, with a hint under the question.",
                 "slug": "default"
               },
               {
+                "description": "Radios drawn as cards, for choices that need room to explain themselves.",
                 "slug": "cards"
               },
               {
@@ -41991,15 +42175,19 @@
                 "slug": "chips"
               },
               {
+                "description": "A whole group disabled, and one option disabled inside a live group.",
                 "slug": "disabled"
               },
               {
+                "description": "The options in a row, which suits a short scale.",
                 "slug": "horizontal"
               },
               {
+                "description": "The group reporting that nothing was chosen.",
                 "slug": "invalid"
               },
               {
+                "description": "A question that has to be answered before the form will submit.",
                 "slug": "required"
               }
             ],
@@ -43303,6 +43491,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A score out of five, set by pointer or by arrow key.",
                 "slug": "default"
               },
               {
@@ -45637,6 +45826,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A box that scrolls, with the overflow faded at whichever edge has more.",
                 "slug": "default"
               },
               {
@@ -46708,18 +46898,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A native select with a label and a hint.",
                 "slug": "default"
               },
               {
+                "description": "Disabled, and one option disabled inside a live select.",
                 "slug": "disabled"
               },
               {
+                "description": "A select reporting that nothing was chosen.",
                 "slug": "invalid"
               },
               {
+                "description": "Several options chosen from one list.",
                 "slug": "multiple"
               },
               {
+                "description": "A select that wants an answer before the form will submit.",
                 "slug": "required"
               }
             ],
@@ -47298,6 +47493,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "The shape of content that has not arrived, in text, circle and block.",
                 "slug": "default"
               }
             ],
@@ -48295,15 +48491,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A value along a track, with the number shown.",
                 "slug": "default"
               },
               {
+                "description": "Disabled, with the handle still showing where the value is.",
                 "slug": "disabled"
               },
               {
+                "description": "A value the control will not accept, and what it says.",
                 "slug": "invalid"
               },
               {
+                "description": "Marks along the track, unlabelled and labelled.",
                 "slug": "markers"
               },
               {
@@ -48311,6 +48511,7 @@
                 "slug": "range"
               },
               {
+                "description": "A value that moves in named steps rather than continuously.",
                 "slug": "stepped"
               },
               {
@@ -51145,24 +51346,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Two panes and a divider a pointer or an arrow key can move.",
                 "slug": "default"
               },
               {
+                "description": "A pane collapsed to a sliver, and the handle that brings it back.",
                 "slug": "collapsed"
               },
               {
+                "description": "Three panes across, which is two splitters nested.",
                 "slug": "columns"
               },
               {
+                "description": "A divider with a visible grip rather than a bare rule.",
                 "slug": "grip"
               },
               {
+                "description": "A splitter inside a pane of another, which is how a workbench is built.",
                 "slug": "nested"
               },
               {
+                "description": "Panes stacked, with the divider between them.",
                 "slug": "vertical"
               },
               {
+                "description": "The arrangement an editor uses: a tree, a document and a panel.",
                 "slug": "workbench"
               }
             ],
@@ -51594,9 +51802,11 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Figures in a row with rules between them.",
                 "slug": "default"
               },
               {
+                "description": "A figure with a trend beside it, up, down and flat.",
                 "slug": "directions"
               }
             ],
@@ -52047,18 +52257,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A sequence with each step named and its state shown.",
                 "slug": "default"
               },
               {
+                "description": "A sequence with the third step current, so before and after both show.",
                 "slug": "active"
               },
               {
+                "description": "Steps that fold to the current one where there is no room for all of them.",
                 "slug": "collapsible"
               },
               {
+                "description": "Numbered steps rather than marked ones.",
                 "slug": "numeric"
               },
               {
+                "description": "The sequence running down rather than across.",
                 "slug": "vertical"
               }
             ],
@@ -53334,15 +53549,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A setting that takes effect as it is switched, rather than on submit.",
                 "slug": "default"
               },
               {
+                "description": "Disabled on and disabled off, since the two look different.",
                 "slug": "disabled"
               },
               {
+                "description": "A switch reporting that it has to be on.",
                 "slug": "invalid"
               },
               {
+                "description": "A switch that must be on before the form will submit.",
                 "slug": "required"
               }
             ],
@@ -54377,6 +54596,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Rows and columns with a caption naming what they are.",
                 "slug": "default"
               }
             ],
@@ -55328,12 +55548,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Panels behind tabs, with a mark that travels between them.",
                 "slug": "default"
               },
               {
+                "description": "The tabs drawn as one segmented control.",
                 "slug": "segmented"
               },
               {
+                "description": "A rule under the active tab rather than a filled one.",
                 "slug": "underlined"
               }
             ],
@@ -56068,15 +56291,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A label with a meaning, in each tone.",
                 "slug": "default"
               },
               {
+                "description": "The tag filled, outlined and subtle.",
                 "slug": "appearances"
               },
               {
+                "description": "Tags a reader can take off, which is what a filter bar holds.",
                 "slug": "dismissible"
               },
               {
+                "description": "A glyph or an avatar before the label.",
                 "slug": "prefix"
               }
             ],
@@ -56312,12 +56539,15 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A paragraph and the elements prose is made of.",
                 "slug": "default"
               },
               {
+                "description": "The text scale from the largest display size down to the smallest.",
                 "slug": "appearances"
               },
               {
+                "description": "The text tones, from the resting ink down to the most muted.",
                 "slug": "tones"
               }
             ],
@@ -57246,21 +57476,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A multi-line field with a label and a hint.",
                 "slug": "default"
               },
               {
+                "description": "A box that grows with what is typed into it rather than scrolling.",
                 "slug": "auto-grow"
               },
               {
+                "description": "Disabled, filled and empty.",
                 "slug": "disabled"
               },
               {
+                "description": "A box reporting what is wrong with what is in it.",
                 "slug": "invalid"
               },
               {
+                "description": "Text that can be read and copied but not changed.",
                 "slug": "read-only"
               },
               {
+                "description": "Required marked on the label, and what the browser says when it is skipped.",
                 "slug": "required"
               }
             ],
@@ -58798,27 +59034,35 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A field that takes a typed time or one from the wheels it opens.",
                 "slug": "default"
               },
               {
+                "description": "A time inside a window, moving in named steps.",
                 "slug": "bounded"
               },
               {
+                "description": "Disabled with a time in it.",
                 "slug": "disabled"
               },
               {
+                "description": "A time outside the window, and what the field says about it.",
                 "slug": "invalid"
               },
               {
+                "description": "The same time written in each style, including with seconds.",
                 "slug": "iso"
               },
               {
+                "description": "Several times in one field, each as a tag.",
                 "slug": "multiple"
               },
               {
+                "description": "A start and an end, chosen as one gesture.",
                 "slug": "range"
               },
               {
+                "description": "The picker drawn as wheels, which is what a phone expects.",
                 "slug": "wheels"
               }
             ],
@@ -60132,24 +60376,31 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Hours and minutes, with a time already chosen.",
                 "slug": "default"
               },
               {
+                "description": "Working hours only, at half-hour steps.",
                 "slug": "business"
               },
               {
+                "description": "Named times taken out of an otherwise open range.",
                 "slug": "disable-times"
               },
               {
+                "description": "Disabled, showing its time and refusing to move.",
                 "slug": "disabled"
               },
               {
+                "description": "The picker reporting a time it cannot accept.",
                 "slug": "invalid"
               },
               {
+                "description": "A start and an end in one picker.",
                 "slug": "range"
               },
               {
+                "description": "The picker as wheels rather than as a list.",
                 "slug": "wheels"
               }
             ],
@@ -60878,6 +61129,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Events down a line, each with its own mark and time.",
                 "slug": "default"
               }
             ],
@@ -61714,18 +61966,23 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A message over the page, in the corner it was told to appear.",
                 "slug": "default"
               },
               {
+                "description": "Several toasts stacking as they arrive.",
                 "slug": "arriving"
               },
               {
+                "description": "A toast that leaves on its own, and one that waits to be dismissed.",
                 "slug": "auto-dismiss"
               },
               {
+                "description": "Toasts over a dark page, taking their own colour mode.",
                 "slug": "page-mode"
               },
               {
+                "description": "The severities together, from a plain note to a danger.",
                 "slug": "severities"
               }
             ],
@@ -63082,21 +63339,27 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Buttons where one stays pressed, which is a choice rather than an action.",
                 "slug": "default"
               },
               {
+                "description": "A whole group disabled, and one member disabled inside a live group.",
                 "slug": "disabled"
               },
               {
+                "description": "The pressed member filled rather than outlined.",
                 "slug": "filled"
               },
               {
+                "description": "The group reporting that nothing was chosen.",
                 "slug": "invalid"
               },
               {
+                "description": "No track and no edges, for a group inside something that has both.",
                 "slug": "plain"
               },
               {
+                "description": "One that toggles, and one where exactly one stays pressed.",
                 "slug": "states"
               }
             ],
@@ -63482,6 +63745,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Controls in a row that arrow keys move between as one stop.",
                 "slug": "default"
               }
             ],
@@ -64196,15 +64460,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A word of explanation on hover and on focus.",
                 "slug": "default"
               },
               {
+                "description": "A tooltip that describes its target rather than naming it.",
                 "slug": "described"
               },
               {
+                "description": "The twelve positions a tooltip can take around its anchor.",
                 "slug": "placements"
               },
               {
+                "description": "More than a line, for a tooltip that has something to explain.",
                 "slug": "rich-content"
               }
             ],
@@ -67058,6 +67326,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Nested nodes that open and close, with one marked current.",
                 "slug": "default"
               },
               {
@@ -67065,6 +67334,7 @@
                 "slug": "chevron-placement"
               },
               {
+                "description": "The same tree with a glyph on each node.",
                 "slug": "with-icons"
               }
             ],
@@ -68512,6 +68782,7 @@
             "part": "Root",
             "examples": [
               {
+                "description": "Clips and the one player they take turns in.",
                 "slug": "default"
               },
               {
@@ -70084,15 +70355,19 @@
             "part": "Root",
             "examples": [
               {
+                "description": "A clip with a poster and the controls this library draws.",
                 "slug": "default"
               },
               {
+                "description": "A clip with subtitle tracks and the control that chooses between them.",
                 "slug": "captions"
               },
               {
+                "description": "Skip, speed and download added to the bar.",
                 "slug": "extra-controls"
               },
               {
+                "description": "The browser's own controls instead of these, which is what `controls` means.",
                 "slug": "native"
               },
               {
@@ -70100,6 +70375,7 @@
                 "slug": "overflow-controls"
               },
               {
+                "description": "No frame and no fill, for a player inside something that has both.",
                 "slug": "plain"
               },
               {
@@ -70107,12 +70383,15 @@
                 "slug": "playlist-controls"
               },
               {
+                "description": "The player lifted off the page.",
                 "slug": "shadow"
               },
               {
+                "description": "A filled frame around the picture.",
                 "slug": "solid"
               },
               {
+                "description": "Several encodings of one clip, the browser taking the first it can play.",
                 "slug": "sources"
               },
               {
