@@ -403,32 +403,51 @@ export const FRAGMENT = `#version 300 es
    */
   float threads(vec2 q, float t, vec2 qp, float reach) {
     float pinchAt = mix(0.0, qp.x, reach);
-    float gather = 1.0 - falloff((q.x - pinchAt) * (q.x - pinchAt), 1.1) * 0.88;
+    /* Narrowed, not collapsed. At 0.88 the amplitude and the spacing both fell
+       to a tenth and all seven threads landed on the same line, which is a
+       bright blob rather than a gathering: what a pinch has to preserve is that
+       there are still threads in it. */
+    float gather = 1.0 - falloff((q.x - pinchAt) * (q.x - pinchAt), 1.1) * 0.6;
 
+    /* Seven, and every one of them the same thread.
+    
+       The pass before this gave each its own amplitude, height, thickness and
+       brightness, all from hashes, and the result was a scatter rather than a
+       set: seven unrelated squiggles that happened to share a frame. What makes
+       a weave read as a weave is that the strands are alike and only their
+       phase differs, which is also what makes it a wave rather than a wobble.
+    
+       So one amplitude, one thickness, one weight, one frequency, and the
+       phases fanned evenly across a turn. Alike, they cross at regular
+       intervals instead of at coincidences. */
     float lit = 0.0;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 7; i++) {
       float f = float(i);
-      float amp = (0.3 + hash(vec2(f, 3.0)) * 0.45) * gather;
+      float phase = f * (6.2831853 / 7.0);
 
-      /* Two harmonics, not one. A single sine is a mechanical curve and five of
-         them are five mechanical curves: the second, at an incommensurate
-         frequency and running the other way, is what stops each thread
-         repeating itself across the frame. */
+      /* Evenly spaced, and the spacing collapses at the pinch along with the
+         amplitude: threads that only narrow still run parallel through it,
+         where threads that also converge actually gather. */
+      /* The spacing closes less than the amplitude does, so the threads draw
+         together without stacking. */
+      float lane = (f - 3.0) * 0.17 * mix(1.0, gather, 0.65);
+      float amp = 0.34 * gather;
+
+      /* A second harmonic at a third the frequency and a third the amplitude,
+         which bends the long run of each thread without breaking it into
+         wiggles. Low and quiet is the difference between a wave with character
+         and a wave with noise on it. */
       float y =
-        sin(q.x * (1.2 + f * 0.28) + t * (0.5 + f * 0.22) + f * 1.7) * amp +
-        sin(q.x * (2.7 + f * 0.51) - t * (0.31 + f * 0.17) + f * 3.1) * amp * 0.42;
+        lane +
+        sin(q.x * 1.5 + t * 0.55 + phase) * amp +
+        sin(q.x * 0.5 - t * 0.3 + phase) * amp * 0.32;
 
-      /* And each hangs at its own height. Centred on the same line, five
-         threads cross only where their phases happen to meet, which is a fan;
-         spread apart they cross everywhere, which is a weave. */
-      y += (hash(vec2(f, 23.0)) - 0.5) * 0.75 * gather;
-
-      /* Thickness varies too, so the set does not read as one pen. */
-      float thick = 15.0 + hash(vec2(f, 41.0)) * 16.0;
-      lit += falloff((q.y - y) * (q.y - y), thick) * (0.55 + hash(vec2(f, 9.0)) * 0.7);
+      lit += falloff((q.y - y) * (q.y - y), 24.0);
     }
-    float grain = fbm(vec2(q.x * 2.2, q.y * 2.2 - t));
-    return lit * mix(0.7, 1.2, grain) * falloff(dot(q, q), 0.4);
+    /* Quiet grain. At the old depth it was texture on the threads rather than
+       air around them, and a wave with grain on it is a wobble again. */
+    float grain = fbm(vec2(q.x * 2.0, q.y * 2.0 - t));
+    return lit * mix(0.85, 1.12, grain) * falloff(dot(q, q), 0.4);
   }
 
   /* Points adrift, and pushed aside.
