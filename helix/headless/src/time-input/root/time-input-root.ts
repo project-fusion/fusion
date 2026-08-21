@@ -7,8 +7,10 @@ import {
   MixinField,
   PopoverController,
 } from '@helix-io/core'
+import { clock } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
    custom element registers on import. The public tags rather than the base ones,
    the arrangement Date Input has with its calendar. */
@@ -57,6 +59,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart time - One held time, as a tag, in `multiple`.
  * @csspart rest - How many times are held beyond the ones shown.
  * @csspart trigger - The control that opens the list.
+ * @csspart trigger-icon - The mark on the button that opens the clock.
  * @csspart surface - The floating panel.
  * @csspart picker - The list inside it.
  */
@@ -483,13 +486,22 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    * The mark on the button that opens the clock, behind a seam.
    *
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
-   * tier above replaces it by overriding. Those answer different people: the
-   * slot is for the page and the method is for whoever is building the styled
-   * layer, and a fallback with only the first is one a tier can restyle and
-   * cannot change.
+   * tier above replaces it by overriding.
+   *
+   * **A named import rather than `<helix-icon>`, and that is a reversal.** The
+   * element looked like the tidier of the two and loses on three counts.
+   * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
+   * no bundler can shake a runtime lookup, so every consumer of any component
+   * that renders one ships all 50kB of path data; a named import ships one
+   * path. The import is checked when the package compiles, where a `name`
+   * string is checked only when `check:icons` runs. And `helix-icon` is not
+   * registered on the headless tier at all, which registers `helix-base-icon`,
+   * so a headless consumer got an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
-    return html`<slot name="trigger"><helix-icon name="clock"></helix-icon></slot>`
+    return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${clock.viewBox}>
+        ${unsafeSVG(clock.content)}
+      </svg></slot>`
   }
 
   protected override render(): TemplateResult {

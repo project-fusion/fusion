@@ -15992,7 +15992,7 @@
                   "text": "TemplateResult"
                 }
               },
-              "description": "The mark on the button that opens the calendar, behind a seam.\n\n**It had no fallback, so a date input written without a hand-slotted icon\ndrew an empty button.** Every example in the family passes one, which is\nexactly what hid it; `Select`'s own template records the identical bug as\nalready fixed there, and `Time Input` has drawn a clock all along. Slotting\nanything still replaces it, which is this library's rule for a content\ndefault.",
+              "description": "The mark on the button that opens the calendar, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding.\n\n**A named import rather than `<helix-icon>`, and that is a reversal.** The\nelement looked like the tidier of the two and loses on three counts.\n`helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and\nno bundler can shake a runtime lookup, so every consumer of any component\nthat renders one ships all 50kB of path data; a named import ships one\npath. The import is checked when the package compiles, where a `name`\nstring is checked only when `check:icons` runs. And `helix-icon` is not\nregistered on the headless tier at all, which registers `helix-base-icon`,\nso a headless consumer got an inert unknown element and no mark whatsoever.",
               "inheritedFrom": {
                 "name": "HelixBaseDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -16586,6 +16586,14 @@
             {
               "description": "The control that opens the calendar.",
               "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixBaseDateInput",
+                "module": "src/date-input/root/date-input-root.ts"
+              }
+            },
+            {
+              "description": "The mark on the button that opens the calendar.",
+              "name": "trigger-icon",
               "inheritedFrom": {
                 "name": "HelixBaseDateInput",
                 "module": "src/date-input/root/date-input-root.ts"
@@ -57397,7 +57405,7 @@
                   "text": "TemplateResult"
                 }
               },
-              "description": "The mark on the button that opens the clock, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.",
+              "description": "The mark on the button that opens the clock, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding.\n\n**A named import rather than `<helix-icon>`, and that is a reversal.** The\nelement looked like the tidier of the two and loses on three counts.\n`helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and\nno bundler can shake a runtime lookup, so every consumer of any component\nthat renders one ships all 50kB of path data; a named import ships one\npath. The import is checked when the package compiles, where a `name`\nstring is checked only when `check:icons` runs. And `helix-icon` is not\nregistered on the headless tier at all, which registers `helix-base-icon`,\nso a headless consumer got an inert unknown element and no mark whatsoever.",
               "inheritedFrom": {
                 "name": "HelixBaseTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"
@@ -57964,6 +57972,14 @@
             {
               "description": "The control that opens the list.",
               "name": "trigger",
+              "inheritedFrom": {
+                "name": "HelixBaseTimeInput",
+                "module": "src/time-input/root/time-input-root.ts"
+              }
+            },
+            {
+              "description": "The mark on the button that opens the clock.",
+              "name": "trigger-icon",
               "inheritedFrom": {
                 "name": "HelixBaseTimeInput",
                 "module": "src/time-input/root/time-input-root.ts"

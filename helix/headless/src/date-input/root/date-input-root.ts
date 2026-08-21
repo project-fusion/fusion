@@ -7,9 +7,10 @@ import {
   MixinField,
   PopoverController,
 } from '@helix-io/core'
-import '../../icon/index.js'
+import { calendarBlank } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import '../../date-picker/index.js'
 import '../../tag/index.js'
 
@@ -84,6 +85,7 @@ const dates = (value: string): string[] =>
  * @csspart date - One held date, as a tag, in `multiple`.
  * @csspart rest - How many dates are held beyond the ones shown.
  * @csspart trigger - The control that opens the calendar.
+ * @csspart trigger-icon - The mark on the button that opens the calendar.
  * @csspart surface - The floating panel.
  * @csspart picker - The date picker inside it.
  */
@@ -607,15 +609,23 @@ export class HelixBaseDateInput extends MixinControllerOpen(
   /**
    * The mark on the button that opens the calendar, behind a seam.
    *
-   * **It had no fallback, so a date input written without a hand-slotted icon
-   * drew an empty button.** Every example in the family passes one, which is
-   * exactly what hid it; `Select`'s own template records the identical bug as
-   * already fixed there, and `Time Input` has drawn a clock all along. Slotting
-   * anything still replaces it, which is this library's rule for a content
-   * default.
+   * Slot fallback, so a consumer replaces it by slotting; and a method, so the
+   * tier above replaces it by overriding.
+   *
+   * **A named import rather than `<helix-icon>`, and that is a reversal.** The
+   * element looked like the tidier of the two and loses on three counts.
+   * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
+   * no bundler can shake a runtime lookup, so every consumer of any component
+   * that renders one ships all 50kB of path data; a named import ships one
+   * path. The import is checked when the package compiles, where a `name`
+   * string is checked only when `check:icons` runs. And `helix-icon` is not
+   * registered on the headless tier at all, which registers `helix-base-icon`,
+   * so a headless consumer got an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
-    return html`<slot name="trigger"><helix-icon name="calendar-blank"></helix-icon></slot>`
+    return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${calendarBlank.viewBox}>
+        ${unsafeSVG(calendarBlank.content)}
+      </svg></slot>`
   }
 
   protected override render(): TemplateResult {

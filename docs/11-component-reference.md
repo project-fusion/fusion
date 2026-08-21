@@ -1576,6 +1576,7 @@ whatever holds it.
 | `date` | One held date, as a tag, in `multiple`. |
 | `rest` | How many dates are held beyond the ones shown. |
 | `trigger` | The control that opens the calendar. |
+| `trigger-icon` | The mark on the button that opens the calendar. |
 | `surface` | The floating panel. |
 | `picker` | The date picker inside it. |
 
@@ -5481,6 +5482,7 @@ belongs to. That is the same reasoning Select gives for its own list.
 | `time` | One held time, as a tag, in `multiple`. |
 | `rest` | How many times are held beyond the ones shown. |
 | `trigger` | The control that opens the list. |
+| `trigger-icon` | The mark on the button that opens the clock. |
 | `surface` | The floating panel. |
 | `picker` | The list inside it. |
 
