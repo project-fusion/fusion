@@ -136,3 +136,49 @@
     translate: 0 0;
   }
 }
+
+/* The trigger this component draws when a consumer slots none.
+ *
+ * `::slotted()` matches assigned nodes and fallback content is not assigned, so
+ * every rule that styles a slotted trigger reaches nothing here. The button was
+ * left with the browser's own: measured at 16x6 with a grey fill and a 2px
+ * border, against 40x40 for the `helix-icon-button` the example slots. A
+ * floating action button rendering as a grey nub, and only for the consumer who
+ * wrote the least markup.
+ *
+ * Same shape and the same tokens the slotted path resolves to, so a trigger a
+ * consumer passes and one drawn here come out as the same control. This is the
+ * `CopyButton` failure again, which is why it is written out again: valid CSS,
+ * matching nothing, no error and no warning. */
+[part="trigger"] {
+  all: unset;
+  --icon-size: var(--helix-size-icon-md);
+
+  align-items: center;
+  background-color: var(--helix-color-primary);
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-md);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-on-accent);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-control);
+  justify-content: center;
+  transition: box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Lifted under the pointer and set back down on the press, which is what
+   `IconButton`'s `raised` does and what the example's slotted trigger has. */
+[part="trigger"]:hover {
+  box-shadow: var(--helix-shadow-lg);
+}
+
+[part="trigger"]:active {
+  box-shadow: var(--helix-shadow-sm);
+}
+
+[part="trigger"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

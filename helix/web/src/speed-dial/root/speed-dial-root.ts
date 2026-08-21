@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseSpeedDial } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './speed-dial-root.css.js'
+import '../../icon/index.js'
 
 /**
  * @summary A button that fans out the few actions a screen is for.

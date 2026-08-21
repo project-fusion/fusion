@@ -7,6 +7,7 @@ import {
   type Placement,
   PopoverController,
 } from '@helix-io/core'
+import '../../icon/index.js'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
@@ -199,7 +200,16 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="menu"
           aria-label=${this.label}
-        ></button>
+        >
+          ${
+            /* A glyph, because the fallback was an empty `<button>`: a consumer
+               who slots no trigger got a control with nothing in it, and a
+               floating action button whose whole job is to be found. `plus` is
+               what a speed dial opens with everywhere it exists. */
+            ''
+          }
+          <helix-icon name="plus"></helix-icon>
+        </button>
       </slot>
       <div
         part="actions"
