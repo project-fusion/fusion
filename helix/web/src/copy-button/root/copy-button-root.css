@@ -23,6 +23,18 @@
   color: var(--helix-color-success);
 }
 
+/* And it stays loud under the pointer, which it did not.
+ *
+ * `IconButton`'s hover is `:host(:not(:disabled)) [part="button"]:hover`, which
+ * is (0,4,0), against (0,2,0) here: the hover won on specificity whatever the
+ * order of the sheets, so the check mark went back to the hover ink the moment
+ * a reader looked at it. They are still on the button they just pressed, which
+ * is the one moment the answer matters, and the answer is the more important of
+ * the two. */
+:host(:not(:disabled)) [part="button"][data-copied]:hover {
+  color: var(--helix-color-success);
+}
+
 /* The fallback icons need sizing here, and this is the whole reason why.
  *
  * `::slotted()` matches assigned nodes and never fallback content, so

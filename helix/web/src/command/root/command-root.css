@@ -70,6 +70,44 @@ helix-listbox::part(search-field) {
   font-size: var(--helix-text-md);
 }
 
+/* Room to read, because a palette is scanned rather than filled in.
+ *
+ * `Option` sizes itself for a select's dropdown, where a row is one of a few and
+ * the list is short. A palette is a page of them read at speed, and at the
+ * select's inset the rows ran together. The hook `Option` already reads is the
+ * one thing to set, so the rows and the group headings above them move
+ * together: the comment there records what happened when two stylesheets each
+ * named the inset themselves.
+ *
+ * `data-density` is honoured because a consumer putting a palette in a dense
+ * region means it, and the recipes in `base.css` set the same attribute on
+ * buttons and fields. Read from the host as well as from an ancestor, so
+ * `<helix-command data-density="sm">` works as well as a region around it. */
+:host {
+  --_command-row: var(--helix-space-sm);
+}
+
+:host([data-density="sm"]),
+:host(:where([data-density="sm"] *)) {
+  --_command-row: var(--helix-space-2xs);
+}
+
+:host([data-density="lg"]),
+:host(:where([data-density="lg"] *)) {
+  --_command-row: var(--helix-space-md);
+}
+
+/* Set on the host, not reached for through a part.
+ *
+ * The rows are `helix-option` elements in this element's own light DOM, slotted
+ * onward into the listbox. They are not parts of anything here, so
+ * `::part(option)` matched nothing at all: measured, the rows kept the select's
+ * 2xs and the rule did nothing. A custom property inherits down the tree and
+ * into each row's shadow root, which is the one thing that reaches them. */
+:host {
+  --option-block-inset: var(--_command-row);
+}
+
 /* The keys a reader can press, under the list. Quiet, because it is a legend
    for the thing above it rather than part of the answer. */
 [part="footer"] {

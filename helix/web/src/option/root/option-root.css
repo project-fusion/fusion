@@ -33,7 +33,11 @@
      overflowed into the rows above and below. */
   min-block-size: var(--helix-size-control-sm);
   box-sizing: border-box;
-  padding-block: var(--helix-space-2xs);
+  /* Through a hook, for the reason the inline inset above is: a panel that
+     wants roomier rows says one thing and the group headings move with them.
+     `Command` is that panel, being a page of rows read at speed rather than a
+     select's short list. */
+  padding-block: var(--option-block-inset, var(--helix-space-2xs));
   /* Twelve, matching the drilldown's rows and the select's own trigger. A row
      that reaches both edges of its panel needs its words held further in than
      one that sits inside a padded box: the inset is doing the work the box used

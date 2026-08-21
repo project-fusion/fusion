@@ -181,23 +181,40 @@
   animation: none;
 }
 
+/* The ring goes too.
+ *
+ * It was carrying the pulse whenever nothing was slotted, which made this
+ * appearance a circle that breathed with a logo inside it: two things moving,
+ * and the outer one is the chrome this appearance exists to remove. What is
+ * left is the mark, which is what a reader is waiting on. A pulse with nothing
+ * slotted therefore shows nothing, and that is the honest reading of asking for
+ * a mark that pulses and giving it no mark. */
 :host([appearance="pulse"]) [part="track"] {
-  animation: helix-loader-pulse-ring 2.4s ease-in-out infinite;
-  /* Stated, because the resting value is the one the shallow swell used and a
-     ring that is the only mark on screen cannot be a twelfth of an opacity. */
-  opacity: 0.45;
+  display: none;
 }
 
-@keyframes helix-loader-pulse-ring {
+/* Opacity alone, where the default appearance also scales.
+ *
+ * The default's mark is a small shape inside a turning ring, and a little
+ * growth is what keeps it from being lost against the movement around it. With
+ * the ring and the arc both gone the mark *is* the loader, and a wordmark that
+ * grows and shrinks reads as a logo being animated rather than as a page
+ * waiting. Fading is the quietest thing that still says something is happening.
+ *
+ * `animation-name` rather than the whole shorthand, so the timing and easing
+ * stay the ones the default was tuned with and only the frames change. */
+:host([appearance="pulse"]) [part="mark"] {
+  animation-name: helix-loader-pulse-mark;
+}
+
+@keyframes helix-loader-pulse-mark {
   0%,
   100% {
-    opacity: 0.45;
-    scale: 0.94;
+    opacity: 0.35;
   }
 
   50% {
     opacity: 1;
-    scale: 1;
   }
 }
 
@@ -210,9 +227,11 @@
  * state is on the host through `ElementInternals` and is what actually
  * announces the wait, so nothing is lost by going still. */
 @media (prefers-reduced-motion: reduce) {
-  :host([appearance="pulse"]) [part="track"] {
+  /* The mark, because the mark is the whole of this appearance now. The rule
+     that was here answered for the ring, which no longer draws, so a reader who
+     asked for less motion still got a fading logo. */
+  :host([appearance="pulse"]) [part="mark"] {
     animation: none;
-    opacity: 0.45;
-    scale: 1;
+    opacity: 1;
   }
 }
