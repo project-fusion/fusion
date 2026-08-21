@@ -175,6 +175,39 @@ export interface DismissDetail {
  * One verb for both shapes. A tag leaving a list and an announcement closing
  * itself are the same act from the element's side.
  */
+/** What a stop's own controls ask the tour to do. */
+export interface TourAskDetail {
+  /**
+   * Which control was pressed.
+   */
+  what: 'back' | 'next' | 'skip'
+}
+
+/**
+ * A stop asking the tour to move.
+ *
+ * Composed and bubbling, because a stop is slotted into the root and the root
+ * has to hear it across that boundary.
+ *
+ * **A class rather than the raw `CustomEvent` this was.** It dispatched, it
+ * bubbled, and it was invisible: `check:events` matches `new HelixSomethingEvent(`,
+ * so a hand-rolled `CustomEvent` was not held to being declared, and nothing
+ * carried it into the manifest. Consumers could hear it and could not find it,
+ * which is the trap #75 is about, in its purest form.
+ */
+export class HelixTourAskEvent extends CustomEvent<TourAskDetail> {
+  static readonly eventName = 'helix-tour-ask'
+
+  constructor(detail: TourAskDetail) {
+    super(HelixTourAskEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   static readonly eventName = 'helix-dismiss'
 
@@ -669,6 +702,7 @@ const registry = {
   HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
+  HelixTourAskEvent,
 } as const
 
 /**

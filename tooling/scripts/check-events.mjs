@@ -141,6 +141,17 @@ for (const tier of TIERS) {
     const dispatched = [...code.matchAll(/new (Helix\w*Event)\s*\(/g)]
       .map((m) => names.get(m[1]))
       .filter(Boolean)
+    /* And any hand-rolled `new CustomEvent('helix-…')`, which this matched none
+       of. `Tour.Stop` dispatched `helix-tour-ask` that way: it bubbled, it was
+       composed, a consumer could listen for it, and it appeared in no manifest
+       and no documentation, because the check only ever asked about the event
+       classes. An event nobody can find is not API, and the way to notice is to
+       hold the raw form to the same rule. */
+    for (const [, name] of code.matchAll(
+      /new CustomEvent(?:<[^>]*>)?\s*\(\s*['"`](helix-[\w-]+)['"`]/g,
+    )) {
+      dispatched.push(name)
+    }
     components.set(name, {
       bases: [...base.matchAll(/(\w+)/g)].map((m) => m[1]),
       declared,

@@ -127,6 +127,7 @@ import type {
   HelixFilterEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
+  HelixTourAskEvent,
   HelixNextEvent,
   HelixPreviousEvent,
 } from "@helix-io/web";
@@ -6132,6 +6133,12 @@ export type HelixTourVueEvents = {
   "helix-close": HelixTourHelixCloseElementEvent;
 };
 
+/** `HelixTourStop` component event */
+export type HelixTourStopElementEvent<E = Event> = TypedEvent<HelixTourStop, E>;
+/** `helix-tour-ask` event type */
+export type HelixTourStopHelixTourAskElementEvent =
+  HelixTourStopElementEvent<HelixTourAskEvent>;
+
 export type HelixTourStopVueProps = {
   /** The id of the element this stop is about. */
   for?: HelixTourStop["for"];
@@ -6167,7 +6174,10 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   skipLabel?: HelixTourStop["skipLabel"];
 };
 
-export type HelixTourStopVueEvents = {};
+export type HelixTourStopVueEvents = {
+  /** A stop asking the tour to move, from its own controls. */
+  "helix-tour-ask": HelixTourStopHelixTourAskElementEvent;
+};
 
 /** `HelixTreeItem` component event */
 export type HelixTreeItemElementEvent<E = Event> = TypedEvent<HelixTreeItem, E>;

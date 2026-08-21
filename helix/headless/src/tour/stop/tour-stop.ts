@@ -1,6 +1,7 @@
 import {
   customElement,
   HelixElement,
+  HelixTourAskEvent,
   hostAria,
   type Placement,
   PopoverController,
@@ -47,6 +48,8 @@ import '../../button/index.js'
  * @status experimental
  * @category overlays
  * @documentation https://helix.fusion.dev/components/tour
+ *
+ * @event {HelixTourAskEvent} helix-tour-ask - A stop asking the tour to move, from its own controls.
  *
  * @slot - What this stop says. A card, a heading and a line, anything.
  * @slot actions - Replaces the controls, which are Back, Next and Skip.
@@ -213,9 +216,7 @@ export class HelixBaseTourStop extends HelixElement {
    * inside one. Composed, so the root hears it through its own slot.
    */
   private ask(what: 'back' | 'next' | 'skip'): void {
-    this.dispatchEvent(
-      new CustomEvent('helix-tour-ask', { bubbles: true, composed: true, detail: { what } }),
-    )
+    this.dispatchEvent(new HelixTourAskEvent({ what }))
   }
 }
 

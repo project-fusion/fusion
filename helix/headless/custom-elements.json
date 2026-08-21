@@ -47930,7 +47930,16 @@
               }
             }
           ],
-          "events": [],
+          "events": [
+            {
+              "type": {
+                "text": "HelixTourAskEvent"
+              },
+              "description": "A stop asking the tour to move, from its own controls.",
+              "name": "helix-tour-ask",
+              "reactProp": "onhelix-tour-ask"
+            }
+          ],
           "attributes": [
             {
               "name": "for",

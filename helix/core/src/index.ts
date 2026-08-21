@@ -79,6 +79,7 @@ export {
   HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
+  HelixTourAskEvent,
   type LoadDetail,
   type NavigateDetail,
   type OpenDetail,

@@ -1505,7 +1505,29 @@
         },
         {
           "kind": "class",
-          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and an announcement closing\nitself are the same act from the element's side.",
+          "description": "A stop asking the tour to move.\n\nComposed and bubbling, because a stop is slotted into the root and the root\nhas to hear it across that boundary.\n\n**A class rather than the raw `CustomEvent` this was.** It dispatched, it\nbubbled, and it was invisible: `check:events` matches `new HelixSomethingEvent(`,\nso a hand-rolled `CustomEvent` was not held to being declared, and nothing\ncarried it into the manifest. Consumers could hear it and could not find it,\nwhich is the trap #75 is about, in its purest form.",
+          "name": "HelixTourAskEvent",
+          "members": [
+            {
+              "kind": "field",
+              "name": "eventName",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "readonly": true,
+              "default": "'helix-tour-ask'"
+            }
+          ],
+          "superclass": {
+            "name": "CustomEvent",
+            "module": "src/events/events.ts"
+          },
+          "helix": {}
+        },
+        {
+          "kind": "class",
+          "description": "",
           "name": "HelixDismissEvent",
           "members": [
             {
@@ -1851,6 +1873,14 @@
           "name": "HelixPreviousEvent",
           "declaration": {
             "name": "HelixPreviousEvent",
+            "module": "src/events/events.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixTourAskEvent",
+          "declaration": {
+            "name": "HelixTourAskEvent",
             "module": "src/events/events.ts"
           }
         },
@@ -2731,6 +2761,14 @@
           "name": "HelixToggleEvent",
           "declaration": {
             "name": "HelixToggleEvent",
+            "module": "./events/events.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HelixTourAskEvent",
+          "declaration": {
+            "name": "HelixTourAskEvent",
             "module": "./events/events.js"
           }
         },

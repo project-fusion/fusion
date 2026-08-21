@@ -121,6 +121,7 @@ import type {
   HelixPreviousEvent,
   HelixSelectEvent,
   HelixToggleEvent,
+  HelixTourAskEvent,
   fromMinutes,
   initialsOf,
   isTime,
@@ -10301,6 +10302,15 @@ export type HelixBaseTourSolidJsProps = {
   textContent?: string | number;
 };
 
+/** `HelixBaseTourStop` component event */
+export type HelixBaseTourStopElementEvent<E = Event> = TypedEvent<
+  HelixBaseTourStop,
+  E
+>;
+/** `helix-tour-ask` event type */
+export type HelixBaseTourStopHelixTourAskElementEvent =
+  HelixBaseTourStopElementEvent<HelixTourAskEvent>;
+
 export type HelixBaseTourStopProps = {
   /** The id of the element this stop is about. */
   for?: HelixBaseTourStop["for"];
@@ -10334,6 +10344,9 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "skip-label"?: HelixBaseTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
   skipLabel?: HelixBaseTourStop["skipLabel"];
+
+  /** A stop asking the tour to move, from its own controls. */
+  "onhelix-tour-ask"?: (e: HelixBaseTourStopHelixTourAskElementEvent) => void;
 };
 
 export type HelixBaseTourStopSolidJsProps = {
@@ -10369,6 +10382,8 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
   "attr:skip-label"?: HelixBaseTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
   "prop:skipLabel"?: HelixBaseTourStop["skipLabel"];
+  /** A stop asking the tour to move, from its own controls. */
+  "on:helix-tour-ask"?: (e: HelixBaseTourStopHelixTourAskElementEvent) => void;
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -20779,6 +20794,12 @@ export type CustomElements = {
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
    *
    * ## Slots
    *
@@ -31257,6 +31278,12 @@ export type CustomElementsSolidJs = {
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-tour-ask`: A stop asking the tour to move, from its own controls.
    *
    * ## Slots
    *

@@ -6012,6 +6012,12 @@ name, on purpose.
 | `skipLabel` | `skip-label` | `string` | `'Skip'` | `HelixBaseTourStop` | Label for the control that leaves the tour. |
 | `target` | - | `HTMLElement \| null` | - | `HelixBaseTourStop` | The element this stop is about, or null where the id resolves to nothing. |
 
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-tour-ask` | `HelixTourAskEvent` | A stop asking the tour to move, from its own controls. |
+
 #### Slots
 
 | Slot | Description |
