@@ -281,6 +281,18 @@ helix-drawer {
   block-size: 200svh;
   inset-block-start: 0;
   inset-inline: 0;
+  /* Faded out at the bottom, because the shape does not reliably do it.
+   *
+   * Each shape ends with a vertical envelope, but those are written against an
+   * unscaled box: `scale` multiplies the sampled coordinates after the
+   * rotation, so at 1.7 the lit region reaches past the edge and the light was
+   * simply stopping where the canvas did. Seen by shortening the box until its
+   * own bottom was on screen: a bright braid and then a horizontal line.
+   *
+   * A mask rather than more envelope, because it holds for every shape, every
+   * tilt and every scale, including the ones nobody has tried. The last third,
+   * which at two screens is most of the band the aura shares with the page. */
+  mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
   pointer-events: none;
   position: absolute;
 }
