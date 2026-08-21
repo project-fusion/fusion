@@ -3,6 +3,7 @@ import { formatDate, INSIGHTS } from '../../lib/insights'
 import { PRODUCTS } from '../products'
 import { SERVICES } from '../services'
 import { stageAppearance } from '../verticals'
+import { Showcase } from './showcase'
 
 /**
  * The Fusion landing page.
@@ -295,8 +296,17 @@ export default function Home() {
           masked rather than cut: a hard edge says the layout ran out, a fade
           says there is more, which there is. */}
       <section className="band reveal showcaseBand">
-        <div className="shell showcaseSplit">
-          <helix-flex class="showcaseProse" direction="column" gap="sm">
+        {/* **A splitter, not a rule.** The section is an argument beside the
+            thing it is about, and where the line between them falls is a
+            judgement rather than a fact: a reader who wants to look at the
+            library can take the space from the prose. It is also the component
+            doing the job it exists for, on a page whose whole claim is that
+            these things compose.
+    
+            `default-position` rather than a fixed share, so the split has an
+            opinion and is not held to it. */}
+        <helix-splitter class="shell showcaseSplit" default-position={34} label="Showcase">
+          <helix-flex class="showcaseProse" direction="column" gap="sm" slot="start">
             <helix-text appearance="label" tone="subtle">
               Helix
             </helix-text>
@@ -315,216 +325,10 @@ export default function Home() {
             </helix-flex>
           </helix-flex>
 
-          <helix-divider orientation="vertical"></helix-divider>
-
-          <div className="showcaseStage">
-            {/* **A mosaic of surfaces, not a row of parts.**
-    
-              A line of controls at rest shows that the library has a switch. It
-              does not show what a switch is for, and it is the arrangement every
-              component gallery already uses. What a reader is deciding is
-              whether these things compose, so each card here is a small real
-              surface built out of several of them, and the cards are laid out
-              in columns that flow rather than a grid that pads every row to its
-              tallest cell.
-    
-              The cards are `helix-card`. A showcase built from anything else
-              would be making its claim in someone else's components. */}
-            <div className="showcase">
-              {/* **The anchor, and it is filled through the door Card published.**
-    
-                A mosaic of six outlined cards has no first card: the eye starts
-                wherever it likes and the arrangement reads as an inventory. One
-                filled surface gives it a beginning, and the one worth filling
-                is the claim the fill itself demonstrates, since the colour on
-                it is derived from the same value everything else here is.
-    
-                `--card-background-color` and `--card-border-color` are hooks
-                the component publishes, so this needs no new API and no
-                `::part()`: Card has always been able to be any colour, and
-                nothing here reaches past its surface. `helix-text` is
-                `color: inherit`, so the words take the card's own colour as
-                long as none of them names a tone. */}
-              <helix-card class="showcaseCard showcaseAnchor">
-                <helix-flex direction="column" gap="md">
-                  <helix-text appearance="label">Helix</helix-text>
-                  <helix-text as="h3" class="anchorTitle">
-                    One brand colour in. A whole palette out.
-                  </helix-text>
-                  <helix-text>
-                    Every surface, border and text colour on this page is derived from a single
-                    value, and each one is checked against the ground it lands on. That is why
-                    nothing here had to be chosen twice, and why the dark mode is not a second set
-                    of decisions.
-                  </helix-text>
-                  <helix-flex>
-                    <helix-button appearance="solid">Read the derivation</helix-button>
-                  </helix-flex>
-                </helix-flex>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-flex direction="column" gap="md">
-                  <helix-flex align="center" gap="sm" justify="between" wrap>
-                    <helix-flex align="center" gap="sm">
-                      <helix-avatar name="Ada Whitfield"></helix-avatar>
-                      <helix-flex direction="column" gap="2xs">
-                        <helix-text appearance="body-strong">Ada Whitfield</helix-text>
-                        <helix-text appearance="caption" tone="muted">
-                          Derive the dark palette
-                        </helix-text>
-                      </helix-flex>
-                    </helix-flex>
-                    <helix-tag tone="primary">In review</helix-tag>
-                  </helix-flex>
-                  <helix-progress label="Contrast pass" value={72}></helix-progress>
-                </helix-flex>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-flex direction="column" gap="lg">
-                  <helix-flex align="center" gap="lg" justify="between" wrap>
-                    <helix-switch default-checked label="Reduced motion"></helix-switch>
-                    {/* The badge wraps what it marks. `value` is the count and the
-                      child is the thing being counted on, which is the whole
-                      reason it is an element rather than a number in a span. */}
-                    <helix-badge label="3 unread" value="3">
-                      <helix-icon-button label="Notifications">
-                        <helix-icon name="bell"></helix-icon>
-                      </helix-icon-button>
-                    </helix-badge>
-                  </helix-flex>
-                  <helix-checkbox default-checked label="Ship with the audit"></helix-checkbox>
-                  <helix-slider
-                    default-value="60"
-                    label="Bloom"
-                    markers={5}
-                    max={100}
-                    min={0}
-                    show-value
-                  ></helix-slider>
-                  <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
-                </helix-flex>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-flex direction="column" gap="md">
-                  <helix-stat-group divided>
-                    <helix-stat>
-                      1,284
-                      <span slot="label">Installs</span>
-                    </helix-stat>
-                    <helix-stat>
-                      99.98
-                      <span slot="label">Uptime</span>
-                      <span slot="unit">%</span>
-                    </helix-stat>
-                  </helix-stat-group>
-                  <helix-sparkline
-                    label="Installs rose from 1,240 to 1,284 over seven days"
-                    values="1240 1318 1102 1291 1244 1180 1284"
-                  ></helix-sparkline>
-                </helix-flex>
-              </helix-card>
-
-              {/* No card around this one. `CodeBlock` is already a figure with
-                  its own box, its own border and a name across the top, so
-                  wrapping it draws a second edge a few pixels outside the first
-                  and the whole thing reads as a box in a box. What belongs in a
-                  card is content that has no surface of its own. */}
-              <helix-code-block class="showcaseCode" label="Install Helix">
-                bun add @helix-io/web
-              </helix-code-block>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-table label="Packages">
-                  <helix-table-column width="9rem">Package</helix-table-column>
-                  <helix-table-column>Size</helix-table-column>
-                  <helix-table-column>State</helix-table-column>
-
-                  <helix-table-row>
-                    <helix-table-cell header>web</helix-table-cell>
-                    <helix-table-cell>118 kB</helix-table-cell>
-                    <helix-table-cell>
-                      <helix-tag tone="success">Passing</helix-tag>
-                    </helix-table-cell>
-                  </helix-table-row>
-                  <helix-table-row>
-                    <helix-table-cell header>headless</helix-table-cell>
-                    <helix-table-cell>74 kB</helix-table-cell>
-                    <helix-table-cell>
-                      <helix-tag tone="success">Passing</helix-tag>
-                    </helix-table-cell>
-                  </helix-table-row>
-                  <helix-table-row>
-                    <helix-table-cell header>styles</helix-table-cell>
-                    <helix-table-cell>12 kB</helix-table-cell>
-                    <helix-table-cell>
-                      <helix-tag>Building</helix-tag>
-                    </helix-table-cell>
-                  </helix-table-row>
-                </helix-table>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-flex align="center" gap="sm" wrap>
-                  <helix-button appearance="solid" tone="primary">
-                    Primary
-                  </helix-button>
-                  <helix-button>Secondary</helix-button>
-                  <helix-button appearance="subtle">Subtle</helix-button>
-                  <helix-kbd>Cmd K</helix-kbd>
-                  <helix-loader></helix-loader>
-                </helix-flex>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-tabs default-active="palette" label="Derivation">
-                  <helix-tabs-tab value="palette">Palette</helix-tabs-tab>
-                  <helix-tabs-tab value="ramp">Ramp</helix-tabs-tab>
-                  <helix-tabs-panel slot="panels" value="palette">
-                    <helix-flex align="center" gap="sm" wrap>
-                      <helix-tag tone="primary">Primary</helix-tag>
-                      <helix-tag tone="success">Success</helix-tag>
-                      <helix-tag tone="warning">Warning</helix-tag>
-                      <helix-tag tone="danger">Danger</helix-tag>
-                    </helix-flex>
-                  </helix-tabs-panel>
-                  <helix-tabs-panel slot="panels" value="ramp">
-                    <helix-text tone="muted">
-                      Eleven steps, checked against both grounds.
-                    </helix-text>
-                  </helix-tabs-panel>
-                </helix-tabs>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-timeline label="Release history">
-                  <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
-                    <helix-icon name="check" slot="marker"></helix-icon>
-                    <span slot="time">09:12</span>
-                    <helix-text appearance="body-strong">Contrast pass</helix-text>
-                  </helix-timeline-item>
-                  <helix-timeline-item datetime="2026-08-21T08:40">
-                    <span slot="time">08:40</span>
-                    <helix-text appearance="body-strong">Tokens regenerated</helix-text>
-                  </helix-timeline-item>
-                </helix-timeline>
-              </helix-card>
-
-              <helix-card appearance="outlined" class="showcaseCard">
-                <helix-flex align="center" gap="lg" justify="between" wrap>
-                  <helix-rating default-value="4" label="Docs"></helix-rating>
-                  <helix-flex align="center" gap="sm">
-                    <helix-avatar name="Ada Whitfield"></helix-avatar>
-                    <helix-avatar name="Grace Nakamura"></helix-avatar>
-                    <helix-avatar name="Lin Ortega"></helix-avatar>
-                  </helix-flex>
-                </helix-flex>
-              </helix-card>
-            </div>
+          <div slot="end">
+            <Showcase />
           </div>
-        </div>
+        </helix-splitter>
       </section>
 
       <section className="band reveal">

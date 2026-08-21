@@ -2490,16 +2490,11 @@ helix-drawer helix-tree {
  * which is the one direction text must not go. Wider than it was, at 20 to 30
  * rem, because the heading was breaking into five lines at 24. */
 .showcaseSplit {
-  align-items: stretch;
   block-size: 100%;
-  column-gap: var(--helix-space-2xl);
-  /* **`block-size: 100%` is a preference, and a grid item's automatic minimum
-     is its content.** Left at `auto` the split measured 1199 inside a 720 band
-     and hung 184 above the fold, taking the top rule with it. Zeroing the
-     minimum is what makes the percentage binding. */
+  /* The split is a grid item and a grid item's automatic minimum is its
+     content, so `block-size: 100%` is only a preference until this says
+     otherwise: left at `auto` it measured 1199 inside a 720 band. */
   min-block-size: 0;
-  display: grid;
-  grid-template-columns: minmax(20rem, 30rem) auto minmax(0, 1fr);
 }
 
 .showcaseProse {
@@ -2547,7 +2542,7 @@ helix-drawer helix-tree {
   }
 
   .showcaseSplit {
-    grid-template-columns: minmax(0, 1fr);
+    block-size: auto;
   }
 
   .showcaseSplit helix-divider {
@@ -2569,4 +2564,34 @@ helix-drawer helix-tree {
    nothing else: it brings its own surface. */
 .showcaseCode {
   display: block;
+}
+
+/* The switch sits above the grid and never moves with it. A control that jumps
+   to a new position when you use it is one you have to find again each time. */
+.showcaseSwitch {
+  margin-block: var(--helix-space-md);
+}
+
+/* The stage stacks: the anchor, the switch, then whatever the switch is
+   showing, and the grid takes the rest so the fade lands on real content. */
+.showcaseStage {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+/* A cell that wants the pair of columns: a table with a sparkline in every row
+   is unreadable at half the panel. */
+.showcaseWide {
+  grid-column: 1 / -1;
+}
+
+/* Sparklines take the width they are given and none by default. The one under
+   the figures spans its card; the ones in table rows fill their cell. */
+.showcaseTrendLine {
+  inline-size: 100%;
+}
+
+.showcaseRowLine {
+  inline-size: 100%;
+  min-inline-size: 4rem;
 }
