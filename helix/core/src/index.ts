@@ -125,6 +125,7 @@ export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export { customElement } from './utils/custom-element/custom-element.js'
+export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export {
   deepActiveElement,
   focusableElements,

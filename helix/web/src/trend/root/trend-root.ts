@@ -2,6 +2,7 @@ import { customElement } from '@helix-io/core'
 import { HelixBaseTrend } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import '../../icon/index.js'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './trend-root.css.js'
 
 /**
@@ -27,7 +28,7 @@ import { styles } from './trend-root.css.js'
  */
 @customElement('helix-trend')
 export class HelixTrend extends HelixBaseTrend {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

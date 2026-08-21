@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseSpeedDial } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './speed-dial-root.css.js'
 import '../../icon/index.js'
 
@@ -22,7 +23,7 @@ import '../../icon/index.js'
  */
 @customElement('helix-speed-dial')
 export class HelixSpeedDial extends HelixBaseSpeedDial {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

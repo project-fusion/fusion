@@ -9,6 +9,7 @@ import '../../icon/index.js'
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../field/field.css.js'
 import { styles as fieldStackedStyles } from '../../field/field-stacked.css.js'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './file-input-root.css.js'
 
 /**
@@ -40,7 +41,7 @@ import { styles } from './file-input-root.css.js'
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixBaseFileInput {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [glyphStyles, fieldStyles, fieldStackedStyles, styles]
 }
 
 declare global {

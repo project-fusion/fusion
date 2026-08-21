@@ -1,13 +1,14 @@
 import {
   customElement,
+  drawIcon,
   HelixChangeEvent,
   HelixFormElement,
   MixinField,
   restoreValue,
 } from '@helix-io/core'
+import { trash } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import '../../icon/index.js'
 import '../../tag/index.js'
 
 /**
@@ -429,7 +430,7 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}
                   >
-                    <helix-icon name="trash"></helix-icon>
+                    ${drawIcon(trash)}
                   </button>
                 </li>`,
               )}

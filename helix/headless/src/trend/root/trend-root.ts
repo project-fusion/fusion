@@ -1,13 +1,14 @@
 import { customElement, HelixElement } from '@helix-io/core'
+import { arrowDown, arrowUp, minus } from '@helix-io/icons'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import '../../icon/index.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** The three directions a measurement can have moved, and how each is drawn. */
 const DIRECTIONS = {
-  down: { icon: 'arrow-down', word: 'Down' },
-  neutral: { icon: 'minus', word: 'Unchanged' },
-  up: { icon: 'arrow-up', word: 'Up' },
+  down: { icon: arrowDown, word: 'Down' },
+  neutral: { icon: minus, word: 'Unchanged' },
+  up: { icon: arrowUp, word: 'Up' },
 } as const
 
 type Direction = keyof typeof DIRECTIONS
@@ -102,11 +103,19 @@ export class HelixBaseTrend extends HelixElement {
        markup. No screen reader is confused by adjacent text nodes, but the
        server output should read as the thing the DOM will hold, and a test
        against it should be able to say so in one string. */
-    return html`<helix-icon
+    /* Written out rather than through `drawIcon`, because this one needs a
+       `part` and a part behind an interpolation is one the manifest cannot see:
+       the helper's `part=${…}` binding took `[part="icon"]` out of the
+       stylesheet's reach and `check:selectors` said so. */
+    return html`<svg
         aria-hidden="true"
-        name=${direction.icon}
+        data-glyph
+        fill="currentColor"
         part="icon"
-      ></helix-icon>
+        viewBox=${direction.icon.viewBox}
+      >
+        ${unsafeSVG(direction.icon.content)}
+      </svg>
       <span part="direction">${`${direction.word}${judgment}`}</span>
       <slot></slot>
       <slot name="label"></slot>`

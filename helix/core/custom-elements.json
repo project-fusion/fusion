@@ -3169,6 +3169,22 @@
         },
         {
           "kind": "js",
+          "name": "DrawIconOptions",
+          "declaration": {
+            "name": "DrawIconOptions",
+            "module": "./utils/draw-icon/draw-icon.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "drawIcon",
+          "declaration": {
+            "name": "drawIcon",
+            "module": "./utils/draw-icon/draw-icon.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "deepActiveElement",
           "declaration": {
             "name": "deepActiveElement",
@@ -5330,6 +5346,47 @@
           "declaration": {
             "name": "target",
             "module": "src/utils/custom-element/custom-element.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/draw-icon/draw-icon.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "drawIcon",
+          "return": {
+            "type": {
+              "text": "TemplateResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "icon",
+              "type": {
+                "text": "HelixIcon"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "DrawIconOptions"
+              }
+            }
+          ],
+          "description": "Draws an icon that was imported by name, rather than looked up by string.\n\n**`<helix-icon name=\"play\">` indexes the whole icon set at runtime.** Its\nrender is `icons[this.name]`, and no bundler can shake a dynamic index, so\nevery consumer of any component that renders one ships all of the generated\npath data: measured at 50,814 bytes raw and 15,010 gzipped for 102 icons, and\ngrowing about 147 gzipped bytes per icon added. A named import ships one path\nand is checked when the package compiles rather than when `check:icons` runs.\n\nThat element still earns its place as *public* API, where a consumer writes a\nname in markup and a lookup is the only thing that can work. What it should\nnot be is how this library draws its own marks.\n\n**There is no `part` option, and there cannot be.** A part name behind an\ninterpolation is a part the manifest cannot see, so `check:selectors` reports\nthe component's own stylesheet as matching nothing and the part stops being\nAPI. `Trend` needs one and therefore writes its `<svg>` out with a literal\n`part=\"icon\"`, which is the honest cost: a helper can carry everything except\nthe thing static analysis has to read.\n\n`data-glyph` rather than a class, because the sizing lives in\n`helix/web/src/icon/glyph.css` and a component's own `--icon-size`\ndeclarations have to keep working untouched: the variable was read by\n`helix-icon`, and now it is read by the rule that sheet carries. Without it\nevery one of those declarations would go quietly dead and every mark in six\nfamilies would change size."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "drawIcon",
+          "declaration": {
+            "name": "drawIcon",
+            "module": "src/utils/draw-icon/draw-icon.ts"
           }
         }
       ]

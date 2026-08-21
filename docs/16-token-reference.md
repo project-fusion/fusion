@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-radii-lg`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
+Currently unread anywhere: `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-blur-lg`, `--helix-material-translucent-strong`, `--helix-material-border`.
 
 ## color
 
@@ -30,7 +30,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 49 |
 | `--helix-color-surface-raised` | `light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))` | 32 |
 | `--helix-color-surface-overlay` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))` | 39 |
-| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 83 |
+| `--helix-color-surface-sunken` | `light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))` | 84 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | 15 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 163 |
@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 193 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 194 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 155 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 6 |
@@ -93,10 +93,10 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 273 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 233 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 231 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 123 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 124 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 79 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 64 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 40 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 41 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 19 |
 | `--helix-space-control` | `var(--helix-space-md)` | 6 |
 
@@ -109,7 +109,7 @@ Corner radius. `sm` is the house value at 4px and is on nearly every container.
 | `--helix-radii-none` | `0` | 64 |
 | `--helix-radii-sm` | `calc(var(--_helix-seed-radii) * 0.5)` | 197 |
 | `--helix-radii-md` | `var(--_helix-seed-radii)` | 18 |
-| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 0 |
+| `--helix-radii-lg` | `calc(var(--_helix-seed-radii) * 1.5)` | 1 |
 | `--helix-radii-full` | `9999px` | 73 |
 
 ## font
@@ -173,7 +173,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 214 |
+| `--helix-border-thin` | `1px` | 215 |
 | `--helix-border-thick` | `2px` | 61 |
 
 ## shadow

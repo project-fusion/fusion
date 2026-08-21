@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../icon/index.js'
 import '../../menu/index.js'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './video-root.css.js'
 
 /**
@@ -68,7 +69,7 @@ export class HelixVideo extends HelixBaseVideo {
   @property({ reflect: true })
   appearance: 'plain' | 'shadow' | 'solid' = 'shadow'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

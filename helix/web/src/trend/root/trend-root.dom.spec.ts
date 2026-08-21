@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, slotted } from '@fusion-io/testing/dom'
+import { arrowDown, arrowUp, minus } from '@helix-io/icons'
 
 beforeAll(async () => {
   registerDom()
@@ -11,7 +12,17 @@ const trend = async (attributes: string): Promise<HTMLElement> =>
 
 const word = (host: HTMLElement): string => part(host, 'direction')?.textContent?.trim() ?? ''
 
-const arrow = (host: HTMLElement): string | null => part(host, 'icon')?.getAttribute('name') ?? null
+/* The glyph, by its path rather than by a name.
+ *
+ * The mark was a `<helix-icon name="arrow-up">` and is now an inlined `<svg>`
+ * from a named import, so there is no name to read: the element indexed the
+ * whole icon set at runtime and shipped all of it to every consumer. What
+ * identifies a glyph now is the path it draws, which is what the import
+ * carries. */
+const arrow = (host: HTMLElement): string =>
+  Object.entries({ 'arrow-down': arrowDown, 'arrow-up': arrowUp, minus }).find(([, icon]) =>
+    part(host, 'icon')?.innerHTML.includes(icon.content.slice(0, 40)),
+  )?.[0] ?? 'none'
 
 describe('trend', () => {
   test('the metric and the label are bare slots', async () => {

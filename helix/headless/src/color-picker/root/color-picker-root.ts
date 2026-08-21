@@ -2,12 +2,14 @@ import {
   CopyController,
   capturePointer,
   customElement,
+  drawIcon,
   type HelixChangeEvent,
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   MixinControllerValue,
 } from '@helix-io/core'
+import { eyedropper } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* Side-effect import, because this renders `<helix-slider>` in its own shadow
@@ -16,7 +18,6 @@ import { property, state } from 'lit/decorators.js'
    headless tier brings a slider of their own under that name. */
 import '../../button/index.js'
 import '../../button-group/index.js'
-import '../../icon/index.js'
 import '../../slider/index.js'
 import {
   type Color,
@@ -421,7 +422,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
-                        <helix-icon name="eyedropper"></helix-icon>
+                        ${drawIcon(eyedropper)}
                       </helix-button>`
                     : nothing
                 }

@@ -23165,6 +23165,26 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/icon/glyph.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/icon/glyph.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/icon/index.ts",
       "declarations": [],
       "exports": [

@@ -1,16 +1,17 @@
 import {
   customElement,
+  drawIcon,
   HelixFormElement,
   holdCaret,
   MixinControllerValue,
   MixinField,
   restoreValue,
 } from '@helix-io/core'
+import { eye, eyeSlash, x } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* Side-effect import, because both buttons render a `helix-icon` and a custom
    element registers on import. File Input's remove button does the same. */
-import '../../icon/index.js'
 
 /** What the control accepts, which is text of one kind or another. */
 export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
@@ -345,7 +346,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
               aria-label=${this.clearLabel}
               @click=${this.handleClear}
             >
-              <helix-icon name="x"></helix-icon>
+              ${drawIcon(x)}
             </button>`
           : nothing
       }
@@ -361,7 +362,7 @@ export class HelixBaseInput extends MixinControllerValue(MixinField(HelixFormEle
                 this.revealed = !this.revealed
               }}
             >
-              <helix-icon name=${this.revealed ? 'eye-slash' : 'eye'}></helix-icon>
+              ${drawIcon(this.revealed ? eyeSlash : eye)}
             </button>`
           : nothing
       }

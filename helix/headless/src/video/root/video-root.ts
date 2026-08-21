@@ -1,13 +1,31 @@
 import {
   customElement,
+  drawIcon,
   HelixElement,
   HelixNextEvent,
   HelixPreviousEvent,
   onUnlessFalse,
 } from '@helix-io/core'
+import {
+  airplay,
+  arrowClockwise,
+  arrowCounterClockwise,
+  closedCaptioning,
+  cornersIn,
+  cornersOut,
+  dotsThreeVertical,
+  download,
+  gauge,
+  pause,
+  pictureInPicture,
+  play,
+  skipBack,
+  skipForward,
+  speakerHigh,
+  speakerX,
+} from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import '../../icon/index.js'
 /* Side-effect, and the public tag rather than the base one: a consumer on the
    styled tier gets the styled menu, and one on the headless tier brings their
    own under that name. Both tiers import it, because this tier writes the tag
@@ -1115,7 +1133,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-pressed=${this.remoteConnected ? 'true' : 'false'}
         @click=${() => void this.promptRemote()}
       >
-        <helix-icon name="airplay"></helix-icon>
+        ${drawIcon(airplay)}
       </button>`
     }
     /* Two templates rather than one with the name bound in, for the reason
@@ -1130,7 +1148,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-label=${`Back ${SKIP_SECONDS} seconds`}
         @click=${() => this.skipBy(-SKIP_SECONDS)}
       >
-        <helix-icon name="arrow-counter-clockwise"></helix-icon>
+        ${drawIcon(arrowCounterClockwise)}
       </button>`
     }
     if (one === 'forward') {
@@ -1140,7 +1158,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-label=${`Forward ${SKIP_SECONDS} seconds`}
         @click=${() => this.skipBy(SKIP_SECONDS)}
       >
-        <helix-icon name="arrow-clockwise"></helix-icon>
+        ${drawIcon(arrowClockwise)}
       </button>`
     }
     if (one === 'speed') {
@@ -1165,7 +1183,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-label="Previous"
         @click=${() => this.skip(true)}
       >
-        <helix-icon name="skip-back"></helix-icon>
+        ${drawIcon(skipBack)}
       </button>`
     }
     if (one === 'next') {
@@ -1175,7 +1193,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-label="Next"
         @click=${() => this.skip(false)}
       >
-        <helix-icon name="skip-forward"></helix-icon>
+        ${drawIcon(skipForward)}
       </button>`
     }
     if (one === 'download') {
@@ -1201,7 +1219,7 @@ export class HelixBaseVideo extends HelixElement {
         rel=${local ? nothing : 'noreferrer'}
         aria-label="Download"
       >
-        <helix-icon name="download"></helix-icon>
+        ${drawIcon(download)}
       </a>`
     }
     return html`<button
@@ -1210,7 +1228,7 @@ export class HelixBaseVideo extends HelixElement {
       aria-label="Picture in picture"
       @click=${() => void this.togglePip()}
     >
-      <helix-icon name="picture-in-picture"></helix-icon>
+      ${drawIcon(pictureInPicture)}
     </button>`
   }
 
@@ -1254,12 +1272,12 @@ export class HelixBaseVideo extends HelixElement {
         aria-pressed=${this.captioned ? 'true' : 'false'}
         @click=${() => this.toggleCaptions()}
       >
-        <helix-icon name="closed-captioning"></helix-icon>
+        ${drawIcon(closedCaptioning)}
       </button>`
     }
     return html`<helix-menu part="captions-menu" label="Subtitles" placement="top-end">
       <button part="captions" slot="trigger" type="button" aria-label="Subtitles">
-        <helix-icon name="closed-captioning"></helix-icon>
+        ${drawIcon(closedCaptioning)}
       </button>
       <helix-menu-item
         value="off"
@@ -1290,13 +1308,13 @@ export class HelixBaseVideo extends HelixElement {
         value="remote"
         @helix-select=${() => void this.promptRemote()}
       >
-        <helix-icon name="airplay" slot="start"></helix-icon>
+        ${drawIcon(airplay, { slot: 'start' })}
         Play on another device
       </helix-menu-item>`
     }
     if (one === 'speed') {
       return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}>
-        <helix-icon name="gauge" slot="start"></helix-icon>
+        ${drawIcon(gauge, { slot: 'start' })}
         Playback speed: ${this.rate}x
       </helix-menu-item>`
     }
@@ -1306,22 +1324,19 @@ export class HelixBaseVideo extends HelixElement {
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
-        <helix-icon
-          name=${back ? 'arrow-counter-clockwise' : 'arrow-clockwise'}
-          slot="start"
-        ></helix-icon>
+        ${drawIcon(back ? arrowCounterClockwise : arrowClockwise, { slot: 'start' })}
         ${back ? `Back ${SKIP_SECONDS} seconds` : `Forward ${SKIP_SECONDS} seconds`}
       </helix-menu-item>`
     }
     if (one === 'previous') {
       return html`<helix-menu-item value="previous" @helix-select=${() => this.skip(true)}>
-        <helix-icon name="skip-back" slot="start"></helix-icon>
+        ${drawIcon(skipBack, { slot: 'start' })}
         Previous
       </helix-menu-item>`
     }
     if (one === 'next') {
       return html`<helix-menu-item value="next" @helix-select=${() => this.skip(false)}>
-        <helix-icon name="skip-forward" slot="start"></helix-icon>
+        ${drawIcon(skipForward, { slot: 'start' })}
         Next
       </helix-menu-item>`
     }
@@ -1334,12 +1349,12 @@ export class HelixBaseVideo extends HelixElement {
         target=${local ? nothing : '_blank'}
         value="download"
       >
-        <helix-icon name="download" slot="start"></helix-icon>
+        ${drawIcon(download, { slot: 'start' })}
         Download
       </helix-menu-item>`
     }
     return html`<helix-menu-item value="pip" @helix-select=${() => void this.togglePip()}>
-      <helix-icon name="picture-in-picture" slot="start"></helix-icon>
+      ${drawIcon(pictureInPicture, { slot: 'start' })}
       Picture in picture
     </helix-menu-item>`
   }
@@ -1355,7 +1370,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-label=${this.playing ? this.pauseLabel : this.playLabel}
         @click=${() => this.toggle()}
       >
-        <helix-icon name=${this.playing ? 'pause' : 'play'}></helix-icon>
+        ${drawIcon(this.playing ? pause : play)}
       </button>
       <span part="time">${clock(this.position)} / ${clock(this.duration)}</span>
       <input
@@ -1383,7 +1398,7 @@ export class HelixBaseVideo extends HelixElement {
           }
         }}
       >
-        <helix-icon name=${this.silent || this.loudness === 0 ? 'speaker-x' : 'speaker-high'}></helix-icon>
+        ${drawIcon(this.silent || this.loudness === 0 ? speakerX : speakerHigh)}
       </button>
       <input
         part="volume"
@@ -1411,7 +1426,7 @@ export class HelixBaseVideo extends HelixElement {
           ? nothing
           : html`<helix-menu part="overflow" label="More controls" placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label="More controls">
-                <helix-icon name="dots-three-vertical"></helix-icon>
+                ${drawIcon(dotsThreeVertical)}
               </button>
               ${this.overflow.map((one) => this.renderOverflowItem(one))}
             </helix-menu>`
@@ -1435,7 +1450,7 @@ export class HelixBaseVideo extends HelixElement {
         aria-pressed=${this.full ? 'true' : 'false'}
         @click=${() => void this.toggleFullscreen()}
       >
-        <helix-icon name=${this.full ? 'corners-in' : 'corners-out'}></helix-icon>
+        ${drawIcon(this.full ? cornersIn : cornersOut)}
       </button>
     </div>`
   }
@@ -1571,7 +1586,7 @@ export class HelixBaseVideo extends HelixElement {
               aria-label=${this.playLabel}
               @click=${() => this.toggle()}
             >
-              <helix-icon name="play"></helix-icon>
+              ${drawIcon(play)}
             </button>`
       }
       ${this.controls ? nothing : this.renderBar()}

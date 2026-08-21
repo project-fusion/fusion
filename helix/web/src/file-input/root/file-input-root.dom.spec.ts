@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion-io/testing/dom'
+import { trash } from '@helix-io/icons'
 
 beforeAll(async () => {
   registerDom()
@@ -139,7 +140,11 @@ describe('input file', () => {
     // A cross says "dismiss this", which is what a tag does. This is not that.
     const host = await field()
     await choose(host, 'one.txt')
-    expect(part(host, 'remove')?.querySelector('helix-icon')?.getAttribute('name')).toBe('trash')
+    // The glyph is an inlined `<svg>` from a named import now, not an element
+    // with a name: `helix-icon` indexed the whole set at runtime.
+    expect(part(host, 'remove')?.querySelector('svg')?.innerHTML).toContain(
+      trash.content.slice(0, 40),
+    )
   })
 
   test('one file can be taken back out, and the rest stay', async () => {

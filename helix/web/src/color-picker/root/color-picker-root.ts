@@ -9,6 +9,7 @@ import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../icon/index.js'
 import '../../slider/index.js'
+import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './color-picker-root.css.js'
 
 /**
@@ -51,7 +52,7 @@ import { styles } from './color-picker-root.css.js'
  */
 @customElement('helix-color-picker')
 export class HelixColorPicker extends HelixBaseColorPicker {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 
 declare global {

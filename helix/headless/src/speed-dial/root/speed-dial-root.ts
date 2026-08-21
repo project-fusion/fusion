@@ -1,13 +1,14 @@
 import {
   anchorElement,
   customElement,
+  drawIcon,
   HelixElement,
   KeyboardNavigationController,
   MixinControllerOpen,
   type Placement,
   PopoverController,
 } from '@helix-io/core'
-import '../../icon/index.js'
+import { plus } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixBaseSpeedDialItem } from '../item/speed-dial-item.js'
@@ -208,7 +209,7 @@ export class HelixBaseSpeedDial extends MixinControllerOpen(HelixElement) {
                what a speed dial opens with everywhere it exists. */
             ''
           }
-          <helix-icon name="plus"></helix-icon>
+          ${drawIcon(plus)}
         </button>
       </slot>
       <div
