@@ -31,14 +31,27 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Rounded at the far end only.
+/* Rounded at the far end only, and the far end depends on which way it grows.
  *
- * A column grows out of the baseline, so rounding its foot would lift it off
- * the rule it is measured against and make short columns look like they start
- * above zero. There is no per-corner radius on an SVG rect, so the shape is
- * drawn square and the corners are taken off with a clip. */
+ * A bar grows out of the baseline, so rounding its foot would lift it off the
+ * rule it is measured against and make short bars look like they start above
+ * zero. There is no per-corner radius on an SVG rect, so the shape is drawn
+ * square and the corners are taken off with a clip.
+ *
+ * **The corners are physical and the growth direction is not**, which is the
+ * bug this replaces: one rule rounded the top two corners, which is the far end
+ * of a column and the long *side* of a bar. A horizontal chart came out rounded
+ * along its top edge, so every bar looked like it had a lid.
+ *
+ * `inset()` takes its radii in border-radius order, top-left first and
+ * clockwise. A column ends at the top, so it is the first two; a bar ends at the
+ * right, so it is the second and third. */
 [part="bar"] {
   clip-path: inset(0 round var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0);
+}
+
+:host([direction="horizontal"]) [part="bar"] {
+  clip-path: inset(0 round 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0);
 }
 
 [part="labels"] {
