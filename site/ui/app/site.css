@@ -2707,7 +2707,15 @@ helix-drawer helix-tree {
  * not have a size yet. The cell is as tall as the tallest view, which the stage
  * clips anyway. */
 .showcaseView {
-  align-items: start;
+  /* **Every card fills its row, which is a claim about the mosaic and not
+     about any card.** A row is as tall as its tallest member, so aligning to
+     the start leaves the shorter one floating with a band of ground under it
+     and the pair reads as two sizes of card rather than one grid. The worry
+     that kept this at `start` was the figures card, whose chart is pinned to
+     its own bottom edge: stretching it would move the gap up between the
+     numbers and the line. It does not arise, because that card is the tallest
+     in its row and a stretched row never stretches its tallest member. */
+  align-items: stretch;
   display: grid;
   gap: var(--helix-space-md);
   grid-area: 1 / 1;
@@ -2716,17 +2724,6 @@ helix-drawer helix-tree {
 
 .showcaseView[hidden] {
   display: none;
-}
-
-/* **One view fills its rows, and it is deliberately not all three.** A row is
-   as tall as its tallest card, so stretching makes the pair beside it match
-   rather than sit short. That is right where the cards are surfaces holding
-   assorted content, and wrong in `data`: the figures card pins its chart to
-   its own bottom edge, so a stretched one puts the gap between the numbers and
-   the line instead of under the card, which is the same space moved somewhere
-   it reads as a mistake. */
-.showcaseFill {
-  align-items: stretch;
 }
 
 /* The faces sit in a row, which is `orientation` and not a custom property I

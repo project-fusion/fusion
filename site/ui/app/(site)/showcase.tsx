@@ -313,7 +313,12 @@ export function Showcase(): React.ReactElement {
                 <helix-option value="light">Light</helix-option>
                 <helix-option value="dark">Dark</helix-option>
               </helix-select>
-              <helix-number-input default-value="8" label="Octaves" min={1}></helix-number-input>
+              <helix-number-input
+                default-value="8"
+                label="Octaves"
+                min={1}
+                scrub
+              ></helix-number-input>
               <helix-slider
                 default-value="35,65"
                 label="Bloom"
@@ -522,7 +527,20 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
-              <helix-donut-chart class="showcaseRing" for="showcase-sources"></helix-donut-chart>
+              {/* **The names beside the ring, not under it.** A ring at 8rem in a
+                  cell twice that wide left the whole right half empty, and a
+                  legend is the one thing that belongs there: it reads the same
+                  table the chart does, through the same `for`, so the two
+                  cannot disagree about how many slices there are or what they
+                  are called. `entries="categories"` is the donut shape: its
+                  slices are the table's rows, where the default names the
+                  columns, which is what a line or a bar chart draws. Left at
+                  the default it produced a single entry reading "Downloads",
+                  the value column's own header. */}
+              <helix-flex align="center" gap="lg">
+                <helix-donut-chart class="showcaseRing" for="showcase-sources"></helix-donut-chart>
+                <helix-legend entries="categories" for="showcase-sources"></helix-legend>
+              </helix-flex>
             </helix-flex>
           </helix-card>
 
@@ -559,7 +577,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className="showcaseView showcaseFill" hidden={view !== 'surfaces'}>
+        <div className="showcaseView" hidden={view !== 'surfaces'}>
           {/* Flat, like the code block. `Callout` already draws its own band:
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two
@@ -578,11 +596,11 @@ export function Showcase(): React.ReactElement {
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
               <helix-flex align="center" gap="sm" justify="between" wrap>
-                <helix-flex align="center" gap="sm">
+                <helix-avatar-group>
                   <helix-avatar name="Ada Whitfield"></helix-avatar>
                   <helix-avatar name="Grace Nakamura"></helix-avatar>
                   <helix-avatar name="Lin Ortega"></helix-avatar>
-                </helix-flex>
+                </helix-avatar-group>
                 <helix-badge label="3 unread" value="3">
                   <helix-icon-button label="Notifications">
                     <helix-icon name="bell"></helix-icon>
@@ -609,12 +627,12 @@ export function Showcase(): React.ReactElement {
                   ownership, and the generated types refuse it without a handler
                   or a ref for exactly that reason. This seeds it and leaves the
                   element to run itself. */}
-              <helix-accordion-item default-open>
+              <helix-accordion-item>
                 <span slot="summary">What ships</span>
                 Custom elements, a stylesheet, and the types. No runtime beyond the components
                 themselves.
               </helix-accordion-item>
-              <helix-accordion-item>
+              <helix-accordion-item default-open>
                 <span slot="summary">What it needs</span>A browser. The elements upgrade on import
                 and render on a server without one.
               </helix-accordion-item>
