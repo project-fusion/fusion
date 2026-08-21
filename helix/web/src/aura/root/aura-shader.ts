@@ -287,10 +287,20 @@ export const FRAGMENT = `#version 300 es
       /* Sharp, but not a cliff: the edge is where the light stops, and a step
          narrower than a pixel is an aliased line rather than an edge. */
       float edge = smoothstep(-0.1, 0.05, depth);
-      float rise = exp(-max(depth, 0.0) * (1.5 + f * 0.7));
+      /* Steeper, so the curtain thins instead of filling everything above the
+         border. At 1.5 it still stood at a fifth a whole unit up, which with
+         the bundles over it painted a solid wall of stripes from the border to
+         the top of the frame: the dark under a hard line then read as a hill
+         and the light over it as rain. A curtain is mostly the bottom of a
+         curtain. */
+      float rise = exp(-max(depth, 0.0) * (2.9 + f * 1.1));
       /* Stretched hard along the fall, so the striations are the vertical rays
          a curtain is actually made of rather than texture on a stripe. */
-      float rays = fbm(vec2(q.x * (9.0 + f * 4.0), q.y * 0.35 - t * (2.2 + f)));
+      /* 0.9 along the fall, not 0.35. Stretched that hard the rays held one
+         value for their whole length, which is a picket fence however the
+         bundles are shaped: what varies along a ray is the thing that makes it
+         look like moving light rather than a printed stripe. */
+      float rays = fbm(vec2(q.x * (9.0 + f * 4.0), q.y * 0.9 - t * (2.2 + f)));
 
       /* A rim along the top edge. The brightest part of a curtain is the line
          where the field lines end, and without it the sheet fades in from
@@ -384,7 +394,11 @@ export const FRAGMENT = `#version 300 es
     /* A rim, and an interior barely above the ground. Glass is mostly the
        edges: fill it and the wedge becomes a solid triangle sitting on the
        field, which is a logo rather than something light passes through. */
-    float glassRim = falloff(body * body, 16.0);
+    /* Softer than 16, which drew a hairline: an even hairline around a
+       triangle is a wireframe, and no amount of grading rescues a drawing whose
+       edges are one pixel of pure line. Wider and dimmer reads as an edge
+       catching light. */
+    float glassRim = falloff(body * body, 9.0);
 
     vec2 dir = normalize(vec2(0.55, -1.0));
     vec2 side = vec2(-dir.y, dir.x);
@@ -401,7 +415,12 @@ export const FRAGMENT = `#version 300 es
        inside of rather than a filled shape. */
     float faceLight = mix(0.3, 1.55, smoothstep(-0.45, 0.3, along));
     float interior = smoothstep(0.04, -0.3, body) * mix(0.05, 0.16, smoothstep(-0.3, 0.25, along));
-    float glass = glassRim * 0.72 * faceLight + interior;
+    /* And a halo around the whole wedge, well outside its own edges. Glass in
+       a lit field is surrounded by what it is scattering; without it the
+       triangle sits on the black with a hard boundary and reads as a shape cut
+       out of the picture rather than an object in it. */
+    float halo = falloff(max(body, 0.0) * max(body, 0.0), 2.2) * 0.16;
+    float glass = glassRim * 0.6 * faceLight + interior + halo;
 
     /* The entry beam, which stops at the glass rather than running through it.
        All of the light that the fan then divides, so it is the brighter half:
@@ -435,7 +454,7 @@ export const FRAGMENT = `#version 300 es
        are the last thing to appear, not the first. */
     float cell = fract(u * 1.5 + 0.5) - 0.5;
     float resolved = smoothstep(0.0, 0.9, max(alongOut, 0.0));
-    float bands = falloff(cell * cell, mix(1.1, 3.4, resolved));
+    float bands = falloff(cell * cell, mix(0.9, 2.4, resolved));
 
     float pv = clamp(uVariance, 0.0, 1.0);
     float order = mix(mix(0.825, 1.15, pv), mix(0.825, 0.5, pv), clamp(u * 0.5 + 0.5, 0.0, 1.0));
@@ -478,7 +497,15 @@ export const FRAGMENT = `#version 300 es
        Visiting the neighbours and weighting each by its own distance is the
        same answer particles already uses for the same reason. The weight
        reaches zero between centres, so nothing is left to step. */
-    float laneF = s.x * 2.4;
+    /* **Fewer lanes, and not all of them carry anything.** At 2.4 a frame held
+       a dozen streaks at once and read as rain: a streak is an event, and a
+       field of simultaneous events is a texture. Sixteen hundredths of the
+       lanes and a little over half of those alive puts the count at about
+       two fifths of what it was.
+    
+       A dead lane contributes nothing anywhere rather than being cut off
+       somewhere, so it costs the three lane blend nothing. */
+    float laneF = s.x * 1.6;
     float base = floor(laneF);
 
     float lit = 0.0;
@@ -508,6 +535,7 @@ export const FRAGMENT = `#version 300 es
          apparent lanes and six straight edges. There is nothing above 1 worth
          reaching, the resting spread already being fourfold in speed. */
       float v = clamp(uVariance, 0.0, 1.0);
+      float alive = step(0.42, hash(vec2(id, 97.0)));
       float speed = mix(1.3, 0.55 + hash(vec2(id, 11.0)) * 1.5, v);
       float phase = hash(vec2(id, 29.0));
       /* Longer than they were. At 0.3 to 1.3 the tail was spent within about
@@ -550,7 +578,7 @@ export const FRAGMENT = `#version 300 es
          spreads as it falls behind, and the front is a round cap rather than a
          full-width wall cut off across the lane. Together that is a teardrop,
          which is the silhouette the thing actually has. */
-      float across = within / 2.4;
+      float across = within / 1.6;
       /* 0.06, which is what the profile it replaces actually measured. Lanes
          sit 0.417 apart and the old exp(-|within| * 4) was half-height at 0.072
          of a lane, so a sigma of 0.15 was two and a half times too wide: every
@@ -585,7 +613,7 @@ export const FRAGMENT = `#version 300 es
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
-      lit += (tail + cap) * weight * mix(1.0, 0.45, near);
+      lit += (tail + cap) * alive * weight * mix(1.0, 0.45, near);
     }
     float grain = fbm(vec2(s.x * 3.0, s.y * 1.4 - t * 1.6));
     return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
@@ -862,22 +890,13 @@ export const FRAGMENT = `#version 300 es
        crumple at one density: marbled stone, and it looked the same at every
        scale, gain and bloom because there was no large form for any of them to
        act on. Big shapes first, detail on top of them. */
-    /* **A current, which is the thing it did not have.** Isotropic noise makes
-       clouds however large the octaves are, and clouds are what this was: soft
-       masses with no direction in them and nothing being carried anywhere. A
-       liquid reads as a liquid because its detail is drawn out along the way it
-       is going.
-    
-       So a slow angle field says which way the current runs here, and the ink
-       is sampled stretched along it: four times longer down the current than
-       across it, which turns the same noise into filaments. It costs one extra
-       noise lookup and a change of basis. */
-    float ang = noise(p * 0.32 + vec2(t * 0.09, 0.0)) * 6.2831853;
-    vec2 run = vec2(cos(ang), sin(ang));
-    vec2 cut = vec2(-run.y, run.x);
-    vec2 drawn = vec2(dot(p, run) * 0.4, dot(p, cut) * 1.6);
-
-    float ink = warped(drawn, t * 0.55);
+    /* *The directional pass is reverted.* Sampling the ink stretched along a
+       slow angle field did make filaments, and it made the shape busier and
+       more literal than the soft masses it replaced. Preferred as it was, so it
+       is as it was. The finding is worth keeping even though the code is not:
+       isotropic noise cannot make a current, so anything wanting one has to
+       carry a direction, and that is a bigger change than this shape wants. */
+    float ink = warped(p * 0.55, t * 0.55);
     float sheet = warped(p * 1.1 + vec2(3.1, 1.7), t * 0.35);
 
     /* **Floors of 0.55 and 0.5 meant it was never dark anywhere.** The lowest
@@ -902,7 +921,7 @@ export const FRAGMENT = `#version 300 es
        scale the mass noise varies less across the frame than the frame is wide,
        so a reader can sit inside one void and see almost nothing: measured at
        scale 0.5, which came out near black. Empty has to mean faint. */
-    float body = mix(0.07, 1.55, ink) * mix(0.45, 1.25, sheet) * mix(0.28, 1.5, mass);
+    float body = mix(0.05, 1.4, ink) * mix(0.4, 1.2, sheet) * mix(0.22, 1.45, mass);
 
     /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
