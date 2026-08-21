@@ -95,6 +95,7 @@ export default function Home() {
       <helix-aura
         class="reelAura"
         gain={0.55}
+        interactive
         scale={1.7}
         speed={0.45}
         terminus={0.61}
