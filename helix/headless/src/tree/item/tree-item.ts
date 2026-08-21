@@ -154,9 +154,17 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
    * row rather than the wrapper around it.
    */
   focusItem(): void {
+    /* `preventScroll`, because the browser's own answer to a focus is to walk
+       every scrollable ancestor and reveal the element, which is
+       `scrollIntoView` by another route and takes the page with it. The root
+       calls `scrollItemIntoView` on the next line precisely to avoid that, and
+       without this the careful call was arriving after the thing it exists to
+       prevent had already happened. It was also hiding whether that util worked
+       at all: measured in Chrome, a tree in a scroller scrolled either way, so
+       the util could have been scrolling nothing and nobody would have seen. */
     this.renderRoot
       .querySelector<HTMLElement>(this.href === '' ? '[part="item"]' : '[part="row"]')
-      ?.focus()
+      ?.focus({ preventScroll: true })
   }
 
   /** Selects this node and announces it. */

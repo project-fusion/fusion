@@ -2,7 +2,7 @@
 export interface ScrollItemOptions {
   /** Space left between the item and the edge it came in at. */
   padding?: number
-  /** The scrolling box. Defaults to the item's offset parent. */
+  /** The scrolling box. Defaults to the nearest ancestor that scrolls. */
   scroller?: HTMLElement
   /** Whether to animate. Ignored where the reader asked for less motion. */
   smooth?: boolean
@@ -30,9 +30,55 @@ export interface ScrollItemOptions {
  * next press arrives, so this follows `prefers-reduced-motion` and is off by
  * default for exactly that case.
  */
+/**
+ * The nearest ancestor that actually scrolls, crossing shadow boundaries.
+ *
+ * This was `item.offsetParent`, which is the nearest *positioned* ancestor and
+ * has nothing whatever to do with overflow. The two coincide often enough to
+ * look right, because a scroller frequently is positioned, and they come apart
+ * exactly where it matters: put anything `position: relative` between the item
+ * and the box that scrolls, and the util scrolled the thing in between, which
+ * does not scroll, and reported nothing. `Tree` passes no scroller at all, so
+ * it had the default on every keypress.
+ *
+ * The walk crosses shadow boundaries through the host, because the item is
+ * almost always in one and `parentElement` is null at the root. Without that
+ * step, a component whose scroller is its own `[part]` would find nothing.
+ *
+ * It stops before the document. Scrolling the page is the one thing this whole
+ * util exists not to do, so finding nothing inside the component and returning
+ * null is the honest answer: the caller no-ops rather than taking the address
+ * bar with it.
+ */
+const scrollingAncestor = (item: HTMLElement): HTMLElement | null => {
+  const stop = item.ownerDocument.body
+  let node: HTMLElement | null = climb(item)
+  while (node && node !== stop) {
+    const style = getComputedStyle(node)
+    /* Both axes, since the caller may need either, and `overlay` because a
+       scroller styled with it scrolls exactly as `auto` does. `clip` and
+       `hidden` are deliberately not here: they cut the content off and are not
+       something a reader can move. */
+    if (/\b(auto|scroll|overlay)\b/.test(`${style.overflowX} ${style.overflowY}`)) {
+      return node
+    }
+    node = climb(node)
+  }
+  return null
+}
+
+/** Up one, through a shadow root where that is what is above. */
+const climb = (node: HTMLElement): HTMLElement | null => {
+  if (node.parentElement) {
+    return node.parentElement
+  }
+  const root = node.getRootNode()
+  return root instanceof ShadowRoot ? (root.host as HTMLElement) : null
+}
+
 export const scrollItemIntoView = (item: HTMLElement, options: ScrollItemOptions = {}): void => {
   const { padding = 0, smooth = false } = options
-  const scroller = options.scroller ?? (item.offsetParent as HTMLElement | null)
+  const scroller = options.scroller ?? scrollingAncestor(item)
   if (!scroller) {
     return
   }
