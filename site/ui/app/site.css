@@ -230,24 +230,39 @@ helix-drawer {
  * `interactive`, so it asks for no hit test of its own, but it does cover the
  * whole hero including both calls to action, and a layer over those is one
  * refactor away from swallowing the press that pays for the site. */
-.heroAura {
-  block-size: 100%;
-  inline-size: 100%;
+/* The aura, fixed behind the whole page.
+ *
+ * **Fixed rather than sitting in the hero.** The light runs the length of the
+ * page now, so it cannot belong to one band: parked in the hero it scrolled
+ * away after a screen, which is a hero decoration with extra steps.
+ *
+ * **No `z-index`, and none needed.** This is positioned, the sections after it
+ * are positioned, and positioned boxes with no layer of their own paint in tree
+ * order. The markup already says what the order is, so a number here would be a
+ * second statement of the same thing, and the layer scale has no negative step
+ * to spend on it anyway. */
+.reelAura {
   inset: 0;
   pointer-events: none;
-  position: absolute;
+  position: fixed;
+}
+
+/* Every band sits over the light, so every band has to be positioned or it
+   paints under a fixed element instead of over it. */
+.reel > section {
+  position: relative;
 }
 
 /* Ground under the words, thinning to nothing where they end.
  *
  * The claim is white and holds its own, but the lede under it is muted, and a
- * braid drifts: text that is legible in one frame is not a text that is
- * legible. The scrim is the same shape the shapes bench uses, held further
- * right because the lede runs to roughly half the viewport here.
+ * braid drifts: text that is legible in one frame is not text that is legible.
+ * Fixed alongside the aura, because it now has nine screens of copy to protect
+ * rather than one, and a scrim that scrolled would leave eight of them bare.
  *
  * The right stays clear on purpose. A scrim across the whole hero would be a
  * dimmer switch on the thing it was added to show. */
-.heroScrim {
+.reelScrim {
   background: linear-gradient(
     to right,
     color-mix(in srgb, var(--helix-color-background) 100%, transparent) 0%,
@@ -256,7 +271,7 @@ helix-drawer {
   );
   inset: 0;
   pointer-events: none;
-  position: absolute;
+  position: fixed;
 }
 
 /* Above the light. Positioned, and that is the whole of the stacking:

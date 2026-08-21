@@ -113,9 +113,17 @@ export function SiteNav() {
           duration the panel's reveal runs for, so they move together without
           either being told about the other. */}
       <helix-app-header
-        appearance={panelDown ? 'material' : onHero ? 'transparent' : undefined}
+        appearance={onHero ? 'transparent' : undefined}
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
+        style={
+          panelDown
+            ? {
+                '--app-header-backdrop': 'none',
+                '--app-header-background': 'var(--helix-material-translucent)',
+              }
+            : undefined
+        }
       >
         <a data-link="quiet" href="/" slot="start">
           <Wordmark />
@@ -200,7 +208,6 @@ export function SiteNav() {
               {PRODUCTS.map((product) => (
                 <div data-megamenu-group key={product.name}>
                   <h3 data-megamenu-heading>
-                    <helix-icon name={product.mark}></helix-icon>
                     {product.name}. {product.role}
                   </h3>
                   {product.destinations.map((destination) => (

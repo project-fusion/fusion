@@ -65,14 +65,18 @@ const questions = [
 export default function Home() {
   return (
     <div className="reel">
+      {/* Behind the whole page, not only the hero.
+          
+          `position: fixed`, so the light holds still while nine screens of
+          content pass over it: a field that scrolled away would be a hero
+          decoration with extra steps. No `interactive`, so it never asks for
+          the hit test and every control on the page keeps its presses. It stops
+          itself in a background tab, and where WebGL is refused it draws
+          nothing and the page is the type it always was. */}
+      <helix-aura class="reelAura" gain={0.55} scale={1.35} speed={0.45} tilt={42}></helix-aura>
+      <div className="reelScrim" />
+
       <section className="hero">
-        {/* Behind the claim, and behind it in every sense: no `interactive`, so
-            it never asks for the hit test and the two buttons below keep every
-            press. It stops itself off screen and in a background tab, and where
-            WebGL is refused it draws nothing and the hero is the type it always
-            was. */}
-        <helix-aura class="heroAura" gain={0.55} scale={1.35} speed={0.45} tilt={42}></helix-aura>
-        <div className="heroScrim" />
         <helix-flex class="shell heroShell" direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
             Fusion Development Group

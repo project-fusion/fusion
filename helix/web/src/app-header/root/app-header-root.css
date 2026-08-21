@@ -50,9 +50,23 @@
     border-color var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
+/* The filter is a hook too, and it has to be, for the seam it otherwise makes.
+ *
+ * `backdrop-filter` is clipped to the element's own box, so a 57 pixel bar
+ * running a 16 pixel blur clamps at both edges and averages to a flat tone,
+ * while a tall panel directly beneath it running the same blur keeps its
+ * structure. Two boxes, same filter, visibly different results, and a line
+ * across the join. There is no way to span one filter across both: the panel is
+ * a popover in the top layer, so it cannot sit behind the bar, and the bar
+ * cannot grow to cover a panel whose height it does not know.
+ *
+ * So a consumer pairing the two turns this off on the bar and keeps the fill.
+ * Over the soft field these sit on that is nearly free: blurring a smooth
+ * gradient returns very nearly the same gradient, and what the filter was
+ * contributing at the top of a page is mostly the artifact. */
 :host([appearance="material"]) {
+  backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-md)));
   background-color: var(--app-header-background, var(--helix-material-translucent));
-  backdrop-filter: blur(var(--helix-material-blur-md));
 }
 
 /* Nothing behind it at all, until there is something to be legible over.
@@ -84,7 +98,7 @@
  * stays legible as motion. The hook still wins where a consumer sets it, in
  * both states, which is how a scrolled bar gets tinted to match a hero. */
 :host([appearance="transparent"][data-scrolled]) {
-  backdrop-filter: blur(var(--helix-material-blur-md));
+  backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-md)));
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }
 
