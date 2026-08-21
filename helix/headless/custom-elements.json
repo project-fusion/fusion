@@ -23587,6 +23587,10 @@
           "name": "HelixBaseNumberInput",
           "cssParts": [
             {
+              "description": "The name over the field, which is also the scrub grip.",
+              "name": "label"
+            },
+            {
               "description": "The box holding everything.",
               "name": "field"
             },
@@ -23685,6 +23689,17 @@
               "default": "false",
               "description": "Whether the field refuses input while still submitting its value.",
               "attribute": "read-only",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "scrub",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a grip is shown that changes the value when it is dragged.\n\nThe label is what is dragged, so this adds no chrome at all. Still opt-in,\nbecause it changes what a press on the label does and a reader who drags\nacross a word expecting to select it should get that everywhere it has not\nbeen asked for. Where it earns its place is a value a reader tunes rather\nthan states: a duration, a weight, a count they are looking for rather than\none they already know.",
+              "attribute": "scrub",
               "reflects": true
             },
             {
@@ -23811,6 +23826,61 @@
               "type": {
                 "text": "stepDown(large = false) => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderLabel",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "The label is the surface, which is where the convention already is.\n\nA grip was drawn first, an icon of its own at the leading edge, and it was\na second control in a field that already has three. Every tool that does\nthis well drags the *name* of the value: the label is present on every\nfield, costs no chrome, and a reader who wants to know what they are\ndragging is already looking at it.\n\nOverridden rather than handled on the host, because the handlers have to\nsit on the element that takes the capture. The markup is the mixin's, said\nagain here, which is the duplication #76 exists to remove: when base\nrenders break into methods a styled tier can extend, this becomes a call to\n`super` with three listeners added.\n\nA label with nothing in it is still nothing. `scrub` on a field whose label\nis empty leaves no surface, which is honest: there is nowhere to put the\ngesture and inventing somewhere is how the grip happened.",
+              "inheritedFrom": {
+                "name": "MixinField",
+                "module": "src/mixins/mixin-field/mixin-field.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "scrubFrom",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "Where the pointer went down, and what the value was there."
+            },
+            {
+              "kind": "field",
+              "name": "scrubValue",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "handleScrubDown",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Press, and the value follows the pointer.\n\nCaptured, so a drag that leaves the grip keeps going: a reader tuning a\nnumber moves further than a 20 pixel handle and the gesture ending because\nthey overshot it would be the control refusing the very thing it offered.\n`preventDefault` because a press inside a field otherwise starts a text\nselection, which drags a blue wash across the label at the same time."
+            },
+            {
+              "kind": "field",
+              "name": "handleScrubMove",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Read from where the press began, never from the last frame.\n\nAccumulating a delta per move drifts: every rounding to a step throws away\nthe remainder, and a slow drag across a hundred events throws it away a\nhundred times, so the value and the pointer disagree by more the longer\nanyone holds. From the origin the arithmetic is the same on every frame and\nthe value can only be where the pointer says it is."
+            },
+            {
+              "kind": "field",
+              "name": "handleScrubEnd",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Let go, and the capture goes with it."
             },
             {
               "kind": "field",
@@ -24157,21 +24227,6 @@
                 }
               },
               "description": "A label over a set rather than beside a control.\n\nA plain element and not a `<label for>`, because a group is not a single\ncontrol and there is nothing for `for` to point at. What names the group\nis `linkHost`, pointing the host's internals at this element.",
-              "inheritedFrom": {
-                "name": "MixinField",
-                "module": "src/mixins/mixin-field/mixin-field.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "renderLabel",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "TemplateResult | typeof nothing"
-                }
-              },
-              "description": "A label above the control, pointing at it.\n\nA real `<label for>`, so pressing the words focuses the field and the\nbrowser does the forwarding. It resolves because `for` looks within the\nsame tree, and the control it names is in this shadow root.\n\n**Nothing at all when there is no label**, which is the same rule the\nhint and the feedback follow: none of the three is always used, and an\nelement rendered empty is not free. It still generates a box, so it still\ntakes a row of the grid and a gap on either side of it, which is a field\nthat has moved down the page for a label nobody wrote. `nothing` leaves\ncomment markers rather than a node, so the gap has nothing to sit between.\n\n**`aria-label` names without showing**, and it is forwarded rather than\nleft where the consumer put it. A custom element has no way to delegate a\nlabel to the control inside it, so an `aria-label` on the host reaches\nnothing: measured, the inner input came back with no label and no name of\nits own while the attribute sat on the wrapper. What happens instead is\nthat the label is rendered and clipped, so the name arrives through the\nsame `<label for>` a visible one does.\n\nThis replaced `hide-label`, which was a second attribute to say what the\nabsence of the first should have said. The rule is now `label` means a\nlabel, `aria-label` means a name, and neither means an unnamed field a\nscreen reader announces as \"edit text\"",
               "inheritedFrom": {
                 "name": "MixinField",
                 "module": "src/mixins/mixin-field/mixin-field.ts"
@@ -24548,6 +24603,15 @@
               "default": "false",
               "description": "Whether the field refuses input while still submitting its value.",
               "fieldName": "readOnly"
+            },
+            {
+              "name": "scrub",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a grip is shown that changes the value when it is dragged.\n\nThe label is what is dragged, so this adds no chrome at all. Still opt-in,\nbecause it changes what a press on the label does and a reader who drags\nacross a word expecting to select it should get that everywhere it has not\nbeen asked for. Where it earns its place is a value a reader tunes rather\nthan states: a duration, a weight, a count they are looking for rather than\none they already know.",
+              "fieldName": "scrub"
             },
             {
               "name": "decrement-label",
@@ -36527,7 +36591,7 @@
                 "text": "TemplateResult"
               },
               "privacy": "private",
-              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the fill on\nthe mark is what says they are back in it.",
+              "description": "The mark this stage's state calls for.\n\n`complete` first, so a stage a reader has stepped back into keeps its check\nrather than losing it to the target: they did finish it, and the name and\nthe rule below still say which one is open.\n\n**Three shapes, and the reader can tell them apart with the colour off.**\nAn outline circle for a stage nobody has reached, the same circle with a\ncentre for the one they are standing on, a bare check for one that is done.\nThe first two are one shape filling in, which is the progression, and the\ncheck is the only mark that leaves the family because finishing is the only\nstate that is not a position in the sequence.\n\nWhat went was the coin around the check: a filled disc carrying a check\nbeside a filled disc carrying a ring put two of the three inside the same\ncontainer, and left hue doing most of the work of telling them apart.\n\nThe bare check is `Timeline`'s, deliberately: the two components report the\nsame kind of thing, a sequence with marks down it, and a check floating on\na hairline in one beside a check inside a green coin in the other was two\nanswers to one question. Timeline's rings came off the same day.",
               "readonly": true
             },
             {
@@ -43191,6 +43255,16 @@
             },
             {
               "kind": "field",
+              "name": "dot",
+              "type": {
+                "text": "TemplateResult"
+              },
+              "privacy": "private",
+              "description": "The mark for an entry that slotted none, which the tone decides.\n\nToned entries are reporting something, so they take the circle with a\ncentre, which is `Steps` drawing the stage a reader is standing on. Untoned\nones are just things that happened and take the open circle, which is\n`Steps` drawing a stage nobody has reached. The same two glyphs in both\ncomponents rather than two that resemble each other: a shape drawn twice\ndrifts, and these are already the marks a reader has learned one page over.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -45534,7 +45608,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**Two forms, and they are not equivalent for a screen reader.**\n\nWrapping is the convenience form and is right where the bubble decorates a\ncontrol that already says what it is. The trigger stays the consumer's own\nelement, slotted, and nothing here can describe it: an IDREF cannot cross a\nshadow boundary, an element reference is valid only into the same tree or a\nshadow-including *ancestor* (the bubble's tree is neither, it is inward), and\na string on the trigger means writing to markup the consumer server-rendered.\nAll three measured.\n\n`for` is the form that works. The tooltip sits *beside* the trigger in the\nconsumer's own tree and names it by id, so both are in one tree and an IDREF\nbetween them is legal in the ordinary way:\n\n```html\n<helix-button id=\"save\" aria-describedby=\"save-tip\">Save</helix-button>\n<helix-tooltip id=\"save-tip\" for=\"save\" content=\"Save your work\"></helix-tooltip>\n```\n\nNote that the reference points at *this host*, not at the bubble inside its\nshadow root: the description is computed from the flat tree, which descends\ninto shadow content on its own.\n\n**The consumer writes that `aria-describedby`, and nothing here writes it for\nthem.** WebAwesome and Spectrum Web Components both do write it, with\n`setAttribute` on the trigger at runtime, which is the one thing this library\ndeclines everywhere: React rendered that element on the server without the\nattribute and reports a mismatch it will not patch up. Two ids in the markup\nis the whole cost of the version that is correct before any JavaScript runs.\n\nBecause it is the consumer's line to write, it is also theirs to forget, so\n`for` audits itself on first open and says so once. Same shape as\n`requestControlledChange` warning about a controlled property nothing\nanswered.\n\nIt shows on hover and on focus, and hides on leave, on blur, and on Escape.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-open` and\n`helix-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
+          "description": "The trigger is slotted and stays the consumer's own element. The bubble is\nrendered here, in the top layer through the popover API, so it clears any\nancestor with `overflow: hidden` without a `z-index` anywhere.\n\nPosition comes from `FloatingController`, which flips to another side when\nthe preferred one does not fit and slides along it to stay in view.\n\n**Two forms, and they are not equivalent for a screen reader.**\n\nWrapping is the convenience form and is right where the bubble decorates a\ncontrol that already says what it is. The trigger stays the consumer's own\nelement, slotted, and nothing here can describe it: an IDREF cannot cross a\nshadow boundary, an element reference is valid only into the same tree or a\nshadow-including *ancestor* (the bubble's tree is neither, it is inward), and\na string on the trigger means writing to markup the consumer server-rendered.\nAll three measured.\n\n`for` is the form that works. The tooltip sits *beside* the trigger in the\nconsumer's own tree and names it by id, so both are in one tree and an IDREF\nbetween them is legal in the ordinary way:\n\n```html\n<helix-button id=\"save\" aria-describedby=\"save-tip\">Save</helix-button>\n<helix-tooltip id=\"save-tip\" for=\"save\" content=\"Save your work\"></helix-tooltip>\n```\n\nNote that the reference points at *this host*, not at the bubble inside its\nshadow root: the description is computed from the flat tree, which descends\ninto shadow content on its own.\n\n**The consumer writes that `aria-describedby`, and nothing here writes it for\nthem.** WebAwesome and Spectrum Web Components both do write it, with\n`setAttribute` on the trigger at runtime, which is the one thing this library\ndeclines everywhere: React rendered that element on the server without the\nattribute and reports a mismatch it will not patch up. Two ids in the markup\nis the whole cost of the version that is correct before any JavaScript runs.\n\nBecause it is the consumer's line to write, it is also theirs to forget, so\n`for` audits itself on first open and says so once. Same shape as\n`requestControlledChange` warning about a controlled property nothing\nanswered.\n\nIt shows on hover and on focus, and hides on leave, on blur, on Escape, and\nonce the trigger has been activated: the hint is spent when the control has\nbeen used.\nA tooltip that answers only the pointer is one a keyboard reader never sees.\n\nThe pointer waits out `delay` first, or sweeping a row of controls flashes a\ntooltip for each of them. Focus does not wait: a keyboard reader landing on a\ncontrol has already committed to it.\n\nOpen state comes from `MixinControllerOpen`, so it announces `helix-open` and\n`helix-close` like every other overlay here, and a consumer can drive it with\n`open` where they need to.",
           "name": "HelixBaseTooltip",
           "cssParts": [
             {
@@ -45765,6 +45839,13 @@
                 }
               },
               "description": "Hides only once nothing is holding the bubble up."
+            },
+            {
+              "kind": "field",
+              "name": "handleActivate",
+              "privacy": "private",
+              "readonly": true,
+              "description": "Activating the trigger closes the bubble, which nothing was doing.\n\nA tooltip is a hint about what a control will do, and once the control has\nbeen used the hint is spent. Nothing else was going to take it down either:\n`pointerleave` cannot fire while the pointer is still on the button it just\npressed, and `focusout` does not fire when activation leaves focus where it\nwas. So a gear that opened a drawer left its own label floating over the\ndrawer until the reader moved the mouse away.\n\n`click` rather than `pointerdown`, because it is the one event both a mouse\nand a keyboard produce: Enter and Space on a focused button raise it, and a\nhint that outlived activation for keyboard readers alone would be the same\nbug with a smaller audience.\n\nHolds are cleared as well as hiding, the same as Escape. Leaving them set\nmeans the pointer is still recorded as being over the trigger, so the next\n`focusout` anywhere releases nothing and the bubble comes back on a\n`release` it should have been dropped from."
             },
             {
               "kind": "field",
@@ -48066,6 +48147,10 @@
               "name": "poster"
             },
             {
+              "description": "The region top left, for a way out of a set.",
+              "name": "back"
+            },
+            {
               "description": "What is said when the source will not play.",
               "name": "failure"
             },
@@ -48114,6 +48199,18 @@
               "name": "captions"
             },
             {
+              "description": "The language menu, where there is more than one.",
+              "name": "captions-menu"
+            },
+            {
+              "description": "The control that goes back ten seconds.",
+              "name": "rewind"
+            },
+            {
+              "description": "The control that goes on ten seconds.",
+              "name": "forward"
+            },
+            {
               "description": "Play on another device, where one is available.",
               "name": "remote"
             },
@@ -48158,6 +48255,14 @@
             {
               "description": "`<source>` and `<track>` elements, which are copied into the video.",
               "name": ""
+            },
+            {
+              "description": "Top left over the frame, for a way out of a set.",
+              "name": "back"
+            },
+            {
+              "description": "Added to the control bar, before fullscreen.",
+              "name": "controls"
             },
             {
               "description": "Shown over the video until it starts.",
@@ -48432,12 +48537,23 @@
             },
             {
               "kind": "field",
-              "name": "hasCaptions",
+              "name": "captionIndex",
               "type": {
-                "text": "boolean"
+                "text": "number"
               },
               "privacy": "private",
-              "default": "false"
+              "default": "-1",
+              "description": "Which caption track is showing, or `-1` for none.\n\n`@state`, because it is read off the video rather than declared: a consumer\nasking for a language would be naming a track that may not have loaded, and\n`default` on the `<track>` is the platform's own way to say it."
+            },
+            {
+              "kind": "field",
+              "name": "captionCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "How many caption tracks there are, which decides which control is drawn.\n\nA count and not a boolean, and that is the whole reason it changed. Tracks\nresolve after the element renders, so this is what schedules the update\nthat draws the control at all; as a boolean it went false to true when the\nfirst one arrived and then never moved again, so a second track landing\nleft the toggle in place and the language menu was unreachable on exactly\nthe videos it exists for."
             },
             {
               "kind": "field",
@@ -48691,6 +48807,54 @@
             },
             {
               "kind": "method",
+              "name": "skipBy",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "seconds",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Moves by a fixed length, clamped by `seek`.\n\nSeparate from the arrow keys, which move by 5 and by 10 with Shift. Those\nare a scrub; this is the gesture for \"I missed that\", and a reader who\npresses it twice expects twenty seconds rather than an accelerating jump."
+            },
+            {
+              "kind": "field",
+              "name": "captionTracks",
+              "type": {
+                "text": "TextTrack[]"
+              },
+              "privacy": "private",
+              "description": "The tracks a reader could choose between, in the order they were written.\n\nFiltered by kind, because `textTracks` also carries `chapters`, `metadata`\nand `descriptions`, and a menu offering \"Chapters\" as a subtitle language\nwould be offering something that draws no words. Read off the video rather\nthan off the slot: a `<track>` added later is in one and not the other, and\nthe video is the one that has resolved them.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "showCaption",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Shows one track and disables every other, or shows none at `-1`.\n\nEvery other, rather than only the one that was on. Two tracks in `hidden`\nboth fire `cuechange`, so the rendered cue becomes whichever fired last and\na reader who switched language gets the two interleaved. Measured as two\nsubtitles alternating line by line.\n\n`hidden`, never `showing`. Hidden is the mode where a track still fires\n`cuechange` and still fills `activeCues`, and the browser draws nothing,\nwhich is exactly what is wanted when something else is doing the drawing."
+            },
+            {
+              "kind": "method",
               "name": "toggleCaptions",
               "privacy": "private",
               "return": {
@@ -48698,7 +48862,7 @@
                   "text": "void"
                 }
               },
-              "description": "Turns the first caption track on or off, which is what the button means."
+              "description": "Turns captions on or off, which is what the button means with one track."
             },
             {
               "kind": "method",
@@ -48820,6 +48984,17 @@
             },
             {
               "kind": "method",
+              "name": "renderCaptions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              },
+              "description": "A toggle for one track, a menu for several, and nothing for none.\n\nNo menu at one, because a menu of a single language plus \"Off\" is a\ntwo-state control wearing a popover, and the button already says which\nstate it is in through `aria-pressed`. The moment there are two the button\ncannot say which one is on, so it stops being a button.\n\nThe label comes off the track: `label` where the markup gave one, and\n`srclang` where it did not, because a `<track>` with neither is a track\nnobody can choose between and that is the markup's fault to fix, not this\ncomponent's to paper over with \"Track 2\"."
+            },
+            {
+              "kind": "method",
               "name": "renderOverflowItem",
               "privacy": "private",
               "return": {
@@ -48834,8 +49009,7 @@
                     "text": "string"
                   }
                 }
-              ],
-              "description": "The same control as a row in the overflow menu.\n\nThe label is words rather than a mark, which is the difference between a\nbar and a menu: a row has the width for a name and a reader scanning one is\nreading rather than recognising. `download` is a linked row, which is what\n`Menu.Item`'s `href` is for."
+              ]
             },
             {
               "kind": "method",

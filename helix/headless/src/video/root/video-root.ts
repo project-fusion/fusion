@@ -1110,15 +1110,29 @@ export class HelixBaseVideo extends HelixElement {
         <helix-icon name="airplay"></helix-icon>
       </button>`
     }
-    if (one === 'rewind' || one === 'forward') {
-      const back = one === 'rewind'
+    /* Two templates rather than one with the name bound in, for the reason
+       written under `previous` below: a part is read from the source, so
+       `part=${one}` is a part no check can prove anything about. These two were
+       left bound when that pair was split, and `check:parts` had them exactly
+       right: both were documented and neither could be found. */
+    if (one === 'rewind') {
       return html`<button
-        part=${one}
+        part="rewind"
         type="button"
-        aria-label=${back ? `Back ${SKIP_SECONDS} seconds` : `Forward ${SKIP_SECONDS} seconds`}
-        @click=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
+        aria-label=${`Back ${SKIP_SECONDS} seconds`}
+        @click=${() => this.skipBy(-SKIP_SECONDS)}
       >
-        <helix-icon name=${back ? 'arrow-counter-clockwise' : 'arrow-clockwise'}></helix-icon>
+        <helix-icon name="arrow-counter-clockwise"></helix-icon>
+      </button>`
+    }
+    if (one === 'forward') {
+      return html`<button
+        part="forward"
+        type="button"
+        aria-label=${`Forward ${SKIP_SECONDS} seconds`}
+        @click=${() => this.skipBy(SKIP_SECONDS)}
+      >
+        <helix-icon name="arrow-clockwise"></helix-icon>
       </button>`
     }
     if (one === 'speed') {
@@ -1133,8 +1147,9 @@ export class HelixBaseVideo extends HelixElement {
     }
     /* Two templates rather than one with the name bound in, because a part is
        read from the source: `check:selectors` scans for the literal, so a part
-       written as `part=${one}` is a part no stylesheet can be proved to reach.
-       It reported both of these as matching nothing. */
+       written as `part=${one}` is a part no stylesheet can be proved to reach,
+       and `check:parts` cannot find it to match against the documentation
+       either. It reported both of these as matching nothing. */
     if (one === 'previous') {
       return html`<button
         part="previous"

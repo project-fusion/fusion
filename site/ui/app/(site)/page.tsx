@@ -73,7 +73,7 @@ export default function Home() {
           it never asks for the hit test and every control keeps its presses. It
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
-      <helix-aura class="reelAura" gain={0.55} scale={1.35} speed={0.45} tilt={42}></helix-aura>
+      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={0.45} tilt={42}></helix-aura>
       <div className="reelScrim" />
 
       <section className="hero">

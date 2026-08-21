@@ -83,6 +83,7 @@ const SCRUB_FINE = 16
  * @event {HelixInputEvent} helix-input - Fired as the value changes, and cancelable.
  * @event {Event} change - Relayed from the field once the reader has finished.
  *
+ * @csspart label - The name over the field, which is also the scrub grip.
  * @csspart field - The box holding everything.
  * @csspart control - The field itself.
  * @csspart decrement - The control that steps down.

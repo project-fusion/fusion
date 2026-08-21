@@ -208,6 +208,7 @@ no shadow: the rule is the whole of it.
 | Property | Description |
 | --- | --- |
 | `--app-header-background` | Fill behind the banner. |
+| `--app-header-backdrop` | The filter behind it. `none` to pair it with a panel. |
 | `--app-header-border-color` | The line under the bar. None by default. |
 | `--app-header-height` | Height of the banner. |
 | `--app-header-inset` | Inline padding of the banner. |
@@ -2645,6 +2646,8 @@ Everything about what opens it and what closes it is the base class.
 
 | Property | Description |
 | --- | --- |
+| `--megamenu-background` | The panel's own fill. |
+| `--megamenu-backdrop` | A filter behind the panel, for glass. |
 | `--megamenu-size` | How wide the panel may get. |
 | `--megamenu-column-size` | The narrowest a column goes before the grid wraps. |
 | `--megamenu-full-size` | How wide the band's contents may get, centred in it. |
@@ -2941,6 +2944,7 @@ three times as long to cross.
 | `readOnly` | `read-only` | `boolean` | `false` | `HelixBaseNumberInput` | Whether the field refuses input while still submitting its value. |
 | `required` | `required` | `boolean` | `false` | `MixinField` | Whether the form refuses to submit without it. |
 | `resolvedFeedback` | - | `string` | - | `MixinField` | The message actually shown: the consumer's, or the platform's, or none. |
+| `scrub` | `scrub` | `boolean` | `false` | `HelixBaseNumberInput` | Whether a grip is shown that changes the value when it is dragged. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseNumberInput` | Focus is delegated to the field, so the host is never the focus target. |
 | `step` | `step` | `number` | `1` | `HelixBaseNumberInput` | How far one step moves. |
 | `value` | `value` | `string` | - | `MixinControllerValue` | What the control holds now, and what its form submits. |
@@ -2980,6 +2984,7 @@ three times as long to cross.
 | `control` | The field itself. |
 | `decrement` | The control that steps down. |
 | `increment` | The control that steps up. |
+| `label` | The name over the field, which is also the scrub grip. |
 
 ## Option
 
@@ -6011,6 +6016,8 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | Slot | Description |
 | --- | --- |
 | *(default)* | `<source>` and `<track>` elements, which are copied into the video. |
+| `back` | Top left over the frame, for a way out of a set. |
+| `controls` | Added to the control bar, before fullscreen. |
 | `poster` | Shown over the video until it starts. |
 
 #### Parts
@@ -6020,6 +6027,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `stage` | The box holding the picture and its controls, and the focus target the keys are bound to. |
 | `video` | The video itself. |
 | `poster` | What covers it before it plays. |
+| `back` | The region top left, for a way out of a set. |
 | `failure` | What is said when the source will not play. |
 | `loading` | What is said while the picture waits for more of itself. |
 | `loading-mark` | The part of that which spins. |
@@ -6032,6 +6040,9 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `mute` | Sound on and off. |
 | `volume` | How loud. |
 | `captions` | Subtitles on and off. |
+| `captions-menu` | The language menu, where there is more than one. |
+| `rewind` | The control that goes back ten seconds. |
+| `forward` | The control that goes on ten seconds. |
 | `remote` | Play on another device, where one is available. |
 | `speed` | Playback speed, where it was asked for. |
 | `pip` | Picture in picture, where it was asked for and exists. |
