@@ -49759,6 +49759,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/video-playlist/menu/video-playlist-menu.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/video-playlist/root/video-playlist-root.js"
           }
         }
@@ -50027,6 +50035,277 @@
           "declaration": {
             "name": "HelixBaseVideoPlaylistItem",
             "module": "src/video-playlist/item/video-playlist-item.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/video-playlist/menu/video-playlist-menu.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The entries again, reachable without leaving the picture. A playlist beside\nthe player is a list a reader scrolls to; the same list in the control bar is\none they open over the video, which is what a full-screen player has and what\na phone has room for.\n\n**It is placed by the consumer, not rendered by the playlist**, and that is\nforced rather than chosen. A shadow root cannot project into a sibling's\nlight DOM, so nothing the playlist renders can land inside the player's\ncontrol bar. What can is an element the consumer writes there, which is what\n`Video`'s `controls` slot is for:\n\n```html\n<helix-video-playlist>\n  <helix-video slot=\"player\" controls>\n    <helix-video-playlist-menu slot=\"controls\"></helix-video-playlist-menu>\n  </helix-video>\n  <helix-video-playlist-item value=\"one\" src=\"/one.mp4\">One</helix-video-playlist-item>\n</helix-video-playlist>\n```\n\nSo it finds its playlist upward rather than being handed one, and that chain\ncrosses a shadow boundary in the ordinary arrangement, which is why it is\n`closestInstance` and not `closest`.\n\n**Choosing dispatches `helix-select`, the same event an entry dispatches.**\nIt never writes `active` on the playlist, which looks like the shorter path\nand would latch the controlled contract: a playlist assigned `active` once\ngoes quiet and waits for a consumer who was never there. Announcing is what\nan entry does, the playlist already listens for it, and a consumer refusing a\nselection gets `preventDefault()` on one event rather than two paths that\nbehave differently.",
+          "name": "HelixBaseVideoPlaylistMenu",
+          "cssParts": [
+            {
+              "description": "One entry in the menu.",
+              "name": "entry"
+            },
+            {
+              "description": "The menu that holds the entries.",
+              "name": "menu"
+            },
+            {
+              "description": "The button that opens it.",
+              "name": "trigger"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Replaces the button that opens the menu.",
+              "name": "trigger"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Episodes'",
+              "description": "The menu's accessible name, and its trigger's.\n\n\"Episodes\" suits a series and is wrong for a set of camera angles, and the\ncomponent cannot know which one it is in.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "string"
+              },
+              "default": "'top-end'",
+              "description": "Where the menu opens relative to its trigger.\n\n`top-end` because a control bar sits at the foot of the picture, and a menu\nopening downward from there opens off the player.",
+              "attribute": "placement"
+            },
+            {
+              "kind": "field",
+              "name": "revision",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#playlist",
+              "privacy": "private",
+              "type": {
+                "text": "HelixBaseVideoPlaylist | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "playlist",
+              "type": {
+                "text": "HelixBaseVideoPlaylist | undefined"
+              },
+              "privacy": "private",
+              "description": "The playlist this menu belongs to, found upward through the slots.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "HelixBaseVideoPlaylistItem[]"
+              },
+              "privacy": "private",
+              "description": "The playlist's entries, in the order it holds them.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches the playlist for entries arriving, and re-reads it on every open.\n\nTwo signals rather than one, because the two facts change on different\nclocks and only one of them is observable.\n\n**Which entries exist** is the playlist's light DOM, and a `MutationObserver`\nsees it directly.\n\n**Which entry is current** is `active`, a property with no attribute, so\nthere is nothing to observe: events travel up from the playlist and this\nelement is below it, and mirroring `active` to a `data-` name is ruled out\non its own merits, `active` being a payload rather than a boolean fact.\nMirroring it was written and reverted here: it put `data-active` onto every\nhost, which `tree-root.ssr.spec.ts` caught, and the rule it broke was the\none that stops a copied host coming back frozen.\n\nSo it is re-read at the moment it is looked at. `helix-open` comes from the\nmenu in this element's own shadow root, which is the one direction events\ndo arrive from, and a closed menu showing a stale mark is a thing nobody\ncan see."
+            },
+            {
+              "kind": "field",
+              "name": "reread",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "choose",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "renderMenu",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The menu itself, behind a method so a styled tier can render another one."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "HelixSelectEvent"
+              },
+              "description": "Fired with the chosen entry's value. The playlist listens for it.",
+              "name": "helix-select",
+              "reactProp": "onhelix-select"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Episodes'",
+              "description": "The menu's accessible name, and its trigger's.\n\n\"Episodes\" suits a series and is wrong for a set of camera angles, and the\ncomponent cannot know which one it is in.",
+              "fieldName": "label"
+            },
+            {
+              "name": "placement",
+              "type": {
+                "text": "string"
+              },
+              "default": "'top-end'",
+              "description": "Where the menu opens relative to its trigger.\n\n`top-end` because a control bar sits at the foot of the picture, and a menu\nopening downward from there opens off the player.",
+              "fieldName": "placement"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "The playlist's entries, as a menu inside the player's control bar.",
+          "helix": {
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/video-playlist",
+            "aliases": [
+              "Episode Menu",
+              "Queue Menu",
+              "Up Next"
+            ],
+            "tier": "headless",
+            "group": "BaseVideoPlaylist",
+            "part": "Menu"
+          },
+          "tagName": "helix-base-video-playlist-menu",
+          "customElement": true,
+          "modulePath": "src/video-playlist/menu/video-playlist-menu.ts",
+          "definitionPath": "src/video-playlist/menu/video-playlist-menu.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseVideoPlaylistMenu",
+          "declaration": {
+            "name": "HelixBaseVideoPlaylistMenu",
+            "module": "src/video-playlist/menu/video-playlist-menu.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-video-playlist-menu",
+          "declaration": {
+            "name": "HelixBaseVideoPlaylistMenu",
+            "module": "src/video-playlist/menu/video-playlist-menu.ts"
           }
         }
       ]

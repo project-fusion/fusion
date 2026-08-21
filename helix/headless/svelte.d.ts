@@ -109,6 +109,7 @@ declare module 'svelte/elements' {
     'helix-base-tree': CustomElements['helix-base-tree']
     'helix-base-trend': CustomElements['helix-base-trend']
     'helix-base-video-playlist-item': CustomElements['helix-base-video-playlist-item']
+    'helix-base-video-playlist-menu': CustomElements['helix-base-video-playlist-menu']
     'helix-base-video-playlist': CustomElements['helix-base-video-playlist']
     'helix-base-video': CustomElements['helix-base-video']
   }

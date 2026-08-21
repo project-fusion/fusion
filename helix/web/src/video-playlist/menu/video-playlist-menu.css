@@ -1,0 +1,40 @@
+/* The trigger is drawn here rather than by the bar, and it has to be.
+ *
+ * `Video` styles its controls with `[part="controls"] :where(a, button)`, a
+ * rule inside its own shadow root, and this menu sits in its *light* DOM under
+ * `slot="controls"`. A shadow rule reaches assigned nodes only through
+ * `::slotted()`, and never their descendants at all, so the button in this
+ * element's shadow root is two boundaries away from the rule that styles every
+ * button beside it.
+ *
+ * Same failure as a `::slotted()` rule against fallback content: valid CSS
+ * matching nothing, no error and no warning, and here the symptom would be one
+ * raw browser-chrome button in a row of flat glyphs. So the declarations below
+ * are that rule again against the same tokens, which is what makes the two come
+ * out identical. */
+:host {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+[part="trigger"] {
+  all: unset;
+
+  --icon-size: var(--video-playlist-menu-size, var(--helix-size-icon-sm));
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--video-playlist-menu-color, inherit);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-lg);
+  min-inline-size: var(--helix-size-icon-lg);
+}
+
+[part="trigger"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

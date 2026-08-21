@@ -111,6 +111,7 @@ import type {
   HelixTree,
   HelixTrend,
   HelixVideoPlaylistItem,
+  HelixVideoPlaylistMenu,
   HelixVideoPlaylist,
   HelixVideo,
   HelixOpenEvent,
@@ -6486,6 +6487,33 @@ export type HelixVideoPlaylistItemVueEvents = {
   "helix-select": HelixVideoPlaylistItemHelixSelectElementEvent;
 };
 
+/** `HelixVideoPlaylistMenu` component event */
+export type HelixVideoPlaylistMenuElementEvent<E = Event> = TypedEvent<
+  HelixVideoPlaylistMenu,
+  E
+>;
+/** `helix-select` event type */
+export type HelixVideoPlaylistMenuHelixSelectElementEvent =
+  HelixVideoPlaylistMenuElementEvent<HelixSelectEvent>;
+
+export type HelixVideoPlaylistMenuVueProps = {
+  /** The menu's accessible name, and its trigger's.
+
+"Episodes" suits a series and is wrong for a set of camera angles, and the
+component cannot know which one it is in. */
+  label?: HelixVideoPlaylistMenu["label"];
+  /** Where the menu opens relative to its trigger.
+
+`top-end` because a control bar sits at the foot of the picture, and a menu
+opening downward from there opens off the player. */
+  placement?: HelixVideoPlaylistMenu["placement"];
+};
+
+export type HelixVideoPlaylistMenuVueEvents = {
+  /** Fired with the chosen entry's value. The playlist listens for it. */
+  "helix-select": HelixVideoPlaylistMenuHelixSelectElementEvent;
+};
+
 /** `HelixVideoPlaylist` component event */
 export type HelixVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixVideoPlaylist,
@@ -7254,6 +7282,10 @@ export type CustomCssProperties = {
   "--video-playlist-item-background-color"?: string;
   /** Width of the thumbnail column. */
   "--video-playlist-media-size"?: string;
+  /** Colour of the trigger, defaulting to the control bar's. */
+  "--video-playlist-menu-color"?: string;
+  /** Size of the trigger's glyph. */
+  "--video-playlist-menu-size"?: string;
   /** Columns for the player and the list. */
   "--video-playlist-layout"?: string;
   /** How tall the list gets before it scrolls. */
@@ -7948,6 +7980,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixVideoPlaylistItem,
     HelixVideoPlaylistItemVueProps,
     HelixVideoPlaylistItemVueEvents
+  >;
+  /** Presentation only: a control-bar button drawn like the ones beside it, and a menu that opens over the picture rather than under it. The base class holds where the playlist is, what the entries are, and what choosing announces.  The trigger's declarations are 'Video''s control rule written out a second time, which is not duplication that could be avoided. That rule is '[part="controls"] :where(a, button)' inside 'Video''s shadow root, and this element sits in its light DOM: a shadow rule reaches an assigned node only through '::slotted()' and never reaches into the node's own shadow root at all. So the button here is two boundaries away from the rule that styles every button beside it, and the same tokens are what make the two agree.  Colour is inherited rather than named, so the bar's own colour arrives on its own. '--video-playlist-menu-color' is there for the case where it should not. */
+  "helix-video-playlist-menu": DefineCustomElement<
+    HelixVideoPlaylistMenu,
+    HelixVideoPlaylistMenuVueProps,
+    HelixVideoPlaylistMenuVueEvents
   >;
   /** Presentation only: the arrangement of the two regions and the scroller the entries sit in. Everything about which clip is current is the base class. */
   "helix-video-playlist": DefineCustomElement<

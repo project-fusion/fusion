@@ -107,6 +107,7 @@ import type {
   HelixBaseTree,
   HelixBaseTrend,
   HelixBaseVideoPlaylistItem,
+  HelixBaseVideoPlaylistMenu,
   HelixBaseVideoPlaylist,
   HelixBaseVideo,
   HelixCloseEvent,
@@ -5688,6 +5689,33 @@ export type HelixBaseVideoPlaylistItemVueEvents = {
   "helix-select": HelixBaseVideoPlaylistItemHelixSelectElementEvent;
 };
 
+/** `HelixBaseVideoPlaylistMenu` component event */
+export type HelixBaseVideoPlaylistMenuElementEvent<E = Event> = TypedEvent<
+  HelixBaseVideoPlaylistMenu,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseVideoPlaylistMenuHelixSelectElementEvent =
+  HelixBaseVideoPlaylistMenuElementEvent<HelixSelectEvent>;
+
+export type HelixBaseVideoPlaylistMenuVueProps = {
+  /** The menu's accessible name, and its trigger's.
+
+"Episodes" suits a series and is wrong for a set of camera angles, and the
+component cannot know which one it is in. */
+  label?: HelixBaseVideoPlaylistMenu["label"];
+  /** Where the menu opens relative to its trigger.
+
+`top-end` because a control bar sits at the foot of the picture, and a menu
+opening downward from there opens off the player. */
+  placement?: HelixBaseVideoPlaylistMenu["placement"];
+};
+
+export type HelixBaseVideoPlaylistMenuVueEvents = {
+  /** Fired with the chosen entry's value. The playlist listens for it. */
+  "helix-select": HelixBaseVideoPlaylistMenuHelixSelectElementEvent;
+};
+
 /** `HelixBaseVideoPlaylist` component event */
 export type HelixBaseVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixBaseVideoPlaylist,
@@ -6548,6 +6576,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseVideoPlaylistItem,
     HelixBaseVideoPlaylistItemVueProps,
     HelixBaseVideoPlaylistItemVueEvents
+  >;
+  /** The entries again, reachable without leaving the picture. A playlist beside the player is a list a reader scrolls to; the same list in the control bar is one they open over the video, which is what a full-screen player has and what a phone has room for.  **It is placed by the consumer, not rendered by the playlist**, and that is forced rather than chosen. A shadow root cannot project into a sibling's light DOM, so nothing the playlist renders can land inside the player's control bar. What can is an element the consumer writes there, which is what 'Video''s 'controls' slot is for:  '''html <helix-video-playlist>   <helix-video slot="player" controls>     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>   </helix-video>   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item> </helix-video-playlist> '''  So it finds its playlist upward rather than being handed one, and that chain crosses a shadow boundary in the ordinary arrangement, which is why it is 'closestInstance' and not 'closest'.  **Choosing dispatches 'helix-select', the same event an entry dispatches.** It never writes 'active' on the playlist, which looks like the shorter path and would latch the controlled contract: a playlist assigned 'active' once goes quiet and waits for a consumer who was never there. Announcing is what an entry does, the playlist already listens for it, and a consumer refusing a selection gets 'preventDefault()' on one event rather than two paths that behave differently. */
+  "helix-base-video-playlist-menu": DefineCustomElement<
+    HelixBaseVideoPlaylistMenu,
+    HelixBaseVideoPlaylistMenuVueProps,
+    HelixBaseVideoPlaylistMenuVueEvents
   >;
   /** **The player is slotted, never rendered here.** A consumer's player carries their appearance, their extra controls, their captions and their poster treatment, and a playlist that rendered its own would either lose all of that or grow a property for each of them. 'Sandbox' takes its preview and 'Menu' its trigger the same way.  **The entries are markup rather than an array property.** A list of objects would be the shorter API and it does not survive the trip: React skips every property it would have to apply imperatively while hydrating, so an array handed to a custom element is missing on the first paint of every server-rendered page. 'using-the-elements.mdx' carries the measurement. Markup is also what makes each entry a real button with a real name in it.  **Nothing here plays anything.** It sets 'src' on the player and lets the player be a player. What the playlist owns is which entry is current, and it moves that on three signals: an entry pressed, 'helix-next' or 'helix-previous' from the player, and the player reaching the end.  'ended' advances without asking, because a set of clips that stopped between each one is a set the reader has to nurse. The clip that follows starts where the last one left off, which is 'autoplay' in the only sense that matters here: the reader already pressed play once. */
   "helix-base-video-playlist": DefineCustomElement<

@@ -105,6 +105,7 @@ import type {
   HelixBaseVideo,
   HelixBaseVideoPlaylist,
   HelixBaseVideoPlaylistItem,
+  HelixBaseVideoPlaylistMenu,
   HelixChangeEvent,
   HelixCloseEvent,
   HelixCompleteEvent,
@@ -10845,6 +10846,55 @@ which one is playing. */
   textContent?: string | number;
 };
 
+/** `HelixBaseVideoPlaylistMenu` component event */
+export type HelixBaseVideoPlaylistMenuElementEvent<E = Event> = TypedEvent<
+  HelixBaseVideoPlaylistMenu,
+  E
+>;
+/** `helix-select` event type */
+export type HelixBaseVideoPlaylistMenuHelixSelectElementEvent =
+  HelixBaseVideoPlaylistMenuElementEvent<HelixSelectEvent>;
+
+export type HelixBaseVideoPlaylistMenuProps = {
+  /** The menu's accessible name, and its trigger's.
+
+"Episodes" suits a series and is wrong for a set of camera angles, and the
+component cannot know which one it is in. */
+  label?: HelixBaseVideoPlaylistMenu["label"];
+  /** Where the menu opens relative to its trigger.
+
+`top-end` because a control bar sits at the foot of the picture, and a menu
+opening downward from there opens off the player. */
+  placement?: HelixBaseVideoPlaylistMenu["placement"];
+
+  /** Fired with the chosen entry's value. The playlist listens for it. */
+  "onhelix-select"?: (
+    e: HelixBaseVideoPlaylistMenuHelixSelectElementEvent,
+  ) => void;
+};
+
+export type HelixBaseVideoPlaylistMenuSolidJsProps = {
+  /** The menu's accessible name, and its trigger's.
+
+"Episodes" suits a series and is wrong for a set of camera angles, and the
+component cannot know which one it is in. */
+  "prop:label"?: HelixBaseVideoPlaylistMenu["label"];
+  /** Where the menu opens relative to its trigger.
+
+`top-end` because a control bar sits at the foot of the picture, and a menu
+opening downward from there opens off the player. */
+  "prop:placement"?: HelixBaseVideoPlaylistMenu["placement"];
+  /** Fired with the chosen entry's value. The playlist listens for it. */
+  "on:helix-select"?: (
+    e: HelixBaseVideoPlaylistMenuHelixSelectElementEvent,
+  ) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
 /** `HelixBaseVideoPlaylist` component event */
 export type HelixBaseVideoPlaylistElementEvent<E = Event> = TypedEvent<
   HelixBaseVideoPlaylist,
@@ -21299,6 +21349,78 @@ export type CustomElements = {
   "helix-base-video-playlist-item": Partial<
     HelixBaseVideoPlaylistItemProps &
       BaseProps<HelixBaseVideoPlaylistItem> &
+      BaseEvents
+  >;
+
+  /**
+   * The entries again, reachable without leaving the picture. A playlist beside
+   * the player is a list a reader scrolls to; the same list in the control bar is
+   * one they open over the video, which is what a full-screen player has and what
+   * a phone has room for.
+   *
+   * **It is placed by the consumer, not rendered by the playlist**, and that is
+   * forced rather than chosen. A shadow root cannot project into a sibling's
+   * light DOM, so nothing the playlist renders can land inside the player's
+   * control bar. What can is an element the consumer writes there, which is what
+   * `Video`'s `controls` slot is for:
+   *
+   * ```html
+   * <helix-video-playlist>
+   *   <helix-video slot="player" controls>
+   *     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
+   *   </helix-video>
+   *   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item>
+   * </helix-video-playlist>
+   * ```
+   *
+   * So it finds its playlist upward rather than being handed one, and that chain
+   * crosses a shadow boundary in the ordinary arrangement, which is why it is
+   * `closestInstance` and not `closest`.
+   *
+   * **Choosing dispatches `helix-select`, the same event an entry dispatches.**
+   * It never writes `active` on the playlist, which looks like the shorter path
+   * and would latch the controlled contract: a playlist assigned `active` once
+   * goes quiet and waits for a consumer who was never there. Announcing is what
+   * an entry does, the playlist already listens for it, and a consumer refusing a
+   * selection gets `preventDefault()` on one event rather than two paths that
+   * behave differently.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The menu's accessible name, and its trigger's.
+   *
+   * "Episodes" suits a series and is wrong for a set of camera angles, and the
+   * component cannot know which one it is in.
+   * - `placement`: Where the menu opens relative to its trigger.
+   *
+   * `top-end` because a control bar sits at the foot of the picture, and a menu
+   * opening downward from there opens off the player.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: Replaces the button that opens the menu.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One entry in the menu.
+   * - `menu`: The menu that holds the entries.
+   * - `trigger`: The button that opens it.
+   */
+  "helix-base-video-playlist-menu": Partial<
+    HelixBaseVideoPlaylistMenuProps &
+      BaseProps<HelixBaseVideoPlaylistMenu> &
       BaseEvents
   >;
 
@@ -31859,6 +31981,79 @@ export type CustomElementsSolidJs = {
     HelixBaseVideoPlaylistItemProps &
       HelixBaseVideoPlaylistItemSolidJsProps &
       BaseProps<HelixBaseVideoPlaylistItem> &
+      BaseEvents
+  >;
+
+  /**
+   * The entries again, reachable without leaving the picture. A playlist beside
+   * the player is a list a reader scrolls to; the same list in the control bar is
+   * one they open over the video, which is what a full-screen player has and what
+   * a phone has room for.
+   *
+   * **It is placed by the consumer, not rendered by the playlist**, and that is
+   * forced rather than chosen. A shadow root cannot project into a sibling's
+   * light DOM, so nothing the playlist renders can land inside the player's
+   * control bar. What can is an element the consumer writes there, which is what
+   * `Video`'s `controls` slot is for:
+   *
+   * ```html
+   * <helix-video-playlist>
+   *   <helix-video slot="player" controls>
+   *     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
+   *   </helix-video>
+   *   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item>
+   * </helix-video-playlist>
+   * ```
+   *
+   * So it finds its playlist upward rather than being handed one, and that chain
+   * crosses a shadow boundary in the ordinary arrangement, which is why it is
+   * `closestInstance` and not `closest`.
+   *
+   * **Choosing dispatches `helix-select`, the same event an entry dispatches.**
+   * It never writes `active` on the playlist, which looks like the shorter path
+   * and would latch the controlled contract: a playlist assigned `active` once
+   * goes quiet and waits for a consumer who was never there. Announcing is what
+   * an entry does, the playlist already listens for it, and a consumer refusing a
+   * selection gets `preventDefault()` on one event rather than two paths that
+   * behave differently.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: The menu's accessible name, and its trigger's.
+   *
+   * "Episodes" suits a series and is wrong for a set of camera angles, and the
+   * component cannot know which one it is in.
+   * - `placement`: Where the menu opens relative to its trigger.
+   *
+   * `top-end` because a control bar sits at the foot of the picture, and a menu
+   * opening downward from there opens off the player.
+   *
+   * ## Events
+   *
+   * Events that will be emitted by the component.
+   *
+   * - `helix-select`: Fired with the chosen entry's value. The playlist listens for it.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `trigger`: Replaces the button that opens the menu.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One entry in the menu.
+   * - `menu`: The menu that holds the entries.
+   * - `trigger`: The button that opens it.
+   */
+  "helix-base-video-playlist-menu": Partial<
+    HelixBaseVideoPlaylistMenuProps &
+      HelixBaseVideoPlaylistMenuSolidJsProps &
+      BaseProps<HelixBaseVideoPlaylistMenu> &
       BaseEvents
   >;
 

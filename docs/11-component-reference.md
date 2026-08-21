@@ -6510,3 +6510,59 @@ playing. The base class holds what the entry is and what it announces.
 | --- | --- |
 | `--video-playlist-item-background-color` | Fill behind a row. |
 | `--video-playlist-media-size` | Width of the thumbnail column. |
+
+### Menu — `helix-video-playlist-menu`
+
+The playlist's entries, as a menu inside the player's control bar.
+
+Extends `HelixBaseVideoPlaylistMenu`.
+
+Presentation only: a control-bar button drawn like the ones beside it, and a
+menu that opens over the picture rather than under it. The base class holds
+where the playlist is, what the entries are, and what choosing announces.
+
+The trigger's declarations are `Video`'s control rule written out a second
+time, which is not duplication that could be avoided. That rule is
+`[part="controls"] :where(a, button)` inside `Video`'s shadow root, and this
+element sits in its light DOM: a shadow rule reaches an assigned node only
+through `::slotted()` and never reaches into the node's own shadow root at
+all. So the button here is two boundaries away from the rule that styles
+every button beside it, and the same tokens are what make the two agree.
+
+Colour is inherited rather than named, so the bar's own colour arrives on
+its own. `--video-playlist-menu-color` is there for the case where it should
+not.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `'Episodes'` | `HelixBaseVideoPlaylistMenu` | The menu's accessible name, and its trigger's. |
+| `placement` | `placement` | `string` | `'top-end'` | `HelixBaseVideoPlaylistMenu` | Where the menu opens relative to its trigger. |
+
+#### Events
+
+| Event | Type | Description |
+| --- | --- | --- |
+| `helix-select` | `HelixSelectEvent` | Fired with the chosen entry's value. The playlist listens for it. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| `trigger` | Replaces the button that opens the menu. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `entry` | One entry in the menu. |
+| `menu` | The menu that holds the entries. |
+| `trigger` | The button that opens it. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--video-playlist-menu-color` | Colour of the trigger, defaulting to the control bar's. |
+| `--video-playlist-menu-size` | Size of the trigger's glyph. |
