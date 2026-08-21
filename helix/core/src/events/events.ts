@@ -164,17 +164,6 @@ export interface DismissDetail {
   label: string
 }
 
-/*
- * Fired when an element asks to be taken away.
- *
- * A request rather than a notification: the element does not remove itself,
- * because the consumer owns the markup it is in and removing the node under
- * them would put their state and the document out of step. Cancelable, so
- * `preventDefault()` is a refusal.
- *
- * One verb for both shapes. A tag leaving a list and an announcement closing
- * itself are the same act from the element's side.
- */
 /** What a stop's own controls ask the tour to do. */
 export interface TourAskDetail {
   /**
@@ -241,6 +230,17 @@ export class HelixSampleEndEvent extends Event {
   }
 }
 
+/**
+ * Fired when an element asks to be taken away.
+ *
+ * A request rather than a notification: the element does not remove itself,
+ * because the consumer owns the markup it is in and removing the node under
+ * them would put their state and the document out of step. Cancelable, so
+ * `preventDefault()` is a refusal.
+ *
+ * One verb for both shapes. A tag leaving a list and an announcement closing
+ * itself are the same act from the element's side.
+ */
 export class HelixDismissEvent extends CustomEvent<DismissDetail> {
   static readonly eventName = 'helix-dismiss'
 
@@ -543,13 +543,6 @@ export interface SelectDetail {
   value: string
 }
 
-/*
- * Fired when the reader selects an item in a set.
- *
- * Bubbles and is composed, because this is how a set coordinates: a tree, a
- * tab list and a toggle group all learn which of their children was chosen by
- * hearing it arrive.
- */
 /**
  * Fired when a component moves the view it is showing, rather than its value.
  *
@@ -577,27 +570,6 @@ export interface CompleteDetail {
   value: string
 }
 
-/*
- * Fired when a control that fills up has filled.
- *
- * The moment a code entry exists for: a six-character field is worth submitting
- * the instant the sixth character lands, and a consumer watching `helix-change`
- * has to know the length and compare it on every keystroke to find that moment
- * themselves.
- *
- * Separate from `helix-change` rather than a flag on it, because they are
- * answered by different code: one keeps a value in step and the other decides
- * whether to send a form. A listener that only cares about the second says so by
- * which event it listens for.
- *
- * `complete` is free as a verb. React's synthetic system claims `change`,
- * `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and
- * `blur`, measured, and this is none of them.
- *
- * Not cancelable. It reports that something already happened, which is the same
- * reason `helix-caret` is not: there is nothing left to refuse once the last
- * character is in the box.
- */
 /**
  * What a picture reports when it settles, either way.
  */
@@ -654,6 +626,27 @@ export class HelixErrorEvent extends CustomEvent<LoadDetail> {
   }
 }
 
+/**
+ * Fired when a control that fills up has filled.
+ *
+ * The moment a code entry exists for: a six-character field is worth submitting
+ * the instant the sixth character lands, and a consumer watching `helix-change`
+ * has to know the length and compare it on every keystroke to find that moment
+ * themselves.
+ *
+ * Separate from `helix-change` rather than a flag on it, because they are
+ * answered by different code: one keeps a value in step and the other decides
+ * whether to send a form. A listener that only cares about the second says so by
+ * which event it listens for.
+ *
+ * `complete` is free as a verb. React's synthetic system claims `change`,
+ * `input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and
+ * `blur`, measured, and this is none of them.
+ *
+ * Not cancelable. It reports that something already happened, which is the same
+ * reason `helix-caret` is not: there is nothing left to refuse once the last
+ * character is in the box.
+ */
 export class HelixCompleteEvent extends CustomEvent<CompleteDetail> {
   static readonly eventName = 'helix-complete'
 
@@ -687,6 +680,13 @@ export class HelixFilterEvent extends CustomEvent<FilterDetail> {
   }
 }
 
+/**
+ * Fired when the reader selects an item in a set.
+ *
+ * Bubbles and is composed, because this is how a set coordinates: a tree, a
+ * tab list and a toggle group all learn which of their children was chosen by
+ * hearing it arrive.
+ */
 export class HelixSelectEvent extends CustomEvent<SelectDetail> {
   static readonly eventName = 'helix-select'
 

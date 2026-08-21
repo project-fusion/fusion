@@ -1804,7 +1804,7 @@
         },
         {
           "kind": "class",
-          "description": "",
+          "description": "Fired when an element asks to be taken away.\n\nA request rather than a notification: the element does not remove itself,\nbecause the consumer owns the markup it is in and removing the node under\nthem would put their state and the document out of step. Cancelable, so\n`preventDefault()` is a refusal.\n\nOne verb for both shapes. A tag leaving a list and an announcement closing\nitself are the same act from the element's side.",
           "name": "HelixDismissEvent",
           "members": [
             {
@@ -2046,7 +2046,7 @@
         },
         {
           "kind": "class",
-          "description": "",
+          "description": "Fired when a control that fills up has filled.\n\nThe moment a code entry exists for: a six-character field is worth submitting\nthe instant the sixth character lands, and a consumer watching `helix-change`\nhas to know the length and compare it on every keystroke to find that moment\nthemselves.\n\nSeparate from `helix-change` rather than a flag on it, because they are\nanswered by different code: one keeps a value in step and the other decides\nwhether to send a form. A listener that only cares about the second says so by\nwhich event it listens for.\n\n`complete` is free as a verb. React's synthetic system claims `change`,\n`input`, `submit`, `reset`, `copy`, `paste`, `scroll`, `drag`, `focus` and\n`blur`, measured, and this is none of them.\n\nNot cancelable. It reports that something already happened, which is the same\nreason `helix-caret` is not: there is nothing left to refuse once the last\ncharacter is in the box.",
           "name": "HelixCompleteEvent",
           "members": [
             {
@@ -2090,7 +2090,7 @@
         },
         {
           "kind": "class",
-          "description": "",
+          "description": "Fired when the reader selects an item in a set.\n\nBubbles and is composed, because this is how a set coordinates: a tree, a\ntab list and a toggle group all learn which of their children was chosen by\nhearing it arrive.",
           "name": "HelixSelectEvent",
           "members": [
             {

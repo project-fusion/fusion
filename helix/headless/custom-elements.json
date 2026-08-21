@@ -653,14 +653,14 @@
             },
             {
               "kind": "method",
-              "name": "renderIcon",
+              "name": "renderDismissIcon",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
                 }
               },
-              "description": "The mark for the announcement's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change."
+              "description": "The cross inside the dismiss button, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\n**Named for what it draws, which it was not.** It was `renderIcon`, with a\ndescription of \"the mark for the announcement's tone\", and it draws the `x`\nglyph inside the dismiss button and has never drawn a tone. The name is\n`renderIcon` on `Toast` and `Callout` too, and on both of those it takes a\nseverity and draws exactly the tone mark this claimed to: the prose came\nfrom a sibling that meant it. An announcement has no tone mark at all."
             },
             {
               "kind": "field",
@@ -15086,7 +15086,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly\nas they do on an accordion item, and a consumer already knows the API.\n\nModal by default, which is three things together and not one: focus is\ntrapped inside, Escape and an outside press close it, and the page behind is\ncovered. A panel with the look of a modal and none of its behavior is worse\nthan an inline one, because it invites the reader to treat it as blocking.\n\nContent stays mounted when closed, so it is in the server's markup and can\nanimate. It is `inert` while closed, which takes it out of the tab order and\nthe accessibility tree without removing its box.",
+          "description": "Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly\nas they do on an accordion item, and a consumer already knows the API.\n\nModal by default, which is three things together and not one: focus is\ntrapped inside, Escape and an outside press close it, and the page behind is\ncovered. A panel with the look of a modal and none of its behavior is worse\nthan an inline one, because it invites the reader to treat it as blocking.\n\nContent stays mounted when closed, so it is in the server's markup and can\nanimate. A closed `<dialog>` is already out of the tab order and out of the\naccessibility tree, so nothing here writes `inert`.\n\n**This described a hand-written `inert` until 21 Aug 2026, and had done since\nthe panel became a `<dialog>`.** The rewrite took the `role`, the\n`aria-modal`, the scrim and the `inert` with it, because the element brings\nall four, and the comments at the two call sites say so. The class doc did\nnot, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`\nthe whole time: a spec three files away existing to contradict the prose is\nthe same shape as `Stat`'s `detail` slot, which is what `check:references`\nwas written after and is the half it cannot see.",
           "name": "HelixBaseDrawer",
           "cssParts": [
             {
@@ -48108,7 +48108,7 @@
                 "text": "HTMLElement[]"
               },
               "privacy": "private",
-              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
+              "description": "Children that can take the tab stop, in document order.\n\nEvery child that is not `disabled` and not `aria-hidden`, which is\ndeliberately a test on the element rather than a list of tag names: a\ntoolbar holds anything, including elements this package has never heard of.\nClient only, there being no tree to walk on the server.\n\n**It does not ask a child whether it is focusable, and the description said\nit did.** That would mean reading a `focusable` property off each one, which\n`focus` below does when moving the stop and this does not when choosing the\nset. The two are separable and only one of them was ever written: an element\nthat is neither disabled nor hidden and still cannot take focus is counted\nhere and skipped there.",
               "readonly": true
             },
             {

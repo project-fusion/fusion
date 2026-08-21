@@ -890,14 +890,14 @@
             },
             {
               "kind": "method",
-              "name": "renderIcon",
+              "name": "renderDismissIcon",
               "privacy": "protected",
               "return": {
                 "type": {
                   "text": "TemplateResult"
                 }
               },
-              "description": "The mark for the announcement's tone, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.",
+              "description": "The cross inside the dismiss button, behind a seam.\n\nSlot fallback, so a consumer replaces it by slotting; and a method, so the\ntier above replaces it by overriding. Those answer different people: the\nslot is for the page and the method is for whoever is building the styled\nlayer, and a fallback with only the first is one a tier can restyle and\ncannot change.\n\n**Named for what it draws, which it was not.** It was `renderIcon`, with a\ndescription of \"the mark for the announcement's tone\", and it draws the `x`\nglyph inside the dismiss button and has never drawn a tone. The name is\n`renderIcon` on `Toast` and `Callout` too, and on both of those it takes a\nseverity and draws exactly the tone mark this claimed to: the prose came\nfrom a sibling that meant it. An announcement has no tone mark at all.",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
                 "module": "src/announcement/root/announcement-root.ts"
@@ -64454,7 +64454,7 @@
                 "text": "HTMLElement[]"
               },
               "privacy": "private",
-              "description": "Focusable controls, in document order.\n\nAsks each child for its own focus target rather than matching tag names, so\na toolbar holds anything, including elements this package has never heard\nof. Client only: there is no tree to walk on the server.",
+              "description": "Children that can take the tab stop, in document order.\n\nEvery child that is not `disabled` and not `aria-hidden`, which is\ndeliberately a test on the element rather than a list of tag names: a\ntoolbar holds anything, including elements this package has never heard of.\nClient only, there being no tree to walk on the server.\n\n**It does not ask a child whether it is focusable, and the description said\nit did.** That would mean reading a `focusable` property off each one, which\n`focus` below does when moving the stop and this does not when choosing the\nset. The two are separable and only one of them was ever written: an element\nthat is neither disabled nor hidden and still cannot take focus is counted\nhere and skipped there.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseToolbar",

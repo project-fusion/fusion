@@ -102,15 +102,22 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * The mark for the announcement's tone, behind a seam.
+   * The cross inside the dismiss button, behind a seam.
    *
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding. Those answer different people: the
    * slot is for the page and the method is for whoever is building the styled
    * layer, and a fallback with only the first is one a tier can restyle and
    * cannot change.
+   *
+   * **Named for what it draws, which it was not.** It was `renderIcon`, with a
+   * description of "the mark for the announcement's tone", and it draws the `x`
+   * glyph inside the dismiss button and has never drawn a tone. The name is
+   * `renderIcon` on `Toast` and `Callout` too, and on both of those it takes a
+   * severity and draws exactly the tone mark this claimed to: the prose came
+   * from a sibling that meant it. An announcement has no tone mark at all.
    */
-  protected renderIcon(): TemplateResult {
+  protected renderDismissIcon(): TemplateResult {
     return html`<slot name="icon">
       <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
         ${unsafeSVG(x.content)}
@@ -144,7 +151,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
               aria-label=${this.dismissLabel}
               @click=${() => this.dismiss()}
             >
-              ${this.renderIcon()}
+              ${this.renderDismissIcon()}
             </button>`
           : nothing
       }`

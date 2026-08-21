@@ -15046,8 +15046,17 @@ export type CustomElements = {
    * than an inline one, because it invites the reader to treat it as blocking.
    *
    * Content stays mounted when closed, so it is in the server's markup and can
-   * animate. It is `inert` while closed, which takes it out of the tab order and
-   * the accessibility tree without removing its box.
+   * animate. A closed `<dialog>` is already out of the tab order and out of the
+   * accessibility tree, so nothing here writes `inert`.
+   *
+   * **This described a hand-written `inert` until 21 Aug 2026, and had done since
+   * the panel became a `<dialog>`.** The rewrite took the `role`, the
+   * `aria-modal`, the scrim and the `inert` with it, because the element brings
+   * all four, and the comments at the two call sites say so. The class doc did
+   * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
+   * the whole time: a spec three files away existing to contradict the prose is
+   * the same shape as `Stat`'s `detail` slot, which is what `check:references`
+   * was written after and is the half it cannot see.
    *
    * ## Attributes & Properties
    *
@@ -25892,8 +25901,17 @@ export type CustomElementsSolidJs = {
    * than an inline one, because it invites the reader to treat it as blocking.
    *
    * Content stays mounted when closed, so it is in the server's markup and can
-   * animate. It is `inert` while closed, which takes it out of the tab order and
-   * the accessibility tree without removing its box.
+   * animate. A closed `<dialog>` is already out of the tab order and out of the
+   * accessibility tree, so nothing here writes `inert`.
+   *
+   * **This described a hand-written `inert` until 21 Aug 2026, and had done since
+   * the panel became a `<dialog>`.** The rewrite took the `role`, the
+   * `aria-modal`, the scrim and the `inert` with it, because the element brings
+   * all four, and the comments at the two call sites say so. The class doc did
+   * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
+   * the whole time: a spec three files away existing to contradict the prose is
+   * the same shape as `Stat`'s `detail` slot, which is what `check:references`
+   * was written after and is the half it cannot see.
    *
    * ## Attributes & Properties
    *

@@ -91,11 +91,19 @@ export class HelixBaseToolbar extends HelixElement {
   private watcher: MutationObserver | undefined
 
   /**
-   * Focusable controls, in document order.
+   * Children that can take the tab stop, in document order.
    *
-   * Asks each child for its own focus target rather than matching tag names, so
-   * a toolbar holds anything, including elements this package has never heard
-   * of. Client only: there is no tree to walk on the server.
+   * Every child that is not `disabled` and not `aria-hidden`, which is
+   * deliberately a test on the element rather than a list of tag names: a
+   * toolbar holds anything, including elements this package has never heard of.
+   * Client only, there being no tree to walk on the server.
+   *
+   * **It does not ask a child whether it is focusable, and the description said
+   * it did.** That would mean reading a `focusable` property off each one, which
+   * `focus` below does when moving the stop and this does not when choosing the
+   * set. The two are separable and only one of them was ever written: an element
+   * that is neither disabled nor hidden and still cannot take focus is counted
+   * here and skipped there.
    */
   private get controls(): HTMLElement[] {
     return [...this.children].filter((child): child is HTMLElement => {
