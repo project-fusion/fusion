@@ -1,4 +1,5 @@
 import type {
+  EDGES,
   Helix,
   HelixBaseAccordion,
   HelixBaseAccordionItem,
@@ -62,6 +63,7 @@ import type {
   HelixBaseRadio,
   HelixBaseRadioGroup,
   HelixBaseRating,
+  HelixBaseScrollArea,
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
@@ -7025,6 +7027,25 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseRating["name"];
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseScrollAreaProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  label?: HelixBaseScrollArea["label"];
+};
+
+export type HelixBaseScrollAreaSolidJsProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  "prop:label"?: HelixBaseScrollArea["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -16457,6 +16478,51 @@ export type CustomElements = {
   >;
 
   /**
+   * **The whole component is one fact a stylesheet cannot work out for itself:
+   * which edges have content past them.** A fade at the bottom of a list is easy
+   * to draw and impossible to decide, because CSS has no reading of scroll
+   * position. So this measures and says, in `data-more`, and the styled tier
+   * draws whatever it likes on the edges named.
+   *
+   * **Tokens rather than four attributes**, so a stylesheet asks
+   * `[data-more~="block-end"]` the way it would ask about a class. Four booleans
+   * say the same thing in four selectors and read worse at every use.
+   *
+   * **A scrolling region takes the keyboard when it scrolls, and not before.**
+   * A box a reader can only reach with a pointer is a box some readers cannot
+   * read at all, which is what `tabindex` answers here. Only while it overflows:
+   * a tab stop on a box with nothing to scroll is a stop that does nothing, and a
+   * form full of them is worse than the problem.
+   *
+   * `role="region"` only with a `label`, because an unnamed region is an
+   * announcement with no content: a screen reader says "region" and the reader
+   * has learned nothing they did not already know.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Names the region, for a reader arriving at it out of context.
+   *
+   * Without one there is no region: see the note on the class.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What scrolls.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `viewport`: The scrolling box.
+   */
+  "helix-base-scroll-area": Partial<
+    HelixBaseScrollAreaProps & BaseProps<HelixBaseScrollArea> & BaseEvents
+  >;
+
+  /**
    * **A trigger and a `Listbox`, not a listbox reimplemented behind a button.**
    * The list this opens is the same element a consumer can use on its own, with
    * the same keyboard, the same filtering and the same multi-select rules. What
@@ -25559,6 +25625,54 @@ export type CustomElementsSolidJs = {
     HelixBaseRatingProps &
       HelixBaseRatingSolidJsProps &
       BaseProps<HelixBaseRating> &
+      BaseEvents
+  >;
+
+  /**
+   * **The whole component is one fact a stylesheet cannot work out for itself:
+   * which edges have content past them.** A fade at the bottom of a list is easy
+   * to draw and impossible to decide, because CSS has no reading of scroll
+   * position. So this measures and says, in `data-more`, and the styled tier
+   * draws whatever it likes on the edges named.
+   *
+   * **Tokens rather than four attributes**, so a stylesheet asks
+   * `[data-more~="block-end"]` the way it would ask about a class. Four booleans
+   * say the same thing in four selectors and read worse at every use.
+   *
+   * **A scrolling region takes the keyboard when it scrolls, and not before.**
+   * A box a reader can only reach with a pointer is a box some readers cannot
+   * read at all, which is what `tabindex` answers here. Only while it overflows:
+   * a tab stop on a box with nothing to scroll is a stop that does nothing, and a
+   * form full of them is worse than the problem.
+   *
+   * `role="region"` only with a `label`, because an unnamed region is an
+   * announcement with no content: a screen reader says "region" and the reader
+   * has learned nothing they did not already know.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Names the region, for a reader arriving at it out of context.
+   *
+   * Without one there is no region: see the note on the class.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What scrolls.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `viewport`: The scrolling box.
+   */
+  "helix-base-scroll-area": Partial<
+    HelixBaseScrollAreaProps &
+      HelixBaseScrollAreaSolidJsProps &
+      BaseProps<HelixBaseScrollArea> &
       BaseEvents
   >;
 

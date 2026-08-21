@@ -17735,6 +17735,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/scroll-area/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/select/index.js"
           }
         },
@@ -31538,6 +31546,244 @@
           "declaration": {
             "name": "HelixBaseRating",
             "module": "src/rating/root/rating-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scroll-area/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/scroll-area/root/scroll-area-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scroll-area/root/scroll-area-root.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "EDGES",
+          "type": {
+            "text": "['block-start', 'block-end', 'inline-start', 'inline-end']"
+          },
+          "default": "['block-start', 'block-end', 'inline-start', 'inline-end']",
+          "description": "Which edges have something past them, as a set of tokens."
+        },
+        {
+          "kind": "class",
+          "description": "**The whole component is one fact a stylesheet cannot work out for itself:\nwhich edges have content past them.** A fade at the bottom of a list is easy\nto draw and impossible to decide, because CSS has no reading of scroll\nposition. So this measures and says, in `data-more`, and the styled tier\ndraws whatever it likes on the edges named.\n\n**Tokens rather than four attributes**, so a stylesheet asks\n`[data-more~=\"block-end\"]` the way it would ask about a class. Four booleans\nsay the same thing in four selectors and read worse at every use.\n\n**A scrolling region takes the keyboard when it scrolls, and not before.**\nA box a reader can only reach with a pointer is a box some readers cannot\nread at all, which is what `tabindex` answers here. Only while it overflows:\na tab stop on a box with nothing to scroll is a stop that does nothing, and a\nform full of them is worse than the problem.\n\n`role=\"region\"` only with a `label`, because an unnamed region is an\nannouncement with no content: a screen reader says \"region\" and the reader\nhas learned nothing they did not already know.",
+          "name": "HelixBaseScrollArea",
+          "cssParts": [
+            {
+              "description": "The scrolling box.",
+              "name": "viewport"
+            }
+          ],
+          "slots": [
+            {
+              "description": "What scrolls.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the region, for a reader arriving at it out of context.\n\nWithout one there is no region: see the note on the class.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "more",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "Which edges have content past them, measured rather than guessed."
+            },
+            {
+              "kind": "field",
+              "name": "scrolls",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether there is anything to scroll at all, which decides the tab stop."
+            },
+            {
+              "kind": "field",
+              "name": "watcher",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "viewport",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "measure",
+              "privacy": "private",
+              "description": "Reads the four edges off the box.\n\nA pixel of slack on each, because a scroller at its end is routinely a\nfraction short of it: browsers round scroll positions differently under\nzoom and on a display that is not at one to one, and a fade that never\nquite goes out at the bottom of a fully scrolled list is the bug that\ncosts."
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the region, for a reader arriving at it out of context.\n\nWithout one there is no region: see the note on the class.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "A scrolling box that says there is more.",
+          "helix": {
+            "category": "layout",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/scroll-area",
+            "aliases": [
+              "Scroller",
+              "Overflow",
+              "Scroll container"
+            ],
+            "tier": "headless",
+            "group": "BaseScrollArea",
+            "part": "Root",
+            "source": "helix/headless/src/scroll-area"
+          },
+          "tagName": "helix-base-scroll-area",
+          "customElement": true,
+          "modulePath": "src/scroll-area/root/scroll-area-root.ts",
+          "definitionPath": "src/scroll-area/root/scroll-area-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseScrollArea",
+          "declaration": {
+            "name": "HelixBaseScrollArea",
+            "module": "src/scroll-area/root/scroll-area-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-scroll-area",
+          "declaration": {
+            "name": "HelixBaseScrollArea",
+            "module": "src/scroll-area/root/scroll-area-root.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EDGES",
+          "declaration": {
+            "name": "EDGES",
+            "module": "src/scroll-area/root/scroll-area-root.ts"
           }
         }
       ]

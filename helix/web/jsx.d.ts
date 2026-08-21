@@ -86,6 +86,7 @@ import type {
   HelixSandboxStatusBar,
   HelixSandboxTerminal,
   HelixSandboxToolbar,
+  HelixScrollArea,
   HelixSelect,
   HelixSelectEvent,
   HelixSkeleton,
@@ -8264,6 +8265,25 @@ export type HelixSandboxTerminalSolidJsProps = {
 export type HelixSandboxToolbarProps = {};
 
 export type HelixSandboxToolbarSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixScrollAreaProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  label?: HelixScrollArea["label"];
+};
+
+export type HelixScrollAreaSolidJsProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  "prop:label"?: HelixScrollArea["label"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -18240,6 +18260,45 @@ export type CustomElements = {
   >;
 
   /**
+   * Presentation only: the fades on the edges the base class names, and a
+   * scrollbar that belongs to the system rather than to the platform. Which edges
+   * have content past them is measured by the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Names the region, for a reader arriving at it out of context.
+   *
+   * Without one there is no region: see the note on the class.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What scrolls.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--scroll-area-fade`: How deep the fades are. (default: `undefined`)
+   * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
+   * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
+   * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
+   * - `--scroll-area-track-color`: And its track. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `viewport`: The scrolling box.
+   */
+  "helix-scroll-area": Partial<
+    HelixScrollAreaProps & BaseProps<HelixScrollArea> & BaseEvents
+  >;
+
+  /**
    * The trigger wears the same frame as an `Input`, because in a form it stands
    * in a row with them and a control that looks like a button among fields reads
    * as an action rather than an answer.
@@ -27564,6 +27623,48 @@ export type CustomElementsSolidJs = {
   >;
 
   /**
+   * Presentation only: the fades on the edges the base class names, and a
+   * scrollbar that belongs to the system rather than to the platform. Which edges
+   * have content past them is measured by the base class.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `label`: Names the region, for a reader arriving at it out of context.
+   *
+   * Without one there is no region: see the note on the class.
+   *
+   * ## Slots
+   *
+   * Areas where markup can be added to the component.
+   *
+   * - `(default)`: What scrolls.
+   *
+   * ## CSS Custom Properties
+   *
+   * CSS variables available for styling the component.
+   *
+   * - `--scroll-area-fade`: How deep the fades are. (default: `undefined`)
+   * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
+   * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
+   * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
+   * - `--scroll-area-track-color`: And its track. (default: `undefined`)
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `viewport`: The scrolling box.
+   */
+  "helix-scroll-area": Partial<
+    HelixScrollAreaProps &
+      HelixScrollAreaSolidJsProps &
+      BaseProps<HelixScrollArea> &
+      BaseEvents
+  >;
+
+  /**
    * The trigger wears the same frame as an `Input`, because in a form it stands
    * in a row with them and a control that looks like a button among fields reads
    * as an action rather than an answer.
@@ -31026,6 +31127,16 @@ export type CustomCssProperties = {
   "--toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
+  /** How deep the fades are. */
+  "--scroll-area-fade"?: string;
+  /** What they fade to, which is the ground behind. */
+  "--scroll-area-fade-color"?: string;
+  /** The scrollbar width keyword. */
+  "--scroll-area-scrollbar"?: string;
+  /** The scrollbar's handle. */
+  "--scroll-area-thumb-color"?: string;
+  /** And its track. */
+  "--scroll-area-track-color"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */

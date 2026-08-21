@@ -23017,6 +23017,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "src/scroll-area/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "src/select/index.js"
           }
         },
@@ -42347,6 +42355,314 @@
           "declaration": {
             "name": "HelixSandboxToolbar",
             "module": "src/sandbox/toolbar/sandbox-toolbar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scroll-area/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/scroll-area/root/scroll-area-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scroll-area/root/scroll-area-root.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "styles",
+          "declaration": {
+            "name": "styles",
+            "module": "src/scroll-area/root/scroll-area-root.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scroll-area/root/scroll-area-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Presentation only: the fades on the edges the base class names, and a\nscrollbar that belongs to the system rather than to the platform. Which edges\nhave content past them is measured by the base class.",
+          "name": "HelixScrollArea",
+          "cssProperties": [
+            {
+              "description": "How deep the fades are.",
+              "name": "--scroll-area-fade"
+            },
+            {
+              "description": "What they fade to, which is the ground behind.",
+              "name": "--scroll-area-fade-color"
+            },
+            {
+              "description": "The scrollbar width keyword.",
+              "name": "--scroll-area-scrollbar"
+            },
+            {
+              "description": "The scrollbar's handle.",
+              "name": "--scroll-area-thumb-color"
+            },
+            {
+              "description": "And its track.",
+              "name": "--scroll-area-track-color"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the region, for a reader arriving at it out of context.\n\nWithout one there is no region: see the note on the class.",
+              "attribute": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "more",
+              "type": {
+                "text": "string[]"
+              },
+              "privacy": "private",
+              "default": "[]",
+              "description": "Which edges have content past them, measured rather than guessed.",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "scrolls",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether there is anything to scroll at all, which decides the tab stop.",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "watcher",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "viewport",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "measure",
+              "privacy": "private",
+              "description": "Reads the four edges off the box.\n\nA pixel of slack on each, because a scroller at its end is routinely a\nfraction short of it: browsers round scroll positions differently under\nzoom and on a display that is not at one to one, and a fade that never\nquite goes out at the bottom of a fully scrolled list is the bug that\ncosts.",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleSlotChange",
+              "privacy": "private",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "HelixBaseScrollArea",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A scrolling box that says there is more.",
+          "helix": {
+            "category": "layout",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/scroll-area",
+            "aliases": [
+              "Scroller",
+              "Overflow",
+              "Scroll container"
+            ],
+            "tier": "styled",
+            "group": "ScrollArea",
+            "part": "Root",
+            "examples": [
+              {
+                "slug": "default"
+              }
+            ],
+            "source": "helix/web/src/scroll-area"
+          },
+          "tagName": "helix-scroll-area",
+          "customElement": true,
+          "slots": [
+            {
+              "description": "What scrolls.",
+              "name": "",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The scrolling box.",
+              "name": "viewport",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Names the region, for a reader arriving at it out of context.\n\nWithout one there is no region: see the note on the class.",
+              "fieldName": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseScrollArea",
+                "module": "src/scroll-area/root/scroll-area-root.ts"
+              }
+            }
+          ],
+          "modulePath": "src/scroll-area/root/scroll-area-root.ts",
+          "definitionPath": "src/scroll-area/root/scroll-area-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixScrollArea",
+          "declaration": {
+            "name": "HelixScrollArea",
+            "module": "src/scroll-area/root/scroll-area-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-scroll-area",
+          "declaration": {
+            "name": "HelixScrollArea",
+            "module": "src/scroll-area/root/scroll-area-root.ts"
           }
         }
       ]

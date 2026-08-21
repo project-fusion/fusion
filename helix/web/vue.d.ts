@@ -69,6 +69,7 @@ import type {
   HelixSandboxStatusBar,
   HelixSandboxTerminal,
   HelixSandboxToolbar,
+  HelixScrollArea,
   HelixSelect,
   HelixSkeleton,
   HelixSlider,
@@ -4280,6 +4281,15 @@ export type HelixSandboxToolbarVueProps = {};
 
 export type HelixSandboxToolbarVueEvents = {};
 
+export type HelixScrollAreaVueProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  label?: HelixScrollArea["label"];
+};
+
+export type HelixScrollAreaVueEvents = {};
+
 /** `HelixSelect` component event */
 export type HelixSelectElementEvent<E = Event> = TypedEvent<HelixSelect, E>;
 /** `helix-change` event type */
@@ -6648,6 +6658,16 @@ export type CustomCssProperties = {
   "--toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
+  /** How deep the fades are. */
+  "--scroll-area-fade"?: string;
+  /** What they fade to, which is the ground behind. */
+  "--scroll-area-fade-color"?: string;
+  /** The scrollbar width keyword. */
+  "--scroll-area-scrollbar"?: string;
+  /** The scrollbar's handle. */
+  "--scroll-area-thumb-color"?: string;
+  /** And its track. */
+  "--scroll-area-track-color"?: string;
   /** How tall the panel gets. */
   "--select-surface-max-block-size"?: string;
   /** Diameter of the circle shape. */
@@ -7205,6 +7225,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixSandboxToolbar,
     HelixSandboxToolbarVueProps,
     HelixSandboxToolbarVueEvents
+  >;
+  /** Presentation only: the fades on the edges the base class names, and a scrollbar that belongs to the system rather than to the platform. Which edges have content past them is measured by the base class. */
+  "helix-scroll-area": DefineCustomElement<
+    HelixScrollArea,
+    HelixScrollAreaVueProps,
+    HelixScrollAreaVueEvents
   >;
   /** The trigger wears the same frame as an 'Input', because in a form it stands in a row with them and a control that looks like a button among fields reads as an action rather than an answer.  The panel is an overlay surface rather than a sunken one: it sits over the page instead of on it, which is what its shadow says and what tells it apart from the field it came out of. */
   "helix-select": DefineCustomElement<

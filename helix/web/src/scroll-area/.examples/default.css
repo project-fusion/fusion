@@ -1,0 +1,10 @@
+/* A box with a size, because a scroll area has none of its own: it scrolls
+   whatever it is given against whatever room it is given. */
+helix-scroll-area {
+  block-size: 12rem;
+  inline-size: 20rem;
+}
+
+helix-scroll-area p {
+  margin: 0 0 var(--helix-space-sm);
+}

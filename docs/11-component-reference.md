@@ -4038,6 +4038,46 @@ Both slots are bare, so an unfilled one generates no box and costs no gap.
 | `--toolbar-gap` | Space between items. |
 | `--sandbox-toolbar-size` | The bar's height. Defaults to a large control. |
 
+## Scroll Area
+
+### Root — `helix-scroll-area`
+
+A scrolling box that says there is more.
+
+Extends `HelixBaseScrollArea`.
+
+Presentation only: the fades on the edges the base class names, and a
+scrollbar that belongs to the system rather than to the platform. Which edges
+have content past them is measured by the base class.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `label` | `label` | `string` | `''` | `HelixBaseScrollArea` | Names the region, for a reader arriving at it out of context. |
+
+#### Slots
+
+| Slot | Description |
+| --- | --- |
+| *(default)* | What scrolls. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `viewport` | The scrolling box. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--scroll-area-fade` | How deep the fades are. |
+| `--scroll-area-fade-color` | What they fade to, which is the ground behind. |
+| `--scroll-area-scrollbar` | The scrollbar width keyword. |
+| `--scroll-area-thumb-color` | The scrollbar's handle. |
+| `--scroll-area-track-color` | And its track. |
+
 ## Select
 
 ### Root — `helix-select`

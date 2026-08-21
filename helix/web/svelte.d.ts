@@ -77,6 +77,7 @@ declare module 'svelte/elements' {
     'helix-sandbox-status-bar': CustomElements['helix-sandbox-status-bar']
     'helix-sandbox-terminal': CustomElements['helix-sandbox-terminal']
     'helix-sandbox-toolbar': CustomElements['helix-sandbox-toolbar']
+    'helix-scroll-area': CustomElements['helix-scroll-area']
     'helix-select': CustomElements['helix-select']
     'helix-skeleton': CustomElements['helix-skeleton']
     'helix-slider': CustomElements['helix-slider']

@@ -62,6 +62,8 @@ import type {
   HelixBaseRadioGroup,
   HelixBaseRadio,
   HelixBaseRating,
+  HelixBaseScrollArea,
+  EDGES,
   HelixBaseSelect,
   HelixBaseSkeleton,
   HelixBaseSlider,
@@ -3663,6 +3665,15 @@ reflected none of them. */
 
 export type HelixBaseRatingVueEvents = {};
 
+export type HelixBaseScrollAreaVueProps = {
+  /** Names the region, for a reader arriving at it out of context.
+
+Without one there is no region: see the note on the class. */
+  label?: HelixBaseScrollArea["label"];
+};
+
+export type HelixBaseScrollAreaVueEvents = {};
+
 /** `HelixBaseSelect` component event */
 export type HelixBaseSelectElementEvent<E = Event> = TypedEvent<
   HelixBaseSelect,
@@ -5998,6 +6009,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseRating,
     HelixBaseRatingVueProps,
     HelixBaseRatingVueEvents
+  >;
+  /** **The whole component is one fact a stylesheet cannot work out for itself: which edges have content past them.** A fade at the bottom of a list is easy to draw and impossible to decide, because CSS has no reading of scroll position. So this measures and says, in 'data-more', and the styled tier draws whatever it likes on the edges named.  **Tokens rather than four attributes**, so a stylesheet asks '[data-more~="block-end"]' the way it would ask about a class. Four booleans say the same thing in four selectors and read worse at every use.  **A scrolling region takes the keyboard when it scrolls, and not before.** A box a reader can only reach with a pointer is a box some readers cannot read at all, which is what 'tabindex' answers here. Only while it overflows: a tab stop on a box with nothing to scroll is a stop that does nothing, and a form full of them is worse than the problem.  'role="region"' only with a 'label', because an unnamed region is an announcement with no content: a screen reader says "region" and the reader has learned nothing they did not already know. */
+  "helix-base-scroll-area": DefineCustomElement<
+    HelixBaseScrollArea,
+    HelixBaseScrollAreaVueProps,
+    HelixBaseScrollAreaVueEvents
   >;
   /** **A trigger and a 'Listbox', not a listbox reimplemented behind a button.** The list this opens is the same element a consumer can use on its own, with the same keyboard, the same filtering and the same multi-select rules. What Select adds is the closing: a trigger that says what is chosen, a surface that floats, and somewhere for focus to go back to.  The options are the consumer's, in the consumer's light DOM, slotted through into the listbox. That is why the listbox walks through slots to find them: from its point of view the options belong to something else.  **What it does not do is duplicate the value.** 'Select' owns it, hands it down, and takes changes back; the listbox is the thing being operated and not a second place the answer lives. */
   "helix-base-select": DefineCustomElement<

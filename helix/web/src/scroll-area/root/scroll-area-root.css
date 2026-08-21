@@ -1,0 +1,87 @@
+/* The fades sit over the viewport rather than inside it, so they stay put while
+   the content moves under them. That is what `relative` here is for. */
+:host {
+  display: block;
+  position: relative;
+}
+
+[part="viewport"] {
+  block-size: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* A scrolling region takes focus when it scrolls, and says so when it has it.
+   The ring is on the viewport because the viewport is what the tab stop is. */
+[part="viewport"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* The scrollbar, made to belong to the system rather than to the platform.
+ *
+ * `thin` rather than a width in pixels: the two engines that implement this
+ * disagree about what a number means, and a track sized in pixels on one and
+ * ignored on the other is worse than the platform's own on both. Colour is the
+ * part worth setting, and it takes tokens like everything else. */
+[part="viewport"] {
+  scrollbar-color: var(--scroll-area-thumb-color, var(--helix-color-border))
+    var(--scroll-area-track-color, transparent);
+  scrollbar-width: var(--scroll-area-scrollbar, thin);
+}
+
+/* What says there is more.
+ *
+ * Drawn on the host as pseudo-elements rather than as parts, because a fade is
+ * not a thing a consumer composes into: it has no content, takes no pointer,
+ * and its whole job is to be over the edge it names. Two of them cover four
+ * edges, since a box that overflows both ways is rarer than one that does not
+ * and a second pair can be added the day something needs it.
+ *
+ * `pointer-events: none` because a fade over the last row of a list would
+ * otherwise be a fade that eats the click on it. */
+:host::before,
+:host::after {
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-raised);
+}
+
+:host::before {
+  background: linear-gradient(
+    to bottom,
+    var(--scroll-area-fade-color, var(--helix-color-background)),
+    transparent
+  );
+  block-size: var(--scroll-area-fade, var(--helix-space-xl));
+  inset-block-start: 0;
+  inset-inline: 0;
+}
+
+:host::after {
+  background: linear-gradient(
+    to top,
+    var(--scroll-area-fade-color, var(--helix-color-background)),
+    transparent
+  );
+  block-size: var(--scroll-area-fade, var(--helix-space-xl));
+  inset-block-end: 0;
+  inset-inline: 0;
+}
+
+/* `~=` so the element can name the edges in one attribute and a stylesheet can
+   ask about one of them, the way it would ask about a class. */
+:host([data-more~="block-start"])::before,
+:host([data-more~="block-end"])::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host::before,
+  :host::after {
+    transition: none;
+  }
+}
