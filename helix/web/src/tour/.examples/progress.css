@@ -4,3 +4,12 @@
   gap: var(--helix-space-sm);
   margin-block-end: var(--helix-space-xl);
 }
+
+/* The slotted row fills the panel, so `justify="between"` has something to
+   space against: the count to the left and the controls to the right, which is
+   the rhythm the stop's own row has with Skip pushed away from the rest.
+   Without a width the row is `max-content` and `between` is inert, which is an
+   attribute in an example that does nothing. */
+helix-tour-stop [slot="actions"] {
+  inline-size: 100%;
+}

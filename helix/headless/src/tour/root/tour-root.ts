@@ -38,6 +38,15 @@ import type { HelixBaseTourStop } from '../stop/tour-stop.js'
  * acceptable for the root to write `current` onto stops it does not own: there
  * is no server state for the write to disagree with.
  *
+ * **It cannot point inside a modal, and nothing can fix that here.**
+ * `showModal()` makes everything outside the dialog's own subtree inert, so a
+ * panel anywhere else is unpressable however the top layer is ordered: this is
+ * what modal means rather than a stacking accident. Measured with a modal
+ * `Drawer` open, `elementsFromPoint` over the tour's own Done button returned
+ * the drawer, the press light-dismissed the drawer, and the tour heard nothing
+ * at all. Anything a tour points into has to stay reachable, which for `Drawer`
+ * and `Dialog` means not modal while the tour is running.
+ *
  * **Focus is not trapped.** A reader has to be able to look at, and reach, the
  * thing being pointed at. `Escape` leaves, which is the one binding a tour
  * needs and the one every reader already tries.

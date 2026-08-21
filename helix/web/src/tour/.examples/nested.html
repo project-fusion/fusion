@@ -99,6 +99,16 @@
   const menu = document.querySelector('#actions')
   const drawer = document.querySelector('#settings')
 
+  /* Not modal, and this is the one thing a tour cannot work around.
+     `showModal()` makes everything outside the dialog's own subtree inert, so a
+     panel anywhere else, top layer or not, cannot be pressed at all. Measured:
+     with the drawer modal, `elementsFromPoint` over the Done button returned
+     the drawer, the press light-dismissed the drawer and the tour heard
+     nothing. A tour points *into* things, so anything it points into has to
+     stay reachable. Set as a property because `modal` is a boolean attribute
+     defaulting to true, so `modal="false"` in markup still reads as true. */
+  drawer.modal = false
+
   const arrange = (index) => {
     menu.open = index === 1
     drawer.open = index === 2
