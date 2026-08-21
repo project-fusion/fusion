@@ -156,6 +156,20 @@ Two things follow for the component:
   property, so nothing schedules an update. A framework rendering the content
   after the element upgrades would otherwise leave a stale accessible name.
 
+  **Bind it to the slot or to `renderRoot`, never to the host.** `slotchange`
+  bubbles and is *not composed*, so it reaches the shadow root that owns the
+  slot and stops there. Measured on `Stat`: one call on the slot, zero on the
+  host, from the same assignment. A handler on the host simply never runs, and
+  the attribute it was going to write stays absent, which is indistinguishable
+  from the case it was meant to detect. That is what sank the first attempt at
+  `data-labelled`, and every one of the thirty listeners in the library already
+  does it the right way, `DisabledCascadeController` saying so in a comment.
+
+  **And it does not fire when nothing is assigned**, which is a feature here:
+  the resting state of a `data-` mirror is the attribute's absence, so an empty
+  slot needs no event to stay correct. `Checkbox` carries the case where that is
+  not enough.
+
 `Avatar` had this before it was written down: its default slot falls back to
 the initials derived from `name`. `Tooltip` follows it.
 
