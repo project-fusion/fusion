@@ -109,23 +109,41 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
   curve?: Curve
 
   /**
-   * Whether rules are drawn across the plot at the levels a reader would infer.
+   * Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for, which is the honest default rather than a timid one:
-   * a chart in a card and a chart beside a figure are read as a shape, and a
-   * grid over one is furniture around a drawing nobody is measuring. A chart
-   * with an axis is read by comparing a reading to a level, and there is
-   * nothing to compare against without this.
+   * Absent draws none, which is the honest default rather than a timid one: a
+   * chart in a card and a chart beside a figure are read as a shape, and a grid
+   * over one is furniture around a drawing nobody is measuring.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts, and two charts over
-   * different ranges rule at the same levels.
+   * `value` rules the axis the readings are *measured* on, at the levels
+   * `ticks` picks, which are round numbers anchored to the number line rather
+   * than to where the data starts, so two charts over different ranges rule at
+   * the same levels. `category` rules the axis they are *arranged* on, one
+   * through each reading, which is what lets a point be traced down to its
+   * label across a wide chart. `both` draws both.
+   *
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised.
+   * Written out, the attribute a consumer reaches for first should be the grid
+   * they meant, and a typo should fall back to the useful half rather than to
+   * nothing at all: an unrecognised value that draws no rules is
+   * indistinguishable from the attribute being absent, which is the one thing
+   * a reader cannot debug.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
    */
-  @property({ type: Boolean })
-  gridlines = false
+  @property()
+  gridlines?: 'both' | 'category' | 'value'
+
+  /** Whether the levels are ruled, which is every value but `category`. */
+  protected get rulesValue(): boolean {
+    return this.gridlines !== undefined && this.gridlines !== 'category'
+  }
+
+  /** Whether each reading is ruled, which only two values ask for. */
+  protected get rulesCategory(): boolean {
+    return this.gridlines === 'both' || this.gridlines === 'category'
+  }
 
   /**
    * Whether zero is forced into the range.
@@ -200,7 +218,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${this.renderGridlines(y, domain)}
+        ${this.renderGridlines(x, y, domain, series[0]?.points.length ?? 0)}
         ${
           floor === undefined
             ? nothing
@@ -222,15 +240,32 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
    * data and a gridline is a ruler, and the reader should see the fact.
    */
   protected renderGridlines(
+    x: (value: number) => number,
     y: (value: number) => number,
     domain: [number, number],
+    count: number,
   ): TemplateResult | typeof nothing {
-    if (!this.gridlines) {
+    if (this.gridlines === undefined) {
       return nothing
     }
-    return svg`${ticks(domain).map(
-      (level) => svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${y(level)} y2=${y(level)} />`,
-    )}`
+    /* Through each reading rather than between them. A rule on the boundary
+       divides two catchments, which is a fact about the pointer; a rule on the
+       reading is the line a reader traces down to the label, which is what a
+       category grid is for. The readings sit at slot centres, so the two are
+       half a slot apart and only one of them lands under a point. */
+    const down = this.rulesCategory
+      ? Array.from(
+          { length: count },
+          (_, index) =>
+            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${HEIGHT} />`,
+        )
+      : []
+    const across = this.rulesValue
+      ? ticks(domain).map(
+          (level) => svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${y(level)} y2=${y(level)} />`,
+        )
+      : []
+    return svg`${down}${across}`
   }
 
   /**

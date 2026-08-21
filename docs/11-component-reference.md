@@ -449,7 +449,7 @@ it is measured against.
 | --- | --- | --- | --- | --- | --- |
 | `direction` | `direction` | `'horizontal' \| undefined` | - | `HelixBaseBarChart` | Whether the categories run down the side rather than along the bottom. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `gridlines` | `gridlines` | `boolean` | `false` | `HelixBaseBarChart` | Whether rules are drawn across the plot at the levels a reader would infer. |
+| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
@@ -2615,7 +2615,7 @@ answers for a shape.
 | `area` | `area` | `boolean` | `false` | `HelixBaseLineChart` | Whether a wash is drawn under each line. |
 | `curve` | `curve` | `Curve \| undefined` | - | `HelixBaseLineChart` | How the line gets from one reading to the next. |
 | `for` | `for` | `string` | `''` | `MixinChartSource` | The id of the table to read. |
-| `gridlines` | `gridlines` | `boolean` | `false` | `HelixBaseLineChart` | Whether rules are drawn across the plot at the levels a reader would infer. |
+| `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseLineChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |

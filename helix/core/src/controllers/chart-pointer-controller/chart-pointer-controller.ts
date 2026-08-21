@@ -45,16 +45,23 @@ export class ChartPointerController implements ReactiveController {
   at = -1
 
   /**
-   * Whether the pointer's x is what decides the reading.
+   * Which axis the readings are laid out along.
    *
-   * True for anything laid out along an axis. **A donut turns it off**, and
-   * that is the whole reason this is a flag rather than an assumption: its
-   * slices are real elements, so the reading under the pointer is the one the
-   * pointer is actually over, and mapping x across a ring would answer with
-   * whichever slice happened to share a horizontal position. Off, the chart
-   * calls `set` from its own hover and everything downstream is unchanged.
+   * **An axis and not a boolean, because two of the four charts do not use x.**
+   * This was `tracks = true`, and every reading was resolved from the pointer's
+   * x whatever the chart was doing. A horizontal bar chart runs its categories
+   * *down* the box, so moving the pointer from the first row to the last never
+   * changed the answer: measured on four rows, all four reported the third,
+   * which is the slot the middle of the box falls in. It looked like a tooltip
+   * that would not follow and was a tooltip reading the wrong axis.
+   *
+   * `none` is the ring. Its slices are real elements at every angle, so the
+   * reading under the pointer is the one the pointer is over, and arithmetic on
+   * either axis would answer with whichever slice shared a coordinate: at three
+   * o'clock and at nine o'clock, x alone gives the same slice for opposite
+   * sides. The slices call `set` and this only holds the answer.
    */
-  tracks = true
+  axis: 'block' | 'inline' | 'none' = 'inline'
 
   constructor(host: ChartPointerHost) {
     this.#host = host
@@ -100,9 +107,11 @@ export class ChartPointerController implements ReactiveController {
    * The box the readings are laid out in, which is the plot and not the host.
    *
    * The host also holds the row of labels, so measuring against it would map
-   * the pointer over a box taller than the drawing. Width is what this uses and
-   * the two agree on width today, which is exactly the kind of coincidence that
-   * stops being true the first time a chart grows an axis down its side.
+   * the pointer over a box taller than the drawing. That mattered the moment a
+   * chart started measuring down the box rather than across it, which is what
+   * `axis` is for: on a horizontal bar chart the labels are beside the plot
+   * rather than under it, and the host is wider than the drawing by exactly
+   * their column.
    */
   #box(): DOMRect | undefined {
     this.#plot ??= this.#host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
@@ -119,12 +128,13 @@ export class ChartPointerController implements ReactiveController {
   }
 
   readonly #move = (event: PointerEvent): void => {
-    if (!this.tracks || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
+    if (this.axis === 'none' || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
       return
     }
     const box = this.#box()
     const count = this.#host.readings
-    if (!box || box.width === 0 || count === 0) {
+    const along = this.axis === 'block' ? box?.height : box?.width
+    if (!box || !along || count === 0) {
       return
     }
     /* The same slot arithmetic the charts draw with: reading `i` sits in the
@@ -132,7 +142,8 @@ export class ChartPointerController implements ReactiveController {
        the pointer is in. Rounding a proportion of `count - 1` instead puts the
        boundaries half a slot off and the first and last reading get half the
        catchment of the others. */
-    const slot = Math.floor(((event.clientX - box.left) / box.width) * count)
+    const from = this.axis === 'block' ? event.clientY - box.top : event.clientX - box.left
+    const slot = Math.floor((from / along) * count)
     const next = Math.min(Math.max(slot, 0), count - 1)
     if (next !== this.at) {
       this.at = next

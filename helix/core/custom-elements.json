@@ -136,12 +136,12 @@
             },
             {
               "kind": "field",
-              "name": "tracks",
+              "name": "axis",
               "type": {
-                "text": "boolean"
+                "text": "'block' | 'inline' | 'none'"
               },
-              "default": "true",
-              "description": "Whether the pointer's x is what decides the reading.\n\nTrue for anything laid out along an axis. **A donut turns it off**, and\nthat is the whole reason this is a flag rather than an assumption: its\nslices are real elements, so the reading under the pointer is the one the\npointer is actually over, and mapping x across a ring would answer with\nwhichever slice happened to share a horizontal position. Off, the chart\ncalls `set` from its own hover and everything downstream is unchanged."
+              "default": "'inline'",
+              "description": "Which axis the readings are laid out along.\n\n**An axis and not a boolean, because two of the four charts do not use x.**\nThis was `tracks = true`, and every reading was resolved from the pointer's\nx whatever the chart was doing. A horizontal bar chart runs its categories\n*down* the box, so moving the pointer from the first row to the last never\nchanged the answer: measured on four rows, all four reported the third,\nwhich is the slot the middle of the box falls in. It looked like a tooltip\nthat would not follow and was a tooltip reading the wrong axis.\n\n`none` is the ring. Its slices are real elements at every angle, so the\nreading under the pointer is the one the pointer is over, and arithmetic on\neither axis would answer with whichever slice shared a coordinate: at three\no'clock and at nine o'clock, x alone gives the same slice for opposite\nsides. The slices call `set` and this only holds the answer."
             },
             {
               "kind": "method",
@@ -180,7 +180,7 @@
                   "text": "DOMRect | undefined"
                 }
               },
-              "description": "The box the readings are laid out in, which is the plot and not the host.\n\nThe host also holds the row of labels, so measuring against it would map\nthe pointer over a box taller than the drawing. Width is what this uses and\nthe two agree on width today, which is exactly the kind of coincidence that\nstops being true the first time a chart grows an axis down its side."
+              "description": "The box the readings are laid out in, which is the plot and not the host.\n\nThe host also holds the row of labels, so measuring against it would map\nthe pointer over a box taller than the drawing. That mattered the moment a\nchart started measuring down the box rather than across it, which is what\n`axis` is for: on a horizontal bar chart the labels are beside the plot\nrather than under it, and the host is wider than the drawing by exactly\ntheir column."
             },
             {
               "kind": "method",

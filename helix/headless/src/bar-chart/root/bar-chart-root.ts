@@ -9,7 +9,7 @@ import {
   seriesIndex,
   ticks,
 } from '@helix-io/core'
-import { html, nothing, svg, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
@@ -76,24 +76,56 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
   direction?: 'horizontal'
 
   /**
-   * Whether rules are drawn across the plot at the levels a reader would infer.
+   * Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for. A chart in a card and a chart beside a figure are
-   * read as a shape, and a grid over one is furniture around a drawing nobody
-   * is measuring. A chart with an axis is read by comparing a column to a
-   * level, and there is nothing to compare against without this.
+   * Absent draws none. `value` rules the axis the columns are *measured* on,
+   * `category` rules the axis they are *arranged* on with one through each
+   * group, and `both` draws both. Which of those is horizontal turns with
+   * `direction`, because a rule belongs to an axis and not to a screen edge.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts. They run across the
-   * measured axis, which turns with `direction`: down the box for columns and
-   * along it for rows, because the axis a rule belongs to is the one the bars
-   * are measured on and not the one they are arranged on.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised: an
+   * unrecognised value that draws nothing is indistinguishable from the
+   * attribute being absent, which is the one thing a reader cannot debug.
+   *
+   * `category` is the quieter half of this on a bar chart and is here for
+   * completeness rather than because it is usually right: columns already
+   * divide the categories by being separate columns, and a rule through each
+   * one is a second statement of the same fact. It earns its place on a chart
+   * of many thin bars, where the eye has stopped counting.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
    */
-  @property({ type: Boolean })
-  gridlines = false
+  @property()
+  gridlines?: 'both' | 'category' | 'value'
+
+  /** Whether the levels are ruled, which is every value but `category`. */
+  protected get rulesValue(): boolean {
+    return this.gridlines !== undefined && this.gridlines !== 'category'
+  }
+
+  /** Whether each category is ruled, which only two values ask for. */
+  protected get rulesCategory(): boolean {
+    return this.gridlines === 'both' || this.gridlines === 'category'
+  }
+
+  /**
+   * Tells the pointer which way the categories run.
+   *
+   * In `willUpdate` because `direction` is a property a consumer can change at
+   * any time, and the controller resolves a reading from whichever axis it was
+   * last told about: set once at connect, a chart turned sideways after that
+   * would go on reading x and answer with the same row wherever the pointer
+   * went. That is the bug this pair was written for, one step later.
+   *
+   * `willUpdate` and not `updated`, because SSR calls the first and not the
+   * second, and a value the server and the client disagree about is worse than
+   * one neither has.
+   */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    this.pointer.axis = this.direction === 'horizontal' ? 'block' : 'inline'
+  }
 
   protected override render(): TemplateResult {
     const series = this.series
@@ -186,7 +218,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${this.renderGridlines(y, domain, sideways)}
+        ${this.renderGridlines(y, domain, sideways, categories.length)}
         ${
           sideways
             ? svg`<line part="baseline" x1=${floor} x2=${floor} y1="0" y2="100" />`
@@ -232,15 +264,29 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     y: (value: number) => number,
     domain: [number, number],
     sideways: boolean,
+    count: number,
   ): TemplateResult | typeof nothing {
-    if (!this.gridlines) {
+    if (this.gridlines === undefined) {
       return nothing
     }
-    return svg`${ticks(domain).map((level) =>
-      sideways
-        ? svg`<line part="gridline" x1=${y(level)} x2=${y(level)} y1="0" y2="100" />`
-        : svg`<line part="gridline" x1="0" x2="100" y1=${y(level)} y2=${y(level)} />`,
-    )}`
+    /* Through the middle of each group, which is where the column stands, and
+       not on the boundary between two of them. */
+    const slot = 100 / Math.max(count, 1)
+    const categories = this.rulesCategory
+      ? Array.from({ length: count }, (_, index) => (index + 0.5) * slot).map((at) =>
+          sideways
+            ? svg`<line part="gridline" x1="0" x2="100" y1=${at} y2=${at} />`
+            : svg`<line part="gridline" x1=${at} x2=${at} y1="0" y2="100" />`,
+        )
+      : []
+    const levels = this.rulesValue
+      ? ticks(domain).map((level) =>
+          sideways
+            ? svg`<line part="gridline" x1=${y(level)} x2=${y(level)} y1="0" y2="100" />`
+            : svg`<line part="gridline" x1="0" x2="100" y1=${y(level)} y2=${y(level)} />`,
+        )
+      : []
+    return svg`${categories}${levels}`
   }
 
   /**

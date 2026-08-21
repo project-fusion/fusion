@@ -3565,11 +3565,38 @@
               "kind": "field",
               "name": "gridlines",
               "type": {
+                "text": "'both' | 'category' | 'value' | undefined"
+              },
+              "description": "Which rules are drawn across the plot, if any.\n\nAbsent draws none. `value` rules the axis the columns are *measured* on,\n`category` rules the axis they are *arranged* on with one through each\ngroup, and `both` draws both. Which of those is horizontal turns with\n`direction`, because a rule belongs to an axis and not to a screen edge.\n\n**A bare `gridlines` means `value`**, and so does anything unrecognised: an\nunrecognised value that draws nothing is indistinguishable from the\nattribute being absent, which is the one thing a reader cannot debug.\n\n`category` is the quieter half of this on a bar chart and is here for\ncompleteness rather than because it is usually right: columns already\ndivide the categories by being separate columns, and a rule through each\none is a second statement of the same fact. It earns its place on a chart\nof many thin bars, where the eye has stopped counting.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rulesValue",
+              "type": {
                 "text": "boolean"
               },
-              "default": "false",
-              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
-              "attribute": "gridlines",
+              "privacy": "protected",
+              "description": "Whether the levels are ruled, which is every value but `category`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rulesCategory",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "description": "Whether each category is ruled, which only two values ask for.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -3654,6 +3681,12 @@
                   "name": "sideways",
                   "type": {
                     "text": "boolean"
+                  }
+                },
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
                   }
                 }
               ],
@@ -3884,10 +3917,9 @@
             {
               "name": "gridlines",
               "type": {
-                "text": "boolean"
+                "text": "'both' | 'category' | 'value' | undefined"
               },
-              "default": "false",
-              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for. A chart in a card and a chart beside a figure are\nread as a shape, and a grid over one is furniture around a drawing nobody\nis measuring. A chart with an axis is read by comparing a column to a\nlevel, and there is nothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts. They run across the\nmeasured axis, which turns with `direction`: down the box for columns and\nalong it for rows, because the axis a rule belongs to is the one the bars\nare measured on and not the one they are arranged on.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "description": "Which rules are drawn across the plot, if any.\n\nAbsent draws none. `value` rules the axis the columns are *measured* on,\n`category` rules the axis they are *arranged* on with one through each\ngroup, and `both` draws both. Which of those is horizontal turns with\n`direction`, because a rule belongs to an axis and not to a screen edge.\n\n**A bare `gridlines` means `value`**, and so does anything unrecognised: an\nunrecognised value that draws nothing is indistinguishable from the\nattribute being absent, which is the one thing a reader cannot debug.\n\n`category` is the quieter half of this on a bar chart and is here for\ncompleteness rather than because it is usually right: columns already\ndivide the categories by being separate columns, and a rule through each\none is a second statement of the same fact. It earns its place on a chart\nof many thin bars, where the eye has stopped counting.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
               "fieldName": "gridlines",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
@@ -27941,11 +27973,38 @@
               "kind": "field",
               "name": "gridlines",
               "type": {
+                "text": "'both' | 'category' | 'value' | undefined"
+              },
+              "description": "Which rules are drawn across the plot, if any.\n\nAbsent draws none, which is the honest default rather than a timid one: a\nchart in a card and a chart beside a figure are read as a shape, and a grid\nover one is furniture around a drawing nobody is measuring.\n\n`value` rules the axis the readings are *measured* on, at the levels\n`ticks` picks, which are round numbers anchored to the number line rather\nthan to where the data starts, so two charts over different ranges rule at\nthe same levels. `category` rules the axis they are *arranged* on, one\nthrough each reading, which is what lets a point be traced down to its\nlabel across a wide chart. `both` draws both.\n\n**A bare `gridlines` means `value`**, and so does anything unrecognised.\nWritten out, the attribute a consumer reaches for first should be the grid\nthey meant, and a typo should fall back to the useful half rather than to\nnothing at all: an unrecognised value that draws no rules is\nindistinguishable from the attribute being absent, which is the one thing\na reader cannot debug.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "attribute": "gridlines",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rulesValue",
+              "type": {
                 "text": "boolean"
               },
-              "default": "false",
-              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
-              "attribute": "gridlines",
+              "privacy": "protected",
+              "description": "Whether the levels are ruled, which is every value but `category`.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rulesCategory",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected",
+              "description": "Whether each reading is ruled, which only two values ask for.",
+              "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -28047,6 +28106,12 @@
               },
               "parameters": [
                 {
+                  "name": "x",
+                  "type": {
+                    "text": "(value: number) => number"
+                  }
+                },
+                {
                   "name": "y",
                   "type": {
                     "text": "(value: number) => number"
@@ -28056,6 +28121,12 @@
                   "name": "domain",
                   "type": {
                     "text": "[number, number]"
+                  }
+                },
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
                   }
                 }
               ],
@@ -28371,10 +28442,9 @@
             {
               "name": "gridlines",
               "type": {
-                "text": "boolean"
+                "text": "'both' | 'category' | 'value' | undefined"
               },
-              "default": "false",
-              "description": "Whether rules are drawn across the plot at the levels a reader would infer.\n\nOff unless asked for, which is the honest default rather than a timid one:\na chart in a card and a chart beside a figure are read as a shape, and a\ngrid over one is furniture around a drawing nobody is measuring. A chart\nwith an axis is read by comparing a reading to a level, and there is\nnothing to compare against without this.\n\nThe levels come from `ticks`, so they are round numbers anchored to the\nnumber line rather than to where the data starts, and two charts over\ndifferent ranges rule at the same levels.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
+              "description": "Which rules are drawn across the plot, if any.\n\nAbsent draws none, which is the honest default rather than a timid one: a\nchart in a card and a chart beside a figure are read as a shape, and a grid\nover one is furniture around a drawing nobody is measuring.\n\n`value` rules the axis the readings are *measured* on, at the levels\n`ticks` picks, which are round numbers anchored to the number line rather\nthan to where the data starts, so two charts over different ranges rule at\nthe same levels. `category` rules the axis they are *arranged* on, one\nthrough each reading, which is what lets a point be traced down to its\nlabel across a wide chart. `both` draws both.\n\n**A bare `gridlines` means `value`**, and so does anything unrecognised.\nWritten out, the attribute a consumer reaches for first should be the grid\nthey meant, and a typo should fall back to the useful half rather than to\nnothing at all: an unrecognised value that draws no rules is\nindistinguishable from the attribute being absent, which is the one thing\na reader cannot debug.\n\nFurniture rather than data, so the rules are inside the `aria-hidden` plot\nand reach no reader through the table.",
               "fieldName": "gridlines",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",

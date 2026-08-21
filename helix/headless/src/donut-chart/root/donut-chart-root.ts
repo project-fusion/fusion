@@ -120,14 +120,14 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * are and this only holds the answer.
    *
    * Set here rather than in a constructor, and that is not a style choice. The
-   * analyzer reads `this.pointer.tracks = false` in a constructor body as a
-   * declaration of a public field called `tracks`, and failed the build with
+   * analyzer reads `this.pointer.axis = 'none'` in a constructor body as a
+   * declaration of a public field called `axis`, and failed the build with
    * `HelixBaseDonutChart.tracks has no description` for a member that does not
    * exist on this class at all.
    */
   override connectedCallback(): void {
     super.connectedCallback()
-    this.pointer.tracks = false
+    this.pointer.axis = 'none'
   }
 
   /**

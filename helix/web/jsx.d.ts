@@ -1029,18 +1029,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   direction?: HelixBarChart["direction"];
-  /** Whether rules are drawn across the plot at the levels a reader would infer.
+  /** Which rules are drawn across the plot, if any.
 
-Off unless asked for. A chart in a card and a chart beside a figure are
-read as a shape, and a grid over one is furniture around a drawing nobody
-is measuring. A chart with an axis is read by comparing a column to a
-level, and there is nothing to compare against without this.
+Absent draws none. `value` rules the axis the columns are *measured* on,
+`category` rules the axis they are *arranged* on with one through each
+group, and `both` draws both. Which of those is horizontal turns with
+`direction`, because a rule belongs to an axis and not to a screen edge.
 
-The levels come from `ticks`, so they are round numbers anchored to the
-number line rather than to where the data starts. They run across the
-measured axis, which turns with `direction`: down the box for columns and
-along it for rows, because the axis a rule belongs to is the one the bars
-are measured on and not the one they are arranged on.
+**A bare `gridlines` means `value`**, and so does anything unrecognised: an
+unrecognised value that draws nothing is indistinguishable from the
+attribute being absent, which is the one thing a reader cannot debug.
+
+`category` is the quieter half of this on a bar chart and is here for
+completeness rather than because it is usually right: columns already
+divide the categories by being separate columns, and a rule through each
+one is a second statement of the same fact. It earns its place on a chart
+of many thin bars, where the eye has stopped counting.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
@@ -1069,18 +1073,22 @@ names are words rather than dates: a row of long names either overlaps or
 turns on its side, and neither is as readable as putting them down the left
 where they read normally. */
   "prop:direction"?: HelixBarChart["direction"];
-  /** Whether rules are drawn across the plot at the levels a reader would infer.
+  /** Which rules are drawn across the plot, if any.
 
-Off unless asked for. A chart in a card and a chart beside a figure are
-read as a shape, and a grid over one is furniture around a drawing nobody
-is measuring. A chart with an axis is read by comparing a column to a
-level, and there is nothing to compare against without this.
+Absent draws none. `value` rules the axis the columns are *measured* on,
+`category` rules the axis they are *arranged* on with one through each
+group, and `both` draws both. Which of those is horizontal turns with
+`direction`, because a rule belongs to an axis and not to a screen edge.
 
-The levels come from `ticks`, so they are round numbers anchored to the
-number line rather than to where the data starts. They run across the
-measured axis, which turns with `direction`: down the box for columns and
-along it for rows, because the axis a rule belongs to is the one the bars
-are measured on and not the one they are arranged on.
+**A bare `gridlines` means `value`**, and so does anything unrecognised: an
+unrecognised value that draws nothing is indistinguishable from the
+attribute being absent, which is the one thing a reader cannot debug.
+
+`category` is the quieter half of this on a bar chart and is here for
+completeness rather than because it is usually right: columns already
+divide the categories by being separate columns, and a rule through each
+one is a second statement of the same fact. It earns its place on a chart
+of many thin bars, where the eye has stopped counting.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
@@ -5727,17 +5735,25 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   curve?: HelixLineChart["curve"];
-  /** Whether rules are drawn across the plot at the levels a reader would infer.
+  /** Which rules are drawn across the plot, if any.
 
-Off unless asked for, which is the honest default rather than a timid one:
-a chart in a card and a chart beside a figure are read as a shape, and a
-grid over one is furniture around a drawing nobody is measuring. A chart
-with an axis is read by comparing a reading to a level, and there is
-nothing to compare against without this.
+Absent draws none, which is the honest default rather than a timid one: a
+chart in a card and a chart beside a figure are read as a shape, and a grid
+over one is furniture around a drawing nobody is measuring.
 
-The levels come from `ticks`, so they are round numbers anchored to the
-number line rather than to where the data starts, and two charts over
-different ranges rule at the same levels.
+`value` rules the axis the readings are *measured* on, at the levels
+`ticks` picks, which are round numbers anchored to the number line rather
+than to where the data starts, so two charts over different ranges rule at
+the same levels. `category` rules the axis they are *arranged* on, one
+through each reading, which is what lets a point be traced down to its
+label across a wide chart. `both` draws both.
+
+**A bare `gridlines` means `value`**, and so does anything unrecognised.
+Written out, the attribute a consumer reaches for first should be the grid
+they meant, and a typo should fall back to the useful half rather than to
+nothing at all: an unrecognised value that draws no rules is
+indistinguishable from the attribute being absent, which is the one thing
+a reader cannot debug.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
@@ -5793,17 +5809,25 @@ where the path is built, as `curve ?? 'smooth'`.
 
 `step` claims the opposite of both, that a reading holds until the next. */
   "prop:curve"?: HelixLineChart["curve"];
-  /** Whether rules are drawn across the plot at the levels a reader would infer.
+  /** Which rules are drawn across the plot, if any.
 
-Off unless asked for, which is the honest default rather than a timid one:
-a chart in a card and a chart beside a figure are read as a shape, and a
-grid over one is furniture around a drawing nobody is measuring. A chart
-with an axis is read by comparing a reading to a level, and there is
-nothing to compare against without this.
+Absent draws none, which is the honest default rather than a timid one: a
+chart in a card and a chart beside a figure are read as a shape, and a grid
+over one is furniture around a drawing nobody is measuring.
 
-The levels come from `ticks`, so they are round numbers anchored to the
-number line rather than to where the data starts, and two charts over
-different ranges rule at the same levels.
+`value` rules the axis the readings are *measured* on, at the levels
+`ticks` picks, which are round numbers anchored to the number line rather
+than to where the data starts, so two charts over different ranges rule at
+the same levels. `category` rules the axis they are *arranged* on, one
+through each reading, which is what lets a point be traced down to its
+label across a wide chart. `both` draws both.
+
+**A bare `gridlines` means `value`**, and so does anything unrecognised.
+Written out, the attribute a consumer reaches for first should be the grid
+they meant, and a typo should fall back to the useful half rather than to
+nothing at all: an unrecognised value that draws no rules is
+indistinguishable from the attribute being absent, which is the one thing
+a reader cannot debug.
 
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
@@ -14169,18 +14193,22 @@ export type CustomElements = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
-   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   * - `gridlines`: Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for. A chart in a card and a chart beside a figure are
-   * read as a shape, and a grid over one is furniture around a drawing nobody
-   * is measuring. A chart with an axis is read by comparing a column to a
-   * level, and there is nothing to compare against without this.
+   * Absent draws none. `value` rules the axis the columns are *measured* on,
+   * `category` rules the axis they are *arranged* on with one through each
+   * group, and `both` draws both. Which of those is horizontal turns with
+   * `direction`, because a rule belongs to an axis and not to a screen edge.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts. They run across the
-   * measured axis, which turns with `direction`: down the box for columns and
-   * along it for rows, because the axis a rule belongs to is the one the bars
-   * are measured on and not the one they are arranged on.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised: an
+   * unrecognised value that draws nothing is indistinguishable from the
+   * attribute being absent, which is the one thing a reader cannot debug.
+   *
+   * `category` is the quieter half of this on a bar chart and is here for
+   * completeness rather than because it is usually right: columns already
+   * divide the categories by being separate columns, and a rule through each
+   * one is a second statement of the same fact. It earns its place on a chart
+   * of many thin bars, where the eye has stopped counting.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
@@ -18024,17 +18052,25 @@ export type CustomElements = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
-   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   * - `gridlines`: Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for, which is the honest default rather than a timid one:
-   * a chart in a card and a chart beside a figure are read as a shape, and a
-   * grid over one is furniture around a drawing nobody is measuring. A chart
-   * with an axis is read by comparing a reading to a level, and there is
-   * nothing to compare against without this.
+   * Absent draws none, which is the honest default rather than a timid one: a
+   * chart in a card and a chart beside a figure are read as a shape, and a grid
+   * over one is furniture around a drawing nobody is measuring.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts, and two charts over
-   * different ranges rule at the same levels.
+   * `value` rules the axis the readings are *measured* on, at the levels
+   * `ticks` picks, which are round numbers anchored to the number line rather
+   * than to where the data starts, so two charts over different ranges rule at
+   * the same levels. `category` rules the axis they are *arranged* on, one
+   * through each reading, which is what lets a point be traced down to its
+   * label across a wide chart. `both` draws both.
+   *
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised.
+   * Written out, the attribute a consumer reaches for first should be the grid
+   * they meant, and a typo should fall back to the useful half rather than to
+   * nothing at all: an unrecognised value that draws no rules is
+   * indistinguishable from the attribute being absent, which is the one thing
+   * a reader cannot debug.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
@@ -25210,18 +25246,22 @@ export type CustomElementsSolidJs = {
    * names are words rather than dates: a row of long names either overlaps or
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
-   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   * - `gridlines`: Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for. A chart in a card and a chart beside a figure are
-   * read as a shape, and a grid over one is furniture around a drawing nobody
-   * is measuring. A chart with an axis is read by comparing a column to a
-   * level, and there is nothing to compare against without this.
+   * Absent draws none. `value` rules the axis the columns are *measured* on,
+   * `category` rules the axis they are *arranged* on with one through each
+   * group, and `both` draws both. Which of those is horizontal turns with
+   * `direction`, because a rule belongs to an axis and not to a screen edge.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts. They run across the
-   * measured axis, which turns with `direction`: down the box for columns and
-   * along it for rows, because the axis a rule belongs to is the one the bars
-   * are measured on and not the one they are arranged on.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised: an
+   * unrecognised value that draws nothing is indistinguishable from the
+   * attribute being absent, which is the one thing a reader cannot debug.
+   *
+   * `category` is the quieter half of this on a bar chart and is here for
+   * completeness rather than because it is usually right: columns already
+   * divide the categories by being separate columns, and a rule through each
+   * one is a second statement of the same fact. It earns its place on a chart
+   * of many thin bars, where the eye has stopped counting.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
@@ -29173,17 +29213,25 @@ export type CustomElementsSolidJs = {
    * where the path is built, as `curve ?? 'smooth'`.
    *
    * `step` claims the opposite of both, that a reading holds until the next.
-   * - `gridlines`: Whether rules are drawn across the plot at the levels a reader would infer.
+   * - `gridlines`: Which rules are drawn across the plot, if any.
    *
-   * Off unless asked for, which is the honest default rather than a timid one:
-   * a chart in a card and a chart beside a figure are read as a shape, and a
-   * grid over one is furniture around a drawing nobody is measuring. A chart
-   * with an axis is read by comparing a reading to a level, and there is
-   * nothing to compare against without this.
+   * Absent draws none, which is the honest default rather than a timid one: a
+   * chart in a card and a chart beside a figure are read as a shape, and a grid
+   * over one is furniture around a drawing nobody is measuring.
    *
-   * The levels come from `ticks`, so they are round numbers anchored to the
-   * number line rather than to where the data starts, and two charts over
-   * different ranges rule at the same levels.
+   * `value` rules the axis the readings are *measured* on, at the levels
+   * `ticks` picks, which are round numbers anchored to the number line rather
+   * than to where the data starts, so two charts over different ranges rule at
+   * the same levels. `category` rules the axis they are *arranged* on, one
+   * through each reading, which is what lets a point be traced down to its
+   * label across a wide chart. `both` draws both.
+   *
+   * **A bare `gridlines` means `value`**, and so does anything unrecognised.
+   * Written out, the attribute a consumer reaches for first should be the grid
+   * they meant, and a typo should fall back to the useful half rather than to
+   * nothing at all: an unrecognised value that draws no rules is
+   * indistinguishable from the attribute being absent, which is the one thing
+   * a reader cannot debug.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
