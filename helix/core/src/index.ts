@@ -3,10 +3,6 @@ export {
   type AriaForwardOptions,
 } from './controllers/aria-forward-controller/aria-forward-controller.js'
 export {
-  CollapseController,
-  type CollapseOptions,
-} from './controllers/collapse-controller/collapse-controller.js'
-export {
   CommandController,
   type CommandOptions,
   HelixFallbackCommandEvent,

@@ -2230,7 +2230,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**`collapse` hides the middle, and only ever the middle.** A trail that does\nnot fit keeps its root and its current page, because those are the two a\nreader is orienting by: the first says where the tree begins and the last says\nwhere they are. Everything between them goes behind one trigger.\n\n**The server sends the whole trail, and the client only ever removes.** There\nis no width to measure without a DOM, so nothing is hidden until\n`CollapseController` has measured, and a reader with no JavaScript keeps every\ncrumb. That is the right answer rather than a fallback, and this arrangement\ncannot leave them with less.\n\n**The overflow control is the consumer's, and it is a crumb.** Rendering a menu here\nwould put `Menu`, and the popover machinery under it, into anything that\nimports a breadcrumb trail, which is a lot to carry for a trail that usually\nfits. So the trail hides crumbs and reports which, and whatever is slotted as\n`overflow` decides how to show them. It appears only while something is\nactually hidden.\n\n**And it says when the set changes, which it did not.** Reporting which\ncrumbs are hidden through a getter and never announcing that the answer moved\nleft a consumer with a menu they had no moment to fill: the trail collapsed on\na resize and whatever was slotted as `overflow` heard nothing. A getter is an\nanswer to a question nobody knew to ask again.",
+          "description": "The host is the landmark, so `aria-label` on it names the trail directly and\nthere is no property mirroring one. A page may hold more than one navigation,\nand landmarks are how a screen-reader user chooses between them.\n\n`role=\"list\"` is set explicitly on the `<ol>` even though it is already a\nlist: removing the markers with `list-style: none` strips list semantics in\nSafari, and a breadcrumb trail always removes its markers.\n\nItems are slotted rather than wrapped, so they are `<ol>` children in the flat\ntree and each carries `role=\"listitem\"` itself.\n\n**The trail does not measure itself, and the overflow is markup.** It held a\n`collapse` property, a `ResizeObserver` through `CollapseController`, an\n`overflowed` getter and a `helix-change` event, all to answer one question:\nhow many crumbs fit. Removed 20 Aug 2026, because the question is the wrong\none and answering it cost more than it returned.\n\n- **It can never reach the server.** There is no width without a DOM, so the\n  server shipped every crumb and the client removed some after hydrating. A\n  trail that collapses therefore painted wrong on every single load, and the\n  SSR spec asserting \"hides no crumb, whatever collapse says\" was recording\n  that as correct behaviour rather than as the cost it is.\n- **The consumer already wrote the crumbs.** The measurement hid some, then\n  announced which, so that the consumer could read them back off the element\n  and clone them into menu items. The overflow example spent 32 lines of\n  JavaScript making a round trip out of data that started in its own markup.\n- **Nobody specifies a breadcrumb in units of fit.** Designs say \"keep the\n  root and the current page, fold the middle\", which is a fact about depth,\n  or \"fold below this width\", which is a fact CSS knows. The arithmetic was\n  the only thing that needed a width, and it was wrong three times in one day:\n  the observer watched a container that did not exist yet, the gap between\n  items went uncounted, and the result was still wrong at 34rem.\n\nSo the trail lays out crumbs and separators, and the consumer writes what\nfolds. A `helix-menu` of `helix-menu-item`s in a crumb marked `overflow`, and\na container query deciding when it shows: server rendered, no observer, and\ncorrect before the first script runs. `.examples/overflow.css` is the whole\nof it.",
           "name": "HelixBaseBreadcrumbs",
           "cssParts": [
             {
@@ -2245,90 +2245,6 @@
             }
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "collapse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a trail that does not fit hides its middle.",
-              "attribute": "collapse",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "assigned",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "Everything slotted in, in reading order."
-            },
-            {
-              "kind": "field",
-              "name": "crumbs",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "The steps, which is everything except the overflow control.\n\nSplit here rather than asking the consumer to keep two lists in step: the\ntrigger is a crumb so that it looks and reads like one, and it is not a\nstep, so it must not be measured as one or hidden as one.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "trigger",
-              "type": {
-                "text": "HTMLElement | undefined"
-              },
-              "privacy": "private",
-              "description": "The overflow crumb, where the consumer wrote one.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "hiddenAt",
-              "type": {
-                "text": "readonly number[]"
-              },
-              "privacy": "private",
-              "default": "[]",
-              "description": "Which crumbs are hidden, by index.\n\n`@state`, because it is measured rather than declared: a consumer setting\nit would be claiming a width the element can see for itself.\n\nNamed `hiddenAt` and not `hidden`, which is `HTMLElement`'s own property:\nshadowing it with an array made the element's own visibility a list of\nnumbers, and TypeScript caught it only because the base class declares it."
-            },
-            {
-              "kind": "field",
-              "name": "fit",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new CollapseController(this, { container: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"list\"]'), items: () => this.crumbs ?? [], trigger: () => this.trigger, })"
-            },
-            {
-              "kind": "field",
-              "name": "overflowed",
-              "type": {
-                "text": "readonly HTMLElement[]"
-              },
-              "description": "The crumbs behind the trigger, in order, for whoever is showing them.\n\nElements rather than data, so a consumer reads `href` and text off the same\nobjects they wrote. Handing over a copy would be a second version of the\ntrail to keep in step.",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "apply",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Turns a count of what fits into a set of hidden indices.\n\nThe first crumb and the last `fits` crumbs stay; the rest go. Written as\nindices rather than by writing `hidden` onto the elements, because the\nelements are the consumer's and this has to be able to give them back."
-            },
-            {
-              "kind": "field",
-              "name": "handleSlotChange",
-              "privacy": "private",
-              "readonly": true,
-              "description": "The crumbs arrived, so measure them now that they are real.\n\nThe host renders and measures before its crumbs have upgraded, so every\nwidth is zero and the arithmetic concludes that five crumbs fit in a\ncontainer half their size. Measured: `updated` ran once with\n`widths: [0,0,0,0,0]`. `Tabs` carries the same paragraph for the same\nreason, and its answer is this one, because a slot change is the moment\nthe children are real.\n\nNo `requestUpdate` here. `measure` asks for one when the answer moves,\nwhich is the only time an update is owed."
-            },
             {
               "kind": "field",
               "name": "internals",
@@ -2397,27 +2313,6 @@
                 "name": "HelixElement",
                 "module": "src/helix-element/helix-element.ts"
               }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixChangeEvent"
-              },
-              "description": "Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "collapse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a trail that does not fit hides its middle.",
-              "fieldName": "collapse"
             }
           ],
           "superclass": {

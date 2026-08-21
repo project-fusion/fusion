@@ -1,16 +1,14 @@
-<!-- @summary A trail that hides its middle when it will not fit, behind a menu you supply. -->
+<!-- @summary A trail that folds its middle below a width, into a menu you wrote. -->
 <link
   href="styles.css"
   rel="stylesheet"
 >
-<helix-breadcrumbs
-  aria-label="Breadcrumb"
-  collapse
->
+<helix-breadcrumbs aria-label="Breadcrumb">
   <helix-breadcrumb href="/">Home</helix-breadcrumb>
 
-  <!-- Written where the gap belongs, because that is where it renders. The
-       trail shows it only while something is behind it. -->
+  <!-- Written where the gap belongs, holding the steps that fold. The crumbs
+       and the menu items are both markup, so the container query in the sheet
+       decides which of the two a reader sees and nothing has to run first. -->
   <helix-breadcrumb overflow>
     <helix-menu label="Hidden steps">
       <helix-icon-button
@@ -20,38 +18,23 @@
       >
         <helix-icon name="dots-three"></helix-icon>
       </helix-icon-button>
+      <helix-menu-item href="/design">Design</helix-menu-item>
+      <helix-menu-item href="/design/components">Components</helix-menu-item>
+      <helix-menu-item href="/design/components/navigation">Navigation</helix-menu-item>
     </helix-menu>
   </helix-breadcrumb>
 
-  <helix-breadcrumb href="/design">Design</helix-breadcrumb>
-  <helix-breadcrumb href="/design/components">Components</helix-breadcrumb>
-  <helix-breadcrumb href="/design/components/navigation">Navigation</helix-breadcrumb>
+  <helix-breadcrumb
+    data-folds
+    href="/design"
+  >Design</helix-breadcrumb>
+  <helix-breadcrumb
+    data-folds
+    href="/design/components"
+  >Components</helix-breadcrumb>
+  <helix-breadcrumb
+    data-folds
+    href="/design/components/navigation"
+  >Navigation</helix-breadcrumb>
   <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
 </helix-breadcrumbs>
-
-<script type="module">
-  /* The trail hides crumbs and says which. Filling the menu is the consumer's
-     half, and without it the control opens on nothing, which is what "the
-     overflow is not showing" looked like from the outside.
-
-     Queried rather than reached for from `currentScript`, which is null inside
-     a module: modules run after parsing and the property is only set while a
-     classic script is executing. */
-  const trail = document.querySelector('helix-breadcrumbs')
-  const menu = trail.querySelector('helix-menu')
-
-  const fill = () => {
-    for (const stale of menu.querySelectorAll('helix-menu-item')) {
-      stale.remove()
-    }
-    for (const crumb of trail.overflowed) {
-      const item = document.createElement('helix-menu-item')
-      item.textContent = crumb.textContent.trim()
-      item.href = crumb.getAttribute('href') ?? ''
-      menu.append(item)
-    }
-  }
-
-  trail.addEventListener('helix-change', fill)
-  fill()
-</script>

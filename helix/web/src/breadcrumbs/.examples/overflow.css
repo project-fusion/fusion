@@ -1,9 +1,34 @@
-/* Narrow on purpose, because the trail only collapses when it has to.
+/* The trail folds by container query, which is the whole of the mechanism.
  *
- * Without a width the example fits, nothing is hidden, and the control this
- * example exists to show is correctly not drawn: it demonstrated the absence of
- * itself. A width forces the case. */
+ * `data-folds` marks the steps that go and `overflow` marks the crumb that
+ * replaces them, so the two swap at one width and neither the component nor a
+ * script has to work out which. It is server rendered, so a narrow page paints
+ * folded on the first frame rather than painting the full trail and snapping.
+ *
+ * `container-type: inline-size` goes on the trail because the crumbs are its
+ * light-DOM children, and a container query is answered by descendants. */
 helix-breadcrumbs {
+  container-type: inline-size;
   display: block;
+  /* Narrow on purpose. Without a width the example never reaches the query and
+     demonstrates the absence of the thing it exists to show. */
   inline-size: 26rem;
+}
+
+/* Wide enough for the path: every step, and no control in the way. */
+helix-breadcrumb[overflow] {
+  display: none;
+}
+
+@container (max-width: 34rem) {
+  helix-breadcrumb[data-folds] {
+    display: none;
+  }
+
+  /* The value the trail's own sheet gives it, not `revert`: these rules are in
+     the document and the component's are in a shadow root, so reverting lands
+     on the user agent's `inline` rather than on anything Helix wrote. */
+  helix-breadcrumb[overflow] {
+    display: inline-flex;
+  }
 }

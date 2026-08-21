@@ -400,19 +400,6 @@ Extends `HelixBaseBreadcrumbs`.
 A single wrapping line by default. The trail wraps rather than scrolling,
 because a truncated path tells the reader less than a two-line one.
 
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `collapse` | `collapse` | `boolean` | `false` | `HelixBaseBreadcrumbs` | Whether a trail that does not fit hides its middle. |
-| `overflowed` | - | `readonly HTMLElement[]` | - | `HelixBaseBreadcrumbs` | The crumbs behind the trigger, in order, for whoever is showing them. |
-
-#### Events
-
-| Event | Type | Description |
-| --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. |
-
 #### Slots
 
 | Slot | Description |

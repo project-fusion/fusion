@@ -109,8 +109,8 @@ import type {
   HelixOpenEvent,
   HelixCloseEvent,
   HelixDismissEvent,
-  HelixChangeEvent,
   HelixSelectEvent,
+  HelixChangeEvent,
   HelixToggleEvent,
   HelixCopyEvent,
   HelixCreateEvent,
@@ -454,24 +454,9 @@ one, and nothing selects on it. */
 
 export type HelixBreadcrumbVueEvents = {};
 
-/** `HelixBreadcrumbs` component event */
-export type HelixBreadcrumbsElementEvent<E = Event> = TypedEvent<
-  HelixBreadcrumbs,
-  E
->;
-/** `helix-change` event type */
-export type HelixBreadcrumbsHelixChangeElementEvent =
-  HelixBreadcrumbsElementEvent<HelixChangeEvent>;
+export type HelixBreadcrumbsVueProps = {};
 
-export type HelixBreadcrumbsVueProps = {
-  /** Whether a trail that does not fit hides its middle. */
-  collapse?: HelixBreadcrumbs["collapse"];
-};
-
-export type HelixBreadcrumbsVueEvents = {
-  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
-  "helix-change": HelixBreadcrumbsHelixChangeElementEvent;
-};
+export type HelixBreadcrumbsVueEvents = {};
 
 export type HelixButtonGroupVueProps = {
   /** Whether the buttons are one bar or a spaced row. */

@@ -885,29 +885,9 @@ one, and nothing selects on it. */
   textContent?: string | number;
 };
 
-/** `HelixBreadcrumbs` component event */
-export type HelixBreadcrumbsElementEvent<E = Event> = TypedEvent<
-  HelixBreadcrumbs,
-  E
->;
-/** `helix-change` event type */
-export type HelixBreadcrumbsHelixChangeElementEvent =
-  HelixBreadcrumbsElementEvent<HelixChangeEvent>;
-
-export type HelixBreadcrumbsProps = {
-  /** Whether a trail that does not fit hides its middle. */
-  collapse?: HelixBreadcrumbs["collapse"];
-
-  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
-  "onhelix-change"?: (e: HelixBreadcrumbsHelixChangeElementEvent) => void;
-};
+export type HelixBreadcrumbsProps = {};
 
 export type HelixBreadcrumbsSolidJsProps = {
-  /** Whether a trail that does not fit hides its middle. */
-  "prop:collapse"?: HelixBreadcrumbs["collapse"];
-  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
-  "on:helix-change"?: (e: HelixBreadcrumbsHelixChangeElementEvent) => void;
-
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -12728,23 +12708,6 @@ export type CustomElements = {
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
    *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `collapse`: Whether a trail that does not fit hides its middle.
-   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
-   *
-   * Elements rather than data, so a consumer reads `href` and text off the same
-   * objects they wrote. Handing over a copy would be a second version of the
-   * trail to keep in step. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-change`: Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.
-   *
    * ## Slots
    *
    * Areas where markup can be added to the component.
@@ -21929,23 +21892,6 @@ export type CustomElementsSolidJs = {
   /**
    * A single wrapping line by default. The trail wraps rather than scrolling,
    * because a truncated path tells the reader less than a two-line one.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `collapse`: Whether a trail that does not fit hides its middle.
-   * - `overflowed`: The crumbs behind the trigger, in order, for whoever is showing them.
-   *
-   * Elements rather than data, so a consumer reads `href` and text off the same
-   * objects they wrote. Handing over a copy would be a second version of the
-   * trail to keep in step. (property only) (readonly)
-   *
-   * ## Events
-   *
-   * Events that will be emitted by the component.
-   *
-   * - `helix-change`: Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.
    *
    * ## Slots
    *

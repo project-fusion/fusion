@@ -3110,126 +3110,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "collapse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a trail that does not fit hides its middle.",
-              "attribute": "collapse",
-              "reflects": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "assigned",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "Everything slotted in, in reading order.",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "crumbs",
-              "type": {
-                "text": "HTMLElement[]"
-              },
-              "privacy": "private",
-              "description": "The steps, which is everything except the overflow control.\n\nSplit here rather than asking the consumer to keep two lists in step: the\ntrigger is a crumb so that it looks and reads like one, and it is not a\nstep, so it must not be measured as one or hidden as one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "trigger",
-              "type": {
-                "text": "HTMLElement | undefined"
-              },
-              "privacy": "private",
-              "description": "The overflow crumb, where the consumer wrote one.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "hiddenAt",
-              "type": {
-                "text": "readonly number[]"
-              },
-              "privacy": "private",
-              "default": "[]",
-              "description": "Which crumbs are hidden, by index.\n\n`@state`, because it is measured rather than declared: a consumer setting\nit would be claiming a width the element can see for itself.\n\nNamed `hiddenAt` and not `hidden`, which is `HTMLElement`'s own property:\nshadowing it with an array made the element's own visibility a list of\nnumbers, and TypeScript caught it only because the base class declares it.",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "fit",
-              "privacy": "private",
-              "readonly": true,
-              "default": "new CollapseController(this, { container: () => this.renderRoot?.querySelector<HTMLElement>('[part=\"list\"]'), items: () => this.crumbs ?? [], trigger: () => this.trigger, })",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "overflowed",
-              "type": {
-                "text": "readonly HTMLElement[]"
-              },
-              "description": "The crumbs behind the trigger, in order, for whoever is showing them.\n\nElements rather than data, so a consumer reads `href` and text off the same\nobjects they wrote. Handing over a copy would be a second version of the\ntrail to keep in step.",
-              "readonly": true,
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "apply",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Turns a count of what fits into a set of hidden indices.\n\nThe first crumb and the last `fits` crumbs stay; the rest go. Written as\nindices rather than by writing `hidden` onto the elements, because the\nelements are the consumer's and this has to be able to give them back.",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleSlotChange",
-              "privacy": "private",
-              "readonly": true,
-              "description": "The crumbs arrived, so measure them now that they are real.\n\nThe host renders and measures before its crumbs have upgraded, so every\nwidth is zero and the arithmetic concludes that five crumbs fit in a\ncontainer half their size. Measured: `updated` ran once with\n`widths: [0,0,0,0,0]`. `Tabs` carries the same paragraph for the same\nreason, and its answer is this one, because a slot change is the moment\nthe children are real.\n\nNo `requestUpdate` here. `measure` asks for one when the answer moves,\nwhich is the only time an update is owed.",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -3324,7 +3204,7 @@
                 "slug": "links"
               },
               {
-                "description": "A trail that hides its middle when it will not fit, behind a menu you supply.",
+                "description": "A trail that folds its middle below a width, into a menu you wrote.",
                 "slug": "overflow"
               }
             ],
@@ -3332,35 +3212,6 @@
           },
           "tagName": "helix-breadcrumbs",
           "customElement": true,
-          "attributes": [
-            {
-              "name": "collapse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether a trail that does not fit hides its middle.",
-              "fieldName": "collapse",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "HelixChangeEvent"
-              },
-              "description": "Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs.",
-              "name": "helix-change",
-              "reactProp": "onhelix-change",
-              "inheritedFrom": {
-                "name": "HelixBaseBreadcrumbs",
-                "module": "src/breadcrumbs/root/breadcrumbs-root.ts"
-              }
-            }
-          ],
           "modulePath": "src/breadcrumbs/root/breadcrumbs-root.ts",
           "definitionPath": "src/breadcrumbs/root/breadcrumbs-root.ts"
         }

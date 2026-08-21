@@ -106,8 +106,8 @@ import type {
   HelixCloseEvent,
   HelixOpenEvent,
   HelixDismissEvent,
-  HelixChangeEvent,
   HelixSelectEvent,
+  HelixChangeEvent,
   HelixToggleEvent,
   HelixCopyEvent,
   HelixCreateEvent,
@@ -399,24 +399,9 @@ one, and nothing selects on it. */
 
 export type HelixBaseBreadcrumbVueEvents = {};
 
-/** `HelixBaseBreadcrumbs` component event */
-export type HelixBaseBreadcrumbsElementEvent<E = Event> = TypedEvent<
-  HelixBaseBreadcrumbs,
-  E
->;
-/** `helix-change` event type */
-export type HelixBaseBreadcrumbsHelixChangeElementEvent =
-  HelixBaseBreadcrumbsElementEvent<HelixChangeEvent>;
+export type HelixBaseBreadcrumbsVueProps = {};
 
-export type HelixBaseBreadcrumbsVueProps = {
-  /** Whether a trail that does not fit hides its middle. */
-  collapse?: HelixBaseBreadcrumbs["collapse"];
-};
-
-export type HelixBaseBreadcrumbsVueEvents = {
-  /** Fired when the hidden set changes, carrying the count. Read `overflowed` off the element for the crumbs. */
-  "helix-change": HelixBaseBreadcrumbsHelixChangeElementEvent;
-};
+export type HelixBaseBreadcrumbsVueEvents = {};
 
 export type HelixBaseButtonGroupVueProps = {
   /** Accessible name for the group.
@@ -5704,7 +5689,7 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseBreadcrumbVueProps,
     HelixBaseBreadcrumbVueEvents
   >;
-  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **'collapse' hides the middle, and only ever the middle.** A trail that does not fit keeps its root and its current page, because those are the two a reader is orienting by: the first says where the tree begins and the last says where they are. Everything between them goes behind one trigger.  **The server sends the whole trail, and the client only ever removes.** There is no width to measure without a DOM, so nothing is hidden until 'CollapseController' has measured, and a reader with no JavaScript keeps every crumb. That is the right answer rather than a fallback, and this arrangement cannot leave them with less.  **The overflow control is the consumer's, and it is a crumb.** Rendering a menu here would put 'Menu', and the popover machinery under it, into anything that imports a breadcrumb trail, which is a lot to carry for a trail that usually fits. So the trail hides crumbs and reports which, and whatever is slotted as 'overflow' decides how to show them. It appears only while something is actually hidden.  **And it says when the set changes, which it did not.** Reporting which crumbs are hidden through a getter and never announcing that the answer moved left a consumer with a menu they had no moment to fill: the trail collapsed on a resize and whatever was slotted as 'overflow' heard nothing. A getter is an answer to a question nobody knew to ask again. */
+  /** The host is the landmark, so 'aria-label' on it names the trail directly and there is no property mirroring one. A page may hold more than one navigation, and landmarks are how a screen-reader user chooses between them.  'role="list"' is set explicitly on the '<ol>' even though it is already a list: removing the markers with 'list-style: none' strips list semantics in Safari, and a breadcrumb trail always removes its markers.  Items are slotted rather than wrapped, so they are '<ol>' children in the flat tree and each carries 'role="listitem"' itself.  **The trail does not measure itself, and the overflow is markup.** It held a 'collapse' property, a 'ResizeObserver' through 'CollapseController', an 'overflowed' getter and a 'helix-change' event, all to answer one question: how many crumbs fit. Removed 20 Aug 2026, because the question is the wrong one and answering it cost more than it returned.  - **It can never reach the server.** There is no width without a DOM, so the   server shipped every crumb and the client removed some after hydrating. A   trail that collapses therefore painted wrong on every single load, and the   SSR spec asserting "hides no crumb, whatever collapse says" was recording   that as correct behaviour rather than as the cost it is. - **The consumer already wrote the crumbs.** The measurement hid some, then   announced which, so that the consumer could read them back off the element   and clone them into menu items. The overflow example spent 32 lines of   JavaScript making a round trip out of data that started in its own markup. - **Nobody specifies a breadcrumb in units of fit.** Designs say "keep the   root and the current page, fold the middle", which is a fact about depth,   or "fold below this width", which is a fact CSS knows. The arithmetic was   the only thing that needed a width, and it was wrong three times in one day:   the observer watched a container that did not exist yet, the gap between   items went uncounted, and the result was still wrong at 34rem.  So the trail lays out crumbs and separators, and the consumer writes what folds. A 'helix-menu' of 'helix-menu-item's in a crumb marked 'overflow', and a container query deciding when it shows: server rendered, no observer, and correct before the first script runs. '.examples/overflow.css' is the whole of it. */
   "helix-base-breadcrumbs": DefineCustomElement<
     HelixBaseBreadcrumbs,
     HelixBaseBreadcrumbsVueProps,
