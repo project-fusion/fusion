@@ -110,12 +110,15 @@ let owner: HTMLElement | undefined
  * `disableremoteplayback` on this element.
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
+ * @slot back - Top left over the frame, for a way out of a set.
+ * @slot controls - Added to the control bar, before fullscreen.
  * @slot poster - Shown over the video until it starts.
  *
  * @csspart stage - The box holding the picture and its controls, and the focus
  * target the keys are bound to.
  * @csspart video - The video itself.
  * @csspart poster - What covers it before it plays.
+ * @csspart back - The region top left, for a way out of a set.
  * @csspart failure - What is said when the source will not play.
  * @csspart loading - What is said while the picture waits for more of itself.
  * @csspart loading-mark - The part of that which spins.
@@ -1209,6 +1212,18 @@ export class HelixBaseVideo extends HelixElement {
               ${this.overflow.map((one) => this.renderOverflowItem(one))}
             </helix-menu>`
       }
+      ${
+        /* Whatever else belongs on this bar, put here by whoever knows.
+           A playlist's dropdown is the case this was written for and the video
+           deliberately knows nothing about it: `helix-video-playlist` renders a
+           menu of its own entries into this slot, so the popover machinery and
+           the notion of a set of clips both stay in the component that is about
+           a set of clips. Before fullscreen, which is always the last thing on
+           a control bar because it is the one that changes what the bar is
+           attached to. */
+        ''
+      }
+      <slot name="controls"></slot>
       <button
         part="fullscreen"
         type="button"
@@ -1290,6 +1305,15 @@ export class HelixBaseVideo extends HelixElement {
            the first one ends it. -->
       <span aria-hidden="true" hidden><slot @slotchange=${this.handleMedia}></slot></span>
       ${this.cue === undefined ? nothing : html`<p aria-live="off" part="cue">${this.cue}</p>`}
+      ${
+        /* Top left, over the frame, and empty unless something is slotted.
+           A player inside a set has somewhere to go back to and a player on its
+           own does not, so the video draws whatever it is handed and decides
+           nothing: a `back` property would be this component holding an opinion
+           about navigation, which is the consumer's. */
+        ''
+      }
+      <div part="back"><slot name="back"></slot></div>
       <slot name="poster" part="poster"></slot>
       ${
         /* A live region rather than a spinning box, because the reader who most

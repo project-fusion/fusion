@@ -678,3 +678,26 @@
     animation: none;
   }
 }
+
+/* A way out of the set, over the frame at the top left.
+ *
+ * It rides with the controls rather than sitting on the picture permanently:
+ * a control bar that fades and a back button that does not would leave one
+ * chrome element floating over a film with nothing around it. Same visibility
+ * as the bar, said the same way, so the two can never disagree.
+ *
+ * `pointer-events` follows, or an invisible button keeps taking presses meant
+ * for the picture underneath it. Empty unless something is slotted, and a slot
+ * with nothing assigned generates no box, so a player on its own pays nothing
+ * for this. */
+[part="back"] {
+  inset-block-start: var(--helix-space-sm);
+  inset-inline-start: var(--helix-space-sm);
+  opacity: inherit;
+  position: absolute;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="back"]:not(:has(*)) {
+  display: none;
+}
