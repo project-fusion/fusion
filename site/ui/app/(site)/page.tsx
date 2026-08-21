@@ -67,13 +67,22 @@ export default function Home() {
     <div className="reel">
       {/* Starting at the top of the page and running past the hero.
           
+          The tilt is 23 rather than a rounder number because it is derived.
+          The braid's axis is the line where the rotated x is zero, which in
+          screen terms is `x = y * tan(tilt)`, so at the top of the box it comes
+          out at `tan(tilt)`. Against a field 1280 by 1600 that is an aspect of
+          0.8, and 42 degrees put the axis at 1360: past the right edge, so it
+          left through the side instead of the top and read as running into the
+          corner. 23 lands it at 979, which is the midpoint between the
+          navigation's right edge and the actions.
+          
           It used to be inside the hero, so it stopped dead at the end of the
           first band. It scrolls with the page rather than being pinned to the
           window: a field that never moves is a wallpaper. No `interactive`, so
           it never asks for the hit test and every control keeps its presses. It
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
-      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={0.45} tilt={42}></helix-aura>
+      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={0.45} tilt={23}></helix-aura>
       <div className="reelScrim" />
 
       <section className="hero">
