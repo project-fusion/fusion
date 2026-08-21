@@ -142,7 +142,28 @@
  * pays it, because everything after it scrolls under the bar rather than
  * beneath it. */
 .reel > .hero {
-  min-block-size: calc(100svh - var(--helix-size-header));
+  /* Reaches up behind the masthead, which is transparent on this page.
+   *
+   * The header is `position: sticky`, so it takes a row in flow and the hero
+   * began under it: with the bar see-through, that left a strip of flat page
+   * across the top of the light, which is worse than an opaque bar because it
+   * looks like the aura failed rather than like a decision. The negative start
+   * margin pulls the band up by exactly the header's height and the padding
+   * puts the words back where they were, so the light runs to the top of the
+   * window and nothing inside the hero moves. Same construction `.pageHero`
+   * already uses on the two gallery routes.
+   *
+   * The height goes back to a whole viewport, because the band now spans the
+   * strip it was subtracting. */
+  margin-block-start: calc(-1 * var(--helix-size-header));
+  min-block-size: 100svh;
+  /* `max`, not a sum. Added together the band ran twelve pixels past the
+     viewport and broke the one-band-one-screen rhythm the rest of the page
+     keeps. The words are centred in the box, so all the top padding has to
+     guarantee is that they clear the bar if the hero ever grows tall enough for
+     the centring to stop doing it, and the band inset is already larger than
+     the header at every width this clamps to. */
+  padding-block-start: max(var(--site-band), var(--helix-size-header));
 }
 
 /* The header spans the viewport, so its own centering is turned off and it

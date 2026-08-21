@@ -72,7 +72,15 @@ export function SiteNav() {
   /* Gallery heroes and the scale candidate run up behind the masthead, so the
      bar has nothing to separate itself from until the page moves. Component
      pages under `/helix` keep a white top. */
-  const onHero = pathname === '/helix' || pathname === '/insights' || pathname === '/preview/scale'
+  /* The landing page joins these because its hero draws an aura, and a bar with
+     a fill of its own would cut a strip of flat background across the top of
+     the light. `transparent` takes the fill back once anything scrolls under
+     it, which is the state a hero is guaranteed not to still be in. */
+  const onHero =
+    pathname === '/' ||
+    pathname === '/helix' ||
+    pathname === '/insights' ||
+    pathname === '/preview/scale'
 
   /* Products is current wherever a product or a vertical is, which is what the
      panel actually contains. Checked against the verticals rather than the
