@@ -140,7 +140,6 @@ export class HelixAura extends HelixElement {
    */
   private readonly trail = new Float32Array(8 * 3).fill(1)
   private trailNext = 0
-  private trailLeft = 0
 
   /** Where the pointer is, and where the field has got to. The gap is weight. */
   private readonly target = { reach: 0, x: 0, y: 0 }
@@ -148,6 +147,21 @@ export class HelixAura extends HelixElement {
 
   private motion: MediaQueryList | undefined
   private visible: IntersectionObserver | undefined
+
+  /**
+   * The element's box, cached.
+   *
+   * **Read per event, this was the ragged half.** `getBoundingClientRect` forces
+   * a synchronous layout, and a pointer emits events far faster than the
+   * display refreshes: a 1000Hz mouse flushed layout a thousand times a second
+   * to compute a number that only changes when the page reflows. Refreshed from
+   * the resize observer and from scroll, both of which are exactly when it can
+   * go stale, and never from the handler that reads it.
+   */
+  private box = { height: 1, left: 0, top: 0, width: 1 }
+
+  /** Watches the element's own size, so no frame has to ask for it. */
+  private sized: ResizeObserver | undefined
 
   protected override render(): TemplateResult {
     /* `aria-hidden` on the canvas rather than on the host, because a consumer
@@ -219,8 +233,17 @@ export class HelixAura extends HelixElement {
     this.visible.observe(this)
 
     document.addEventListener('visibilitychange', this.handleVisibility)
-    window.addEventListener('resize', this.handleResize)
+    /* Scroll moves the box without resizing it, and the cached origin is what
+       the pointer is measured against. Passive, because nothing here cancels. */
+    window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
 
+    this.sized = new ResizeObserver(() => {
+      this.measure()
+      this.paintOnce()
+    })
+    this.sized.observe(this)
+
+    this.measure()
     this.paintOnce()
     this.play()
   }
@@ -240,7 +263,9 @@ export class HelixAura extends HelixElement {
     this.removeEventListener('pointermove', this.handlePointer)
     this.removeEventListener('pointerleave', this.handleLeave)
     document.removeEventListener('visibilitychange', this.handleVisibility)
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('scroll', this.handleScroll, { capture: true })
+    this.sized?.disconnect()
+    this.sized = undefined
     if (this.gl && this.program) {
       this.gl.deleteProgram(this.program)
     }
@@ -281,17 +306,35 @@ export class HelixAura extends HelixElement {
     return program
   }
 
-  private resize(): void {
+  /**
+   * Re-reads the box and resizes the drawing buffer to match.
+   *
+   * **Called from the observer, never from the frame.** `clientWidth` is a
+   * layout read, and doing it in `tick` meant a forced synchronous layout on
+   * every single frame to learn a number that changes when the box changes and
+   * at no other time. A `ResizeObserver` is told when that is.
+   */
+  private measure(): void {
     const { canvas, gl } = this
     if (!canvas || !gl) {
       return
     }
-    /* Capped at two and scaled beneath it. Every pixel runs four octaves of
-       noise, and a 6K display at its native ratio is four times the work for a
-       gradient nobody can resolve. */
-    const dpr = Math.min(window.devicePixelRatio || 1, 2) * 0.66
-    const width = Math.round(canvas.clientWidth * dpr)
-    const height = Math.round(canvas.clientHeight * dpr)
+    const rect = this.getBoundingClientRect()
+    this.box = {
+      height: Math.max(rect.height, 1),
+      left: rect.left,
+      top: rect.top,
+      width: Math.max(rect.width, 1),
+    }
+
+    /* Capped at two, and a little under native beneath that. Every pixel runs
+       five octaves of noise through two warps, and a 6K display at its full
+       ratio is four times the work for a gradient nobody can resolve. Not as
+       far under as it was: a parallax shift resolves on the buffer's own grid,
+       so an aggressive scale makes the field step as it slides. */
+    const dpr = Math.min(window.devicePixelRatio || 1, 2) * 0.85
+    const width = Math.round(this.box.width * dpr)
+    const height = Math.round(this.box.height * dpr)
     if (width === this.width && height === this.height) {
       return
     }
@@ -350,7 +393,6 @@ export class HelixAura extends HelixElement {
     if (this.frame) {
       return
     }
-    this.resize()
     this.paint()
   }
 
@@ -368,9 +410,14 @@ export class HelixAura extends HelixElement {
        must never do. */
     this.elapsed += delta * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
 
-    /* Frame-rate independent easing. A fixed factor per frame ties the feel to
-       the refresh rate, so a 120Hz display would chase twice as eagerly. */
-    const k = 1 - (1 - 0.12) ** (delta * 60)
+    /* Frame-rate independent easing, written as a time constant rather than a
+       per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
+       display would chase twice as eagerly as a 60Hz one.
+       
+       85 milliseconds, down from the 300 this took to close nine tenths of the
+       gap. That much lag does not read as weight, it reads as the page being
+       busy, which is the opposite of what the easing is for. */
+    const k = 1 - Math.exp(-delta / 0.085)
     if (!this.interactive) {
       this.target.reach = 0
     }
@@ -379,7 +426,6 @@ export class HelixAura extends HelixElement {
     this.eased.reach += (this.target.reach - this.eased.reach) * k
     this.age(delta)
 
-    this.resize()
     this.paint()
     this.frame = requestAnimationFrame(this.tick)
   }
@@ -426,29 +472,38 @@ export class HelixAura extends HelixElement {
       const next = (this.trail[i] ?? 1) + delta / 2
       this.trail[i] = next > 1 ? 1 : next
     }
-    if (this.trailLeft <= 0) {
-      return
-    }
-    this.trailLeft -= delta
   }
 
   private readonly handlePointer = (event: PointerEvent): void => {
     if (this.motion?.matches) {
       return
     }
-    const box = this.getBoundingClientRect()
-    const aspect = box.width / Math.max(box.height, 1)
-    this.target.x = ((event.clientX - box.left) / box.width - 0.5) * 2 * aspect
-    this.target.y = -((event.clientY - box.top) / box.height - 0.5) * 2
+    const { height, left, top, width } = this.box
+    const aspect = width / height
+    this.target.x = ((event.clientX - left) / width - 0.5) * 2 * aspect
+    this.target.y = -((event.clientY - top) / height - 0.5) * 2
     this.target.reach = this.interactive ? 1 : 0
 
-    /* Marks are dropped on a clock rather than on every move. A pointer emits
-       far more events than eight slots can hold, so unthrottled the whole wake
-       is the last few milliseconds of a gesture and none of its shape. */
-    if (this.trailLeft > 0 || !this.interactive) {
+    /* Marks are spaced by distance, not by a clock.
+     *
+     * A pointer emits far more events than eight slots hold, so something has
+     * to thin them, and time was the wrong axis twice over. A fast gesture laid
+     * marks a third of a frame apart and the wake stepped, while a slow one
+     * stacked all eight inside a thumbnail. And the countdown was decremented
+     * from the frame loop, so with the loop stopped it never expired: measured
+     * at 200 events, exactly one mark was ever dropped.
+     *
+     * By distance the spacing is even at every speed, which is what a wake
+     * looks like, and it depends on nothing but the pointer. */
+    if (!this.interactive) {
       return
     }
-    this.trailLeft = 0.05
+    const last = ((this.trailNext + 7) % 8) * 3
+    const dx = this.target.x - (this.trail[last] ?? 0)
+    const dy = this.target.y - (this.trail[last + 1] ?? 0)
+    if (dx * dx + dy * dy < 0.014) {
+      return
+    }
     const at = this.trailNext * 3
     this.trail[at] = this.target.x
     this.trail[at + 1] = this.target.y
@@ -468,8 +523,11 @@ export class HelixAura extends HelixElement {
     }
   }
 
-  private readonly handleResize = (): void => {
-    this.paintOnce()
+  private readonly handleScroll = (): void => {
+    /* Only the origin can have moved, and only what the pointer is measured
+       against needs it, so this refreshes the cache and draws nothing. */
+    const rect = this.getBoundingClientRect()
+    this.box = { ...this.box, left: rect.left, top: rect.top }
   }
 }
 
