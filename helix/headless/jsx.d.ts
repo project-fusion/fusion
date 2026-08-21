@@ -21484,6 +21484,13 @@ export type CustomElements = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reposition() => void`: Places the bubble again, for an anchor that moved without the page moving.
+   *
+   * Public because a chart needs it. Its mark walks from reading to reading
+   * while the page holds still, and `autoUpdate` watches scrolling, resizing
+   * and layout shift, none of which is that. Everything else floating here is
+   * anchored to something the page moves, which is why nothing wanted this
+   * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
@@ -21499,6 +21506,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
   "helix-base-tooltip": Partial<
@@ -32429,6 +32437,13 @@ export type CustomElementsSolidJs = {
    *
    * Methods that can be called to access component functionality.
    *
+   * - `reposition() => void`: Places the bubble again, for an anchor that moved without the page moving.
+   *
+   * Public because a chart needs it. Its mark walks from reading to reading
+   * while the page holds still, and `autoUpdate` watches scrolling, resizing
+   * and layout shift, none of which is that. Everything else floating here is
+   * anchored to something the page moves, which is why nothing wanted this
+   * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
    * - `requestOpen(next: boolean) => boolean`: Requests an open-state change, and reports whether it was applied.
@@ -32444,6 +32459,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
   "helix-base-tooltip": Partial<

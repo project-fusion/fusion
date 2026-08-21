@@ -110,6 +110,15 @@
             },
             {
               "kind": "field",
+              "name": "#moved",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
               "name": "#plot",
               "privacy": "private",
               "type": {
@@ -151,6 +160,16 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "hostUpdated",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Tells the tooltip its anchor moved, which nothing else would.\n\nThe mark the tooltip is hung on is one element the chart walks from reading\nto reading with an inline style, and Floating UI's `autoUpdate` watches\nscrolling, resizing and layout shift. Moving an absolutely positioned\nelement by writing `inset` is none of the three, so the bubble is placed\nonce on open and then stays where the first reading was while the mark\ntravels out from under it.\n\nHere rather than in the chart because the reading is this controller's, and\nafter the update rather than in `set` because the mark is still at the old\nposition until the render that follows."
             },
             {
               "kind": "method",
@@ -1272,13 +1291,22 @@
             },
             {
               "kind": "method",
-              "name": "hostDisconnected",
+              "name": "reposition",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "description": "Leaves the top layer when the host does.\n\nAn element removed while its popover is showing is removed from the top\nlayer by the platform, but the controllers watching it are this host's to\nstop, and `autoUpdate` in particular holds listeners on every scrolling\nancestor of something no longer in the document."
+              "description": "Places the surface again, for an anchor that moved without the page moving.\n\n`autoUpdate` watches scrolling, resizing and layout shift, which covers\neverything that moves an anchor *with* its surroundings. It does not cover\nan absolutely positioned anchor being moved by an inline style, and that is\nexactly what a chart does: the mark walks from reading to reading while the\npage holds still, so the bubble was placed once and stayed there."
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             }
           ],
           "helix": {}
@@ -5870,7 +5898,8 @@
                 "text": "TooltipAt"
               }
             }
-          ]
+          ],
+          "description": "What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.\n\n**A chart does not draw its own tooltip, and the top layer is why.** `Tooltip`\nrenders `popover=\"manual\"` through `PopoverController`, so it clears every\nstacking context and every `overflow` on the page. A box drawn by the chart is\n`position: absolute` inside the plot and is confined to the chart's own\ncontext, so it is clipped by, or layered under, whatever sits beside the\nchart. Escaping that means reimplementing `PopoverController`, which is\n`Tooltip` with extra steps and a second copy of the hard part.\n\n**`for` was already the anchor and needed nothing added.** It resolves through\n`getRootNode().getElementById()`, and a chart's shadow root *is* a\n`ShadowRoot`, so a chart names an element inside itself and `Tooltip` finds\nit. What the chart provides is an invisible mark at the reading's point.\n\n**An HTML mark rather than the `<rect>` or `<circle>` already there.**\n`FloatingController` types its anchor as `HTMLElement` and an SVG element is\nnot one; and a slice's `<circle>` has the bounding box of the whole ring\nrather than of its arc, so anchoring to it would point at the ring's centre\nfor every slice.\n\n**And the arrow now follows from placement rather than from a compass.** The\nchart says which side it prefers and `FloatingController` moves it if that\nside does not fit, which is how a slice at any bearing gets a bubble that\npoints at it. Four hard-coded sides could not express a bearing, which is what\nmade the donut's arrow miss its own ring.\n\n**It shows the table's text and not the chart's numbers.** `$128k` is what the\ncell says and `128000` is what the drawing measured. Every cell of the row is\nhere, including columns nothing was plotted from, because a note beside the\nfigures is most of the reason to want a tooltip.\n\n**Hidden from assistive technology, on purpose.** The table is the accessible\nrepresentation and the drawing is `aria-hidden`; a reader on a keyboard gets\nthe table, which they can reach, rather than a tooltip which they cannot."
         }
       ],
       "exports": [

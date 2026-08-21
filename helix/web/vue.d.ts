@@ -7437,6 +7437,8 @@ export type CustomCssProperties = {
   "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
+  /** Size of the point at the bubble's edge. */
+  "--tooltip-arrow-size"?: string;
   /** Fill of the bubble. */
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */

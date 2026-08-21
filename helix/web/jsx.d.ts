@@ -23417,6 +23417,13 @@ export type CustomElements = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `reposition() => void`: Places the bubble again, for an anchor that moved without the page moving.
+   *
+   * Public because a chart needs it. Its mark walks from reading to reading
+   * while the page holds still, and `autoUpdate` watches scrolling, resizing
+   * and layout shift, none of which is that. Everything else floating here is
+   * anchored to something the page moves, which is why nothing wanted this
+   * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
    *
@@ -23424,6 +23431,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--tooltip-arrow-size`: Size of the point at the bubble's edge. (default: `undefined`)
    * - `--tooltip-background-color`: Fill of the bubble. (default: `undefined`)
    * - `--tooltip-max-inline-size`: Widest the bubble grows before wrapping. (default: `undefined`)
    *
@@ -23431,6 +23439,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
   "helix-tooltip": Partial<
@@ -34628,6 +34637,13 @@ export type CustomElementsSolidJs = {
    * waits for the consumer to pass a new `open`, which is what "controlled"
    * means.
    * - `toggleOpen() => boolean`: Requests the opposite of the current state.
+   * - `reposition() => void`: Places the bubble again, for an anchor that moved without the page moving.
+   *
+   * Public because a chart needs it. Its mark walks from reading to reading
+   * while the page holds still, and `autoUpdate` watches scrolling, resizing
+   * and layout shift, none of which is that. Everything else floating here is
+   * anchored to something the page moves, which is why nothing wanted this
+   * until a chart did.
    * - `show() => void`: Shows the bubble, unless there is nothing to show.
    * - `hide() => void`: Hides the bubble.
    *
@@ -34635,6 +34651,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--tooltip-arrow-size`: Size of the point at the bubble's edge. (default: `undefined`)
    * - `--tooltip-background-color`: Fill of the bubble. (default: `undefined`)
    * - `--tooltip-max-inline-size`: Widest the bubble grows before wrapping. (default: `undefined`)
    *
@@ -34642,6 +34659,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `arrow`: The point, resting against the trigger.
    * - `tooltip`: The bubble.
    */
   "helix-tooltip": Partial<
@@ -35976,6 +35994,8 @@ export type CustomCssProperties = {
   "--toast-inline-size"?: string;
   /** Fill of the moving marker. */
   "--toggle-group-indicator-color"?: string;
+  /** Size of the point at the bubble's edge. */
+  "--tooltip-arrow-size"?: string;
   /** Fill of the bubble. */
   "--tooltip-background-color"?: string;
   /** Widest the bubble grows before wrapping. */

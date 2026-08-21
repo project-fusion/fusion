@@ -48108,6 +48108,10 @@
           "name": "HelixBaseTooltip",
           "cssParts": [
             {
+              "description": "The point, resting against the trigger.",
+              "name": "arrow"
+            },
+            {
               "description": "The bubble.",
               "name": "tooltip"
             }
@@ -48221,6 +48225,19 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "reposition",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Places the bubble again, for an anchor that moved without the page moving.\n\nPublic because a chart needs it. Its mark walks from reading to reading\nwhile the page holds still, and `autoUpdate` watches scrolling, resizing\nand layout shift, none of which is that. Everything else floating here is\nanchored to something the page moves, which is why nothing wanted this\nuntil a chart did.",
+              "type": {
+                "text": "reposition() => void"
+              }
+            },
+            {
               "kind": "field",
               "name": "named",
               "type": {
@@ -48235,7 +48252,7 @@
               "name": "bubbleLayer",
               "privacy": "private",
               "readonly": true,
-              "default": "new PopoverController(this, { anchor: () => this.trigger, /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })"
+              "default": "new PopoverController(this, { anchor: () => this.trigger, arrow: () => this.renderRoot.querySelector<HTMLElement>('[part=\"arrow\"]'), /* Annotated, because without it the array's element type is inferred from `this`, whose own type depends on this controller, and TypeScript stops at the cycle. */ boundary: (): readonly (Element | null)[] => [this, this.named], offset: () => this.offset, onDismiss: () => this.hide(), placement: () => this.placement, surface: () => this.renderRoot.querySelector<HTMLElement>('[part=\"tooltip\"]'), })"
             },
             {
               "kind": "field",
