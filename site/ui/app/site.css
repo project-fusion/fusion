@@ -2362,13 +2362,6 @@ helix-drawer helix-tree {
   flex: none;
 }
 
-/* Meter and progress are bars: they take the width they are given, and in a
-   flex row with nothing to stretch against they take none. Measured at zero
-   wide, which renders as nothing at all rather than as a bar at its minimum. */
-.showcaseBar {
-  inline-size: 10rem;
-}
-
 /* **Columns, not a grid.**
  *
  * A grid pads every row to its tallest cell, so a card with a table in it sets
@@ -2691,13 +2684,6 @@ helix-drawer helix-tree {
    it. */
 .showcaseRing {
   --donut-chart-size: 8rem;
-}
-
-/* Sparklines take the width they are given and none by default. The one under
-   the figures spans its card; the ones in table rows fill their cell. */
-.showcaseRowLine {
-  inline-size: 100%;
-  min-inline-size: 4rem;
 }
 
 /* The three views share one cell, and all but one is hidden.

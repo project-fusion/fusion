@@ -55,13 +55,6 @@ const FACES = [
   { label: 'Great', mouth: 'M8.5 14q3.5 3.4 7 0', value: 'great' },
 ] as const
 
-/** Seven days of a figure, for the rows that carry one. */
-const SERIES: Record<string, string> = {
-  headless: '74 74 73 75 74 74 74',
-  styles: '9 10 10 11 11 12 12',
-  web: '104 109 112 110 115 117 118',
-}
-
 /** How long a view holds before the next one, when nobody is looking at it. */
 const DWELL = 7000
 
@@ -430,6 +423,16 @@ export function Showcase(): React.ReactElement {
                 <span slot="unit">%</span>
               </helix-stat>
             </helix-stat-group>
+            {/* **The meter joins the figures rather than standing in a card of
+                its own**, which is what the note beside Progress already said a
+                meter should do: a reading against a range belongs with the
+                readings. Its own card was the last row of a view that runs past
+                what the panel shows, so it rendered for nobody. */}
+            <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
+            <helix-flex align="center" gap="sm" wrap>
+              <helix-tag tone="success">Passing</helix-tag>
+              <helix-tag tone="warning">Near budget</helix-tag>
+            </helix-flex>
             {/* **The chart is the card's media, which is why it is a direct
                 child and carries no width of its own.** `media` is the one
                 region that escapes the inset, and `media-placement="end"` puts
@@ -565,37 +568,14 @@ export function Showcase(): React.ReactElement {
             </helix-flex>
           </helix-card>
 
-          <helix-card appearance="outlined" class="showcaseCard showcaseWide">
-            <helix-table label="Packages">
-              <helix-table-column width="7rem">Package</helix-table-column>
-              <helix-table-column>Seven days</helix-table-column>
-              <helix-table-column width="5rem">Size</helix-table-column>
-
-              {Object.entries(SERIES).map(([name, values]) => (
-                <helix-table-row key={name}>
-                  <helix-table-cell header>{name}</helix-table-cell>
-                  <helix-table-cell>
-                    <helix-sparkline
-                      class="showcaseRowLine"
-                      label={`${name} over seven days`}
-                      values={values}
-                    ></helix-sparkline>
-                  </helix-table-cell>
-                  <helix-table-cell>{values.split(' ').at(-1)} kB</helix-table-cell>
-                </helix-table-row>
-              ))}
-            </helix-table>
-          </helix-card>
-
-          <helix-card appearance="outlined" class="showcaseCard">
-            <helix-flex direction="column" gap="md">
-              <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
-              <helix-flex align="center" gap="sm" wrap>
-                <helix-tag tone="success">Passing</helix-tag>
-                <helix-tag tone="warning">Near budget</helix-tag>
-              </helix-flex>
-            </helix-flex>
-          </helix-card>
+          {/* **Four cards, because the panel shows two rows.** Measured at
+              1512x1080: the views area is 433px tall and these two rows come to
+              exactly that. A fifth card is not a fifth card, it is a card that
+              renders for nobody, which this view carried for several days in
+              three different positions. The Packages table was the last of them
+              and is the one worth bringing back first if this panel ever gets
+              taller: it is the only place a table and a sparkline appear
+              together. */}
         </div>
 
         <div className="showcaseView" hidden={view !== 'surfaces'}>
