@@ -1,4 +1,4 @@
-import { customElement, HelixElement, TokenColorController } from '@helix-io/core'
+import { customElement, HelixElement, type TokenColor, TokenColorController } from '@helix-io/core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -119,7 +119,27 @@ export class HelixAura extends HelixElement {
   tilt = 14
 
   /** Repaints when the palette moves, which no re-render would do on its own. */
-  private readonly tokens = new TokenColorController(this, () => this.paintOnce())
+  private readonly tokens = new TokenColorController(this, () => {
+    this.readPalette()
+    this.paintOnce()
+  })
+
+  /**
+   * The four ramp stops, resolved.
+   *
+   * **Cached, because reading them is not free and they do not move.** Each
+   * read sets a style, calls `getComputedStyle`, fills a pixel and reads it
+   * back: a style recalc and a canvas readback apiece. Doing that inside
+   * `paint` meant four of each on every frame, forever, to fetch values that
+   * change only when the color mode does. The controller already says when
+   * that happens, so this is filled from there and from the first paint.
+   */
+  private palette: { glow: TokenColor; ground: TokenColor; haze: TokenColor; peak: TokenColor } = {
+    glow: [0.29, 0.61, 1],
+    ground: [0, 0, 0],
+    haze: [0.02, 0.15, 0.34],
+    peak: [1, 1, 1],
+  }
 
   private canvas: HTMLCanvasElement | null = null
   private gl: WebGL2RenderingContext | null = null
@@ -244,6 +264,7 @@ export class HelixAura extends HelixElement {
     this.sized.observe(this)
 
     this.measure()
+    this.readPalette()
     this.paintOnce()
     this.play()
   }
@@ -271,6 +292,28 @@ export class HelixAura extends HelixElement {
     }
     this.program = null
     this.gl = null
+  }
+
+  /**
+   * Resolves the ramp. Called when the palette moves, not when a frame draws.
+   *
+   * Light pages peak on a deep brand blue and dark ones on the foreground, and
+   * the ground is what says which: mixing a saturated hue toward near-black
+   * takes the chroma out of exactly the pixels carrying the most of it. Read
+   * from the ground's own luminance rather than asked of the color mode, which
+   * is a private token this tier may not reach for.
+   */
+  private readPalette(): void {
+    const ground = this.tokens.read('--helix-color-background', [0, 0, 0])
+    const light = ground[0] * 0.2126 + ground[1] * 0.7152 + ground[2] * 0.0722 > 0.5
+    this.palette = {
+      glow: this.tokens.read('--helix-color-primary', [0.29, 0.61, 1]),
+      ground,
+      haze: this.tokens.read('--helix-color-primary-subtle', [0.02, 0.15, 0.34]),
+      peak: light
+        ? this.tokens.read('--helix-color-primary-active', [0.1, 0.2, 0.55])
+        : this.tokens.read('--helix-color-foreground', [1, 1, 1]),
+    }
   }
 
   private link(vertex: string, fragment: string): WebGLProgram | null {
@@ -351,27 +394,11 @@ export class HelixAura extends HelixElement {
     if (!gl || !this.program) {
       return
     }
-    const ground = this.tokens.read('--helix-color-background', [0, 0, 0])
-    /* Light pages peak on a deep brand blue and dark ones on the foreground,
-       and the ground is what says which. Read here rather than asked of the
-       mode, which is a private token this tier may not reach for. */
-    const light = ground[0] * 0.2126 + ground[1] * 0.7152 + ground[2] * 0.0722 > 0.5
-
+    const { glow, ground, haze, peak } = this.palette
     gl.uniform3fv(uniforms.uGround ?? null, ground)
-    gl.uniform3fv(
-      uniforms.uHaze ?? null,
-      this.tokens.read('--helix-color-primary-subtle', [0.02, 0.15, 0.34]),
-    )
-    gl.uniform3fv(
-      uniforms.uGlow ?? null,
-      this.tokens.read('--helix-color-primary', [0.29, 0.61, 1]),
-    )
-    gl.uniform3fv(
-      uniforms.uPeak ?? null,
-      light
-        ? this.tokens.read('--helix-color-primary-active', [0.1, 0.2, 0.55])
-        : this.tokens.read('--helix-color-foreground', [1, 1, 1]),
-    )
+    gl.uniform3fv(uniforms.uHaze ?? null, haze)
+    gl.uniform3fv(uniforms.uGlow ?? null, glow)
+    gl.uniform3fv(uniforms.uPeak ?? null, peak)
 
     gl.uniform1f(uniforms.uTime ?? null, this.elapsed)
     gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.shape ?? 'braid'))
@@ -410,20 +437,31 @@ export class HelixAura extends HelixElement {
        must never do. */
     this.elapsed += delta * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
 
-    /* Frame-rate independent easing, written as a time constant rather than a
-       per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
-       display would chase twice as eagerly as a 60Hz one.
+    /* Two time constants, because position and presence are two different
+       jobs and one number was serving both badly.
        
-       85 milliseconds, down from the 300 this took to close nine tenths of the
-       gap. That much lag does not read as weight, it reads as the page being
-       busy, which is the opposite of what the easing is for. */
-    const k = 1 - Math.exp(-delta / 0.085)
+       **Position tracks.** A parallax that lags is not weighty, it is late: at
+       85 milliseconds it took about two tenths of a second to close nine tenths
+       of the gap, which is well inside what a reader perceives as the page
+       being slow rather than the field being heavy. 28 milliseconds puts it at
+       the edge of perception while still absorbing the jitter a raw pointer
+       carries, which is the only thing the easing was ever for.
+       
+       **Presence does not.** `reach` is the effect fading in as the pointer
+       arrives and out as it leaves, and that wants to be gradual: snapped on,
+       the whole field flinches the instant a cursor crosses the edge.
+       
+       Frame-rate independent, written as a time constant rather than a
+       per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
+       display would chase twice as eagerly as a 60Hz one. */
+    const follow = 1 - Math.exp(-delta / 0.028)
+    const fade = 1 - Math.exp(-delta / 0.16)
     if (!this.interactive) {
       this.target.reach = 0
     }
-    this.eased.x += (this.target.x - this.eased.x) * k
-    this.eased.y += (this.target.y - this.eased.y) * k
-    this.eased.reach += (this.target.reach - this.eased.reach) * k
+    this.eased.x += (this.target.x - this.eased.x) * follow
+    this.eased.y += (this.target.y - this.eased.y) * follow
+    this.eased.reach += (this.target.reach - this.eased.reach) * fade
     this.age(delta)
 
     this.paint()
