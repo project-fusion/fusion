@@ -31,6 +31,7 @@ import { styles } from './donut-chart-root.css.js'
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://helix.fusion.dev/components/donut-chart
  *
+ * @cssproperty --chart-tooltip-arrow - Half the width of the tooltip's point.
  * @cssproperty --donut-chart-size - Width and height of the ring.
  * @cssproperty --donut-chart-track-color - Colour of the ring under the slices.
  */

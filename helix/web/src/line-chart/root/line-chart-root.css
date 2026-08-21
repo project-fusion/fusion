@@ -289,12 +289,9 @@
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-2xs);
   grid-area: 1 / 1;
-  inset-block-start: 0;
-  inset-inline-start: var(--_chart-tooltip-at, 50%);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   pointer-events: none;
   position: absolute;
-  translate: -50% 0;
   white-space: nowrap;
   z-index: var(--helix-layer-popover);
 }
@@ -439,6 +436,7 @@
  * already carrying the half-width offset and animating both fights. */
 [part="tooltip"] {
   transition:
+    inset-block-start var(--helix-duration-fast) var(--helix-easing-decelerate),
     inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
     opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
@@ -534,4 +532,54 @@
   [part="area"] {
     transition: none;
   }
+}
+
+/* Placed at the point the chart handed over, and shifted off it by its own size.
+ *
+ * `--_chart-tooltip-at` and `--_chart-tooltip-down` are where the reading is,
+ * in the plot's own percentages; `--_chart-tooltip-shift` is how to move the box
+ * clear of it. The shift is a `translate` rather than an inset because the box's
+ * size is its content's and nothing here knows it, and it comes from the chart
+ * because only the chart knows which way its readings grow. */
+[part="tooltip"] {
+  inset-block-start: var(--_chart-tooltip-down, 0%);
+  inset-inline-start: var(--_chart-tooltip-at, 50%);
+  translate: none;
+  transform: var(--_chart-tooltip-shift, translate(-50%, -100%));
+}
+
+/* The arrow, a square turned forty-five degrees with two of its corners under
+   the box. Drawn from the same surface and border as the box so the seam does
+   not show, and hung on whichever edge the chart said. */
+[part="tooltip-arrow"] {
+  background-color: var(--helix-color-surface-raised);
+  block-size: calc(var(--chart-tooltip-arrow, 6px) * 2);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  inline-size: calc(var(--chart-tooltip-arrow, 6px) * 2);
+  position: absolute;
+  rotate: 45deg;
+}
+
+[part="tooltip"][data-side="bottom"] [part="tooltip-arrow"] {
+  clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+  inset-block-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
+  inset-inline-start: calc(50% - var(--chart-tooltip-arrow, 6px));
+}
+
+[part="tooltip"][data-side="top"] [part="tooltip-arrow"] {
+  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+  inset-block-start: calc(var(--chart-tooltip-arrow, 6px) * -1);
+  inset-inline-start: calc(50% - var(--chart-tooltip-arrow, 6px));
+}
+
+[part="tooltip"][data-side="start"] [part="tooltip-arrow"] {
+  clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+  inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
+  inset-inline-start: calc(var(--chart-tooltip-arrow, 6px) * -1);
+}
+
+[part="tooltip"][data-side="end"] [part="tooltip-arrow"] {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
+  inset-block-start: calc(50% - var(--chart-tooltip-arrow, 6px));
+  inset-inline-end: calc(var(--chart-tooltip-arrow, 6px) * -1);
 }

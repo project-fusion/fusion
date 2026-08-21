@@ -94,6 +94,7 @@ const THICKNESS: Record<string, number> = {
  * @csspart centre - The middle of the ring, holding whatever is slotted.
  * @csspart plot - The drawing.
  * @csspart tooltip - What a pointer resting on a slice shows.
+ * @csspart tooltip-arrow - The point of the tooltip, resting on the reading.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The slice's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -247,9 +248,41 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
    * about rather than covering something else.
    */
   protected renderTooltip(): TemplateResult | typeof nothing {
-    /* Over the hole where there is one, and above the drawing where there is
-       not: a tooltip centred on a pie covers the slices it is describing. */
-    return drawTooltip(this.rows, this.pointer.at, '50%')
+    const at = this.pointer.at
+    const share = this.shares[at]
+    if (!share) {
+      return drawTooltip(this.rows, at)
+    }
+    /* **Outside the ring, on the slice's own bearing.** Centred in the hole was
+       the first version: harmless over a donut, since the hole is empty, and it
+       covers the data on a pie, and in neither case does it say *which* slice it
+       means. Out here it does, and one rule serves both.
+     *
+     * The mid-angle, less a quarter turn because the ring is rotated to start
+     * at twelve o'clock and this arithmetic starts at three. The point is the
+     * outer edge, and the box is pushed a little further along the same bearing
+     * so its arrow rests on the ring rather than in it. */
+    const angle = (share.start + share.fraction / 2) * 2 * Math.PI - Math.PI / 2
+    const edge = EDGE
+    const x = CENTRE + Math.cos(angle) * edge
+    const y = CENTRE + Math.sin(angle) * edge
+    return drawTooltip(this.rows, at, {
+      /* Half the box either way, then outward along the bearing. A ring has no
+         single side to hang the arrow on, so it is placed by direction. */
+      shift:
+        `translate(calc(-50% + ${Math.cos(angle) * 50}% + ${Math.cos(angle)} * var(--chart-tooltip-arrow, 6px)),` +
+        ` calc(-50% + ${Math.sin(angle) * 50}% + ${Math.sin(angle)} * var(--chart-tooltip-arrow, 6px)))`,
+      side:
+        Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
+          ? Math.cos(angle) > 0
+            ? 'start'
+            : 'end'
+          : Math.sin(angle) > 0
+            ? 'top'
+            : 'bottom',
+      x: `${x}%`,
+      y: `${y}%`,
+    })
   }
 }
 

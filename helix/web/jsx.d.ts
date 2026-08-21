@@ -7456,9 +7456,18 @@ being four of a kind rather than four of three kinds. */
   length?: HelixPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -7554,9 +7563,18 @@ being four of a kind rather than four of three kinds. */
   "prop:length"?: HelixPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -13903,6 +13921,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -13918,6 +13937,7 @@ export type CustomElements = {
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -16512,6 +16532,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
@@ -16522,6 +16543,7 @@ export type CustomElements = {
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -17683,6 +17705,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -17700,6 +17723,7 @@ export type CustomElements = {
    * - `line`: One series.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -19183,9 +19207,18 @@ export type CustomElements = {
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
-   * `numeric` also refuses anything else on the way in, because a code that is
-   * digits is digits: letting a letter into a box a reader cannot submit is a
-   * mistake they have to find and undo themselves.
+   * `numeric` and `alphanumeric` also refuse anything else on the way in,
+   * because a code that is digits is digits: letting a letter into a box a
+   * reader cannot submit is a mistake they have to find and undo themselves.
+   * `text` refuses nothing and only trims, so it is the mode for a code with a
+   * hyphen in it.
+   *
+   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
+   * word is in general and is the right narrowness here. A code of this kind
+   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+   * a filter that accepted it would let through a character the service on the
+   * other end is going to reject. A consumer whose codes really do carry
+   * marked letters wants `text`, which judges nothing.
    *
    * **Not reflected**, and it was until this component's own server spec caught
    * it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -24782,6 +24815,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--bar-chart-bar-radius`: Corner radius at the far end of a column. (default: `undefined`)
    * - `--bar-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--bar-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -24797,6 +24831,7 @@ export type CustomElementsSolidJs = {
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -27455,6 +27490,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--donut-chart-size`: Width and height of the ring. (default: `undefined`)
    * - `--donut-chart-track-color`: Colour of the ring under the slices. (default: `undefined`)
    *
@@ -27465,6 +27501,7 @@ export type CustomElementsSolidJs = {
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -28670,6 +28707,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--chart-tooltip-arrow`: Half the width of the tooltip's point. (default: `undefined`)
    * - `--line-chart-area-opacity`: How much of a line's colour its wash takes. (default: `undefined`)
    * - `--line-chart-block-size`: Height of the drawing. (default: `undefined`)
    * - `--line-chart-gap`: Space between the drawing and its labels. (default: `undefined`)
@@ -28687,6 +28725,7 @@ export type CustomElementsSolidJs = {
    * - `line`: One series.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -30221,9 +30260,18 @@ export type CustomElementsSolidJs = {
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
-   * `numeric` also refuses anything else on the way in, because a code that is
-   * digits is digits: letting a letter into a box a reader cannot submit is a
-   * mistake they have to find and undo themselves.
+   * `numeric` and `alphanumeric` also refuse anything else on the way in,
+   * because a code that is digits is digits: letting a letter into a box a
+   * reader cannot submit is a mistake they have to find and undo themselves.
+   * `text` refuses nothing and only trims, so it is the mode for a code with a
+   * hyphen in it.
+   *
+   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
+   * word is in general and is the right narrowness here. A code of this kind
+   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+   * a filter that accepted it would let through a character the service on the
+   * other end is going to reject. A consumer whose codes really do carry
+   * marked letters wants `text`, which judges nothing.
    *
    * **Not reflected**, and it was until this component's own server spec caught
    * it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -35394,6 +35442,8 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** Half the width of the tooltip's point. */
+  "--chart-tooltip-arrow"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
   /** Height of the drawing. */

@@ -3395,9 +3395,18 @@ export type HelixBasePinInputVueProps = {
   length?: HelixBasePinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`

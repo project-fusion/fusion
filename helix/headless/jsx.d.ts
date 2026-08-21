@@ -6499,9 +6499,18 @@ export type HelixBasePinInputProps = {
   length?: HelixBasePinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -6597,9 +6606,18 @@ export type HelixBasePinInputSolidJsProps = {
   "prop:length"?: HelixBasePinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -12169,6 +12187,7 @@ export type CustomElements = {
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -14711,6 +14730,7 @@ export type CustomElements = {
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -15846,6 +15866,7 @@ export type CustomElements = {
    * - `line`: One series.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -17515,9 +17536,18 @@ export type CustomElements = {
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
-   * `numeric` also refuses anything else on the way in, because a code that is
-   * digits is digits: letting a letter into a box a reader cannot submit is a
-   * mistake they have to find and undo themselves.
+   * `numeric` and `alphanumeric` also refuse anything else on the way in,
+   * because a code that is digits is digits: letting a letter into a box a
+   * reader cannot submit is a mistake they have to find and undo themselves.
+   * `text` refuses nothing and only trims, so it is the mode for a code with a
+   * hyphen in it.
+   *
+   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
+   * word is in general and is the right narrowness here. A code of this kind
+   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+   * a filter that accepted it would let through a character the service on the
+   * other end is going to reject. A consumer whose codes really do carry
+   * marked letters wants `text`, which judges nothing.
    *
    * **Not reflected**, and it was until this component's own server spec caught
    * it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -22824,6 +22854,7 @@ export type CustomElementsSolidJs = {
    * - `labels`: The row of category names.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -25432,6 +25463,7 @@ export type CustomElementsSolidJs = {
    * - `centre`: The middle of the ring, holding whatever is slotted.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a slice shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The slice's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -26603,6 +26635,7 @@ export type CustomElementsSolidJs = {
    * - `line`: One series.
    * - `plot`: The drawing.
    * - `tooltip`: What a pointer resting on a reading shows.
+   * - `tooltip-arrow`: The point of the tooltip, resting on the reading.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -28319,9 +28352,18 @@ export type CustomElementsSolidJs = {
    * - `length`: How many characters the code has.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
-   * `numeric` also refuses anything else on the way in, because a code that is
-   * digits is digits: letting a letter into a box a reader cannot submit is a
-   * mistake they have to find and undo themselves.
+   * `numeric` and `alphanumeric` also refuse anything else on the way in,
+   * because a code that is digits is digits: letting a letter into a box a
+   * reader cannot submit is a mistake they have to find and undo themselves.
+   * `text` refuses nothing and only trims, so it is the mode for a code with a
+   * hyphen in it.
+   *
+   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
+   * word is in general and is the right narrowness here. A code of this kind
+   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+   * a filter that accepted it would let through a character the service on the
+   * other end is going to reject. A consumer whose codes really do carry
+   * marked letters wants `text`, which judges nothing.
    *
    * **Not reflected**, and it was until this component's own server spec caught
    * it: nothing selects on it, so all reflection did was write `type="numeric"`

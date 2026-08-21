@@ -3389,6 +3389,10 @@
           "name": "HelixBarChart",
           "cssProperties": [
             {
+              "description": "Half the width of the tooltip's point.",
+              "name": "--chart-tooltip-arrow"
+            },
+            {
               "description": "Corner radius at the far end of a column.",
               "name": "--bar-chart-bar-radius"
             },
@@ -3805,6 +3809,14 @@
             {
               "description": "What a pointer resting on a reading shows.",
               "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The point of the tooltip, resting on the reading.",
+              "name": "tooltip-arrow",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -19353,6 +19365,10 @@
           "name": "HelixDonutChart",
           "cssProperties": [
             {
+              "description": "Half the width of the tooltip's point.",
+              "name": "--chart-tooltip-arrow"
+            },
+            {
               "description": "Width and height of the ring.",
               "name": "--donut-chart-size"
             },
@@ -19781,6 +19797,14 @@
             {
               "description": "What a pointer resting on a slice shows.",
               "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseDonutChart",
+                "module": "src/donut-chart/root/donut-chart-root.ts"
+              }
+            },
+            {
+              "description": "The point of the tooltip, resting on the reading.",
+              "name": "tooltip-arrow",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
                 "module": "src/donut-chart/root/donut-chart-root.ts"
@@ -27491,6 +27515,10 @@
           "name": "HelixLineChart",
           "cssProperties": [
             {
+              "description": "Half the width of the tooltip's point.",
+              "name": "--chart-tooltip-arrow"
+            },
+            {
               "description": "How much of a line's colour its wash takes.",
               "name": "--line-chart-area-opacity"
             },
@@ -27650,6 +27678,29 @@
               "description": "Whether zero is forced into the range.\n\nAbsent measures from the data's own extent, which is what a line is for.\nSet it where the distance from nothing is the point rather than the shape,\nand accept that a series which never approaches zero becomes a flat rule\nnear the top of the box.",
               "attribute": "zero",
               "reflects": true,
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "range",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "[number, number]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "series",
+                  "type": {
+                    "text": "Series[]"
+                  }
+                }
+              ],
+              "description": "The domain every series is drawn against, which the tooltip also needs.",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -28052,6 +28103,14 @@
             {
               "description": "What a pointer resting on a reading shows.",
               "name": "tooltip",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "The point of the tooltip, resting on the reading.",
+              "name": "tooltip-arrow",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -38913,7 +38972,7 @@
                 "text": "PinType"
               },
               "default": "'numeric'",
-              "description": "What a box accepts, which decides the keyboard a phone offers.\n\n`numeric` also refuses anything else on the way in, because a code that is\ndigits is digits: letting a letter into a box a reader cannot submit is a\nmistake they have to find and undo themselves.\n\n**Not reflected**, and it was until this component's own server spec caught\nit: nothing selects on it, so all reflection did was write `type=\"numeric\"`\nonto every `<helix-pin-input>` ever rendered, an attribute no consumer's\nmarkup had. That is the fault `Input`'s own `type` had and the reason the\narea rules carry the sentence \"reflect only what CSS selects on\". The real\ninputs take it as a binding, which is what makes the keyboard follow.",
+              "description": "What a box accepts, which decides the keyboard a phone offers.\n\n`numeric` and `alphanumeric` also refuse anything else on the way in,\nbecause a code that is digits is digits: letting a letter into a box a\nreader cannot submit is a mistake they have to find and undo themselves.\n`text` refuses nothing and only trims, so it is the mode for a code with a\nhyphen in it.\n\n**`alphanumeric` is ASCII letters and digits**, which is narrower than the\nword is in general and is the right narrowness here. A code of this kind\ncomes off a keypad, an SMS or an authenticator, and none of them emit `é`;\na filter that accepted it would let through a character the service on the\nother end is going to reject. A consumer whose codes really do carry\nmarked letters wants `text`, which judges nothing.\n\n**Not reflected**, and it was until this component's own server spec caught\nit: nothing selects on it, so all reflection did was write `type=\"numeric\"`\nonto every `<helix-pin-input>` ever rendered, an attribute no consumer's\nmarkup had. That is the fault `Input`'s own `type` had and the reason the\narea rules carry the sentence \"reflect only what CSS selects on\". The real\ninputs take it as a binding, which is what makes the keyboard follow.",
               "attribute": "type",
               "inheritedFrom": {
                 "name": "HelixBasePinInput",
@@ -39540,7 +39599,7 @@
                 "text": "PinType"
               },
               "default": "'numeric'",
-              "description": "What a box accepts, which decides the keyboard a phone offers.\n\n`numeric` also refuses anything else on the way in, because a code that is\ndigits is digits: letting a letter into a box a reader cannot submit is a\nmistake they have to find and undo themselves.\n\n**Not reflected**, and it was until this component's own server spec caught\nit: nothing selects on it, so all reflection did was write `type=\"numeric\"`\nonto every `<helix-pin-input>` ever rendered, an attribute no consumer's\nmarkup had. That is the fault `Input`'s own `type` had and the reason the\narea rules carry the sentence \"reflect only what CSS selects on\". The real\ninputs take it as a binding, which is what makes the keyboard follow.",
+              "description": "What a box accepts, which decides the keyboard a phone offers.\n\n`numeric` and `alphanumeric` also refuse anything else on the way in,\nbecause a code that is digits is digits: letting a letter into a box a\nreader cannot submit is a mistake they have to find and undo themselves.\n`text` refuses nothing and only trims, so it is the mode for a code with a\nhyphen in it.\n\n**`alphanumeric` is ASCII letters and digits**, which is narrower than the\nword is in general and is the right narrowness here. A code of this kind\ncomes off a keypad, an SMS or an authenticator, and none of them emit `é`;\na filter that accepted it would let through a character the service on the\nother end is going to reject. A consumer whose codes really do carry\nmarked letters wants `text`, which judges nothing.\n\n**Not reflected**, and it was until this component's own server spec caught\nit: nothing selects on it, so all reflection did was write `type=\"numeric\"`\nonto every `<helix-pin-input>` ever rendered, an attribute no consumer's\nmarkup had. That is the fault `Input`'s own `type` had and the reason the\narea rules carry the sentence \"reflect only what CSS selects on\". The real\ninputs take it as a binding, which is what makes the keyboard follow.",
               "fieldName": "type",
               "inheritedFrom": {
                 "name": "HelixBasePinInput",

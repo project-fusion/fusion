@@ -3874,9 +3874,18 @@ being four of a kind rather than four of three kinds. */
   length?: HelixPinInput["length"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
-`numeric` also refuses anything else on the way in, because a code that is
-digits is digits: letting a letter into a box a reader cannot submit is a
-mistake they have to find and undo themselves.
+`numeric` and `alphanumeric` also refuse anything else on the way in,
+because a code that is digits is digits: letting a letter into a box a
+reader cannot submit is a mistake they have to find and undo themselves.
+`text` refuses nothing and only trims, so it is the mode for a code with a
+hyphen in it.
+
+**`alphanumeric` is ASCII letters and digits**, which is narrower than the
+word is in general and is the right narrowness here. A code of this kind
+comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+a filter that accepted it would let through a character the service on the
+other end is going to reject. A consumer whose codes really do carry
+marked letters wants `text`, which judges nothing.
 
 **Not reflected**, and it was until this component's own server spec caught
 it: nothing selects on it, so all reflection did was write `type="numeric"`
@@ -3887,6 +3896,18 @@ inputs take it as a binding, which is what makes the keyboard follow. */
   type?: HelixPinInput["type"];
   /** Whether the characters are hidden, the way a password is. */
   mask?: HelixPinInput["mask"];
+  /** What an empty box shows, usually a single dot.
+
+The platform's own placeholder, on each cell, rather than a character
+drawn behind the field: it clears the moment anything is typed, it is
+already excluded from the accessible value, and it works the same under
+`mask`, where the cell is a password input and a hand-drawn glyph would
+have to know that.
+
+Empty by default, because a row of boxes already reads as a row of boxes
+and a dot in each is a choice about how much the field should announce
+itself before anybody has touched it. */
+  placeholder?: HelixPinInput["placeholder"];
   /** Whether the boxes refuse input while still submitting their value. */
   "read-only"?: HelixPinInput["readOnly"];
   /** Whether the boxes refuse input while still submitting their value. */
@@ -6927,6 +6948,8 @@ export type CustomCssProperties = {
   "--badge-offset"?: string;
   /** The ring separating it from what is behind. */
   "--badge-ring-color"?: string;
+  /** Half the width of the tooltip's point. */
+  "--chart-tooltip-arrow"?: string;
   /** Corner radius at the far end of a column. */
   "--bar-chart-bar-radius"?: string;
   /** Height of the drawing. */

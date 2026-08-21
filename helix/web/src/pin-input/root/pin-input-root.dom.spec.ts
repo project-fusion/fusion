@@ -96,6 +96,27 @@ describe('input pin', () => {
     expect(host.value).toBe('a1b2')
   })
 
+  test('`alphanumeric` takes letters and digits and refuses the rest', async () => {
+    /* The mode between the other two: `numeric` drops a letter, `text` keeps a
+       hyphen, and a code that is letters and digits wants neither. */
+    const host = await pin('length="6" type="alphanumeric"')
+    await arrive(host, 0, 'a1-b2!')
+    expect(host.value).toBe('a1b2')
+  })
+
+  test('`alphanumeric` is ASCII, and `text` is where a marked letter goes', async () => {
+    /* Narrower than the word is in general, and deliberately: a code off a
+       keypad, an SMS or an authenticator does not carry `é`, so accepting one
+       admits a character the service on the other end will reject. */
+    const strict = await pin('length="4" type="alphanumeric"')
+    await arrive(strict, 0, 'éa9')
+    expect(strict.value).toBe('a9')
+
+    const loose = await pin('length="4" type="text"')
+    await arrive(loose, 0, 'éa9')
+    expect(loose.value).toBe('éa9')
+  })
+
   test('anything past the last box is dropped rather than wrapping', async () => {
     const host = await pin('length="4"')
     await arrive(host, 0, '123456789')

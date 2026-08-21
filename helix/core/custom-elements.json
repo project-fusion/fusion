@@ -5864,14 +5864,13 @@
               }
             },
             {
-              "name": "place",
+              "name": "where",
               "optional": true,
               "type": {
-                "text": "string"
+                "text": "TooltipAt"
               }
             }
-          ],
-          "description": "What a pointer resting on a reading shows, as markup every chart can use.\n\n**A function rather than a method on `MixinChartSource`, and that is forced.**\nA mixin's members reach a subclass only through its declared interface, and an\ninterface cannot carry a protected one: TypeScript refuses to widen a class to\nan interface across a protected member. Declaring it public would make a\nrender seam part of the published API and break the convention\n`check:seams` holds, that a composed thing sits behind\n`protected render…()`. So the markup is shared here, the way `drawIcon`\nshares a glyph, and each chart keeps a one-line seam of its own.\n\n**It shows the table's text and not the chart's numbers.** `$128k` is what\nthe cell says and `128000` is what the drawing measured, and a tooltip\nprinting the second is the chart overruling the table about how its own\nfigure reads. Every cell of the row is here, including columns nothing was\nplotted from, because a note or a status beside the figures is most of the\nreason to want a tooltip at all.\n\n**Hidden from assistive technology, on purpose.** The table is the accessible\nrepresentation and the drawing is `aria-hidden`; a reader on a keyboard gets\nthe table, which they can reach, rather than a tooltip which they cannot."
+          ]
         }
       ],
       "exports": [

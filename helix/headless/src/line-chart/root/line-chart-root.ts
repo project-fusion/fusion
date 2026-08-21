@@ -60,6 +60,7 @@ const HEIGHT = 100
  * @csspart line - One series.
  * @csspart plot - The drawing.
  * @csspart tooltip - What a pointer resting on a reading shows.
+ * @csspart tooltip-arrow - The point of the tooltip, resting on the reading.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -113,6 +114,13 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
   @property({ reflect: true, type: Boolean })
   zero = false
 
+  /** The domain every series is drawn against, which the tooltip also needs. */
+  private range(series: Series[]): [number, number] {
+    const values = series.flatMap((one) => one.points.map((point) => point.value))
+    const [low, high] = extent(values.length > 0 ? values : [0])
+    return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
+  }
+
   protected override render(): TemplateResult {
     const series = this.series
     const readings = series[0]?.points.map((point) => point.label) ?? []
@@ -120,9 +128,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
       return html`<div part="plot"></div>`
     }
 
-    const values = series.flatMap((one) => one.points.map((point) => point.value))
-    const [low, high] = extent(values.length > 0 ? values : [0])
-    const domain: [number, number] = this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
+    const domain = this.range(series)
     const y = linear(domain, [HEIGHT, 0])
     /* **A reading sits in the middle of its own slot, not at the edge of the
        box**, which is what makes the names underneath line up with it.
@@ -245,7 +251,28 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
    * there, including the columns nothing was plotted from.
    */
   protected renderTooltip(): TemplateResult | typeof nothing {
-    return drawTooltip(this.rows, this.pointer.at)
+    const at = this.pointer.at
+    const series = this.series
+    if (at < 0 || series.length === 0) {
+      return drawTooltip(this.rows, at)
+    }
+    /* Above the topmost series at that reading, so the box never covers the
+       line it is describing. `y` counts down in the drawing, so the smallest is
+       the highest, and no readings at all would make `Math.min` return
+       Infinity. */
+    const domain = this.range(series)
+    const scale = linear(domain, [HEIGHT, 0])
+    const tops = series
+      .map((one) => one.points[at]?.value)
+      .filter((one): one is number => one !== undefined)
+      .map((one) => scale(one))
+    const slot = 100 / this.readings
+    return drawTooltip(this.rows, at, {
+      shift: 'translate(-50%, calc(-100% - var(--chart-tooltip-arrow, 6px)))',
+      side: 'bottom',
+      x: `${at * slot + slot / 2}%`,
+      y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,
+    })
   }
 }
 

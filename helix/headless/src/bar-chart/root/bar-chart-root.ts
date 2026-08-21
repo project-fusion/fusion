@@ -51,6 +51,7 @@ const HEIGHT = 100
  * @csspart labels - The row of category names.
  * @csspart plot - The drawing.
  * @csspart tooltip - What a pointer resting on a reading shows.
+ * @csspart tooltip-arrow - The point of the tooltip, resting on the reading.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -200,7 +201,37 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
    * there, including the columns nothing was plotted from.
    */
   protected renderTooltip(): TemplateResult | typeof nothing {
-    return drawTooltip(this.rows, this.pointer.at)
+    const at = this.pointer.at
+    const series = this.series
+    if (at < 0 || series.length === 0) {
+      return drawTooltip(this.rows, at)
+    }
+    /* Off the far end of the tallest bar in the group, so the box never covers
+       the columns it is describing. Horizontal bars grow rightward, so the far
+       end is along x and the arrow hangs off the box's start edge. */
+    const values = series.map((one) => one.points[at]?.value ?? 0)
+    const all = series.flatMap((one) => one.points.map((point) => point.value))
+    const [low, high] = extent(all.length > 0 ? all : [0])
+    const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
+    const sideways = this.direction === 'horizontal'
+    const scale = sideways ? linear(domain, [0, HEIGHT]) : linear(domain, [HEIGHT, 0])
+    const ends = values.map((one) => scale(one))
+    const far = sideways ? Math.max(...ends) : Math.min(...ends)
+    const slot = 100 / this.readings
+    const across = at * slot + slot / 2
+    return sideways
+      ? drawTooltip(this.rows, at, {
+          shift: 'translate(calc(var(--chart-tooltip-arrow, 6px)), -50%)',
+          side: 'start',
+          x: `${far}%`,
+          y: `${across}%`,
+        })
+      : drawTooltip(this.rows, at, {
+          shift: 'translate(-50%, calc(-100% - var(--chart-tooltip-arrow, 6px)))',
+          side: 'bottom',
+          x: `${across}%`,
+          y: `${far}%`,
+        })
   }
 }
 

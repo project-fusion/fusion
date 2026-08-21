@@ -25,6 +25,7 @@ import { styles } from './line-chart-root.css.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://helix.fusion.dev/components/line-chart
  *
+ * @cssproperty --chart-tooltip-arrow - Half the width of the tooltip's point.
  * @cssproperty --line-chart-area-opacity - How much of a line's colour its wash takes.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
