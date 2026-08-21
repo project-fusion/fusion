@@ -161,6 +161,16 @@ export class HelixAura extends HelixElement {
   private readonly trail = new Float32Array(8 * 3).fill(1)
   private trailNext = 0
 
+  /**
+   * The same marks, oldest first, which is what the shader is given.
+   *
+   * The ring's own order is not time order, and the wake is drawn as a polyline
+   * through consecutive entries: a segment across the wrap joined the newest
+   * mark to the oldest and drew a bright bar clean through the middle of the
+   * field. Unrolled once per frame, which is eight copies.
+   */
+  private readonly ordered = new Float32Array(8 * 3).fill(1)
+
   /** Where the pointer is, and where the field has got to. The gap is weight. */
   private readonly target = { reach: 0, x: 0, y: 0 }
   private readonly eased = { reach: 0, x: 0, y: 0 }
@@ -409,7 +419,16 @@ export class HelixAura extends HelixElement {
     gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
     gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
     gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
-    gl.uniform3fv(uniforms.uTrail ?? null, this.trail)
+    /* Unrolled oldest first. `trailNext` is where the next mark goes, so it is
+       also the oldest slot. */
+    for (let i = 0; i < 8; i++) {
+      const from = ((this.trailNext + i) % 8) * 3
+      const to = i * 3
+      this.ordered[to] = this.trail[from] ?? 1
+      this.ordered[to + 1] = this.trail[from + 1] ?? 1
+      this.ordered[to + 2] = this.trail[from + 2] ?? 1
+    }
+    gl.uniform3fv(uniforms.uTrail ?? null, this.ordered)
     gl.uniform2f(uniforms.uPointer ?? null, this.eased.x, this.eased.y)
     gl.uniform1f(uniforms.uReach ?? null, this.eased.reach)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -455,12 +474,21 @@ export class HelixAura extends HelixElement {
        per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
        display would chase twice as eagerly as a 60Hz one. */
     const follow = 1 - Math.exp(-delta / 0.028)
-    const fade = 1 - Math.exp(-delta / 0.16)
     if (!this.interactive) {
       this.target.reach = 0
     }
     this.eased.x += (this.target.x - this.eased.x) * follow
     this.eased.y += (this.target.y - this.eased.y) * follow
+
+    /* Presence rises fast and falls slowly, which is not symmetry for its own
+       sake. A single constant meant the effect took about four tenths of a
+       second to reach full strength every time a pointer entered, and that
+       ramp is indistinguishable from lag: a reader moves in, nothing much
+       happens, and by the time it does they have decided the page is slow.
+       Rising in 115 milliseconds it answers immediately; falling over half a
+       second it lets go without the field flinching as the cursor crosses out. */
+    const rising = this.target.reach > this.eased.reach
+    const fade = 1 - Math.exp(-delta / (rising ? 0.05 : 0.22))
     this.eased.reach += (this.target.reach - this.eased.reach) * fade
     this.age(delta)
 

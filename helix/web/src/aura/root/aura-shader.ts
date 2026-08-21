@@ -161,42 +161,67 @@ export const FRAGMENT = `#version 300 es
     return pow(rings, 4.0) * mix(0.45, 1.45, grain) * exp(-r * 1.05);
   }
 
-  /* Ink in a viscous medium, stirred by where the pointer has been.
+  /* Ink in a viscous medium, drawn through by where the pointer went.
    *
-   * The field is warped by itself twice over, which is what gives a liquid its
-   * unhurried, folded look: each sample is displaced by the field's own value,
-   * so structure gathers into sheets rather than staying a cloud.
+   * **The wake is one stroke, not eight marks.** Each trail point used to add a
+   * vortex of its own, rotating the sample around its own centre, which drew
+   * eight discrete swirls fading in place: a row of blobs rather than anything
+   * a hand had done. The marks are a polyline now. Distance is measured to the
+   * nearest *segment*, age is interpolated along it, and what a reader sees is
+   * a continuous stroke however far apart the samples fell.
    *
-   * Every trail point adds a vortex, rotating the sample around it by the
-   * perpendicular of the offset. Rotating the *coordinate* rather than adding a
-   * blob is what makes it read as stirring: the pattern that was there is
-   * carried around the point instead of being painted over. */
-  float flow(vec2 q, float t) {
-    vec2 p = q * 0.9;
-    float stirred = 0.0;
+   * **And the displacement runs along the stroke, not around it.** Pushing the
+   * sample down the tangent is advection: the pattern is carried the way the
+   * hand went, which is what stirring looks like. Rotating it around a point is
+   * a whirlpool, and eight whirlpools is a washing machine.
+   *
+   * The marks arrive oldest first, so consecutive indices are consecutive in
+   * time. In the ring they are not, and a segment drawn across the wrap joined
+   * the newest mark to the oldest with a bright bar through the middle of the
+   * field.
+   */
+  float flowWake(vec2 p, out vec2 push) {
+    push = vec2(0.0);
+    float wake = 0.0;
 
-    for (int i = 0; i < 8; i++) {
-      vec3 mark = uTrail[i];
-      if (mark.z >= 1.0) {
+    for (int i = 0; i < 7; i++) {
+      vec3 a = uTrail[i];
+      vec3 b = uTrail[i + 1];
+      if (a.z >= 1.0 || b.z >= 1.0) {
         continue;
       }
-      vec2 d = p - mark.xy;
-      float r = length(d);
-      /* Squared falloff of age, so a wake thins as it dies rather than
-         switching off, and an exponential in distance so the swirl is local. */
-      float life = (1.0 - mark.z) * (1.0 - mark.z);
-      float swirl = life * exp(-r * 2.4);
-      p += vec2(-d.y, d.x) * swirl * 0.75;
-      stirred += swirl;
+      vec2 ab = b.xy - a.xy;
+      float len2 = dot(ab, ab);
+      if (len2 < 1e-6) {
+        continue;
+      }
+      float t = clamp(dot(p - a.xy, ab) / len2, 0.0, 1.0);
+      float r = length(p - (a.xy + ab * t));
+      /* Squared, so a wake thins as it dies rather than switching off. */
+      float life = 1.0 - mix(a.z, b.z, t);
+      float w = life * life * exp(-r * 3.2);
+      wake += w;
+      push += (ab * inversesqrt(len2)) * w;
     }
+    return wake;
+  }
+
+  float flow(vec2 q, float t) {
+    vec2 push;
+    float wake = flowWake(q * 0.9, push);
+    vec2 p = q * 0.9 + push * 0.5;
+
+    /* The field is warped by itself twice over, which is what gives a liquid
+       its folded look: each sample is displaced by the field's own value, so
+       structure gathers into sheets rather than staying a cloud. */
+    float ink = warped(p * 1.15, t * 0.55);
+    float sheet = warped(p * 2.3 + vec2(3.1, 1.7), t * 0.35);
+    float body = mix(0.55, 1.3, ink) * mix(0.5, 1.15, sheet);
 
     /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
        people never see. */
-    float ink = warped(p * 1.15, t * 0.55);
-    float sheet = warped(p * 2.3 + vec2(3.1, 1.7), t * 0.35);
-    float body = mix(0.55, 1.3, ink) * mix(0.5, 1.15, sheet);
-    return body * (0.42 + clamp(stirred, 0.0, 1.6) * 0.75) * exp(-length(q) * 0.5);
+    return body * (0.5 + clamp(wake, 0.0, 1.0) * 0.38) * exp(-length(q) * 0.55);
   }
 
   /* Two wave fields crossed, lit where they agree. */
