@@ -559,7 +559,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className="showcaseView" hidden={view !== 'surfaces'}>
+        <div className="showcaseView showcaseFill" hidden={view !== 'surfaces'}>
           {/* Flat, like the code block. `Callout` already draws its own band:
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two
@@ -604,8 +604,12 @@ export function Showcase(): React.ReactElement {
               only thing in this view a reader can open, so it says something
               the tags and the avatars beside it cannot. */}
           <helix-card appearance="outlined" class="showcaseCard">
-            <helix-accordion mode="single-collapsible">
-              <helix-accordion-item>
+            <helix-accordion mode="single">
+              {/* `default-open`, not `open`: writing `open` is a claim of
+                  ownership, and the generated types refuse it without a handler
+                  or a ref for exactly that reason. This seeds it and leaves the
+                  element to run itself. */}
+              <helix-accordion-item default-open>
                 <span slot="summary">What ships</span>
                 Custom elements, a stylesheet, and the types. No runtime beyond the components
                 themselves.

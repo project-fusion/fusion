@@ -2718,6 +2718,17 @@ helix-drawer helix-tree {
   display: none;
 }
 
+/* **One view fills its rows, and it is deliberately not all three.** A row is
+   as tall as its tallest card, so stretching makes the pair beside it match
+   rather than sit short. That is right where the cards are surfaces holding
+   assorted content, and wrong in `data`: the figures card pins its chart to
+   its own bottom edge, so a stretched one puts the gap between the numbers and
+   the line instead of under the card, which is the same space moved somewhere
+   it reads as a mistake. */
+.showcaseFill {
+  align-items: stretch;
+}
+
 /* The faces sit in a row, which is `orientation` and not a custom property I
    invented: five of them stacked is a list of moods, and what a scale wants is
    to be seen at once. The mark carries the meaning here, so the words under it
