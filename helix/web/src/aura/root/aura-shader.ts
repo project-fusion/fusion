@@ -65,7 +65,7 @@ export const FRAGMENT = `#version 300 es
      how long the page has been open. What it cannot do is conserve anything, so
      there is no diffusion and no pressure: the wake decays rather than
      spreading. Worth knowing before this is asked to be a simulation. */
-  uniform vec3 uTrail[8];
+  uniform vec3 uTrail[9];
   uniform vec3 uGround;
   uniform vec3 uHaze;
   uniform vec3 uGlow;
@@ -179,12 +179,17 @@ export const FRAGMENT = `#version 300 es
    * time. In the ring they are not, and a segment drawn across the wrap joined
    * the newest mark to the oldest with a bright bar through the middle of the
    * field.
+   *
+   * Nine, not eight: eight committed marks and the live head, which is held
+   * outside the ring so that committing appends rather than overwrites. A
+   * zero-length segment between the newest mark and the head is skipped below,
+   * which is what makes the commit invisible.
    */
   float flowWake(vec2 p, out vec2 push) {
     push = vec2(0.0);
     float wake = 0.0;
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
       vec3 a = uTrail[i];
       vec3 b = uTrail[i + 1];
       if (a.z >= 1.0 || b.z >= 1.0) {

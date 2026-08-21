@@ -169,7 +169,18 @@ export class HelixAura extends HelixElement {
    * mark to the oldest and drew a bright bar clean through the middle of the
    * field. Unrolled once per frame, which is eight copies.
    */
-  private readonly ordered = new Float32Array(8 * 3).fill(1)
+  private readonly ordered = new Float32Array(9 * 3).fill(1)
+
+  /**
+   * The live end of the stroke, outside the ring.
+   *
+   * **In the ring it destroyed a mark every time it committed.** The head was
+   * the slot at `trailNext`, so advancing wrote over whatever was oldest, and
+   * the tail of the stroke lost a point instantly rather than fading. Held
+   * apart, committing appends where the head already is: the polyline goes from
+   * ending at P to ending at P, P, which is the same shape, and nothing jumps.
+   */
+  private readonly head = { x: 1, y: 1 }
 
   /** Where the pointer is, and where the field has got to. The gap is weight. */
   private readonly target = { reach: 0, x: 0, y: 0 }
@@ -419,18 +430,20 @@ export class HelixAura extends HelixElement {
     gl.uniform1f(uniforms.uScale ?? null, this.drifted(this.scale, 0.32, 0.061))
     gl.uniform1f(uniforms.uBloom ?? null, this.drifted(this.bloom, 0.22, 0.029))
     gl.uniform1f(uniforms.uGain ?? null, this.drifted(this.gain, 0.3, 0.053))
-    /* Unrolled oldest first, and the offset moved when the head became
-       provisional. `trailNext` used to be the next slot to write, and so the
-       oldest; it is now the live head, and so the newest. The oldest is the one
-       after it. Left as it was, the stroke came out reversed in age and drew a
-       segment across the wrap. */
+    /* Unrolled oldest first, with the live head appended last. `trailNext` is
+       the next slot to be written and so the oldest again, now that the head no
+       longer lives in the ring. */
     for (let i = 0; i < 8; i++) {
-      const from = ((this.trailNext + 1 + i) % 8) * 3
+      const from = ((this.trailNext + i) % 8) * 3
       const to = i * 3
       this.ordered[to] = this.trail[from] ?? 1
       this.ordered[to + 1] = this.trail[from + 1] ?? 1
       this.ordered[to + 2] = this.trail[from + 2] ?? 1
     }
+    this.ordered[24] = this.head.x
+    this.ordered[25] = this.head.y
+    this.ordered[26] = 0
+
     gl.uniform3fv(uniforms.uTrail ?? null, this.ordered)
     gl.uniform2f(uniforms.uPointer ?? null, this.eased.x, this.eased.y)
     gl.uniform1f(uniforms.uReach ?? null, this.eased.reach)
@@ -539,11 +552,6 @@ export class HelixAura extends HelixElement {
        made it, which is the whole effect, and short enough that a page left
        alone settles rather than keeping a drawing nobody made. */
     for (let i = 2; i < this.trail.length; i += 3) {
-      /* The provisional head is rewritten every frame and is always fresh, so
-         ageing it would fight `advanceWake` for the same slot. */
-      if (i === this.trailNext * 3 + 2) {
-        continue
-      }
       const next = (this.trail[i] ?? 1) + delta / 2
       this.trail[i] = next > 1 ? 1 : next
     }
@@ -584,16 +592,41 @@ export class HelixAura extends HelixElement {
     if (!this.interactive) {
       return
     }
-    const head = this.trailNext * 3
-    this.trail[head] = this.eased.x
-    this.trail[head + 1] = this.eased.y
-    this.trail[head + 2] = 0
+    this.head.x = this.eased.x
+    this.head.y = this.eased.y
 
     const last = ((this.trailNext + 7) % 8) * 3
-    const dx = this.eased.x - (this.trail[last] ?? 0)
-    const dy = this.eased.y - (this.trail[last + 1] ?? 0)
-    if (dx * dx + dy * dy >= 0.014) {
-      this.trailNext = (this.trailNext + 1) % 8
+    const dx = this.head.x - (this.trail[last] ?? 0)
+    const dy = this.head.y - (this.trail[last + 1] ?? 0)
+    if (dx * dx + dy * dy < 0.014) {
+      return
+    }
+
+    const at = this.trailNext * 3
+    this.trail[at] = this.head.x
+    this.trail[at + 1] = this.head.y
+    this.trail[at + 2] = 0
+    this.trailNext = (this.trailNext + 1) % 8
+
+    /* Every other mark ages a slot's worth on each commit, on top of ageing
+       with time.
+       
+       Time alone is not enough, because what has to be spent by the moment the
+       ring reuses a slot is a function of *distance travelled*, not of seconds:
+       marks commit every gate length, so a brisk gesture laps the ring long
+       before a two second fade has taken the oldest down, and overwriting a
+       mark that is still bright is a pop at the tail.
+
+       A seventh, not an eighth. A mark is written at nought and is skipped on
+       its own commit, so it collects exactly seven increments before its slot
+       comes round again. Measured at an eighth, every overwritten slot stood at
+       0.875: faint, and not gone, and a faint point vanishing is still a pop. */
+    for (let i = 2; i < this.trail.length; i += 3) {
+      if (i === at + 2) {
+        continue
+      }
+      const next = (this.trail[i] ?? 1) + 1 / 7
+      this.trail[i] = next > 1 ? 1 : next
     }
   }
 
