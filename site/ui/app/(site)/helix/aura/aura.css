@@ -76,8 +76,8 @@
   padding-block-end: calc(var(--helix-size-header) + var(--helix-space-2xl));
 }
 
-/* The knobs live in the popover, so they are only on screen while somebody is
-   using them: seven sliders across the middle of a field is most of the field. */
+/* Flat on the bar rather than behind a trigger. A grid that wraps by itself,
+   so the seven find their own number of rows at whatever width there is. */
 .auraKnobs {
-  inline-size: min(38rem, 80vw);
+  inline-size: 100%;
 }

@@ -169,7 +169,7 @@ export function AuraLab(): React.ReactElement {
               ))}
             </helix-toggle-group>
 
-            <helix-flex align="center" gap="lg" wrap>
+            <helix-flex align="center" data-density="sm" gap="lg" wrap>
               <helix-switch
                 checked={interactive}
                 label="Follow"
@@ -178,35 +178,29 @@ export function AuraLab(): React.ReactElement {
                 }}
               ></helix-switch>
 
-              <helix-popover id="auraKnobs" label="Parameters" placement="top-end">
-                <button data-button data-button-fill="standard" slot="trigger" type="button">
-                  Parameters
-                </button>
-                <helix-grid class="auraKnobs" gap="lg" min="12rem">
-                  {KNOBS.map((knob) => (
-                    <helix-slider
-                      key={knob.key}
-                      label={knob.label}
-                      max={knob.max}
-                      min={knob.min}
-                      onhelix-input={(event: CustomEvent<{ value: string }>) => {
-                        const next = Number(event.detail.value)
-                        setKnobs((held) => ({ ...held, [knob.key]: next }))
-                      }}
-                      show-value
-                      step={knob.step}
-                      value={String(knobs[knob.key])}
-                    ></helix-slider>
-                  ))}
-                </helix-grid>
-                <helix-flex data-density="sm" slot="footer">
-                  <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
-                    Reset
-                  </button>
-                </helix-flex>
-              </helix-popover>
+              <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
+                Reset
+              </button>
             </helix-flex>
           </helix-flex>
+
+          <helix-grid class="auraKnobs" data-density="sm" gap="lg" min="8.5rem">
+            {KNOBS.map((knob) => (
+              <helix-slider
+                key={knob.key}
+                label={knob.label}
+                max={knob.max}
+                min={knob.min}
+                onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                  const next = Number(event.detail.value)
+                  setKnobs((held) => ({ ...held, [knob.key]: next }))
+                }}
+                show-value
+                step={knob.step}
+                value={String(knobs[knob.key])}
+              ></helix-slider>
+            ))}
+          </helix-grid>
         </helix-flex>
       </div>
     </section>

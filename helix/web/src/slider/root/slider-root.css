@@ -246,15 +246,36 @@
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
   /* `overlay`, the token for a thing over the page rather than on it, which is
-     what every other thumb in this library takes: the switch's and the
-     segmented control's both. This was `background`, the page's own color, so
-     the thumb was white on a white page in light and black on a black one in
-     dark. It had contrast with nothing by construction. */
-  background-color: var(--slider-thumb-color, var(--helix-color-surface-overlay));
+     This was `background`, the page's own color, so the thumb was white on a
+     white page in light and black on a black one in dark: no contrast, by
+     construction. `surface-overlay` fixed the page and not the track, which is
+     the surface a thumb actually sits on.
+     
+     **In dark mode `surface-overlay` is neutral-800 and the track is
+     neutral-700, and higher numbers are darker here.** The thumb was darker
+     than the thing it slid along, and on a raised surface, a popover or a bar
+     with its own fill, it disappeared outright.
+     
+     `surface-inverse` is the one token that is light where the page is dark and
+     dark where the page is light, so it has contrast with the track, with the
+     fill, and with any surface either sits on, in both modes and without a
+     second value to keep in step. It is what this library already reaches for
+     when something has to read as emphasis. */
+  background-color: var(--slider-thumb-color, var(--helix-color-surface-inverse));
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-md);
+  /* A ring of the page's own colour, so the thumb reads against whichever
+     half of the track it is over.
+     
+     Contrast against the track is 11.25 and against the fill is 2.57, which is
+     under the three to one non-text contrast wants: the thumb sits on the
+     boundary between the two and at the end of its travel it is over the fill
+     alone. A ring separates it from both without tinting it, and it inverts
+     with the mode for free because it is the ground either sits on. */
+  box-shadow:
+    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
 }
@@ -262,6 +283,7 @@
 [part="control"]:focus-visible::-webkit-slider-thumb,
 [part="control"]:active::-webkit-slider-thumb {
   box-shadow:
+    0 0 0 var(--helix-border-thick) var(--helix-color-background),
     var(--helix-shadow-md),
     0 0 0 var(--helix-space-2xs) var(--_slider-halo);
 }
@@ -269,18 +291,29 @@
 [part="control"]:focus-visible::-moz-range-thumb,
 [part="control"]:active::-moz-range-thumb {
   box-shadow:
+    0 0 0 var(--helix-border-thick) var(--helix-color-background),
     var(--helix-shadow-md),
     0 0 0 var(--helix-space-2xs) var(--_slider-halo);
 }
 
 [part="control"]::-moz-range-thumb {
-  background-color: var(--slider-thumb-color, var(--helix-color-surface-overlay));
+  background-color: var(--slider-thumb-color, var(--helix-color-surface-inverse));
   block-size: var(--_slider-thumb);
   /* Stated rather than dropped: Firefox's UA stylesheet gives the thumb a
      border, so leaving the declaration out leaves a border rather than none. */
   border: none;
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-md);
+  /* A ring of the page's own colour, so the thumb reads against whichever
+     half of the track it is over.
+     
+     Contrast against the track is 11.25 and against the fill is 2.57, which is
+     under the three to one non-text contrast wants: the thumb sits on the
+     boundary between the two and at the end of its travel it is over the fill
+     alone. A ring separates it from both without tinting it, and it inverts
+     with the mode for free because it is the ground either sits on. */
+  box-shadow:
+    0 0 0 var(--helix-border-thick) var(--helix-color-background),
+    var(--helix-shadow-md);
   inline-size: var(--_slider-thumb);
 }
 
