@@ -369,10 +369,14 @@ export function Showcase(): React.ReactElement {
               the faces below deliberately are not. */}
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
+              {/* `text` is the component's non-numeric mode, and it is any
+                  character rather than strictly alphanumeric: the numeric mode
+                  strips non-digits and this one only trims. */}
               <helix-pin-input
                 label="Verification code"
                 length={4}
                 placeholder="•"
+                type="text"
               ></helix-pin-input>
               <helix-rating default-value="4" label="Documentation"></helix-rating>
             </helix-flex>
