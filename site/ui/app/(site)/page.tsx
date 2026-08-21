@@ -68,15 +68,23 @@ export default function Home() {
     <div className="reel">
       {/* Starting at the top of the page and running past the hero.
 
-          `terminus` and not `tilt`, because the thing being asked for is where
-          the braid leaves the top edge and an angle only says that for one
-          shape of box. It was 23 degrees, derived against a field 1280 by 1600
-          to land the axis at 979, the midpoint between the navigation's right
-          edge and the actions. That number holds at exactly one window height:
-          measured at a 720 pixel viewport the same 23 degrees put the exit at
-          611, a third of the way further left, because the reel is two screens
-          tall and its aspect moves with the window. 0.76 of the width is the
-          same intent said in the terms the reader sees, and it holds.
+          **`terminus`, tuned so the angle reads about 23 degrees on a large
+          screen.** 23 is the derived number: against a field 1280 by 1600 it
+          lands the axis at 979, the midpoint between the navigation's right edge
+          and the actions.
+
+          It is not set as `tilt`, and `tilt` would not take if it were: the
+          component resolves `terminus` first and only falls back to an angle
+          when there is no exit point to honour. The two are asking different
+          questions. An angle says where the braid leaves the top edge for one
+          shape of box only, and this reel is two screens tall, so its aspect
+          moves with the window rather than with the width alone.
+
+          So the exit point is what is declared and 23 is what it draws where it
+          matters. Measured across the widths a desktop actually is, at a reel
+          twice the viewport's height: 26.0 degrees at 1280, 23.1 at 1512, and
+          28.5 from 1920 up, where the reel stops growing with the width. The
+          previous 0.76 drew 28.0, 31.3 and 34.0 at those same three.
           
           It used to be inside the hero, so it stopped dead at the end of the
           first band. It scrolls with the page rather than being pinned to the
@@ -89,7 +97,7 @@ export default function Home() {
         gain={0.55}
         scale={1.7}
         speed={0.45}
-        terminus={0.76}
+        terminus={0.61}
       ></helix-aura>
       <div className="reelScrim" />
 
