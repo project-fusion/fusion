@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * The library, running, with a switch that changes what it is showing.
@@ -61,11 +61,94 @@ const SERIES: Record<string, string> = {
   web: '104 109 112 110 115 117 118',
 }
 
+/** How long a view holds before the next one, when nobody is looking at it. */
+const DWELL = 7000
+
 export function Showcase(): React.ReactElement {
   const [view, setView] = useState<View>('controls')
 
+  /**
+   * It cycles on its own, and stops the moment anybody arrives.
+   *
+   * **A pointer inside the panel is somebody reading it**, and moving what
+   * they are reading out from under them is the worst thing this could do. The
+   * same goes for focus: a reader on a keyboard has no pointer to hold still
+   * with, so focus anywhere inside pauses it too.
+   *
+   * **And it does not run at all for a reader who asked not to be moved.**
+   * Nothing in the base layer covers this. That rule caps animation and
+   * transition durations, and this is neither: it is a state change on a timer,
+   * which no duration reaches. Asked directly, and asked again if the
+   * preference changes rather than only at mount.
+   */
+  const [held, setHeld] = useState(false)
+  const stage = useRef<HTMLDivElement>(null)
+
+  /* **Listened for on the node rather than bound in the markup.** A panel that
+     pauses when a pointer arrives is not an interactive element: it has no
+     activation, no role and nothing to press, and `onPointerEnter` in the JSX
+     had Biome asking for a role to justify it. Inventing one to satisfy a
+     linter puts a lie in the accessibility tree. The listeners belong on the
+     node, which is also where React's own enter and leave are synthesised from
+     delegated over and out anyway. */
+  useEffect(() => {
+    const node = stage.current
+    if (!node) {
+      return
+    }
+
+    const hold = (): void => setHeld(true)
+    const release = (): void => setHeld(false)
+
+    node.addEventListener('pointerenter', hold)
+    node.addEventListener('pointerleave', release)
+    node.addEventListener('focusin', hold)
+    node.addEventListener('focusout', release)
+
+    return () => {
+      node.removeEventListener('pointerenter', hold)
+      node.removeEventListener('pointerleave', release)
+      node.removeEventListener('focusin', hold)
+      node.removeEventListener('focusout', release)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (held) {
+      return
+    }
+
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let timer: ReturnType<typeof setInterval> | undefined
+
+    const start = (): void => {
+      if (still.matches) {
+        return
+      }
+      timer = setInterval(() => {
+        setView((was) => {
+          const at = VIEWS.findIndex((one) => one.name === was)
+          return VIEWS[(at + 1) % VIEWS.length]?.name ?? was
+        })
+      }, DWELL)
+    }
+
+    const restart = (): void => {
+      clearInterval(timer)
+      start()
+    }
+
+    start()
+    still.addEventListener('change', restart)
+
+    return () => {
+      clearInterval(timer)
+      still.removeEventListener('change', restart)
+    }
+  }, [held])
+
   return (
-    <div className="showcaseStage">
+    <div className="showcaseStage" ref={stage}>
       <helix-card class="showcaseAnchor">
         <helix-flex direction="column" gap="md">
           <helix-text appearance="label">Helix</helix-text>
@@ -243,6 +326,45 @@ export function Showcase(): React.ReactElement {
             </helix-timeline>
           </helix-card>
 
+          {/* **The chart reads a table, and the table is the accessible copy.**
+              `for` points at it and the markup carries `data-value` beside the
+              text a reader sees, so the numbers exist as numbers whether or not
+              anything draws them. The table is hidden visually and not from a
+              screen reader, which is the whole reason the component takes this
+              shape rather than an array of values. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <table data-hidden-visually id="showcase-releases">
+                <caption>Releases by quarter</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Quarter</th>
+                    <th scope="col">Releases</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Q1</th>
+                    <td data-value="18">18</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Q2</th>
+                    <td data-value="31">31</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Q3</th>
+                    <td data-value="24">24</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Q4</th>
+                    <td data-value="39">39</td>
+                  </tr>
+                </tbody>
+              </table>
+              <helix-bar-chart for="showcase-releases"></helix-bar-chart>
+            </helix-flex>
+          </helix-card>
+
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
               <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
@@ -290,7 +412,6 @@ export function Showcase(): React.ReactElement {
                 <helix-tag tone="warning">Warning</helix-tag>
                 <helix-tag tone="danger">Danger</helix-tag>
               </helix-flex>
-              <helix-progress label="Contrast pass" value={72}></helix-progress>
             </helix-flex>
           </helix-card>
 
@@ -309,7 +430,16 @@ export function Showcase(): React.ReactElement {
                 </helix-breadcrumb>
                 <helix-breadcrumb current>Aura</helix-breadcrumb>
               </helix-breadcrumbs>
-              <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
+              {/* **No second bar here.** A meter and a progress bar are the same
+                  drawing and different claims: one is a reading against a range
+                  and the other is how far along a task is. Put side by side a
+                  reader compares their lengths, which means nothing, so they
+                  live in different views. Progress is with the actions and the
+                  meter is with the figures. */}
+              <helix-flex align="center" gap="sm" wrap>
+                <helix-tag>Building</helix-tag>
+                <helix-tag tone="success">Active</helix-tag>
+              </helix-flex>
             </helix-flex>
           </helix-card>
         </div>
