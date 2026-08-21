@@ -1,7 +1,7 @@
 /* The bench. Scoped to this route: a background is the one decision on a page
    that everything else has to stay legible against, and this one is provisional. */
 
-.shapeStage {
+.auraStage {
   position: relative;
   display: grid;
   align-content: center;
@@ -10,7 +10,7 @@
   background: var(--helix-color-background);
 }
 
-.shapeCanvasFrame {
+.auraCanvasFrame {
   position: absolute;
   inset: 0;
 }
@@ -30,7 +30,7 @@
    `pointermove` events and `elementFromPoint` answered `shapeScrim` every
    time. The component had already been given the hit test back for exactly
    this feature, and a decorative wash one layer up took it away again. */
-.shapeScrim {
+.auraScrim {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -45,6 +45,39 @@
 /* Positioned, and that is the whole of the stacking. Three `z-index` values
    would want three layer tokens and the scale has two that fit; positioned
    elements with no `z-index` stack in tree order, which is already correct. */
-.shapeShell {
+.auraShell {
   position: relative;
+}
+
+/* One bar, fixed to the bottom, holding every control.
+ *
+ * Fixed rather than in the flow, because the field runs the height of the
+ * viewport and controls placed under it are controls a reader has to scroll away
+ * from the thing they are adjusting to reach.
+ *
+ * `sticky` layer, so it sits over the aura and under the masthead, and its own
+ * material so the field reads through it: an opaque strip across the bottom of a
+ * background is a strip taken out of the background. */
+.auraBar {
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  background-color: var(--helix-material-translucent);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-2xl);
+  position: fixed;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* Room under the field for the bar, so the last of the light is not sitting
+   behind it. */
+.auraStage {
+  padding-block-end: calc(var(--helix-size-header) + var(--helix-space-2xl));
+}
+
+/* The knobs live in the popover, so they are only on screen while somebody is
+   using them: seven sliders across the middle of a field is most of the field. */
+.auraKnobs {
+  inline-size: min(38rem, 80vw);
 }

@@ -81,7 +81,7 @@ const RESTING: Record<Knob, number> = {
  * Slider announces `helix-input` rather than `helix-change`, being one of the
  * five continuous controls, so the field moves under the thumb.
  */
-export function ShapeLab(): React.ReactElement {
+export function AuraLab(): React.ReactElement {
   const [shape, setShape] = useState(0)
   const [interactive, setInteractive] = useState(true)
   const [knobs, setKnobs] = useState(RESTING)
@@ -89,8 +89,8 @@ export function ShapeLab(): React.ReactElement {
   const current = SHAPES[shape]
 
   return (
-    <section className="shapeStage">
-      <div className="shapeCanvasFrame">
+    <section className="auraStage">
+      <div className="auraCanvasFrame">
         <helix-aura
           bloom={knobs.bloom}
           drift={knobs.drift}
@@ -104,12 +104,12 @@ export function ShapeLab(): React.ReactElement {
           tilt={knobs.tilt}
         ></helix-aura>
       </div>
-      <div className="shapeScrim" />
+      <div className="auraScrim" />
 
-      <helix-flex class="shell shapeShell" direction="column" gap="xl">
+      <helix-flex class="shell auraShell" direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
           <helix-text appearance="label" tone="subtle">
-            Shape bench
+            Helix. Aura
           </helix-text>
           <helix-text as="h1" class="heroTitle">
             {current?.name}
@@ -118,8 +118,17 @@ export function ShapeLab(): React.ReactElement {
             {current?.body}
           </helix-text>
         </helix-flex>
+      </helix-flex>
 
-        <helix-flex align="end" gap="xl" wrap>
+      {/* One bar, fixed to the bottom, and the parameters behind a trigger.
+          
+          The controls used to sit in the flow directly under the copy, which
+          put nine sliders across the middle of the thing they were adjusting:
+          a reader tuning bloom could not see most of what bloom was doing. A
+          bar leaves the field whole, and a popover means the seven numbers are
+          only on screen while somebody is using them. */}
+      <div className="auraBar">
+        <helix-flex class="auraBarInner" direction="column" gap="md">
           <helix-toggle-group
             appearance="filled"
             label="Shape"
@@ -138,59 +147,65 @@ export function ShapeLab(): React.ReactElement {
             ))}
           </helix-toggle-group>
 
-          <helix-toggle-group
-            appearance="filled"
-            label="Pointer"
-            onhelix-change={(event: CustomEvent<{ value: string }>) => {
-              const next = INTERACTIONS.find((one) => one === event.detail.value)
-              if (next) {
-                setInteraction(next)
-              }
-            }}
-            value={interaction}
-          >
-            {INTERACTIONS.map((one) => (
-              <helix-toggle key={one} value={one}>
-                {one}
-              </helix-toggle>
-            ))}
-          </helix-toggle-group>
+          <helix-flex align="center" gap="lg" justify="between" wrap>
+            <helix-toggle-group
+              appearance="filled"
+              label="Pointer"
+              onhelix-change={(event: CustomEvent<{ value: string }>) => {
+                const next = INTERACTIONS.find((one) => one === event.detail.value)
+                if (next) {
+                  setInteraction(next)
+                }
+              }}
+              value={interaction}
+            >
+              {INTERACTIONS.map((one) => (
+                <helix-toggle key={one} value={one}>
+                  {one}
+                </helix-toggle>
+              ))}
+            </helix-toggle-group>
 
-          <helix-switch
-            checked={interactive}
-            label="Follow the pointer"
-            onhelix-toggle={(event: CustomEvent<{ checked: boolean }>) => {
-              setInteractive(event.detail.checked)
-            }}
-          ></helix-switch>
-        </helix-flex>
-
-        <helix-card appearance="outlined" class="shapeKnobs">
-          <helix-grid gap="lg" min="13rem">
-            {KNOBS.map((knob) => (
-              <helix-slider
-                key={knob.key}
-                label={knob.label}
-                max={knob.max}
-                min={knob.min}
-                onhelix-input={(event: CustomEvent<{ value: string }>) => {
-                  const next = Number(event.detail.value)
-                  setKnobs((held) => ({ ...held, [knob.key]: next }))
+            <helix-flex align="center" gap="lg" wrap>
+              <helix-switch
+                checked={interactive}
+                label="Follow"
+                onhelix-toggle={(event: CustomEvent<{ checked: boolean }>) => {
+                  setInteractive(event.detail.checked)
                 }}
-                show-value
-                step={knob.step}
-                value={String(knobs[knob.key])}
-              ></helix-slider>
-            ))}
-          </helix-grid>
+              ></helix-switch>
 
-          <helix-flex data-density="sm" slot="footer">
-            <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
-              Reset
-            </button>
+              <helix-popover id="auraKnobs" label="Parameters" placement="top-end">
+                <button data-button data-button-fill="standard" slot="trigger" type="button">
+                  Parameters
+                </button>
+                <helix-grid class="auraKnobs" gap="lg" min="12rem">
+                  {KNOBS.map((knob) => (
+                    <helix-slider
+                      key={knob.key}
+                      label={knob.label}
+                      max={knob.max}
+                      min={knob.min}
+                      onhelix-input={(event: CustomEvent<{ value: string }>) => {
+                        const next = Number(event.detail.value)
+                        setKnobs((held) => ({ ...held, [knob.key]: next }))
+                      }}
+                      show-value
+                      step={knob.step}
+                      value={String(knobs[knob.key])}
+                    ></helix-slider>
+                  ))}
+                </helix-grid>
+                <helix-flex data-density="sm" slot="footer">
+                  <button data-button="subtle" onClick={() => setKnobs(RESTING)} type="button">
+                    Reset
+                  </button>
+                </helix-flex>
+              </helix-popover>
+            </helix-flex>
           </helix-flex>
-        </helix-card>
-      </helix-flex>
+        </helix-flex>
+      </div>
     </section>
   )
 }

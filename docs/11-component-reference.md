@@ -268,7 +268,9 @@ takes no pointer events.
 | `bloom` | `bloom` | `number` | `0.5` | - | How soft the falloff is, `0` tight and `1` diffuse. |
 | `drift` | `drift` | `number` | `0` | - | How far the settings wander on their own, `0` still and `1` restless. |
 | `gain` | `gain` | `number` | `1` | - | Overall brightness, as a multiplier on the field. |
+| `interaction` | `interaction` | `'light' \| 'none' \| 'ripple' \| 'shadow' \| undefined` | - | - | What the pointer does, where the shape's own answer is not wanted. |
 | `interactive` | `interactive` | `boolean` | `false` | - | Whether the pointer shifts and lifts the field. |
+| `reach` | `reach` | `number` | `1` | - | How far the pointer reaches into the field, `0` upward. |
 | `scale` | `scale` | `number` | `1` | - | Feature size, as a multiplier on the sampled coordinates. |
 | `shape` | `shape` | `\| 'aurora'
     \| 'braid'

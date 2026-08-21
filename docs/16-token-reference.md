@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 188 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 189 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 153 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -69,10 +69,10 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 267 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 228 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 222 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 121 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 122 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 75 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 64 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 38 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 40 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 19 |
 | `--helix-space-control` | `var(--helix-space-md)` | 6 |
 
@@ -149,7 +149,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 207 |
+| `--helix-border-thin` | `1px` | 208 |
 | `--helix-border-thick` | `2px` | 49 |
 
 ## shadow
@@ -170,9 +170,9 @@ Blur and translucency, for a surface that lets the page through.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-material-blur-sm` | `8px` | 0 |
-| `--helix-material-blur-md` | `16px` | 5 |
+| `--helix-material-blur-md` | `16px` | 6 |
 | `--helix-material-blur-lg` | `32px` | 0 |
-| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 5 |
+| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 6 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
 | `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 0 |
 
@@ -232,7 +232,7 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 20 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 21 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 86 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 40 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 13 |
@@ -248,6 +248,6 @@ Position in the stack. Positional, never named after a component.
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
 | `--helix-layer-raised` | `10` | 32 |
-| `--helix-layer-sticky` | `100` | 5 |
+| `--helix-layer-sticky` | `100` | 6 |
 | `--helix-layer-overlay` | `1000` | 4 |
 | `--helix-layer-toast` | `1200` | 2 |
