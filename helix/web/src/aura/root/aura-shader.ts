@@ -116,20 +116,42 @@ export const FRAGMENT = `#version 300 es
     return fbm(p + 4.0 * r);
   }
 
+  /* An exponential falloff without the corner.
+   *
+   * Both abs and length have a vertex at zero and their derivative jumps
+   * across it, so a falloff built on either acquires a hard line exactly along
+   * the axis it is brightest on. That is a crease in something meant to be
+   * light, and it is what put a chevron through the braid wherever the
+   * pointer's height crossed a strand.
+   *
+   * Softening the distance rather than the exponent keeps the tails identical
+   * and rounds only the point. The softening scales with the rate, so a tight
+   * falloff is rounded tightly and a broad one broadly: at zero the result is
+   * exp(-0.06) whatever the rate is, six per cent off the peak, which is not
+   * visible as flattening.
+   *
+   * Takes the squared distance, because every caller already has one and a
+   * square root taken here is the one that would have reintroduced the vertex.
+   */
+  float falloff(float d2, float k) {
+    float soft = 0.06 / k;
+    return exp(-sqrt(d2 + soft * soft) * k);
+  }
+
   /* Two strands half a turn apart, inside a wider volume. */
   float braid(vec2 q, float t, vec2 qp, float reach) {
     /* The strands lean toward the pointer where it is alongside them, and are
        unmoved where it is not. A braid is a thing with a length, so what it can
        answer with is a bend at a height, not a bulge at a point. */
-    float alongside = exp(-abs(q.y - qp.y) * 1.1) * reach;
+    float alongside = falloff((q.y - qp.y) * (q.y - qp.y), 1.1) * reach;
     float lean = qp.x * alongside * 0.45;
     float lit = 0.0;
     for (int i = 0; i < 2; i++) {
       float phase = float(i) * 3.14159265;
       float x = q.x - lean - 0.34 * sin(q.y * 1.6 + t * 1.4 + phase);
-      lit += 0.8 * exp(-abs(x) * 13.0);
+      lit += 0.8 * falloff(x * x, 13.0);
     }
-    float volume = exp(-abs(q.x) * 2.6);
+    float volume = falloff(q.x * q.x, 2.6);
     /* Compressed hard across the shaft and stretched along it. The same octaves
        sampled square read as haze; this way they read as filaments. */
     float streak = fbm(vec2(q.x * 9.0, q.y * 0.55 - t * 2.4));
@@ -149,7 +171,7 @@ export const FRAGMENT = `#version 300 es
     float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8));
     float dust = warped(vec2(ang * 2.0, dist * 0.7), t * 0.4);
     float spread = smoothstep(0.85, 0.05, abs(ang));
-    return spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * exp(-dist * 0.8);
+    return spread * mix(0.2, 1.5, fan) * mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
   }
 
   /* Curtains on a drifting horizon. */
@@ -158,7 +180,7 @@ export const FRAGMENT = `#version 300 es
        length, so what moves is the ridge, not the brightness. */
     float ridge = (warped(vec2(q.x * 0.7, 0.0), t * 0.7) - 0.5) * 1.3;
     ridge += exp(-(q.x - qp.x) * (q.x - qp.x) * 2.2) * reach * 0.45;
-    float band = exp(-abs(q.y - ridge) * 3.2);
+    float band = falloff((q.y - ridge) * (q.y - ridge), 3.2);
     float fall = fbm(vec2(q.x * 7.0, q.y * 0.7 - t * 2.6));
     return band * mix(0.3, 1.6, fall);
   }
@@ -173,7 +195,7 @@ export const FRAGMENT = `#version 300 es
     float press = exp(-dot(q - qp, q - qp) * 2.4) * reach;
     float rings = sin(r * 8.0 - t * 5.0 + press * 3.2) * 0.5 + 0.5;
     float grain = warped(vec2(atan(e.y, e.x) * 1.5, r * 1.2), t * 0.6);
-    return pow(rings, 4.0) * mix(0.45, 1.45, grain) * exp(-r * 1.05);
+    return pow(rings, 4.0) * mix(0.45, 1.45, grain) * falloff(dot(e, e), 1.05);
   }
 
   /* Ink in a viscous medium, drawn through by where the pointer went.
@@ -216,10 +238,10 @@ export const FRAGMENT = `#version 300 es
         continue;
       }
       float t = clamp(dot(p - a.xy, ab) / len2, 0.0, 1.0);
-      float r = length(p - (a.xy + ab * t));
+      vec2 off = p - (a.xy + ab * t);
       /* Squared, so a wake thins as it dies rather than switching off. */
       float life = 1.0 - mix(a.z, b.z, t);
-      float w = life * life * exp(-r * 3.2);
+      float w = life * life * falloff(dot(off, off), 3.2);
       wake += w;
       push += (ab * inversesqrt(len2)) * w;
     }
@@ -241,7 +263,7 @@ export const FRAGMENT = `#version 300 es
     /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
        people never see. */
-    return body * (0.5 + clamp(wake, 0.0, 1.0) * 0.38) * exp(-length(q) * 0.55);
+    return body * (0.5 + clamp(wake, 0.0, 1.0) * 0.38) * falloff(dot(q, q), 0.55);
   }
 
   /* Two wave fields crossed, lit where they agree. */
@@ -255,7 +277,7 @@ export const FRAGMENT = `#version 300 es
     float shear = exp(-dot(q - qp, q - qp) * 2.6) * reach * 2.4;
     float w = sin(u1 * 9.0 + t * 2.2 + shear) * sin(u2 * 9.0 - t * 1.7 - shear);
     float grain = warped(vec2(q.x * 1.5, q.y * 1.5), t * 0.5);
-    return pow(max(w, 0.0), 2.2) * mix(0.5, 1.4, grain) * exp(-length(q) * 0.85);
+    return pow(max(w, 0.0), 2.2) * mix(0.5, 1.4, grain) * falloff(dot(q, q), 0.85);
   }
 
   void main() {
