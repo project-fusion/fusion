@@ -364,7 +364,7 @@ export function Showcase(): React.ReactElement {
               the faces below deliberately are not. */}
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
-              <helix-pin-input label="Verification code" length={4}></helix-pin-input>
+              <helix-pin-input label="Verification code" length={4} mask></helix-pin-input>
               <helix-rating default-value="4" label="Documentation"></helix-rating>
             </helix-flex>
           </helix-card>
@@ -405,7 +405,7 @@ export function Showcase(): React.ReactElement {
                 container. Given the card's width and a rule above it, the two
                 are one thing. */}
           <helix-card appearance="outlined" class="showcaseCard" media-placement="end">
-            <helix-stat-group divided>
+            <helix-stat-group class="showcaseStats" divided>
               <helix-stat>
                 1,284
                 <span slot="label">Installs</span>
@@ -481,7 +481,44 @@ export function Showcase(): React.ReactElement {
                   </tr>
                 </tbody>
               </table>
-              <helix-bar-chart for="showcase-releases"></helix-bar-chart>
+              <helix-bar-chart class="showcaseBars" for="showcase-releases"></helix-bar-chart>
+            </helix-flex>
+          </helix-card>
+
+          {/* Beside the bars, which is where the right column ran out of
+              cards. A ring rather than a second line: it answers shares where
+              the sparkline above answers trend, so the two are not one chart
+              drawn twice. */}
+          <helix-card appearance="outlined" class="showcaseCard">
+            <helix-flex direction="column" gap="md">
+              <table data-hidden-visually id="showcase-sources">
+                <caption>Downloads by source</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col">Downloads</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">npm</th>
+                    <td data-value="4200">4,200</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">jsDelivr</th>
+                    <td data-value="3100">3,100</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">unpkg</th>
+                    <td data-value="1800">1,800</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Git</th>
+                    <td data-value="900">900</td>
+                  </tr>
+                </tbody>
+              </table>
+              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
             </helix-flex>
           </helix-card>
 
@@ -514,42 +551,6 @@ export function Showcase(): React.ReactElement {
                 <helix-tag tone="success">Passing</helix-tag>
                 <helix-tag tone="warning">Near budget</helix-tag>
               </helix-flex>
-            </helix-flex>
-          </helix-card>
-
-          {/* Last, and a ring rather than a second line: it answers shares
-              where the sparkline above answers trend, so the two are not one
-              chart drawn twice. */}
-          <helix-card appearance="outlined" class="showcaseCard">
-            <helix-flex direction="column" gap="md">
-              <table data-hidden-visually id="showcase-sources">
-                <caption>Downloads by source</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Source</th>
-                    <th scope="col">Downloads</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">npm</th>
-                    <td data-value="4200">4,200</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">jsDelivr</th>
-                    <td data-value="3100">3,100</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">unpkg</th>
-                    <td data-value="1800">1,800</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Git</th>
-                    <td data-value="900">900</td>
-                  </tr>
-                </tbody>
-              </table>
-              <helix-donut-chart for="showcase-sources"></helix-donut-chart>
             </helix-flex>
           </helix-card>
         </div>

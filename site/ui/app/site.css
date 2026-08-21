@@ -2654,6 +2654,28 @@ helix-drawer helix-tree {
   grid-row: span 2;
 }
 
+/* **A gap the pair actually fits in.**
+ *
+ * `Stat Group` wraps, and its default gap is `2xl`. Two figures measured 113
+ * and 174 with 318 of card to sit in, so 287 of content plus a 48 gap came to
+ * 335 and the second one wrapped, and the same 48 then became the space
+ * between the two lines. That is where the card's height was going: 345 with
+ * the figures stacked, 222 with them side by side, for a component whose
+ * drawing never changed size.
+ *
+ * A custom property rather than a rule on the group, which is what makes this
+ * safe from here: it inherits through the shadow boundary and is read inside
+ * it, so there is no document declaration racing a shadow one. */
+.showcaseStats {
+  --stat-group-gap: var(--helix-space-lg);
+}
+
+/* Shorter than the 12em the component draws at, because this one sits in a
+   mosaic cell rather than on a page of its own. */
+.showcaseBars {
+  --bar-chart-block-size: 8em;
+}
+
 /* Sparklines take the width they are given and none by default. The one under
    the figures spans its card; the ones in table rows fill their cell. */
 .showcaseRowLine {
