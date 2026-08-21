@@ -6,6 +6,27 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
+/**
+ * The readings in a path, as `[x, y]` pairs.
+ *
+ * **Anchor points, not every coordinate.** Four assertions here matched
+ * `/[ML]x,y/`, which was every reading while the resting curve was straight and
+ * is the first one alone now that it is smooth: a cubic segment carries two
+ * control points before the reading it lands on, and `M` is the only command
+ * left that the old pattern matches. Two of those assertions failed outright
+ * and a third kept passing on a one-element array, which is the one worth
+ * naming: `Math.max` of a single point is that point, so the scale assertion
+ * agreed with itself about nothing.
+ *
+ * The anchor is the last pair of whatever command drew the segment, which is
+ * the same point whichever curve is in use.
+ */
+const anchors = (path: string): Array<[number, number]> =>
+  [...path.matchAll(/([MLC])([^MLCHVZ]*)/g)].map((command) => {
+    const [x, y] = ((command[2] ?? '').trim().split(/\s+/).at(-1) ?? '').split(',')
+    return [Number(x), Number(y)]
+  })
+
 /** A series that never approaches zero, which is what the range rule is about. */
 const SESSIONS = `<table id="sessions">
   <caption>Sessions a month</caption>
@@ -82,9 +103,7 @@ describe('line chart', () => {
        Three readings, so the slots are a third each and the centres are at
        16.67, 50 and 83.33. */
     const host = await chart(SESSIONS, 'for="sessions"')
-    const xs = [...d(lines(host)[0]).matchAll(/[ML](-?[\d.]+),(-?[\d.]+)/g)].map((m) =>
-      Number(m[1]),
-    )
+    const xs = anchors(d(lines(host)[0])).map(([x]) => x)
     expect(xs[0]).toBeCloseTo(100 / 6, 1)
     expect(xs[1]).toBeCloseTo(50, 1)
     expect(xs[2]).toBeCloseTo(100 - 100 / 6, 1)
@@ -96,14 +115,14 @@ describe('line chart', () => {
        the box, which is a rule rather than a line. */
     const host = await chart(SESSIONS, 'for="sessions"')
     const path = d(lines(host)[0])
-    const ys = [...path.matchAll(/[ML](-?[\d.]+),(-?[\d.]+)/g)].map((m) => Number(m[2]))
+    const ys = anchors(path).map(([, y]) => y)
     expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(90)
   })
 
   test('`zero` forces it in, for where the distance from nothing is the point', async () => {
     const host = await chart(SESSIONS, 'for="sessions" zero')
     const path = d(lines(host)[0])
-    const ys = [...path.matchAll(/[ML](-?[\d.]+),(-?[\d.]+)/g)].map((m) => Number(m[2]))
+    const ys = anchors(path).map(([, y]) => y)
     expect(Math.max(...ys) - Math.min(...ys)).toBeLessThan(10)
   })
 
@@ -118,20 +137,26 @@ describe('line chart', () => {
   test('one scale across every series, since two scales is two charts', async () => {
     const host = await chart(CHANNELS, 'for="channels"')
     const [first, second] = lines(host)
-    const low = (one: Element | undefined): number =>
-      Math.max(...[...d(one).matchAll(/[ML](-?[\d.]+),(-?[\d.]+)/g)].map((m) => Number(m[2])))
+    const low = (one: Element | undefined): number => Math.max(...anchors(d(one)).map(([, y]) => y))
     // The smaller series sits nearer the floor; on its own scale it would touch it.
     expect(low(second)).toBeGreaterThan(low(first))
     expect(low(second)).toBe(100)
   })
 
   test('the curve changes the path and nothing else about the reading', async () => {
-    const straight = d(lines(await chart(SESSIONS, 'for="sessions"'))[0])
+    const resting = d(lines(await chart(SESSIONS, 'for="sessions"'))[0])
+    const straight = d(lines(await chart(SESSIONS, 'for="sessions" curve="straight"'))[0])
     const smooth = d(lines(await chart(SESSIONS, 'for="sessions" curve="smooth"'))[0])
     const step = d(lines(await chart(SESSIONS, 'for="sessions" curve="step"'))[0])
+    // Saying nothing gets the smooth curve; `straight` is what opts out of it.
+    expect(resting).toBe(smooth)
     expect(smooth).not.toBe(straight)
     expect(step).not.toBe(straight)
     expect(smooth).toContain('C')
+    expect(straight).not.toContain('C')
+    // And the curve is the only thing that moved: every reading lands where it
+    // did, which is the half of this test's name that was never asserted.
+    expect(anchors(smooth)).toEqual(anchors(straight))
   })
 
   test('`area` adds a wash that closes along the floor, and absent adds none', async () => {
