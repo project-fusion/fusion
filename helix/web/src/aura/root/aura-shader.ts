@@ -286,7 +286,14 @@ export const FRAGMENT = `#version 300 es
       float depth = q.y - ridge;
       /* Sharp, but not a cliff: the edge is where the light stops, and a step
          narrower than a pixel is an aliased line rather than an edge. */
-      float edge = smoothstep(-0.1, 0.05, depth);
+      /* **The border's sharpness varies along it.** One constant made one
+         continuously crisp line across the whole curtain, and a line of even
+         weight reads as drawn rather than lit however it wanders: it is the
+         same fault the prism's rim had. A real lower border is hard where the
+         sheet faces us and diffuse where it turns away, so the crispness is
+         drawn from the same slow noise the folds are. */
+      float crisp = mix(0.04, 0.3, noise(vec2(q.x * 0.8 + f * 5.0, t * 0.15)));
+      float edge = smoothstep(-crisp, crisp * 0.5, depth);
       /* Steeper, so the curtain thins instead of filling everything above the
          border. At 1.5 it still stood at a fifth a whole unit up, which with
          the bundles over it painted a solid wall of stripes from the border to
