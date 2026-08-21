@@ -1546,6 +1546,18 @@ helix-toast:not([data-color-mode]) {
  *
  * Not `:where()`. A consumer writing this attribute is asking for one specific
  * thing and a stray `display` from somewhere else winning would be silent. */
+/* The 1px box does not bind on a table, and that is correct.
+ *
+ * Measured in Chrome: a div, a p and a span each collapse to 1 by 1, and a
+ * `<table>` carrying this renders 46 by 40, because a CSS table's used width is
+ * its min-content width and cannot be set below it. Nothing follows from that
+ * here. `clip-path` hides it and clips hit testing with it, and `position:
+ * absolute` takes it out of flow, so it paints nothing and pushes nothing.
+ *
+ * **Do not add `display: block` to make the number match.** A table forced to a
+ * block box loses its table semantics in the accessibility tree, which is the
+ * one thing this rule exists to keep. The chart work depends on it: the table
+ * is the accessible representation and this is how it is hidden. */
 [data-hidden-visually] {
   block-size: 1px;
   border: var(--helix-space-none);
