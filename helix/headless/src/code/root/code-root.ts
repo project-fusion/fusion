@@ -18,7 +18,7 @@ import { html, type TemplateResult } from 'lit'
  * together would say `CodeBlock` is part of `Code`, and it is not.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Inline code, Kbd
  * @documentation https://helix.fusion.dev/components/code

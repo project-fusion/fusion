@@ -12,7 +12,7 @@ import { styles } from './empty-root.css.js'
  * empty.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://helix.fusion.dev/components/empty

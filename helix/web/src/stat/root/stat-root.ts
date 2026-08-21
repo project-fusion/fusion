@@ -13,7 +13,7 @@ import { styles } from './stat-root.css.js'
  * pair reads as one object rather than as two lines of text.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Metric, KPI, Figure
  * @documentation https://helix.fusion.dev/components/stat

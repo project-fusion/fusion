@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
  * indicator is hidden from assistive technology when a number already says it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Count, Indicator, Pip
  * @documentation https://helix.fusion.dev/components/badge

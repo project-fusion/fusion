@@ -15,7 +15,7 @@ import { property } from 'lit/decorators.js'
  * which is a different element for a different job.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Q, InlineQuote
  * @documentation https://helix.fusion.dev/components/quote

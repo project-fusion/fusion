@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
  * connect, which is a component for something the consumer can write.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://helix.fusion.dev/components/empty

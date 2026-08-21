@@ -20,7 +20,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * needs a DOM, and the server has none.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card

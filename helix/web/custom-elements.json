@@ -3243,7 +3243,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/badge",
             "aliases": [
               "Count",
@@ -3870,7 +3870,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/blockquote",
             "aliases": [
               "Pullquote",
@@ -5884,7 +5884,7 @@
           "helix": {
             "category": "layout",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/card",
             "aliases": [
               "Panel",
@@ -9102,7 +9102,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/code",
             "tier": "styled",
             "group": "Code",
@@ -20652,7 +20652,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/empty",
             "aliases": [
               "Placeholder",
@@ -26123,7 +26123,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/kbd",
             "aliases": [
               "Key",
@@ -39547,7 +39547,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/quote",
             "aliases": [
               "Q",
@@ -46193,7 +46193,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/skeleton",
             "aliases": [
               "Placeholder",
@@ -50293,7 +50293,7 @@
           "summary": "A row of related measurements.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/stat",
             "aliases": [
               "Metrics",
@@ -50489,7 +50489,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/stat",
             "aliases": [
               "Metric",
@@ -52230,7 +52230,7 @@
           "helix": {
             "category": "forms",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/switch",
             "aliases": [
               "Toggle switch",

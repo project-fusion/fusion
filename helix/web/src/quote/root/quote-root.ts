@@ -11,7 +11,7 @@ import { styles } from './quote-root.css.js'
  * inside a paragraph is that paragraph's text with marks around it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Q, InlineQuote
  * @documentation https://helix.fusion.dev/components/quote

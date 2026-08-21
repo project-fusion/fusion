@@ -15,7 +15,7 @@ import { property } from 'lit/decorators.js'
  * because it is a different job.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Pullquote, Citation, Excerpt
  * @documentation https://helix.fusion.dev/components/blockquote

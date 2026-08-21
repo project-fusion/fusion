@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
  * consumer's server markup never had.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Metric, KPI, Figure
  * @documentation https://helix.fusion.dev/components/stat

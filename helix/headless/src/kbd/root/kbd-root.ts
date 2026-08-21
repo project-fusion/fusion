@@ -14,7 +14,7 @@ import { html, type TemplateResult } from 'lit'
  * inserted one would have to guess which.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Key, Shortcut, Hotkey
  * @documentation https://helix.fusion.dev/components/kbd

@@ -22,7 +22,7 @@ import { styles } from './card-root.css.js'
  * element you slotted, not a wrapper around it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Panel, Surface
  * @documentation https://helix.fusion.dev/components/card

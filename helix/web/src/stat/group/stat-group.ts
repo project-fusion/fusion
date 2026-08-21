@@ -14,7 +14,7 @@ import { styles } from './stat-group.css.js'
  * same quantity.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Metrics, KPIs, Figures
  * @documentation https://helix.fusion.dev/components/stat
  *

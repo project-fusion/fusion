@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
  * there is no above: the switch and the words naming it are one line.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Toggle switch, On/off
  * @documentation https://helix.fusion.dev/components/switch

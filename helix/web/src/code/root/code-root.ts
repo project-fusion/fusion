@@ -13,7 +13,7 @@ import { styles } from './code-root.css.js'
  * @cssproperty --code-size - The fragment's size. Defaults to `text-sm`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @documentation https://helix.fusion.dev/components/code
  */

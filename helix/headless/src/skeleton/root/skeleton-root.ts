@@ -14,7 +14,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * property, which is the one thing that tier is for not having.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://helix.fusion.dev/components/skeleton

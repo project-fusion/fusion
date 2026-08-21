@@ -13,7 +13,7 @@ import { styles } from './skeleton-root.css.js'
  * the same one property animating either way.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://helix.fusion.dev/components/skeleton

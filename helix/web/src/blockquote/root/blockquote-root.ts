@@ -13,7 +13,7 @@ import { styles } from './blockquote-root.css.js'
  * top of that are the same thing said twice.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Pullquote, Citation, Excerpt
  * @documentation https://helix.fusion.dev/components/blockquote

@@ -141,14 +141,23 @@ for (const tier of TIERS) {
     const dispatched = [...code.matchAll(/new (Helix\w*Event)\s*\(/g)]
       .map((m) => names.get(m[1]))
       .filter(Boolean)
-    /* And any hand-rolled `new CustomEvent('helix-…')`, which this matched none
+    /* And any hand-rolled `new Event('helix-…')` or `new CustomEvent(…)`, which
+       this matched none
        of. `Tour.Stop` dispatched `helix-tour-ask` that way: it bubbled, it was
        composed, a consumer could listen for it, and it appeared in no manifest
        and no documentation, because the check only ever asked about the event
        classes. An event nobody can find is not API, and the way to notice is to
-       hold the raw form to the same rule. */
+       hold the raw form to the same rule.
+     *
+     * `Event` as well as `CustomEvent`, and that took two goes. The first
+       widening covered `CustomEvent` alone, so `ColorPicker`'s
+       `helix-sample-start` and `helix-sample-end`, dispatched as bare `Event`s
+       and bound by `ColorInput`, stayed invisible: audible to a consumer,
+       absent from the manifest, the React types and the docs page. Widening for
+       the constructor somebody happened to think of is how a check comes to
+       cover one case. */
     for (const [, name] of code.matchAll(
-      /new CustomEvent(?:<[^>]*>)?\s*\(\s*['"`](helix-[\w-]+)['"`]/g,
+      /new (?:Custom)?Event(?:<[^>]*>)?\s*\(\s*['"`](helix-[\w-]+)['"`]/g,
     )) {
       dispatched.push(name)
     }

@@ -27,7 +27,7 @@ import { styles } from './switch-root.css.js'
  * consumer has to keep.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Toggle switch, On/off
  * @documentation https://helix.fusion.dev/components/switch

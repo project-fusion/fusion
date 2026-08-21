@@ -11,7 +11,7 @@ import { property } from 'lit/decorators.js'
  * position is not information.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Metrics, KPIs, Figures
  * @documentation https://helix.fusion.dev/components/stat
  *
