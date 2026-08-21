@@ -286,13 +286,30 @@ export const FRAGMENT = `#version 300 es
       wake += w;
       push += (ab * inversesqrt(len2)) * w;
     }
+
+    /* Limited, because an unbounded displacement folds and a fold is a crease.
+    
+       Where the map from sample to displaced sample stops being one to one,
+       neighbouring samples land on the same value and the pattern piles into a
+       hard bright line: a caustic, which is what a sharp diagonal with a bright
+       wedge beside it always is. The sum runs over eight segments of unit
+       tangents, so near the stroke it reached several times the width of the
+       falloff it was displacing across, and folded every time.
+    
+       The falloff is about a third of a unit wide, so the displacement has to
+       stay under that for the map to stay monotone. Saturating rather than
+       clamped: a clamp is a corner, and a corner in a displacement is the same
+       crease by another route. */
+    float mag = length(push);
+    push = mag > 0.0 ? push * (0.24 / (0.9 + mag)) : vec2(0.0);
     return wake;
   }
 
   float flow(vec2 q, float t, mat2 turn, vec2 shift) {
     vec2 push;
     float wake = flowWake(q, turn, shift, push);
-    vec2 p = q + push * 0.5;
+    /* Already limited inside, so it is applied whole. */
+    vec2 p = q + push;
 
     /* The field is warped by itself twice over, which is what gives a liquid
        its folded look: each sample is displaced by the field's own value, so
