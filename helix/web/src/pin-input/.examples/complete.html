@@ -1,0 +1,17 @@
+<!-- @summary The boxes advance as you type, and the last one completes the code. -->
+<helix-pin-input
+  hint="Sent to your phone"
+  id="code"
+  label="Verification code"
+></helix-pin-input>
+
+<script type="module">
+  /* Preview frame: a real page would post the code and act on the answer.
+     `helix-complete` is what saves a reader pressing anything: the last box is
+     the last thing they have to do, so a submit button beside it would be a
+     control that is only ever pressed after the work is already finished. */
+  const code = document.querySelector('#code')
+  code.addEventListener('helix-complete', (event) => {
+    code.hint = `Checking ${event.detail.value}`
+  })
+</script>
