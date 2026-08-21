@@ -5,11 +5,19 @@
   margin-block-end: var(--helix-space-xl);
 }
 
-/* The slotted row fills the panel, so `justify="between"` has something to
-   space against: the count to the left and the controls to the right, which is
-   the rhythm the stop's own row has with Skip pushed away from the rest.
-   Without a width the row is `max-content` and `between` is inert, which is an
-   attribute in an example that does nothing. */
+/* The count to one end and the controls together at the other, which is the
+   arrangement the stop's own row already has: `[part="skip"]` takes an auto
+   margin and everything after it groups at the end.
+ *
+ * `justify="between"` was tried and is wrong here. It spreads *every* child
+ * evenly, so Back landed halfway across the panel with nothing either side of
+ * it, reading as a third separate thing rather than as one of two controls. An
+ * auto margin on the first child says the one thing that is true: the count is
+ * not part of the group. */
 helix-tour-stop [slot="actions"] {
   inline-size: 100%;
+}
+
+helix-tour-stop .count {
+  margin-inline-end: auto;
 }
