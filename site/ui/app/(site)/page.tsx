@@ -19,6 +19,26 @@ import { stageAppearance, VERTICALS } from '../verticals'
  * the single registration in the root layout.
  */
 
+/** Why choose this over an agency starting from a blank file. */
+const REASONS = [
+  {
+    body: 'A token layer, two tiers, generated framework wrappers, a sandbox and the checks that keep it honest. We are not learning this on your project.',
+    name: 'The system already exists',
+  },
+  {
+    body: 'Four weeks, two days a week, because the hard part is behind us. Starting from nothing, the same deliverable is quoted in months.',
+    name: 'It is faster because of that',
+  },
+  {
+    body: 'Your repository, your license. Handover is a condition of the work rather than a phase at the end, and no engagement should leave you needing us on a retainer.',
+    name: 'You keep all of it',
+  },
+  {
+    body: 'Active ships with users. Building is real work with nothing shipped. Declared is a direction. Nothing here is described as further along than it is.',
+    name: 'We tell you what is not done',
+  },
+]
+
 const questions = [
   {
     answer:
@@ -51,61 +71,101 @@ export default function Home() {
             Fusion Development Group
           </helix-text>
           <helix-text as="h1" class="heroTitle">
-            Sovereignty at every scale
+            We built our own design system. We will build yours.
           </helix-text>
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Cheap intelligence and cheap energy are collapsing in cost at the same moment. What was
-            affordable only to an institution becomes affordable to a person. We build the stack
-            that makes that practical.
+            Interface and intelligence work, delivered into your repository under your license. The
+            substrate is already built, which is what makes four weeks a real number.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
-            <Link data-button="solid" data-button-tone="primary" href="/helix">
-              See what is shipping
+            <Link data-button="solid" data-button-tone="primary" href="/services">
+              See what it costs
             </Link>
-            <a data-button href="mailto:hello@fusion.dev">
-              Start a conversation
-            </a>
+            <Link data-button href="/helix">
+              Open Helix
+            </Link>
           </helix-flex>
         </helix-flex>
       </section>
 
+      {/* Why us, where the mechanism and the constraint used to be.
+          
+          Both were arguments a reader had to accept before they reached
+          anything they could buy, and both have pages of their own now. What a
+          first visit needs here is the reason to choose this over an agency
+          starting from a blank file. */}
       <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
-            Why now
-          </helix-text>
-          <helix-text as="h2" class="sectionTitle measure">
-            Abundance is the mechanism
-          </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
-            The two things that forced a person to depend on an institution were the cost of
-            thinking at scale and the cost of power. Both are falling, and the same argument runs
-            all the way up: a household, a company, and a country each become sovereign through the
-            same stack at a different scale.
-          </helix-text>
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" tone="subtle">
+              Why us
+            </helix-text>
+            <helix-text as="h2" class="sectionTitle measure">
+              You are hiring the people who built the tools
+            </helix-text>
+          </helix-flex>
+
+          <helix-grid gap="xl" min="18rem">
+            {REASONS.map((reason) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={reason.name}>
+                <helix-text as="h3" class="substrateName">
+                  {reason.name}
+                </helix-text>
+                <helix-text as="p" tone="muted">
+                  {reason.body}
+                </helix-text>
+              </helix-flex>
+            ))}
+          </helix-grid>
         </helix-flex>
       </section>
 
+      {/* Services sits directly under `Why us`, which is a prominence decision
+          rather than an ordering accident. It used to sit sixth, under three
+          bands of argument: the only part of this anyone can buy was harder to
+          reach than the parts that cannot be bought yet. */}
       <section className="band reveal">
-        <helix-flex class="shell statement" direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
-            The Sovereignty Constraint
-          </helix-text>
-          <helix-text as="p" class="statementText">
-            No Fusion product may create a dependency its user cannot exit.
-          </helix-text>
-          <helix-text as="p" tone="muted">
-            The user holds their own keys, data, and hardware. Fusion may operate a control plane,
-            never a chokepoint.
-          </helix-text>
-          <helix-flex data-density="sm" gap="lg" wrap>
-            <Link data-link href="/thesis">
-              Read the argument
-            </Link>
-            <Link data-link href="/trust">
-              What has to be true before anything ships
-            </Link>
+        <helix-flex class="shell" direction="column" gap="xl">
+          <helix-flex direction="column" gap="sm">
+            <helix-text appearance="label" tone="subtle">
+              Services
+            </helix-text>
+            <helix-text as="h2" class="sectionTitle measure">
+              The part you can buy today
+            </helix-text>
+            <helix-text as="p" class="measure" tone="muted">
+              Interface and intelligence work the substrates make faster to do well. It starts with
+              a two week audit, and every price is stated in full, because an offer you cannot
+              compare is not an offer.
+            </helix-text>
           </helix-flex>
+
+          <helix-grid gap="xl" min="18rem">
+            {SERVICES.map((service) => (
+              <helix-flex class="substrate" direction="column" gap="sm" key={service.name}>
+                <helix-icon name={service.icon}></helix-icon>
+                <helix-text as="h3" class="substrateName">
+                  {service.name}
+                </helix-text>
+                {/* No number here, and the prices page is one line below.
+                    
+                    Three offers in a row with three five-figure sums beside
+                    them is a price list, and a landing band is not one: a
+                    reader meets the cost before they have been told what any of
+                    it is, which is the anchoring problem `docs/17` names for the
+                    sprint in particular. The figures are stated in full on
+                    `/services`, where the sentence explaining each one arrives
+                    first. */}
+                <helix-text as="p" tone="muted">
+                  {service.summary}
+                </helix-text>
+              </helix-flex>
+            ))}
+          </helix-grid>
+
+          <Link data-link href="/services">
+            See what each one includes, and what it costs
+          </Link>
         </helix-flex>
       </section>
 
@@ -188,55 +248,6 @@ export default function Home() {
         </helix-flex>
       </section>
 
-      {/* Services sits directly after the map, which is a prominence decision
-          rather than an ordering accident. Everything above this band is being
-          built; this is the only part of it anyone can buy today, and it should
-          not be harder to find than the things that cannot yet be bought. */}
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
-          <helix-flex direction="column" gap="sm">
-            <helix-text appearance="label" tone="subtle">
-              Services
-            </helix-text>
-            <helix-text as="h2" class="sectionTitle measure">
-              The part you can buy today
-            </helix-text>
-            <helix-text as="p" class="measure" tone="muted">
-              Interface and intelligence work the substrates make faster to do well. It starts with
-              a two week audit, and every price is stated in full, because an offer you cannot
-              compare is not an offer.
-            </helix-text>
-          </helix-flex>
-
-          <helix-grid gap="xl" min="18rem">
-            {SERVICES.map((service) => (
-              <helix-flex class="substrate" direction="column" gap="sm" key={service.name}>
-                <helix-icon name={service.icon}></helix-icon>
-                <helix-text as="h3" class="substrateName">
-                  {service.name}
-                </helix-text>
-                {/* No number here, and the prices page is one line below.
-                    
-                    Three offers in a row with three five-figure sums beside
-                    them is a price list, and a landing band is not one: a
-                    reader meets the cost before they have been told what any of
-                    it is, which is the anchoring problem `docs/17` names for the
-                    sprint in particular. The figures are stated in full on
-                    `/services`, where the sentence explaining each one arrives
-                    first. */}
-                <helix-text as="p" tone="muted">
-                  {service.summary}
-                </helix-text>
-              </helix-flex>
-            ))}
-          </helix-grid>
-
-          <Link data-link href="/services">
-            See what each one includes, and what it costs
-          </Link>
-        </helix-flex>
-      </section>
-
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
           <helix-text as="h2" class="sectionTitle measure">
@@ -303,6 +314,32 @@ export default function Home() {
               </Link>
             ))}
           </helix-grid>
+        </helix-flex>
+      </section>
+
+      {/* The story, last and short. It is why the work compounds rather than
+          why anyone should buy it, and a reader who wants it can follow it. */}
+      <section className="band reveal">
+        <helix-flex class="shell" direction="column" gap="lg">
+          <helix-text appearance="label" tone="subtle">
+            Where this goes
+          </helix-text>
+          <helix-text as="h2" class="sectionTitle measure">
+            Software now. The rest of the stack after.
+          </helix-text>
+          <helix-text as="p" class="measure" tone="muted">
+            Each engagement that feeds Helix or Cortex makes the next one faster, which is why we
+            take the work we take. Energy and hardware are further out and we say so. Behind all of
+            it is one rule: nothing we build should create a dependency you cannot leave.
+          </helix-text>
+          <helix-flex data-density="sm" gap="lg" wrap>
+            <Link data-link href="/thesis">
+              Read the thesis
+            </Link>
+            <Link data-link href="/trust">
+              What has to be true before anything ships
+            </Link>
+          </helix-flex>
         </helix-flex>
       </section>
 

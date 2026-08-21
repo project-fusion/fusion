@@ -11,9 +11,13 @@ export const metadata = {
  *
  * **The only page on the site with a price on it**, which is why it is written
  * plainly and why every number is stated rather than gated behind a call. An
- * offer whose cost appears only after a conversation cannot be compared, and a
- * company whose constraint forbids lock-in has a hard time explaining why its
- * pricing is the one thing a reader may not leave with.
+ * offer whose cost appears only after a conversation cannot be compared.
+ *
+ * The constraint is stated here as terms rather than as a principle. Quoted at
+ * a buyer mid-page it asked them to care about a governance rule at the moment
+ * they were working out what they were committing to; said as what they keep
+ * and what they are not signing up for, it is the thing they wanted to know.
+ * The rule itself lives on `/trust`.
  *
  * Copy lives in `services.ts`, derived from `the internal plan` and
  * `the internal plan`, so the site and the plan cannot drift on what is
@@ -114,21 +118,26 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      {/* The exit test, applied to the services rather than to a product.
-          It is the same constraint and it is easy to assume it only governs
-          software, so it is said here where the money is. */}
+      {/* How an engagement runs, where the constraint used to be stated.
+          
+          It was the Sovereignty Constraint quoted at a buyer mid-page, which
+          asks them to care about a governance rule at the moment they are
+          working out what they are committing to. The same commitment said as
+          terms is the thing they actually wanted to know. The rule itself is on
+          `/trust`, one link away. */}
       <section className="band reveal">
-        <helix-flex class="shell statement" direction="column" gap="lg">
+        <helix-flex class="shell" direction="column" gap="lg">
           <helix-text appearance="label" tone="subtle">
-            The Sovereignty Constraint, applied here
+            How it runs
           </helix-text>
-          <helix-text as="p" class="statementText">
-            Everything we build for you is yours, and runs without us.
+          <helix-text as="h2" class="sectionTitle measure">
+            You are not acquiring a dependency
           </helix-text>
           <helix-text as="p" class="measure" tone="muted">
             Your repository, your license, your infrastructure. Handover is a condition of the work
-            rather than a phase at the end of it. If an engagement would leave you unable to
-            continue without us on retainer, it is not one we will take.
+            rather than a phase at the end of it, and the architecture decisions are written down
+            with their trade-offs rather than just made. If an engagement would leave you unable to
+            continue without us on a retainer, it is not one we will take.
           </helix-text>
           <a data-link href="/trust">
             The bar every product clears before it ships
