@@ -315,11 +315,12 @@ export function Showcase(): React.ReactElement {
               </helix-select>
               <helix-number-input default-value="8" label="Octaves" min={1}></helix-number-input>
               <helix-slider
-                default-value="60"
+                default-value="20,70"
                 label="Bloom"
                 markers={5}
                 max={100}
                 min={0}
+                range
                 show-value
               ></helix-slider>
               <helix-switch default-checked label="Reduced motion"></helix-switch>
@@ -600,7 +601,7 @@ export function Showcase(): React.ReactElement {
               only thing in this view a reader can open, so it says something
               the tags and the avatars beside it cannot. */}
           <helix-card appearance="outlined" class="showcaseCard">
-            <helix-accordion>
+            <helix-accordion mode="single-collapsible">
               <helix-accordion-item>
                 <span slot="summary">What ships</span>
                 Custom elements, a stylesheet, and the types. No runtime beyond the components
