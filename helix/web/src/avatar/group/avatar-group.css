@@ -38,8 +38,38 @@
 }
 
 /* Past `max`. Hidden rather than removed, so nothing re-renders when the limit
-   changes and the group can still count what it is not showing. */
-::slotted([data-overflow]) {
+ * changes and the group can still count what it is not showing.
+ *
+ * In CSS, because this was JavaScript writing `data-overflow` onto each avatar
+ * from `updated`. Measured in Chrome 148: append two avatars past `max` to a
+ * settled group and read before yielding, and all five are `flex`; they fold to
+ * three only on the next Lit update. So a framework rendering a list painted
+ * the whole set for a frame, and the group wrote attributes onto elements it
+ * does not own to do it.
+ *
+ * The comment justifying that said `::slotted()` takes a compound selector "and
+ * not `:nth-child()`", which is wrong: `:nth-child()` is a pseudo-class and a
+ * compound selector may hold one, exactly as `:not(:first-child)` does in the
+ * rule above. Measured before it was believed, `::slotted(*:nth-child(n + 4))`
+ * hides the fourth onward and nothing else.
+ *
+ * One selector per value of `max`, because `An+B` takes a literal and there is
+ * no reading a custom property into it, so this cannot be written once. Twelve,
+ * which is more faces than a facepile shows before folding, and `max` past that
+ * is no limit at all rather than a limit that quietly does not apply. The
+ * component says so, and its count agrees. */
+:host([max="1"]) ::slotted(:nth-child(n + 2)),
+:host([max="2"]) ::slotted(:nth-child(n + 3)),
+:host([max="3"]) ::slotted(:nth-child(n + 4)),
+:host([max="4"]) ::slotted(:nth-child(n + 5)),
+:host([max="5"]) ::slotted(:nth-child(n + 6)),
+:host([max="6"]) ::slotted(:nth-child(n + 7)),
+:host([max="7"]) ::slotted(:nth-child(n + 8)),
+:host([max="8"]) ::slotted(:nth-child(n + 9)),
+:host([max="9"]) ::slotted(:nth-child(n + 10)),
+:host([max="10"]) ::slotted(:nth-child(n + 11)),
+:host([max="11"]) ::slotted(:nth-child(n + 12)),
+:host([max="12"]) ::slotted(:nth-child(n + 13)) {
   display: none;
 }
 

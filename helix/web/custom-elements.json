@@ -1573,6 +1573,20 @@
             },
             {
               "kind": "field",
+              "name": "warned",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Said once per element, because a re-render is not a second mistake.",
+              "inheritedFrom": {
+                "name": "HelixBaseAvatarGroup",
+                "module": "src/avatar/group/avatar-group.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"

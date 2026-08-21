@@ -1082,7 +1082,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A part of `Avatar` rather than a family of its own: it arranges avatars and\nis about nothing else, and its member is a complete `Avatar` the group did\nnot have to explain.\n\n**The overflow count is the group's, not a slot.** Which avatars are hidden\nis a fact the group works out from `max` and how many it was given, so a\nconsumer writing the \"+3\" themselves would be writing a number that has to\nagree with a list they do not control.\n\n**Hidden, not removed.** Past `max`, the extra avatars stay in the DOM and\nstop being shown, so nothing re-renders when `max` changes and the accessible\nname can still be built from all of them. The count is what a sighted reader\ngets; the group's own name is what everyone else gets, and \"Seven people\" is\nmore useful than seven names read in a row.\n\n**It is a list.** A row of faces is a set of separate people, and a group\nwith no role announces as one run of text. `role=\"list\"` needs its children\nto be `listitem`, which they cannot be told to become without writing an\nattribute onto a consumer's element, so the group carries `role=\"group\"` and\nits name instead: one announcement, correct, and nothing written to anyone\nelse's markup.",
+          "description": "A part of `Avatar` rather than a family of its own: it arranges avatars and\nis about nothing else, and its member is a complete `Avatar` the group did\nnot have to explain.\n\n**The overflow count is the group's, not a slot.** Which avatars are hidden\nis a fact the group works out from `max` and how many it was given, so a\nconsumer writing the \"+3\" themselves would be writing a number that has to\nagree with a list they do not control.\n\n**Hidden, not removed.** Past `max`, the extra avatars stay in the DOM and\nstop being shown, so nothing re-renders when `max` changes and the accessible\nname can still be built from all of them. The count is what a sighted reader\ngets; the group's own name is what everyone else gets, and \"Seven people\" is\nmore useful than seven names read in a row.\n\n**And hidden by the stylesheet, not by this class.** It wrote `data-overflow`\nonto each avatar from `updated`, which is one update too late and one element\ntoo far out: Lit renders on a microtask, so an avatar appended past the limit\nwas laid out and painted before anything ran to hide it, and the group was\nwriting attributes onto markup a consumer owns to do it. Measured in Chrome\n148, appending two past `max=\"3\"` and reading before yielding: five `flex`,\nfolding to three on the next update. The styled tier now does it with\n`:host([max=\"N\"]) ::slotted(:nth-child(n + N+1))`, which is right at the\nfirst style resolution and writes nothing.\n\n**The fold is finite, and the count agrees with it.** `An+B` takes a literal,\nso there is one selector per value of `max` and the range stops at twelve.\nPast that the group shows everyone, counts nothing and says so, because\nshowing everyone is a defensible answer and showing everyone beside a \"+5\" is\nnot. `max` above twelve is a list the consumer should be slicing themselves.\n\n**It is a list.** A row of faces is a set of separate people, and a group\nwith no role announces as one run of text. `role=\"list\"` needs its children\nto be `listitem`, which they cannot be told to become without writing an\nattribute onto a consumer's element, so the group carries `role=\"group\"` and\nits name instead: one announcement, correct, and nothing written to anyone\nelse's markup.",
           "name": "HelixBaseAvatarGroup",
           "cssParts": [
             {
@@ -1134,6 +1134,16 @@
               },
               "description": "How many avatars are past the limit, and so not shown.\n\nNot `hidden`, which is `HTMLElement`'s own boolean: a getter of that name\nreturning a number is a type error, and had it been assignable it would\nhave been worse, because a group with three extra members would have set\nthe attribute that hides the whole group.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "warned",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Said once per element, because a re-render is not a second mistake."
             },
             {
               "kind": "field",

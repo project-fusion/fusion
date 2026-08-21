@@ -3,6 +3,17 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
+ * The largest `max` the styled tier can hide past.
+ *
+ * The fold is `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, one selector
+ * per value, because `An+B` takes a literal and no custom property can be read
+ * into it. So the range is finite and this is where it is written down, in the
+ * tier that has to agree with it: a count that folds and a stylesheet that does
+ * not would put a "+5" beside five avatars that are still on screen.
+ */
+const FOLDS_UP_TO = 12
+
+/**
  * @summary Overlapping avatars, with a count for the ones not shown.
  *
  * @description
@@ -20,6 +31,22 @@ import { property } from 'lit/decorators.js'
  * name can still be built from all of them. The count is what a sighted reader
  * gets; the group's own name is what everyone else gets, and "Seven people" is
  * more useful than seven names read in a row.
+ *
+ * **And hidden by the stylesheet, not by this class.** It wrote `data-overflow`
+ * onto each avatar from `updated`, which is one update too late and one element
+ * too far out: Lit renders on a microtask, so an avatar appended past the limit
+ * was laid out and painted before anything ran to hide it, and the group was
+ * writing attributes onto markup a consumer owns to do it. Measured in Chrome
+ * 148, appending two past `max="3"` and reading before yielding: five `flex`,
+ * folding to three on the next update. The styled tier now does it with
+ * `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, which is right at the
+ * first style resolution and writes nothing.
+ *
+ * **The fold is finite, and the count agrees with it.** `An+B` takes a literal,
+ * so there is one selector per value of `max` and the range stops at twelve.
+ * Past that the group shows everyone, counts nothing and says so, because
+ * showing everyone is a defensible answer and showing everyone beside a "+5" is
+ * not. `max` above twelve is a list the consumer should be slicing themselves.
  *
  * **It is a list.** A row of faces is a set of separate people, and a group
  * with no role announces as one run of text. `role="list"` needs its children
@@ -72,8 +99,12 @@ export class HelixBaseAvatarGroup extends HelixElement {
    * the attribute that hides the whole group.
    */
   get overflow(): number {
-    return this.max > 0 ? Math.max(this.avatars.length - this.max, 0) : 0
+    const limited = this.max > 0 && this.max <= FOLDS_UP_TO
+    return limited ? Math.max(this.avatars.length - this.max, 0) : 0
   }
+
+  /** Said once per element, because a re-render is not a second mistake. */
+  private warned = false
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -82,15 +113,19 @@ export class HelixBaseAvatarGroup extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* Marked on the avatars themselves, because the group cannot select its own
-       light-DOM children past a count from CSS alone: `::slotted()` takes a
-       compound selector and not `:nth-child()` counting from the other end.
-       Client only, which is where a limit can be applied at all, since the
-       server cannot see the children to count them. */
-    const max = this.max > 0 ? this.max : Number.POSITIVE_INFINITY
-    this.avatars.forEach((avatar, index) => {
-      avatar.toggleAttribute('data-overflow', index >= max)
-    })
+    /* Nothing hides anything here any more: the stylesheet does it, from `max`
+       on the host, so the arrangement is right at the first style resolution
+       rather than one update later. What is left is saying so when a `max` is
+       set that no rule can match, because showing everyone is a defensible
+       answer and showing everyone beside a "+5" is not. */
+    if (this.max > FOLDS_UP_TO && this.avatars.length > this.max && !this.warned) {
+      this.warned = true
+      console.warn(
+        `<${this.localName}> has max="${this.max}", past the ${FOLDS_UP_TO} the fold is written for, ` +
+          'so every avatar is shown and none are counted. Lower `max`, or hand the group the ' +
+          'avatars you want shown.',
+      )
+    }
   }
 
   protected override render(): TemplateResult {
