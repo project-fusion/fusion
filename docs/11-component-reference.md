@@ -4427,6 +4427,7 @@ first and heavy in the second.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
+| `appearance` | `appearance` | `'area' \| undefined` | - | - | Whether the region under the line is filled. |
 | `for` | `for` | `string` | `''` | `HelixBaseSparkline` | The id of a table to read instead, when there is one behind the line. |
 | `label` | `label` | `string` | `''` | `HelixBaseSparkline` | What the line says, in a sentence. |
 | `values` | `values` | `string` | `''` | `HelixBaseSparkline` | The numbers, separated by whitespace or by commas. |
@@ -4435,6 +4436,7 @@ first and heavy in the second.
 
 | Part | Description |
 | --- | --- |
+| `area` | The region between the line and the bottom of its range. |
 | `line` | The path itself. |
 | `point` | The mark on the last value. |
 | `svg` | The drawing. |
@@ -4443,6 +4445,7 @@ first and heavy in the second.
 
 | Property | Description |
 | --- | --- |
+| `--sparkline-area-opacity` | How much of the line's colour the fill takes. |
 | `--sparkline-block-size` | Height of the drawing. |
 | `--sparkline-color` | Colour of the line and the mark. |
 | `--sparkline-inline-size` | Width of the drawing. |

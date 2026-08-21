@@ -45,6 +45,42 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* Nothing until `appearance` says otherwise. The region is always drawn, since
+   the shape is the tier below's business; whether it is painted is this one's.
+ *
+ * A wash of the line's own colour rather than a colour of its own, so a
+ * consumer setting `--sparkline-color` moves both and cannot end up with a fill
+ * that disagrees with the line over it. `color-mix` in oklab rather than an
+ * `opacity` on the element: opacity would fade the whole path including where
+ * the fill meets the stroke, and this leaves the line at full strength.
+ *
+ * Decorative, and stated as such: the line carries the series and the wash says
+ * only which side of it is under. There is no contrast floor for it to clear,
+ * so the number was picked by measuring the tint against the surface it sits
+ * on, per mode:
+ *
+ *     16%  dark 1.28  light 1.25
+ *     20%  dark 1.39  light 1.33
+ *     24%  dark 1.50  light 1.41
+ *
+ * 20 rather than 16, which read faint at the default size, and not 24, which
+ * starts competing with the line it is meant to sit under. The pairs matter
+ * more than the numbers: the wash lands within a twentieth of the same weight
+ * in both modes at every step, so a page does not get a heavier fill for being
+ * dark. */
+[part="area"] {
+  fill: none;
+  stroke: none;
+}
+
+:host([appearance="area"]) [part="area"] {
+  fill: color-mix(
+    in oklab,
+    var(--sparkline-color, var(--helix-color-series-1)) var(--sparkline-area-opacity, 20%),
+    transparent
+  );
+}
+
 /* Where the series ended, which is the one point a reader looks for.
  *
  * An element rather than a `<circle>`, because a circle inside a stretched

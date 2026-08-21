@@ -66,6 +66,22 @@ describe('sparkline', () => {
     expect(part(bare, 'svg')?.hasAttribute('role')).toBe(false)
   })
 
+  test('the region under the line is drawn whether or not it is painted', async () => {
+    /* Geometry belongs to the tier below and paint to this one, so the shape is
+       always there and `appearance` decides whether anything is poured in. A
+       headless consumer gets the region without having to work out that a
+       sparkline's baseline is its own minimum rather than zero. */
+    const host = await spark('values="1 5 9"')
+    const area = part(host, 'area')?.getAttribute('d') ?? ''
+    expect(area).toContain(part(host, 'line')?.getAttribute('d') ?? 'no line')
+    // Closed along the floor of the box and back, which is what makes it fillable.
+    expect(area.endsWith('L100,32L0,32Z')).toBe(true)
+  })
+
+  test('one value draws no region either, since there is no line to close', async () => {
+    expect(part(await spark('values="4"'), 'area')).toBeNull()
+  })
+
   test('the mark sits on the last value', async () => {
     const host = await spark('values="9 5 1"')
     // Last value is the smallest, so the bottom of the box.
@@ -131,6 +147,37 @@ if (hasLayout()) {
       expect(typeof line.getBBox).toBe('function')
       expect(line.getBBox().width).toBeGreaterThan(0)
       expect(line.getBBox().height).toBeGreaterThan(0)
+    })
+
+    test('the region is unpainted by default and washed under appearance', async () => {
+      /* Two elements rather than a fill on the line itself: a closed path
+         strokes its closing edges, so filling the line would draw a rule along
+         the bottom of the box and up both sides. Asserted through the computed
+         fill, since the shape is present either way. */
+      /* Both in one mount. `mount` replaces the body, so reading the first
+         one's computed style after mounting the second reads a detached
+         element, and every computed value comes back as the empty string. The
+         first version of this test did exactly that and reported the component
+         for a stroke it had never lost. */
+      await mount(`<div>
+        <helix-sparkline id="plain" values="1 9 3"></helix-sparkline>
+        <helix-sparkline appearance="area" id="washed" values="1 9 3"></helix-sparkline>
+      </div>`)
+      const plain = document.getElementById('plain') as HTMLElement
+      const washed = document.getElementById('washed') as HTMLElement
+      await Promise.all(
+        [plain, washed].map(
+          (one) => (one as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete,
+        ),
+      )
+
+      expect(getComputedStyle(part(plain, 'area') as Element).fill).toBe('none')
+      expect(getComputedStyle(part(washed, 'area') as Element).fill).not.toBe('none')
+      // The line stays at full strength over the wash, which an `opacity` on
+      // the element would not have allowed.
+      expect(getComputedStyle(part(washed, 'line') as Element).stroke).toBe(
+        getComputedStyle(part(plain, 'line') as Element).stroke,
+      )
     })
 
     test('the line keeps its weight whatever the box, and the mark stays round', async () => {

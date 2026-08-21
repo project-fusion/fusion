@@ -8988,6 +8988,17 @@ reflected none of them. */
 };
 
 export type HelixSparklineProps = {
+  /** Whether the region under the line is filled.
+
+Absent is the line alone, which is the sparkline that sits in a line of
+text. `area` fills the region beneath it, which reads as a silhouette and
+carries better at small sizes and from further away, at the cost of the
+exact path being harder to follow where two of them are compared.
+
+The fill is a wash of the line's own colour rather than a second one, so a
+consumer setting `--sparkline-color` moves both and cannot end up with a
+fill that disagrees with the line above it. */
+  appearance?: HelixSparkline["appearance"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -9015,6 +9026,17 @@ does not. */
 };
 
 export type HelixSparklineSolidJsProps = {
+  /** Whether the region under the line is filled.
+
+Absent is the line alone, which is the sparkline that sits in a line of
+text. `area` fills the region beneath it, which reads as a silhouette and
+carries better at small sizes and from further away, at the cost of the
+exact path being harder to follow where two of them are compared.
+
+The fill is a wash of the line's own colour rather than a second one, so a
+consumer setting `--sparkline-color` moves both and cannot end up with a
+fill that disagrees with the line above it. */
+  "prop:appearance"?: HelixSparkline["appearance"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
@@ -19895,6 +19917,16 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the region under the line is filled.
+   *
+   * Absent is the line alone, which is the sparkline that sits in a line of
+   * text. `area` fills the region beneath it, which reads as a silhouette and
+   * carries better at small sizes and from further away, at the cost of the
+   * exact path being harder to follow where two of them are compared.
+   *
+   * The fill is a wash of the line's own colour rather than a second one, so a
+   * consumer setting `--sparkline-color` moves both and cannot end up with a
+   * fill that disagrees with the line above it.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -19921,6 +19953,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--sparkline-area-opacity`: How much of the line's colour the fill takes. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
    * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
@@ -19931,6 +19964,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
    * - `point`: The mark on the last value.
    * - `svg`: The drawing.
@@ -30436,6 +30470,16 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `appearance`: Whether the region under the line is filled.
+   *
+   * Absent is the line alone, which is the sparkline that sits in a line of
+   * text. `area` fills the region beneath it, which reads as a silhouette and
+   * carries better at small sizes and from further away, at the cost of the
+   * exact path being harder to follow where two of them are compared.
+   *
+   * The fill is a wash of the line's own colour rather than a second one, so a
+   * consumer setting `--sparkline-color` moves both and cannot end up with a
+   * fill that disagrees with the line above it.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -30462,6 +30506,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--sparkline-area-opacity`: How much of the line's colour the fill takes. (default: `undefined`)
    * - `--sparkline-block-size`: Height of the drawing. (default: `undefined`)
    * - `--sparkline-color`: Colour of the line and the mark. (default: `undefined`)
    * - `--sparkline-inline-size`: Width of the drawing. (default: `undefined`)
@@ -30472,6 +30517,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
    * - `point`: The mark on the last value.
    * - `svg`: The drawing.
@@ -33950,6 +33996,8 @@ export type CustomCssProperties = {
   "--slider-marker-color"?: string;
   /** The whole track, for a slider whose color is the value. */
   "--slider-track-image"?: string;
+  /** How much of the line's colour the fill takes. */
+  "--sparkline-area-opacity"?: string;
   /** Height of the drawing. */
   "--sparkline-block-size"?: string;
   /** Colour of the line and the mark. */

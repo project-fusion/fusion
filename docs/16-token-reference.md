@@ -54,7 +54,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
-| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 6 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 8 |
 | `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 2 |
 | `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 2 |
 | `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 2 |

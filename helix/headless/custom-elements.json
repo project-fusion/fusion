@@ -34470,6 +34470,10 @@
           "name": "HelixBaseSparkline",
           "cssParts": [
             {
+              "description": "The region between the line and the bottom of its range.",
+              "name": "area"
+            },
+            {
               "description": "The path itself.",
               "name": "line"
             },

@@ -49,6 +49,7 @@ const readValues = (input: string): number[] =>
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline
  *
+ * @csspart area - The region between the line and the bottom of its range.
  * @csspart line - The path itself.
  * @csspart point - The mark on the last value.
  * @csspart svg - The drawing.
@@ -155,6 +156,18 @@ export class HelixBaseSparkline extends HelixElement {
         ? ''
         : points.map((value, index) => `${index === 0 ? 'M' : 'L'}${x(index)},${y(value)}`).join('')
 
+    /* The same line closed down to the floor of its own range, which is where
+       the fill goes. Drawn always and painted only by `appearance`: the shape
+       is geometry and belongs to this tier, and whether anything is poured into
+       it is a decision for the one above. A headless consumer gets the region
+       without having to work out that a sparkline's baseline is its minimum
+       rather than zero, which is the part that is easy to get wrong.
+
+       Its own path rather than a fill on the line, because a closed path
+       strokes its closing edges too: filling the line itself would draw a rule
+       along the bottom of the box and up both sides. */
+    const area = path === '' ? '' : `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
+
     return html`<svg
         aria-hidden=${this.label === '' ? 'true' : nothing}
         aria-label=${this.label === '' ? nothing : this.label}
@@ -176,7 +189,7 @@ export class HelixBaseSparkline extends HelixElement {
              asserted the `d` attribute, the part, the ARIA and the computed
              `vector-effect`, and all of those are true of an HTML element
              wearing the same name. */
-          path === '' ? nothing : svg`<path d=${path} part="line" />`
+          path === '' ? nothing : svg`<path d=${area} part="area" /><path d=${path} part="line" />`
         }
       </svg>
       ${

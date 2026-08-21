@@ -1,0 +1,34 @@
+<!-- @summary The same series as a silhouette. The wash carries further at small sizes; the bare line is easier to follow where two are compared. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-stat>
+      1,102
+      <span slot="label">Sessions</span>
+    </helix-stat>
+    <helix-sparkline
+      appearance="area"
+      label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
+      values="1240 1318 1102 1291 1244 1180 1102"
+    ></helix-sparkline>
+  </helix-flex>
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-stat>
+      1,102
+      <span slot="label">The same series, unfilled</span>
+    </helix-stat>
+    <helix-sparkline
+      label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
+      values="1240 1318 1102 1291 1244 1180 1102"
+    ></helix-sparkline>
+  </helix-flex>
+</helix-flex>

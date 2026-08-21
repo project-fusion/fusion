@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseSparkline } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './sparkline-root.css.js'
 
 /**
@@ -22,6 +23,7 @@ import { styles } from './sparkline-root.css.js'
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline
  *
+ * @cssproperty --sparkline-area-opacity - How much of the line's colour the fill takes.
  * @cssproperty --sparkline-block-size - Height of the drawing.
  * @cssproperty --sparkline-color - Colour of the line and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
@@ -31,6 +33,21 @@ import { styles } from './sparkline-root.css.js'
 @customElement('helix-sparkline')
 export class HelixSparkline extends HelixBaseSparkline {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * Whether the region under the line is filled.
+   *
+   * Absent is the line alone, which is the sparkline that sits in a line of
+   * text. `area` fills the region beneath it, which reads as a silhouette and
+   * carries better at small sizes and from further away, at the cost of the
+   * exact path being harder to follow where two of them are compared.
+   *
+   * The fill is a wash of the line's own colour rather than a second one, so a
+   * consumer setting `--sparkline-color` moves both and cannot end up with a
+   * fill that disagrees with the line above it.
+   */
+  @property({ reflect: true })
+  appearance?: 'area'
 }
 
 declare global {

@@ -17960,6 +17960,7 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
    * - `point`: The mark on the last value.
    * - `svg`: The drawing.
@@ -28281,6 +28282,7 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
+   * - `area`: The region between the line and the bottom of its range.
    * - `line`: The path itself.
    * - `point`: The mark on the last value.
    * - `svg`: The drawing.
