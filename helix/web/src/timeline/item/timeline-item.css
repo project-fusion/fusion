@@ -30,7 +30,7 @@
   background-color: var(--helix-color-border);
   block-size: 100%;
   grid-row: 1;
-  inline-size: var(--timeline-rail-size, var(--helix-border-thick));
+  inline-size: var(--timeline-rail-size, var(--helix-border-thin));
 }
 
 :host(:first-child) [part="connector"] {
@@ -50,7 +50,7 @@
      of out of it, in a rail one column wider than it looked. */
   grid-column: 1;
   grid-row: 2;
-  inline-size: var(--timeline-rail-size, var(--helix-border-thick));
+  inline-size: var(--timeline-rail-size, var(--helix-border-thin));
   margin-block-start: var(--timeline-marker-size, var(--helix-size-icon-md));
 }
 
@@ -88,17 +88,20 @@
    * to. */
   translate: 0 -0.1em;
   background-color: var(--helix-color-background);
-  /* A rounded square rather than a circle. `sm` is 4px, and the hook is here so
-     a record that wants the disc back can say so without rewriting the rest. */
-  border-radius: var(--timeline-marker-radius, var(--helix-radii-sm));
-  /* The border stays neutral whatever the entry was.
+  /* Round, because all this shape does now is cut the line.
    *
-   * Toned, it made every mark a coloured box and the column read as a stack of
-   * badges: the ring is the same shape on every entry, so colouring it says
-   * nothing that the thing inside it is not already saying, and it says it
-   * loudly. Neutral, the marks are one set of boxes down the line and the colour
-   * is carried by the mark itself, which is the part that differs. */
-  box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
+   * There was a ring here, a neutral one-pixel border on a rounded square, and
+   * it is what made the column read as a row of stickers rather than a record:
+   * a 16 pixel glyph inside a 20 pixel box with a 4 pixel radius is the shape
+   * of an app icon, and four of them stacked read as four badges pinned to a
+   * cable. Rendered beside three alternatives at the size it is actually drawn,
+   * the one that stopped looking cartoony is the one with no ring at all.
+   *
+   * What is left is the background, which knocks the rail out behind the mark
+   * so the line arrives and leaves rather than passing through. Round rather
+   * than square so the cut stays a cut if a consumer ever thickens the rail,
+   * and the hook stays for a record that wants its ring back. */
+  border-radius: var(--timeline-marker-radius, var(--helix-radii-full));
   color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
   display: inline-flex;
   grid-column: 1;
@@ -113,9 +116,12 @@
    unmarked entry as an empty ring. */
 [part="dot"] {
   background-color: var(--_timeline-tone, var(--helix-color-border));
-  block-size: var(--helix-space-xs);
+  /* A step up from `xs`, because it is the mark now rather than the thing
+     inside one. At the ring's old size it read as a bullet that had lost its
+     box, which is exactly what it was. */
+  block-size: var(--helix-space-sm);
   border-radius: var(--helix-radii-full);
-  inline-size: var(--helix-space-xs);
+  inline-size: var(--helix-space-sm);
 }
 
 :host([tone="danger"]) {
