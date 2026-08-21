@@ -54,6 +54,7 @@ const HEIGHT = 100
  *
  * @csspart area - The wash under one line, where `area` is set.
  * @csspart baseline - The rule at zero, where zero is inside the range.
+ * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - One series.
@@ -175,9 +176,29 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
             ? nothing
             : svg`<line part="baseline" x1="0" x2=${WIDTH} y1=${floor} y2=${floor} />`
         }
+        ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
     </div>`
+  }
+
+  /**
+   * A rule down the reading the tooltip is about.
+   *
+   * Without it the tooltip is a box of numbers floating over a drawing, and a
+   * reader has to match its heading against the row of names to find out which
+   * column it means. The rule is the whole of what connects the two, and it
+   * matters most on a line, where there is no marker under the pointer to
+   * stand in for one.
+   *
+   * Drawn before the series so a line is never cut by it.
+   */
+  protected renderGuide(x: (value: number) => number): TemplateResult | typeof nothing {
+    const at = this.pointer.at
+    if (at < 0) {
+      return nothing
+    }
+    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${HEIGHT} />`
   }
 
   /** One series, its wash first so the line is drawn over its own fill. */

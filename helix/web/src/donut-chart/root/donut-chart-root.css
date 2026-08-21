@@ -2,6 +2,7 @@
    the hole without either knowing the other's size. */
 :host {
   display: grid;
+  position: relative;
   /* Bigger than the other charts' 12em, because the hole has to hold something.
    *
    * The hole is `80 - thickness` percent of the width, so at 12em it is about
@@ -184,4 +185,220 @@
 
 [part="segment"][data-series="24"] {
   stroke: var(--helix-color-series-24);
+}
+
+/* The tooltip, placed on the reading rather than under the pointer.
+ *
+ * `--_chart-tooltip-at` is the middle of the reading's slot, which is where the
+ * drawing put it, so the box holds still while a pointer wanders inside one
+ * column. Following the pointer exactly gives a tooltip that never settles and
+ * is harder to read than the number in it.
+ *
+ * `translate` by half its own width rather than a margin, because the width is
+ * the content's and nothing here knows it. Clamped so the first and last
+ * readings do not push it off the chart: `min()` and `max()` against the
+ * element's own inline size is the whole of it, and it costs no measurement. */
+[part="tooltip"] {
+  background-color: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-md);
+  box-sizing: border-box;
+  display: grid;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+  grid-area: 1 / 1;
+  inset-block-start: 0;
+  inset-inline-start: var(--_chart-tooltip-at, 50%);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% 0;
+  white-space: nowrap;
+  z-index: var(--helix-layer-popover);
+}
+
+[part="tooltip-label"] {
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* Name and value on one line, the value pushed to the end so a column of them
+   lines up whatever the names are. */
+[part="tooltip-cell"] {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+}
+
+[part="tooltip-name"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="tooltip-value"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A dot in the series colour, so a row of the tooltip and a line in the drawing
+   are visibly the same thing. Drawn with a pseudo-element rather than a real
+   one, since it says nothing a reader of the table needs. */
+[part="tooltip-cell"][data-series]::before {
+  block-size: 0.5em;
+  border-radius: var(--helix-radii-full);
+  content: "";
+  inline-size: 0.5em;
+}
+
+[part="tooltip-cell"][data-series="1"]::before {
+  background-color: var(--helix-color-series-1);
+}
+
+[part="tooltip-cell"][data-series="2"]::before {
+  background-color: var(--helix-color-series-2);
+}
+
+[part="tooltip-cell"][data-series="3"]::before {
+  background-color: var(--helix-color-series-3);
+}
+
+[part="tooltip-cell"][data-series="4"]::before {
+  background-color: var(--helix-color-series-4);
+}
+
+[part="tooltip-cell"][data-series="5"]::before {
+  background-color: var(--helix-color-series-5);
+}
+
+[part="tooltip-cell"][data-series="6"]::before {
+  background-color: var(--helix-color-series-6);
+}
+
+[part="tooltip-cell"][data-series="7"]::before {
+  background-color: var(--helix-color-series-7);
+}
+
+[part="tooltip-cell"][data-series="8"]::before {
+  background-color: var(--helix-color-series-8);
+}
+
+[part="tooltip-cell"][data-series="9"]::before {
+  background-color: var(--helix-color-series-9);
+}
+
+[part="tooltip-cell"][data-series="10"]::before {
+  background-color: var(--helix-color-series-10);
+}
+
+[part="tooltip-cell"][data-series="11"]::before {
+  background-color: var(--helix-color-series-11);
+}
+
+[part="tooltip-cell"][data-series="12"]::before {
+  background-color: var(--helix-color-series-12);
+}
+
+[part="tooltip-cell"][data-series="13"]::before {
+  background-color: var(--helix-color-series-13);
+}
+
+[part="tooltip-cell"][data-series="14"]::before {
+  background-color: var(--helix-color-series-14);
+}
+
+[part="tooltip-cell"][data-series="15"]::before {
+  background-color: var(--helix-color-series-15);
+}
+
+[part="tooltip-cell"][data-series="16"]::before {
+  background-color: var(--helix-color-series-16);
+}
+
+[part="tooltip-cell"][data-series="17"]::before {
+  background-color: var(--helix-color-series-17);
+}
+
+[part="tooltip-cell"][data-series="18"]::before {
+  background-color: var(--helix-color-series-18);
+}
+
+[part="tooltip-cell"][data-series="19"]::before {
+  background-color: var(--helix-color-series-19);
+}
+
+[part="tooltip-cell"][data-series="20"]::before {
+  background-color: var(--helix-color-series-20);
+}
+
+[part="tooltip-cell"][data-series="21"]::before {
+  background-color: var(--helix-color-series-21);
+}
+
+[part="tooltip-cell"][data-series="22"]::before {
+  background-color: var(--helix-color-series-22);
+}
+
+[part="tooltip-cell"][data-series="23"]::before {
+  background-color: var(--helix-color-series-23);
+}
+
+[part="tooltip-cell"][data-series="24"]::before {
+  background-color: var(--helix-color-series-24);
+}
+
+/* The tooltip glides between readings rather than teleporting.
+ *
+ * A box that jumps from slot to slot reads as a new tooltip each time and the
+ * eye re-finds it on every step; moved, it stays the same object and the eye
+ * follows. The distance is one slot, so the duration is short: long enough to
+ * be a movement and not long enough to lag behind the pointer.
+ *
+ * `inset-inline-start` rather than a transform, because the transform is
+ * already carrying the half-width offset and animating both fights. */
+[part="tooltip"] {
+  transition:
+    inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="tooltip"] {
+    transition: none;
+  }
+}
+
+/* The slice under the pointer, thickened rather than recoloured.
+ *
+ * Recolouring would break the agreement with a legend beside it. Growing the
+ * stroke keeps the colour and still says which one is being asked about, and it
+ * grows outward and inward equally because the stroke sits astride its own
+ * radius, so the hole does not move.
+ */
+[part="segment"][data-active] {
+  stroke-width: calc(var(--donut-chart-thickness, 12) * 1.18);
+}
+
+[part="segment"] {
+  transition: stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="segment"] {
+    transition: none;
+  }
+}
+
+/* Centred in the hole rather than pinned to the top.
+ *
+ * The shared rule places a tooltip at the block start, which is right for a
+ * chart laid out left to right: there is nothing above the plot and the box
+ * sits clear of it. A ring has its own middle and that is where a reader is
+ * already looking, so pinning it to the top put it over the twelve o'clock
+ * slices instead. It covers whatever is slotted into the hole, which is the
+ * intent: a total is replaced by the figure being asked about, and comes back
+ * when the pointer leaves. */
+[part="tooltip"] {
+  inset-block-start: 50%;
+  translate: -50% -50%;
 }

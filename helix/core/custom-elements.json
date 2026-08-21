@@ -126,6 +126,15 @@
               "description": "The reading under the pointer, or -1 when the pointer is elsewhere."
             },
             {
+              "kind": "field",
+              "name": "tracks",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether the pointer's x is what decides the reading.\n\nTrue for anything laid out along an axis. **A donut turns it off**, and\nthat is the whole reason this is a flag rather than an assumption: its\nslices are real elements, so the reading under the pointer is the one the\npointer is actually over, and mapping x across a ring would answer with\nwhichever slice happened to share a horizontal position. Off, the chart\ncalls `set` from its own hover and everything downstream is unchanged."
+            },
+            {
               "kind": "method",
               "name": "hostConnected",
               "return": {
@@ -153,6 +162,24 @@
                 }
               },
               "description": "The box the readings are laid out in, which is the plot and not the host.\n\nThe host also holds the row of labels, so measuring against it would map\nthe pointer over a box taller than the drawing. Width is what this uses and\nthe two agree on width today, which is exactly the kind of coincidence that\nstops being true the first time a chart grows an axis down its side."
+            },
+            {
+              "kind": "method",
+              "name": "set",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "at",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Puts the pointer on a reading, for a chart that resolves it some other way."
             },
             {
               "kind": "field",
@@ -5834,6 +5861,13 @@
               "name": "at",
               "type": {
                 "text": "number"
+              }
+            },
+            {
+              "name": "place",
+              "optional": true,
+              "type": {
+                "text": "string"
               }
             }
           ],

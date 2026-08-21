@@ -128,3 +128,35 @@ describe('donut chart', () => {
     expect(part(host, 'centre')?.querySelector('slot')).not.toBeNull()
   })
 })
+
+describe('donut chart tooltip', () => {
+  const hover = async (host: HTMLElement, index: number): Promise<void> => {
+    segments(host)[index]?.dispatchEvent(new Event('pointerenter'))
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+  }
+
+  test('a slice says which reading it is, rather than x deciding', async () => {
+    /* The donut turns the pointer controller's tracking off. Its slices are
+       real elements at every angle, and x alone would give the same reading for
+       three o'clock and nine o'clock, which are opposite sides of the ring. */
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    await hover(host, 1)
+    expect(part(host, 'tooltip')?.querySelector('[part="tooltip-label"]')?.textContent).toBe(
+      'Search',
+    )
+  })
+
+  test('nothing is shown until a pointer is on a slice', async () => {
+    expect(part(await chart(TRAFFIC, 'for="traffic"'), 'tooltip')).toBeNull()
+  })
+
+  test('the slice under the pointer is marked, so the ring says which one too', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    await hover(host, 2)
+    expect(segments(host).map((one) => one.hasAttribute('data-active'))).toEqual([
+      false,
+      false,
+      true,
+    ])
+  })
+})

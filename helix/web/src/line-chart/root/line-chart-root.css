@@ -427,3 +427,36 @@
 [part="tooltip-cell"][data-series="24"]::before {
   background-color: var(--helix-color-series-24);
 }
+
+/* The tooltip glides between readings rather than teleporting.
+ *
+ * A box that jumps from slot to slot reads as a new tooltip each time and the
+ * eye re-finds it on every step; moved, it stays the same object and the eye
+ * follows. The distance is one slot, so the duration is short: long enough to
+ * be a movement and not long enough to lag behind the pointer.
+ *
+ * `inset-inline-start` rather than a transform, because the transform is
+ * already carrying the half-width offset and animating both fights. */
+[part="tooltip"] {
+  transition:
+    inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="tooltip"] {
+    transition: none;
+  }
+}
+
+/* The rule under the tooltip, drawn faintly.
+ *
+ * It is a pointer at the data rather than part of it, so it sits below every
+ * series in weight as well as in stacking order. `vector-effect` for the reason
+ * the baseline gives: the view box stretches and a stroke stretches with it. */
+[part="guide"] {
+  stroke: var(--helix-color-foreground-muted);
+  stroke-dasharray: 3 3;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}

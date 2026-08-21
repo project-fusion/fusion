@@ -1,4 +1,10 @@
-import { customElement, HelixElement, MixinChartSource, seriesIndex } from '@helix-io/core'
+import {
+  customElement,
+  drawTooltip,
+  HelixElement,
+  MixinChartSource,
+  seriesIndex,
+} from '@helix-io/core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 
 /** The drawing's own coordinates, square because the shape has to stay round. */
@@ -46,6 +52,11 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
  *
  * @csspart centre - The middle of the ring, holding whatever is slotted.
  * @csspart plot - The drawing.
+ * @csspart tooltip - What a pointer resting on a slice shows.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-label - The slice's own name inside the tooltip.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  * @csspart segment - One slice.
  * @csspart track - The ring the slices are drawn on.
  *
@@ -53,6 +64,18 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
  */
 @customElement('helix-base-donut-chart')
 export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
+  constructor() {
+    super()
+    /* The pointer is not mapped across this one.
+     *
+     * Every other chart lays its readings out left to right, so the nearest is
+     * arithmetic on x. A ring's slices are real elements at every angle, and x
+     * alone would answer with whichever slice happened to share a horizontal
+     * position with the pointer: at three o'clock and at nine o'clock it would
+     * give the same reading for opposite sides of the chart. So the slices say
+     * which one they are, and this only holds the answer. */
+    this.pointer.tracks = false
+  }
   /** The slices, in table order, with anything negative dropped. */
   private get shares(): { fraction: number; start: number }[] {
     const series = this.series
@@ -76,7 +99,8 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     const shares = this.shares
     const named = this.named
     return html`${this.renderPlot(shares, named)}
-      <div part="centre"><slot></slot></div>`
+      <div part="centre"><slot></slot></div>
+      ${this.renderTooltip()}`
   }
 
   /**
@@ -110,13 +134,26 @@ export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
     return svg`<circle
       cx=${CENTRE}
       cy=${CENTRE}
+      data-active=${this.pointer.at === index ? '' : nothing}
       data-series=${seriesIndex(index)}
       fill="none"
+      @pointerenter=${() => this.pointer.set(index)}
       part="segment"
       r=${RADIUS}
       stroke-dasharray="${length} ${CIRCUMFERENCE - length}"
       stroke-dashoffset=${-share.start * CIRCUMFERENCE}
     />`
+  }
+  /**
+   * What a pointer resting on a slice shows.
+   *
+   * Placed in the middle rather than along an axis, a ring having none, and the
+   * middle is where a reader is already looking: the hole usually holds a
+   * total, so a tooltip over it replaces one figure with the one being asked
+   * about rather than covering something else.
+   */
+  protected renderTooltip(): TemplateResult | typeof nothing {
+    return drawTooltip(this.rows, this.pointer.at, '50%')
   }
 }
 

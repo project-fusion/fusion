@@ -365,3 +365,47 @@
 [part="tooltip-cell"][data-series="24"]::before {
   background-color: var(--helix-color-series-24);
 }
+
+/* The tooltip glides between readings rather than teleporting.
+ *
+ * A box that jumps from slot to slot reads as a new tooltip each time and the
+ * eye re-finds it on every step; moved, it stays the same object and the eye
+ * follows. The distance is one slot, so the duration is short: long enough to
+ * be a movement and not long enough to lag behind the pointer.
+ *
+ * `inset-inline-start` rather than a transform, because the transform is
+ * already carrying the half-width offset and animating both fights. */
+[part="tooltip"] {
+  transition:
+    inset-inline-start var(--helix-duration-fast) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="tooltip"] {
+    transition: none;
+  }
+}
+
+/* The groups the tooltip is not about, faded.
+ *
+ * Only while one of them is active, which is what the `:has()` guard is for: a
+ * chart nobody is pointing at should look like a chart, not like a chart with
+ * everything dimmed. Opacity rather than colour, so the palette a legend maps
+ * is still the palette drawn.
+ *
+ * `:has()` on a plain descendant, which is supported: the invalid form is
+ * `:host(:has(...))`, and `check:selectors` fails on that one. */
+[part="plot"]:has([data-active]) [part="group"]:not([data-active]) {
+  opacity: 0.45;
+}
+
+[part="group"] {
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="group"] {
+    transition: none;
+  }
+}

@@ -26,7 +26,11 @@ import type { Row } from '../read-series/read-series.js'
  * representation and the drawing is `aria-hidden`; a reader on a keyboard gets
  * the table, which they can reach, rather than a tooltip which they cannot.
  */
-export const drawTooltip = (rows: Row[], at: number): TemplateResult | typeof nothing => {
+export const drawTooltip = (
+  rows: Row[],
+  at: number,
+  place?: string,
+): TemplateResult | typeof nothing => {
   const row = rows[at]
   if (!row || rows.length === 0) {
     return nothing
@@ -35,10 +39,13 @@ export const drawTooltip = (rows: Row[], at: number): TemplateResult | typeof no
      slot, which is where the drawing put it. A box that follows the pointer
      exactly never settles and is harder to read than the number in it. */
   const slot = 100 / rows.length
+  /* A ring passes its own placement, having no axis to sit along. Everything
+     laid out left to right takes the middle of the reading's own slot. */
+  const along = place ?? `${at * slot + slot / 2}%`
   return html`<div
     aria-hidden="true"
     part="tooltip"
-    style=${styleMap({ '--_chart-tooltip-at': `${at * slot + slot / 2}%` })}
+    style=${styleMap({ '--_chart-tooltip-at': along })}
   >
     <span part="tooltip-label">${row.label}</span>
     ${row.cells.map(

@@ -43,6 +43,18 @@ export class ChartPointerController implements ReactiveController {
   /** The reading under the pointer, or -1 when the pointer is elsewhere. */
   at = -1
 
+  /**
+   * Whether the pointer's x is what decides the reading.
+   *
+   * True for anything laid out along an axis. **A donut turns it off**, and
+   * that is the whole reason this is a flag rather than an assumption: its
+   * slices are real elements, so the reading under the pointer is the one the
+   * pointer is actually over, and mapping x across a ring would answer with
+   * whichever slice happened to share a horizontal position. Off, the chart
+   * calls `set` from its own hover and everything downstream is unchanged.
+   */
+  tracks = true
+
   constructor(host: ChartPointerHost) {
     this.#host = host
     host.addController(this)
@@ -72,8 +84,16 @@ export class ChartPointerController implements ReactiveController {
     return this.#plot?.getBoundingClientRect()
   }
 
+  /** Puts the pointer on a reading, for a chart that resolves it some other way. */
+  set(at: number): void {
+    if (at !== this.at) {
+      this.at = at
+      this.#host.requestUpdate()
+    }
+  }
+
   readonly #move = (event: PointerEvent): void => {
-    if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
+    if (!this.tracks || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
       return
     }
     const box = this.#box()

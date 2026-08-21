@@ -167,7 +167,11 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         }
         ${categories.map(
           (_, index) =>
-            svg`<g part="group">
+            /* The group the tooltip is about says so, and the stylesheet fades
+               the rest. A tooltip over a chart of five categories otherwise
+               makes a reader match its heading against the row of names to find
+               out which columns it means. */
+            svg`<g data-active=${this.pointer.at === index ? '' : nothing} part="group">
               ${series.map((one, depth) => bar(one.points[index]?.value ?? 0, index, depth))}
             </g>`,
         )}
