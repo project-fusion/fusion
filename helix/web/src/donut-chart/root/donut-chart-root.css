@@ -452,6 +452,23 @@
   translate: -50% -50%;
 }
 
+/* **A chart must never animate through a value it does not have**, which is why
+ * none of this uses `emphasized`.
+ *
+ * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
+ * carries the property past its target and settles back. That is right for a
+ * panel arriving or a mark travelling, where the overshoot is the motion having
+ * weight, and it is wrong for a quantity, because the frames past the target are
+ * a number the data does not contain. A bar that reads 15 momentarily drawn at
+ * 16.8 is showing something untrue, briefly, to look nice.
+ *
+ * On the donut it was visible rather than theoretical. Four slices partition one
+ * circumference, so their shares must sum to it at every frame; each overshooting
+ * independently, with the offsets overshooting too, made the arcs slide past one
+ * another and snap back. Reported as ragged and jittery, and that is what it was.
+ *
+ * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
+ * value between where the reading was and where it is. */
 /* The ring answers a change in its numbers, and draws itself on arrival.
  *
  * A chart that swaps its shape between frames makes a reader re-read the whole
@@ -470,9 +487,9 @@
  * enters along the circle rather than fading. */
 [part="segment"] {
   transition:
-    r var(--helix-duration-normal) var(--helix-easing-emphasized),
-    stroke-dasharray var(--helix-duration-normal) var(--helix-easing-emphasized),
-    stroke-dashoffset var(--helix-duration-normal) var(--helix-easing-emphasized),
+    r var(--helix-duration-normal) var(--helix-easing-decelerate),
+    stroke-dasharray var(--helix-duration-normal) var(--helix-easing-decelerate),
+    stroke-dashoffset var(--helix-duration-normal) var(--helix-easing-decelerate),
     stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
 
@@ -483,7 +500,7 @@
 }
 
 [part="track"] {
-  transition: r var(--helix-duration-normal) var(--helix-easing-emphasized);
+  transition: r var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
 @media (prefers-reduced-motion: reduce) {
