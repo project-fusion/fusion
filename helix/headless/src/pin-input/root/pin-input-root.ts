@@ -78,6 +78,22 @@ export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixForm
   @property({ reflect: true, type: Boolean })
   mask = false
 
+  /**
+   * What an empty box shows, usually a single dot.
+   *
+   * The platform's own placeholder, on each cell, rather than a character
+   * drawn behind the field: it clears the moment anything is typed, it is
+   * already excluded from the accessible value, and it works the same under
+   * `mask`, where the cell is a password input and a hand-drawn glyph would
+   * have to know that.
+   *
+   * Empty by default, because a row of boxes already reads as a row of boxes
+   * and a dot in each is a choice about how much the field should announce
+   * itself before anybody has touched it.
+   */
+  @property()
+  placeholder = ''
+
   /** Whether the boxes refuse input while still submitting their value. */
   @property({ attribute: 'read-only', reflect: true, type: Boolean })
   readOnly = false
@@ -319,6 +335,7 @@ export class HelixBasePinInput extends MixinControllerValue(MixinField(HelixForm
             part="cell"
             .value=${character}
             type=${this.mask ? 'password' : 'text'}
+            placeholder=${this.placeholder || nothing}
             inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
             autocomplete=${at === 0 ? 'one-time-code' : 'off'}
             aria-label=${this.cellLabel

@@ -369,7 +369,7 @@ export function Showcase(): React.ReactElement {
               the faces below deliberately are not. */}
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
-              <helix-pin-input label="Verification code" length={4} mask></helix-pin-input>
+              <helix-pin-input label="Verification code" length={4} mask placeholder="•"></helix-pin-input>
               <helix-rating default-value="4" label="Documentation"></helix-rating>
             </helix-flex>
           </helix-card>
@@ -463,34 +463,50 @@ export function Showcase(): React.ReactElement {
               shape rather than an array of values. */}
           <helix-card appearance="outlined" class="showcaseCard">
             <helix-flex direction="column" gap="md">
+              {/* **Two value columns, which is all a grouped bar chart is.**
+                  The component reads every column the table plots and draws one
+                  column per series inside each category's slot, dividing the
+                  slot's width by however many there are. Nothing here says
+                  "group": the shape of the table is the shape of the chart, and
+                  the two domains version independently, so a quarter really
+                  does have two numbers rather than one split in half. */}
               <table data-hidden-visually id="showcase-releases">
                 <caption>Releases by quarter</caption>
                 <thead>
                   <tr>
                     <th scope="col">Quarter</th>
-                    <th scope="col">Releases</th>
+                    <th scope="col">Helix</th>
+                    <th scope="col">Cortex</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <th scope="row">Q1</th>
                     <td data-value="18">18</td>
+                    <td data-value="6">6</td>
                   </tr>
                   <tr>
                     <th scope="row">Q2</th>
                     <td data-value="31">31</td>
+                    <td data-value="9">9</td>
                   </tr>
                   <tr>
                     <th scope="row">Q3</th>
                     <td data-value="24">24</td>
+                    <td data-value="7">7</td>
                   </tr>
                   <tr>
                     <th scope="row">Q4</th>
                     <td data-value="39">39</td>
+                    <td data-value="12">12</td>
                   </tr>
                 </tbody>
               </table>
               <helix-bar-chart class="showcaseBars" for="showcase-releases"></helix-bar-chart>
+              {/* Two series need saying which is which, and the default
+                  `entries` is the one that names columns, which is what these
+                  are. */}
+              <helix-legend for="showcase-releases"></helix-legend>
             </helix-flex>
           </helix-card>
 

@@ -82,3 +82,11 @@
     transition: none;
   }
 }
+
+/* Quieter than a typed character, and it has to be said here because a cell is
+   an `<input>` and the UA gives its placeholder a colour of its own. Subtle
+   rather than muted: this is a hint at the shape of the field, sitting under
+   nothing, where muted is for text somebody is meant to read. */
+[part="cell"]::placeholder {
+  color: var(--helix-color-foreground-subtle);
+}
