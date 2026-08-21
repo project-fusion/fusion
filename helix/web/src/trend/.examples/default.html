@@ -1,6 +1,9 @@
-<!-- @summary Three figures, each with the movement under it and only two of them judged. -->
+<!-- @summary Four figures and all four ways a movement can land, two of them down. -->
 
-<helix-flex gap="xl">
+<helix-flex
+  gap="xl"
+  wrap
+>
   <helix-flex
     direction="column"
     gap="2xs"
@@ -14,6 +17,40 @@
       good="up"
     >
       12.4%
+      <span slot="label">month over month</span>
+    </helix-trend>
+  </helix-flex>
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-stat>
+      2.1
+      <span slot="label">Churn</span>
+      <span slot="unit">%</span>
+    </helix-stat>
+    <helix-trend
+      direction="down"
+      good="down"
+    >
+      0.4pt
+      <span slot="label">month over month</span>
+    </helix-trend>
+  </helix-flex>
+  <helix-flex
+    direction="column"
+    gap="2xs"
+  >
+    <helix-stat>
+      3.8
+      <span slot="label">Conversion</span>
+      <span slot="unit">%</span>
+    </helix-stat>
+    <helix-trend
+      direction="down"
+      good="up"
+    >
+      0.6pt
       <span slot="label">month over month</span>
     </helix-trend>
   </helix-flex>

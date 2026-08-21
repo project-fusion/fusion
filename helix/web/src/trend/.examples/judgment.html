@@ -1,25 +1,25 @@
-<!-- @summary One direction, one number, three meanings. The colour is a claim the consumer makes, not one the arrow makes. -->
+<!-- @summary The same fall three times, and only one of them is bad news. Down is the direction the convention gets wrong. -->
 
 <helix-flex
   direction="column"
   gap="md"
 >
-  <helix-trend direction="up">
+  <helix-trend direction="down">
     8%
     <span slot="label">Headcount, stated and not judged</span>
   </helix-trend>
   <helix-trend
-    direction="up"
-    good="up"
-  >
-    8%
-    <span slot="label">Signups, where up is the improvement</span>
-  </helix-trend>
-  <helix-trend
-    direction="up"
+    direction="down"
     good="down"
   >
     8%
-    <span slot="label">Churn, where down is</span>
+    <span slot="label">Churn, where down is the improvement</span>
+  </helix-trend>
+  <helix-trend
+    direction="down"
+    good="up"
+  >
+    8%
+    <span slot="label">Conversion, where up is</span>
   </helix-trend>
 </helix-flex>
