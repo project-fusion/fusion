@@ -79,6 +79,22 @@ if (hasLayout()) {
       expect(host.hasAttribute('data-scrolls')).toBe(true)
     })
 
+    test('an edge is opted out by giving its fade no depth', async () => {
+      /* A size rather than a switch, because it is the same question at both
+         ends and a zero-depth fade has no box to be drawn in. A list scrolled
+         to the top has nothing above it worth saying so about, and a fade there
+         covers the first row for no reason. */
+      const body = Array.from({ length: 20 }, (_, at) => `<p>Line ${at}</p>`).join('')
+      const host = (await mount(
+        `<helix-scroll-area label="Notes" style="display:block;block-size:80px;inline-size:200px;--scroll-area-fade-block-start:0">${body}</helix-scroll-area>`,
+      )) as Area
+      await host.updateComplete
+      const top = globalThis.getComputedStyle(host, '::before')
+      const bottom = globalThis.getComputedStyle(host, '::after')
+      expect(Number.parseFloat(top.blockSize)).toBe(0)
+      expect(Number.parseFloat(bottom.blockSize)).toBeGreaterThan(0)
+    })
+
     test('and does not when there is nothing to scroll', async () => {
       /* A tab stop on a box with nothing in it to move is a stop that does
          nothing, and a form full of them is worse than the problem. */

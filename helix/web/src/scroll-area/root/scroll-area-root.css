@@ -50,13 +50,22 @@
   z-index: var(--helix-layer-raised);
 }
 
+/* Each edge takes its own depth before the shared one, which is how an edge is
+ * opted out of: set it to zero and that fade has no box to be drawn in.
+ *
+ * A size rather than a switch, because it is the same question at both ends.
+ * A consumer who wants only the bottom one writes
+ * `--scroll-area-fade-block-start: 0`, and one who wants neither writes
+ * `--scroll-area-fade: 0`, and neither needs a second vocabulary to say it in.
+ * `Card` and `Rating` take their hooks the same way, a specific name falling
+ * back to a general one falling back to a token. */
 :host::before {
   background: linear-gradient(
     to bottom,
     var(--scroll-area-fade-color, var(--helix-color-background)),
     transparent
   );
-  block-size: var(--scroll-area-fade, var(--helix-space-xl));
+  block-size: var(--scroll-area-fade-block-start, var(--scroll-area-fade, var(--helix-space-xl)));
   inset-block-start: 0;
   inset-inline: 0;
 }
@@ -67,7 +76,7 @@
     var(--scroll-area-fade-color, var(--helix-color-background)),
     transparent
   );
-  block-size: var(--scroll-area-fade, var(--helix-space-xl));
+  block-size: var(--scroll-area-fade-block-end, var(--scroll-area-fade, var(--helix-space-xl)));
   inset-block-end: 0;
   inset-inline: 0;
 }

@@ -4072,7 +4072,9 @@ have content past them is measured by the base class.
 
 | Property | Description |
 | --- | --- |
-| `--scroll-area-fade` | How deep the fades are. |
+| `--scroll-area-fade` | How deep the fades are, at both edges. |
+| `--scroll-area-fade-block-start` | How deep the top one is, or `0` to drop it. |
+| `--scroll-area-fade-block-end` | And the bottom one. |
 | `--scroll-area-fade-color` | What they fade to, which is the ground behind. |
 | `--scroll-area-scrollbar` | The scrollbar width keyword. |
 | `--scroll-area-thumb-color` | The scrollbar's handle. |

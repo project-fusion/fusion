@@ -6658,8 +6658,12 @@ export type CustomCssProperties = {
   "--toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
-  /** How deep the fades are. */
+  /** How deep the fades are, at both edges. */
   "--scroll-area-fade"?: string;
+  /** How deep the top one is, or `0` to drop it. */
+  "--scroll-area-fade-block-start"?: string;
+  /** And the bottom one. */
+  "--scroll-area-fade-block-end"?: string;
   /** What they fade to, which is the ground behind. */
   "--scroll-area-fade-color"?: string;
   /** The scrollbar width keyword. */

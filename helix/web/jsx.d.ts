@@ -18282,7 +18282,9 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--scroll-area-fade`: How deep the fades are. (default: `undefined`)
+   * - `--scroll-area-fade`: How deep the fades are, at both edges. (default: `undefined`)
+   * - `--scroll-area-fade-block-start`: How deep the top one is, or `0` to drop it. (default: `undefined`)
+   * - `--scroll-area-fade-block-end`: And the bottom one. (default: `undefined`)
    * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
    * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
    * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
@@ -27645,7 +27647,9 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--scroll-area-fade`: How deep the fades are. (default: `undefined`)
+   * - `--scroll-area-fade`: How deep the fades are, at both edges. (default: `undefined`)
+   * - `--scroll-area-fade-block-start`: How deep the top one is, or `0` to drop it. (default: `undefined`)
+   * - `--scroll-area-fade-block-end`: And the bottom one. (default: `undefined`)
    * - `--scroll-area-fade-color`: What they fade to, which is the ground behind. (default: `undefined`)
    * - `--scroll-area-scrollbar`: The scrollbar width keyword. (default: `undefined`)
    * - `--scroll-area-thumb-color`: The scrollbar's handle. (default: `undefined`)
@@ -31127,8 +31131,12 @@ export type CustomCssProperties = {
   "--toolbar-gap"?: string;
   /** The bar's height. Defaults to a large control. */
   "--sandbox-toolbar-size"?: string;
-  /** How deep the fades are. */
+  /** How deep the fades are, at both edges. */
   "--scroll-area-fade"?: string;
+  /** How deep the top one is, or `0` to drop it. */
+  "--scroll-area-fade-block-start"?: string;
+  /** And the bottom one. */
+  "--scroll-area-fade-block-end"?: string;
   /** What they fade to, which is the ground behind. */
   "--scroll-area-fade-color"?: string;
   /** The scrollbar width keyword. */

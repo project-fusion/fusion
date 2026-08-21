@@ -1,0 +1,12 @@
+/* Only the far edge fades. A list that is scrolled to the top has nothing above
+   it worth saying so about, and a fade there covers the first row for no reason. */
+helix-scroll-area {
+  --scroll-area-fade-block-start: 0;
+
+  block-size: 10rem;
+  inline-size: 20rem;
+}
+
+helix-scroll-area p {
+  margin: 0 0 var(--helix-space-sm);
+}
