@@ -135,6 +135,18 @@
     transition-delay: 0s;
     translate: 0 0;
   }
+
+  /* The lift under the pointer arrives at once instead of easing in. Nothing is
+     displaced by it, so unlike the actions above there is no resting state to
+     write back: the hover shadow still applies, it just applies immediately.
+     Same shape as Card's answer to the same rule.
+
+     Named as its own selector rather than folded into the one above. A reduce
+     rule written looser than the rule it answers loses on specificity and does
+     nothing, which is the trap this file's other comment already records. */
+  [part="trigger"] {
+    transition: none;
+  }
 }
 
 /* The trigger this component draws when a consumer slots none.
