@@ -130,6 +130,9 @@ export default function Page() {
             rather than a phase at the end of it. If an engagement would leave you unable to
             continue without us on retainer, it is not one we will take.
           </helix-text>
+          <a data-link href="/trust">
+            The bar every product clears before it ships
+          </a>
         </helix-flex>
       </section>
 

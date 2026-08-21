@@ -98,6 +98,14 @@ export default function Home() {
             The user holds their own keys, data, and hardware. Fusion may operate a control plane,
             never a chokepoint.
           </helix-text>
+          <helix-flex data-density="sm" gap="lg" wrap>
+            <Link data-link href="/thesis">
+              Read the argument
+            </Link>
+            <Link data-link href="/trust">
+              What has to be true before anything ships
+            </Link>
+          </helix-flex>
         </helix-flex>
       </section>
 
