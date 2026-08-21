@@ -6,7 +6,7 @@ import {
   linear,
   linePath,
   type Point,
-  readSeries,
+  SourceController,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -85,20 +85,10 @@ export class HelixBaseSparkline extends HelixElement {
    * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
    * seven columns of nearly the same height, and that is the true picture: they
    * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape. Neither is
-   * wrong; they answer different questions, and a bar plot chosen for drama is
-   * a bar plot that will be given a cut baseline next.
+   * the movement, because a line is only ever claiming a shape.
    *
-   * This tier rather than the one above, and that retires an argument the first
-   * version of the area made. It said the region should always be drawn and
-   * only sometimes painted, so that the shape stayed here and the paint stayed
-   * there. That works for one variant and does not survive a second: a bar plot
-   * draws no line and no region at all, so what is drawn genuinely varies and
-   * drawing everything always would mean a line and an area under every bar
-   * chart, kept invisible by CSS.
-   *
-   * `curve` applies to a line and an area and is ignored by bars, which have no
-   * between to interpolate.
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
    */
   @property({ reflect: true })
   plot?: 'area' | 'bar'
@@ -108,14 +98,9 @@ export class HelixBaseSparkline extends HelixElement {
    *
    * Absent joins them and claims nothing in between, which is why it is the
    * default. `smooth` is easier to follow across a long series and invents the
-   * values between the readings, so it is a reading aid rather than a neutral
-   * one; it is monotone cubic, so what it invents never leaves the band the
-   * data sets. `step` claims the opposite, that a reading holds until the next.
-   *
-   * This tier and not the one above, though it is a drawing decision: a curve
-   * is expressed as path data, and path data is markup. `linePath` in
-   * `helix/core` is the shared implementation, so every chart that draws a line
-   * offers the same three and draws them the same way.
+   * values between the readings; it is monotone cubic, so what it invents never
+   * leaves the band the data sets. `step` claims the opposite, that a reading
+   * holds until the next. Bars ignore it, having no between to interpolate.
    */
   @property({ reflect: true })
   curve?: Curve
@@ -125,8 +110,7 @@ export class HelixBaseSparkline extends HelixElement {
    *
    * The first column of numbers is the series drawn. This wins over `values`,
    * because a table is the readable representation and a list of numbers in an
-   * attribute is not: given both, the one a reader can also read should be the
-   * one the drawing agrees with.
+   * attribute is not.
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
@@ -156,56 +140,23 @@ export class HelixBaseSparkline extends HelixElement {
   @property()
   values = ''
 
-  #observer: MutationObserver | undefined
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.#watch()
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.#observer?.disconnect()
-    this.#observer = undefined
-  }
+  /* One controller rather than the resolve-and-watch each chart had written
+     out for itself. Three copies had already drifted into two names for the
+     same lookup. */
+  protected readonly source = new SourceController(this)
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
-      this.#watch()
+      this.source.watch()
     }
-  }
-
-  /** The table `for` names, or null where there is no document to ask. */
-  #table(): Element | null {
-    if (this.for === '') {
-      return null
-    }
-    const root = this.getRootNode() as Document | ShadowRoot
-    const found = root.getElementById?.(this.for)
-    // `tagName` rather than `instanceof`, which is not a guard on the server.
-    return found?.tagName === 'TABLE' ? (found as HTMLTableElement) : null
   }
 
   /** The series to draw: the table if there is one, the attribute otherwise. */
   #points(): number[] {
-    const table = this.#table()
-    if (table) {
-      return readSeries(table)[0]?.points.map((point) => point.value) ?? []
-    }
-    return readValues(this.values)
-  }
-
-  /** Follows the table, so an update to the numbers reaches the line. */
-  #watch(): void {
-    this.#observer?.disconnect()
-    const table = this.#table()
-    if (!table || typeof MutationObserver === 'undefined') {
-      return
-    }
-    this.#observer ??= new MutationObserver(() => {
-      this.requestUpdate()
-    })
-    this.#observer.observe(table, { characterData: true, childList: true, subtree: true })
+    const series = this.source.series
+    return series.length > 0
+      ? (series[0]?.points.map((point) => point.value) ?? [])
+      : readValues(this.values)
   }
 
   protected override render(): TemplateResult {

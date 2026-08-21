@@ -1179,6 +1179,93 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/controllers/source-controller/source-controller.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Resolves the element a chart reads from, and follows it.\n\n**Three charts had written this out separately before it was one thing**, and\nthe drift had already started: two of them called the lookup `#table` and one\ncalled it `#source`, for the same method with the same body. Every chart that\ntakes a `for` wants exactly this, and wants it to behave identically, so it is\na controller rather than a paragraph in each of them.\n\nA controller and not a pure function, by the test the rules set: it reacts to\nthe host's lifecycle. It has to start watching when the host connects, stop\nwhen it leaves, and re-resolve when `for` changes.\n\n**What it refuses is as much the point as what it accepts.** A `<table>` or\nanything built from grid roles, including this library's own `helix-table`,\nwhose roles live in `ElementInternals` and therefore write no attribute at\nall. Anything else resolves to null, so a `for` pointed at a paragraph draws\nnothing rather than something arbitrary.\n\nThe element is watched for `childList` and `characterData` alike, because\nrenaming a series edits a text node in place rather than replacing a cell,\nand nothing in a page has reason to know a chart is reading it.",
+          "name": "SourceController",
+          "members": [
+            {
+              "kind": "field",
+              "name": "#host",
+              "privacy": "private",
+              "type": {
+                "text": "SourceHost"
+              },
+              "default": "host"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "element",
+              "type": {
+                "text": "Element | null"
+              },
+              "description": "The element `for` names, or null where there is nothing to name it in.\n\nNull on the server as well, since resolving an id wants a document. Every\nchart inherits that: the table is served whole and the drawing arrives on\nhydration.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "series",
+              "type": {
+                "text": "Series[]"
+              },
+              "description": "The series it holds, or none.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "hostConnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hostDisconnected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watch",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Points the watcher at whatever `for` names now.\n\nCalled on connect and by the host when `for` changes. Safe to call when\nthere is no `MutationObserver`, which is the server."
+            }
+          ],
+          "helix": {}
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "SourceController",
+          "declaration": {
+            "name": "SourceController",
+            "module": "src/controllers/source-controller/source-controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/controllers/token-color-controller/token-color-controller.ts",
       "declarations": [
         {
@@ -2514,6 +2601,22 @@
           "declaration": {
             "name": "PopoverOptions",
             "module": "./controllers/popover-controller/popover-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SourceController",
+          "declaration": {
+            "name": "SourceController",
+            "module": "./controllers/source-controller/source-controller.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SourceHost",
+          "declaration": {
+            "name": "SourceHost",
+            "module": "./controllers/source-controller/source-controller.js"
           }
         },
         {

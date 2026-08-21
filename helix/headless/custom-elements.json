@@ -1866,33 +1866,10 @@
             },
             {
               "kind": "field",
-              "name": "#observer",
-              "privacy": "private",
-              "type": {
-                "text": "MutationObserver | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "#source",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element | null"
-                }
-              },
-              "description": "The table or grid `for` names, or null where there is no document."
-            },
-            {
-              "kind": "method",
-              "name": "#watch",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Follows the table, so an update to the numbers reaches the columns."
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)"
             },
             {
               "kind": "method",
@@ -4134,242 +4111,6 @@
           "declaration": {
             "name": "HelixBaseCarousel",
             "module": "src/carousel/root/carousel-root.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/chart-legend/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/chart-legend/root/chart-legend-root.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/chart-legend/root/chart-legend-root.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A legend is a list, so it is a list: not part of a chart, and shared by\nwhichever of them needs one. It takes its entries from the same table the\nchart reads, through `for`, so the two cannot disagree about how many series\nthere are or what they are called.\n\n`entries` picks which way to read that table, and the two ways are the two\nshapes a chart comes in. `series` is one entry per data column, named by the\nheader row, which is a line or a bar chart. `categories` is one entry per\nbody row, named by its row header, which is a donut: its slices are the rows,\nand it has no axis to write their names along.\n\n**The table is resolved on the client and there is no server pass.** `for` is\nan id and resolving it wants a document, which the server render does not\nhave, so a legend ships empty and fills in on hydration. The table itself is\nordinary markup and is served whole, so nothing is missing from the page\nbefore then, only from this list.\n\nThe table is watched, because a legend that goes stale when its data changes\nis a legend that has to be told, and nothing else in the page would know to\ntell it.\n\n**Not hidden from a screen reader, though the mapping it draws is a colour\none.** The argument for hiding it is real: the colours mean nothing to a\nreader who cannot see them, and the names are already in the table. It stays\nbecause the cost of being wrong runs one way. A duplicated list of three\nwords is noise; a consumer who took the table out of the accessibility tree\nand then found the legend hidden too has a chart nobody can read, and neither\ndecision announces itself.",
-          "name": "HelixBaseChartLegend",
-          "cssParts": [
-            {
-              "description": "One name and its swatch.",
-              "name": "entry"
-            },
-            {
-              "description": "The list itself.",
-              "name": "list"
-            },
-            {
-              "description": "One series name.",
-              "name": "name"
-            },
-            {
-              "description": "The colour a series is drawn in.",
-              "name": "swatch"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "entries",
-              "type": {
-                "text": "'categories' | 'series' | undefined"
-              },
-              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
-              "attribute": "entries",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "attribute": "for"
-            },
-            {
-              "kind": "field",
-              "name": "#observer",
-              "privacy": "private",
-              "type": {
-                "text": "MutationObserver | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "#table",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element | null"
-                }
-              },
-              "description": "The table `for` names, or null where there is no document to ask."
-            },
-            {
-              "kind": "method",
-              "name": "#names",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string[]"
-                }
-              },
-              "description": "The names, in the order the chart will draw them."
-            },
-            {
-              "kind": "method",
-              "name": "#watch",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Follows the table, so an update to the numbers reaches the names.\n\nA row added or a header renamed changes what this list should say, and the\npage has no reason to know a legend is reading it. `characterData` as well\nas `childList`, because renaming a series edits a text node in place rather\nthan replacing the cell.\n\nGuarded on the constructor rather than on the environment, since this runs\nfrom `connectedCallback` and from `willUpdate`, and only the first of those\nis client-only."
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "protected",
-              "readonly": true,
-              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "relayNativeEvent",
-              "privacy": "protected",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "Event"
-                  }
-                },
-                {
-                  "name": "init",
-                  "optional": true,
-                  "type": {
-                    "text": "EventInit"
-                  }
-                }
-              ],
-              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "finalizeStyles",
-              "privacy": "protected",
-              "static": true,
-              "return": {
-                "type": {
-                  "text": "CSSResultOrNative[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "styles",
-                  "optional": true,
-                  "type": {
-                    "text": "CSSResultOrNative | CSSResultOrNative[]"
-                  }
-                }
-              ],
-              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
-              "inheritedFrom": {
-                "name": "HelixElement",
-                "module": "src/helix-element/helix-element.ts"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "entries",
-              "type": {
-                "text": "'categories' | 'series' | undefined"
-              },
-              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
-              "fieldName": "entries"
-            },
-            {
-              "name": "for",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
-              "fieldName": "for"
-            }
-          ],
-          "superclass": {
-            "name": "HelixElement",
-            "package": "@helix-io/core"
-          },
-          "summary": "The names a chart draws, each beside the colour it is drawn in.",
-          "helix": {
-            "category": "content",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/chart-legend",
-            "aliases": [
-              "Key",
-              "Series Key"
-            ],
-            "tier": "headless",
-            "group": "BaseChartLegend",
-            "part": "Root",
-            "source": "helix/headless/src/chart-legend"
-          },
-          "tagName": "helix-base-chart-legend",
-          "customElement": true,
-          "modulePath": "src/chart-legend/root/chart-legend-root.ts",
-          "definitionPath": "src/chart-legend/root/chart-legend-root.ts"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBaseChartLegend",
-          "declaration": {
-            "name": "HelixBaseChartLegend",
-            "module": "src/chart-legend/root/chart-legend-root.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "helix-base-chart-legend",
-          "declaration": {
-            "name": "HelixBaseChartLegend",
-            "module": "src/chart-legend/root/chart-legend-root.ts"
           }
         }
       ]
@@ -18068,14 +17809,6 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/chart-legend/index.js"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
             "module": "src/checkbox/index.js"
           }
         },
@@ -18245,6 +17978,14 @@
           "declaration": {
             "name": "*",
             "module": "src/kbd/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/legend/index.js"
           }
         },
         {
@@ -19889,6 +19630,219 @@
           "declaration": {
             "name": "HelixBaseKbd",
             "module": "src/kbd/root/kbd-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/legend/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/legend/root/legend-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/legend/root/legend-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A legend is a list, so it is a list: not part of a chart, and shared by\nwhichever of them needs one. It takes its entries from the same table the\nchart reads, through `for`, so the two cannot disagree about how many series\nthere are or what they are called.\n\n`entries` picks which way to read that table, and the two ways are the two\nshapes a chart comes in. `series` is one entry per data column, named by the\nheader row, which is a line or a bar chart. `categories` is one entry per\nbody row, named by its row header, which is a donut: its slices are the rows,\nand it has no axis to write their names along.\n\n**The table is resolved on the client and there is no server pass.** `for` is\nan id and resolving it wants a document, which the server render does not\nhave, so a legend ships empty and fills in on hydration. The table itself is\nordinary markup and is served whole, so nothing is missing from the page\nbefore then, only from this list.\n\nThe table is watched, because a legend that goes stale when its data changes\nis a legend that has to be told, and nothing else in the page would know to\ntell it.\n\n**Not hidden from a screen reader, though the mapping it draws is a colour\none.** The argument for hiding it is real: the colours mean nothing to a\nreader who cannot see them, and the names are already in the table. It stays\nbecause the cost of being wrong runs one way. A duplicated list of three\nwords is noise; a consumer who took the table out of the accessibility tree\nand then found the legend hidden too has a chart nobody can read, and neither\ndecision announces itself.",
+          "name": "HelixBaseLegend",
+          "cssParts": [
+            {
+              "description": "One name and its swatch.",
+              "name": "entry"
+            },
+            {
+              "description": "The list itself.",
+              "name": "list"
+            },
+            {
+              "description": "One series name.",
+              "name": "name"
+            },
+            {
+              "description": "The colour a series is drawn in.",
+              "name": "swatch"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "'categories' | 'series' | undefined"
+              },
+              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
+              "attribute": "entries",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for"
+            },
+            {
+              "kind": "field",
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)"
+            },
+            {
+              "kind": "method",
+              "name": "#names",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "description": "The names, in the order the chart will draw them."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "entries",
+              "type": {
+                "text": "'categories' | 'series' | undefined"
+              },
+              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
+              "fieldName": "entries"
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "The names a chart draws, each beside the colour it is drawn in.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/legend",
+            "aliases": [
+              "Key",
+              "Series Key"
+            ],
+            "tier": "headless",
+            "group": "BaseLegend",
+            "part": "Root",
+            "source": "helix/headless/src/legend"
+          },
+          "tagName": "helix-base-legend",
+          "customElement": true,
+          "modulePath": "src/legend/root/legend-root.ts",
+          "definitionPath": "src/legend/root/legend-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseLegend",
+          "declaration": {
+            "name": "HelixBaseLegend",
+            "module": "src/legend/root/legend-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-legend",
+          "declaration": {
+            "name": "HelixBaseLegend",
+            "module": "src/legend/root/legend-root.ts"
           }
         }
       ]
@@ -35085,7 +35039,7 @@
               "type": {
                 "text": "'area' | 'bar' | undefined"
               },
-              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape. Neither is\nwrong; they answer different questions, and a bar plot chosen for drama is\na bar plot that will be given a cut baseline next.\n\nThis tier rather than the one above, and that retires an argument the first\nversion of the area made. It said the region should always be drawn and\nonly sometimes painted, so that the shape stayed here and the paint stayed\nthere. That works for one variant and does not survive a second: a bar plot\ndraws no line and no region at all, so what is drawn genuinely varies and\ndrawing everything always would mean a line and an area under every bar\nchart, kept invisible by CSS.\n\n`curve` applies to a line and an area and is ignored by bars, which have no\nbetween to interpolate.",
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
               "attribute": "plot",
               "reflects": true
             },
@@ -35095,7 +35049,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings, so it is a reading aid rather than a neutral\none; it is monotone cubic, so what it invents never leaves the band the\ndata sets. `step` claims the opposite, that a reading holds until the next.\n\nThis tier and not the one above, though it is a drawing decision: a curve\nis expressed as path data, and path data is markup. `linePath` in\n`helix/core` is the shared implementation, so every chart that draws a line\noffers the same three and draws them the same way.",
+              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
               "attribute": "curve",
               "reflects": true
             },
@@ -35106,7 +35060,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not: given both, the one a reader can also read should be the\none the drawing agrees with.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
               "attribute": "for"
             },
             {
@@ -35131,22 +35085,10 @@
             },
             {
               "kind": "field",
-              "name": "#observer",
-              "privacy": "private",
-              "type": {
-                "text": "MutationObserver | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "#table",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Element | null"
-                }
-              },
-              "description": "The table `for` names, or null where there is no document to ask."
+              "name": "source",
+              "privacy": "protected",
+              "readonly": true,
+              "default": "new SourceController(this)"
             },
             {
               "kind": "method",
@@ -35158,17 +35100,6 @@
                 }
               },
               "description": "The series to draw: the table if there is one, the attribute otherwise."
-            },
-            {
-              "kind": "method",
-              "name": "#watch",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Follows the table, so an update to the numbers reaches the line."
             },
             {
               "kind": "field",
@@ -35246,7 +35177,7 @@
               "type": {
                 "text": "'area' | 'bar' | undefined"
               },
-              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape. Neither is\nwrong; they answer different questions, and a bar plot chosen for drama is\na bar plot that will be given a cut baseline next.\n\nThis tier rather than the one above, and that retires an argument the first\nversion of the area made. It said the region should always be drawn and\nonly sometimes painted, so that the shape stayed here and the paint stayed\nthere. That works for one variant and does not survive a second: a bar plot\ndraws no line and no region at all, so what is drawn genuinely varies and\ndrawing everything always would mean a line and an area under every bar\nchart, kept invisible by CSS.\n\n`curve` applies to a line and an area and is ignored by bars, which have no\nbetween to interpolate.",
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
               "fieldName": "plot"
             },
             {
@@ -35254,7 +35185,7 @@
               "type": {
                 "text": "Curve | undefined"
               },
-              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings, so it is a reading aid rather than a neutral\none; it is monotone cubic, so what it invents never leaves the band the\ndata sets. `step` claims the opposite, that a reading holds until the next.\n\nThis tier and not the one above, though it is a drawing decision: a curve\nis expressed as path data, and path data is markup. `linePath` in\n`helix/core` is the shared implementation, so every chart that draws a line\noffers the same three and draws them the same way.",
+              "description": "How the line gets from one reading to the next.\n\nAbsent joins them and claims nothing in between, which is why it is the\ndefault. `smooth` is easier to follow across a long series and invents the\nvalues between the readings; it is monotone cubic, so what it invents never\nleaves the band the data sets. `step` claims the opposite, that a reading\nholds until the next. Bars ignore it, having no between to interpolate.",
               "fieldName": "curve"
             },
             {
@@ -35263,7 +35194,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not: given both, the one a reader can also read should be the\none the drawing agrees with.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "description": "The id of a table to read instead, when there is one behind the line.\n\nThe first column of numbers is the series drawn. This wins over `values`,\nbecause a table is the readable representation and a list of numbers in an\nattribute is not.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
               "fieldName": "for"
             },
             {

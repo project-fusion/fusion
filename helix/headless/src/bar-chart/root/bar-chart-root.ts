@@ -5,6 +5,7 @@ import {
   linear,
   readSeries,
   type Series,
+  SourceController,
 } from '@helix-io/core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -87,53 +88,19 @@ export class HelixBaseBarChart extends HelixElement {
   @property()
   label = ''
 
-  #observer: MutationObserver | undefined
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.#watch()
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.#observer?.disconnect()
-    this.#observer = undefined
-  }
+  /* One controller rather than the resolve-and-watch each chart had written
+     out for itself. Three copies had already drifted into two names for the
+     same lookup. */
+  protected readonly source = new SourceController(this)
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
-      this.#watch()
+      this.source.watch()
     }
-  }
-
-  /** The table or grid `for` names, or null where there is no document. */
-  #source(): Element | null {
-    if (this.for === '') {
-      return null
-    }
-    const root = this.getRootNode() as Document | ShadowRoot
-    const found = root.getElementById?.(this.for)
-    const role = found?.getAttribute('role')
-    const grid =
-      role === 'table' || role === 'grid' || /^helix-(base-)?table$/i.test(found?.tagName ?? '')
-    return found?.tagName === 'TABLE' || grid ? (found ?? null) : null
-  }
-
-  /** Follows the table, so an update to the numbers reaches the columns. */
-  #watch(): void {
-    this.#observer?.disconnect()
-    const source = this.#source()
-    if (!source || typeof MutationObserver === 'undefined') {
-      return
-    }
-    this.#observer ??= new MutationObserver(() => {
-      this.requestUpdate()
-    })
-    this.#observer.observe(source, { characterData: true, childList: true, subtree: true })
   }
 
   protected override render(): TemplateResult {
-    const source = this.#source()
+    const source = this.source.element
     const series: Series[] = source ? readSeries(source) : []
     const categories = series[0]?.points.map((point) => point.label) ?? []
     if (categories.length === 0) {

@@ -1,8 +1,8 @@
 import { customElement } from '@helix-io/core'
-import { HelixBaseChartLegend } from '@helix-io/headless'
+import { HelixBaseLegend } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './chart-legend-root.css.js'
+import { styles } from './legend-root.css.js'
 
 /**
  * @summary The names a chart draws, each beside the colour it is drawn in.
@@ -10,7 +10,7 @@ import { styles } from './chart-legend-root.css.js'
  * @description
  * A row that wraps, because a legend sits under a chart as wide as the chart
  * and there is no arrangement of eight names that fits every width. Set
- * `--chart-legend-direction` to `column` where it sits beside one instead.
+ * `--legend-direction` to `column` where it sits beside one instead.
  *
  * The eight series colours are mapped here rather than in the tier below, which
  * carries the index and holds no tokens. Written as eight rules for the reason
@@ -21,14 +21,14 @@ import { styles } from './chart-legend-root.css.js'
  * @status experimental
  * @category content
  * @aliases Key, Series Key
- * @documentation https://helix.fusion.dev/components/chart-legend
+ * @documentation https://helix.fusion.dev/components/legend
  *
- * @cssproperty --chart-legend-direction - `row`, which wraps, or `column`.
- * @cssproperty --chart-legend-gap - Space between entries.
- * @cssproperty --chart-legend-swatch-size - Size of the colour patch.
+ * @cssproperty --legend-direction - `row`, which wraps, or `column`.
+ * @cssproperty --legend-gap - Space between entries.
+ * @cssproperty --legend-swatch-size - Size of the colour patch.
  */
-@customElement('helix-chart-legend')
-export class HelixChartLegend extends HelixBaseChartLegend {
+@customElement('helix-legend')
+export class HelixLegend extends HelixBaseLegend {
   static override styles: CSSResultGroup = styles
 
   /**
@@ -55,6 +55,6 @@ export class HelixChartLegend extends HelixBaseChartLegend {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-chart-legend': HelixChartLegend
+    'helix-legend': HelixLegend
   }
 }

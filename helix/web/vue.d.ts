@@ -16,7 +16,6 @@ import type {
   HelixCallout,
   HelixCard,
   HelixCarousel,
-  HelixChartLegend,
   HelixCheckboxGroup,
   HelixCheckbox,
   HelixCodeBlock,
@@ -42,6 +41,7 @@ import type {
   HelixImage,
   HelixInput,
   HelixKbd,
+  HelixLegend,
   HelixListItem,
   HelixList,
   HelixListbox,
@@ -442,8 +442,8 @@ as a bar across the whole frame.
 Read by the shapes made of many similar things, whether those are counted
 or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
 spacing and a weight apiece; `particles`, whose motes draw a size, a
-brightness and a wander; and `rays`, `aurora` and `prism`, whose fan,
-bundles and bands widen or even out. `braid`, `waves` and `flow` have a
+brightness and a wander; and `rays` and `aurora`, whose fan, bundles and
+folds widen or even out. `braid`, `waves` and `flow` have a
 single subject and nothing to vary, and `threads` is even on purpose, so on
 those four this is inert. */
   variance?: HelixAura["variance"];
@@ -949,41 +949,6 @@ export type HelixCarouselVueEvents = {
   /** Fired when the slide in view changes, with its index. */
   "helix-select": HelixCarouselHelixSelectElementEvent;
 };
-
-export type HelixChartLegendVueProps = {
-  /** Where the legend sits and which way its entries run.
-
-Absent is a wrapping row, which is what sits under a chart. `start` and
-`end` stack the entries in a column, for a legend beside one.
-
-**This says which way the entries run and not where the element is**, which
-is the honest limit of a component that is a sibling of the chart rather
-than part of it. A legend cannot place itself relative to something it is
-not inside, so the consumer still puts it above, below or beside; this
-makes it lay out correctly once it is there, which was the part that
-previously took a custom property nobody would guess at.
-
-The alternative was a `legend` slot on every chart, so a chart could place
-its own. That is worse: it makes the legend's position a fact about the
-chart, so two charts sharing one legend becomes impossible, and it puts a
-list inside a drawing that is `aria-hidden`. */
-  placement?: HelixChartLegend["placement"];
-  /** Which way to read the table.
-
-Absent is `series`, one entry per data column. `categories` reads one entry
-per body row instead, for a donut, whose slices are the rows. */
-  entries?: HelixChartLegend["entries"];
-  /** The id of the table to take the names from.
-
-Resolved through `getRootNode()`, so a legend inside another component's
-shadow root names a table in that root rather than in the document.
-
-**In React this arrives as a property and not as an attribute**, the way
-`Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixChartLegend["for"];
-};
-
-export type HelixChartLegendVueEvents = {};
 
 /** `HelixCheckboxGroup` component event */
 export type HelixCheckboxGroupElementEvent<E = Event> = TypedEvent<
@@ -2771,6 +2736,41 @@ export type HelixInputVueEvents = {
 export type HelixKbdVueProps = {};
 
 export type HelixKbdVueEvents = {};
+
+export type HelixLegendVueProps = {
+  /** Where the legend sits and which way its entries run.
+
+Absent is a wrapping row, which is what sits under a chart. `start` and
+`end` stack the entries in a column, for a legend beside one.
+
+**This says which way the entries run and not where the element is**, which
+is the honest limit of a component that is a sibling of the chart rather
+than part of it. A legend cannot place itself relative to something it is
+not inside, so the consumer still puts it above, below or beside; this
+makes it lay out correctly once it is there, which was the part that
+previously took a custom property nobody would guess at.
+
+The alternative was a `legend` slot on every chart, so a chart could place
+its own. That is worse: it makes the legend's position a fact about the
+chart, so two charts sharing one legend becomes impossible, and it puts a
+list inside a drawing that is `aria-hidden`. */
+  placement?: HelixLegend["placement"];
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  entries?: HelixLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixLegend["for"];
+};
+
+export type HelixLegendVueEvents = {};
 
 export type HelixListItemVueProps = {
   /** Where the row goes, and nothing when it goes nowhere.
@@ -4751,40 +4751,24 @@ proportional to nothing.
 zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
 seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape. Neither is
-wrong; they answer different questions, and a bar plot chosen for drama is
-a bar plot that will be given a cut baseline next.
+the movement, because a line is only ever claiming a shape.
 
-This tier rather than the one above, and that retires an argument the first
-version of the area made. It said the region should always be drawn and
-only sometimes painted, so that the shape stayed here and the paint stayed
-there. That works for one variant and does not survive a second: a bar plot
-draws no line and no region at all, so what is drawn genuinely varies and
-drawing everything always would mean a line and an area under every bar
-chart, kept invisible by CSS.
-
-`curve` applies to a line and an area and is ignored by bars, which have no
-between to interpolate. */
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
   plot?: HelixSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
 default. `smooth` is easier to follow across a long series and invents the
-values between the readings, so it is a reading aid rather than a neutral
-one; it is monotone cubic, so what it invents never leaves the band the
-data sets. `step` claims the opposite, that a reading holds until the next.
-
-This tier and not the one above, though it is a drawing decision: a curve
-is expressed as path data, and path data is markup. `linePath` in
-`helix/core` is the shared implementation, so every chart that draws a line
-offers the same three and draws them the same way. */
+values between the readings; it is monotone cubic, so what it invents never
+leaves the band the data sets. `step` claims the opposite, that a reading
+holds until the next. Bars ignore it, having no between to interpolate. */
   curve?: HelixSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
 because a table is the readable representation and a list of numbers in an
-attribute is not: given both, the one a reader can also read should be the
-one the drawing agrees with.
+attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
@@ -6796,12 +6780,6 @@ export type CustomCssProperties = {
   "--carousel-block-size"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
-  /** `row`, which wraps, or `column`. */
-  "--chart-legend-direction"?: string;
-  /** Space between entries. */
-  "--chart-legend-gap"?: string;
-  /** Size of the colour patch. */
-  "--chart-legend-swatch-size"?: string;
   /** Space between the boxes. */
   "--checkbox-group-gap"?: string;
   /** Width and height of the box. */
@@ -6924,6 +6902,12 @@ export type CustomCssProperties = {
   "--kbd-background-color"?: string;
   /** Color of the hairline and the edge. */
   "--kbd-border-color"?: string;
+  /** `row`, which wraps, or `column`. */
+  "--legend-direction"?: string;
+  /** Space between entries. */
+  "--legend-gap"?: string;
+  /** Size of the colour patch. */
+  "--legend-swatch-size"?: string;
   /** Padding inside the row. */
   "--list-item-inset"?: string;
   /** Weight of a description list's term. */
@@ -7366,12 +7350,6 @@ export interface WcToolkitVueGlobalComponents {
     HelixCarouselVueProps,
     HelixCarouselVueEvents
   >;
-  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--chart-legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a colour. */
-  "helix-chart-legend": DefineCustomElement<
-    HelixChartLegend,
-    HelixChartLegendVueProps,
-    HelixChartLegendVueEvents
-  >;
   /** A column by default, which is what a list of choices wants: the eye scans one line per answer rather than hunting along a row. */
   "helix-checkbox-group": DefineCustomElement<
     HelixCheckboxGroup,
@@ -7521,6 +7499,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixKbd,
     HelixKbdVueProps,
     HelixKbdVueEvents
+  >;
+  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a colour. */
+  "helix-legend": DefineCustomElement<
+    HelixLegend,
+    HelixLegendVueProps,
+    HelixLegendVueEvents
   >;
   /** A grid rather than a flex row, so the supporting text lines up under the label rather than under the leading icon. The leading and trailing regions hold their own width and the middle takes the rest. */
   "helix-list-item": DefineCustomElement<

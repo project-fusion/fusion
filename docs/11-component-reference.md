@@ -848,48 +848,6 @@ which is what a run of cards wants rather than a run of full-width panels.
 | `--carousel-block-size` | Height of a vertical track. |
 | `--carousel-gap` | Space between slides. |
 
-## Chart Legend
-
-### Root — `helix-chart-legend`
-
-The names a chart draws, each beside the colour it is drawn in.
-
-Extends `HelixBaseChartLegend`.
-
-A row that wraps, because a legend sits under a chart as wide as the chart
-and there is no arrangement of eight names that fits every width. Set
-`--chart-legend-direction` to `column` where it sits beside one instead.
-
-The eight series colours are mapped here rather than in the tier below, which
-carries the index and holds no tokens. Written as eight rules for the reason
-`Avatar.Group` writes twelve: an index in markup cannot select a token, and a
-custom property set inline would be the headless tier naming a colour.
-
-#### Properties
-
-| Property | Attribute | Type | Default | From | Description |
-| --- | --- | --- | --- | --- | --- |
-| `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixBaseChartLegend` | Which way to read the table. |
-| `for` | `for` | `string` | `''` | `HelixBaseChartLegend` | The id of the table to take the names from. |
-| `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
-
-#### Parts
-
-| Part | Description |
-| --- | --- |
-| `entry` | One name and its swatch. |
-| `list` | The list itself. |
-| `name` | One series name. |
-| `swatch` | The colour a series is drawn in. |
-
-#### Custom properties
-
-| Property | Description |
-| --- | --- |
-| `--chart-legend-direction` | `row`, which wraps, or `column`. |
-| `--chart-legend-gap` | Space between entries. |
-| `--chart-legend-swatch-size` | Size of the colour patch. |
-
 ## Checkbox
 
 ### Root — `helix-checkbox`
@@ -2476,6 +2434,48 @@ than holding one size and looking wrong in a heading.
 | --- | --- |
 | `--kbd-background-color` | Fill of the key. |
 | `--kbd-border-color` | Color of the hairline and the edge. |
+
+## Legend
+
+### Root — `helix-legend`
+
+The names a chart draws, each beside the colour it is drawn in.
+
+Extends `HelixBaseLegend`.
+
+A row that wraps, because a legend sits under a chart as wide as the chart
+and there is no arrangement of eight names that fits every width. Set
+`--legend-direction` to `column` where it sits beside one instead.
+
+The eight series colours are mapped here rather than in the tier below, which
+carries the index and holds no tokens. Written as eight rules for the reason
+`Avatar.Group` writes twelve: an index in markup cannot select a token, and a
+custom property set inline would be the headless tier naming a colour.
+
+#### Properties
+
+| Property | Attribute | Type | Default | From | Description |
+| --- | --- | --- | --- | --- | --- |
+| `entries` | `entries` | `'categories' \| 'series' \| undefined` | - | `HelixBaseLegend` | Which way to read the table. |
+| `for` | `for` | `string` | `''` | `HelixBaseLegend` | The id of the table to take the names from. |
+| `placement` | `placement` | `'end' \| 'start' \| undefined` | - | - | Where the legend sits and which way its entries run. |
+
+#### Parts
+
+| Part | Description |
+| --- | --- |
+| `entry` | One name and its swatch. |
+| `list` | The list itself. |
+| `name` | One series name. |
+| `swatch` | The colour a series is drawn in. |
+
+#### Custom properties
+
+| Property | Description |
+| --- | --- |
+| `--legend-direction` | `row`, which wraps, or `column`. |
+| `--legend-gap` | Space between entries. |
+| `--legend-swatch-size` | Size of the colour patch. |
 
 ## List
 

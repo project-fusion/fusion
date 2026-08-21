@@ -17,7 +17,6 @@ import type {
   HelixBaseCallout,
   HelixBaseCard,
   HelixBaseCarousel,
-  HelixBaseChartLegend,
   HelixBaseCheckbox,
   HelixBaseCheckboxGroup,
   HelixBaseCode,
@@ -41,6 +40,7 @@ import type {
   HelixBaseImage,
   HelixBaseInput,
   HelixBaseKbd,
+  HelixBaseLegend,
   HelixBaseList,
   HelixBaseListItem,
   HelixBaseListbox,
@@ -1113,43 +1113,6 @@ want. */
   "prop:interval"?: HelixBaseCarousel["interval"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
-
-  /** Set the innerHTML of the element */
-  innerHTML?: string;
-  /** Set the textContent of the element */
-  textContent?: string | number;
-};
-
-export type HelixBaseChartLegendProps = {
-  /** Which way to read the table.
-
-Absent is `series`, one entry per data column. `categories` reads one entry
-per body row instead, for a donut, whose slices are the rows. */
-  entries?: HelixBaseChartLegend["entries"];
-  /** The id of the table to take the names from.
-
-Resolved through `getRootNode()`, so a legend inside another component's
-shadow root names a table in that root rather than in the document.
-
-**In React this arrives as a property and not as an attribute**, the way
-`Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseChartLegend["for"];
-};
-
-export type HelixBaseChartLegendSolidJsProps = {
-  /** Which way to read the table.
-
-Absent is `series`, one entry per data column. `categories` reads one entry
-per body row instead, for a donut, whose slices are the rows. */
-  "prop:entries"?: HelixBaseChartLegend["entries"];
-  /** The id of the table to take the names from.
-
-Resolved through `getRootNode()`, so a legend inside another component's
-shadow root names a table in that root rather than in the document.
-
-**In React this arrives as a property and not as an attribute**, the way
-`Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  "prop:for"?: HelixBaseChartLegend["for"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -4408,6 +4371,43 @@ reflected none of them. */
 export type HelixBaseKbdProps = {};
 
 export type HelixBaseKbdSolidJsProps = {
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseLegendProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  entries?: HelixBaseLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseLegend["for"];
+};
+
+export type HelixBaseLegendSolidJsProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  "prop:entries"?: HelixBaseLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseLegend["for"];
+
   /** Set the innerHTML of the element */
   innerHTML?: string;
   /** Set the textContent of the element */
@@ -7700,40 +7700,24 @@ proportional to nothing.
 zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
 seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape. Neither is
-wrong; they answer different questions, and a bar plot chosen for drama is
-a bar plot that will be given a cut baseline next.
+the movement, because a line is only ever claiming a shape.
 
-This tier rather than the one above, and that retires an argument the first
-version of the area made. It said the region should always be drawn and
-only sometimes painted, so that the shape stayed here and the paint stayed
-there. That works for one variant and does not survive a second: a bar plot
-draws no line and no region at all, so what is drawn genuinely varies and
-drawing everything always would mean a line and an area under every bar
-chart, kept invisible by CSS.
-
-`curve` applies to a line and an area and is ignored by bars, which have no
-between to interpolate. */
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
   plot?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
 default. `smooth` is easier to follow across a long series and invents the
-values between the readings, so it is a reading aid rather than a neutral
-one; it is monotone cubic, so what it invents never leaves the band the
-data sets. `step` claims the opposite, that a reading holds until the next.
-
-This tier and not the one above, though it is a drawing decision: a curve
-is expressed as path data, and path data is markup. `linePath` in
-`helix/core` is the shared implementation, so every chart that draws a line
-offers the same three and draws them the same way. */
+values between the readings; it is monotone cubic, so what it invents never
+leaves the band the data sets. `step` claims the opposite, that a reading
+holds until the next. Bars ignore it, having no between to interpolate. */
   curve?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
 because a table is the readable representation and a list of numbers in an
-attribute is not: given both, the one a reader can also read should be the
-one the drawing agrees with.
+attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
@@ -7771,40 +7755,24 @@ proportional to nothing.
 zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
 seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape. Neither is
-wrong; they answer different questions, and a bar plot chosen for drama is
-a bar plot that will be given a cut baseline next.
+the movement, because a line is only ever claiming a shape.
 
-This tier rather than the one above, and that retires an argument the first
-version of the area made. It said the region should always be drawn and
-only sometimes painted, so that the shape stayed here and the paint stayed
-there. That works for one variant and does not survive a second: a bar plot
-draws no line and no region at all, so what is drawn genuinely varies and
-drawing everything always would mean a line and an area under every bar
-chart, kept invisible by CSS.
-
-`curve` applies to a line and an area and is ignored by bars, which have no
-between to interpolate. */
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
   "prop:plot"?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
 default. `smooth` is easier to follow across a long series and invents the
-values between the readings, so it is a reading aid rather than a neutral
-one; it is monotone cubic, so what it invents never leaves the band the
-data sets. `step` claims the opposite, that a reading holds until the next.
-
-This tier and not the one above, though it is a drawing decision: a curve
-is expressed as path data, and path data is markup. `linePath` in
-`helix/core` is the shared implementation, so every chart that draws a line
-offers the same three and draws them the same way. */
+values between the readings; it is monotone cubic, so what it invents never
+leaves the band the data sets. `step` claims the opposite, that a reading
+holds until the next. Bars ignore it, having no between to interpolate. */
   "prop:curve"?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
 because a table is the readable representation and a list of numbers in an
-attribute is not: given both, the one a reader can also read should be the
-one the drawing agrees with.
+attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
@@ -12276,65 +12244,6 @@ export type CustomElements = {
   > & HelixBaseCarouselControlled;
 
   /**
-   * A legend is a list, so it is a list: not part of a chart, and shared by
-   * whichever of them needs one. It takes its entries from the same table the
-   * chart reads, through `for`, so the two cannot disagree about how many series
-   * there are or what they are called.
-   *
-   * `entries` picks which way to read that table, and the two ways are the two
-   * shapes a chart comes in. `series` is one entry per data column, named by the
-   * header row, which is a line or a bar chart. `categories` is one entry per
-   * body row, named by its row header, which is a donut: its slices are the rows,
-   * and it has no axis to write their names along.
-   *
-   * **The table is resolved on the client and there is no server pass.** `for` is
-   * an id and resolving it wants a document, which the server render does not
-   * have, so a legend ships empty and fills in on hydration. The table itself is
-   * ordinary markup and is served whole, so nothing is missing from the page
-   * before then, only from this list.
-   *
-   * The table is watched, because a legend that goes stale when its data changes
-   * is a legend that has to be told, and nothing else in the page would know to
-   * tell it.
-   *
-   * **Not hidden from a screen reader, though the mapping it draws is a colour
-   * one.** The argument for hiding it is real: the colours mean nothing to a
-   * reader who cannot see them, and the names are already in the table. It stays
-   * because the cost of being wrong runs one way. A duplicated list of three
-   * words is noise; a consumer who took the table out of the accessibility tree
-   * and then found the legend hidden too has a chart nobody can read, and neither
-   * decision announces itself.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `entries`: Which way to read the table.
-   *
-   * Absent is `series`, one entry per data column. `categories` reads one entry
-   * per body row instead, for a donut, whose slices are the rows.
-   * - `for`: The id of the table to take the names from.
-   *
-   * Resolved through `getRootNode()`, so a legend inside another component's
-   * shadow root names a table in that root rather than in the document.
-   *
-   * **In React this arrives as a property and not as an attribute**, the way
-   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `entry`: One name and its swatch.
-   * - `list`: The list itself.
-   * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
-   */
-  "helix-base-chart-legend": Partial<
-    HelixBaseChartLegendProps & BaseProps<HelixBaseChartLegend> & BaseEvents
-  >;
-
-  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -15212,6 +15121,65 @@ export type CustomElements = {
    */
   "helix-base-kbd": Partial<
     HelixBaseKbdProps & BaseProps<HelixBaseKbd> & BaseEvents
+  >;
+
+  /**
+   * A legend is a list, so it is a list: not part of a chart, and shared by
+   * whichever of them needs one. It takes its entries from the same table the
+   * chart reads, through `for`, so the two cannot disagree about how many series
+   * there are or what they are called.
+   *
+   * `entries` picks which way to read that table, and the two ways are the two
+   * shapes a chart comes in. `series` is one entry per data column, named by the
+   * header row, which is a line or a bar chart. `categories` is one entry per
+   * body row, named by its row header, which is a donut: its slices are the rows,
+   * and it has no axis to write their names along.
+   *
+   * **The table is resolved on the client and there is no server pass.** `for` is
+   * an id and resolving it wants a document, which the server render does not
+   * have, so a legend ships empty and fills in on hydration. The table itself is
+   * ordinary markup and is served whole, so nothing is missing from the page
+   * before then, only from this list.
+   *
+   * The table is watched, because a legend that goes stale when its data changes
+   * is a legend that has to be told, and nothing else in the page would know to
+   * tell it.
+   *
+   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * reader who cannot see them, and the names are already in the table. It stays
+   * because the cost of being wrong runs one way. A duplicated list of three
+   * words is noise; a consumer who took the table out of the accessibility tree
+   * and then found the legend hidden too has a chart nobody can read, and neither
+   * decision announces itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `entries`: Which way to read the table.
+   *
+   * Absent is `series`, one entry per data column. `categories` reads one entry
+   * per body row instead, for a donut, whose slices are the rows.
+   * - `for`: The id of the table to take the names from.
+   *
+   * Resolved through `getRootNode()`, so a legend inside another component's
+   * shadow root names a table in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One name and its swatch.
+   * - `list`: The list itself.
+   * - `name`: One series name.
+   * - `swatch`: The colour a series is drawn in.
+   */
+  "helix-base-legend": Partial<
+    HelixBaseLegendProps & BaseProps<HelixBaseLegend> & BaseEvents
   >;
 
   /**
@@ -18257,38 +18225,22 @@ export type CustomElements = {
    * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
    * seven columns of nearly the same height, and that is the true picture: they
    * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape. Neither is
-   * wrong; they answer different questions, and a bar plot chosen for drama is
-   * a bar plot that will be given a cut baseline next.
+   * the movement, because a line is only ever claiming a shape.
    *
-   * This tier rather than the one above, and that retires an argument the first
-   * version of the area made. It said the region should always be drawn and
-   * only sometimes painted, so that the shape stayed here and the paint stayed
-   * there. That works for one variant and does not survive a second: a bar plot
-   * draws no line and no region at all, so what is drawn genuinely varies and
-   * drawing everything always would mean a line and an area under every bar
-   * chart, kept invisible by CSS.
-   *
-   * `curve` applies to a line and an area and is ignored by bars, which have no
-   * between to interpolate.
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
    * - `curve`: How the line gets from one reading to the next.
    *
    * Absent joins them and claims nothing in between, which is why it is the
    * default. `smooth` is easier to follow across a long series and invents the
-   * values between the readings, so it is a reading aid rather than a neutral
-   * one; it is monotone cubic, so what it invents never leaves the band the
-   * data sets. `step` claims the opposite, that a reading holds until the next.
-   *
-   * This tier and not the one above, though it is a drawing decision: a curve
-   * is expressed as path data, and path data is markup. `linePath` in
-   * `helix/core` is the shared implementation, so every chart that draws a line
-   * offers the same three and draws them the same way.
+   * values between the readings; it is monotone cubic, so what it invents never
+   * leaves the band the data sets. `step` claims the opposite, that a reading
+   * holds until the next. Bars ignore it, having no between to interpolate.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
    * because a table is the readable representation and a list of numbers in an
-   * attribute is not: given both, the one a reader can also read should be the
-   * one the drawing agrees with.
+   * attribute is not.
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.
@@ -22584,68 +22536,6 @@ export type CustomElementsSolidJs = {
   > & HelixBaseCarouselControlledSolidJs;
 
   /**
-   * A legend is a list, so it is a list: not part of a chart, and shared by
-   * whichever of them needs one. It takes its entries from the same table the
-   * chart reads, through `for`, so the two cannot disagree about how many series
-   * there are or what they are called.
-   *
-   * `entries` picks which way to read that table, and the two ways are the two
-   * shapes a chart comes in. `series` is one entry per data column, named by the
-   * header row, which is a line or a bar chart. `categories` is one entry per
-   * body row, named by its row header, which is a donut: its slices are the rows,
-   * and it has no axis to write their names along.
-   *
-   * **The table is resolved on the client and there is no server pass.** `for` is
-   * an id and resolving it wants a document, which the server render does not
-   * have, so a legend ships empty and fills in on hydration. The table itself is
-   * ordinary markup and is served whole, so nothing is missing from the page
-   * before then, only from this list.
-   *
-   * The table is watched, because a legend that goes stale when its data changes
-   * is a legend that has to be told, and nothing else in the page would know to
-   * tell it.
-   *
-   * **Not hidden from a screen reader, though the mapping it draws is a colour
-   * one.** The argument for hiding it is real: the colours mean nothing to a
-   * reader who cannot see them, and the names are already in the table. It stays
-   * because the cost of being wrong runs one way. A duplicated list of three
-   * words is noise; a consumer who took the table out of the accessibility tree
-   * and then found the legend hidden too has a chart nobody can read, and neither
-   * decision announces itself.
-   *
-   * ## Attributes & Properties
-   *
-   * Component attributes and properties that can be applied to the element or by using JavaScript.
-   *
-   * - `entries`: Which way to read the table.
-   *
-   * Absent is `series`, one entry per data column. `categories` reads one entry
-   * per body row instead, for a donut, whose slices are the rows.
-   * - `for`: The id of the table to take the names from.
-   *
-   * Resolved through `getRootNode()`, so a legend inside another component's
-   * shadow root names a table in that root rather than in the document.
-   *
-   * **In React this arrives as a property and not as an attribute**, the way
-   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
-   *
-   * ## CSS Parts
-   *
-   * Custom selectors for styling elements within the component.
-   *
-   * - `entry`: One name and its swatch.
-   * - `list`: The list itself.
-   * - `name`: One series name.
-   * - `swatch`: The colour a series is drawn in.
-   */
-  "helix-base-chart-legend": Partial<
-    HelixBaseChartLegendProps &
-      HelixBaseChartLegendSolidJsProps &
-      BaseProps<HelixBaseChartLegend> &
-      BaseEvents
-  >;
-
-  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -25591,6 +25481,68 @@ export type CustomElementsSolidJs = {
     HelixBaseKbdProps &
       HelixBaseKbdSolidJsProps &
       BaseProps<HelixBaseKbd> &
+      BaseEvents
+  >;
+
+  /**
+   * A legend is a list, so it is a list: not part of a chart, and shared by
+   * whichever of them needs one. It takes its entries from the same table the
+   * chart reads, through `for`, so the two cannot disagree about how many series
+   * there are or what they are called.
+   *
+   * `entries` picks which way to read that table, and the two ways are the two
+   * shapes a chart comes in. `series` is one entry per data column, named by the
+   * header row, which is a line or a bar chart. `categories` is one entry per
+   * body row, named by its row header, which is a donut: its slices are the rows,
+   * and it has no axis to write their names along.
+   *
+   * **The table is resolved on the client and there is no server pass.** `for` is
+   * an id and resolving it wants a document, which the server render does not
+   * have, so a legend ships empty and fills in on hydration. The table itself is
+   * ordinary markup and is served whole, so nothing is missing from the page
+   * before then, only from this list.
+   *
+   * The table is watched, because a legend that goes stale when its data changes
+   * is a legend that has to be told, and nothing else in the page would know to
+   * tell it.
+   *
+   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * reader who cannot see them, and the names are already in the table. It stays
+   * because the cost of being wrong runs one way. A duplicated list of three
+   * words is noise; a consumer who took the table out of the accessibility tree
+   * and then found the legend hidden too has a chart nobody can read, and neither
+   * decision announces itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `entries`: Which way to read the table.
+   *
+   * Absent is `series`, one entry per data column. `categories` reads one entry
+   * per body row instead, for a donut, whose slices are the rows.
+   * - `for`: The id of the table to take the names from.
+   *
+   * Resolved through `getRootNode()`, so a legend inside another component's
+   * shadow root names a table in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One name and its swatch.
+   * - `list`: The list itself.
+   * - `name`: One series name.
+   * - `swatch`: The colour a series is drawn in.
+   */
+  "helix-base-legend": Partial<
+    HelixBaseLegendProps &
+      HelixBaseLegendSolidJsProps &
+      BaseProps<HelixBaseLegend> &
       BaseEvents
   >;
 
@@ -28717,38 +28669,22 @@ export type CustomElementsSolidJs = {
    * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
    * seven columns of nearly the same height, and that is the true picture: they
    * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape. Neither is
-   * wrong; they answer different questions, and a bar plot chosen for drama is
-   * a bar plot that will be given a cut baseline next.
+   * the movement, because a line is only ever claiming a shape.
    *
-   * This tier rather than the one above, and that retires an argument the first
-   * version of the area made. It said the region should always be drawn and
-   * only sometimes painted, so that the shape stayed here and the paint stayed
-   * there. That works for one variant and does not survive a second: a bar plot
-   * draws no line and no region at all, so what is drawn genuinely varies and
-   * drawing everything always would mean a line and an area under every bar
-   * chart, kept invisible by CSS.
-   *
-   * `curve` applies to a line and an area and is ignored by bars, which have no
-   * between to interpolate.
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
    * - `curve`: How the line gets from one reading to the next.
    *
    * Absent joins them and claims nothing in between, which is why it is the
    * default. `smooth` is easier to follow across a long series and invents the
-   * values between the readings, so it is a reading aid rather than a neutral
-   * one; it is monotone cubic, so what it invents never leaves the band the
-   * data sets. `step` claims the opposite, that a reading holds until the next.
-   *
-   * This tier and not the one above, though it is a drawing decision: a curve
-   * is expressed as path data, and path data is markup. `linePath` in
-   * `helix/core` is the shared implementation, so every chart that draws a line
-   * offers the same three and draws them the same way.
+   * values between the readings; it is monotone cubic, so what it invents never
+   * leaves the band the data sets. `step` claims the opposite, that a reading
+   * holds until the next. Bars ignore it, having no between to interpolate.
    * - `for`: The id of a table to read instead, when there is one behind the line.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
    * because a table is the readable representation and a list of numbers in an
-   * attribute is not: given both, the one a reader can also read should be the
-   * one the drawing agrees with.
+   * attribute is not.
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.

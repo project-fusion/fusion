@@ -16,7 +16,6 @@ import type {
   HelixBaseCallout,
   HelixBaseCard,
   HelixBaseCarousel,
-  HelixBaseChartLegend,
   HelixBaseCheckboxGroup,
   HelixBaseCheckbox,
   HelixBaseCodeBlock,
@@ -40,6 +39,7 @@ import type {
   HelixBaseImage,
   HelixBaseInput,
   HelixBaseKbd,
+  HelixBaseLegend,
   HelixBaseListItem,
   HelixBaseList,
   HelixBaseListbox,
@@ -573,24 +573,6 @@ export type HelixBaseCarouselVueEvents = {
   /** Fired when the slide in view changes, with its index. */
   "helix-select": HelixBaseCarouselHelixSelectElementEvent;
 };
-
-export type HelixBaseChartLegendVueProps = {
-  /** Which way to read the table.
-
-Absent is `series`, one entry per data column. `categories` reads one entry
-per body row instead, for a donut, whose slices are the rows. */
-  entries?: HelixBaseChartLegend["entries"];
-  /** The id of the table to take the names from.
-
-Resolved through `getRootNode()`, so a legend inside another component's
-shadow root names a table in that root rather than in the document.
-
-**In React this arrives as a property and not as an attribute**, the way
-`Tooltip.for` does, so it does not reflect and nothing styles on it. */
-  for?: HelixBaseChartLegend["for"];
-};
-
-export type HelixBaseChartLegendVueEvents = {};
 
 /** `HelixBaseCheckboxGroup` component event */
 export type HelixBaseCheckboxGroupElementEvent<E = Event> = TypedEvent<
@@ -2306,6 +2288,24 @@ export type HelixBaseKbdVueProps = {};
 
 export type HelixBaseKbdVueEvents = {};
 
+export type HelixBaseLegendVueProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  entries?: HelixBaseLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseLegend["for"];
+};
+
+export type HelixBaseLegendVueEvents = {};
+
 export type HelixBaseListItemVueProps = {
   /** Where the row goes, and nothing when it goes nowhere.
 
@@ -4020,40 +4020,24 @@ proportional to nothing.
 zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
 seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape. Neither is
-wrong; they answer different questions, and a bar plot chosen for drama is
-a bar plot that will be given a cut baseline next.
+the movement, because a line is only ever claiming a shape.
 
-This tier rather than the one above, and that retires an argument the first
-version of the area made. It said the region should always be drawn and
-only sometimes painted, so that the shape stayed here and the paint stayed
-there. That works for one variant and does not survive a second: a bar plot
-draws no line and no region at all, so what is drawn genuinely varies and
-drawing everything always would mean a line and an area under every bar
-chart, kept invisible by CSS.
-
-`curve` applies to a line and an area and is ignored by bars, which have no
-between to interpolate. */
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
   plot?: HelixBaseSparkline["plot"];
   /** How the line gets from one reading to the next.
 
 Absent joins them and claims nothing in between, which is why it is the
 default. `smooth` is easier to follow across a long series and invents the
-values between the readings, so it is a reading aid rather than a neutral
-one; it is monotone cubic, so what it invents never leaves the band the
-data sets. `step` claims the opposite, that a reading holds until the next.
-
-This tier and not the one above, though it is a drawing decision: a curve
-is expressed as path data, and path data is markup. `linePath` in
-`helix/core` is the shared implementation, so every chart that draws a line
-offers the same three and draws them the same way. */
+values between the readings; it is monotone cubic, so what it invents never
+leaves the band the data sets. `step` claims the opposite, that a reading
+holds until the next. Bars ignore it, having no between to interpolate. */
   curve?: HelixBaseSparkline["curve"];
   /** The id of a table to read instead, when there is one behind the line.
 
 The first column of numbers is the series drawn. This wins over `values`,
 because a table is the readable representation and a list of numbers in an
-attribute is not: given both, the one a reader can also read should be the
-one the drawing agrees with.
+attribute is not.
 
 **In React this arrives as a property and not as an attribute**, the way
 `Tooltip.for` does, so it does not reflect and nothing styles on it. */
@@ -6013,12 +5997,6 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseCarouselVueProps,
     HelixBaseCarouselVueEvents
   >;
-  /** A legend is a list, so it is a list: not part of a chart, and shared by whichever of them needs one. It takes its entries from the same table the chart reads, through 'for', so the two cannot disagree about how many series there are or what they are called.  'entries' picks which way to read that table, and the two ways are the two shapes a chart comes in. 'series' is one entry per data column, named by the header row, which is a line or a bar chart. 'categories' is one entry per body row, named by its row header, which is a donut: its slices are the rows, and it has no axis to write their names along.  **The table is resolved on the client and there is no server pass.** 'for' is an id and resolving it wants a document, which the server render does not have, so a legend ships empty and fills in on hydration. The table itself is ordinary markup and is served whole, so nothing is missing from the page before then, only from this list.  The table is watched, because a legend that goes stale when its data changes is a legend that has to be told, and nothing else in the page would know to tell it.  **Not hidden from a screen reader, though the mapping it draws is a colour one.** The argument for hiding it is real: the colours mean nothing to a reader who cannot see them, and the names are already in the table. It stays because the cost of being wrong runs one way. A duplicated list of three words is noise; a consumer who took the table out of the accessibility tree and then found the legend hidden too has a chart nobody can read, and neither decision announces itself. */
-  "helix-base-chart-legend": DefineCustomElement<
-    HelixBaseChartLegend,
-    HelixBaseChartLegendVueProps,
-    HelixBaseChartLegendVueEvents
-  >;
   /** The host is the group, so 'role="group"' sits on it through internals and 'label' names it. A run of checkboxes with no name is announced as separate controls, which is what the grouping exists to say it is not.  **Each checkbox still submits itself.** They are form-associated already and a native group is several inputs sharing a name, so this adds no form value of its own: it would submit the same answers twice. What it adds is the grouping, a shared 'name' so it is written once, and one place to read and write the whole set.  'value' is the checked values, comma separated, in the order the boxes are written. Setting it ticks exactly those and unticks the rest. */
   "helix-base-checkbox-group": DefineCustomElement<
     HelixBaseCheckboxGroup,
@@ -6156,6 +6134,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixBaseKbd,
     HelixBaseKbdVueProps,
     HelixBaseKbdVueEvents
+  >;
+  /** A legend is a list, so it is a list: not part of a chart, and shared by whichever of them needs one. It takes its entries from the same table the chart reads, through 'for', so the two cannot disagree about how many series there are or what they are called.  'entries' picks which way to read that table, and the two ways are the two shapes a chart comes in. 'series' is one entry per data column, named by the header row, which is a line or a bar chart. 'categories' is one entry per body row, named by its row header, which is a donut: its slices are the rows, and it has no axis to write their names along.  **The table is resolved on the client and there is no server pass.** 'for' is an id and resolving it wants a document, which the server render does not have, so a legend ships empty and fills in on hydration. The table itself is ordinary markup and is served whole, so nothing is missing from the page before then, only from this list.  The table is watched, because a legend that goes stale when its data changes is a legend that has to be told, and nothing else in the page would know to tell it.  **Not hidden from a screen reader, though the mapping it draws is a colour one.** The argument for hiding it is real: the colours mean nothing to a reader who cannot see them, and the names are already in the table. It stays because the cost of being wrong runs one way. A duplicated list of three words is noise; a consumer who took the table out of the accessibility tree and then found the legend hidden too has a chart nobody can read, and neither decision announces itself. */
+  "helix-base-legend": DefineCustomElement<
+    HelixBaseLegend,
+    HelixBaseLegendVueProps,
+    HelixBaseLegendVueEvents
   >;
   /** Layout and semantics, and deliberately not a target.  **'href' makes the row itself the link.** *Corrected 19 Aug 2026.* This said a row could not become one, on the grounds that "a whole-row target needs the anchor to wrap the layout, and the layout is what this component is." That is true of the *consumer's* anchor, which cannot wrap slots it does not own, and it is not true of the component's: an '<a part="row">' wraps this component's own layout perfectly well. 'Tree.Item' does exactly that, and the two were refusing and accepting 'href' on the same argument.  What the anchor buys is what the row could not fake: the whole row is a target, Enter follows it, middle click opens a tab, the status bar shows the destination, and it all works before any JavaScript runs.  What it costs is client-side routing, and that is the consumer's to restore. A router renders its own anchor and cannot render one inside this shadow root, so a framework wanting a soft navigation intercepts the click on the way out: the anchor is in 'composedPath()', and taking only a plain primary press leaves every native gesture alone.  **'data-list-item' is still the answer for a row that is not a destination.** A list row is often a container of controls rather than a place to go, and a row with 'href' unset behaves exactly as it always did. */
   "helix-base-list-item": DefineCustomElement<

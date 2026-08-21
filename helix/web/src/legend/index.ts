@@ -1,1 +1,1 @@
-export * from './root/chart-legend-root.js'
+export * from './root/legend-root.js'

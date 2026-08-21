@@ -17,11 +17,11 @@
 
 [part="list"] {
   display: flex;
-  flex-direction: var(--chart-legend-direction, row);
+  flex-direction: var(--legend-direction, row);
   /* Wraps, because a legend is as wide as the chart above it and no arrangement
      of eight names fits every width. A column never needs it and is unharmed. */
   flex-wrap: wrap;
-  gap: var(--chart-legend-gap, var(--helix-space-sm));
+  gap: var(--legend-gap, var(--helix-space-sm));
   list-style: none;
   margin: var(--helix-space-none);
   padding: var(--helix-space-none);
@@ -37,13 +37,13 @@
 }
 
 [part="swatch"] {
-  block-size: var(--chart-legend-swatch-size, var(--helix-space-sm));
+  block-size: var(--legend-swatch-size, var(--helix-space-sm));
   /* Rounded rather than round, and rather than a line. A dot reads as a bullet
      and a line only suits the one chart that draws lines; a filled square is
      what a bar, an arc and a line all have in common. */
   border-radius: var(--helix-radii-sm);
   flex: 0 0 auto;
-  inline-size: var(--chart-legend-swatch-size, var(--helix-space-sm));
+  inline-size: var(--legend-swatch-size, var(--helix-space-sm));
 }
 
 /* Index to colour, which is the whole of what this tier adds.

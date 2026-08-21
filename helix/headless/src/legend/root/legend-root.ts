@@ -1,4 +1,4 @@
-import { customElement, HelixElement, readSeries } from '@helix-io/core'
+import { customElement, HelixElement, type Series, SourceController } from '@helix-io/core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -42,15 +42,15 @@ const PALETTE = 24
  * @status experimental
  * @category content
  * @aliases Key, Series Key
- * @documentation https://helix.fusion.dev/components/chart-legend
+ * @documentation https://helix.fusion.dev/components/legend
  *
  * @csspart entry - One name and its swatch.
  * @csspart list - The list itself.
  * @csspart name - One series name.
  * @csspart swatch - The colour a series is drawn in.
  */
-@customElement('helix-base-chart-legend')
-export class HelixBaseChartLegend extends HelixElement {
+@customElement('helix-base-legend')
+export class HelixBaseLegend extends HelixElement {
   /**
    * Which way to read the table.
    *
@@ -72,82 +72,23 @@ export class HelixBaseChartLegend extends HelixElement {
   @property()
   for = ''
 
-  #observer: MutationObserver | undefined
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.#watch()
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.#observer?.disconnect()
-    this.#observer = undefined
-  }
+  /* One controller rather than the resolve-and-watch each chart had written
+     out for itself. Three copies had already drifted into two names for the
+     same lookup. */
+  protected readonly source = new SourceController(this)
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
-      this.#watch()
+      this.source.watch()
     }
-  }
-
-  /** The table `for` names, or null where there is no document to ask. */
-  #table(): Element | null {
-    if (this.for === '') {
-      return null
-    }
-    const root = this.getRootNode() as Document | ShadowRoot
-    const found = root.getElementById?.(this.for)
-    /* `tagName` rather than `instanceof HTMLTableElement`, which is not a
-       guard on the server: the constructor is not defined there, so naming it
-       throws before the comparison can answer false. It is also the check that
-       survives a table from another document.
-     *
-     * A grid is accepted too, so `for` can name this library's own
-     * `helix-table` or anything else built from roles. `readSeries` decides
-     * which shape it is looking at; what is refused here is an element that is
-     * neither, so pointing `for` at a paragraph still draws nothing rather
-     * than something arbitrary. */
-    const role = found?.getAttribute('role')
-    const grid =
-      role === 'table' || role === 'grid' || /^helix-(base-)?table$/i.test(found?.tagName ?? '')
-    return found?.tagName === 'TABLE' || grid ? (found ?? null) : null
   }
 
   /** The names, in the order the chart will draw them. */
   #names(): string[] {
-    const table = this.#table()
-    if (!table) {
-      return []
-    }
-    const series = readSeries(table)
+    const series: Series[] = this.source.series
     return this.entries === 'categories'
       ? (series[0]?.points.map((point) => point.label) ?? [])
       : series.map((one) => one.name)
-  }
-
-  /**
-   * Follows the table, so an update to the numbers reaches the names.
-   *
-   * A row added or a header renamed changes what this list should say, and the
-   * page has no reason to know a legend is reading it. `characterData` as well
-   * as `childList`, because renaming a series edits a text node in place rather
-   * than replacing the cell.
-   *
-   * Guarded on the constructor rather than on the environment, since this runs
-   * from `connectedCallback` and from `willUpdate`, and only the first of those
-   * is client-only.
-   */
-  #watch(): void {
-    this.#observer?.disconnect()
-    const table = this.#table()
-    if (!table || typeof MutationObserver === 'undefined') {
-      return
-    }
-    this.#observer ??= new MutationObserver(() => {
-      this.requestUpdate()
-    })
-    this.#observer.observe(table, { characterData: true, childList: true, subtree: true })
   }
 
   protected override render(): TemplateResult {
@@ -176,6 +117,6 @@ export class HelixBaseChartLegend extends HelixElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'helix-base-chart-legend': HelixBaseChartLegend
+    'helix-base-legend': HelixBaseLegend
   }
 }

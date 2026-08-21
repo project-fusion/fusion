@@ -9,15 +9,13 @@ describe('chart legend server output', () => {
        this is the one component here that genuinely cannot be served whole. The
        table it reads is ordinary markup and is served in full, so what is
        missing before hydration is this list and nothing a reader needs. */
-    const markup = withoutStyles(ssr(html`<helix-chart-legend for="traffic"></helix-chart-legend>`))
+    const markup = withoutStyles(ssr(html`<helix-legend for="traffic"></helix-legend>`))
     expect(markup).toContain('part="list"')
     expect(markup).not.toContain('part="entry"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(
-      hostAttributes(ssr(html`<helix-chart-legend></helix-chart-legend>`), 'helix-chart-legend'),
-    ).toEqual([])
+    expect(hostAttributes(ssr(html`<helix-legend></helix-legend>`), 'helix-legend')).toEqual([])
   })
 
   test('for does not reflect, because React sets it as a property', () => {
@@ -26,10 +24,7 @@ describe('chart legend server output', () => {
        find nothing. Asserted through the served markup, where the only `for`
        is the one the template wrote. */
     expect(
-      hostAttributes(
-        ssr(html`<helix-chart-legend for="traffic"></helix-chart-legend>`),
-        'helix-chart-legend',
-      ),
+      hostAttributes(ssr(html`<helix-legend for="traffic"></helix-legend>`), 'helix-legend'),
     ).toEqual(['for'])
   })
 })

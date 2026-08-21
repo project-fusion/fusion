@@ -44,6 +44,10 @@ export {
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
 export {
+  SourceController,
+  type SourceHost,
+} from './controllers/source-controller/source-controller.js'
+export {
   type TokenColor,
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'

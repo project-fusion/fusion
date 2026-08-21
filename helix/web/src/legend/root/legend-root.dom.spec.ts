@@ -25,8 +25,8 @@ const PLANS = `<table id="plans">
 
 /** Mounts a table and a legend together, and returns the legend. */
 const legend = async (table: string, attributes: string): Promise<HTMLElement> => {
-  await mount(`<div>${table}<helix-chart-legend ${attributes}></helix-chart-legend></div>`)
-  const host = document.querySelector('helix-chart-legend') as HTMLElement & {
+  await mount(`<div>${table}<helix-legend ${attributes}></helix-legend></div>`)
+  const host = document.querySelector('helix-legend') as HTMLElement & {
     updateComplete: Promise<unknown>
   }
   await host.updateComplete
