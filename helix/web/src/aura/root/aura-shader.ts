@@ -514,7 +514,7 @@ export const FRAGMENT = `#version 300 es
          half the gap and each streak read as a blob with a smudge behind it;
          the thing is named for the trail, so the trail is the part that should
          dominate the head. */
-      float len = mix(1.1, 0.5 + hash(vec2(id, 47.0)) * 1.3, v);
+      float len = mix(1.7, 0.9 + hash(vec2(id, 47.0)) * 1.7, v);
 
       /* **The lane is periodic, not a single streak that is put back when it
          runs out.** It was fract() over a fixed span of 3.6, so a head left the
@@ -533,7 +533,10 @@ export const FRAGMENT = `#version 300 es
          P is the gap between successive heads in a lane, and it is what density
          is now made of. It varies too: lanes that are alike in spacing read as
          a grid however much else about them differs. */
-      float gap = mix(3.0, 2.2 + hash(vec2(id, 59.0)) * 1.8, v);
+      /* Wider spacing, because the tails are longer: at the old gap a streak's
+         tail reached the next one's nose and the lane read as a dashed line
+         rather than as separate things travelling. */
+      float gap = mix(4.2, 3.2 + hash(vec2(id, 59.0)) * 2.2, v);
       float travel = phase + t * speed * 1.8 / gap;
       float u = s.y / gap - travel;
       float w = fract(u);
@@ -553,10 +556,24 @@ export const FRAGMENT = `#version 300 es
          of a lane, so a sigma of 0.15 was two and a half times too wide: every
          lane overlapped both neighbours and the frame came out a blue wash with
          no streaks in it at all. */
-      float wide = mix(0.06, 0.04 + hash(vec2(id, 71.0)) * 0.05, v);
+      /* Thinner, and paired with the longer tail below. Length against width is
+         what makes a streak read as a streak: at a ratio near four these were
+         stubby rods with rounded ends whichever way they tapered, and the fix
+         for that is proportion rather than another change of profile. */
+      float wide = mix(0.045, 0.03 + hash(vec2(id, 71.0)) * 0.04, v);
+
+      /* **The nose is the narrow end.** A round cap the full width of the body,
+         with the body then widening behind it, draws a bulb on a shaft. That is
+         the silhouette this had, and it is not one to ship on a landing page.
+    
+         Tapering the front to a fraction of the width and letting it open out
+         backwards makes the bright end the thin end, which is also what a
+         streak of light actually looks like: the luminous part is the point,
+         and what widens behind it is the part that is fading. */
+      float nose = wide * 0.38;
 
       float behind = (1.0 - w) * gap;
-      float spread = min(wide * (1.0 + behind * 0.7), 0.15);
+      float spread = min(nose + wide * behind * 0.85, 0.15);
       float tail = exp(-behind / len) * exp(-(across * across) / (2.0 * spread * spread));
 
       /* The cap is the same sigma as the tail is where they meet, so crossing a
@@ -564,7 +581,7 @@ export const FRAGMENT = `#version 300 es
          tail stands at full and the cap is spent, just over it the reverse, and
          at the join both are the same gaussian. */
       float ahead = w * gap;
-      float cap = exp(-(ahead * ahead + across * across) / (2.0 * wide * wide));
+      float cap = exp(-(ahead * ahead + across * across) / (2.0 * nose * nose));
 
       /* Slowed where the pointer is, which is the other half of an obstacle. */
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
@@ -845,7 +862,22 @@ export const FRAGMENT = `#version 300 es
        crumple at one density: marbled stone, and it looked the same at every
        scale, gain and bloom because there was no large form for any of them to
        act on. Big shapes first, detail on top of them. */
-    float ink = warped(p * 0.55, t * 0.55);
+    /* **A current, which is the thing it did not have.** Isotropic noise makes
+       clouds however large the octaves are, and clouds are what this was: soft
+       masses with no direction in them and nothing being carried anywhere. A
+       liquid reads as a liquid because its detail is drawn out along the way it
+       is going.
+    
+       So a slow angle field says which way the current runs here, and the ink
+       is sampled stretched along it: four times longer down the current than
+       across it, which turns the same noise into filaments. It costs one extra
+       noise lookup and a change of basis. */
+    float ang = noise(p * 0.32 + vec2(t * 0.09, 0.0)) * 6.2831853;
+    vec2 run = vec2(cos(ang), sin(ang));
+    vec2 cut = vec2(-run.y, run.x);
+    vec2 drawn = vec2(dot(p, run) * 0.4, dot(p, cut) * 1.6);
+
+    float ink = warped(drawn, t * 0.55);
     float sheet = warped(p * 1.1 + vec2(3.1, 1.7), t * 0.35);
 
     /* **Floors of 0.55 and 0.5 meant it was never dark anywhere.** The lowest
@@ -866,7 +898,11 @@ export const FRAGMENT = `#version 300 es
        inside one void and see nothing at all: empty has to mean faint, not
        absent, or the shape can disappear entirely at a setting the property
        explicitly allows. */
-    float body = mix(0.05, 1.4, ink) * mix(0.4, 1.2, sheet) * mix(0.18, 1.45, mass);
+    /* 0.28 rather than 0.18 under the voids, and a brighter ceiling. At a low
+       scale the mass noise varies less across the frame than the frame is wide,
+       so a reader can sit inside one void and see almost nothing: measured at
+       scale 0.5, which came out near black. Empty has to mean faint. */
+    float body = mix(0.07, 1.55, ink) * mix(0.45, 1.25, sheet) * mix(0.28, 1.5, mass);
 
     /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
