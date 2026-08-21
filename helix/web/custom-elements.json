@@ -2981,6 +2981,10 @@
               {
                 "description": "A photograph, at the three sizes an avatar comes in.",
                 "slug": "image"
+              },
+              {
+                "description": "The two shapes at the sizes a person appears at, from a table row to a profile.",
+                "slug": "shapes"
               }
             ],
             "source": "helix/web/src/avatar"
@@ -23386,6 +23390,10 @@
               {
                 "description": "A column with a gap, which is most of what a page needs.",
                 "slug": "column"
+              },
+              {
+                "description": "A row that wraps, spread along its line, and one that sits inside a sentence.",
+                "slug": "wrapping-row"
               }
             ],
             "source": "helix/web/src/flex"
