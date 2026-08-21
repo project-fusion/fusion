@@ -71,8 +71,9 @@ export function LightPillar(): React.ReactElement {
 
       uniform vec2 uResolution;
       uniform float uTime;
-      uniform vec3 uNear;
-      uniform vec3 uFar;
+      uniform vec3 uGround;
+      uniform vec3 uGlow;
+      uniform vec3 uInk;
 
       /* Value noise. Cheaper than gradient noise and indistinguishable once it
          is folded four times and used to modulate a light rather than to
@@ -104,7 +105,7 @@ export function LightPillar(): React.ReactElement {
       }
 
       void main() {
-        vec2 p = (uv * 2.0 - 1.0);
+        vec2 p = uv * 2.0 - 1.0;
         p.x *= uResolution.x / max(uResolution.y, 1.0);
 
         /* Tilted, so the shaft is a diagonal rather than a column. A vertical
@@ -129,23 +130,52 @@ export function LightPillar(): React.ReactElement {
            reading as two drawn lines. */
         float volume = exp(-abs(q.x) * 2.6);
 
-        /* Filaments drifting up the shaft. Scrolling against the braid rather
-           than with it, so nothing in here has a period a reader can count. */
-        float grain = fbm(vec2(q.x * 2.4, q.y * 1.1 - t * 2.2));
-        float body = (lit + volume * 0.42) * mix(0.45, 1.5, grain);
+        /* Streaks rather than clouds, and the aspect is the whole of it. The
+           same four octaves compressed hard across the shaft and stretched
+           along it read as filaments; sampled square they read as haze, which
+           is what this was and why it looked like a smear. */
+        float streak = fbm(vec2(q.x * 9.0, q.y * 0.55 - t * 2.4));
+        float haze = fbm(vec2(q.x * 1.6 + 4.0, q.y * 0.9 - t * 1.1));
+
+        /* The core is what the shaft is seen by: a thin bright axis the streaks
+           cut into, sitting inside a much wider bloom. Without it the braid is
+           two soft ribbons and reads as a gradient. */
+        float core = lit * mix(0.35, 1.65, streak);
+        float body = core + volume * 0.5 * mix(0.6, 1.25, haze);
 
         /* Fades out at both ends rather than meeting the edge of its own
            canvas, which is the tell that a background is a rectangle. */
         body *= smoothstep(-1.35, 0.15, q.y) * smoothstep(1.05, -0.25, q.y);
         body *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y));
 
-        vec3 rgb = mix(uFar, uNear, clamp(body, 0.0, 1.0)) * clamp(body, 0.0, 1.0);
+        float lift = clamp(body, 0.0, 1.0);
+
+        /* The shader composites against the page rather than blending with it.
+         *
+         * The CSS blend mode screen was here, and it is why nothing appeared in
+         * light mode: screen adds light, and a near-white ground already sits
+         * at the top of every channel, so every value it could contribute is a
+         * no-op. Branching the blend mode by color mode is not available
+         * either, since the mode is a primitive this package may not read and
+         * light-dark() takes colors alone.
+         *
+         * Reading the ground as a uniform settles all of it on one path. The
+         * shaft is the brand hue rising out of whatever the page is: light out
+         * of black in dark mode, ink into white in light mode, and the token
+         * layer decides which without this file knowing.
+         *
+         * The hot core goes toward the foreground, which is the same move a
+         * second time. White in dark mode gives a beam with a bright axis;
+         * near-black in light mode gives a dense one. One expression, and the
+         * palette inverts it. */
+        vec3 rgb = mix(uGround, uGlow, lift);
+        rgb = mix(rgb, uInk, clamp(core, 0.0, 1.0) * 0.4);
 
         /* Dither before the buffer quantizes. A shaft this soft spans a few
            hundred 8-bit steps across a whole screen, and without a sub-step of
            noise the falloff paints as visible rings. */
         float d = (hash(gl_FragCoord.xy) - 0.5) / 255.0;
-        color = vec4(rgb + d, clamp(body, 0.0, 1.0) * 0.9 + d);
+        color = vec4(rgb + d, 1.0);
       }
     `
 
@@ -181,42 +211,77 @@ export function LightPillar(): React.ReactElement {
 
     const uResolution = gl.getUniformLocation(program, 'uResolution')
     const uTime = gl.getUniformLocation(program, 'uTime')
-    const uNear = gl.getUniformLocation(program, 'uNear')
-    const uFar = gl.getUniformLocation(program, 'uFar')
+    const uGround = gl.getUniformLocation(program, 'uGround')
+    const uGlow = gl.getUniformLocation(program, 'uGlow')
+    const uInk = gl.getUniformLocation(program, 'uInk')
 
-    /* The token layer's answer, whatever it currently is. `getComputedStyle`
-       on a probe is the only way to read an `oklch()` as the sRGB the shader
-       needs: the custom property's own value is the unresolved function text. */
+    /* The token layer's answer, whatever it currently is. `getComputedStyle` on
+       a probe is the only way to see a resolved color at all: the custom
+       property's own value is the unevaluated function text. */
     const probe = document.createElement('span')
     probe.style.display = 'none'
     document.body.appendChild(probe)
 
+    /* A 1x1 canvas is what converts it, and parsing the string is what this did
+       until it was measured.
+
+       `getComputedStyle().color` is not `rgb()`. The palette derives from an
+       `oklch()` seed and Chrome answers `lab(100 0 0)` for white, which a
+       regular expression for numbers reads as the three channels 100, 0 and 0.
+       Divided by 255 that is a dark red, so `--helix-color-foreground` arrived
+       as one: measured as a warm streak down the right of the shaft in dark
+       mode, and as a black half-hero in light mode, where the background token
+       resolved to the same shape and handed the shader a ground it then painted
+       everything against.
+
+       Filling a pixel and reading it back asks the browser to do the
+       conversion, so it holds for `lab()`, `oklch()`, `color-mix()` and
+       whatever a token is written in next. */
+    const swatch = document.createElement('canvas')
+    swatch.width = 1
+    swatch.height = 1
+    const ctx = swatch.getContext('2d', { willReadFrequently: true })
+
     const readColor = (token: string, fallback: [number, number, number]) => {
-      probe.style.color = `var(${token})`
-      const match = getComputedStyle(probe).color.match(/[\d.]+/g)
-      if (!match || match.length < 3) {
+      if (!ctx) {
         return fallback
       }
-      return [Number(match[0]) / 255, Number(match[1]) / 255, Number(match[2]) / 255] as [
-        number,
-        number,
-        number,
-      ]
+      probe.style.color = `var(${token})`
+      /* Reset first. An unparseable value leaves `fillStyle` where it was,
+         which would silently hand back the previous token's color. */
+      ctx.fillStyle = '#000000'
+      ctx.fillStyle = getComputedStyle(probe).color
+      ctx.fillRect(0, 0, 1, 1)
+      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
+      return [(r ?? 0) / 255, (g ?? 0) / 255, (b ?? 0) / 255] as [number, number, number]
     }
 
     const applyColors = () => {
-      gl.uniform3fv(uNear, readColor('--helix-color-primary-subtle', [0.72, 0.79, 1]))
-      gl.uniform3fv(uFar, readColor('--helix-color-primary', [0.24, 0.36, 0.9]))
+      gl.uniform3fv(uGround, readColor('--helix-color-background', [0, 0, 0]))
+      gl.uniform3fv(uGlow, readColor('--helix-color-primary', [0.24, 0.36, 0.9]))
+      gl.uniform3fv(uInk, readColor('--helix-color-foreground', [1, 1, 1]))
     }
     applyColors()
 
     /* The document's color mode is an attribute, so the palette changing is an
        attribute changing. Nothing else announces it. */
-    const modes = new MutationObserver(applyColors)
+    /* A palette change has to reach the screen even when the loop is not
+       running, which is every reader who asked for no motion. */
+    const repaint = () => {
+      applyColors()
+      if (!frame) {
+        draw(0)
+      }
+    }
+
+    const modes = new MutationObserver(repaint)
     modes.observe(document.documentElement, {
       attributeFilter: ['data-color-mode'],
       attributes: true,
     })
+
+    const scheme = window.matchMedia('(prefers-color-scheme: light)')
+    scheme.addEventListener('change', repaint)
 
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
@@ -306,6 +371,7 @@ export function LightPillar(): React.ReactElement {
       stop()
       visible.disconnect()
       modes.disconnect()
+      scheme.removeEventListener('change', repaint)
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', onResize)
       probe.remove()

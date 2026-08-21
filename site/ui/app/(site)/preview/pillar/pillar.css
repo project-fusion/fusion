@@ -25,9 +25,10 @@
   display: block;
   inline-size: 100%;
   block-size: 100%;
-  /* `screen`, so the shaft adds light to the page rather than painting over it:
-     a beam that can darken what is behind it is not a beam. */
-  mix-blend-mode: screen;
+  /* No blend mode. `screen` was here, and it is why nothing appeared in light
+     mode: screen adds light, and a near-white ground is already at the top of
+     every channel. The shader reads the page's own background as a uniform and
+     composites against it instead, which is one path for both modes. */
 }
 
 /* The floor the text stands on. Without it the shaft's brightest filaments run

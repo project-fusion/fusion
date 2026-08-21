@@ -109,6 +109,30 @@
   align-content: center;
   display: grid;
   min-block-size: 100svh;
+  scroll-snap-align: start;
+}
+
+/* The snap lives on the scroll container, which is the root and not the reel.
+ *
+ * `.reel` cannot be it: making it one means `block-size: 100svh` and
+ * `overflow-y: auto`, which takes the page's scroll away from the document and
+ * strands the sticky masthead outside the thing that scrolls. So the property
+ * goes on `:root` and `:has()` is what keeps it to this one page. Valid here,
+ * unlike inside the functional `:host()`, where it is dropped at parse time.
+ *
+ * `proximity`, never `mandatory`. The verticals band needs 906 pixels against
+ * an 800 pixel window, and `mandatory` on a section taller than the viewport
+ * fights the reader for its own bottom half: every attempt to reach the last
+ * row is pulled back to the top of the band. `proximity` snaps when a reader
+ * lands near an edge and otherwise leaves the scroll alone, which is also the
+ * right answer for anyone driving this with a keyboard or a screen reader.
+ *
+ * No `scroll-padding-block-start` for the masthead. The bands after the hero
+ * scroll under it rather than beneath it, and their content is centered, so the
+ * strip the bar covers is empty space either way. Padding it would push each
+ * band's bottom the same distance past the fold. */
+:root:has(.reel) {
+  scroll-snap-type: y proximity;
 }
 
 /* The header is `position: sticky`, so it takes a row in flow: the first screen
