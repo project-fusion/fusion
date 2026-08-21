@@ -156,8 +156,11 @@
   --_timeline-tone: var(--helix-color-warning);
 }
 
+/* `muted` for the same reason `Stat`'s label takes it: a time is the reading,
+   not a decoration beside one, and `subtle` measures 3.95 on a light card where
+   12px text wants 4.5. */
 [part="time"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

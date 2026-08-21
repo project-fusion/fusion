@@ -26,6 +26,34 @@
  * Values resolve to primitives from `primitives.css`, which is internal.
  */
 
+/* **The mode, and only the root decides it.**
+ *
+ * These are defaults that `[data-color-mode]` overrides on any element, so they
+ * must not be restated by a subtree: `[data-helix-theme]` carried them for a
+ * day and every scoped panel re-asserted `light dark` over the `light` it had
+ * inherited, which sent every `light-dark()` inside it back to the operating
+ * system while the page followed the reader's choice. Measured with the OS in
+ * dark and the page set to light: `--helix-color-warning` resolved to the 600
+ * outside the panel and the 400 inside it, so the panel was quietly in the
+ * other mode and its contrast was being judged against the wrong ground.
+ *
+ * A theme scope re-derives *colour* from a seed. Which of the two halves that
+ * colour is written in is a document-level fact about the reader, and belongs
+ * to whoever the reader told.
+ *
+ * `--_helix-mode` travels with it, for the reason it was written: `color-scheme`
+ * cannot be read back or negated in CSS and a descendant selector cannot say
+ * "the nearest ancestor that set it", which is what a light preview inside a
+ * dark page needs. A custom property can, since it inherits and the nearest
+ * declaration wins by the language's own rules. `Toast` is what reads it, to be
+ * the opposite of whatever it is sitting on. */
+:root {
+  color-scheme: light dark;
+
+  --_helix-mode: light;
+  --_helix-mode-inverted: dark;
+}
+
 /* **`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to
  * be on the block rather than anywhere else.**
  *
@@ -51,19 +79,6 @@
      so choosing a mode by hand left `surface-sunken`, `overlay`,
      `foreground-subtle` and both material tokens at the other mode's values:
      a segmented control kept its light gray track on a dark page. */
-  color-scheme: light dark;
-
-  /* Which mode is in force, and its opposite, as values something can read.
-   *
-   * `color-scheme` cannot be read back or negated in CSS, and a descendant
-   * selector cannot say "the nearest ancestor that set it", which is exactly
-   * what a light preview inside a dark page needs. A custom property can:
-   * it inherits, so the nearest declaration wins by the language's own rules
-   * and nesting needs no special case. `Toast` is what reads it, to be the
-   * opposite of whatever it is sitting on. */
-  --_helix-mode: light;
-  --_helix-mode-inverted: dark;
-
   /* ======================================================== color ======= */
   /* Surfaces, from furthest back to nearest front. */
   /* Depth is distance from the page, in whichever direction there is room.

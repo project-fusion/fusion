@@ -52,8 +52,14 @@
  * that sets a font size is that container's size. `--stat-value-size` still
  * overrides, for a figure that wants a size of its own regardless.
  */
+/* **`muted`, not `subtle`, because a label is content.** `subtle` is
+   `neutral-500` in both modes, which paints `#808080` and reads 3.95 against a
+   white card: under the 4.5 that 12px text needs, and measured on this very
+   label. It is the right token for a mark nobody reads, a placeholder standing
+   in for text that is not there yet. The word naming the figure is not that:
+   the number means nothing without it. */
 slot[name="label"]::slotted(*) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: calc(var(--helix-text-xs) / var(--helix-text-md) * 1em);
   font-weight: var(--helix-weight-medium);
   grid-column: 1 / -1;
