@@ -70,21 +70,9 @@ const MECHANISM = [
 
 /** The same stack at three scales, which is the argument the company is making. */
 const LADDER = [
-  {
-    body: 'Your keys, your data, your hardware. Nothing recoverable by a company that changes its pricing.',
-    name: 'Personal',
-    rung: 'One person',
-  },
-  {
-    body: 'The same, with more people and an audit trail. Not hostage to a vendor roadmap.',
-    name: 'Organizational',
-    rung: 'One company',
-  },
-  {
-    body: 'The same again, at the scale where it decides things. A written thesis, not a product, and we say so.',
-    name: 'National',
-    rung: 'One country',
-  },
+  { body: 'Your keys, your data, your hardware.', name: 'Personal', rung: 'One person' },
+  { body: 'The same, with an audit trail.', name: 'Organizational', rung: 'One company' },
+  { body: 'The same again, and only a thesis.', name: 'National', rung: 'One country' },
 ]
 
 export default function Page() {
@@ -195,25 +183,22 @@ export default function Page() {
             <helix-text as="h2" class="specTitle">
               The same stack, three times over
             </helix-text>
-            <helix-flex direction="column" gap="none">
+            {/* Three across rather than three stacked. The same three claims
+                as a column of prose is a wall of text; as a row of words it is
+                a diagram, and the rungs are legible without reading. */}
+            <helix-grid class="specRungs" gap="none" min="14rem">
               {LADDER.map((rung) => (
-                <helix-flex align="start" class="tdRow" gap="xl" key={rung.name} wrap>
-                  <helix-flex align="start" class="tdLede" direction="column" gap="2xs">
-                    <helix-text appearance="label" tone="subtle">
-                      {rung.rung}
-                    </helix-text>
-                  </helix-flex>
-                  <helix-flex class="tdBody" direction="column" gap="sm">
-                    <helix-text as="h3" class="tdName">
-                      {rung.name}
-                    </helix-text>
-                    <helix-text as="p" tone="muted">
-                      {rung.body}
-                    </helix-text>
-                  </helix-flex>
+                <helix-flex class="specRung" direction="column" gap="sm" key={rung.name}>
+                  <helix-text class="specDoorFor">{rung.rung}</helix-text>
+                  <helix-text as="h3" class="specRungName">
+                    {rung.name}
+                  </helix-text>
+                  <helix-text appearance="caption" tone="muted">
+                    {rung.body}
+                  </helix-text>
                 </helix-flex>
               ))}
-            </helix-flex>
+            </helix-grid>
           </helix-flex>
         </div>
       </section>

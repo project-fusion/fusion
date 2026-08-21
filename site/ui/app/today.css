@@ -158,3 +158,29 @@
 .specHero {
   padding-block: calc(var(--helix-space-3xl) * 1.9) var(--helix-space-3xl);
 }
+
+/* The ladder as a row rather than a column.
+ *
+ * Three claims stacked with a paragraph each is a wall; three words across with
+ * a clause each is a diagram, and the shape of the argument is legible before
+ * any of it is read. The hairlines between are the rungs. */
+.specRungs {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.specRung {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding: var(--helix-space-xl) var(--helix-space-lg) var(--helix-space-xl) var(--helix-space-md);
+}
+
+.specRung:first-child {
+  border-inline-start: none;
+  padding-inline-start: var(--helix-space-none);
+}
+
+.specRungName {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-xl), 2.4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1.05;
+}
