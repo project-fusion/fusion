@@ -240,7 +240,7 @@ describe('input number validity', () => {
 
 describe('number input scrub', () => {
   const drag = async (host: HTMLElement, dx: number, keys: Partial<PointerEventInit> = {}) => {
-    const grip = part(host, 'grip') as HTMLElement
+    const grip = part(host, 'label') as HTMLElement
     /* happy-dom has no pointer capture, so the handlers' own guard would refuse
        every move. Stubbed to the two answers the component asks for, which is
        the smallest thing that lets the arithmetic be tested at all; whether a
@@ -265,11 +265,15 @@ describe('number input scrub', () => {
   const scrubField = async (attrs: string) =>
     mount(`<helix-number-input label="N" scrub ${attrs}></helix-number-input>`)
 
-  test('no grip without asking for one', async () => {
+  test('a label without `scrub` does not move the value', async () => {
+    /* The part is there either way, because every field has a label. What
+       `scrub` decides is whether a press on it does anything, so this asks the
+       value rather than asking whether an element exists. */
     const host = await mount(
-      '<helix-number-input label="N" default-value="1"></helix-number-input>',
+      '<helix-number-input label="N" default-value="10"></helix-number-input>',
     )
-    expect(part(host, 'grip')).toBeNull()
+    await drag(host, 40)
+    expect((host as HTMLElement & { value: string }).value).toBe('10')
   })
 
   test('four pixels is one step', async () => {

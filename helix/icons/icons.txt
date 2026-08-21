@@ -101,4 +101,3 @@ x
 x-circle-fill
 helix
 cortex
-arrows-left-right

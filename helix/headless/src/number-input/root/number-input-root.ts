@@ -6,7 +6,7 @@ import {
   MixinField,
   restoreValue,
 } from '@helix-io/core'
-import { arrowsLeftRight, minus, plus } from '@helix-io/icons'
+import { minus, plus } from '@helix-io/icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -86,7 +86,6 @@ const SCRUB_FINE = 16
  * @csspart field - The box holding everything.
  * @csspart control - The field itself.
  * @csspart decrement - The control that steps down.
- * @csspart grip - The handle that changes the value when dragged, with `scrub`.
  * @csspart increment - The control that steps up.
  */
 @customElement('helix-base-number-input')
@@ -127,10 +126,12 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
   /**
    * Whether a grip is shown that changes the value when it is dragged.
    *
-   * Off by default, because it is chrome: a field that grows a handle nobody
-   * asked for has a handle in every form that ever rendered one. Where it earns
-   * its place is a value a reader tunes rather than states, a duration or a
-   * weight or a count they are looking for rather than one they know.
+   * The label is what is dragged, so this adds no chrome at all. Still opt-in,
+   * because it changes what a press on the label does and a reader who drags
+   * across a word expecting to select it should get that everywhere it has not
+   * been asked for. Where it earns its place is a value a reader tunes rather
+   * than states: a duration, a weight, a count they are looking for rather than
+   * one they already know.
    */
   @property({ reflect: true, type: Boolean })
   scrub = false
@@ -212,6 +213,45 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
   /** One step down. */
   stepDown(large = false): void {
     this.nudge(large ? -(this.largeStep ?? 10) : -1)
+  }
+
+  /**
+   * The label is the surface, which is where the convention already is.
+   *
+   * A grip was drawn first, an icon of its own at the leading edge, and it was
+   * a second control in a field that already has three. Every tool that does
+   * this well drags the *name* of the value: the label is present on every
+   * field, costs no chrome, and a reader who wants to know what they are
+   * dragging is already looking at it.
+   *
+   * Overridden rather than handled on the host, because the handlers have to
+   * sit on the element that takes the capture. The markup is the mixin's, said
+   * again here, which is the duplication #76 exists to remove: when base
+   * renders break into methods a styled tier can extend, this becomes a call to
+   * `super` with three listeners added.
+   *
+   * A label with nothing in it is still nothing. `scrub` on a field whose label
+   * is empty leaves no surface, which is honest: there is nowhere to put the
+   * gesture and inventing somewhere is how the grip happened.
+   */
+  protected override renderLabel(): TemplateResult | typeof nothing {
+    if (!this.scrub) {
+      return super.renderLabel()
+    }
+    const hidden = this.label === '' ? this.getAttribute('aria-label') : null
+    if (this.label === '' && !hidden) {
+      return nothing
+    }
+    return html`<label
+      part="label"
+      for="control"
+      ?data-hidden=${hidden !== null}
+      @pointercancel=${this.handleScrubEnd}
+      @pointerdown=${this.handleScrubDown}
+      @pointermove=${this.handleScrubMove}
+      @pointerup=${this.handleScrubEnd}
+      ><slot name="label">${this.label || hidden}</slot></label
+    >`
   }
 
   /** Where the pointer went down, and what the value was there. */
@@ -434,33 +474,6 @@ export class HelixBaseNumberInput extends MixinControllerValue(MixinField(HelixF
     const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
     return html`${this.renderLabel()}
       <div part="field">
-        ${
-          /* Not a button, and hidden from assistive technology.
-             The grip adds no capability: the arrow keys on the field already
-             step the value, and `PageUp` already takes the large step this
-             offers as a modifier. So a control announced here would be one a
-             screen reader could find, focus, and get nothing from, which is
-             worse than the affordance being pointer-only and honest about it.
-             A `<span>` rather than a `<button>` for the same reason: a button
-             that does nothing when pressed is a lie the markup tells. */
-          ''
-        }
-        ${
-          this.scrub
-            ? html`<span
-                part="grip"
-                aria-hidden="true"
-                @pointercancel=${this.handleScrubEnd}
-                @pointerdown=${this.handleScrubDown}
-                @pointermove=${this.handleScrubMove}
-                @pointerup=${this.handleScrubEnd}
-              >
-                <svg fill="currentColor" viewBox=${arrowsLeftRight.viewBox} aria-hidden="true">
-                  ${unsafeSVG(arrowsLeftRight.content)}
-                </svg>
-              </span>`
-            : nothing
-        }
         <button
           part="decrement"
           type="button"
