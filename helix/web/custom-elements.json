@@ -11845,6 +11845,7 @@
                 "slug": "disabled"
               },
               {
+                "description": "A list with nothing in it says so, rather than opening onto a blank panel.",
                 "slug": "empty"
               },
               {

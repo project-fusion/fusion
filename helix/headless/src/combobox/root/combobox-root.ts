@@ -583,11 +583,34 @@ export class HelixBaseCombobox extends MixinControllerOpen(
     this.sync()
     /* After the render, not during it: the input's value is a binding, so
        selecting a range of it before Lit has written it selects a range of the
-       previous value. */
-    if (changed.has('suggestion') && this.suggestion !== '') {
-      this.renderRoot
-        .querySelector<HTMLInputElement>('[part="control"]')
-        ?.setSelectionRange(this.typed.length, this.suggestion.length)
+       previous value.
+     
+       **And written here rather than left to the binding, because the binding
+       stops writing.** Lit dirty-checks a property binding against the value it
+       last wrote, not against the DOM, and typing changes the DOM underneath
+       it. Type `r` into a list holding Ruby and the completion is `Ruby`, so
+       the field is written `Ruby` with `uby` selected. Type `u` and the field
+       is already `Ru` because the browser replaced the selection, and the
+       completion is *still* `Ruby`: unchanged, so Lit writes nothing and
+       `changed.has('suggestion')` is false, so nothing is selected either. The
+       completion appeared on the first character and never again, which is
+       exactly how it was reported.
+     
+       Reconciled against what the input actually holds, which is the only thing
+       that knows. */
+    const control = this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    /* The same expression the template binds, because this has to agree with it
+       in both directions. Writing only when there is a completion put the field
+       right while one was showing and left it stale afterwards: this reconcile
+       writes behind Lit's back, so Lit's own dirty-check then believes the DOM
+       already holds whatever it last wrote and declines to correct it. A field
+       cleared on close kept the last completion for exactly that reason. */
+    const wanted = this.multiple || this.open ? this.suggestion || this.typed : this.word
+    if (control && control.value !== wanted) {
+      control.value = wanted
+    }
+    if (control && this.suggestion !== '') {
+      control.setSelectionRange(this.typed.length, this.suggestion.length)
     }
     if (this.open) {
       this.panel.show()
