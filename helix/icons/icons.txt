@@ -101,3 +101,5 @@ x
 x-circle-fill
 helix
 cortex
+arrow-clockwise
+arrow-counter-clockwise

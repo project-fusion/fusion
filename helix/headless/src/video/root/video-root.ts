@@ -47,6 +47,15 @@ const clock = (seconds: number): string => {
 let owner: HTMLElement | undefined
 
 /**
+ * How far a skip control moves, in seconds.
+ *
+ * Ten, which is the number every player that has one uses, and the number the
+ * platform names in `seekbackward` and `seekforward` when it hands over a
+ * default. A different length here would be correct only on this player.
+ */
+const SKIP_SECONDS = 10
+
+/**
  * @summary Plays a video, with controls this library draws rather than the
  * browser's.
  *
@@ -131,6 +140,9 @@ let owner: HTMLElement | undefined
  * @csspart mute - Sound on and off.
  * @csspart volume - How loud.
  * @csspart captions - Subtitles on and off.
+ * @csspart captions-menu - The language menu, where there is more than one.
+ * @csspart rewind - The control that goes back ten seconds.
+ * @csspart forward - The control that goes on ten seconds.
  * @csspart remote - Play on another device, where one is available.
  * @csspart speed - Playback speed, where it was asked for.
  * @csspart pip - Picture in picture, where it was asked for and exists.
@@ -357,8 +369,28 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private captioned = false
 
+  /**
+   * Which caption track is showing, or `-1` for none.
+   *
+   * `@state`, because it is read off the video rather than declared: a consumer
+   * asking for a language would be naming a track that may not have loaded, and
+   * `default` on the `<track>` is the platform's own way to say it.
+   */
   @state()
-  private hasCaptions = false
+  private captionIndex = -1
+
+  /**
+   * How many caption tracks there are, which decides which control is drawn.
+   *
+   * A count and not a boolean, and that is the whole reason it changed. Tracks
+   * resolve after the element renders, so this is what schedules the update
+   * that draws the control at all; as a boolean it went false to true when the
+   * first one arrived and then never moved again, so a second track landing
+   * left the toggle in place and the language menu was unreachable on exactly
+   * the videos it exists for.
+   */
+  @state()
+  private captionCount = 0
 
   /**
    * The cue on screen now, as nodes, or nothing between cues.
@@ -421,6 +453,11 @@ export class HelixBaseVideo extends HelixElement {
        set answers. A player that hid them until it could prove a set existed
        would be a player that cannot know. */
     if (one === 'next' || one === 'previous') {
+      return true
+    }
+    /* A skip needs only a timeline, and a video that has none cannot be played
+       at all, so there is nothing here to check either. */
+    if (one === 'forward' || one === 'rewind') {
       return true
     }
     return one === 'speed'
@@ -551,7 +588,7 @@ export class HelixBaseVideo extends HelixElement {
     /* Read once the video has its tracks, not from the slot. A `<track>` is
        only a caption once the platform has parsed it, and a consumer can add
        one later. */
-    this.hasCaptions = video.textTracks.length > 0
+    this.captionCount = this.captionTracks.length
     /* And what the first one is doing, which is not always nothing: a
        `<track default>` starts showing without anyone pressing anything, so a
        button that began at "off" reported the opposite of what was on screen. */
@@ -663,6 +700,16 @@ export class HelixBaseVideo extends HelixElement {
        handler is set, so setting one unconditionally would put two dead keys on
        every lock screen showing this video. */
     const skips = `${this.extraControls} ${this.overflowControls}`.split(/\s+/)
+    /* The platform asks for a length and we answer with ours, or with its
+       default where it did not say. A lock screen offering a skip that moves a
+       different distance than the button on the bar is one player with two
+       answers to the same gesture. */
+    session.setActionHandler('seekbackward', (details) => {
+      this.skipBy(-(details.seekOffset ?? SKIP_SECONDS))
+    })
+    session.setActionHandler('seekforward', (details) => {
+      this.skipBy(details.seekOffset ?? SKIP_SECONDS)
+    })
     session.setActionHandler('nexttrack', skips.includes('next') ? () => this.skip(false) : null)
     session.setActionHandler(
       'previoustrack',
@@ -694,24 +741,74 @@ export class HelixBaseVideo extends HelixElement {
    * `::cue` only half allows.
    */
   private readonly handleCue = (): void => {
-    const track = this.video?.textTracks[0]
+    /* The track that is showing, not the first one. With one track those are
+       the same and with two they are not, so a reader on the second language
+       was shown the first one's words. */
+    const track = this.captionTracks[this.captionIndex] ?? this.video?.textTracks[0]
     const active = track?.activeCues?.[0]
     this.cue = active instanceof VTTCue ? active.getCueAsHTML() : undefined
   }
 
-  /** Turns the first caption track on or off, which is what the button means. */
-  private toggleCaptions(): void {
-    const track = this.video?.textTracks[0]
-    if (!track) {
+  /**
+   * Moves by a fixed length, clamped by `seek`.
+   *
+   * Separate from the arrow keys, which move by 5 and by 10 with Shift. Those
+   * are a scrub; this is the gesture for "I missed that", and a reader who
+   * presses it twice expects twenty seconds rather than an accelerating jump.
+   */
+  private skipBy(seconds: number): void {
+    const video = this.video
+    if (!video) {
       return
     }
-    const next = track.mode === 'disabled'
-    /* `hidden`, never `showing`. Hidden is the mode where a track still fires
-       `cuechange` and still fills `activeCues`, and the browser draws nothing:
-       exactly what is wanted when something else is doing the drawing. */
-    track.mode = next ? 'hidden' : 'disabled'
-    this.captioned = next
+    this.seek(video.currentTime + seconds)
+  }
+
+  /**
+   * The tracks a reader could choose between, in the order they were written.
+   *
+   * Filtered by kind, because `textTracks` also carries `chapters`, `metadata`
+   * and `descriptions`, and a menu offering "Chapters" as a subtitle language
+   * would be offering something that draws no words. Read off the video rather
+   * than off the slot: a `<track>` added later is in one and not the other, and
+   * the video is the one that has resolved them.
+   */
+  private get captionTracks(): TextTrack[] {
+    const tracks = this.video?.textTracks
+    if (!tracks) {
+      return []
+    }
+    return [...tracks].filter((one) => one.kind === 'subtitles' || one.kind === 'captions')
+  }
+
+  /**
+   * Shows one track and disables every other, or shows none at `-1`.
+   *
+   * Every other, rather than only the one that was on. Two tracks in `hidden`
+   * both fire `cuechange`, so the rendered cue becomes whichever fired last and
+   * a reader who switched language gets the two interleaved. Measured as two
+   * subtitles alternating line by line.
+   *
+   * `hidden`, never `showing`. Hidden is the mode where a track still fires
+   * `cuechange` and still fills `activeCues`, and the browser draws nothing,
+   * which is exactly what is wanted when something else is doing the drawing.
+   */
+  private showCaption(index: number): void {
+    const tracks = this.captionTracks
+    tracks.forEach((track, at) => {
+      track.mode = at === index ? 'hidden' : 'disabled'
+    })
+    this.captionIndex = index
+    this.captioned = index >= 0
     this.cue = undefined
+  }
+
+  /** Turns captions on or off, which is what the button means with one track. */
+  private toggleCaptions(): void {
+    if (this.captionTracks.length === 0) {
+      return
+    }
+    this.showCaption(this.captioned ? -1 : 0)
   }
 
   /**
@@ -898,6 +995,14 @@ export class HelixBaseVideo extends HelixElement {
         video.volume = Math.max(video.volume - 0.1, 0)
         break
       }
+      case 'j': {
+        this.skipBy(-SKIP_SECONDS)
+        break
+      }
+      case 'l': {
+        this.skipBy(SKIP_SECONDS)
+        break
+      }
       case 'm': {
         video.muted = !video.muted
         break
@@ -981,7 +1086,7 @@ export class HelixBaseVideo extends HelixElement {
     if (changed.has('media')) {
       const video = this.video
       video?.load()
-      this.hasCaptions = (video?.textTracks.length ?? 0) > 0
+      this.captionCount = this.captionTracks.length
     }
   }
 
@@ -1003,6 +1108,17 @@ export class HelixBaseVideo extends HelixElement {
         @click=${() => void this.promptRemote()}
       >
         <helix-icon name="airplay"></helix-icon>
+      </button>`
+    }
+    if (one === 'rewind' || one === 'forward') {
+      const back = one === 'rewind'
+      return html`<button
+        part=${one}
+        type="button"
+        aria-label=${back ? `Back ${SKIP_SECONDS} seconds` : `Forward ${SKIP_SECONDS} seconds`}
+        @click=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
+      >
+        <helix-icon name=${back ? 'arrow-counter-clockwise' : 'arrow-clockwise'}></helix-icon>
       </button>`
     }
     if (one === 'speed') {
@@ -1083,6 +1199,64 @@ export class HelixBaseVideo extends HelixElement {
    * reading rather than recognising. `download` is a linked row, which is what
    * `Menu.Item`'s `href` is for.
    */
+  /**
+   * A toggle for one track, a menu for several, and nothing for none.
+   *
+   * No menu at one, because a menu of a single language plus "Off" is a
+   * two-state control wearing a popover, and the button already says which
+   * state it is in through `aria-pressed`. The moment there are two the button
+   * cannot say which one is on, so it stops being a button.
+   *
+   * The label comes off the track: `label` where the markup gave one, and
+   * `srclang` where it did not, because a `<track>` with neither is a track
+   * nobody can choose between and that is the markup's fault to fix, not this
+   * component's to paper over with "Track 2".
+   */
+  private renderCaptions(): TemplateResult | typeof nothing {
+    /* Branched on the state rather than on the getter, so the render that draws
+       this is one the state scheduled. Reading the tracks for their labels is
+       fine either way: by the time this runs, the count that got us here was
+       taken from the same list. */
+    const tracks = this.captionTracks
+    if (this.captionCount === 0) {
+      return nothing
+    }
+    if (this.captionCount === 1) {
+      return html`<button
+        part="captions"
+        type="button"
+        aria-label="Captions"
+        aria-pressed=${this.captioned ? 'true' : 'false'}
+        @click=${() => this.toggleCaptions()}
+      >
+        <helix-icon name="closed-captioning"></helix-icon>
+      </button>`
+    }
+    return html`<helix-menu part="captions-menu" label="Subtitles" placement="top-end">
+      <button part="captions" slot="trigger" type="button" aria-label="Subtitles">
+        <helix-icon name="closed-captioning"></helix-icon>
+      </button>
+      <helix-menu-item
+        value="off"
+        aria-checked=${this.captionIndex < 0 ? 'true' : 'false'}
+        role="menuitemradio"
+        @helix-select=${() => this.showCaption(-1)}
+      >
+        Off
+      </helix-menu-item>
+      ${tracks.map(
+        (track, at) => html`<helix-menu-item
+          value=${track.language || String(at)}
+          aria-checked=${this.captionIndex === at ? 'true' : 'false'}
+          role="menuitemradio"
+          @helix-select=${() => this.showCaption(at)}
+        >
+          ${track.label || track.language}
+        </helix-menu-item>`,
+      )}
+    </helix-menu>`
+  }
+
   private renderOverflowItem(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<helix-menu-item
@@ -1097,6 +1271,19 @@ export class HelixBaseVideo extends HelixElement {
       return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}>
         <helix-icon name="gauge" slot="start"></helix-icon>
         Playback speed: ${this.rate}x
+      </helix-menu-item>`
+    }
+    if (one === 'rewind' || one === 'forward') {
+      const back = one === 'rewind'
+      return html`<helix-menu-item
+        value=${one}
+        @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
+      >
+        <helix-icon
+          name=${back ? 'arrow-counter-clockwise' : 'arrow-clockwise'}
+          slot="start"
+        ></helix-icon>
+        ${back ? `Back ${SKIP_SECONDS} seconds` : `Forward ${SKIP_SECONDS} seconds`}
       </helix-menu-item>`
     }
     if (one === 'previous') {
@@ -1188,19 +1375,7 @@ export class HelixBaseVideo extends HelixElement {
         }}
       />
       </span>
-      ${
-        this.hasCaptions
-          ? html`<button
-              part="captions"
-              type="button"
-              aria-label="Captions"
-              aria-pressed=${this.captioned ? 'true' : 'false'}
-              @click=${() => this.toggleCaptions()}
-            >
-              <helix-icon name="closed-captioning"></helix-icon>
-            </button>`
-          : nothing
-      }
+      ${this.renderCaptions()}
       ${this.extras.map((one) => this.renderExtra(one))}
       ${
         this.overflow.length === 0
