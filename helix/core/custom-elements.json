@@ -3193,6 +3193,14 @@
         },
         {
           "kind": "js",
+          "name": "deepContains",
+          "declaration": {
+            "name": "deepContains",
+            "module": "./utils/focusable-elements/focusable-elements.js"
+          }
+        },
+        {
+          "kind": "js",
           "name": "focusableElements",
           "declaration": {
             "name": "focusableElements",
@@ -5422,6 +5430,30 @@
             }
           },
           "description": "The truly focused element, following shadow roots down.\n\n`document.activeElement` stops at the outermost host, so a button inside two\nshadow roots reports as the component rather than as itself."
+        },
+        {
+          "kind": "function",
+          "name": "deepContains",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "root",
+              "type": {
+                "text": "Node"
+              }
+            },
+            {
+              "name": "node",
+              "type": {
+                "text": "Node | null"
+              }
+            }
+          ],
+          "description": "Whether `node` sits inside `root`, following shadow boundaries upward.\n\n`Node.contains` walks `parentNode` and a shadow root's `parentNode` is null,\nso it answers false for anything inside a component. Paired with\n`deepActiveElement`, which returns exactly such a node, that pairing is a trap\nof its own: the two look like they belong together and one of them crosses.\n\n`FocusTrapController` had precisely that, `contains(deepActiveElement())`,\nand it is why every dialog and drawer in the library leaked. Focus on a\n`helix-button` reports as the `<button>` in its shadow root, which is in no\nlight-DOM container anywhere, so the trap read every reader as already\noutside it.\n\n`host` is reached without naming `ShadowRoot`, which the server has no global\nfor. This runs from a keydown handler and would never execute there, but a\nbare reference is the kind that surfaces as a crash in Lit's result collector\nthe first time something calls it early."
         }
       ],
       "exports": [
@@ -5438,6 +5470,14 @@
           "name": "deepActiveElement",
           "declaration": {
             "name": "deepActiveElement",
+            "module": "src/utils/focusable-elements/focusable-elements.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "deepContains",
+          "declaration": {
+            "name": "deepContains",
             "module": "src/utils/focusable-elements/focusable-elements.ts"
           }
         }

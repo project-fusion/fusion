@@ -150,6 +150,19 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
+    /* The observer is rebuilt here, because nothing else does it.
+     *
+     * `firstUpdated` runs once for the life of the element and
+     * `disconnectedCallback` runs every time it moves, so a framework
+     * reordering a list left this permanently dead: the observer gone, nothing
+     * to rebuild it, and the component still rendering as though it were
+     * watching. Guarded on `hasUpdated`, because the first connection happens
+     * before the first render and there is nothing to watch yet.
+     * `check:observers` holds it. */
+    if (this.hasUpdated) {
+      this.measure()
+      this.watch()
+    }
   }
 
   override disconnectedCallback(): void {
@@ -173,9 +186,15 @@ export class HelixBaseTabs extends MixinControllerActive(HelixElement) {
        the origin the moment the page was looked at. */
     this.indicator.place()
     requestAnimationFrame(() => this.indicator.place())
+    this.measure()
+    this.watch()
+  }
+
+  /** The host's own size, which moves every tab and therefore the mark. */
+  private measure(): void {
+    this.observer?.disconnect()
     this.observer = new ResizeObserver(() => this.indicator.place())
     this.observer.observe(this)
-    this.watch()
   }
 
   /**

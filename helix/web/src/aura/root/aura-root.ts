@@ -269,6 +269,22 @@ export class HelixAura extends HelixElement {
   }
 
   protected override firstUpdated(): void {
+    this.start()
+  }
+
+  /* Everything the canvas needs, in one place both lifecycles can reach.
+   *
+   * This was the body of `firstUpdated`, which runs once for the life of the
+   * element, while `disconnectedCallback` deletes the program, drops the
+   * context and disconnects both observers, and runs every time the element
+   * moves. So an aura reordered by a framework came back with `this.gl` null
+   * and nothing to rebuild it: a live component painting nothing, for the rest
+   * of the page's life, with no error anywhere.
+   *
+   * Guarded at the call site on `hasUpdated`, because the first connection
+   * happens before the first render and there is no canvas yet.
+   * `check:observers` holds the pairing. */
+  private start(): void {
     /* Client only, and by contract. There is no canvas on a server, so the
        shader is an enhancement over markup that already renders a gradient. */
     this.canvas = this.renderRoot.querySelector('canvas')
@@ -347,6 +363,13 @@ export class HelixAura extends HelixElement {
     this.readPalette()
     this.paintOnce()
     this.play()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.start()
+    }
   }
 
   protected override updated(): void {

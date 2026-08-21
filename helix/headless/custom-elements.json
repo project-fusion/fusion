@@ -40005,6 +40005,17 @@
             },
             {
               "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The host's own size, which moves every tab and therefore the mark."
+            },
+            {
+              "kind": "method",
               "name": "watch",
               "privacy": "private",
               "return": {
@@ -41002,6 +41013,17 @@
                 }
               },
               "description": "Reports the value and the validity the host stands behind."
+            },
+            {
+              "kind": "method",
+              "name": "watchControl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches the control so the box grows with what is typed into it."
             },
             {
               "kind": "field",
@@ -45491,6 +45513,17 @@
               "name": "handleSelection",
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The observer the items are registered on, rebuilt with them."
             },
             {
               "kind": "method",

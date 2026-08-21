@@ -1828,6 +1828,16 @@
             },
             {
               "kind": "method",
+              "name": "start",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
               "name": "readPalette",
               "privacy": "private",
               "return": {
@@ -43160,6 +43170,17 @@
               "readonly": true
             },
             {
+              "kind": "method",
+              "name": "watchBody",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches the body, whose height is what the pane sizes are computed from."
+            },
+            {
               "kind": "field",
               "name": "readPanel",
               "privacy": "private",
@@ -54133,6 +54154,21 @@
             },
             {
               "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The host's own size, which moves every tab and therefore the mark.",
+              "inheritedFrom": {
+                "name": "HelixBaseTabs",
+                "module": "src/tabs/root/tabs-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "watch",
               "privacy": "private",
               "return": {
@@ -55889,6 +55925,21 @@
                 }
               },
               "description": "Reports the value and the validity the host stands behind.",
+              "inheritedFrom": {
+                "name": "HelixBaseTextarea",
+                "module": "src/textarea/root/textarea-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "watchControl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Watches the control so the box grows with what is typed into it.",
               "inheritedFrom": {
                 "name": "HelixBaseTextarea",
                 "module": "src/textarea/root/textarea-root.ts"
@@ -61291,6 +61342,21 @@
               "name": "handleSelection",
               "privacy": "private",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "HelixBaseToggleGroup",
+                "module": "src/toggle/group/toggle-group.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "measure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The observer the items are registered on, rebuilt with them.",
               "inheritedFrom": {
                 "name": "HelixBaseToggleGroup",
                 "module": "src/toggle/group/toggle-group.ts"

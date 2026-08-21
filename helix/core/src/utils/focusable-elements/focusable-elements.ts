@@ -49,3 +49,33 @@ export const deepActiveElement = (): Element | null => {
   }
   return active
 }
+
+/**
+ * Whether `node` sits inside `root`, following shadow boundaries upward.
+ *
+ * `Node.contains` walks `parentNode` and a shadow root's `parentNode` is null,
+ * so it answers false for anything inside a component. Paired with
+ * `deepActiveElement`, which returns exactly such a node, that pairing is a trap
+ * of its own: the two look like they belong together and one of them crosses.
+ *
+ * `FocusTrapController` had precisely that, `contains(deepActiveElement())`,
+ * and it is why every dialog and drawer in the library leaked. Focus on a
+ * `helix-button` reports as the `<button>` in its shadow root, which is in no
+ * light-DOM container anywhere, so the trap read every reader as already
+ * outside it.
+ *
+ * `host` is reached without naming `ShadowRoot`, which the server has no global
+ * for. This runs from a keydown handler and would never execute there, but a
+ * bare reference is the kind that surfaces as a crash in Lit's result collector
+ * the first time something calls it early.
+ */
+export const deepContains = (root: Node, node: Node | null): boolean => {
+  let current: Node | null = node
+  while (current) {
+    if (current === root) {
+      return true
+    }
+    current = current.parentNode ?? ((current as ShadowRoot).host as Node | undefined) ?? null
+  }
+  return false
+}

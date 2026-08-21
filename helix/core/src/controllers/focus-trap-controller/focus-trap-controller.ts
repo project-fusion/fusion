@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import {
   deepActiveElement,
+  deepContains,
   focusableElements,
 } from '../../utils/focusable-elements/focusable-elements.js'
 
@@ -40,10 +41,27 @@ export class FocusTrapController implements ReactiveController {
     const last = items.at(-1) as HTMLElement
     const active = deepActiveElement()
 
-    if (event.shiftKey && (active === first || !this.container.contains(active))) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && active === last) {
+    /* Which item holds focus, rather than which item *is* focus.
+     *
+     * `focusableElements` returns hosts: a `helix-button` delegates focus, so
+     * the list holds the component and `deepActiveElement` returns the
+     * `<button>` in its shadow root. They are never equal, and the container
+     * never `contains` the second, so this read `active === first` as false on
+     * the first element and "outside the trap" on every element. Measured
+     * against the two branches below, that made shift-Tab jump to the last item
+     * from anywhere and forward Tab never wrap at all, which is a trap that
+     * leaks in one direction and cannot be walked backwards in the other.
+     *
+     * An index also gives the outside-entirely case for free: -1 wraps to
+     * whichever end the reader was heading for. */
+    const at = items.findIndex((item) => item === active || deepContains(item, active))
+
+    if (event.shiftKey) {
+      if (at <= 0) {
+        event.preventDefault()
+        last.focus()
+      }
+    } else if (at === -1 || at === items.length - 1) {
       event.preventDefault()
       first.focus()
     }

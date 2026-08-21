@@ -93,6 +93,21 @@ export class HelixBaseNavigation extends HelixElement {
     }
   }
 
+  /* Rebuilt on reconnection, because nothing else does it.
+   *
+   * `firstUpdated` runs once for the life of the element and
+   * `disconnectedCallback` runs every time it moves, so a framework reordering
+   * a list left this permanently dead: the observer gone, nothing to rebuild
+   * it, and the component still rendering as though it were watching. Guarded
+   * on `hasUpdated`, because the first connection happens before the first
+   * render and there is nothing to watch yet. `check:observers` holds it. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.watch()
+    }
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.observer?.disconnect()

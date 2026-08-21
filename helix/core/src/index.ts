@@ -128,6 +128,7 @@ export { customElement } from './utils/custom-element/custom-element.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
 export {
   deepActiveElement,
+  deepContains,
   focusableElements,
 } from './utils/focusable-elements/focusable-elements.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'

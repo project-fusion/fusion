@@ -455,6 +455,26 @@ export class HelixSandbox extends HelixElement {
     this.addEventListener('helix-caret', this.handleCaret)
     this.addEventListener('helix-console', this.handleConsole)
     this.addEventListener('helix-change', this.handleSourceChange)
+    /* And the body is watched again, because `disconnectedCallback` stopped
+       watching it. The observer itself survives, being a field rather than
+       something `firstUpdated` built, but a disconnected one reports nothing
+       until something calls `observe` again, and only `firstUpdated` did. So a
+       sandbox moved in the DOM came back with its panel sizes frozen.
+       `check:observers` holds this. */
+    if (this.hasUpdated) {
+      this.watchBody()
+    }
+  }
+
+  /** Watches the body, whose height is what the pane sizes are computed from. */
+  private watchBody(): void {
+    const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
+    if (!body) {
+      return
+    }
+    this.bodyHeight = body.getBoundingClientRect().height
+    this.watch?.observe(body)
+    this.requestUpdate()
   }
 
   /**
@@ -478,12 +498,7 @@ export class HelixSandbox extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.readPanel()
-    const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
-    if (body) {
-      this.bodyHeight = body.getBoundingClientRect().height
-      this.watch?.observe(body)
-      this.requestUpdate()
-    }
+    this.watchBody()
   }
 
   override disconnectedCallback(): void {
