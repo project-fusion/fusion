@@ -124,7 +124,28 @@
      `--helix-color-primary`, not for a darker default here. */
   --_helix-neutral-300: oklch(0.91 var(--_helix-neutral-cast));
   --_helix-neutral-400: oklch(0.71 var(--_helix-neutral-cast));
+  /* The two half steps, and they exist because 4.5:1 puts a hard ceiling on how
+     quiet a *readable* ink can be.
+   *
+   * Light grounds run 0.96 to 1.0, so any ink above about 0.53 is under 4.5 on
+   * one of them: 500 at 0.6 measured 3.53 on `surface-sunken`, 3.62 raised,
+   * 3.78 on surface and 3.95 on the page, and it was carrying inactive tab
+   * labels, the pagination summary and an input's own text. Dark is the mirror,
+   * `surface-raised` at 0.29 being the worst ground and 0.67 the floor: 500
+   * measured 3.59 there.
+   *
+   * 0.53 and 0.67 are those thresholds with nothing to spare, measured rather
+   * than picked, and they clear every ground in their own mode at 4.69 and 4.73.
+   *
+   * **They sit three and four hundredths from 600 and 400, which is the finding
+   * and not an accident.** The readable range in light is the whole of 0 to
+   * 0.53, and two inks that are both quiet and both readable have to share the
+   * top of it. A ramp on these grounds supports one quiet readable step, not
+   * two, and whether the library wants two at all is a palette question rather
+   * than a contrast one. */
+  --_helix-neutral-450: oklch(0.67 var(--_helix-neutral-cast));
   --_helix-neutral-500: oklch(0.6 var(--_helix-neutral-cast));
+  --_helix-neutral-550: oklch(0.53 var(--_helix-neutral-cast));
   --_helix-neutral-600: oklch(0.5 var(--_helix-neutral-cast));
   /* 0.33, and it barely moves while 300 moves three times as far, because this
      end of the ramp has a floor and that end does not.

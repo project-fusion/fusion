@@ -174,7 +174,13 @@
      that wants to be quieter asks for `-muted` or `-subtle` by name. */
   --helix-color-foreground: light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0));
   --helix-color-foreground-muted: light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400));
-  --helix-color-foreground-subtle: light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500));
+  /* The quieter of the two secondary inks, and it is still an ink.
+   *
+   * It was `neutral-500` in both modes and failed 4.5:1 on every ground in
+   * light and on `surface-raised` in dark, while carrying inactive tab labels,
+   * the pagination summary and the text an input paints. Measured before the
+   * change: 3.53, 3.62, 3.78, 3.95 in light and 3.59 in dark. */
+  --helix-color-foreground-subtle: light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450));
   --helix-color-foreground-on-accent: var(--_helix-neutral-0);
   /* The mode's opposite, for a surface that has to read as separate from the
      page rather than as part of it: a tooltip, a toast. Both flip together, so
