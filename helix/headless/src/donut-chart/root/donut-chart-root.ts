@@ -16,6 +16,19 @@ const CENTRE = BOX / 2
 const EDGE = 40
 
 /**
+ * The dash gap, long enough that the pattern cannot repeat.
+ *
+ * A dash array tiles. Set to `circumference - length` the pattern fills the
+ * circle exactly once and is right at rest, and wrong the moment it animates:
+ * both numbers interpolate, and while the gap is shorter than the path still to
+ * cover, a second and third copy of the slice sweep round the ring and vanish
+ * inside one transition. A constant far larger than any circumference has no
+ * second tile to draw at any point in the interpolation. It is the number
+ * `@starting-style` already uses for the same reason.
+ */
+const GAP = 9999
+
+/**
  * How much of the radius the ring takes, by name.
  *
  * **The outer edge is fixed and the radius follows the thickness**, which is
