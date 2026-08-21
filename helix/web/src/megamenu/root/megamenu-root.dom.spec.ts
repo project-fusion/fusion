@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, role } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom, role, settled } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -320,6 +320,12 @@ if (hasLayout()) {
 
         press(host, 'none', 0)
         await host.updateComplete
+        /* The exit has to run before the box goes. `allow-discrete` holds the
+           `display` change back so the transition has somewhere to happen, so
+           measured on the update that closed it the panel is still 900 by 85
+           with three transitions in flight. Waiting on the animations rather
+           than on a duration, which would be a number kept beside a token. */
+        await settled(part(host, 'panel'))
         expect(host.open).toBe(false)
         /* The band was 1280 by 267 here, and `open` was already false.
            `:host([appearance="full"]) [part="panel"]` is (0,3,0) and the guard

@@ -422,3 +422,26 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
  * measurement.
  */
 export const hasLayout = (): boolean => true
+
+/**
+ * Waits for an element's own animations to finish, and returns at once where
+ * there are none.
+ *
+ * For the exit half of anything that closes. A panel that transitions out with
+ * `transition-behavior: allow-discrete` keeps its box until the transition
+ * ends, because that is what `allow-discrete` is: the browser holds the
+ * discrete `display` change back so the animated properties have somewhere to
+ * run. Measured on `Megamenu`, immediately after the update that closed it:
+ * `hidden` present, `open` false, `display: grid`, 900 by 85, three transitions
+ * running. Six hundred milliseconds later, `display: none` and zero by zero.
+ *
+ * The same function in both harnesses, and it has to be: a name exported from
+ * one and not the other does not fail a spec, it fails the bundle, which is how
+ * this one announced itself. Waits on the animations rather than on a duration,
+ * a timeout being a number kept beside a token and either flaky or slow
+ * depending on which way it is wrong.
+ */
+export const settled = async (element: Element | null): Promise<void> => {
+  const running = (element as HTMLElement | null)?.getAnimations?.() ?? []
+  await Promise.allSettled(running.map((animation) => animation.finished))
+}
