@@ -35075,9 +35075,9 @@
               "kind": "field",
               "name": "plot",
               "type": {
-                "text": "'area' | 'bar' | undefined"
+                "text": "'area' | 'bar' | 'line' | undefined"
               },
-              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\n**Absent is `area`**, which is the departure from the rule that a resting\narrangement is the plainest thing. At the size a sparkline is actually\ndrawn, a hairline in a wide box is mostly box: the wash under it is what\ngives the shape a body and lets a reader see it at a glance rather than\nhunting for it, which is the entire job. `line` is the bare stroke for\nanywhere the fill would be noise, several of them in one box for instance.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
               "attribute": "plot",
               "reflects": true
             },
@@ -35213,9 +35213,9 @@
             {
               "name": "plot",
               "type": {
-                "text": "'area' | 'bar' | undefined"
+                "text": "'area' | 'bar' | 'line' | undefined"
               },
-              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
+              "description": "What the readings are drawn as.\n\nAbsent is a line, `area` is a line with the region beneath it washed, and\n`bar` is a column per reading.\n\n**A bar plot measures from zero and the other two measure from the data's\nown range**, which is the one way the plots are not interchangeable. A line\nsays where the readings sit relative to each other, so a scale over their\nextent uses the whole box and claims nothing about absolute size. A bar's\nlength *is* the value, so any baseline but zero makes the lengths\nproportional to nothing.\n\n**Which is a reason to prefer a line for readings in a narrow band far from\nzero.** Seven values between 1,102 and 1,408 drawn as columns from zero are\nseven columns of nearly the same height, and that is the true picture: they\n*are* nearly the same. The same readings as a line fill the box and show\nthe movement, because a line is only ever claiming a shape.\n\n**Absent is `area`**, which is the departure from the rule that a resting\narrangement is the plainest thing. At the size a sparkline is actually\ndrawn, a hairline in a wide box is mostly box: the wash under it is what\ngives the shape a body and lets a reader see it at a glance rather than\nhunting for it, which is the entire job. `line` is the bare stroke for\nanywhere the fill would be noise, several of them in one box for instance.\n\nThis tier rather than the one above: a plot type is geometry and geometry\nis markup, the same reason `curve` lives here.",
               "fieldName": "plot"
             },
             {
@@ -50051,6 +50051,10 @@
             {
               "description": "One entry in the menu.",
               "name": "entry"
+            },
+            {
+              "description": "An entry's still, where it has one.",
+              "name": "poster"
             },
             {
               "description": "The menu that holds the entries.",

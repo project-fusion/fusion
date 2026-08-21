@@ -16,6 +16,7 @@ import { styles } from './menu-item.css.js'
  * @aliases Menu option, Menu row
  * @documentation https://helix.fusion.dev/components/menu
  *
+ * @cssproperty --menu-item-start - Width of the leading column, for a row carrying more than a mark.
  * @cssproperty --menu-item-hover-color - Fill under the pointer.
  */
 @customElement('helix-menu-item')

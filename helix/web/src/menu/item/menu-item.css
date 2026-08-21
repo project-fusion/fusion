@@ -33,7 +33,16 @@
      an icon and three do not still reads as one column of labels: `auto` would
      collapse the empty ones and step every other label left. The mark's column
      already worked this way and the note under it says why. */
-  grid-template-columns: var(--helix-size-icon) minmax(0, 1fr) var(--helix-size-icon);
+  /* The leading column takes a hook, the trailing one does not, and the
+     asymmetry is the point. What goes in `start` is whatever the consumer put
+     there, and it is not always a mark: a still from a video, an avatar, a
+     favicon. What goes in the mark column is a tick or a caret this component
+     draws, at icon size, always. So one of them is a decision a consumer can
+     have and the other is not. */
+  grid-template-columns:
+    var(--menu-item-start, var(--helix-size-icon))
+    minmax(0, 1fr)
+    var(--helix-size-icon);
   min-block-size: var(--helix-size-control-sm);
   /* The inset is padding on the row and nothing else. A margin here would put
      the same gap back that taking the surface's padding away removed: the row
@@ -71,11 +80,16 @@
   --icon-size: var(--helix-size-icon-sm);
 
   align-items: center;
-  block-size: var(--helix-size-icon);
   color: var(--helix-color-foreground-subtle);
   display: flex;
-  inline-size: var(--helix-size-icon);
+  inline-size: var(--menu-item-start, var(--helix-size-icon));
   justify-content: center;
+  /* `min-block-size` rather than `block-size`, so the column is at least as
+     tall as a mark on every row and taller where the content is. Fixed, a 16:9
+     still slotted here overflowed a sixteen pixel box and ran under the label,
+     the grid track having stayed at icon width as well. Both were measured on
+     `Video.Playlist.Menu`, which is what a media row in a menu looks like. */
+  min-block-size: var(--helix-size-icon);
 }
 
 /* The column exists on every row, filled or not, so nothing shifts when a tick

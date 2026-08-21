@@ -4059,6 +4059,13 @@ seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
 the movement, because a line is only ever claiming a shape.
 
+**Absent is `area`**, which is the departure from the rule that a resting
+arrangement is the plainest thing. At the size a sparkline is actually
+drawn, a hairline in a wide box is mostly box: the wash under it is what
+gives the shape a body and lets a reader see it at a glance rather than
+hunting for it, which is the entire job. `line` is the bare stroke for
+anywhere the fill would be noise, several of them in one box for instance.
+
 This tier rather than the one above: a plot type is geometry and geometry
 is markup, the same reason `curve` lives here. */
   plot?: HelixBaseSparkline["plot"];

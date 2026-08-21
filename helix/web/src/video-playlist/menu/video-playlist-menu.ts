@@ -33,6 +33,7 @@ import '../../menu/index.js'
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
  * @cssproperty --video-playlist-menu-color - Colour of the trigger, defaulting to the control bar's.
+ * @cssproperty --video-playlist-menu-poster - Width of an entry's still.
  * @cssproperty --video-playlist-menu-size - Size of the trigger's glyph.
  */
 @customElement('helix-video-playlist-menu')

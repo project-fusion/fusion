@@ -16,8 +16,8 @@ const mountMenu = async (): Promise<{ menu: Menu; playlist: Playlist }> => {
     <helix-video label="Player" slot="player">
       <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
     </helix-video>
-    <helix-video-playlist-item src="/one.mp4" value="one">One</helix-video-playlist-item>
-    <helix-video-playlist-item src="/two.mp4" value="two">Two</helix-video-playlist-item>
+    <helix-video-playlist-item poster="/one.jpg" src="/one.mp4" value="one">One</helix-video-playlist-item>
+    <helix-video-playlist-item poster="/two.jpg" src="/two.mp4" value="two">Two</helix-video-playlist-item>
     <helix-video-playlist-item disabled src="/three.mp4" value="three">Three</helix-video-playlist-item>
   </helix-video-playlist>`)) as Playlist
   const menu = playlist.querySelector<Menu>('helix-video-playlist-menu')
@@ -64,6 +64,22 @@ describe('video playlist menu', () => {
   test('carries every entry, in the order the playlist holds them', async () => {
     const { menu } = await mountMenu()
     expect(entries(menu).map((one) => one.getAttribute('value'))).toEqual(['one', 'two', 'three'])
+  })
+
+  test("carries each entry's still, so an episode is recognised not read", async () => {
+    const { menu } = await mountMenu()
+    const posters = entries(menu).map(
+      (one) => one.querySelector('[part="poster"]')?.getAttribute('src') ?? null,
+    )
+    expect(posters).toEqual(['/one.jpg', '/two.jpg', null])
+  })
+
+  test('omits the still where there is none, rather than serving an empty one', async () => {
+    /* An `<img>` with no `src` is a broken-image glyph in every engine, which
+       is worse than the gap it fills. The third entry has no poster and the
+       assertion above is what says so. */
+    const { menu } = await mountMenu()
+    expect(entries(menu)[2]?.querySelector('[part="poster"]')).toBeNull()
   })
 
   test('marks the current entry, and only that one', async () => {

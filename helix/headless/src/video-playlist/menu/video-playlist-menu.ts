@@ -6,7 +6,7 @@ import {
   HelixSelectEvent,
 } from '@helix-io/core'
 import { list } from '@helix-io/icons'
-import { html, type TemplateResult } from 'lit'
+import { html, nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { HelixBaseVideoPlaylist } from '../root/video-playlist-root.js'
@@ -57,6 +57,7 @@ const ITEMS = 'helix-video-playlist-item, helix-base-video-playlist-item'
  * @documentation https://helix.fusion.dev/components/video-playlist
  *
  * @csspart entry - One entry in the menu.
+ * @csspart poster - An entry's still, where it has one.
  * @csspart menu - The menu that holds the entries.
  * @csspart trigger - The button that opens it.
  *
@@ -202,6 +203,24 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
             this.choose(entry.value)
           }}
         >
+          ${
+            /* The still, where there is one, for the reason the list beside the
+               player shows one: a reader picks an episode by recognising it
+               faster than by reading its title, and this menu opens over the
+               picture where reading is hardest.
+             *
+             * In `start`, which is free: `Menu.Item` renders its tick *after*
+             * the label as `part="mark"`, so the leading column has nothing to
+             * collide with. `alt=""`, because the name is in the same row and a
+             * still repeating it is the same thing said twice, which is what
+             * `Video.Playlist.Item` already decided about its own thumbnail.
+             *
+             * Omitted rather than empty where there is no poster, an `<img>`
+             * with no `src` being a broken-image glyph in every engine. */
+            entry.poster === ''
+              ? nothing
+              : html`<img alt="" part="poster" slot="start" src=${entry.poster} />`
+          }
           ${entry.text}
         </helix-menu-item>`,
       )}

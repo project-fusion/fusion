@@ -9193,6 +9193,13 @@ seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
 the movement, because a line is only ever claiming a shape.
 
+**Absent is `area`**, which is the departure from the rule that a resting
+arrangement is the plainest thing. At the size a sparkline is actually
+drawn, a hairline in a wide box is mostly box: the wash under it is what
+gives the shape a body and lets a reader see it at a glance rather than
+hunting for it, which is the entire job. `line` is the bare stroke for
+anywhere the fill would be noise, several of them in one box for instance.
+
 This tier rather than the one above: a plot type is geometry and geometry
 is markup, the same reason `curve` lives here. */
   plot?: HelixSparkline["plot"];
@@ -9276,6 +9283,13 @@ zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
 seven columns of nearly the same height, and that is the true picture: they
 *are* nearly the same. The same readings as a line fill the box and show
 the movement, because a line is only ever claiming a shape.
+
+**Absent is `area`**, which is the departure from the rule that a resting
+arrangement is the plainest thing. At the size a sparkline is actually
+drawn, a hairline in a wide box is mostly box: the wash under it is what
+gives the shape a body and lets a reader see it at a glance rather than
+hunting for it, which is the entire job. `line` is the bare stroke for
+anywhere the fill would be noise, several of them in one box for instance.
 
 This tier rather than the one above: a plot type is geometry and geometry
 is markup, the same reason `curve` lives here. */
@@ -17744,6 +17758,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-item-start`: Width of the leading column, for a row carrying more than a mark. (default: `undefined`)
    * - `--menu-item-hover-color`: Fill under the pointer. (default: `undefined`)
    *
    * ## CSS Parts
@@ -20432,6 +20447,13 @@ export type CustomElements = {
    * seven columns of nearly the same height, and that is the true picture: they
    * *are* nearly the same. The same readings as a line fill the box and show
    * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
    *
    * This tier rather than the one above: a plot type is geometry and geometry
    * is markup, the same reason `curve` lives here.
@@ -23281,6 +23303,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--video-playlist-menu-color`: Colour of the trigger, defaulting to the control bar's. (default: `undefined`)
+   * - `--video-playlist-menu-poster`: Width of an entry's still. (default: `undefined`)
    * - `--video-playlist-menu-size`: Size of the trigger's glyph. (default: `undefined`)
    *
    * ## CSS Parts
@@ -23288,6 +23311,7 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
    */
@@ -28443,6 +28467,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--menu-item-start`: Width of the leading column, for a row carrying more than a mark. (default: `undefined`)
    * - `--menu-item-hover-color`: Fill under the pointer. (default: `undefined`)
    *
    * ## CSS Parts
@@ -31223,6 +31248,13 @@ export type CustomElementsSolidJs = {
    * seven columns of nearly the same height, and that is the true picture: they
    * *are* nearly the same. The same readings as a line fill the box and show
    * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
    *
    * This tier rather than the one above: a plot type is geometry and geometry
    * is markup, the same reason `curve` lives here.
@@ -34178,6 +34210,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--video-playlist-menu-color`: Colour of the trigger, defaulting to the control bar's. (default: `undefined`)
+   * - `--video-playlist-menu-poster`: Width of an entry's still. (default: `undefined`)
    * - `--video-playlist-menu-size`: Size of the trigger's glyph. (default: `undefined`)
    *
    * ## CSS Parts
@@ -34185,6 +34218,7 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `entry`: One entry in the menu.
+   * - `poster`: An entry's still, where it has one.
    * - `menu`: The menu that holds the entries.
    * - `trigger`: The button that opens it.
    */
@@ -34692,6 +34726,8 @@ export type CustomCssProperties = {
   "--megamenu-column-size"?: string;
   /** How wide the band's contents may get, centred in it. */
   "--megamenu-full-size"?: string;
+  /** Width of the leading column, for a row carrying more than a mark. */
+  "--menu-item-start"?: string;
   /** Fill under the pointer. */
   "--menu-item-hover-color"?: string;
   /** Tallest the surface grows before it scrolls. */
@@ -34984,6 +35020,8 @@ export type CustomCssProperties = {
   "--video-playlist-media-size"?: string;
   /** Colour of the trigger, defaulting to the control bar's. */
   "--video-playlist-menu-color"?: string;
+  /** Width of an entry's still. */
+  "--video-playlist-menu-poster"?: string;
   /** Size of the trigger's glyph. */
   "--video-playlist-menu-size"?: string;
   /** Columns for the player and the list. */

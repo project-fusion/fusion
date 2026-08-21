@@ -1,0 +1,7 @@
+/* The list is not shown, because the bar carries it. Two copies of one set of
+   entries on one screen is the arrangement this example exists to replace, and
+   `display: none` takes the hidden one out of the accessibility tree as well as
+   off the page, so a reader is offered the episodes once. */
+helix-video-playlist::part(items) {
+  display: none;
+}

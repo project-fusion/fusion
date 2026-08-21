@@ -38,3 +38,40 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* The leading column widened for a still, through the hook `Menu.Item` exposes
+   for exactly this.
+ *
+ * A custom property rather than `::part()`, because the width has to reach the
+ * grid *track* and not just the element in it. Setting `inline-size` on the
+ * part was the first attempt and it looked right in isolation: the still
+ * measured 48x27 as asked, and the track behind it was still sixteen pixels, so
+ * the picture overflowed its column and the label was drawn across it. Custom
+ * properties inherit through a shadow boundary, so one declaration here reaches
+ * both the track and the box. */
+[part="entry"] {
+  --menu-item-start: var(--video-playlist-menu-poster, calc(var(--helix-size-icon-lg) * 2));
+}
+
+/* And the row given room to hold one.
+ *
+ * `Menu.Item`'s block padding is sized for text with a mark beside it, so a
+ * 48x27 still landed in a 32px row: measured, three pixels above and two below,
+ * with five between one still and the next. Nothing overflowed and nothing was
+ * clipped, which is why it needed measuring rather than looking at, and it
+ * still read as stills stacked edge to edge rather than as rows carrying one.
+ *
+ * A media row is a taller row. Stated once here rather than pushed into `Menu`,
+ * where it would make every menu in the library pay for a case only this one
+ * has. */
+[part="entry"]::part(item) {
+  padding-block: var(--helix-space-2xs);
+}
+
+[part="poster"] {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
