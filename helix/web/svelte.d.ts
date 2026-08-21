@@ -23,6 +23,7 @@ declare module 'svelte/elements' {
     'helix-callout': CustomElements['helix-callout']
     'helix-card': CustomElements['helix-card']
     'helix-carousel': CustomElements['helix-carousel']
+    'helix-chart-legend': CustomElements['helix-chart-legend']
     'helix-checkbox-group': CustomElements['helix-checkbox-group']
     'helix-checkbox': CustomElements['helix-checkbox']
     'helix-code-block': CustomElements['helix-code-block']

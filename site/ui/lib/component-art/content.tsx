@@ -145,6 +145,34 @@ export const contentArt: Record<string, ReactNode> = {
      to be a mark. The first drawing was a single caret beside a rule, which
      read as a list item pointing the wrong way: it was a caret and a line, not
      a picture of anything. */
+  /**
+   * Three rows, each a filled patch and the name it stands for.
+   *
+   * The patch is the whole subject. Take it away and this is `list`, and every
+   * other way of saying "legend" draws the chart instead, which the system
+   * forbids for the reason `tree` records: a drawing depicts what the component
+   * is, not what it sits next to.
+   *
+   * Solid and edgeless, so they read as colour rather than as controls. An
+   * outlined square in a column of three is a checkbox list. The weights
+   * descend because the grid is monotone and has no accent, and three series
+   * that differ is the fact the card has to carry.
+   *
+   * Still, like `stat` and `trend`. A legend does not move.
+   */
+  'chart-legend': (
+    <>
+      <rect className="artInk" fillOpacity="0.55" height="12" rx="4" width="12" x="100" y="62" />
+      <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="88" x="120" y="64" />
+
+      <rect className="artInk" fillOpacity="0.28" height="12" rx="4" width="12" x="100" y="96" />
+      <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="104" x="120" y="98" />
+
+      <rect className="artInk" fillOpacity="0.12" height="12" rx="4" width="12" x="100" y="130" />
+      <rect className="artInk" fillOpacity="0.12" height="8" rx="4" width="72" x="120" y="132" />
+    </>
+  ),
+
   code: (
     <>
       <g className="artMotion artLift">

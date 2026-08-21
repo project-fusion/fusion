@@ -1,0 +1,28 @@
+<!-- @summary The same element reading rows instead of columns, which is what a donut needs and a bar chart does not. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table id="plans">
+    <caption>Accounts by plan</caption>
+    <tbody>
+      <tr>
+        <th scope="row">Free</th>
+        <td>1840</td>
+      </tr>
+      <tr>
+        <th scope="row">Team</th>
+        <td>612</td>
+      </tr>
+      <tr>
+        <th scope="row">Enterprise</th>
+        <td>78</td>
+      </tr>
+    </tbody>
+  </table>
+  <helix-chart-legend
+    entries="categories"
+    for="plans"
+  ></helix-chart-legend>
+</helix-flex>

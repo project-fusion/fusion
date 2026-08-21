@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * Gallery art for the ten families the language was worked out on.
  *
  * Bodies only: the `<svg>`, its shared shadow filter and the `aria-hidden` live
- * in `index.tsx`, so they are stated once rather than eighty-three times.
+ * in `index.tsx`, so they are stated once rather than eighty-four times.
  *
  * The system, which every entry in every one of these files obeys:
  *
@@ -26,7 +26,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * - **Every card sits on the same dot lattice**, drawn once in `index.tsx` at
  *   16 units, which is `space-md`. It shows through the sparse drawings and is
  *   covered by the dense ones, so the gallery reads as one measured field
- *   rather than eighty-three unrelated pictures.
+ *   rather than eighty-four unrelated pictures.
  * - **An edge has to earn its place.** `artEdge` is for a border the component
  *   actually has (a field, a key cap, a group's shared outline, an unchecked
  *   box) or for a plane that would otherwise have no silhouette at all. It is
@@ -39,7 +39,7 @@ import type { CSSProperties, ReactNode } from 'react'
  *   a node graph is not a Tree, browser chrome is not an App Header.
  * - **One motion archetype per card**, opted into by class, and **nothing moves
  *   at rest**. Skeleton and Spinner were the exception on the grounds that
- *   their motion *is* the component; in a grid of eighty-three still cards two
+ *   their motion *is* the component; in a grid of eighty-four still cards two
  *   that move on their own read as the only two that are broken. Both are
  *   recognisable frozen, so both wait for hover like everything else.
  */

@@ -2736,7 +2736,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -3790,6 +3790,242 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/chart-legend/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/chart-legend/root/chart-legend-root.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/chart-legend/root/chart-legend-root.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A legend is a list, so it is a list: not part of a chart, and shared by\nwhichever of them needs one. It takes its entries from the same table the\nchart reads, through `for`, so the two cannot disagree about how many series\nthere are or what they are called.\n\n`entries` picks which way to read that table, and the two ways are the two\nshapes a chart comes in. `series` is one entry per data column, named by the\nheader row, which is a line or a bar chart. `categories` is one entry per\nbody row, named by its row header, which is a donut: its slices are the rows,\nand it has no axis to write their names along.\n\n**The table is resolved on the client and there is no server pass.** `for` is\nan id and resolving it wants a document, which the server render does not\nhave, so a legend ships empty and fills in on hydration. The table itself is\nordinary markup and is served whole, so nothing is missing from the page\nbefore then, only from this list.\n\nThe table is watched, because a legend that goes stale when its data changes\nis a legend that has to be told, and nothing else in the page would know to\ntell it.\n\n**Not hidden from a screen reader, though the mapping it draws is a colour\none.** The argument for hiding it is real: the colours mean nothing to a\nreader who cannot see them, and the names are already in the table. It stays\nbecause the cost of being wrong runs one way. A duplicated list of three\nwords is noise; a consumer who took the table out of the accessibility tree\nand then found the legend hidden too has a chart nobody can read, and neither\ndecision announces itself.",
+          "name": "HelixBaseChartLegend",
+          "cssParts": [
+            {
+              "description": "One name and its swatch.",
+              "name": "entry"
+            },
+            {
+              "description": "The list itself.",
+              "name": "list"
+            },
+            {
+              "description": "One series name.",
+              "name": "name"
+            },
+            {
+              "description": "The colour a series is drawn in.",
+              "name": "swatch"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "'categories' | 'series' | undefined"
+              },
+              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
+              "attribute": "entries",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "attribute": "for"
+            },
+            {
+              "kind": "field",
+              "name": "#observer",
+              "privacy": "private",
+              "type": {
+                "text": "MutationObserver | undefined"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#table",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLTableElement | null"
+                }
+              },
+              "description": "The table `for` names, or null where there is no document to ask."
+            },
+            {
+              "kind": "method",
+              "name": "#names",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "description": "The names, in the order the chart will draw them."
+            },
+            {
+              "kind": "method",
+              "name": "#watch",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Follows the table, so an update to the numbers reaches the names.\n\nA row added or a header renamed changes what this list should say, and the\npage has no reason to know a legend is reading it. `characterData` as well\nas `childList`, because renaming a series edits a text node in place rather\nthan replacing the cell.\n\nGuarded on the constructor rather than on the environment, since this runs\nfrom `connectedCallback` and from `willUpdate`, and only the first of those\nis client-only."
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true,
+              "description": "The element's semantics, set without touching the DOM.\n\n`ElementInternals` sets the implicit role, which an author's own `role`\nattribute still overrides, and it writes no attribute. Setting `role` on the\nhost directly would: that is an attribute the element gives itself after it\nupgrades, which a React consumer's server markup never had, and hydration\nreports it as a mismatch.\n\nAvailable during server rendering. Lit's shim implements `attachInternals`,\nso nothing here needs a guard.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "relayNativeEvent",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "init",
+                  "optional": true,
+                  "type": {
+                    "text": "EventInit"
+                  }
+                }
+              ],
+              "description": "Re-emits a native event from the host, under its own name.\n\nA native event fired by an inner `<input>` or `<textarea>` is not composed,\nso it stops at the shadow boundary and a consumer listening on\n`<helix-input>` hears nothing. Re-dispatching it from the host is what\nmakes the component behave like the control it wraps.\n\nThe relayed event keeps the native name deliberately. `change` is `change`,\nwhich is what a consumer already knows to listen for, and it is what\nreaches React: its synthetic system claims `onChange` and wires it to that\nname, so a prefixed one would never arrive.\n\n`composed` is not forced. It defaults to the original event's own value, so\na relayed `change` stops at the next shadow boundary exactly as a native\none would. Pass it explicitly only where escaping is the intent, and say so\nwhere you do.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "finalizeStyles",
+              "privacy": "protected",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "CSSResultOrNative[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "styles",
+                  "optional": true,
+                  "type": {
+                    "text": "CSSResultOrNative | CSSResultOrNative[]"
+                  }
+                }
+              ],
+              "description": "Prepends the shadow-root reset to every subclass's styles, so no component\nhas to remember to include it.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "entries",
+              "type": {
+                "text": "'categories' | 'series' | undefined"
+              },
+              "description": "Which way to read the table.\n\nAbsent is `series`, one entry per data column. `categories` reads one entry\nper body row instead, for a donut, whose slices are the rows.",
+              "fieldName": "entries"
+            },
+            {
+              "name": "for",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The id of the table to take the names from.\n\nResolved through `getRootNode()`, so a legend inside another component's\nshadow root names a table in that root rather than in the document.\n\n**In React this arrives as a property and not as an attribute**, the way\n`Tooltip.for` does, so it does not reflect and nothing styles on it.",
+              "fieldName": "for"
+            }
+          ],
+          "superclass": {
+            "name": "HelixElement",
+            "package": "@helix-io/core"
+          },
+          "summary": "The names a chart draws, each beside the colour it is drawn in.",
+          "helix": {
+            "category": "content",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/chart-legend",
+            "aliases": [
+              "Key",
+              "Series Key"
+            ],
+            "tier": "headless",
+            "group": "BaseChartLegend",
+            "part": "Root",
+            "source": "helix/headless/src/chart-legend"
+          },
+          "tagName": "helix-base-chart-legend",
+          "customElement": true,
+          "modulePath": "src/chart-legend/root/chart-legend-root.ts",
+          "definitionPath": "src/chart-legend/root/chart-legend-root.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBaseChartLegend",
+          "declaration": {
+            "name": "HelixBaseChartLegend",
+            "module": "src/chart-legend/root/chart-legend-root.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "helix-base-chart-legend",
+          "declaration": {
+            "name": "HelixBaseChartLegend",
+            "module": "src/chart-legend/root/chart-legend-root.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/checkbox-group/index.ts",
       "declarations": [],
       "exports": [
@@ -4233,7 +4469,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -5113,7 +5349,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -6664,7 +6900,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -7784,7 +8020,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -9093,7 +9329,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -10370,7 +10606,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -11630,7 +11866,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -12786,7 +13022,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -15801,7 +16037,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -16499,7 +16735,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -17303,6 +17539,14 @@
           "declaration": {
             "name": "*",
             "module": "src/carousel/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/chart-legend/index.js"
           }
         },
         {
@@ -18582,7 +18826,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -20528,7 +20772,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -24430,7 +24674,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -27749,7 +27993,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -29874,7 +30118,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -31200,7 +31444,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -32578,7 +32822,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -33833,7 +34077,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -37352,7 +37596,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -40377,7 +40621,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -41706,7 +41950,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -42832,7 +43076,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"
@@ -44771,7 +45015,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed.",
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing.",
               "inheritedFrom": {
                 "name": "HelixFormElement",
                 "module": "src/helix-form-element/helix-form-element.ts"

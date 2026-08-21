@@ -15,6 +15,7 @@ import type {
   HelixCallout,
   HelixCard,
   HelixCarousel,
+  HelixChartLegend,
   HelixCheckboxGroup,
   HelixCheckbox,
   HelixCodeBlock,
@@ -919,6 +920,24 @@ export type HelixCarouselVueEvents = {
   /** Fired when the slide in view changes, with its index. */
   "helix-select": HelixCarouselHelixSelectElementEvent;
 };
+
+export type HelixChartLegendVueProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  entries?: HelixChartLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixChartLegend["for"];
+};
+
+export type HelixChartLegendVueEvents = {};
 
 /** `HelixCheckboxGroup` component event */
 export type HelixCheckboxGroupElementEvent<E = Event> = TypedEvent<
@@ -6573,6 +6592,12 @@ export type CustomCssProperties = {
   "--carousel-block-size"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
+  /** `row`, which wraps, or `column`. */
+  "--chart-legend-direction"?: string;
+  /** Space between entries. */
+  "--chart-legend-gap"?: string;
+  /** Size of the colour patch. */
+  "--chart-legend-swatch-size"?: string;
   /** Space between the boxes. */
   "--checkbox-group-gap"?: string;
   /** Width and height of the box. */
@@ -7112,6 +7137,12 @@ export interface WcToolkitVueGlobalComponents {
     HelixCarousel,
     HelixCarouselVueProps,
     HelixCarouselVueEvents
+  >;
+  /** A row that wraps, because a legend sits under a chart as wide as the chart and there is no arrangement of eight names that fits every width. Set '--chart-legend-direction' to 'column' where it sits beside one instead.  The eight series colours are mapped here rather than in the tier below, which carries the index and holds no tokens. Written as eight rules for the reason 'Avatar.Group' writes twelve: an index in markup cannot select a token, and a custom property set inline would be the headless tier naming a colour. */
+  "helix-chart-legend": DefineCustomElement<
+    HelixChartLegend,
+    HelixChartLegendVueProps,
+    HelixChartLegendVueEvents
   >;
   /** A column by default, which is what a list of choices wants: the eye scans one line per answer rather than hunting along a row. */
   "helix-checkbox-group": DefineCustomElement<

@@ -16,6 +16,7 @@ import type {
   HelixBaseCallout,
   HelixBaseCard,
   HelixBaseCarousel,
+  HelixBaseChartLegend,
   HelixBaseCheckbox,
   HelixBaseCheckboxGroup,
   HelixBaseCode,
@@ -1056,6 +1057,43 @@ want. */
   "prop:interval"?: HelixBaseCarousel["interval"];
   /** Fired when the slide in view changes, with its index. */
   "on:helix-select"?: (e: HelixBaseCarouselHelixSelectElementEvent) => void;
+
+  /** Set the innerHTML of the element */
+  innerHTML?: string;
+  /** Set the textContent of the element */
+  textContent?: string | number;
+};
+
+export type HelixBaseChartLegendProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  entries?: HelixBaseChartLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  for?: HelixBaseChartLegend["for"];
+};
+
+export type HelixBaseChartLegendSolidJsProps = {
+  /** Which way to read the table.
+
+Absent is `series`, one entry per data column. `categories` reads one entry
+per body row instead, for a donut, whose slices are the rows. */
+  "prop:entries"?: HelixBaseChartLegend["entries"];
+  /** The id of the table to take the names from.
+
+Resolved through `getRootNode()`, so a legend inside another component's
+shadow root names a table in that root rather than in the document.
+
+**In React this arrives as a property and not as an attribute**, the way
+`Tooltip.for` does, so it does not reflect and nothing styles on it. */
+  "prop:for"?: HelixBaseChartLegend["for"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11682,6 +11720,38 @@ export type CustomElements = {
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -11848,6 +11918,65 @@ export type CustomElements = {
   > & HelixBaseCarouselControlled;
 
   /**
+   * A legend is a list, so it is a list: not part of a chart, and shared by
+   * whichever of them needs one. It takes its entries from the same table the
+   * chart reads, through `for`, so the two cannot disagree about how many series
+   * there are or what they are called.
+   *
+   * `entries` picks which way to read that table, and the two ways are the two
+   * shapes a chart comes in. `series` is one entry per data column, named by the
+   * header row, which is a line or a bar chart. `categories` is one entry per
+   * body row, named by its row header, which is a donut: its slices are the rows,
+   * and it has no axis to write their names along.
+   *
+   * **The table is resolved on the client and there is no server pass.** `for` is
+   * an id and resolving it wants a document, which the server render does not
+   * have, so a legend ships empty and fills in on hydration. The table itself is
+   * ordinary markup and is served whole, so nothing is missing from the page
+   * before then, only from this list.
+   *
+   * The table is watched, because a legend that goes stale when its data changes
+   * is a legend that has to be told, and nothing else in the page would know to
+   * tell it.
+   *
+   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * reader who cannot see them, and the names are already in the table. It stays
+   * because the cost of being wrong runs one way. A duplicated list of three
+   * words is noise; a consumer who took the table out of the accessibility tree
+   * and then found the legend hidden too has a chart nobody can read, and neither
+   * decision announces itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `entries`: Which way to read the table.
+   *
+   * Absent is `series`, one entry per data column. `categories` reads one entry
+   * per body row instead, for a donut, whose slices are the rows.
+   * - `for`: The id of the table to take the names from.
+   *
+   * Resolved through `getRootNode()`, so a legend inside another component's
+   * shadow root names a table in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One name and its swatch.
+   * - `list`: The list itself.
+   * - `name`: One series name.
+   * - `swatch`: The colour a series is drawn in.
+   */
+  "helix-base-chart-legend": Partial<
+    HelixBaseChartLegendProps & BaseProps<HelixBaseChartLegend> & BaseEvents
+  >;
+
+  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -11930,6 +12059,38 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -12068,6 +12229,38 @@ export type CustomElements = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -12338,6 +12531,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -12494,6 +12719,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -12723,6 +12980,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -12971,6 +13260,38 @@ export type CustomElements = {
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -13190,6 +13511,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -13337,6 +13690,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -13914,6 +14299,38 @@ export type CustomElements = {
    * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -14036,6 +14453,38 @@ export type CustomElements = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -14336,6 +14785,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -14668,6 +15149,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -15413,6 +15926,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -16066,6 +16611,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -16478,6 +17055,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -16683,6 +17292,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -16921,6 +17562,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -17125,6 +17798,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -17867,6 +18572,38 @@ export type CustomElements = {
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18380,6 +19117,38 @@ export type CustomElements = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -18567,6 +19336,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -18760,6 +19561,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -19159,6 +19992,38 @@ export type CustomElements = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -20950,6 +21815,38 @@ export type CustomElementsSolidJs = {
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -21128,6 +22025,68 @@ export type CustomElementsSolidJs = {
   > & HelixBaseCarouselControlledSolidJs;
 
   /**
+   * A legend is a list, so it is a list: not part of a chart, and shared by
+   * whichever of them needs one. It takes its entries from the same table the
+   * chart reads, through `for`, so the two cannot disagree about how many series
+   * there are or what they are called.
+   *
+   * `entries` picks which way to read that table, and the two ways are the two
+   * shapes a chart comes in. `series` is one entry per data column, named by the
+   * header row, which is a line or a bar chart. `categories` is one entry per
+   * body row, named by its row header, which is a donut: its slices are the rows,
+   * and it has no axis to write their names along.
+   *
+   * **The table is resolved on the client and there is no server pass.** `for` is
+   * an id and resolving it wants a document, which the server render does not
+   * have, so a legend ships empty and fills in on hydration. The table itself is
+   * ordinary markup and is served whole, so nothing is missing from the page
+   * before then, only from this list.
+   *
+   * The table is watched, because a legend that goes stale when its data changes
+   * is a legend that has to be told, and nothing else in the page would know to
+   * tell it.
+   *
+   * **Not hidden from a screen reader, though the mapping it draws is a colour
+   * one.** The argument for hiding it is real: the colours mean nothing to a
+   * reader who cannot see them, and the names are already in the table. It stays
+   * because the cost of being wrong runs one way. A duplicated list of three
+   * words is noise; a consumer who took the table out of the accessibility tree
+   * and then found the legend hidden too has a chart nobody can read, and neither
+   * decision announces itself.
+   *
+   * ## Attributes & Properties
+   *
+   * Component attributes and properties that can be applied to the element or by using JavaScript.
+   *
+   * - `entries`: Which way to read the table.
+   *
+   * Absent is `series`, one entry per data column. `categories` reads one entry
+   * per body row instead, for a donut, whose slices are the rows.
+   * - `for`: The id of the table to take the names from.
+   *
+   * Resolved through `getRootNode()`, so a legend inside another component's
+   * shadow root names a table in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   *
+   * ## CSS Parts
+   *
+   * Custom selectors for styling elements within the component.
+   *
+   * - `entry`: One name and its swatch.
+   * - `list`: The list itself.
+   * - `name`: One series name.
+   * - `swatch`: The colour a series is drawn in.
+   */
+  "helix-base-chart-legend": Partial<
+    HelixBaseChartLegendProps &
+      HelixBaseChartLegendSolidJsProps &
+      BaseProps<HelixBaseChartLegend> &
+      BaseEvents
+  >;
+
+  /**
    * The host is the group, so `role="group"` sits on it through internals and
    * `label` names it. A run of checkboxes with no name is announced as separate
    * controls, which is what the grouping exists to say it is not.
@@ -21210,6 +22169,38 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -21351,6 +22342,38 @@ export type CustomElementsSolidJs = {
    * clearing `checked` alone only leaves controlled mode. The value the
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -21630,6 +22653,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -21789,6 +22844,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -22021,6 +23108,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -22275,6 +23394,38 @@ export type CustomElementsSolidJs = {
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -22497,6 +23648,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -22647,6 +23830,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -23245,6 +24460,38 @@ export type CustomElementsSolidJs = {
    * - `formResetCallback() => void`: Empties it, which is what a form reset means for a file input.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -23370,6 +24617,38 @@ export type CustomElementsSolidJs = {
    * Methods that can be called to access component functionality.
    *
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -23679,6 +24958,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -24023,6 +25334,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -24789,6 +26132,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -25459,6 +26834,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -25886,6 +27293,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -26097,6 +27536,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -26341,6 +27812,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -26551,6 +28054,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -27317,6 +28852,38 @@ export type CustomElementsSolidJs = {
    * element has been keeping lives here, so this is where it is dropped.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -27857,6 +29424,38 @@ export type CustomElementsSolidJs = {
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
    *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
+   *
    * ## CSS Parts
    *
    * Custom selectors for styling elements within the component.
@@ -28047,6 +29646,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -28243,6 +29874,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *
@@ -28657,6 +30320,38 @@ export type CustomElementsSolidJs = {
    * with no state is a form the browser has nothing recorded for, which is
    * the same situation as a fresh one.
    * - `formDisabledCallback(disabled: boolean) => void`: The platform's notice that an ancestor fieldset changed.
+   *
+   * **The argument is the effective state, and taking it whole is what latched
+   * every control in the library.** The platform calls this for the element's
+   * own `disabled` as well as for a fieldset, and our own arrives here at the
+   * worst possible moment: reflecting `disabled` to the attribute happens
+   * inside Lit's `update()`, the UA fires this synchronously from that write,
+   * and a reactive write during an update is a change-in-update Lit does not
+   * re-render for. So `formDisabled` ran exactly one update behind forever.
+   *
+   * Measured on Slider, logging what `render` saw:
+   *
+   * ```
+   * set true    disabled true   formDisabled false  isDisabled true
+   * set false   disabled false  formDisabled true   isDisabled true   <- stale
+   * (no third render)
+   * ```
+   *
+   * The host came out right every time, `disabled` false, `:disabled` not
+   * matching, and the inner control kept the attribute, so a control disabled
+   * once could never be re-enabled. It only shows when something re-enables,
+   * which is the same shape of bug `inheritDisabled` was written for.
+   *
+   * Our own half is already in `this.disabled` and `isDisabled` is an or, so
+   * this records only what the fieldset adds. That also removes the write
+   * entirely on the own-disabled path rather than moving it.
+   *
+   * The one case this cannot see is a control that is disabled itself *and*
+   * inside a disabled fieldset, whose own `disabled` is then removed: the
+   * effective state does not change, so the platform does not call again, and
+   * the fieldset's hold is not recorded. There is no callback to learn it from
+   * and reading `:disabled` here would answer about the attribute we are in the
+   * middle of removing.
    *
    * ## CSS Parts
    *

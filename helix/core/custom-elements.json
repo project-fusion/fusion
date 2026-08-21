@@ -2135,7 +2135,7 @@
                   }
                 }
               ],
-              "description": "The platform's notice that an ancestor fieldset changed."
+              "description": "The platform's notice that an ancestor fieldset changed.\n\n**The argument is the effective state, and taking it whole is what latched\nevery control in the library.** The platform calls this for the element's\nown `disabled` as well as for a fieldset, and our own arrives here at the\nworst possible moment: reflecting `disabled` to the attribute happens\ninside Lit's `update()`, the UA fires this synchronously from that write,\nand a reactive write during an update is a change-in-update Lit does not\nre-render for. So `formDisabled` ran exactly one update behind forever.\n\nMeasured on Slider, logging what `render` saw:\n\n```\nset true    disabled true   formDisabled false  isDisabled true\nset false   disabled false  formDisabled true   isDisabled true   <- stale\n(no third render)\n```\n\nThe host came out right every time, `disabled` false, `:disabled` not\nmatching, and the inner control kept the attribute, so a control disabled\nonce could never be re-enabled. It only shows when something re-enables,\nwhich is the same shape of bug `inheritDisabled` was written for.\n\nOur own half is already in `this.disabled` and `isDisabled` is an or, so\nthis records only what the fieldset adds. That also removes the write\nentirely on the own-disabled path rather than moving it.\n\nThe one case this cannot see is a control that is disabled itself *and*\ninside a disabled fieldset, whose own `disabled` is then removed: the\neffective state does not change, so the platform does not call again, and\nthe fieldset's hold is not recorded. There is no callback to learn it from\nand reading `:disabled` here would answer about the attribute we are in the\nmiddle of removing."
             },
             {
               "kind": "field",
@@ -3012,6 +3012,30 @@
           "declaration": {
             "name": "onUnlessFalse",
             "module": "./utils/on-unless-false/on-unless-false.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "readSeries",
+          "declaration": {
+            "name": "readSeries",
+            "module": "./utils/read-series/read-series.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Series",
+          "declaration": {
+            "name": "Series",
+            "module": "./utils/read-series/read-series.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SeriesPoint",
+          "declaration": {
+            "name": "SeriesPoint",
+            "module": "./utils/read-series/read-series.js"
           }
         },
         {
@@ -5224,6 +5248,40 @@
           "declaration": {
             "name": "onUnlessFalse",
             "module": "src/utils/on-unless-false/on-unless-false.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils/read-series/read-series.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "readSeries",
+          "return": {
+            "type": {
+              "text": "Series[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "table",
+              "type": {
+                "text": "HTMLTableElement"
+              }
+            }
+          ],
+          "description": "Reads a table as series, one per data column.\n\n**The table is the chart's accessible representation, not a fallback for\none.** Every chart here takes its numbers from real markup rather than from a\nproperty, so the page is readable with no script at all, sortable by anything\nthat sorts tables, and correct in a screen reader without a parallel\ndescription that has to be kept in step by hand. A `values` array would be\neasier to pass and would make the accessible version the thing nobody\nmaintains.\n\nThe shape is the ordinary one: a header row naming the series, a first column\nof row headers, and numbers in the rest. A single-column table has one series\nand takes its name from the caption, since a header row of one is usually\nabsent.\n\n`data-value` wins over the cell's text, because `$1.2k` is what a reader\nshould see and is not a number. `Number()` rather than `parseFloat`, because\nthe second reads `12abc` as 12: a value that is nearly a number is a mistake\nworth dropping rather than rounding off, and a dropped point is visible where\na silently truncated one is not."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "readSeries",
+          "declaration": {
+            "name": "readSeries",
+            "module": "src/utils/read-series/read-series.ts"
           }
         }
       ]

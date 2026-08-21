@@ -22,6 +22,7 @@ declare module 'svelte/elements' {
     'helix-base-callout': CustomElements['helix-base-callout']
     'helix-base-card': CustomElements['helix-base-card']
     'helix-base-carousel': CustomElements['helix-base-carousel']
+    'helix-base-chart-legend': CustomElements['helix-base-chart-legend']
     'helix-base-checkbox-group': CustomElements['helix-base-checkbox-group']
     'helix-base-checkbox': CustomElements['helix-base-checkbox']
     'helix-base-code-block': CustomElements['helix-base-code-block']

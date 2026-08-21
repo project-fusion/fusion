@@ -17,6 +17,40 @@ export const registerDom = (): void => {
   registered = true
   GlobalRegistrator.register()
   shimElementInternals()
+  shimTableSections()
+}
+
+/**
+ * Fills in `HTMLTableSectionElement.rows`, which happy-dom does not implement.
+ *
+ * Measured rather than assumed: of the table DOM, happy-dom gives `caption`,
+ * `tHead`, `tBodies`, `table.rows` and `tr.cells`, and inserts the implied
+ * `<tbody>` the way a parser must. `section.rows` is the one hole, so
+ * `table.tBodies[0].rows` reads `undefined` and indexing it throws.
+ *
+ * The gap belongs to the double, so the fix does too. `readSeries` reads a
+ * table through the table's own API because that is the API a table has, and a
+ * `querySelectorAll` rewritten around a missing shim would be production code
+ * made defensive about a capability every browser ships.
+ *
+ * Indexing and iteration are modelled and liveness is not: this returns an
+ * array where the platform returns a live `HTMLCollection`. Every caller
+ * spreads it or reads an index, and a spec that needs a collection which
+ * updates under it wants a real browser.
+ */
+const shimTableSections = (): void => {
+  const prototype = globalThis.HTMLTableSectionElement?.prototype
+  if (!prototype || 'rows' in prototype) {
+    return
+  }
+  Object.defineProperty(prototype, 'rows', {
+    configurable: true,
+    get(this: HTMLElement): HTMLTableRowElement[] {
+      return [...this.children].filter(
+        (child): child is HTMLTableRowElement => child.tagName === 'TR',
+      )
+    },
+  })
 }
 
 /**

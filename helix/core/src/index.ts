@@ -129,6 +129,7 @@ export {
   inheritDisabled,
 } from './utils/inherit-disabled/inherit-disabled.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { readSeries, type Series, type SeriesPoint } from './utils/read-series/read-series.js'
 export {
   type ControlledChangeOptions,
   requestControlledChange,

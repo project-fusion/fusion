@@ -263,8 +263,18 @@
    * is the only way to get sRGB out of these: `getComputedStyle` returns
    * `oklch(...)` verbatim in Chrome, and reading those three numbers as if they
    * were RGB is how the first three attempts at this produced contrast figures
-   * that meant nothing at all. Lowest against the surface is 3.45 in the light
-   * and 7.29 in the dark, so every series clears 3:1 for a graphic.
+   * that meant nothing at all.
+   *
+   * Against all three surface tokens, since a chart sits on whichever one its
+   * card uses. Worst of the eight, per ground:
+   *
+   *   light   surface 3.30   raised 3.16   sunken 3.08
+   *   dark    surface 6.16   raised 4.92   sunken 6.83
+   *
+   * So every series clears the 3:1 a graphic needs, and the light end clears it
+   * by very little. This first read 3.45, measured against `surface` alone and
+   * reported as though it were the number: the figure was right and the claim
+   * around it was one ground wide. 3.08 is the one to design against.
    *
    * The weakest pair under deuteranopia is 1 and 8 in the light, and they are
    * closer than is comfortable. Eight series is already more than a chart

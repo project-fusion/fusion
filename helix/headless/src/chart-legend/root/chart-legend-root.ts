@@ -1,0 +1,169 @@
+import { customElement, HelixElement, readSeries } from '@helix-io/core'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
+
+/** How many colours the series palette has, and so where it starts over. */
+const PALETTE = 8
+
+/**
+ * @summary The names a chart draws, each beside the colour it is drawn in.
+ *
+ * @description
+ * A legend is a list, so it is a list: not part of a chart, and shared by
+ * whichever of them needs one. It takes its entries from the same table the
+ * chart reads, through `for`, so the two cannot disagree about how many series
+ * there are or what they are called.
+ *
+ * `entries` picks which way to read that table, and the two ways are the two
+ * shapes a chart comes in. `series` is one entry per data column, named by the
+ * header row, which is a line or a bar chart. `categories` is one entry per
+ * body row, named by its row header, which is a donut: its slices are the rows,
+ * and it has no axis to write their names along.
+ *
+ * **The table is resolved on the client and there is no server pass.** `for` is
+ * an id and resolving it wants a document, which the server render does not
+ * have, so a legend ships empty and fills in on hydration. The table itself is
+ * ordinary markup and is served whole, so nothing is missing from the page
+ * before then, only from this list.
+ *
+ * The table is watched, because a legend that goes stale when its data changes
+ * is a legend that has to be told, and nothing else in the page would know to
+ * tell it.
+ *
+ * **Not hidden from a screen reader, though the mapping it draws is a colour
+ * one.** The argument for hiding it is real: the colours mean nothing to a
+ * reader who cannot see them, and the names are already in the table. It stays
+ * because the cost of being wrong runs one way. A duplicated list of three
+ * words is noise; a consumer who took the table out of the accessibility tree
+ * and then found the legend hidden too has a chart nobody can read, and neither
+ * decision announces itself.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category content
+ * @aliases Key, Series Key
+ * @documentation https://helix.fusion.dev/components/chart-legend
+ *
+ * @csspart entry - One name and its swatch.
+ * @csspart list - The list itself.
+ * @csspart name - One series name.
+ * @csspart swatch - The colour a series is drawn in.
+ */
+@customElement('helix-base-chart-legend')
+export class HelixBaseChartLegend extends HelixElement {
+  /**
+   * Which way to read the table.
+   *
+   * Absent is `series`, one entry per data column. `categories` reads one entry
+   * per body row instead, for a donut, whose slices are the rows.
+   */
+  @property({ reflect: true })
+  entries?: 'categories' | 'series'
+
+  /**
+   * The id of the table to take the names from.
+   *
+   * Resolved through `getRootNode()`, so a legend inside another component's
+   * shadow root names a table in that root rather than in the document.
+   *
+   * **In React this arrives as a property and not as an attribute**, the way
+   * `Tooltip.for` does, so it does not reflect and nothing styles on it.
+   */
+  @property()
+  for = ''
+
+  #observer: MutationObserver | undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.#watch()
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.#observer?.disconnect()
+    this.#observer = undefined
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has('for')) {
+      this.#watch()
+    }
+  }
+
+  /** The table `for` names, or null where there is no document to ask. */
+  #table(): HTMLTableElement | null {
+    if (this.for === '') {
+      return null
+    }
+    const root = this.getRootNode() as Document | ShadowRoot
+    const found = root.getElementById?.(this.for)
+    /* `tagName` rather than `instanceof HTMLTableElement`, which is not a
+       guard on the server: the constructor is not defined there, so naming it
+       throws before the comparison can answer false. It is also the check that
+       survives a table from another document. */
+    return found?.tagName === 'TABLE' ? (found as HTMLTableElement) : null
+  }
+
+  /** The names, in the order the chart will draw them. */
+  #names(): string[] {
+    const table = this.#table()
+    if (!table) {
+      return []
+    }
+    const series = readSeries(table)
+    return this.entries === 'categories'
+      ? (series[0]?.points.map((point) => point.label) ?? [])
+      : series.map((one) => one.name)
+  }
+
+  /**
+   * Follows the table, so an update to the numbers reaches the names.
+   *
+   * A row added or a header renamed changes what this list should say, and the
+   * page has no reason to know a legend is reading it. `characterData` as well
+   * as `childList`, because renaming a series edits a text node in place rather
+   * than replacing the cell.
+   *
+   * Guarded on the constructor rather than on the environment, since this runs
+   * from `connectedCallback` and from `willUpdate`, and only the first of those
+   * is client-only.
+   */
+  #watch(): void {
+    this.#observer?.disconnect()
+    const table = this.#table()
+    if (!table || typeof MutationObserver === 'undefined') {
+      return
+    }
+    this.#observer ??= new MutationObserver(() => {
+      this.requestUpdate()
+    })
+    this.#observer.observe(table, { characterData: true, childList: true, subtree: true })
+  }
+
+  protected override render(): TemplateResult {
+    /* The index rather than the colour, because a colour is a token and the
+       headless tier holds none. The styled tier maps one to the other, and it
+       starts over after eight: a ninth series takes the first colour again,
+       which is a collision, and a chart with nine series has a worse problem
+       than the palette does. */
+    return html`<ul part="list" role="list">
+      ${this.#names().map(
+        (name, index) => html`<li
+          data-series=${(index % PALETTE) + 1}
+          part="entry"
+          role="listitem"
+        >
+          <span aria-hidden="true" part="swatch"></span>
+          <span part="name">${name}</span>
+        </li>`,
+      )}
+    </ul>`
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'helix-base-chart-legend': HelixBaseChartLegend
+  }
+}
