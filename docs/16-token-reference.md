@@ -41,7 +41,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 189 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 153 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 155 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 6 |
@@ -54,14 +54,14 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-syntax-name` | `light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )` | 4 |
 | `--helix-color-syntax-string` | `light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )` | 1 |
 | `--helix-color-syntax-tag` | `light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )` | 3 |
-| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1))) )` | 5 |
-| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2))) )` | 3 |
-| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3))) )` | 3 |
-| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4))) )` | 3 |
-| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-5))) )` | 3 |
-| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-6))) )` | 3 |
-| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-7))) )` | 3 |
-| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-8))) )` | 3 |
+| `--helix-color-series-1` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.17 calc(h + var(--_helix-series-hue-1))), oklch(from var(--_helix-seed-brand) 0.7 0.158 calc(h + var(--_helix-series-hue-1))) )` | 5 |
+| `--helix-color-series-2` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.17 calc(h + var(--_helix-series-hue-2))), oklch(from var(--_helix-seed-brand) 0.78 0.129 calc(h + var(--_helix-series-hue-2))) )` | 3 |
+| `--helix-color-series-3` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.105 calc(h + var(--_helix-series-hue-3))), oklch(from var(--_helix-seed-brand) 0.7 0.141 calc(h + var(--_helix-series-hue-3))) )` | 3 |
+| `--helix-color-series-4` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.17 calc(h + var(--_helix-series-hue-4))), oklch(from var(--_helix-seed-brand) 0.78 0.136 calc(h + var(--_helix-series-hue-4))) )` | 3 |
+| `--helix-color-series-5` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.108 calc(h + var(--_helix-series-hue-5))), oklch(from var(--_helix-seed-brand) 0.7 0.146 calc(h + var(--_helix-series-hue-5))) )` | 3 |
+| `--helix-color-series-6` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.105 calc(h + var(--_helix-series-hue-6))), oklch(from var(--_helix-seed-brand) 0.78 0.136 calc(h + var(--_helix-series-hue-6))) )` | 3 |
+| `--helix-color-series-7` | `light-dark( oklch(from var(--_helix-seed-brand) 0.52 0.17 calc(h + var(--_helix-series-hue-7))), oklch(from var(--_helix-seed-brand) 0.7 0.16 calc(h + var(--_helix-series-hue-7))) )` | 3 |
+| `--helix-color-series-8` | `light-dark( oklch(from var(--_helix-seed-brand) 0.6 0.147 calc(h + var(--_helix-series-hue-8))), oklch(from var(--_helix-seed-brand) 0.78 0.16 calc(h + var(--_helix-series-hue-8))) )` | 3 |
 | `--helix-color-info` | `light-dark(var(--_helix-info-500), var(--_helix-info-400))` | 8 |
 | `--helix-color-success` | `light-dark(var(--_helix-success-500), var(--_helix-success-400))` | 29 |
 | `--helix-color-warning` | `light-dark(var(--_helix-warning-500), var(--_helix-warning-400))` | 22 |
@@ -158,7 +158,7 @@ Widths for a rule or an outline.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-border-thin` | `1px` | 208 |
-| `--helix-border-thick` | `2px` | 59 |
+| `--helix-border-thick` | `2px` | 61 |
 
 ## shadow
 

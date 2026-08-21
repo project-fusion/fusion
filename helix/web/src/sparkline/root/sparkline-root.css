@@ -91,5 +91,15 @@
 }
 
 :host([appearance="area"]) [part="wash-start"] {
-  stop-opacity: var(--sparkline-area-opacity, 0.32);
+  stop-opacity: var(--sparkline-area-opacity, 0.45);
+}
+
+/* The far stop does not reach nothing.
+ *
+ * At zero the ramp had spent itself well before the floor and the lower half of
+ * the region was doing no work: the fill read as a smudge under the peak rather
+ * than as a filled area. Holding a tenth at the bottom keeps the whole region
+ * present and still lets the top read as the denser end. */
+:host([appearance="area"]) [part="wash-end"] {
+  stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 4);
 }

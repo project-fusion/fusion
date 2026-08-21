@@ -256,8 +256,26 @@
    * 1.00 and 1.04 contrast for two of the eight, so each mode states a band
    * that clears the surface and the steps alternate inside it.
    *
-   * Chroma is dropped slightly in the dark, where the same figure reads hotter
-   * against a dark ground.
+   * **Chroma is written per series, and the eight differ because sRGB is not
+   * chroma-uniform.** One number for all eight was the first version and it was
+   * a claim the file could not keep: every light series said 0.16, and 5
+   * painted 0.108, 8 painted 0.121 and 4 painted 0.125, because that chroma is
+   * outside sRGB at those hues and the browser maps it quietly back in. The
+   * file said one thing and the screen showed another, with nothing anywhere
+   * saying so.
+   *
+   * So each is the most its own hue can hold at its own lightness, capped at
+   * 0.17 in the light and 0.16 in the dark so the magenta, which could take
+   * 0.296, does not shout down the cyan, which cannot exceed 0.105. Cyan,
+   * teal and yellow-green are the three that sRGB will not let be vivid at
+   * these lightnesses, and they are duller by that much and by no more.
+   *
+   * **A themed seed moves the hues, so these ceilings are exact for the seed
+   * that ships and approximate for any other.** A brand colour rotated far
+   * enough could push one series back outside the gamut, where the browser maps
+   * it in as before. That is the cost of deriving a chart palette from one
+   * colour, it is bounded and it degrades quietly rather than breaking, and it
+   * is worth saying out loud rather than discovering.
    *
    * Measured by painting each into a canvas and reading the pixel back, which
    * is the only way to get sRGB out of these: `getComputedStyle` returns
@@ -283,36 +301,36 @@
    * distinguishable needs shape or label as well as colour, whatever the
    * palette does. */
   --helix-color-series-1: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-1))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-1)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.17 calc(h + var(--_helix-series-hue-1))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.158 calc(h + var(--_helix-series-hue-1)))
   );
   --helix-color-series-2: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-2))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-2)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.17 calc(h + var(--_helix-series-hue-2))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.129 calc(h + var(--_helix-series-hue-2)))
   );
   --helix-color-series-3: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-3))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-3)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.105 calc(h + var(--_helix-series-hue-3))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.141 calc(h + var(--_helix-series-hue-3)))
   );
   --helix-color-series-4: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-4))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-4)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.17 calc(h + var(--_helix-series-hue-4))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.136 calc(h + var(--_helix-series-hue-4)))
   );
   --helix-color-series-5: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-5))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-5)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.108 calc(h + var(--_helix-series-hue-5))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.146 calc(h + var(--_helix-series-hue-5)))
   );
   --helix-color-series-6: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-6))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-6)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.105 calc(h + var(--_helix-series-hue-6))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.136 calc(h + var(--_helix-series-hue-6)))
   );
   --helix-color-series-7: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.52 0.16 calc(h + var(--_helix-series-hue-7))),
-    oklch(from var(--_helix-seed-brand) 0.7 0.15 calc(h + var(--_helix-series-hue-7)))
+    oklch(from var(--_helix-seed-brand) 0.52 0.17 calc(h + var(--_helix-series-hue-7))),
+    oklch(from var(--_helix-seed-brand) 0.7 0.16 calc(h + var(--_helix-series-hue-7)))
   );
   --helix-color-series-8: light-dark(
-    oklch(from var(--_helix-seed-brand) 0.6 0.16 calc(h + var(--_helix-series-hue-8))),
-    oklch(from var(--_helix-seed-brand) 0.78 0.15 calc(h + var(--_helix-series-hue-8)))
+    oklch(from var(--_helix-seed-brand) 0.6 0.147 calc(h + var(--_helix-series-hue-8))),
+    oklch(from var(--_helix-seed-brand) 0.78 0.16 calc(h + var(--_helix-series-hue-8)))
   );
   --helix-color-info: light-dark(var(--_helix-info-500), var(--_helix-info-400));
   /* Both arms, like every other color here. These were single values, so a
