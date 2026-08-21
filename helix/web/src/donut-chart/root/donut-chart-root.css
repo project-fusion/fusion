@@ -124,10 +124,23 @@
 }
 
 [part="centre"] {
-  /* Centred in the plot, which it now sits inside rather than beside. */
-  inset: 0;
-  margin: auto;
+  /* Centred in the plot, which it now sits inside rather than beside.
+   *
+   * **`pointer-events: none`, and the slices stop responding without it.**
+   * `inset: 0` with `margin: auto` centres a box and also stretches it: with no
+   * block size of its own it filled the plot's height, so a transparent column
+   * lay over the middle of the ring and took every `pointerenter` the slices
+   * were listening for. The tooltip simply stopped appearing, and nothing about
+   * the drawing looked different, which is how it got shipped.
+   *
+   * Placed from the middle rather than stretched between the edges, so the box
+   * is the size of the hole and no larger, and transparent to the pointer
+   * regardless, since nothing in the middle is a target. */
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  pointer-events: none;
   position: absolute;
+  translate: -50% -50%;
 
   box-sizing: border-box;
   /* A container, so what is slotted here can be sized against the hole rather
