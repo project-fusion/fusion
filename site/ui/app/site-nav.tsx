@@ -47,6 +47,11 @@ const SECTIONS = [
  * two substrates are things you take, the services are things you buy, and the
  * rest is things you read. A flat list of five was scannable and said nothing
  * about which of them were the same kind of answer.
+ *
+ * These are the pages a route manifest could not name usefully. Everything that
+ * *is* enumerable, every component and every piece of writing, arrives as
+ * `findable` from the layout, which can read the catalog and the registry
+ * without either of them crossing into the browser.
  */
 const DESTINATIONS = [
   {
@@ -94,7 +99,13 @@ const DESTINATIONS = [
  * layout around. That is also why this component owns the header rather than
  * being slotted into one, and why the header is flat by default.
  */
-export function SiteNav() {
+/** A group of places the palette can go, as the layout hands them down. */
+export interface Findable {
+  group: string
+  items: { href: string; label: string }[]
+}
+
+export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const pathname = usePathname()
   const router = useRouter()
   const [narrow, setNarrow] = useState(false)
@@ -405,7 +416,7 @@ export function SiteNav() {
         open={findOpen}
         placeholder="Search the site"
       >
-        {DESTINATIONS.map((section) => (
+        {[...DESTINATIONS, ...findable].map((section) => (
           <helix-option-group key={section.group} label={section.group}>
             {section.items.map((one) => (
               <helix-option key={one.href} value={one.href}>

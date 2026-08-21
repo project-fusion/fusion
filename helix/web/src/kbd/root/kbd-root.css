@@ -19,7 +19,20 @@
   /* Relative to the surrounding text rather than on the type scale, because a
      key set inside a heading has to be a key-sized thing in that heading. The
      scale is absolute and cannot say "a little smaller than this". */
-  --_kbd-size: 0.75em;
+  /* **0.85, not 0.75, because the shrink compounds.**
+   *
+   * A key is drawn relative to its context so one set inside a heading is a
+   * key-sized thing in that heading, and the scale is absolute and cannot say
+   * "a little smaller than this". That is right and it is also multiplicative:
+   * in a legend already at the smallest step, three quarters of 13px is a
+   * 9.75px glyph, and an arrow at that size in the mono face is a smudge rather
+   * than a mark. Measured in a command palette's footer, which is where a key
+   * is most likely to appear and is the smallest text on the page.
+   *
+   * The box is unchanged at 1.5em, so the label grows into room it already had:
+   * at 0.85 there is still 0.325em of air above and below it. Going further
+   * crowds the box before it helps the glyph. */
+  --_kbd-size: 0.85em;
   --_kbd-height: 1.5em;
   --_kbd-inset: 0.4em;
 }
