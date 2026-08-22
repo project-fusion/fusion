@@ -406,7 +406,7 @@ export default function Home() {
                 href={`/insights/${insight.slug}`}
                 key={insight.slug}
               >
-                <helix-card appearance="outlined">
+                <helix-card appearance="elevated">
                   <InsightArt image={insight.image} slot="media" />
                   {/* The same pair the gallery's cards carry, toned the same
                       way. This one had the subject alone and no kind at all, so

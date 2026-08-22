@@ -55,7 +55,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <helix-flex class="insightShell" direction="column" gap="2xl">
-      <helix-flex align="start" class="insightHead" direction="column" gap="lg">
+      {/* **Three groups, not five evenly spaced things.**
+          
+          Every child used to sit `lg` from the next, so the way out, the
+          filing, the title, the standfirst and the byline were all the same
+          distance apart and nothing said which of them belonged together. A
+          masthead is not a list. It is a way out, then the thing you came for,
+          then the facts about it, and the spacing is what says so: `xl` between
+          the groups and `md` inside them, so the title and its standfirst read
+          as one object and the metadata reads as another. */}
+      <helix-flex align="start" class="insightHead" direction="column" gap="xl">
         {/* The way out, above everything. A reader who opened this from the
             gallery wants it before they want the filing labels.
 
@@ -77,31 +86,44 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           All insights
         </Link>
 
-        <helix-flex align="center" data-density="sm" gap="xs" wrap>
-          <helix-tag tone="primary">{insight.topic}</helix-tag>
-          <helix-tag>{insight.kind}</helix-tag>
+        {/* The title first, and the filing after the standfirst.
+            
+            The chips led before, which put two filter labels between a reader
+            and the sentence they opened the page for. They are how a piece is
+            *found*, and a reader on the page has already finished finding it,
+            so they belong with the other facts about the piece rather than
+            ahead of it. */}
+        <helix-flex align="start" direction="column" gap="md">
+          <helix-text as="h1" class="insightTitle">
+            {insight.title}
+          </helix-text>
+
+          <helix-text as="p" class="insightLede" tone="muted">
+            {insight.summary}
+          </helix-text>
         </helix-flex>
 
-        <helix-text as="h1" class="insightTitle">
-          {insight.title}
-        </helix-text>
+        <helix-flex align="start" direction="column" gap="md">
+          <helix-flex align="center" data-density="sm" gap="xs" wrap>
+            <helix-tag tone="primary">{insight.topic}</helix-tag>
+            <helix-tag>{insight.kind}</helix-tag>
+          </helix-flex>
 
-        <helix-text as="p" class="insightLede" tone="muted">
-          {insight.summary}
-        </helix-text>
-
-        {/* The byline under the title rather than beside the topic. Who wrote a
-            thing and how long it takes are the two questions a reader has once
-            they have decided the subject is theirs. */}
-        <helix-flex align="center" class="insightByline" data-density="sm" gap="sm">
-          <helix-avatar name={insight.author} size="sm"></helix-avatar>
-          <helix-text appearance="body-strong">{insight.author}</helix-text>
-          <helix-divider orientation="vertical"></helix-divider>
-          <helix-text tone="muted">
-            <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-          </helix-text>
-          <helix-divider orientation="vertical"></helix-divider>
-          <helix-text tone="muted">{insight.minutes} min read</helix-text>
+          {/* Kept at the top rather than moved to the foot of the article.
+              Who wrote a thing is a credit and could sit anywhere, but "4 min
+              read" is a decision a reader makes *before* they start, and the
+              two are one row: splitting them to move half of it is worse than
+              either place. */}
+          <helix-flex align="center" class="insightByline" data-density="sm" gap="sm">
+            <helix-avatar name={insight.author} size="sm"></helix-avatar>
+            <helix-text appearance="body-strong">{insight.author}</helix-text>
+            <helix-divider orientation="vertical"></helix-divider>
+            <helix-text tone="muted">
+              <time dateTime={insight.date}>{formatDate(insight.date)}</time>
+            </helix-text>
+            <helix-divider orientation="vertical"></helix-divider>
+            <helix-text tone="muted">{insight.minutes} min read</helix-text>
+          </helix-flex>
         </helix-flex>
       </helix-flex>
 

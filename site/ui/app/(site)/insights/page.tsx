@@ -65,7 +65,7 @@ export default async function Page({
             href={`/insights/${insight.slug}`}
             key={insight.slug}
           >
-            <helix-card appearance="outlined">
+            <helix-card appearance="elevated">
               <InsightArt image={insight.image} slot="media" />
               <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
                 {/* Both facts as tags, and toned the way the post's own page
