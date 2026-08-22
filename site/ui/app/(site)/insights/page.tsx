@@ -68,12 +68,14 @@ export default async function Page({
             <helix-card appearance="outlined">
               <InsightArt image={insight.image} slot="media" />
               <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
-                <helix-tag>{insight.topic}</helix-tag>
-                {/* Neutral and quiet. The kind is a fact about the writing, not
-                    a status, and a toned tag here would read as one. */}
-                <helix-text appearance="caption" tone="subtle">
-                  {insight.kind}
-                </helix-text>
+                {/* Both facts as tags, and toned the way the post's own page
+                    tones them: the subject carries the brand and the kind of
+                    writing stays neutral beside it. The kind was caption text
+                    here, which made the pair read as a label and a footnote
+                    rather than as two filters, and made the card disagree with
+                    the page it opens. */}
+                <helix-tag tone="primary">{insight.topic}</helix-tag>
+                <helix-tag>{insight.kind}</helix-tag>
               </helix-flex>
               <helix-flex direction="column" gap="xs">
                 <helix-text appearance="title" as="h3">

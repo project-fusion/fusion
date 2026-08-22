@@ -408,7 +408,15 @@ export default function Home() {
               >
                 <helix-card appearance="outlined">
                   <InsightArt image={insight.image} slot="media" />
-                  <helix-tag slot="header">{insight.topic}</helix-tag>
+                  {/* The same pair the gallery's cards carry, toned the same
+                      way. This one had the subject alone and no kind at all, so
+                      the two places a card appears described a post differently.
+                      A row rather than a bare tag, because there are two of
+                      them now. */}
+                  <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
+                    <helix-tag tone="primary">{insight.topic}</helix-tag>
+                    <helix-tag>{insight.kind}</helix-tag>
+                  </helix-flex>
                   <helix-flex direction="column" gap="xs">
                     <helix-text appearance="title" as="h3">
                       {insight.title}

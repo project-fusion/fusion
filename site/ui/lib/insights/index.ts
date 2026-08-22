@@ -1,8 +1,18 @@
 /**
  * What an insight is about. One per post, and the filter bar reads the set off
  * the posts rather than from a list kept beside them.
+ *
+ * **One word each, and that is a constraint rather than a preference.** These
+ * render as tags on a card, and a card in a four-column grid is around 310
+ * wide: `Design systems` measured 107 of it and did not shrink, because a tag
+ * sets `white-space: nowrap` and a flex item's `min-width: auto` holds it at
+ * its content width. A label that cannot wrap and cannot shrink is a label that
+ * eventually decides the layout. `Business` and `Design` are 71 and 62.
+ *
+ * They also read better as filters. `Design systems` names a discipline where
+ * the others name a subject, so the set was not one list.
  */
-export type Topic = 'Company' | 'Design systems' | 'Engineering' | 'Intelligence' | 'Sovereignty'
+export type Topic = 'Business' | 'Design' | 'Engineering' | 'Intelligence' | 'Sovereignty'
 
 /**
  * What kind of writing it is, which is a different question from what it is
@@ -125,7 +135,7 @@ export const INSIGHTS: Insight[] = [
     summary:
       'No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.',
     title: 'Helix ships as one open tier',
-    topic: 'Design systems',
+    topic: 'Design',
   },
   {
     author: 'Ross Sheppard',
@@ -136,7 +146,7 @@ export const INSIGHTS: Insight[] = [
     summary:
       'A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.',
     title: 'A palette from one brand color',
-    topic: 'Design systems',
+    topic: 'Design',
   },
   {
     author: 'Ross Sheppard',
@@ -147,7 +157,7 @@ export const INSIGHTS: Insight[] = [
     summary:
       'Active ships with users. Building is real work with nothing shipped. Declared is committed direction with no work started. Why we refuse to soften them.',
     title: 'Stage labels are honest',
-    topic: 'Company',
+    topic: 'Business',
   },
   {
     author: 'Ross Sheppard',
