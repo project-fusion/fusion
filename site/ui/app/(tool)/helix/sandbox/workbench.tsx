@@ -945,7 +945,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
             The name is the accessible one, so the mark beside it is decoration
             rather than a second reading of the same word. */}
-        <a data-link="quiet" href="/helix" slot="start">
+        {/* `/`, because the mark reads "Fusion". It pointed at `/helix` on the
+            reasoning that the sandbox sits under Helix and the wordmark is the
+            way up, and that is a breadcrumb's job rather than a brand mark's: a
+            lockup that says one thing and goes to another is a link nobody can
+            predict. The site's header has always sent it to `/` and this is the
+            same mark. Helix is one row down in the palette either way. */}
+        <a data-link="quiet" href="/" slot="start">
           <Wordmark />
         </a>
 
@@ -957,12 +963,17 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               A reader in the sandbox could reach nothing without going back to
               the site first, which is the request that opened #128.
 
-              No trigger button: the site's header has room for one and a tool's
-              does not, and every row of chrome here is a row taken from the
-              thing being examined. The shortcut still works, because the
-              palette listens on the document rather than on whatever has
-              focus. */}
-          <SiteFind findable={findable} trigger={false} />
+              **With its trigger, which this header refused once and should not
+              have.** The argument was chrome economy: a tool's header has no
+              room for a button the site's has room for, and the hotkey still
+              works because the palette listens on the document. `SiteFind`
+              answers that in its own comment, written for the site and just as
+              true here: a shortcut nobody is told about is a feature for
+              whoever wrote it, and the button is the only thing on the page
+              that says which keys it answers to. Hidden, the palette was
+              something you had to already know about, which is the state #128
+              set out to end rather than to move. */}
+          <SiteFind findable={findable} />
 
           {narrow && (
             <helix-button appearance="ghost" onClick={() => setRailOpen(true)}>

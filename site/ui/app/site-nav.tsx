@@ -310,7 +310,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             workbench renders too. Hidden on a narrow screen, where there is no
             keyboard to press the shortcut with and the drawer is the way
             through. */}
-        {!narrow && <SiteFind findable={findable} />}
+        {!narrow && <SiteFind findable={findable} slot="end" />}
 
         <helix-tooltip content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>

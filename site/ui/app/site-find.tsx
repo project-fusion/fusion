@@ -118,9 +118,29 @@ const ranked =
  */
 export function SiteFind({
   findable = [],
+  slot,
   trigger = true,
 }: {
   findable?: Findable[]
+  /**
+   * Which slot the trigger goes in, or `undefined` for whatever it is inside.
+   *
+   * **An assumption about the parent, made explicit after it cost a feature.**
+   * The trigger hardcoded `slot="end"`, which is right as a direct child of
+   * `helix-app-header` and wrong anywhere else: the workbench groups its
+   * end-slot items in a `helix-flex`, which has no `end` slot, so the button
+   * was unassigned and generated no box at all. Nothing threw and nothing
+   * warned, and a slot that matches nothing looks exactly like a component
+   * that decided not to render.
+   *
+   * **No default, deliberately, and the first attempt had one.** Written
+   * `slot = 'end'` the workbench could not opt out: a default parameter is
+   * what `undefined` selects, so `slot={undefined}` resolved straight back to
+   * `'end'` and the button stayed unassigned through two reloads that looked
+   * like a stale bundle. A prop whose whole job is to say where something goes
+   * should be said rather than assumed.
+   */
+  slot?: string | undefined
   trigger?: boolean
 }) {
   const router = useRouter()
@@ -168,7 +188,7 @@ export function SiteFind({
           appearance="outlined"
           class="siteFind"
           onClick={() => setOpen(true)}
-          slot="end"
+          slot={slot}
         >
           <helix-icon name="magnifying-glass" slot="start"></helix-icon>
           Search
