@@ -167,9 +167,18 @@ export class HelixAura extends HelixElement {
    * Nothing is wrong with either number and neither is what anybody asked for.
    *
    * Given as a fraction rather than a length so it survives the same change:
-   * `0.5` is the middle of the top edge at every size. Absent leaves `tilt` in
-   * charge, so an angle is still sayable where the angle really is the point,
-   * which is what an aura in a square tile wants.
+   * `0` is the left edge, `0.5` the middle and `1` the right edge, at every
+   * size. Absent leaves `tilt` in charge, so an angle is still sayable where
+   * the angle really is the point, which is what an aura in a square tile
+   * wants.
+   *
+   * **The fraction is measured across the whole width, and for a while it was
+   * not.** The first expression corrected for the aspect once in the wrong
+   * direction and never subtracted the centre, so the value read as an offset
+   * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
+   * put the axis at 81.3% of the width and `0` was the only value that reached
+   * the middle. The contract above is now solved against what the shader draws
+   * rather than asserted beside it.
    *
    * Derived from the box the resize observer already keeps, so it costs no
    * layout read per frame, and the drift is applied to the result rather than
@@ -676,7 +685,32 @@ export class HelixAura extends HelixElement {
       return this.tilt
     }
     const { height, width } = this.box
-    return (Math.atan((this.terminus * width) / height) * 180) / Math.PI
+    const aspect = width / Math.max(height, 1)
+    /* Solved against where the shader actually puts the axis, which is not
+       where `terminus * width / height` put it.
+    
+       The fragment shader stretches `p.x` by the aspect *before* it rotates, so
+       the tilt it takes is a slope in the unstretched, box-normalized frame,
+       and the exit it produces on screen is
+    
+         0.5 + tan(tilt) / (2 * aspect^2)
+    
+       as a fraction of the width. The aspect appears squared because it is paid
+       twice: once turning the asked-for screen angle into the rotation applied
+       in the stretched space, and again turning the resulting offset back into
+       screen x.
+    
+       The old expression corrected for the aspect once, in the wrong direction,
+       and never subtracted the centre. So the number behaved as an offset from
+       the middle rather than a position across the width, and one that moved
+       with the box: on a 1440 by 1800 hero, `0.5` landed the axis at 81.3% of
+       the width and `0` was the only value that reached the middle, while the
+       docstring promised the middle at `0.5` and an edge at `1`.
+    
+       Inverting the shader's own expression is what makes those two agree:
+       `0` is the left edge, `0.5` the middle and `1` the right edge, at every
+       box, which is what the property was added to be able to say. */
+    return (Math.atan(2 * (this.terminus - 0.5) * aspect * aspect) * 180) / Math.PI
   }
 
   private drifted(base: number, span: number, seed: number): number {

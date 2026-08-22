@@ -75,7 +75,7 @@ export default function Home() {
         scale={1.7}
         shape="flow"
         speed={1}
-        terminus={0.1}
+        terminus={0.5625}
       ></helix-aura>
       <div className="reelScrim" />
 
