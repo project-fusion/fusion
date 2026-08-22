@@ -44,6 +44,32 @@ const SCOPE = '[data-theme="preview"]'
  */
 const PREVIEW_SHARE = 68
 
+/**
+ * The faces on offer.
+ *
+ * **Stacks the reader already has, not web fonts.** A builder that loaded
+ * Inter to show it would be measuring a page against a face the consumer's own
+ * page may not ship, and the first thing a wrong face does is change every line
+ * length in the preview. These resolve on the machine looking at them, which is
+ * what a preview is for.
+ *
+ * The empty value is the stylesheet's own stack, so "leave it alone" is a
+ * choice a reader can make and can come back to.
+ */
+const FACES = [
+  { label: 'System sans', value: '' },
+  { label: 'Georgia, a serif', value: 'Georgia, "Times New Roman", serif' },
+  { label: 'Palatino, a book serif', value: '"Palatino Linotype", Palatino, Palladio, serif' },
+  { label: 'Verdana, a wide sans', value: 'Verdana, Geneva, sans-serif' },
+  { label: 'Trebuchet, a humanist sans', value: '"Trebuchet MS", Tahoma, sans-serif' },
+] as const
+
+const MONO_FACES = [
+  { label: 'System mono', value: '' },
+  { label: 'Courier', value: '"Courier New", Courier, monospace' },
+  { label: 'Consolas', value: 'Consolas, "Liberation Mono", monospace' },
+] as const
+
 type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
 
 export function ThemeBuilder({ findable }: { findable: Findable[] }) {
@@ -57,6 +83,9 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
   const [radius, setRadius] = useState(50)
   const [allowance, setAllowance] = useState(20)
   const [split, setSplit] = useState(PREVIEW_SHARE)
+  const [bodyFace, setBodyFace] = useState('')
+  const [displayFace, setDisplayFace] = useState('')
+  const [monoFace, setMonoFace] = useState('')
   const [surface, setSurface] = useState<Mechanism>('border')
   const [floating, setFloating] = useState<Mechanism>('shadow')
 
@@ -73,7 +102,10 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     radius === 50 &&
     allowance === 20 &&
     surface === 'border' &&
-    floating === 'shadow'
+    floating === 'shadow' &&
+    bodyFace === '' &&
+    displayFace === '' &&
+    monoFace === ''
 
   const reset = (): void => {
     setBrand(BRAND)
@@ -86,6 +118,9 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     setAllowance(20)
     setSurface('border')
     setFloating('shadow')
+    setBodyFace('')
+    setDisplayFace('')
+    setMonoFace('')
   }
 
   const intent: ThemeIntent = useMemo(
@@ -95,6 +130,11 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
       chroma: { scale: chromaScale / 100 },
       contrastTarget,
       density: density / 100,
+      font: {
+        ...(bodyFace ? { body: bodyFace } : {}),
+        ...(displayFace ? { display: displayFace } : {}),
+        ...(monoFace ? { mono: monoFace } : {}),
+      },
       radius: radius / 100,
       scheme,
       separation: { floating: floating as 'border' | 'fill' | 'shadow', surface },
@@ -103,11 +143,14 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
     [
       accentHue,
       allowance,
+      bodyFace,
       brand,
       chromaScale,
       contrastTarget,
       density,
+      displayFace,
       floating,
+      monoFace,
       radius,
       scheme,
       surface,
@@ -346,6 +389,53 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
               step={10}
               value={String(radius)}
             ></helix-slider>
+
+            {/* **Type is part of a theme.** Families are the half a consumer
+                chooses; the size scale, the weights, the leading and the
+                tracking are a system rather than a choice and are still fixed,
+                which is the honest state of it. */}
+            <helix-select
+              label="Body face"
+              name="body-face"
+              onhelix-change={(event) => setBodyFace(event.detail.value)}
+              value={bodyFace}
+            >
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              {FACES.map((face) => (
+                <helix-option key={face.label} value={face.value}>
+                  {face.label}
+                </helix-option>
+              ))}
+            </helix-select>
+
+            <helix-select
+              hint="Headings. Follows the body face where it is left alone."
+              label="Display face"
+              name="display-face"
+              onhelix-change={(event) => setDisplayFace(event.detail.value)}
+              value={displayFace}
+            >
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              {FACES.map((face) => (
+                <helix-option key={face.label} value={face.value}>
+                  {face.label}
+                </helix-option>
+              ))}
+            </helix-select>
+
+            <helix-select
+              label="Mono face"
+              name="mono-face"
+              onhelix-change={(event) => setMonoFace(event.detail.value)}
+              value={monoFace}
+            >
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              {MONO_FACES.map((face) => (
+                <helix-option key={face.label} value={face.value}>
+                  {face.label}
+                </helix-option>
+              ))}
+            </helix-select>
 
             {/* The repair rather than the report. A status may rotate within its
               meaning to clear a role it cannot be told apart from, and it keeps

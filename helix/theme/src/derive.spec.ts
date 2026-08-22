@@ -437,6 +437,28 @@ describe('the separation policy', () => {
     }
   })
 
+  test('a single face fills the display slot too', () => {
+    const css = toCss(deriveTheme({ brand: BRAND, font: { body: 'Inter, sans-serif' } }))
+    expect(css).toContain('--helix-font-body: Inter, sans-serif;')
+    expect(css).toContain('--helix-font-display: Inter, sans-serif;')
+  })
+
+  test('a display face is kept where one is given', () => {
+    const css = toCss(
+      deriveTheme({
+        brand: BRAND,
+        font: { body: 'Inter, sans-serif', display: 'Fraunces, serif' },
+      }),
+    )
+    expect(css).toContain('--helix-font-display: Fraunces, serif;')
+  })
+
+  /* Emitting a repeat of the stylesheet's own stack would be a theme claiming
+     a decision nobody made. */
+  test('an omitted face emits nothing at all', () => {
+    expect(toCss(deriveTheme({ brand: BRAND }))).not.toContain('--helix-font-')
+  })
+
   test('material is a policy and zero blur means flat', () => {
     expect(toCss(deriveTheme({ brand: BRAND, material: { blur: 0 } }))).toContain(
       '--helix-material-backdrop: none;',

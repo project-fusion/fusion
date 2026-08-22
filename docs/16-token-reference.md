@@ -40,7 +40,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
-| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 221 |
+| `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 220 |
 | `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 157 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
@@ -106,11 +106,11 @@ The spacing scale, used for gaps, padding and margins alike.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-space-none` | `var(--_helix-scale-0)` | 224 |
-| `--helix-space-2xs` | `var(--_helix-scale-1)` | 279 |
+| `--helix-space-2xs` | `var(--_helix-scale-1)` | 282 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 240 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 237 |
 | `--helix-space-md` | `var(--_helix-scale-4)` | 131 |
-| `--helix-space-lg` | `var(--_helix-scale-6)` | 89 |
+| `--helix-space-lg` | `var(--_helix-scale-6)` | 88 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 73 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 42 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 23 |
@@ -189,7 +189,7 @@ Widths for a rule or an outline.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-border-thin` | `1px` | 224 |
+| `--helix-border-thin` | `1px` | 223 |
 | `--helix-border-thick` | `2px` | 63 |
 | `--helix-border-surface` | `var(--helix-border-thin)` | 2 |
 | `--helix-border-floating` | `0` | 20 |
@@ -228,7 +228,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 4 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 342 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 344 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 130 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 26 |
 
@@ -238,7 +238,7 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 306 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 308 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 65 |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 59 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |

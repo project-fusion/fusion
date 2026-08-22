@@ -130,6 +130,25 @@ export interface ThemeIntent {
     opacity?: number
   }
   /**
+   * The faces the theme is set in.
+   *
+   * **Type is part of a theme and had no input at all.** Twenty tokens across
+   * five categories, families, sizes, weights, leading and tracking, were
+   * unreachable from intent while every colour in the palette was one field
+   * away. Families are the half a consumer actually chooses; the size scale,
+   * the weights and the spacing are the half that is a system, and they are
+   * still fixed.
+   *
+   * `display` falls back to `body`, which is what the stylesheet already does:
+   * a theme with one face is the common case and should not have to say so
+   * three times.
+   */
+  font?: {
+    body?: string
+    display?: string
+    mono?: string
+  }
+  /**
    * The token prefix, without dashes. `helix` by default.
    *
    * **What makes the engine useful to somebody who has never heard of Helix.**

@@ -107,6 +107,7 @@ const DEFAULTS = {
   chroma: {},
   contrastTarget: 4.5,
   density: 1,
+  font: {},
   material: {},
   namespace: 'helix',
   neutral: {},
@@ -854,6 +855,22 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
     lines.push(
       `  --${namespace}-shadow-floating: ${floating === 'shadow' ? SHADOW_FLOATING : 'none'};`,
     )
+  }
+
+  /* **Families are emitted and the rest of the type system is not**, which is
+     the honest half of this: a consumer picks faces, where the size scale, the
+     weights, the leading and the tracking are a system rather than a choice.
+     Emitted only when asked for, so an omitted face leaves the stylesheet's
+     own stack standing rather than being replaced by a repeat of it. */
+  const { body, display, mono } = theme.intent.font
+  if (body) {
+    lines.push(`  --${namespace}-font-body: ${body};`)
+  }
+  if (display ?? body) {
+    lines.push(`  --${namespace}-font-display: ${display ?? body};`)
+  }
+  if (mono) {
+    lines.push(`  --${namespace}-font-mono: ${mono};`)
   }
 
   const { blur, opacity } = theme.intent.material
