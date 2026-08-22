@@ -70,12 +70,6 @@ const isInsertion = (event: Event): boolean =>
  * named that way, being the consumer's light DOM, so it is linked by element
  * reference for the reason Listbox records at length.
  *
- * @since 0.1.0
- * @status experimental
- * @category forms
- * @aliases Autocomplete, Typeahead, Search select
- * @documentation https://helix.fusion.dev/components/combobox
- *
  * **With `multiple`, the chosen options are tags in the field.** A field that
  * says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what
  * is in it, and offers nothing to press to take one out: Select does that today
@@ -113,6 +107,12 @@ const isInsertion = (event: Event): boolean =>
  * the completion would narrow the list to the one option it came from, so a
  * reader typing "ru" would be shown "Rust" alone and never learn Ruby was
  * there.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category forms
+ * @aliases Autocomplete, Typeahead, Search select
+ * @documentation https://helix.fusion.dev/components/combobox
  *
  * @slot - The options, which are `helix-option` elements.
  * @slot start - Before the text, for an icon.

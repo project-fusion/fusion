@@ -31,6 +31,20 @@
  * **It also catches a doc block at the end of a file**, where there is nothing
  * under it at all. That is rarer and the same fault.
  *
+ * **The second shape is prose that sits after a tag**, which is dropped the
+ * same way and is harder to see, because the block it is in does document
+ * something. A JSDoc description ends at the first tag, so a paragraph written
+ * below `@csspart` or `@documentation` reaches no manifest and prints on no
+ * page while sitting in the middle of a block that works. Twenty-five were
+ * found, of which sixteen were added the same day by the person writing this
+ * check, which is the argument for it existing.
+ *
+ * A tag's own description may run to several lines and often does, so a
+ * continuation is not this: the fault is a *new paragraph*, marked by a blank
+ * comment line before it and text at the comment margin rather than indented
+ * under a bullet. Without that distinction the same scan reported sixty-eight,
+ * and forty-three were a tag's own words wrapping.
+ *
  * Run with `bun run check:orphans` (also part of `bun run verify`).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -73,12 +87,54 @@ const blockEnd = (text, at) => {
   return close === -1 ? -1 : close + 2
 }
 
+const TERMINAL =
+  /^\s*\*\s+@(since|status|category|aliases|documentation|slot|csspart|cssproperty|event|controlled)\b/
+const PROSE_TAG = /^\s*\*\s+@(description|remarks|example)\b/
+const BLANK = /^\s*\*\s*$/
+
+/** Every paragraph in `text` that sits after a tag, by line number. */
+const stranded = (text) => {
+  const lines = text.split('\n')
+  const found = []
+  let inBlock = false
+  let seen = false
+  for (const [at, line] of lines.entries()) {
+    if (/^\s*\/\*\*/.test(line)) {
+      inBlock = true
+      seen = false
+    } else if (!inBlock) {
+    } else if (line.includes('*/')) {
+      inBlock = false
+    } else if (PROSE_TAG.test(line)) {
+      seen = false
+    } else if (TERMINAL.test(line)) {
+      seen = true
+    } else if (
+      seen &&
+      BLANK.test(lines[at - 1] ?? '') &&
+      /^\s*\* \S/.test(line) &&
+      !/^\s*\* {2}/.test(line) &&
+      !/^\s*\*\s+@/.test(line)
+    ) {
+      found.push(at + 1)
+      seen = false
+    }
+  }
+  return found
+}
+
 const problems = []
 let held = 0
 
 for (const root of ROOTS) {
   for (const file of sources(root)) {
     const text = readFileSync(file, 'utf8')
+    for (const at of stranded(text)) {
+      problems.push(
+        `${file}:${at}: a paragraph sits after a tag, so it is not part of the description and ` +
+          'reaches no manifest and no reference page. Move it above the first tag.',
+      )
+    }
     for (const open of text.matchAll(/\/\*\*/g)) {
       const end = blockEnd(text, open.index)
       if (end === -1) {

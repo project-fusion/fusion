@@ -5456,7 +5456,7 @@ state for stylesheets, which is what it has always been for. */
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
 };
 
@@ -5552,7 +5552,7 @@ state for stylesheets, which is what it has always been for. */
   "prop:defaultOpen"?: HelixBaseMegamenu["defaultOpen"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixBaseMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -7741,7 +7741,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixBaseRating["name"];
 
-  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  /** Fired before the score changes, and cancelable. */
   "onhelix-change"?: (e: HelixBaseRatingHelixChangeElementEvent) => void;
 };
 
@@ -7852,7 +7852,7 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixBaseRating["name"];
-  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  /** Fired before the score changes, and cancelable. */
   "on:helix-change"?: (e: HelixBaseRatingHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -10521,7 +10521,7 @@ reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   dismissLabel?: HelixBaseToastItem["dismissLabel"];
 
-  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired when it asks to go, whether by the control or by its timer. */
   "onhelix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
 };
 
@@ -10568,7 +10568,7 @@ derive one rather than dash-casing it, so this would otherwise be
 reachable only as `dismisslabel`, which nobody would guess and no linter
 would catch. */
   "prop:dismissLabel"?: HelixBaseToastItem["dismissLabel"];
-  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired when it asks to go, whether by the control or by its timer. */
   "on:helix-dismiss"?: (e: HelixBaseToastItemHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11344,7 +11344,7 @@ state for stylesheets, which is what it has always been for. */
   "onhelix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "onhelix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before a branch closes, and cancelable. */
   "onhelix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 };
 
@@ -11419,7 +11419,7 @@ state for stylesheets, which is what it has always been for. */
   "on:helix-select"?: (e: HelixBaseTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "on:helix-open"?: (e: HelixBaseTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before a branch closes, and cancelable. */
   "on:helix-close"?: (e: HelixBaseTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -11950,7 +11950,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   onplay?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
   onpause?: (e: HelixBaseVideoElementEvent) => void;
-  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Relayed for the same reason. */
   onended?: (e: HelixBaseVideoElementEvent) => void;
 };
 
@@ -12138,7 +12138,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "on:play"?: (e: HelixBaseVideoElementEvent) => void;
   /** Relayed for the same reason. */
   "on:pause"?: (e: HelixBaseVideoElementEvent) => void;
-  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Relayed for the same reason. */
   "on:ended"?: (e: HelixBaseVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12626,6 +12626,11 @@ export type CustomElements = {
    * A reader who wants the numbers gets the numbers, not a described picture of
    * them.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -12762,7 +12767,7 @@ export type CustomElements = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps & BaseProps<HelixBaseBarChart> & BaseEvents
@@ -13321,6 +13326,12 @@ export type CustomElements = {
    * `value` is the checked values, comma separated, in the order the boxes are
    * written. Setting it ticks exactly those and unticks the rest.
    *
+   * **Its message is always given, never derived.** Every form-related member of
+   * `ElementInternals` throws on an element that is not form-associated, and this
+   * one is not, on purpose: the boxes submit themselves. So `feedback` is what
+   * shows here, and the browser has nothing to say about a set it does not know
+   * is a set.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -13711,6 +13722,11 @@ export type CustomElements = {
    * the value itself, for the reason Date Input gives about its dates: half-typed
    * input does not survive a round trip through a formatter.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -13920,7 +13936,7 @@ export type CustomElements = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `picker`: The color picker inside it.
    */
   "helix-base-color-input": Partial<
     HelixBaseColorInputProps & BaseProps<HelixBaseColorInput> & BaseEvents
@@ -13954,6 +13970,11 @@ export type CustomElements = {
    * colors. Named colors are the exception, and deliberately: resolving
    * `rebeccapurple` means shipping a table of a hundred and forty or asking the
    * browser, and there is no browser during a server render.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
    *
    * ## Attributes & Properties
    *
@@ -14130,7 +14151,7 @@ export type CustomElements = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `swatch`: One preset.
    */
   "helix-base-color-picker": Partial<
     HelixBaseColorPickerProps & BaseProps<HelixBaseColorPicker> & BaseEvents
@@ -14167,6 +14188,44 @@ export type CustomElements = {
    * listbox because both are in this shadow root. The active option cannot be
    * named that way, being the consumer's light DOM, so it is linked by element
    * reference for the reason Listbox records at length.
+   *
+   * **With `multiple`, the chosen options are tags in the field.** A field that
+   * says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what
+   * is in it, and offers nothing to press to take one out: Select does that today
+   * and it is the weakest part of it. A tag apiece is one object per answer, each
+   * with its own remove control, which is what the reader already believes they
+   * are looking at.
+   *
+   * The panel stays open while more than one can be chosen, because a control
+   * that shut after each pick is one the reader has to reopen to keep using. The
+   * filter clears on each choice instead, so the next pick starts from the whole
+   * list rather than from the last search.
+   *
+   * **`creatable` announces, and does not write.** The options are the consumer's
+   * light DOM and nothing here puts an element into it: a component that grew the
+   * consumer's markup would be a component their framework re-renders over. What
+   * this does is offer a row saying what would be added, take the value when the
+   * reader presses it, and say so with `helix-create`. A consumer who has to
+   * validate first refuses the event and adds nothing.
+   *
+   * Which leaves a value naming no option, and that is what the words fall back
+   * to: for anything chosen the field shows the option's text if there is one and
+   * the value itself otherwise. No copy is stored, so a consumer who then adds a
+   * real option with that value has its words take over on the next render.
+   *
+   * **`suggest` finishes the word, and only ever forwards.** The field completes
+   * to the first option the typing begins, with the part the reader did not type
+   * selected, so the next character replaces it and Delete removes it. Applied on
+   * insertion alone: completing after a deletion would put back what the reader
+   * just took out, and a field that cannot be shortened is a field that cannot be
+   * corrected. Measured as the difference between `insertText` and the several
+   * `delete*` input types, which is what the platform already says about which
+   * happened.
+   *
+   * The filter stays what was typed rather than what was completed. Filtering on
+   * the completion would narrow the list to the one option it came from, so a
+   * reader typing "ru" would be shown "Rust" alone and never learn Ruby was
+   * there.
    *
    * ## Attributes & Properties
    *
@@ -14948,6 +15007,21 @@ export type CustomElements = {
    * Left unset, month and day names come from the runtime's own locale, and a
    * server and a browser need not agree on what that is.
    *
+   * `helix-change` was `helix-select`, and it moved when the calendar became a
+   * form control. A control whose value changes dispatches `helix-change` here:
+   * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
+   * calendar submitting a date is the same kind of thing. `helix-select` stays
+   * what it is elsewhere, which is a row or an item being chosen in something
+   * that reports no value at all, such as `Menu` or `Tree`.
+   *
+   * Paging is `helix-navigate` and not either of those, because it chooses
+   * nothing: the view moves and the answer does not.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -15107,7 +15181,7 @@ export type CustomElements = {
    * - `previous`: The control that moves to the previous month.
    * - `previous-mark`: The glyph on the previous month control.
    * - `week`: One row of days.
-   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `weekday`: A column header naming a day of the week.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps & BaseProps<HelixBaseDatePicker> & BaseEvents
@@ -15136,6 +15210,17 @@ export type CustomElements = {
    * The regions are bare slots rather than wrappers, for the reason the card's
    * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
    * dialog with no footer has no empty band where one would be.
+   *
+   * Opened declaratively with the platform's invoker attributes:
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * <helix-dialog id="confirm">…</helix-dialog>
+   * ```
+   *
+   * `--show`, `--close` and `--toggle`. Custom commands rather than the built-in
+   * `show-modal`, because those are defined against native elements and do
+   * nothing when pointed at a custom one.
    *
    * ## Attributes & Properties
    *
@@ -15294,6 +15379,11 @@ export type CustomElements = {
    *
    * The table is the accessible representation and this drawing is `aria-hidden`.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -15374,7 +15464,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
    *
    * ## CSS Custom Properties
    *
@@ -15423,6 +15513,13 @@ export type CustomElements = {
    * the whole time: a spec three files away existing to contradict the prose is
    * the same shape as `Stat`'s `detail` slot, which is what `check:references`
    * was written after and is the half it cannot see.
+   *
+   * Opened declaratively with the platform's invoker attributes:
+   *
+   * ```html
+   * <helix-button commandfor="nav" command="--toggle">Menu</helix-button>
+   * <helix-drawer id="nav">…</helix-drawer>
+   * ```
    *
    * ## Attributes & Properties
    *
@@ -16171,6 +16268,22 @@ export type CustomElements = {
    * promised by this paragraph and did not exist, so a consumer following the
    * sentence wrote an attribute on the host that reached no input and constrained
    * nothing: the field looked as though it were checked and was not.
+   *
+   * **`clearable` and `reveal` are the field's, not the consumer's.** The `end`
+   * slot used to be the answer to both, which meant every consumer of
+   * `type="search"` built the same button and every consumer of
+   * `type="password"` either built the same toggle or shipped a field a reader
+   * cannot check what they typed into. Neither is a slot's worth of variation:
+   * one empties the value, the other flips the type, and both want the same
+   * position, the same size and the same disabled behaviour. The slot stays for
+   * what actually varies, a unit or a prefix.
+   *
+   * Both opt in rather than following from `type`, and are booleans that default
+   * to false. A Lit boolean property that defaults to *true* cannot be turned off
+   * from HTML at all, only from script, which is the wrong way round for
+   * revealing a password: a consumer should have to ask for it. Drawer's `modal`
+   * defaults true for the opposite reason, that losing a focus trap by forgetting
+   * a word is worse than having to say so.
    *
    * ## Attributes & Properties
    *
@@ -17031,6 +17144,11 @@ export type CustomElements = {
    * anything managing it. Escape closes and puts focus back, because Escape is
    * the one key that has to return the reader to where they were.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -17099,7 +17217,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before it closes, and cancelable.
    *
    * ## Slots
    *
@@ -17396,6 +17514,11 @@ export type CustomElements = {
    * all, which is the same call the carousel's current dot makes by lengthening
    * rather than only changing color.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -17482,7 +17605,7 @@ export type CustomElements = {
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
-   * - `value`: The reading, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading, under `show-value`.
    */
   "helix-base-meter": Partial<
     HelixBaseMeterProps & BaseProps<HelixBaseMeter> & BaseEvents
@@ -18586,6 +18709,11 @@ export type CustomElements = {
    * anonymous to anything walking the light DOM, and a `role` written onto the
    * host as an attribute is one a server's markup never had.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -18649,7 +18777,7 @@ export type CustomElements = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps & BaseProps<HelixBaseProgress> & BaseEvents
@@ -19011,6 +19139,17 @@ export type CustomElements = {
    * `KeyboardNavigationController` takes `selects` for, and why this can use it
    * where a menu cannot.
    *
+   * **The mark is a stylesheet's, not a slot's.** A slot projects its content
+   * once, and there are two layers of marks here: slotting a star would put it in
+   * the track or the fill and leave the other empty. So the mark is a shape the
+   * styled tier masks with, which is also what lets a partial one be a clip of the
+   * whole rather than a second drawing of it.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -19101,7 +19240,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   * - `helix-change`: Fired before the score changes, and cancelable.
    *
    * ## Methods
    *
@@ -19175,7 +19314,7 @@ export type CustomElements = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-base-rating": Partial<
     HelixBaseRatingProps & BaseProps<HelixBaseRating> & BaseEvents
@@ -19512,6 +19651,11 @@ export type CustomElements = {
    * track and the two stop lining up. Both inputs span the whole range and the
    * values are clamped against each other on the way in.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -19700,7 +19844,7 @@ export type CustomElements = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `output`: The current value, shown beside it.
    */
   "helix-base-slider": Partial<
     HelixBaseSliderProps & BaseProps<HelixBaseSlider> & BaseEvents
@@ -19729,6 +19873,11 @@ export type CustomElements = {
    * from called for a `trend` slot on `Stat`; the spec already on `Stat` says the
    * opposite, that a change beside a figure is a second fact, and the spec is
    * right. `Trend` composes the same way.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
    *
    * ## Attributes & Properties
    *
@@ -19822,7 +19971,7 @@ export type CustomElements = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps & BaseProps<HelixBaseSparkline> & BaseEvents
@@ -20075,6 +20224,11 @@ export type CustomElements = {
    * it should be kept at all, is the consumer's to decide, and a component writing
    * to storage on its own would be deciding for all of them under a key it chose.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -20166,7 +20320,7 @@ export type CustomElements = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `corner`: The handle where two dividers cross, added on the client.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps & BaseProps<HelixBaseSplitter> & BaseEvents
@@ -20695,6 +20849,11 @@ export type CustomElements = {
    * all set explicitly, and rows are `display: contents` so their cells become
    * items of the one grid that does the aligning.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -20728,7 +20887,7 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--table-columns`: Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. (default: `undefined`)
+   * - `--table-columns`: Track list for the columns. (default: `undefined`)
    * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
@@ -21746,6 +21905,11 @@ export type CustomElements = {
    * dismiss control raise the same event, so a consumer handles one path and not
    * two.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -21785,7 +21949,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
    *
    * ## Slots
    *
@@ -22527,6 +22691,30 @@ export type CustomElements = {
    * server renders the node as a leaf and the twisty appears on hydration. It
    * appears rather than disappearing, which is the harmless direction.
    *
+   * **`href` makes the row itself the link.** A tree used as navigation is a list
+   * of links, and the row is what a reader presses: with the anchor slotted into
+   * the name instead, everything outside the words is dead, Enter does nothing,
+   * and there is no middle-click, no status bar and no open-in-new-tab. Given an
+   * `href` the row *is* an `<a>`, so the platform provides all of that and the
+   * keyboard needs no handler at all.
+   *
+   * It changes the shape of the ARIA, which is why it is a property and not the
+   * default. An anchor cannot contain the group, since the group holds more
+   * anchors and nesting them is invalid, so the row carries `treeitem` and the
+   * group becomes its sibling under a presentational wrapper. That is exactly the
+   * navigation flavour of the tree pattern, and the arrangement without an `href`
+   * stays as it was: `treeitem` containing `group`, which is what an `<li>`
+   * holding a `<ul>` is.
+   *
+   * A consumer whose framework owns routing slots its own link instead and leaves
+   * `href` unset. The row follows that one too, so the whole row works either
+   * way; what the anchor adds is what only a real anchor can give.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -22594,7 +22782,7 @@ export type CustomElements = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *
@@ -23039,6 +23227,36 @@ export type CustomElements = {
    * plays and immediately pauses. The focus stop goes with them, since the native
    * controls bring their own.
    *
+   * **`<source>` and `<track>` are copied into the video, not slotted into it.**
+   * A media element runs its resource selection over its own child *nodes*, and a
+   * slot is one node: the sources and the caption tracks a consumer wrote were
+   * assigned into the flattened tree and the video never saw any of them. It had
+   * no text tracks, no current source and a `readyState` of zero, so a video
+   * given sources this way did not merely lack captions, it did not play.
+   *
+   * They are copied rather than moved, because the consumer's light DOM is theirs
+   * and a framework that re-renders it would find its children gone. The copies
+   * are rebuilt whenever the slot changes and the video is asked to load again,
+   * which is what makes a `<track>` added later take effect.
+   *
+   * **The lock screen and a headset's buttons work, and one player owns them.**
+   * There is one `navigator.mediaSession` per page, so the rule is stated rather
+   * than left to render order: whichever player was started last owns it, which
+   * is what a reader means by "this one" when they press play on their
+   * headphones. The title comes from `label` and the artwork from `poster`.
+   *
+   * **`remote` sends the picture somewhere else.** The Remote Playback API is
+   * what Safari implements for AirPlay and Chrome for Cast, so one control covers
+   * both and the platform supplies the device list. It is offered only once
+   * something has answered `watchAvailability`: a button that opens an empty list
+   * is worse than no button, and a consumer who wants none can set
+   * `disableremoteplayback` on this element.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -23132,7 +23350,7 @@ export type CustomElements = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `ended`: Relayed for the same reason.
    *
    * ## Slots
    *
@@ -23736,6 +23954,11 @@ export type CustomElementsSolidJs = {
    * A reader who wants the numbers gets the numbers, not a described picture of
    * them.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -23872,7 +24095,7 @@ export type CustomElementsSolidJs = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-base-bar-chart": Partial<
     HelixBaseBarChartProps &
@@ -24458,6 +24681,12 @@ export type CustomElementsSolidJs = {
    * `value` is the checked values, comma separated, in the order the boxes are
    * written. Setting it ticks exactly those and unticks the rest.
    *
+   * **Its message is always given, never derived.** Every form-related member of
+   * `ElementInternals` throws on an element that is not form-associated, and this
+   * one is not, on purpose: the boxes submit themselves. So `feedback` is what
+   * shows here, and the browser has nothing to say about a set it does not know
+   * is a set.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -24860,6 +25089,11 @@ export type CustomElementsSolidJs = {
    * the value itself, for the reason Date Input gives about its dates: half-typed
    * input does not survive a round trip through a formatter.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -25069,7 +25303,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `picker`: The color picker inside it.
    */
   "helix-base-color-input": Partial<
     HelixBaseColorInputProps &
@@ -25106,6 +25340,11 @@ export type CustomElementsSolidJs = {
    * colors. Named colors are the exception, and deliberately: resolving
    * `rebeccapurple` means shipping a table of a hundred and forty or asking the
    * browser, and there is no browser during a server render.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
    *
    * ## Attributes & Properties
    *
@@ -25282,7 +25521,7 @@ export type CustomElementsSolidJs = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `swatch`: One preset.
    */
   "helix-base-color-picker": Partial<
     HelixBaseColorPickerProps &
@@ -25322,6 +25561,44 @@ export type CustomElementsSolidJs = {
    * listbox because both are in this shadow root. The active option cannot be
    * named that way, being the consumer's light DOM, so it is linked by element
    * reference for the reason Listbox records at length.
+   *
+   * **With `multiple`, the chosen options are tags in the field.** A field that
+   * says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what
+   * is in it, and offers nothing to press to take one out: Select does that today
+   * and it is the weakest part of it. A tag apiece is one object per answer, each
+   * with its own remove control, which is what the reader already believes they
+   * are looking at.
+   *
+   * The panel stays open while more than one can be chosen, because a control
+   * that shut after each pick is one the reader has to reopen to keep using. The
+   * filter clears on each choice instead, so the next pick starts from the whole
+   * list rather than from the last search.
+   *
+   * **`creatable` announces, and does not write.** The options are the consumer's
+   * light DOM and nothing here puts an element into it: a component that grew the
+   * consumer's markup would be a component their framework re-renders over. What
+   * this does is offer a row saying what would be added, take the value when the
+   * reader presses it, and say so with `helix-create`. A consumer who has to
+   * validate first refuses the event and adds nothing.
+   *
+   * Which leaves a value naming no option, and that is what the words fall back
+   * to: for anything chosen the field shows the option's text if there is one and
+   * the value itself otherwise. No copy is stored, so a consumer who then adds a
+   * real option with that value has its words take over on the next render.
+   *
+   * **`suggest` finishes the word, and only ever forwards.** The field completes
+   * to the first option the typing begins, with the part the reader did not type
+   * selected, so the next character replaces it and Delete removes it. Applied on
+   * insertion alone: completing after a deletion would put back what the reader
+   * just took out, and a field that cannot be shortened is a field that cannot be
+   * corrected. Measured as the difference between `insertText` and the several
+   * `delete*` input types, which is what the platform already says about which
+   * happened.
+   *
+   * The filter stays what was typed rather than what was completed. Filtering on
+   * the completion would narrow the list to the one option it came from, so a
+   * reader typing "ru" would be shown "Rust" alone and never learn Ruby was
+   * there.
    *
    * ## Attributes & Properties
    *
@@ -26115,6 +26392,21 @@ export type CustomElementsSolidJs = {
    * Left unset, month and day names come from the runtime's own locale, and a
    * server and a browser need not agree on what that is.
    *
+   * `helix-change` was `helix-select`, and it moved when the calendar became a
+   * form control. A control whose value changes dispatches `helix-change` here:
+   * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
+   * calendar submitting a date is the same kind of thing. `helix-select` stays
+   * what it is elsewhere, which is a row or an item being chosen in something
+   * that reports no value at all, such as `Menu` or `Tree`.
+   *
+   * Paging is `helix-navigate` and not either of those, because it chooses
+   * nothing: the view moves and the answer does not.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -26274,7 +26566,7 @@ export type CustomElementsSolidJs = {
    * - `previous`: The control that moves to the previous month.
    * - `previous-mark`: The glyph on the previous month control.
    * - `week`: One row of days.
-   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `weekday`: A column header naming a day of the week.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps &
@@ -26306,6 +26598,17 @@ export type CustomElementsSolidJs = {
    * The regions are bare slots rather than wrappers, for the reason the card's
    * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
    * dialog with no footer has no empty band where one would be.
+   *
+   * Opened declaratively with the platform's invoker attributes:
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * <helix-dialog id="confirm">…</helix-dialog>
+   * ```
+   *
+   * `--show`, `--close` and `--toggle`. Custom commands rather than the built-in
+   * `show-modal`, because those are defined against native elements and do
+   * nothing when pointed at a custom one.
    *
    * ## Attributes & Properties
    *
@@ -26470,6 +26773,11 @@ export type CustomElementsSolidJs = {
    *
    * The table is the accessible representation and this drawing is `aria-hidden`.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -26550,7 +26858,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
    *
    * ## CSS Custom Properties
    *
@@ -26602,6 +26910,13 @@ export type CustomElementsSolidJs = {
    * the whole time: a spec three files away existing to contradict the prose is
    * the same shape as `Stat`'s `detail` slot, which is what `check:references`
    * was written after and is the half it cannot see.
+   *
+   * Opened declaratively with the platform's invoker attributes:
+   *
+   * ```html
+   * <helix-button commandfor="nav" command="--toggle">Menu</helix-button>
+   * <helix-drawer id="nav">…</helix-drawer>
+   * ```
    *
    * ## Attributes & Properties
    *
@@ -27374,6 +27689,22 @@ export type CustomElementsSolidJs = {
    * promised by this paragraph and did not exist, so a consumer following the
    * sentence wrote an attribute on the host that reached no input and constrained
    * nothing: the field looked as though it were checked and was not.
+   *
+   * **`clearable` and `reveal` are the field's, not the consumer's.** The `end`
+   * slot used to be the answer to both, which meant every consumer of
+   * `type="search"` built the same button and every consumer of
+   * `type="password"` either built the same toggle or shipped a field a reader
+   * cannot check what they typed into. Neither is a slot's worth of variation:
+   * one empties the value, the other flips the type, and both want the same
+   * position, the same size and the same disabled behaviour. The slot stays for
+   * what actually varies, a unit or a prefix.
+   *
+   * Both opt in rather than following from `type`, and are booleans that default
+   * to false. A Lit boolean property that defaults to *true* cannot be turned off
+   * from HTML at all, only from script, which is the wrong way round for
+   * revealing a password: a consumer should have to ask for it. Drawer's `modal`
+   * defaults true for the opposite reason, that losing a focus trap by forgetting
+   * a word is worse than having to say so.
    *
    * ## Attributes & Properties
    *
@@ -28258,6 +28589,11 @@ export type CustomElementsSolidJs = {
    * anything managing it. Escape closes and puts focus back, because Escape is
    * the one key that has to return the reader to where they were.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -28326,7 +28662,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before it closes, and cancelable.
    *
    * ## Slots
    *
@@ -28632,6 +28968,11 @@ export type CustomElementsSolidJs = {
    * all, which is the same call the carousel's current dot makes by lengthening
    * rather than only changing color.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -28718,7 +29059,7 @@ export type CustomElementsSolidJs = {
    * - `groove`: The unfilled circle, in `ring` and `arc`.
    * - `indicator`: The part of it the value fills.
    * - `tick`: A mark at `low` or at `high`.
-   * - `value`: The reading, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading, under `show-value`.
    */
   "helix-base-meter": Partial<
     HelixBaseMeterProps &
@@ -29851,6 +30192,11 @@ export type CustomElementsSolidJs = {
    * anonymous to anything walking the light DOM, and a `role` written onto the
    * host as an attribute is one a server's markup never had.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -29914,7 +30260,7 @@ export type CustomElementsSolidJs = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-base-progress": Partial<
     HelixBaseProgressProps &
@@ -30291,6 +30637,17 @@ export type CustomElementsSolidJs = {
    * `KeyboardNavigationController` takes `selects` for, and why this can use it
    * where a menu cannot.
    *
+   * **The mark is a stylesheet's, not a slot's.** A slot projects its content
+   * once, and there are two layers of marks here: slotting a star would put it in
+   * the track or the fill and leave the other empty. So the mark is a shape the
+   * styled tier masks with, which is also what lets a partial one be a clip of the
+   * whole rather than a second drawing of it.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -30381,7 +30738,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   * - `helix-change`: Fired before the score changes, and cancelable.
    *
    * ## Methods
    *
@@ -30455,7 +30812,7 @@ export type CustomElementsSolidJs = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-base-rating": Partial<
     HelixBaseRatingProps &
@@ -30804,6 +31161,11 @@ export type CustomElementsSolidJs = {
    * track and the two stop lining up. Both inputs span the whole range and the
    * values are clamped against each other on the way in.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -30992,7 +31354,7 @@ export type CustomElementsSolidJs = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `output`: The current value, shown beside it.
    */
   "helix-base-slider": Partial<
     HelixBaseSliderProps &
@@ -31024,6 +31386,11 @@ export type CustomElementsSolidJs = {
    * from called for a `trend` slot on `Stat`; the spec already on `Stat` says the
    * opposite, that a change beside a figure is a second fact, and the spec is
    * right. `Trend` composes the same way.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
    *
    * ## Attributes & Properties
    *
@@ -31117,7 +31484,7 @@ export type CustomElementsSolidJs = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-base-sparkline": Partial<
     HelixBaseSparklineProps &
@@ -31379,6 +31746,11 @@ export type CustomElementsSolidJs = {
    * it should be kept at all, is the consumer's to decide, and a component writing
    * to storage on its own would be deciding for all of them under a key it chose.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -31470,7 +31842,7 @@ export type CustomElementsSolidJs = {
    * - `start`: The box holding the first pane.
    * - `end`: The box holding the second.
    * - `separator`: The divider itself.
-   * - `corner`: The handle where two dividers cross, added on the client. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `corner`: The handle where two dividers cross, added on the client.
    */
   "helix-base-splitter": Partial<
     HelixBaseSplitterProps &
@@ -32023,6 +32395,11 @@ export type CustomElementsSolidJs = {
    * all set explicitly, and rows are `display: contents` so their cells become
    * items of the one grid that does the aligning.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -32056,7 +32433,7 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
-   * - `--table-columns`: Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. (default: `undefined`)
+   * - `--table-columns`: Track list for the columns. (default: `undefined`)
    * - `--table-template`: The column track list, built from the columns the consumer declared. (default: `undefined`)
    *
    * ## CSS Parts
@@ -33107,6 +33484,11 @@ export type CustomElementsSolidJs = {
    * dismiss control raise the same event, so a consumer handles one path and not
    * two.
    *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -33146,7 +33528,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
    *
    * ## Slots
    *
@@ -33912,6 +34294,30 @@ export type CustomElementsSolidJs = {
    * server renders the node as a leaf and the twisty appears on hydration. It
    * appears rather than disappearing, which is the harmless direction.
    *
+   * **`href` makes the row itself the link.** A tree used as navigation is a list
+   * of links, and the row is what a reader presses: with the anchor slotted into
+   * the name instead, everything outside the words is dead, Enter does nothing,
+   * and there is no middle-click, no status bar and no open-in-new-tab. Given an
+   * `href` the row *is* an `<a>`, so the platform provides all of that and the
+   * keyboard needs no handler at all.
+   *
+   * It changes the shape of the ARIA, which is why it is a property and not the
+   * default. An anchor cannot contain the group, since the group holds more
+   * anchors and nesting them is invalid, so the row carries `treeitem` and the
+   * group becomes its sibling under a presentational wrapper. That is exactly the
+   * navigation flavour of the tree pattern, and the arrangement without an `href`
+   * stays as it was: `treeitem` containing `group`, which is what an `<li>`
+   * holding a `<ul>` is.
+   *
+   * A consumer whose framework owns routing slots its own link instead and leaves
+   * `href` unset. The row follows that one too, so the whole row works either
+   * way; what the anchor adds is what only a real anchor can give.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -33979,7 +34385,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *
@@ -34438,6 +34844,36 @@ export type CustomElementsSolidJs = {
    * plays and immediately pauses. The focus stop goes with them, since the native
    * controls bring their own.
    *
+   * **`<source>` and `<track>` are copied into the video, not slotted into it.**
+   * A media element runs its resource selection over its own child *nodes*, and a
+   * slot is one node: the sources and the caption tracks a consumer wrote were
+   * assigned into the flattened tree and the video never saw any of them. It had
+   * no text tracks, no current source and a `readyState` of zero, so a video
+   * given sources this way did not merely lack captions, it did not play.
+   *
+   * They are copied rather than moved, because the consumer's light DOM is theirs
+   * and a framework that re-renders it would find its children gone. The copies
+   * are rebuilt whenever the slot changes and the video is asked to load again,
+   * which is what makes a `<track>` added later take effect.
+   *
+   * **The lock screen and a headset's buttons work, and one player owns them.**
+   * There is one `navigator.mediaSession` per page, so the rule is stated rather
+   * than left to render order: whichever player was started last owns it, which
+   * is what a reader means by "this one" when they press play on their
+   * headphones. The title comes from `label` and the artwork from `poster`.
+   *
+   * **`remote` sends the picture somewhere else.** The Remote Playback API is
+   * what Safari implements for AirPlay and Chrome for Cast, so one control covers
+   * both and the platform supplies the device list. It is offered only once
+   * something has answered `watchAvailability`: a button that opens an empty list
+   * is worse than no button, and a consumer who wants none can set
+   * `disableremoteplayback` on this element.
+   *
+   * The properties below are written by this component and read by whoever draws
+   * it. A consumer sets none of them: they carry a number this element computed
+   * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+   * without measuring anything itself.
+   *
    * ## Attributes & Properties
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
@@ -34531,7 +34967,7 @@ export type CustomElementsSolidJs = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `ended`: Relayed for the same reason.
    *
    * ## Slots
    *
@@ -34719,7 +35155,7 @@ export type CustomCssProperties = {
   "--splitter-corner-at"?: string;
   /** Where the divider sits, as a percentage of the box. */
   "--splitter-position"?: string;
-  /** Track list for the columns. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Track list for the columns. */
   "--table-columns"?: string;
   /** The column track list, built from the columns the consumer declared. */
   "--table-template"?: string;

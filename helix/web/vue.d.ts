@@ -3342,7 +3342,7 @@ number in two languages, drifting the first time either moved. This sets
 export type HelixMegamenuVueEvents = {
   /** Fired before it opens, and cancelable. */
   "helix-open": HelixMegamenuHelixOpenElementEvent;
-  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before it closes, and cancelable. */
   "helix-close": HelixMegamenuHelixCloseElementEvent;
 };
 
@@ -4595,7 +4595,7 @@ reflected none of them. */
 };
 
 export type HelixRatingVueEvents = {
-  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  /** Fired before the score changes, and cancelable. */
   "helix-change": HelixRatingHelixChangeElementEvent;
 };
 
@@ -6268,7 +6268,7 @@ attribute nobody can use. */
 };
 
 export type HelixToastItemVueEvents = {
-  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired when it asks to go, whether by the control or by its timer. */
   "helix-dismiss": HelixToastItemHelixDismissElementEvent;
 };
 
@@ -6717,7 +6717,7 @@ export type HelixTreeItemVueEvents = {
   "helix-select": HelixTreeItemHelixSelectElementEvent;
   /** Fired before a branch opens, and cancelable. */
   "helix-open": HelixTreeItemHelixOpenElementEvent;
-  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before a branch closes, and cancelable. */
   "helix-close": HelixTreeItemHelixCloseElementEvent;
 };
 
@@ -7142,7 +7142,7 @@ export type HelixVideoVueEvents = {
   play: HelixVideoElementEvent;
   /** Relayed for the same reason. */
   pause: HelixVideoElementEvent;
-  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Relayed for the same reason. */
   ended: HelixVideoElementEvent;
 };
 

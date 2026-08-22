@@ -31,6 +31,11 @@ import { property } from 'lit/decorators.js'
  * anonymous to anything walking the light DOM, and a `role` written onto the
  * host as an attribute is one a server's markup never had.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category feedback
@@ -41,11 +46,6 @@ import { property } from 'lit/decorators.js'
  * @csspart indicator - The part of it that is done.
  * @csspart groove - The unfilled circle, under the ring's own sweep.
  * @csspart value - The reading beside the bar, under `show-value`.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Absent while indeterminate.
  */

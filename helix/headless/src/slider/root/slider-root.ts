@@ -50,6 +50,11 @@ import { property } from 'lit/decorators.js'
  * track and the two stop lining up. Both inputs span the whole range and the
  * values are clamped against each other on the way in.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  *
  * @since 0.1.0
  * @status experimental
@@ -66,11 +71,6 @@ import { property } from 'lit/decorators.js'
  * @csspart marker - One mark.
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart output - The current value, shown beside it.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.

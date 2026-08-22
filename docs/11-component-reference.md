@@ -482,7 +482,7 @@ it is measured against.
 | `tooltip-cell` | One column's name and value inside the tooltip. |
 | `tooltip-label` | The reading's own name inside the tooltip. |
 | `tooltip-name` | A column's name inside the tooltip. |
-| `tooltip-value` | A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `tooltip-value` | A column's value inside the tooltip. |
 
 #### Custom properties
 
@@ -1203,7 +1203,7 @@ pads its own lower rows.
 | `trigger` | The control that opens the panel. |
 | `preview` | The chip showing the color, inside the trigger. |
 | `surface` | The floating panel. |
-| `picker` | The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `picker` | The color picker inside it. |
 
 #### Custom properties
 
@@ -1307,7 +1307,7 @@ brought its own card would be a card inside a card there.
 | `value` | The color as text, which can be typed or pasted. |
 | `format` | The control that changes the syntax the value is written in. |
 | `swatches` | The row of presets. |
-| `swatch` | One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `swatch` | One preset. |
 
 #### Custom properties
 
@@ -1734,7 +1734,7 @@ grid reads as a continuous run of dates.
 | `previous` | The control that moves to the previous month. |
 | `previous-mark` | The glyph on the previous month control. |
 | `week` | One row of days. |
-| `weekday` | A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `weekday` | A column header naming a day of the week. |
 
 #### Custom properties
 
@@ -1905,7 +1905,7 @@ larger than the default.
 
 | Slot | Description |
 | --- | --- |
-| *(default)* | Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| *(default)* | Goes in the middle of the ring. A total, usually. |
 
 #### Parts
 
@@ -2947,7 +2947,7 @@ Everything about what opens it and what closes it is the base class.
 | Event | Type | Description |
 | --- | --- | --- |
 | `helix-open` | `HelixOpenEvent` | Fired before it opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `helix-close` | `HelixCloseEvent` | Fired before it closes, and cancelable. |
 
 #### Slots
 
@@ -3792,7 +3792,7 @@ thing advancing.
 | `track` | The full length the work is measured against. |
 | `indicator` | The part of it that is done. |
 | `groove` | The unfilled circle, under the ring's own sweep. |
-| `value` | The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `value` | The reading beside the bar, under `show-value`. |
 
 #### Custom properties
 
@@ -4081,7 +4081,7 @@ Everything about what the score is and how it is chosen is the base class.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-change` | `HelixChangeEvent` | Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. |
+| `helix-change` | `HelixChangeEvent` | Fired before the score changes, and cancelable. |
 
 #### Slots
 
@@ -4098,7 +4098,7 @@ Everything about what the score is and how it is chosen is the base class.
 | `fill` | The filled marks, clipped to the score. |
 | `mark` | One mark, in either layer. |
 | `option` | One place a reader can press, which is one step. |
-| `value` | The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `value` | The score written out, under `show-value`. |
 
 #### Custom properties
 
@@ -4704,7 +4704,7 @@ the thumb being dragged.
 | `markers` | The row of marks along the track. |
 | `marker` | One mark. |
 | `marker-label` | The value a mark stands at, when `marker-labels` is set. |
-| `output` | The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `output` | The current value, shown beside it. |
 
 #### Custom properties
 
@@ -4771,7 +4771,7 @@ keeps it out of every other reason it might want to be bigger.
 | `svg` | The drawing. |
 | `terminus` | The mark on the last value. |
 | `wash-end` | The far stop of the area's gradient. |
-| `wash-start` | The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `wash-start` | The stop of the area's gradient that meets the line. |
 
 #### Custom properties
 
@@ -6009,7 +6009,7 @@ costs contrast for something the mark already says.
 
 | Event | Type | Description |
 | --- | --- | --- |
-| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `helix-dismiss` | `HelixDismissEvent` | Fired when it asks to go, whether by the control or by its timer. |
 
 #### Slots
 
@@ -6493,7 +6493,7 @@ the row itself stays flat.
 | --- | --- | --- |
 | `helix-select` | `HelixSelectEvent` | Fired when the item is chosen. |
 | `helix-open` | `HelixOpenEvent` | Fired before a branch opens, and cancelable. |
-| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `helix-close` | `HelixCloseEvent` | Fired before a branch closes, and cancelable. |
 
 #### Slots
 
@@ -6632,7 +6632,7 @@ keeps its bar, because a reader who stopped it is deciding what to do next.
 | `helix-previous` | `HelixPreviousEvent` | Fired when they ask for the previous one. |
 | `play` | `Event` | Relayed, because it does not cross a shadow boundary. |
 | `pause` | `Event` | Relayed for the same reason. |
-| `ended` | `Event` | Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. |
+| `ended` | `Event` | Relayed for the same reason. |
 
 #### Slots
 

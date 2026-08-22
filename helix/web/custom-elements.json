@@ -4351,7 +4351,7 @@
               }
             },
             {
-              "description": "A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "A column's value inside the tooltip.",
               "name": "tooltip-value",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
@@ -11528,7 +11528,7 @@
               }
             },
             {
-              "description": "The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "The color picker inside it.",
               "name": "picker",
               "inheritedFrom": {
                 "name": "HelixBaseColorInput",
@@ -12750,7 +12750,7 @@
               }
             },
             {
-              "description": "One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "One preset.",
               "name": "swatch",
               "inheritedFrom": {
                 "name": "HelixBaseColorPicker",
@@ -19298,7 +19298,7 @@
               }
             },
             {
-              "description": "A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "A column header naming a day of the week.",
               "name": "weekday",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
@@ -20813,7 +20813,7 @@
           ],
           "slots": [
             {
-              "description": "Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "Goes in the middle of the ring. A total, usually.",
               "name": "",
               "inheritedFrom": {
                 "name": "HelixBaseDonutChart",
@@ -32820,7 +32820,7 @@
               "type": {
                 "text": "HelixCloseEvent"
               },
-              "description": "Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "Fired before it closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
               "inheritedFrom": {
@@ -42286,7 +42286,7 @@
               }
             },
             {
-              "description": "The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "The reading beside the bar, under `show-value`.",
               "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseProgress",
@@ -45777,7 +45777,7 @@
               }
             },
             {
-              "description": "The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "The score written out, under `show-value`.",
               "name": "value",
               "inheritedFrom": {
                 "name": "HelixBaseRating",
@@ -45790,7 +45790,7 @@
               "type": {
                 "text": "HelixChangeEvent"
               },
-              "description": "Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.",
+              "description": "Fired before the score changes, and cancelable.",
               "name": "helix-change",
               "reactProp": "onhelix-change",
               "inheritedFrom": {
@@ -51070,7 +51070,7 @@
               }
             },
             {
-              "description": "The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "The current value, shown beside it.",
               "name": "output",
               "inheritedFrom": {
                 "name": "HelixBaseSlider",
@@ -51590,7 +51590,7 @@
               }
             },
             {
-              "description": "The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "The stop of the area's gradient that meets the line.",
               "name": "wash-start",
               "inheritedFrom": {
                 "name": "HelixBaseSparkline",
@@ -64276,7 +64276,7 @@
               "type": {
                 "text": "HelixDismissEvent"
               },
-              "description": "Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "Fired when it asks to go, whether by the control or by its timer.",
               "name": "helix-dismiss",
               "reactProp": "onhelix-dismiss",
               "inheritedFrom": {
@@ -69112,7 +69112,7 @@
               "type": {
                 "text": "HelixCloseEvent"
               },
-              "description": "Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "Fired before a branch closes, and cancelable.",
               "name": "helix-close",
               "reactProp": "onhelix-close",
               "inheritedFrom": {
@@ -73465,7 +73465,7 @@
               "type": {
                 "text": "Event"
               },
-              "description": "Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "description": "Relayed for the same reason.",
               "name": "ended",
               "reactProp": "onended",
               "inheritedFrom": {

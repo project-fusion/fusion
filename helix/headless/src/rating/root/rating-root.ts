@@ -40,6 +40,17 @@ import { property, state } from 'lit/decorators.js'
  * `KeyboardNavigationController` takes `selects` for, and why this can use it
  * where a menu cannot.
  *
+ * **The mark is a stylesheet's, not a slot's.** A slot projects its content
+ * once, and there are two layers of marks here: slotting a star would put it in
+ * the track or the fill and leave the other empty. So the mark is a shape the
+ * styled tier masks with, which is also what lets a partial one be a clip of the
+ * whole rather than a second drawing of it.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category forms
@@ -48,23 +59,12 @@ import { property, state } from 'lit/decorators.js'
  *
  * @event {HelixChangeEvent} helix-change - Fired before the score changes, and cancelable.
  *
- * **The mark is a stylesheet's, not a slot's.** A slot projects its content
- * once, and there are two layers of marks here: slotting a star would put it in
- * the track or the fill and leave the other empty. So the mark is a shape the
- * styled tier masks with, which is also what lets a partial one be a clip of the
- * whole rather than a second drawing of it.
- *
  * @csspart marks - The row of marks.
  * @csspart track - The unfilled marks.
  * @csspart fill - The filled marks, clipped to the score.
  * @csspart mark - One mark, in either layer.
  * @csspart option - One place a reader can press, which is one step.
  * @csspart value - The score written out, under `show-value`.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --rating-full - How many marks are wholly filled.
  * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.

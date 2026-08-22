@@ -40,6 +40,11 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * the value itself, for the reason Date Input gives about its dates: half-typed
  * input does not survive a round trip through a formatter.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category forms
@@ -62,11 +67,6 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
  * @csspart picker - The color picker inside it.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --color-input-swatch - The chosen colour, to paint over the transparency check.
  */

@@ -80,6 +80,11 @@ interface EyeDropperConstructor {
  * `rebeccapurple` means shipping a table of a hundred and forty or asking the
  * browser, and there is no browser during a server render.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category forms
@@ -108,11 +113,6 @@ interface EyeDropperConstructor {
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart swatches - The row of presets.
  * @csspart swatch - One preset.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.

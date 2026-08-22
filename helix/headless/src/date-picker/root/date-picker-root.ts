@@ -116,12 +116,6 @@ const addMonths = (date: Date, months: number): Date => {
  * Left unset, month and day names come from the runtime's own locale, and a
  * server and a browser need not agree on what that is.
  *
- * @since 0.1.0
- * @status experimental
- * @category forms
- * @aliases Calendar, Date grid, Month view
- * @documentation https://helix.fusion.dev/components/date-picker
- *
  * `helix-change` was `helix-select`, and it moved when the calendar became a
  * form control. A control whose value changes dispatches `helix-change` here:
  * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
@@ -131,6 +125,17 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * Paging is `helix-navigate` and not either of those, because it chooses
  * nothing: the view moves and the answer does not.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category forms
+ * @aliases Calendar, Date grid, Month view
+ * @documentation https://helix.fusion.dev/components/date-picker
  *
  * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
@@ -148,11 +153,6 @@ const addMonths = (date: Date, months: number): Date => {
  * @csspart previous-mark - The glyph on the previous month control.
  * @csspart week - One row of days.
  * @csspart weekday - A column header naming a day of the week.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  */

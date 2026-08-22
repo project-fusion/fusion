@@ -52,6 +52,11 @@ const readValues = (input: string): number[] =>
  * opposite, that a change beside a figure is a second fact, and the spec is
  * right. `Trend` composes the same way.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -65,11 +70,6 @@ const readValues = (input: string): number[] =>
  * @csspart terminus - The mark on the last value.
  * @csspart wash-end - The far stop of the area's gradient.
  * @csspart wash-start - The stop of the area's gradient that meets the line.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --chart-terminus-x - Where the last point sits horizontally, as a percentage.
  * @cssproperty --chart-terminus-y - Where the last point sits vertically, as a percentage.

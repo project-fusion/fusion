@@ -103,6 +103,11 @@ import { property, state } from 'lit/decorators.js'
  * it should be kept at all, is the consumer's to decide, and a component writing
  * to storage on its own would be deciding for all of them under a key it chose.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category layout
@@ -118,11 +123,6 @@ import { property, state } from 'lit/decorators.js'
  * @csspart end - The box holding the second.
  * @csspart separator - The divider itself.
  * @csspart corner - The handle where two dividers cross, added on the client.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.

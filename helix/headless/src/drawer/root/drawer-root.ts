@@ -33,18 +33,18 @@ import { property } from 'lit/decorators.js'
  * the same shape as `Stat`'s `detail` slot, which is what `check:references`
  * was written after and is the half it cannot see.
  *
- * @since 0.1.0
- * @status experimental
- * @category overlays
- * @aliases Sheet, Sidebar, Panel, Off-canvas
- * @documentation https://helix.fusion.dev/components/drawer
- *
  * Opened declaratively with the platform's invoker attributes:
  *
  * ```html
  * <helix-button commandfor="nav" command="--toggle">Menu</helix-button>
  * <helix-drawer id="nav">…</helix-drawer>
  * ```
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category overlays
+ * @aliases Sheet, Sidebar, Panel, Off-canvas
+ * @documentation https://helix.fusion.dev/components/drawer
  *
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.

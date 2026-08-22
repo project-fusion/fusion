@@ -46,12 +46,6 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * sentence wrote an attribute on the host that reached no input and constrained
  * nothing: the field looked as though it were checked and was not.
  *
- * @since 0.1.0
- * @status experimental
- * @category forms
- * @aliases TextField, Field, TextInput
- * @documentation https://helix.fusion.dev/components/input
- *
  * **`clearable` and `reveal` are the field's, not the consumer's.** The `end`
  * slot used to be the answer to both, which meant every consumer of
  * `type="search"` built the same button and every consumer of
@@ -67,6 +61,12 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * revealing a password: a consumer should have to ask for it. Drawer's `modal`
  * defaults true for the opposite reason, that losing a focus trap by forgetting
  * a word is worse than having to say so.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category forms
+ * @aliases TextField, Field, TextInput
+ * @documentation https://helix.fusion.dev/components/input
  *
  * @slot start - Before the text, for an icon or a prefix.
  * @slot end - After the text, for an icon or a unit.

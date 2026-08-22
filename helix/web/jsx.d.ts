@@ -6385,7 +6385,7 @@ number in two languages, drifting the first time either moved. This sets
 
   /** Fired before it opens, and cancelable. */
   "onhelix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before it closes, and cancelable. */
   "onhelix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
 };
 
@@ -6481,7 +6481,7 @@ number in two languages, drifting the first time either moved. This sets
   "prop:fullBelow"?: HelixMegamenu["fullBelow"];
   /** Fired before it opens, and cancelable. */
   "on:helix-open"?: (e: HelixMegamenuHelixOpenElementEvent) => void;
-  /** Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before it closes, and cancelable. */
   "on:helix-close"?: (e: HelixMegamenuHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -8769,7 +8769,7 @@ Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   name?: HelixRating["name"];
 
-  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  /** Fired before the score changes, and cancelable. */
   "onhelix-change"?: (e: HelixRatingHelixChangeElementEvent) => void;
 };
 
@@ -8898,7 +8898,7 @@ imperatively later, and nothing is hydrating by then.
 Here rather than on each control, where it was declared eight times and
 reflected none of them. */
   "prop:name"?: HelixRating["name"];
-  /** Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it. */
+  /** Fired before the score changes, and cancelable. */
   "on:helix-change"?: (e: HelixRatingHelixChangeElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12066,7 +12066,7 @@ is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
   open?: HelixToastItem["open"];
 
-  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired when it asks to go, whether by the control or by its timer. */
   "onhelix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
 };
 
@@ -12113,7 +12113,7 @@ only one starting state that makes sense: a message that has been rendered
 is showing. An attribute whose only legal value is the default is an
 attribute nobody can use. */
   "prop:open"?: HelixToastItem["open"];
-  /** Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired when it asks to go, whether by the control or by its timer. */
   "on:helix-dismiss"?: (e: HelixToastItemHelixDismissElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -12881,7 +12881,7 @@ shadow root, which is not part of the tree React hydrates. */
   "onhelix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "onhelix-open"?: (e: HelixTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before a branch closes, and cancelable. */
   "onhelix-close"?: (e: HelixTreeItemHelixCloseElementEvent) => void;
 };
 
@@ -12956,7 +12956,7 @@ shadow root, which is not part of the tree React hydrates. */
   "on:helix-select"?: (e: HelixTreeItemHelixSelectElementEvent) => void;
   /** Fired before a branch opens, and cancelable. */
   "on:helix-open"?: (e: HelixTreeItemHelixOpenElementEvent) => void;
-  /** Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Fired before a branch closes, and cancelable. */
   "on:helix-close"?: (e: HelixTreeItemHelixCloseElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -13576,7 +13576,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   onplay?: (e: HelixVideoElementEvent) => void;
   /** Relayed for the same reason. */
   onpause?: (e: HelixVideoElementEvent) => void;
-  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Relayed for the same reason. */
   onended?: (e: HelixVideoElementEvent) => void;
 };
 
@@ -13766,7 +13766,7 @@ regardless, because a reader who stopped it is deciding what to do next. */
   "on:play"?: (e: HelixVideoElementEvent) => void;
   /** Relayed for the same reason. */
   "on:pause"?: (e: HelixVideoElementEvent) => void;
-  /** Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself. */
+  /** Relayed for the same reason. */
   "on:ended"?: (e: HelixVideoElementEvent) => void;
 
   /** Set the innerHTML of the element */
@@ -14525,7 +14525,7 @@ export type CustomElements = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-bar-chart": Partial<
     HelixBarChartProps & BaseProps<HelixBarChart> & BaseEvents
@@ -15767,7 +15767,7 @@ export type CustomElements = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `picker`: The color picker inside it.
    */
   "helix-color-input": Partial<
     HelixColorInputProps & BaseProps<HelixColorInput> & BaseEvents
@@ -15976,7 +15976,7 @@ export type CustomElements = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `swatch`: One preset.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps & BaseProps<HelixColorPicker> & BaseEvents
@@ -16908,7 +16908,7 @@ export type CustomElements = {
    * - `previous`: The control that moves to the previous month.
    * - `previous-mark`: The glyph on the previous month control.
    * - `week`: One row of days.
-   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `weekday`: A column header naming a day of the week.
    */
   "helix-date-picker": Partial<
     HelixDatePickerProps & BaseProps<HelixDatePicker> & BaseEvents
@@ -17172,7 +17172,7 @@ export type CustomElements = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
    *
    * ## CSS Custom Properties
    *
@@ -18870,7 +18870,7 @@ export type CustomElements = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before it closes, and cancelable.
    *
    * ## Slots
    *
@@ -20274,7 +20274,7 @@ export type CustomElements = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-progress": Partial<
     HelixProgressProps & BaseProps<HelixProgress> & BaseEvents
@@ -20742,7 +20742,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   * - `helix-change`: Fired before the score changes, and cancelable.
    *
    * ## Slots
    *
@@ -20827,7 +20827,7 @@ export type CustomElements = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-rating": Partial<
     HelixRatingProps & BaseProps<HelixRating> & BaseEvents
@@ -21730,7 +21730,7 @@ export type CustomElements = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `output`: The current value, shown beside it.
    */
   "helix-slider": Partial<
     HelixSliderProps & BaseProps<HelixSlider> & BaseEvents
@@ -21887,7 +21887,7 @@ export type CustomElements = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps & BaseProps<HelixSparkline> & BaseEvents
@@ -23727,7 +23727,7 @@ export type CustomElements = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
    *
    * ## Slots
    *
@@ -24419,7 +24419,7 @@ export type CustomElements = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *
@@ -24937,7 +24937,7 @@ export type CustomElements = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `ended`: Relayed for the same reason.
    *
    * ## Slots
    *
@@ -25800,7 +25800,7 @@ export type CustomElementsSolidJs = {
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
-   * - `tooltip-value`: A column's value inside the tooltip. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `tooltip-value`: A column's value inside the tooltip.
    */
   "helix-bar-chart": Partial<
     HelixBarChartProps &
@@ -27079,7 +27079,7 @@ export type CustomElementsSolidJs = {
    * - `trigger`: The control that opens the panel.
    * - `preview`: The chip showing the color, inside the trigger.
    * - `surface`: The floating panel.
-   * - `picker`: The color picker inside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `picker`: The color picker inside it.
    */
   "helix-color-input": Partial<
     HelixColorInputProps &
@@ -27291,7 +27291,7 @@ export type CustomElementsSolidJs = {
    * - `value`: The color as text, which can be typed or pasted.
    * - `format`: The control that changes the syntax the value is written in.
    * - `swatches`: The row of presets.
-   * - `swatch`: One preset. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `swatch`: One preset.
    */
   "helix-color-picker": Partial<
     HelixColorPickerProps &
@@ -28238,7 +28238,7 @@ export type CustomElementsSolidJs = {
    * - `previous`: The control that moves to the previous month.
    * - `previous-mark`: The glyph on the previous month control.
    * - `week`: One row of days.
-   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `weekday`: A column header naming a day of the week.
    */
   "helix-date-picker": Partial<
     HelixDatePickerProps &
@@ -28511,7 +28511,7 @@ export type CustomElementsSolidJs = {
    *
    * Areas where markup can be added to the component.
    *
-   * - `(default)`: Goes in the middle of the ring. A total, usually. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `(default)`: Goes in the middle of the ring. A total, usually.
    *
    * ## CSS Custom Properties
    *
@@ -30267,7 +30267,7 @@ export type CustomElementsSolidJs = {
    * Events that will be emitted by the component.
    *
    * - `helix-open`: Fired before it opens, and cancelable.
-   * - `helix-close`: Fired before it closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before it closes, and cancelable.
    *
    * ## Slots
    *
@@ -31714,7 +31714,7 @@ export type CustomElementsSolidJs = {
    * - `track`: The full length the work is measured against.
    * - `indicator`: The part of it that is done.
    * - `groove`: The unfilled circle, under the ring's own sweep.
-   * - `value`: The reading beside the bar, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The reading beside the bar, under `show-value`.
    */
   "helix-progress": Partial<
     HelixProgressProps &
@@ -32201,7 +32201,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-change`: Fired before the score changes, and cancelable. **The mark is a stylesheet's, not a slot's.** A slot projects its content once, and there are two layers of marks here: slotting a star would put it in the track or the fill and leave the other empty. So the mark is a shape the styled tier masks with, which is also what lets a partial one be a clip of the whole rather than a second drawing of it.
+   * - `helix-change`: Fired before the score changes, and cancelable.
    *
    * ## Slots
    *
@@ -32286,7 +32286,7 @@ export type CustomElementsSolidJs = {
    * - `fill`: The filled marks, clipped to the score.
    * - `mark`: One mark, in either layer.
    * - `option`: One place a reader can press, which is one step.
-   * - `value`: The score written out, under `show-value`. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `value`: The score written out, under `show-value`.
    */
   "helix-rating": Partial<
     HelixRatingProps &
@@ -33219,7 +33219,7 @@ export type CustomElementsSolidJs = {
    * - `markers`: The row of marks along the track.
    * - `marker`: One mark.
    * - `marker-label`: The value a mark stands at, when `marker-labels` is set.
-   * - `output`: The current value, shown beside it. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `output`: The current value, shown beside it.
    */
   "helix-slider": Partial<
     HelixSliderProps &
@@ -33379,7 +33379,7 @@ export type CustomElementsSolidJs = {
    * - `svg`: The drawing.
    * - `terminus`: The mark on the last value.
    * - `wash-end`: The far stop of the area's gradient.
-   * - `wash-start`: The stop of the area's gradient that meets the line. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `wash-start`: The stop of the area's gradient that meets the line.
    */
   "helix-sparkline": Partial<
     HelixSparklineProps &
@@ -35287,7 +35287,7 @@ export type CustomElementsSolidJs = {
    *
    * Events that will be emitted by the component.
    *
-   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-dismiss`: Fired when it asks to go, whether by the control or by its timer.
    *
    * ## Slots
    *
@@ -36004,7 +36004,7 @@ export type CustomElementsSolidJs = {
    *
    * - `helix-select`: Fired when the item is chosen.
    * - `helix-open`: Fired before a branch opens, and cancelable.
-   * - `helix-close`: Fired before a branch closes, and cancelable. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `helix-close`: Fired before a branch closes, and cancelable.
    *
    * ## Slots
    *
@@ -36541,7 +36541,7 @@ export type CustomElementsSolidJs = {
    * - `helix-previous`: Fired when they ask for the previous one.
    * - `play`: Relayed, because it does not cross a shadow boundary.
    * - `pause`: Relayed for the same reason.
-   * - `ended`: Relayed for the same reason. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `ended`: Relayed for the same reason.
    *
    * ## Slots
    *

@@ -17,6 +17,11 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  * all set explicitly, and rows are `display: contents` so their cells become
  * items of the one grid that does the aligning.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -29,11 +34,6 @@ import type { HelixBaseTableColumn } from '../column/table-column.js'
  * @csspart table - The grid.
  *
  * @cssproperty --table-columns - Track list for the columns.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --table-template - The column track list, built from the columns the consumer declared.
  */

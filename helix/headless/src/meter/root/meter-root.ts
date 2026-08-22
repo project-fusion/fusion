@@ -33,6 +33,11 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * all, which is the same call the carousel's current dot makes by lengthening
  * rather than only changing color.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category feedback
@@ -44,11 +49,6 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @csspart indicator - The part of it the value fills.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart value - The reading, under `show-value`.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.

@@ -35,12 +35,6 @@ import { property } from 'lit/decorators.js'
  * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
  * dialog with no footer has no empty band where one would be.
  *
- * @since 0.1.0
- * @status experimental
- * @category overlays
- * @aliases Modal, Lightbox, Sheet
- * @documentation https://helix.fusion.dev/components/dialog
- *
  * Opened declaratively with the platform's invoker attributes:
  *
  * ```html
@@ -51,6 +45,12 @@ import { property } from 'lit/decorators.js'
  * `--show`, `--close` and `--toggle`. Custom commands rather than the built-in
  * `show-modal`, because those are defined against native elements and do
  * nothing when pointed at a custom one.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category overlays
+ * @aliases Modal, Lightbox, Sheet
+ * @documentation https://helix.fusion.dev/components/dialog
  *
  * @slot - The dialog's content.
  * @slot icon - A single mark above the title, for a dialog that warns.

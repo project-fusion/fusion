@@ -66,6 +66,11 @@ let showing: HelixBaseMegamenu | undefined
  * anything managing it. Escape closes and puts focus back, because Escape is
  * the one key that has to return the reader to where they were.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category navigation
@@ -80,11 +85,6 @@ let showing: HelixBaseMegamenu | undefined
  *
  * @event {HelixOpenEvent} helix-open - Fired before it opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  */

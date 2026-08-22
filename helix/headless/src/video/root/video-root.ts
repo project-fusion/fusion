@@ -111,12 +111,6 @@ const SKIP_SECONDS = 10
  * plays and immediately pauses. The focus stop goes with them, since the native
  * controls bring their own.
  *
- * @since 0.1.0
- * @status experimental
- * @category content
- * @aliases Player, Media, Movie
- * @documentation https://helix.fusion.dev/components/video
- *
  * **`<source>` and `<track>` are copied into the video, not slotted into it.**
  * A media element runs its resource selection over its own child *nodes*, and a
  * slot is one node: the sources and the caption tracks a consumer wrote were
@@ -141,6 +135,17 @@ const SKIP_SECONDS = 10
  * something has answered `watchAvailability`: a button that opens an empty list
  * is worse than no button, and a consumer who wants none can set
  * `disableremoteplayback` on this element.
+ *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category content
+ * @aliases Player, Media, Movie
+ * @documentation https://helix.fusion.dev/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
  * @slot back - Top left over the frame, for a way out of a set.
@@ -184,11 +189,6 @@ const SKIP_SECONDS = 10
  * @event {Event} play - Relayed, because it does not cross a shadow boundary.
  * @event {Event} pause - Relayed for the same reason.
  * @event {Event} ended - Relayed for the same reason.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --video-intrinsic-ratio - The media's own aspect ratio, once it is known. `--video-aspect-ratio` overrides it.
  * @cssproperty --video-level - The current volume, 0 to 1.

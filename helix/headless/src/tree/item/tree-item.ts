@@ -26,11 +26,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * server renders the node as a leaf and the twisty appears on hydration. It
  * appears rather than disappearing, which is the harmless direction.
  *
- * @since 0.1.0
- * @status experimental
- * @aliases TreeNode, Branch, Leaf
- * @documentation https://helix.fusion.dev/components/tree
- *
  * **`href` makes the row itself the link.** A tree used as navigation is a list
  * of links, and the row is what a reader presses: with the anchor slotted into
  * the name instead, everything outside the words is dead, Enter does nothing,
@@ -50,6 +45,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `href` unset. The row follows that one too, so the whole row works either
  * way; what the anchor adds is what only a real anchor can give.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @aliases TreeNode, Branch, Leaf
+ * @documentation https://helix.fusion.dev/components/tree
+ *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
  * @slot start - Before the label, after the chevron. A mark about the item.
@@ -64,11 +69,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen.
  * @event {HelixOpenEvent} helix-open - Fired before a branch opens, and cancelable.
  * @event {HelixCloseEvent} helix-close - Fired before a branch closes, and cancelable.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
  */

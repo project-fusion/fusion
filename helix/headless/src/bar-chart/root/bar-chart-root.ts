@@ -41,6 +41,11 @@ const HEIGHT = 100
  * A reader who wants the numbers gets the numbers, not a described picture of
  * them.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -66,11 +71,6 @@ const HEIGHT = 100
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
  * @csspart tooltip-value - A column's value inside the tooltip.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --bar-chart-axis - The colour of a single-series axis, taken from that series.
  * @cssproperty --bar-chart-secondary - The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.

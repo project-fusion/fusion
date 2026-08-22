@@ -86,6 +86,11 @@ const THICKNESS: Record<string, number> = {
  *
  * The table is the accessible representation and this drawing is `aria-hidden`.
  *
+ * The properties below are written by this component and read by whoever draws
+ * it. A consumer sets none of them: they carry a number this element computed
+ * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
+ * without measuring anything itself.
+ *
  * @since 0.1.0
  * @status experimental
  * @category content
@@ -105,11 +110,6 @@ const THICKNESS: Record<string, number> = {
  * @csspart track - The ring the slices are drawn on.
  *
  * @slot - Goes in the middle of the ring. A total, usually.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
  *
  * @cssproperty --donut-chart-stroke - How thick the ring is drawn, derived from `hole`.
  */

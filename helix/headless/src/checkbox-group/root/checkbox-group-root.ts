@@ -28,17 +28,17 @@ import { HelixBaseCheckbox } from '../../checkbox/root/checkbox-root.js'
  * `value` is the checked values, comma separated, in the order the boxes are
  * written. Setting it ticks exactly those and unticks the rest.
  *
- * @since 0.1.0
- * @status experimental
- * @category forms
- * @aliases Checkbox list, Multi-select
- * @documentation https://helix.fusion.dev/components/checkbox-group
- *
  * **Its message is always given, never derived.** Every form-related member of
  * `ElementInternals` throws on an element that is not form-associated, and this
  * one is not, on purpose: the boxes submit themselves. So `feedback` is what
  * shows here, and the browser has nothing to say about a set it does not know
  * is a set.
+ *
+ * @since 0.1.0
+ * @status experimental
+ * @category forms
+ * @aliases Checkbox list, Multi-select
+ * @documentation https://helix.fusion.dev/components/checkbox-group
  *
  * @slot - The checkboxes.
  * @slot label - Richer than a string, where the label is more than one.
