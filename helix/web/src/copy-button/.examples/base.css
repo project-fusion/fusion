@@ -36,23 +36,23 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-base-copy-button::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
-}
-
 helix-base-copy-button::part(button) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
 }
 
-helix-base-icon::part(svg) {
+helix-base-copy-button::part(mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-base-copy-button::part(tooltip) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  padding: 0.5rem;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

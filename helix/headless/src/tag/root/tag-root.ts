@@ -25,8 +25,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot prefix - A category the label belongs to, set before it and weightier.
  * @slot - The tag's label.
  *
- * @csspart prefix - The category before the label.
  * @csspart dismiss - The control that asks to remove the tag.
+ * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart prefix - The category before the label.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag.
  */
@@ -48,7 +49,7 @@ export class HelixBaseTag extends MixinDismissible(HelixElement) {
             aria-label=${this.dismissLabel}
             @click=${() => this.dismiss()}
           >
-            <svg fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
+            <svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
               ${unsafeSVG(x.content)}
             </svg>
           </button>`

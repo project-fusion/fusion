@@ -12382,9 +12382,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `content`: The message region.
    * - `actions`: The trailing action region.
+   * - `content`: The message region.
    * - `dismiss`: The control that asks to close.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    */
   "helix-base-announcement": Partial<
     HelixBaseAnnouncementProps & BaseProps<HelixBaseAnnouncement> & BaseEvents
@@ -12743,20 +12744,21 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `bar`: One column.
+   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
+   * - `bar`: One column.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
-   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
-   * - `line`: A series drawn as a line rather than as columns, under `lines`.
-   * - `tick`: One number on an axis.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
+   * - `line`: A series drawn as a line rather than as columns, under `lines`.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `svg`: The drawing surface the bars and lines sit on.
+   * - `tick`: One number on an axis.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -12853,8 +12855,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `separator`: The separator preceding the item.
    * - `link`: The crumb itself, which is an `<a>` where `href` is set.
+   * - `separator`: The separator preceding the item.
+   * - `separator-mark`: The glyph between this crumb and the next, where none is slotted.
    */
   "helix-base-breadcrumb": Partial<
     HelixBaseBreadcrumbProps & BaseProps<HelixBaseBreadcrumb> & BaseEvents
@@ -13142,8 +13145,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `icon`: The icon region.
    * - `content`: The content region.
+   * - `icon`: The icon region.
+   * - `icon-mark`: The severity glyph, where none is slotted.
    */
   "helix-base-callout": Partial<
     HelixBaseCalloutProps & BaseProps<HelixBaseCallout> & BaseEvents
@@ -13289,12 +13293,15 @@ export type CustomElements = {
    * Custom selectors for styling elements within the component.
    *
    * - `controls`: The row of controls.
-   * - `rotation`: The control that stops and starts rotation.
-   * - `previous`: The control that moves to the previous slide.
-   * - `next`: The control that moves to the next slide.
-   * - `track`: The scroller the slides sit in.
-   * - `indicators`: The row of controls saying where the reader is.
    * - `indicator`: One of them, and a way to reach that slide.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `next`: The control that moves to the next slide.
+   * - `next-mark`: The glyph on the next control.
+   * - `previous`: The control that moves to the previous slide.
+   * - `previous-mark`: The glyph on the previous control.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `rotation-mark`: The glyph on the play and pause control.
+   * - `track`: The scroller the slides sit in.
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps & BaseProps<HelixBaseCarousel> & BaseEvents
@@ -14649,8 +14656,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tooltip`: The bubble, forwarded from the tooltip inside.
    * - `button`: The inner button.
+   * - `mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
    */
   "helix-base-copy-button": Partial<
     HelixBaseCopyButtonProps & BaseProps<HelixBaseCopyButton> & BaseEvents
@@ -15087,17 +15095,19 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `months`: The run of months.
-   * - `month`: One month, its header and its grid.
-   * - `header`: The month name and its controls.
-   * - `previous`: The control that moves to the previous month.
-   * - `next`: The control that moves to the next month.
-   * - `heading`: The month and year being shown.
-   * - `grid`: The grid of days.
-   * - `weekday`: A column header naming a day of the week.
-   * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `grid`: The grid of days.
+   * - `header`: The month name and its controls.
+   * - `heading`: The month and year being shown.
+   * - `month`: One month, its header and its grid.
+   * - `months`: The run of months.
+   * - `next`: The control that moves to the next month.
+   * - `next-mark`: The glyph on the next month control.
+   * - `previous`: The control that moves to the previous month.
+   * - `previous-mark`: The glyph on the previous month control.
+   * - `week`: One row of days.
+   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps & BaseProps<HelixBaseDatePicker> & BaseEvents
@@ -15631,10 +15641,11 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `header`: The bar above a page, holding the way back and its name.
    * - `back`: The control that returns one page.
-   * - `title`: The name of the page showing.
+   * - `back-mark`: The glyph on the back control.
+   * - `header`: The bar above a page, holding the way back and its name.
    * - `page`: The region the rows are in.
+   * - `title`: The name of the page showing.
    */
   "helix-base-drilldown": Partial<
     HelixBaseDrilldownProps & BaseProps<HelixBaseDrilldown> & BaseEvents
@@ -16558,10 +16569,11 @@ export type CustomElements = {
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `svg`: The drawing surface the lines and areas sit on.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -16916,14 +16928,15 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the list.
-   * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
-   * - `search`: The region holding the field that narrows the list.
-   * - `filter-icon`: The mark beside that field.
-   * - `search-field`: The field itself.
-   * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
+   * - `filter-icon`: The mark beside that field.
+   * - `filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `hint`: Help under the list.
+   * - `items`: The list itself.
+   * - `label`: The question, over the list.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
    */
   "helix-base-listbox": Partial<
     HelixBaseListboxProps & BaseProps<HelixBaseListbox> & BaseEvents
@@ -17348,9 +17361,10 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `menu`: The floating panel the menu is drawn on.
-   * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
+   * - `back-mark`: The glyph on the back control of a submenu.
+   * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `menu`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-base-menu": Partial<
@@ -17706,11 +17720,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The name over the field, which is also the scrub grip.
-   * - `field`: The box holding everything.
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
+   * - `decrement-mark`: The glyph on the step down control.
+   * - `field`: The box holding everything.
    * - `increment`: The control that steps up.
+   * - `increment-mark`: The glyph on the step up control.
+   * - `label`: The name over the field, which is also the scrub grip.
    */
   "helix-base-number-input": Partial<
     HelixBaseNumberInputProps & BaseProps<HelixBaseNumberInput> & BaseEvents
@@ -18098,16 +18114,17 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The run of pages.
-   * - `item`: One slot in the run, holding a page or a gap.
-   * - `page`: The control for one page.
-   * - `gap`: The control standing over pages not shown, which jumps into them.
-   * - `previous`: The control that moves back one page.
-   * - `next`: The control that moves forward one page.
    * - `first`: The control that jumps to the first page, under `ends`.
+   * - `gap`: The control standing over pages not shown, which jumps into them.
+   * - `item`: One slot in the run, holding a page or a gap.
    * - `last`: The control that jumps to the last page, under `ends`.
-   * - `status`: The reading of where you are, in `compact`.
+   * - `list`: The run of pages.
    * - `live`: The region that says the page changed. Clipped, not hidden.
+   * - `mark`: The glyph on a first, previous, next or last control.
+   * - `next`: The control that moves forward one page.
+   * - `page`: The control for one page.
+   * - `previous`: The control that moves back one page.
+   * - `status`: The reading of where you are, in `compact`.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps & BaseProps<HelixBasePagination> & BaseEvents
@@ -20409,13 +20426,14 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is a `helix-button`.
-   * - `description`: The line under it.
-   * - `lead`: The half line arriving from the step before.
-   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
+   * - `description`: The line under it.
+   * - `label`: The step's name, which is a `helix-button`.
+   * - `lead`: The half line arriving from the step before.
+   * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
+   * - `marker`: The shape carrying the number or the check.
+   * - `trail`: The half line running on to the next.
    */
   "helix-base-step": Partial<
     HelixBaseStepProps & BaseProps<HelixBaseStep> & BaseEvents
@@ -20963,8 +20981,9 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `prefix`: The category before the label.
    * - `dismiss`: The control that asks to remove the tag.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `prefix`: The category before the label.
    */
   "helix-base-tag": Partial<
     HelixBaseTagProps & BaseProps<HelixBaseTag> & BaseEvents
@@ -21796,11 +21815,13 @@ export type CustomElements = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The message's own surface.
-   * - `icon`: The severity mark, where the message has one.
-   * - `content`: The message.
    * - `actions`: The region holding what to do about it.
+   * - `content`: The message.
    * - `dismiss`: The control that asks to close.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `icon`: The severity mark, where the message has one.
+   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
   "helix-base-toast-item": Partial<
@@ -23444,9 +23465,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `content`: The message region.
    * - `actions`: The trailing action region.
+   * - `content`: The message region.
    * - `dismiss`: The control that asks to close.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
    */
   "helix-base-announcement": Partial<
     HelixBaseAnnouncementProps &
@@ -23820,20 +23842,21 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `bar`: One column.
+   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
    * - `band`: The slot the pointer is resting in.
+   * - `bar`: One column.
    * - `baseline`: The rule the columns stand on.
    * - `gridline`: One rule across the plot, under `gridlines`.
-   * - `axis`: One scale's numbers, drawn only when `secondary` splits them.
-   * - `line`: A series drawn as a line rather than as columns, under `lines`.
-   * - `tick`: One number on an axis.
    * - `group`: One category's columns, together.
    * - `label`: One category's name.
    * - `labels`: The row of category names.
+   * - `line`: A series drawn as a line rather than as columns, under `lines`.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `svg`: The drawing surface the bars and lines sit on.
+   * - `tick`: One number on an axis.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -23936,8 +23959,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `separator`: The separator preceding the item.
    * - `link`: The crumb itself, which is an `<a>` where `href` is set.
+   * - `separator`: The separator preceding the item.
+   * - `separator-mark`: The glyph between this crumb and the next, where none is slotted.
    */
   "helix-base-breadcrumb": Partial<
     HelixBaseBreadcrumbProps &
@@ -24237,8 +24261,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `icon`: The icon region.
    * - `content`: The content region.
+   * - `icon`: The icon region.
+   * - `icon-mark`: The severity glyph, where none is slotted.
    */
   "helix-base-callout": Partial<
     HelixBaseCalloutProps &
@@ -24390,12 +24415,15 @@ export type CustomElementsSolidJs = {
    * Custom selectors for styling elements within the component.
    *
    * - `controls`: The row of controls.
-   * - `rotation`: The control that stops and starts rotation.
-   * - `previous`: The control that moves to the previous slide.
-   * - `next`: The control that moves to the next slide.
-   * - `track`: The scroller the slides sit in.
-   * - `indicators`: The row of controls saying where the reader is.
    * - `indicator`: One of them, and a way to reach that slide.
+   * - `indicators`: The row of controls saying where the reader is.
+   * - `next`: The control that moves to the next slide.
+   * - `next-mark`: The glyph on the next control.
+   * - `previous`: The control that moves to the previous slide.
+   * - `previous-mark`: The glyph on the previous control.
+   * - `rotation`: The control that stops and starts rotation.
+   * - `rotation-mark`: The glyph on the play and pause control.
+   * - `track`: The scroller the slides sit in.
    */
   "helix-base-carousel": Partial<
     HelixBaseCarouselProps &
@@ -25777,8 +25805,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `tooltip`: The bubble, forwarded from the tooltip inside.
    * - `button`: The inner button.
+   * - `mark`: The clipboard glyph, and the confirmation that replaces it.
+   * - `tooltip`: The bubble, forwarded from the tooltip inside.
    */
   "helix-base-copy-button": Partial<
     HelixBaseCopyButtonProps &
@@ -26221,17 +26250,19 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `months`: The run of months.
-   * - `month`: One month, its header and its grid.
-   * - `header`: The month name and its controls.
-   * - `previous`: The control that moves to the previous month.
-   * - `next`: The control that moves to the next month.
-   * - `heading`: The month and year being shown.
-   * - `grid`: The grid of days.
-   * - `weekday`: A column header naming a day of the week.
-   * - `week`: One row of days.
    * - `cell`: One column of a row, which is what a range paints.
-   * - `day`: The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
+   * - `day`: The shape inside a cell, which is what a single date paints.
+   * - `grid`: The grid of days.
+   * - `header`: The month name and its controls.
+   * - `heading`: The month and year being shown.
+   * - `month`: One month, its header and its grid.
+   * - `months`: The run of months.
+   * - `next`: The control that moves to the next month.
+   * - `next-mark`: The glyph on the next month control.
+   * - `previous`: The control that moves to the previous month.
+   * - `previous-mark`: The glyph on the previous month control.
+   * - `week`: One row of days.
+   * - `weekday`: A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.
    */
   "helix-base-date-picker": Partial<
     HelixBaseDatePickerProps &
@@ -26783,10 +26814,11 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `header`: The bar above a page, holding the way back and its name.
    * - `back`: The control that returns one page.
-   * - `title`: The name of the page showing.
+   * - `back-mark`: The glyph on the back control.
+   * - `header`: The bar above a page, holding the way back and its name.
    * - `page`: The region the rows are in.
+   * - `title`: The name of the page showing.
    */
   "helix-base-drilldown": Partial<
     HelixBaseDrilldownProps &
@@ -27737,10 +27769,11 @@ export type CustomElementsSolidJs = {
    * - `label`: One reading's name.
    * - `labels`: The row of reading names.
    * - `line`: One series.
+   * - `mark`: The invisible point the tooltip is anchored to.
    * - `plot`: The drawing.
+   * - `svg`: The drawing surface the lines and areas sit on.
    * - `tooltip`: The bubble, forwarded from `Tooltip`.
    * - `tooltip-anchor`: The `Tooltip` element itself.
-   * - `mark`: The invisible point the tooltip is anchored to.
    * - `tooltip-cell`: One column's name and value inside the tooltip.
    * - `tooltip-label`: The reading's own name inside the tooltip.
    * - `tooltip-name`: A column's name inside the tooltip.
@@ -28104,14 +28137,15 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The question, over the list.
-   * - `items`: The list itself.
    * - `empty`: Shown when a filter has hidden everything.
-   * - `search`: The region holding the field that narrows the list.
-   * - `filter-icon`: The mark beside that field.
-   * - `search-field`: The field itself.
-   * - `hint`: Help under the list.
    * - `feedback`: What is wrong with it.
+   * - `filter-icon`: The mark beside that field.
+   * - `filter-mark`: The glyph beside the filter field, where none is slotted.
+   * - `hint`: Help under the list.
+   * - `items`: The list itself.
+   * - `label`: The question, over the list.
+   * - `search`: The region holding the field that narrows the list.
+   * - `search-field`: The field itself.
    */
   "helix-base-listbox": Partial<
     HelixBaseListboxProps &
@@ -28548,9 +28582,10 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `menu`: The floating panel the menu is drawn on.
-   * - `header`: The bar above a submenu, holding the way back and its name.
    * - `back`: The control that returns from a submenu.
+   * - `back-mark`: The glyph on the back control of a submenu.
+   * - `header`: The bar above a submenu, holding the way back and its name.
+   * - `menu`: The floating panel the menu is drawn on.
    * - `title`: The name of the submenu that is showing.
    */
   "helix-base-menu": Partial<
@@ -28915,11 +28950,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `label`: The name over the field, which is also the scrub grip.
-   * - `field`: The box holding everything.
    * - `control`: The field itself.
    * - `decrement`: The control that steps down.
+   * - `decrement-mark`: The glyph on the step down control.
+   * - `field`: The box holding everything.
    * - `increment`: The control that steps up.
+   * - `increment-mark`: The glyph on the step up control.
+   * - `label`: The name over the field, which is also the scrub grip.
    */
   "helix-base-number-input": Partial<
     HelixBaseNumberInputProps &
@@ -29319,16 +29356,17 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `list`: The run of pages.
-   * - `item`: One slot in the run, holding a page or a gap.
-   * - `page`: The control for one page.
-   * - `gap`: The control standing over pages not shown, which jumps into them.
-   * - `previous`: The control that moves back one page.
-   * - `next`: The control that moves forward one page.
    * - `first`: The control that jumps to the first page, under `ends`.
+   * - `gap`: The control standing over pages not shown, which jumps into them.
+   * - `item`: One slot in the run, holding a page or a gap.
    * - `last`: The control that jumps to the last page, under `ends`.
-   * - `status`: The reading of where you are, in `compact`.
+   * - `list`: The run of pages.
    * - `live`: The region that says the page changed. Clipped, not hidden.
+   * - `mark`: The glyph on a first, previous, next or last control.
+   * - `next`: The control that moves forward one page.
+   * - `page`: The control for one page.
+   * - `previous`: The control that moves back one page.
+   * - `status`: The reading of where you are, in `compact`.
    */
   "helix-base-pagination": Partial<
     HelixBasePaginationProps &
@@ -31692,13 +31730,14 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `marker`: The shape carrying the number or the check.
    * - `body`: The name and its description.
-   * - `label`: The step's name, which is a `helix-button`.
-   * - `description`: The line under it.
-   * - `lead`: The half line arriving from the step before.
-   * - `trail`: The half line running on to the next.
    * - `content`: What the stage holds, while it is open.
+   * - `description`: The line under it.
+   * - `label`: The step's name, which is a `helix-button`.
+   * - `lead`: The half line arriving from the step before.
+   * - `mark`: The glyph inside the marker: a tick, a dot, or an empty ring.
+   * - `marker`: The shape carrying the number or the check.
+   * - `trail`: The half line running on to the next.
    */
   "helix-base-step": Partial<
     HelixBaseStepProps &
@@ -32273,8 +32312,9 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `prefix`: The category before the label.
    * - `dismiss`: The control that asks to remove the tag.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `prefix`: The category before the label.
    */
   "helix-base-tag": Partial<
     HelixBaseTagProps &
@@ -33124,11 +33164,13 @@ export type CustomElementsSolidJs = {
    *
    * Custom selectors for styling elements within the component.
    *
-   * - `item`: The message's own surface.
-   * - `icon`: The severity mark, where the message has one.
-   * - `content`: The message.
    * - `actions`: The region holding what to do about it.
+   * - `content`: The message.
    * - `dismiss`: The control that asks to close.
+   * - `dismiss-mark`: The glyph on the dismiss control, where none is slotted.
+   * - `icon`: The severity mark, where the message has one.
+   * - `icon-mark`: The severity glyph, where none is slotted.
+   * - `item`: The message's own surface.
    * - `timer`: The bar showing how long is left, where a duration was given.
    */
   "helix-base-toast-item": Partial<

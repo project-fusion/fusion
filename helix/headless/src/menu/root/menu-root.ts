@@ -50,9 +50,10 @@ import type { HelixBaseMenuItem } from '../item/menu-item.js'
  * @event {HelixCloseEvent} helix-close - Fired before it closes, and cancelable.
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen.
  *
- * @csspart menu - The floating panel the menu is drawn on.
- * @csspart header - The bar above a submenu, holding the way back and its name.
  * @csspart back - The control that returns from a submenu.
+ * @csspart back-mark - The glyph on the back control of a submenu.
+ * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart menu - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  */
 @customElement('helix-base-menu')
@@ -386,7 +387,7 @@ export class HelixBaseMenu extends MixinCollection(MixinControllerOpen(HelixElem
                   aria-label=${this.backLabel}
                   @click=${() => this.leave()}
                 >
-                  <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                  <svg part="back-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                     ${unsafeSVG(caretLeft.content)}
                   </svg>
                 </button>

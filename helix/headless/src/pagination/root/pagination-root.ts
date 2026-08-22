@@ -138,16 +138,17 @@ const fill = (
  * @aliases Pager, Page nav
  * @documentation https://helix.fusion.dev/components/pagination
  *
- * @csspart list - The run of pages.
- * @csspart item - One slot in the run, holding a page or a gap.
- * @csspart page - The control for one page.
- * @csspart gap - The control standing over pages not shown, which jumps into them.
- * @csspart previous - The control that moves back one page.
- * @csspart next - The control that moves forward one page.
  * @csspart first - The control that jumps to the first page, under `ends`.
+ * @csspart gap - The control standing over pages not shown, which jumps into them.
+ * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
- * @csspart status - The reading of where you are, in `compact`.
+ * @csspart list - The run of pages.
  * @csspart live - The region that says the page changed. Clipped, not hidden.
+ * @csspart mark - The glyph on a first, previous, next or last control.
+ * @csspart next - The control that moves forward one page.
+ * @csspart page - The control for one page.
+ * @csspart previous - The control that moves back one page.
+ * @csspart status - The reading of where you are, in `compact`.
  *
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
  */
@@ -616,7 +617,7 @@ export class HelixBasePagination extends HelixElement {
     return {
       address: spent ? nothing : fill(this.href, to, this.count),
       click: (event: Event): void => this.go(to, event),
-      glyph: html`<svg fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
+      glyph: html`<svg part="mark" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
         ${unsafeSVG(icon.content)}
       </svg>`,
       name,

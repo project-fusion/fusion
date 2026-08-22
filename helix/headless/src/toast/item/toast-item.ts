@@ -63,11 +63,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *   and the severity mark is the one a consumer reaches for.
  * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
  *
- * @csspart item - The message's own surface.
- * @csspart icon - The severity mark, where the message has one.
- * @csspart content - The message.
  * @csspart actions - The region holding what to do about it.
+ * @csspart content - The message.
  * @csspart dismiss - The control that asks to close.
+ * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart icon - The severity mark, where the message has one.
+ * @csspart icon-mark - The severity glyph, where none is slotted.
+ * @csspart item - The message's own surface.
  * @csspart timer - The bar showing how long is left, where a duration was given.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer.
@@ -295,7 +297,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
    */
   protected renderIcon(severity: SeverityMark): TemplateResult {
     return html`<slot name="icon">
-      <svg
+      <svg part="icon-mark"
         fill="currentColor"
         viewBox=${severity.icon.viewBox}
         role="img"
@@ -317,7 +319,7 @@ export class HelixBaseToastItem extends MixinDismissible(HelixElement) {
    */
   protected renderDismissIcon(): TemplateResult {
     return html`<slot name="dismiss-icon">
-      <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
         ${unsafeSVG(x.content)}
       </svg>
     </slot>`

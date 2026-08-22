@@ -42,16 +42,34 @@ helix-base-carousel::part(controls) {
   gap: 0.25rem;
 }
 
+helix-base-carousel::part(next) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+helix-base-carousel::part(next-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-carousel::part(previous) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
 }
 
-helix-base-carousel::part(next) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
+helix-base-carousel::part(previous-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-carousel::part(rotation-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-carousel::part(track) {
@@ -59,10 +77,4 @@ helix-base-carousel::part(track) {
   block-size: 0.5rem;
   display: block;
   inline-size: 100%;
-}
-
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
 }

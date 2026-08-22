@@ -60,12 +60,6 @@ helix-base-icon-button::part(button) {
   cursor: pointer;
 }
 
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-base-speed-dial-item::part(item) {
   padding: 0.25rem 0.5rem;
 }

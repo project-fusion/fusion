@@ -603,16 +603,20 @@
           "name": "HelixBaseAnnouncement",
           "cssParts": [
             {
-              "description": "The message region.",
-              "name": "content"
-            },
-            {
               "description": "The trailing action region.",
               "name": "actions"
             },
             {
+              "description": "The message region.",
+              "name": "content"
+            },
+            {
               "description": "The control that asks to close.",
               "name": "dismiss"
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark"
             }
           ],
           "slots": [
@@ -1830,12 +1834,16 @@
           ],
           "cssParts": [
             {
-              "description": "One column.",
-              "name": "bar"
+              "description": "One scale's numbers, drawn only when `secondary` splits them.",
+              "name": "axis"
             },
             {
               "description": "The slot the pointer is resting in.",
               "name": "band"
+            },
+            {
+              "description": "One column.",
+              "name": "bar"
             },
             {
               "description": "The rule the columns stand on.",
@@ -1844,18 +1852,6 @@
             {
               "description": "One rule across the plot, under `gridlines`.",
               "name": "gridline"
-            },
-            {
-              "description": "One scale's numbers, drawn only when `secondary` splits them.",
-              "name": "axis"
-            },
-            {
-              "description": "A series drawn as a line rather than as columns, under `lines`.",
-              "name": "line"
-            },
-            {
-              "description": "One number on an axis.",
-              "name": "tick"
             },
             {
               "description": "One category's columns, together.",
@@ -1870,8 +1866,24 @@
               "name": "labels"
             },
             {
+              "description": "A series drawn as a line rather than as columns, under `lines`.",
+              "name": "line"
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
+            },
+            {
               "description": "The drawing.",
               "name": "plot"
+            },
+            {
+              "description": "The drawing surface the bars and lines sit on.",
+              "name": "svg"
+            },
+            {
+              "description": "One number on an axis.",
+              "name": "tick"
             },
             {
               "description": "The bubble, forwarded from `Tooltip`.",
@@ -1880,10 +1892,6 @@
             {
               "description": "The `Tooltip` element itself.",
               "name": "tooltip-anchor"
-            },
-            {
-              "description": "The invisible point the tooltip is anchored to.",
-              "name": "mark"
             },
             {
               "description": "One column's name and value inside the tooltip.",
@@ -2705,12 +2713,16 @@
           "name": "HelixBaseBreadcrumb",
           "cssParts": [
             {
+              "description": "The crumb itself, which is an `<a>` where `href` is set.",
+              "name": "link"
+            },
+            {
               "description": "The separator preceding the item.",
               "name": "separator"
             },
             {
-              "description": "The crumb itself, which is an `<a>` where `href` is set.",
-              "name": "link"
+              "description": "The glyph between this crumb and the next, where none is slotted.",
+              "name": "separator-mark"
             }
           ],
           "slots": [
@@ -3727,12 +3739,16 @@
           "name": "HelixBaseCallout",
           "cssParts": [
             {
+              "description": "The content region.",
+              "name": "content"
+            },
+            {
               "description": "The icon region.",
               "name": "icon"
             },
             {
-              "description": "The content region.",
-              "name": "content"
+              "description": "The severity glyph, where none is slotted.",
+              "name": "icon-mark"
             }
           ],
           "slots": [
@@ -4116,28 +4132,40 @@
               "name": "controls"
             },
             {
-              "description": "The control that stops and starts rotation.",
-              "name": "rotation"
-            },
-            {
-              "description": "The control that moves to the previous slide.",
-              "name": "previous"
-            },
-            {
-              "description": "The control that moves to the next slide.",
-              "name": "next"
-            },
-            {
-              "description": "The scroller the slides sit in.",
-              "name": "track"
+              "description": "One of them, and a way to reach that slide.",
+              "name": "indicator"
             },
             {
               "description": "The row of controls saying where the reader is.",
               "name": "indicators"
             },
             {
-              "description": "One of them, and a way to reach that slide.",
-              "name": "indicator"
+              "description": "The control that moves to the next slide.",
+              "name": "next"
+            },
+            {
+              "description": "The glyph on the next control.",
+              "name": "next-mark"
+            },
+            {
+              "description": "The control that moves to the previous slide.",
+              "name": "previous"
+            },
+            {
+              "description": "The glyph on the previous control.",
+              "name": "previous-mark"
+            },
+            {
+              "description": "The control that stops and starts rotation.",
+              "name": "rotation"
+            },
+            {
+              "description": "The glyph on the play and pause control.",
+              "name": "rotation-mark"
+            },
+            {
+              "description": "The scroller the slides sit in.",
+              "name": "track"
             }
           ],
           "slots": [
@@ -11017,16 +11045,20 @@
           "name": "HelixBaseCopyButton",
           "cssParts": [
             {
-              "description": "The bubble, forwarded from the tooltip inside.",
-              "name": "tooltip"
-            },
-            {
               "description": "The inner button.",
               "name": "button",
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
               }
+            },
+            {
+              "description": "The clipboard glyph, and the confirmation that replaces it.",
+              "name": "mark"
+            },
+            {
+              "description": "The bubble, forwarded from the tooltip inside.",
+              "name": "tooltip"
             }
           ],
           "slots": [
@@ -13176,48 +13208,56 @@
           ],
           "cssParts": [
             {
-              "description": "The run of months.",
-              "name": "months"
+              "description": "One column of a row, which is what a range paints.",
+              "name": "cell"
             },
             {
-              "description": "One month, its header and its grid.",
-              "name": "month"
-            },
-            {
-              "description": "The month name and its controls.",
-              "name": "header"
-            },
-            {
-              "description": "The control that moves to the previous month.",
-              "name": "previous"
-            },
-            {
-              "description": "The control that moves to the next month.",
-              "name": "next"
-            },
-            {
-              "description": "The month and year being shown.",
-              "name": "heading"
+              "description": "The shape inside a cell, which is what a single date paints.",
+              "name": "day"
             },
             {
               "description": "The grid of days.",
               "name": "grid"
             },
             {
-              "description": "A column header naming a day of the week.",
-              "name": "weekday"
+              "description": "The month name and its controls.",
+              "name": "header"
+            },
+            {
+              "description": "The month and year being shown.",
+              "name": "heading"
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "month"
+            },
+            {
+              "description": "The run of months.",
+              "name": "months"
+            },
+            {
+              "description": "The control that moves to the next month.",
+              "name": "next"
+            },
+            {
+              "description": "The glyph on the next month control.",
+              "name": "next-mark"
+            },
+            {
+              "description": "The control that moves to the previous month.",
+              "name": "previous"
+            },
+            {
+              "description": "The glyph on the previous month control.",
+              "name": "previous-mark"
             },
             {
               "description": "One row of days.",
               "name": "week"
             },
             {
-              "description": "One column of a row, which is what a range paints.",
-              "name": "cell"
-            },
-            {
-              "description": "The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
-              "name": "day"
+              "description": "A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "name": "weekday"
             }
           ],
           "members": [
@@ -16081,20 +16121,24 @@
           "name": "HelixBaseDrilldown",
           "cssParts": [
             {
-              "description": "The bar above a page, holding the way back and its name.",
-              "name": "header"
-            },
-            {
               "description": "The control that returns one page.",
               "name": "back"
             },
             {
-              "description": "The name of the page showing.",
-              "name": "title"
+              "description": "The glyph on the back control.",
+              "name": "back-mark"
+            },
+            {
+              "description": "The bar above a page, holding the way back and its name.",
+              "name": "header"
             },
             {
               "description": "The region the rows are in.",
               "name": "page"
+            },
+            {
+              "description": "The name of the page showing.",
+              "name": "title"
             }
           ],
           "slots": [
@@ -21009,8 +21053,16 @@
               "name": "line"
             },
             {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark"
+            },
+            {
               "description": "The drawing.",
               "name": "plot"
+            },
+            {
+              "description": "The drawing surface the lines and areas sit on.",
+              "name": "svg"
             },
             {
               "description": "The bubble, forwarded from `Tooltip`.",
@@ -21019,10 +21071,6 @@
             {
               "description": "The `Tooltip` element itself.",
               "name": "tooltip-anchor"
-            },
-            {
-              "description": "The invisible point the tooltip is anchored to.",
-              "name": "mark"
             },
             {
               "description": "One column's name and value inside the tooltip.",
@@ -22014,36 +22062,40 @@
           "name": "HelixBaseListbox",
           "cssParts": [
             {
-              "description": "The question, over the list.",
-              "name": "label"
-            },
-            {
-              "description": "The list itself.",
-              "name": "items"
-            },
-            {
               "description": "Shown when a filter has hidden everything.",
               "name": "empty"
             },
             {
-              "description": "The region holding the field that narrows the list.",
-              "name": "search"
+              "description": "What is wrong with it.",
+              "name": "feedback"
             },
             {
               "description": "The mark beside that field.",
               "name": "filter-icon"
             },
             {
-              "description": "The field itself.",
-              "name": "search-field"
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "filter-mark"
             },
             {
               "description": "Help under the list.",
               "name": "hint"
             },
             {
-              "description": "What is wrong with it.",
-              "name": "feedback"
+              "description": "The list itself.",
+              "name": "items"
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "label"
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "search"
+            },
+            {
+              "description": "The field itself.",
+              "name": "search-field"
             }
           ],
           "slots": [
@@ -24687,16 +24739,20 @@
           "name": "HelixBaseMenu",
           "cssParts": [
             {
-              "description": "The floating panel the menu is drawn on.",
-              "name": "menu"
+              "description": "The control that returns from a submenu.",
+              "name": "back"
+            },
+            {
+              "description": "The glyph on the back control of a submenu.",
+              "name": "back-mark"
             },
             {
               "description": "The bar above a submenu, holding the way back and its name.",
               "name": "header"
             },
             {
-              "description": "The control that returns from a submenu.",
-              "name": "back"
+              "description": "The floating panel the menu is drawn on.",
+              "name": "menu"
             },
             {
               "description": "The name of the submenu that is showing.",
@@ -26119,14 +26175,6 @@
           "name": "HelixBaseNumberInput",
           "cssParts": [
             {
-              "description": "The name over the field, which is also the scrub grip.",
-              "name": "label"
-            },
-            {
-              "description": "The box holding everything.",
-              "name": "field"
-            },
-            {
               "description": "The field itself.",
               "name": "control"
             },
@@ -26135,8 +26183,24 @@
               "name": "decrement"
             },
             {
+              "description": "The glyph on the step down control.",
+              "name": "decrement-mark"
+            },
+            {
+              "description": "The box holding everything.",
+              "name": "field"
+            },
+            {
               "description": "The control that steps up.",
               "name": "increment"
+            },
+            {
+              "description": "The glyph on the step up control.",
+              "name": "increment-mark"
+            },
+            {
+              "description": "The name over the field, which is also the scrub grip.",
+              "name": "label"
             }
           ],
           "slots": [
@@ -28243,44 +28307,48 @@
           "name": "HelixBasePagination",
           "cssParts": [
             {
-              "description": "The run of pages.",
-              "name": "list"
-            },
-            {
-              "description": "One slot in the run, holding a page or a gap.",
-              "name": "item"
-            },
-            {
-              "description": "The control for one page.",
-              "name": "page"
+              "description": "The control that jumps to the first page, under `ends`.",
+              "name": "first"
             },
             {
               "description": "The control standing over pages not shown, which jumps into them.",
               "name": "gap"
             },
             {
-              "description": "The control that moves back one page.",
-              "name": "previous"
-            },
-            {
-              "description": "The control that moves forward one page.",
-              "name": "next"
-            },
-            {
-              "description": "The control that jumps to the first page, under `ends`.",
-              "name": "first"
+              "description": "One slot in the run, holding a page or a gap.",
+              "name": "item"
             },
             {
               "description": "The control that jumps to the last page, under `ends`.",
               "name": "last"
             },
             {
-              "description": "The reading of where you are, in `compact`.",
-              "name": "status"
+              "description": "The run of pages.",
+              "name": "list"
             },
             {
               "description": "The region that says the page changed. Clipped, not hidden.",
               "name": "live"
+            },
+            {
+              "description": "The glyph on a first, previous, next or last control.",
+              "name": "mark"
+            },
+            {
+              "description": "The control that moves forward one page.",
+              "name": "next"
+            },
+            {
+              "description": "The control for one page.",
+              "name": "page"
+            },
+            {
+              "description": "The control that moves back one page.",
+              "name": "previous"
+            },
+            {
+              "description": "The reading of where you are, in `compact`.",
+              "name": "status"
             }
           ],
           "members": [
@@ -39485,32 +39553,36 @@
           "name": "HelixBaseStep",
           "cssParts": [
             {
-              "description": "The shape carrying the number or the check.",
-              "name": "marker"
-            },
-            {
               "description": "The name and its description.",
               "name": "body"
             },
             {
-              "description": "The step's name, which is a `helix-button`.",
-              "name": "label"
+              "description": "What the stage holds, while it is open.",
+              "name": "content"
             },
             {
               "description": "The line under it.",
               "name": "description"
             },
             {
+              "description": "The step's name, which is a `helix-button`.",
+              "name": "label"
+            },
+            {
               "description": "The half line arriving from the step before.",
               "name": "lead"
             },
             {
-              "description": "The half line running on to the next.",
-              "name": "trail"
+              "description": "The glyph inside the marker: a tick, a dot, or an empty ring.",
+              "name": "mark"
             },
             {
-              "description": "What the stage holds, while it is open.",
-              "name": "content"
+              "description": "The shape carrying the number or the check.",
+              "name": "marker"
+            },
+            {
+              "description": "The half line running on to the next.",
+              "name": "trail"
             }
           ],
           "slots": [
@@ -42484,12 +42556,16 @@
           "name": "HelixBaseTag",
           "cssParts": [
             {
-              "description": "The category before the label.",
-              "name": "prefix"
-            },
-            {
               "description": "The control that asks to remove the tag.",
               "name": "dismiss"
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark"
+            },
+            {
+              "description": "The category before the label.",
+              "name": "prefix"
             }
           ],
           "slots": [
@@ -46680,24 +46756,32 @@
           ],
           "cssParts": [
             {
-              "description": "The message's own surface.",
-              "name": "item"
-            },
-            {
-              "description": "The severity mark, where the message has one.",
-              "name": "icon"
+              "description": "The region holding what to do about it.",
+              "name": "actions"
             },
             {
               "description": "The message.",
               "name": "content"
             },
             {
-              "description": "The region holding what to do about it.",
-              "name": "actions"
-            },
-            {
               "description": "The control that asks to close.",
               "name": "dismiss"
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark"
+            },
+            {
+              "description": "The severity mark, where the message has one.",
+              "name": "icon"
+            },
+            {
+              "description": "The severity glyph, where none is slotted.",
+              "name": "icon-mark"
+            },
+            {
+              "description": "The message's own surface.",
+              "name": "item"
             },
             {
               "description": "The bar showing how long is left, where a duration was given.",

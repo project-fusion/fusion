@@ -42,7 +42,7 @@ helix-base-callout::part(icon) {
   inline-size: 1em;
 }
 
-helix-base-icon::part(svg) {
+helix-base-callout::part(icon-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;

@@ -57,9 +57,8 @@ helix-base-sparkline::part(line) {
 }
 
 helix-base-sparkline::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  display: block;
+  inline-size: 100%;
 }
 
 helix-base-sparkline::part(terminus) {
@@ -67,7 +66,6 @@ helix-base-sparkline::part(terminus) {
 }
 
 helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  display: block;
+  inline-size: 100%;
 }

@@ -277,7 +277,18 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
 export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
   const { density, radius } = theme.intent
   const lines = theme.tokens.map((t) => `  --helix-${t.name}: ${t.hex};`)
+  /* **The public seed names, which is what the stylesheet reads them back
+     through.** This emitted `--helix-seed-radius` against a
+     `--_helix-seed-radii` nothing else spells that way, and both names were
+     private in `primitives.css` regardless, so neither figure reached a page:
+     a derived theme moved its colours and left density and corners alone.
+
+     The colour seeds are deliberately not emitted here. `tokens` already
+     carries every colour this solves for, under the names components read, and
+     a seed beside them would be a second input to the same values that the CSS
+     re-derives its own way. Density and radii have no such pair: nothing in
+     `tokens` expresses them, so the seed is the only channel. */
   lines.push(`  --helix-seed-density: ${density};`)
-  lines.push(`  --helix-seed-radius: ${radius}rem;`)
+  lines.push(`  --helix-seed-radii: ${radius}rem;`)
   return `${selector} {\n${lines.join('\n')}\n}\n`
 }

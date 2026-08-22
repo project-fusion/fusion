@@ -37,9 +37,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot actions - What to do about it, usually a link or a button.
  * @slot icon - Replaces the glyph inside the dismiss control.
  *
- * @csspart content - The message region.
  * @csspart actions - The trailing action region.
+ * @csspart content - The message region.
  * @csspart dismiss - The control that asks to close.
+ * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it.
  */
@@ -119,7 +120,7 @@ export class HelixBaseAnnouncement extends MixinDismissible(HelixElement) {
    */
   protected renderDismissIcon(): TemplateResult {
     return html`<slot name="icon">
-      <svg viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
         ${unsafeSVG(x.content)}
       </svg>
     </slot>`

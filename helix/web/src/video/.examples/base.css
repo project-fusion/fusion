@@ -48,6 +48,12 @@ helix-base-video::part(back) {
   cursor: pointer;
 }
 
+helix-base-video::part(loading-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-base-video::part(controls) {
   align-items: center;
   display: flex;
@@ -98,12 +104,6 @@ helix-base-video-playlist::part(items) {
   align-items: center;
   display: flex;
   gap: 0.25rem;
-}
-
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

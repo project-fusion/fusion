@@ -175,7 +175,12 @@ describe('deriveTheme', () => {
     const css = toCss(deriveTheme({ brand: BRAND }))
     expect(css).toStartWith(':root {')
     expect(css).toContain('--helix-color-primary: #')
+    /* Both non-colour seeds, under the exact public names `primitives.css`
+       falls back through. Asserting one of them is what let `radius` sit
+       against a stylesheet reading `radii` for as long as it did, and neither
+       name reached anything: a spec can only hold a name it names. */
     expect(css).toContain('--helix-seed-density: 1')
+    expect(css).toContain('--helix-seed-radii: 0.5rem')
   })
 })
 

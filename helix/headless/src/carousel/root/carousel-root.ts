@@ -39,12 +39,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index.
  *
  * @csspart controls - The row of controls.
- * @csspart rotation - The control that stops and starts rotation.
- * @csspart previous - The control that moves to the previous slide.
- * @csspart next - The control that moves to the next slide.
- * @csspart track - The scroller the slides sit in.
- * @csspart indicators - The row of controls saying where the reader is.
  * @csspart indicator - One of them, and a way to reach that slide.
+ * @csspart indicators - The row of controls saying where the reader is.
+ * @csspart next - The control that moves to the next slide.
+ * @csspart next-mark - The glyph on the next control.
+ * @csspart previous - The control that moves to the previous slide.
+ * @csspart previous-mark - The glyph on the previous control.
+ * @csspart rotation - The control that stops and starts rotation.
+ * @csspart rotation-mark - The glyph on the play and pause control.
+ * @csspart track - The scroller the slides sit in.
  */
 @customElement('helix-base-carousel')
 export class HelixBaseCarousel extends HelixElement {
@@ -508,7 +511,7 @@ export class HelixBaseCarousel extends HelixElement {
                 aria-label=${rotating ? 'Stop slide rotation' : 'Start slide rotation'}
                 @click=${() => (rotating ? this.stop() : this.start())}
               >
-                <svg
+                <svg part="rotation-mark"
                   fill="currentColor"
                   viewBox=${rotating ? stop.viewBox : play.viewBox}
                   aria-hidden="true"
@@ -524,7 +527,7 @@ export class HelixBaseCarousel extends HelixElement {
           aria-label="Previous slide"
           @click=${() => this.goTo(this.index - 1)}
         >
-          <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+          <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
             ${unsafeSVG(caretLeft.content)}
           </svg>
         </button>
@@ -534,7 +537,7 @@ export class HelixBaseCarousel extends HelixElement {
           aria-label="Next slide"
           @click=${() => this.goTo(this.index + 1)}
         >
-          <svg fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+          <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
             ${unsafeSVG(caretRight.content)}
           </svg>
         </button>

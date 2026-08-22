@@ -71,13 +71,14 @@ import '../../button/index.js'
  * @slot marker - Replaces the number, or the check a complete step shows.
  * @slot content - What the stage holds, shown while it is the current one.
  *
- * @csspart marker - The shape carrying the number or the check.
  * @csspart body - The name and its description.
- * @csspart label - The step's name, which is a `helix-button`.
- * @csspart description - The line under it.
- * @csspart lead - The half line arriving from the step before.
- * @csspart trail - The half line running on to the next.
  * @csspart content - What the stage holds, while it is open.
+ * @csspart description - The line under it.
+ * @csspart label - The step's name, which is a `helix-button`.
+ * @csspart lead - The half line arriving from the step before.
+ * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
+ * @csspart marker - The shape carrying the number or the check.
+ * @csspart trail - The half line running on to the next.
  *
  * @event {HelixSelectEvent} helix-select - Fired when the step is pressed.
  */
@@ -132,7 +133,7 @@ export class HelixBaseStep extends HelixElement {
    */
   private get mark(): TemplateResult {
     const icon = this.complete ? check : this.current ? record : circle
-    return html`<svg fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg>`
+    return html`<svg part="mark" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg>`
   }
 
   protected override willUpdate(changed: PropertyValues): void {

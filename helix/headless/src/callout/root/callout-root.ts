@@ -33,8 +33,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot icon - Replaces the icon chosen by `severity`.
  * @slot title - A heading above the content.
  *
- * @csspart icon - The icon region.
  * @csspart content - The content region.
+ * @csspart icon - The icon region.
+ * @csspart icon-mark - The severity glyph, where none is slotted.
  */
 @customElement('helix-base-callout')
 export class HelixBaseCallout extends HelixElement {
@@ -63,7 +64,7 @@ export class HelixBaseCallout extends HelixElement {
    */
   protected renderIcon(icon: { content: string; viewBox: string }, label: string): TemplateResult {
     return html`<slot name="icon">
-      <svg fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
+      <svg part="icon-mark" fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
         ${unsafeSVG(icon.content)}
       </svg>
     </slot>`

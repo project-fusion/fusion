@@ -36,12 +36,6 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-base-icon-button::part(button) {
   all: unset;
   box-sizing: border-box;

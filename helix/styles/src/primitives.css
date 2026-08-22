@@ -109,8 +109,22 @@
    * the raw file so the tokens do resolve, measured, but a parse error that is
    * survivable today is a parse error. One line per step and it goes. */
   --_helix-neutral-cast: var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue);
-  --_helix-seed-density: 1;
-  --_helix-seed-radii: 0.5rem;
+  /* The two intent inputs that are not colours, public for the same reason the
+   * four above are: they are what a consumer writes to move the whole spacing
+   * scale and every corner in the library, and there is nothing else to write.
+   *
+   * **They were private with no public name at all**, which is the half of #110
+   * that was never looked at, and the engine had been emitting into the gap.
+   * `toCss` wrote `--helix-seed-density` and `--helix-seed-radius`, so a theme
+   * derived by `@helix-io/theme` and applied to a page moved its colours and
+   * left its density and its corners exactly where they were: two of the five
+   * `ThemeIntent` knobs inert, with a spec asserting one of the dead names.
+   *
+   * `radii` rather than `radius`, matching the private name it falls back to
+   * and the token category it feeds. The engine's own field stays `radius`,
+   * being one number rather than a category. */
+  --_helix-seed-density: var(--helix-seed-density, 1);
+  --_helix-seed-radii: var(--helix-seed-radii, 0.5rem);
 
   /* ------------------------------------------------------- neutral ----- */
   --_helix-neutral-0: oklch(1 0 0);

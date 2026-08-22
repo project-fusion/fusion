@@ -46,10 +46,11 @@ import { HelixBaseDrilldownItem } from '../item/drilldown-item.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen.
  *
- * @csspart header - The bar above a page, holding the way back and its name.
  * @csspart back - The control that returns one page.
- * @csspart title - The name of the page showing.
+ * @csspart back-mark - The glyph on the back control.
+ * @csspart header - The bar above a page, holding the way back and its name.
  * @csspart page - The region the rows are in.
+ * @csspart title - The name of the page showing.
  */
 @customElement('helix-base-drilldown')
 export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
@@ -258,7 +259,7 @@ export class HelixBaseDrilldown extends MixinCollection(HelixElement) {
         ? ''
         : html`<div part="header">
             <button part="back" type="button" aria-label=${this.backLabel} @click=${() => this.back()}>
-              <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+              <svg part="back-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                 ${unsafeSVG(caretLeft.content)}
               </svg>
             </button>

@@ -77,12 +77,6 @@ helix-base-select::part(feedback) {
   font-size: 0.875em;
 }
 
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-base-option::part(item) {
   padding: 0.25rem 0.5rem;
 }

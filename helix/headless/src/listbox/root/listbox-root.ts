@@ -176,14 +176,15 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @event {HelixChangeEvent} helix-change - Fired when the answer changes, and cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired before the list narrows, and cancelable.
  *
- * @csspart label - The question, over the list.
- * @csspart items - The list itself.
  * @csspart empty - Shown when a filter has hidden everything.
- * @csspart search - The region holding the field that narrows the list.
- * @csspart filter-icon - The mark beside that field.
- * @csspart search-field - The field itself.
- * @csspart hint - Help under the list.
  * @csspart feedback - What is wrong with it.
+ * @csspart filter-icon - The mark beside that field.
+ * @csspart filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart hint - Help under the list.
+ * @csspart items - The list itself.
+ * @csspart label - The question, over the list.
+ * @csspart search - The region holding the field that narrows the list.
+ * @csspart search-field - The field itself.
  */
 @customElement('helix-base-listbox')
 export class HelixBaseListbox extends MixinCollection(
@@ -819,7 +820,7 @@ export class HelixBaseListbox extends MixinCollection(
    */
   protected renderFilterIcon(): TemplateResult {
     return html`<slot name="filter-icon">
-      <svg fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
+      <svg part="filter-mark" fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
         ${unsafeSVG(magnifyingGlass.content)}
       </svg>
     </slot>`

@@ -62,10 +62,11 @@ const HEIGHT = 100
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
  * @csspart line - One series.
+ * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
+ * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
- * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -213,7 +214,7 @@ export class HelixBaseLineChart extends MixinChartSource(HelixElement) {
     const floor = domain[0] <= 0 && domain[1] >= 0 ? y(0) : undefined
 
     return html`<div aria-hidden="true" id="helix-chart-plot" part="plot" title=${named || nothing}>
-      <svg
+      <svg part="svg"
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"

@@ -47,20 +47,21 @@ const HEIGHT = 100
  * @aliases Column Chart, Categorical Chart
  * @documentation https://helix.fusion.dev/components/bar-chart
  *
- * @csspart bar - One column.
+ * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
  * @csspart band - The slot the pointer is resting in.
+ * @csspart bar - One column.
  * @csspart baseline - The rule the columns stand on.
  * @csspart gridline - One rule across the plot, under `gridlines`.
- * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
- * @csspart line - A series drawn as a line rather than as columns, under `lines`.
- * @csspart tick - One number on an axis.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
+ * @csspart line - A series drawn as a line rather than as columns, under `lines`.
+ * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
+ * @csspart svg - The drawing surface the bars and lines sit on.
+ * @csspart tick - One number on an axis.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
- * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
  * @csspart tooltip-name - A column's name inside the tooltip.
@@ -388,7 +389,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
       part="plot"
       title=${named || nothing}
     >
-      <svg
+      <svg part="svg"
         preserveAspectRatio="none"
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"

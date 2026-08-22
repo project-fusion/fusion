@@ -40,9 +40,3 @@ helix-base-code-block::part(label) {
   color: var(--_gray-strong);
   font-weight: 600;
 }
-
-helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}

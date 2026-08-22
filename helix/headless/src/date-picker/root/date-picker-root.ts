@@ -135,17 +135,19 @@ const addMonths = (date: Date, months: number): Date => {
  * @event {HelixChangeEvent} helix-change - Fired before the dates change, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
  *
- * @csspart months - The run of months.
- * @csspart month - One month, its header and its grid.
- * @csspart header - The month name and its controls.
- * @csspart previous - The control that moves to the previous month.
- * @csspart next - The control that moves to the next month.
- * @csspart heading - The month and year being shown.
- * @csspart grid - The grid of days.
- * @csspart weekday - A column header naming a day of the week.
- * @csspart week - One row of days.
  * @csspart cell - One column of a row, which is what a range paints.
  * @csspart day - The shape inside a cell, which is what a single date paints.
+ * @csspart grid - The grid of days.
+ * @csspart header - The month name and its controls.
+ * @csspart heading - The month and year being shown.
+ * @csspart month - One month, its header and its grid.
+ * @csspart months - The run of months.
+ * @csspart next - The control that moves to the next month.
+ * @csspart next-mark - The glyph on the next month control.
+ * @csspart previous - The control that moves to the previous month.
+ * @csspart previous-mark - The glyph on the previous month control.
+ * @csspart week - One row of days.
+ * @csspart weekday - A column header naming a day of the week.
  *
  * The properties below are written by this component and read by whoever draws
  * it. A consumer sets none of them: they carry a number this element computed
@@ -624,7 +626,7 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
                 aria-label=${this.previousLabel}
                 @click=${() => this.show(addMonths(this.shown, -1))}
               >
-                <svg fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                   ${unsafeSVG(caretLeft.content)}
                 </svg>
               </button>`
@@ -639,7 +641,7 @@ export class HelixBaseDatePicker extends MixinControllerValue(HelixFormElement) 
                 aria-label=${this.nextLabel}
                 @click=${() => this.show(addMonths(this.shown, 1))}
               >
-                <svg fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+                <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
                   ${unsafeSVG(caretRight.content)}
                 </svg>
               </button>`

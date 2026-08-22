@@ -48,11 +48,11 @@ const CONFIRM = 1600
  * @slot - The resting icon. Falls back to a clipboard.
  * @slot copied - What replaces it once the write succeeds. Falls back to a check.
  *
- * @csspart tooltip - The bubble, forwarded from the tooltip inside.
- *
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
  *
  * @csspart button - The inner button.
+ * @csspart mark - The clipboard glyph, and the confirmation that replaces it.
+ * @csspart tooltip - The bubble, forwarded from the tooltip inside.
  */
 @customElement('helix-base-copy-button')
 export class HelixBaseCopyButton extends HelixBaseIconButton {
@@ -149,7 +149,7 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    * client to disagree about.
    */
   private static icon(glyph: typeof copy): TemplateResult {
-    return html`<svg fill="currentColor" viewBox=${glyph.viewBox} aria-hidden="true">
+    return html`<svg part="mark" fill="currentColor" viewBox=${glyph.viewBox} aria-hidden="true">
       ${unsafeSVG(glyph.content)}
     </svg>`
   }

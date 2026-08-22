@@ -42,12 +42,16 @@
   gap: 0.5rem;
 }
 
-helix-base-bar-chart::part(bar) {
-  fill: var(--_gray-mark);
+helix-base-bar-chart::part(axis) {
+  stroke: var(--_gray-line);
 }
 
 helix-base-bar-chart::part(band) {
   stroke: var(--_gray-fill);
+}
+
+helix-base-bar-chart::part(bar) {
+  fill: var(--_gray-mark);
 }
 
 helix-base-bar-chart::part(baseline) {
@@ -56,20 +60,6 @@ helix-base-bar-chart::part(baseline) {
 
 helix-base-bar-chart::part(gridline) {
   stroke: var(--_gray-fill);
-}
-
-helix-base-bar-chart::part(axis) {
-  stroke: var(--_gray-line);
-}
-
-helix-base-bar-chart::part(line) {
-  fill: none;
-  stroke: var(--_gray-strong);
-  stroke-width: 2;
-}
-
-helix-base-bar-chart::part(tick) {
-  stroke: var(--_gray-line);
 }
 
 helix-base-bar-chart::part(group) {
@@ -88,11 +78,10 @@ helix-base-bar-chart::part(labels) {
   font-size: 0.75rem;
 }
 
-helix-base-bar-chart::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+helix-base-bar-chart::part(line) {
+  fill: none;
+  stroke: var(--_gray-strong);
+  stroke-width: 2;
 }
 
 helix-base-bar-chart::part(mark) {
@@ -101,8 +90,23 @@ helix-base-bar-chart::part(mark) {
   inline-size: 1em;
 }
 
+helix-base-bar-chart::part(svg) {
+  display: block;
+  inline-size: 100%;
+}
+
+helix-base-bar-chart::part(tick) {
+  stroke: var(--_gray-line);
+}
+
+helix-base-bar-chart::part(tooltip) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  padding: 0.5rem;
+}
+
 helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  display: block;
+  inline-size: 100%;
 }

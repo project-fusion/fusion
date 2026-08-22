@@ -1089,14 +1089,6 @@
           ],
           "cssParts": [
             {
-              "description": "The message region.",
-              "name": "content",
-              "inheritedFrom": {
-                "name": "HelixBaseAnnouncement",
-                "module": "src/announcement/root/announcement-root.ts"
-              }
-            },
-            {
               "description": "The trailing action region.",
               "name": "actions",
               "inheritedFrom": {
@@ -1105,8 +1097,24 @@
               }
             },
             {
+              "description": "The message region.",
+              "name": "content",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
               "description": "The control that asks to close.",
               "name": "dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseAnnouncement",
+                "module": "src/announcement/root/announcement-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark",
               "inheritedFrom": {
                 "name": "HelixBaseAnnouncement",
                 "module": "src/announcement/root/announcement-root.ts"
@@ -4199,8 +4207,8 @@
           ],
           "cssParts": [
             {
-              "description": "One column.",
-              "name": "bar",
+              "description": "One scale's numbers, drawn only when `secondary` splits them.",
+              "name": "axis",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -4209,6 +4217,14 @@
             {
               "description": "The slot the pointer is resting in.",
               "name": "band",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "One column.",
+              "name": "bar",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -4225,30 +4241,6 @@
             {
               "description": "One rule across the plot, under `gridlines`.",
               "name": "gridline",
-              "inheritedFrom": {
-                "name": "HelixBaseBarChart",
-                "module": "src/bar-chart/root/bar-chart-root.ts"
-              }
-            },
-            {
-              "description": "One scale's numbers, drawn only when `secondary` splits them.",
-              "name": "axis",
-              "inheritedFrom": {
-                "name": "HelixBaseBarChart",
-                "module": "src/bar-chart/root/bar-chart-root.ts"
-              }
-            },
-            {
-              "description": "A series drawn as a line rather than as columns, under `lines`.",
-              "name": "line",
-              "inheritedFrom": {
-                "name": "HelixBaseBarChart",
-                "module": "src/bar-chart/root/bar-chart-root.ts"
-              }
-            },
-            {
-              "description": "One number on an axis.",
-              "name": "tick",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -4279,8 +4271,40 @@
               }
             },
             {
+              "description": "A series drawn as a line rather than as columns, under `lines`.",
+              "name": "line",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
               "description": "The drawing.",
               "name": "plot",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "The drawing surface the bars and lines sit on.",
+              "name": "svg",
+              "inheritedFrom": {
+                "name": "HelixBaseBarChart",
+                "module": "src/bar-chart/root/bar-chart-root.ts"
+              }
+            },
+            {
+              "description": "One number on an axis.",
+              "name": "tick",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -4297,14 +4321,6 @@
             {
               "description": "The `Tooltip` element itself.",
               "name": "tooltip-anchor",
-              "inheritedFrom": {
-                "name": "HelixBaseBarChart",
-                "module": "src/bar-chart/root/bar-chart-root.ts"
-              }
-            },
-            {
-              "description": "The invisible point the tooltip is anchored to.",
-              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseBarChart",
                 "module": "src/bar-chart/root/bar-chart-root.ts"
@@ -4675,6 +4691,14 @@
             {
               "description": "The crumb itself, which is an `<a>` where `href` is set.",
               "name": "link",
+              "inheritedFrom": {
+                "name": "HelixBaseBreadcrumb",
+                "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
+              }
+            },
+            {
+              "description": "The glyph between this crumb and the next, where none is slotted.",
+              "name": "separator-mark",
               "inheritedFrom": {
                 "name": "HelixBaseBreadcrumb",
                 "module": "src/breadcrumbs/breadcrumb/breadcrumb.ts"
@@ -6153,6 +6177,14 @@
                 "name": "HelixBaseCallout",
                 "module": "src/callout/root/callout-root.ts"
               }
+            },
+            {
+              "description": "The severity glyph, where none is slotted.",
+              "name": "icon-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseCallout",
+                "module": "src/callout/root/callout-root.ts"
+              }
             }
           ],
           "slots": [
@@ -7435,32 +7467,8 @@
               }
             },
             {
-              "description": "The control that stops and starts rotation.",
-              "name": "rotation",
-              "inheritedFrom": {
-                "name": "HelixBaseCarousel",
-                "module": "src/carousel/root/carousel-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the previous slide.",
-              "name": "previous",
-              "inheritedFrom": {
-                "name": "HelixBaseCarousel",
-                "module": "src/carousel/root/carousel-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the next slide.",
-              "name": "next",
-              "inheritedFrom": {
-                "name": "HelixBaseCarousel",
-                "module": "src/carousel/root/carousel-root.ts"
-              }
-            },
-            {
-              "description": "The scroller the slides sit in.",
-              "name": "track",
+              "description": "One of them, and a way to reach that slide.",
+              "name": "indicator",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -7475,8 +7483,56 @@
               }
             },
             {
-              "description": "One of them, and a way to reach that slide.",
-              "name": "indicator",
+              "description": "The control that moves to the next slide.",
+              "name": "next",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the next control.",
+              "name": "next-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the previous slide.",
+              "name": "previous",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the previous control.",
+              "name": "previous-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The control that stops and starts rotation.",
+              "name": "rotation",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the play and pause control.",
+              "name": "rotation-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "description": "The scroller the slides sit in.",
+              "name": "track",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -15803,19 +15859,27 @@
           ],
           "cssParts": [
             {
-              "description": "The bubble, forwarded from the tooltip inside.",
-              "name": "tooltip",
+              "description": "The inner button.",
+              "name": "button",
+              "inheritedFrom": {
+                "name": "HelixBaseButton",
+                "module": "src/button/root/button-root.ts"
+              }
+            },
+            {
+              "description": "The clipboard glyph, and the confirmation that replaces it.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseCopyButton",
                 "module": "src/copy-button/root/copy-button-root.ts"
               }
             },
             {
-              "description": "The inner button.",
-              "name": "button",
+              "description": "The bubble, forwarded from the tooltip inside.",
+              "name": "tooltip",
               "inheritedFrom": {
-                "name": "HelixBaseButton",
-                "module": "src/button/root/button-root.ts"
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
               }
             }
           ],
@@ -19016,48 +19080,16 @@
           ],
           "cssParts": [
             {
-              "description": "The run of months.",
-              "name": "months",
+              "description": "One column of a row, which is what a range paints.",
+              "name": "cell",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
               }
             },
             {
-              "description": "One month, its header and its grid.",
-              "name": "month",
-              "inheritedFrom": {
-                "name": "HelixBaseDatePicker",
-                "module": "src/date-picker/root/date-picker-root.ts"
-              }
-            },
-            {
-              "description": "The month name and its controls.",
-              "name": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseDatePicker",
-                "module": "src/date-picker/root/date-picker-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the previous month.",
-              "name": "previous",
-              "inheritedFrom": {
-                "name": "HelixBaseDatePicker",
-                "module": "src/date-picker/root/date-picker-root.ts"
-              }
-            },
-            {
-              "description": "The control that moves to the next month.",
-              "name": "next",
-              "inheritedFrom": {
-                "name": "HelixBaseDatePicker",
-                "module": "src/date-picker/root/date-picker-root.ts"
-              }
-            },
-            {
-              "description": "The month and year being shown.",
-              "name": "heading",
+              "description": "The shape inside a cell, which is what a single date paints.",
+              "name": "day",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
@@ -19072,8 +19104,64 @@
               }
             },
             {
-              "description": "A column header naming a day of the week.",
-              "name": "weekday",
+              "description": "The month name and its controls.",
+              "name": "header",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The month and year being shown.",
+              "name": "heading",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "One month, its header and its grid.",
+              "name": "month",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The run of months.",
+              "name": "months",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the next month.",
+              "name": "next",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the next month control.",
+              "name": "next-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The control that moves to the previous month.",
+              "name": "previous",
+              "inheritedFrom": {
+                "name": "HelixBaseDatePicker",
+                "module": "src/date-picker/root/date-picker-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the previous month control.",
+              "name": "previous-mark",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
@@ -19088,16 +19176,8 @@
               }
             },
             {
-              "description": "One column of a row, which is what a range paints.",
-              "name": "cell",
-              "inheritedFrom": {
-                "name": "HelixBaseDatePicker",
-                "module": "src/date-picker/root/date-picker-root.ts"
-              }
-            },
-            {
-              "description": "The shape inside a cell, which is what a single date paints. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
-              "name": "day",
+              "description": "A column header naming a day of the week. The properties below are written by this component and read by whoever draws it. A consumer sets none of them: they carry a number this element computed and CSS cannot, which is what lets a stylesheet on this tier draw the thing without measuring anything itself.",
+              "name": "weekday",
               "inheritedFrom": {
                 "name": "HelixBaseDatePicker",
                 "module": "src/date-picker/root/date-picker-root.ts"
@@ -22188,14 +22268,6 @@
           ],
           "cssParts": [
             {
-              "description": "The bar above a page, holding the way back and its name.",
-              "name": "header",
-              "inheritedFrom": {
-                "name": "HelixBaseDrilldown",
-                "module": "src/drilldown/root/drilldown-root.ts"
-              }
-            },
-            {
               "description": "The control that returns one page.",
               "name": "back",
               "inheritedFrom": {
@@ -22204,8 +22276,16 @@
               }
             },
             {
-              "description": "The name of the page showing.",
-              "name": "title",
+              "description": "The glyph on the back control.",
+              "name": "back-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "description": "The bar above a page, holding the way back and its name.",
+              "name": "header",
               "inheritedFrom": {
                 "name": "HelixBaseDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
@@ -22214,6 +22294,14 @@
             {
               "description": "The region the rows are in.",
               "name": "page",
+              "inheritedFrom": {
+                "name": "HelixBaseDrilldown",
+                "module": "src/drilldown/root/drilldown-root.ts"
+              }
+            },
+            {
+              "description": "The name of the page showing.",
+              "name": "title",
               "inheritedFrom": {
                 "name": "HelixBaseDrilldown",
                 "module": "src/drilldown/root/drilldown-root.ts"
@@ -29147,8 +29235,24 @@
               }
             },
             {
+              "description": "The invisible point the tooltip is anchored to.",
+              "name": "mark",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
               "description": "The drawing.",
               "name": "plot",
+              "inheritedFrom": {
+                "name": "HelixBaseLineChart",
+                "module": "src/line-chart/root/line-chart-root.ts"
+              }
+            },
+            {
+              "description": "The drawing surface the lines and areas sit on.",
+              "name": "svg",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -29165,14 +29269,6 @@
             {
               "description": "The `Tooltip` element itself.",
               "name": "tooltip-anchor",
-              "inheritedFrom": {
-                "name": "HelixBaseLineChart",
-                "module": "src/line-chart/root/line-chart-root.ts"
-              }
-            },
-            {
-              "description": "The invisible point the tooltip is anchored to.",
-              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseLineChart",
                 "module": "src/line-chart/root/line-chart-root.ts"
@@ -31329,22 +31425,6 @@
           ],
           "cssParts": [
             {
-              "description": "The question, over the list.",
-              "name": "label",
-              "inheritedFrom": {
-                "name": "HelixBaseListbox",
-                "module": "src/listbox/root/listbox-root.ts"
-              }
-            },
-            {
-              "description": "The list itself.",
-              "name": "items",
-              "inheritedFrom": {
-                "name": "HelixBaseListbox",
-                "module": "src/listbox/root/listbox-root.ts"
-              }
-            },
-            {
               "description": "Shown when a filter has hidden everything.",
               "name": "empty",
               "inheritedFrom": {
@@ -31353,8 +31433,8 @@
               }
             },
             {
-              "description": "The region holding the field that narrows the list.",
-              "name": "search",
+              "description": "What is wrong with it.",
+              "name": "feedback",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -31369,8 +31449,8 @@
               }
             },
             {
-              "description": "The field itself.",
-              "name": "search-field",
+              "description": "The glyph beside the filter field, where none is slotted.",
+              "name": "filter-mark",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -31385,8 +31465,32 @@
               }
             },
             {
-              "description": "What is wrong with it.",
-              "name": "feedback",
+              "description": "The list itself.",
+              "name": "items",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The question, over the list.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The region holding the field that narrows the list.",
+              "name": "search",
+              "inheritedFrom": {
+                "name": "HelixBaseListbox",
+                "module": "src/listbox/root/listbox-root.ts"
+              }
+            },
+            {
+              "description": "The field itself.",
+              "name": "search-field",
               "inheritedFrom": {
                 "name": "HelixBaseListbox",
                 "module": "src/listbox/root/listbox-root.ts"
@@ -34021,8 +34125,16 @@
           ],
           "cssParts": [
             {
-              "description": "The floating panel the menu is drawn on.",
-              "name": "menu",
+              "description": "The control that returns from a submenu.",
+              "name": "back",
+              "inheritedFrom": {
+                "name": "HelixBaseMenu",
+                "module": "src/menu/root/menu-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the back control of a submenu.",
+              "name": "back-mark",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -34037,8 +34149,8 @@
               }
             },
             {
-              "description": "The control that returns from a submenu.",
-              "name": "back",
+              "description": "The floating panel the menu is drawn on.",
+              "name": "menu",
               "inheritedFrom": {
                 "name": "HelixBaseMenu",
                 "module": "src/menu/root/menu-root.ts"
@@ -35196,6 +35308,22 @@
             {
               "description": "The control that steps up.",
               "name": "increment",
+              "inheritedFrom": {
+                "name": "HelixBaseNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the step down control.",
+              "name": "decrement-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseNumberInput",
+                "module": "src/number-input/root/number-input-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the step up control.",
+              "name": "increment-mark",
               "inheritedFrom": {
                 "name": "HelixBaseNumberInput",
                 "module": "src/number-input/root/number-input-root.ts"
@@ -37950,6 +38078,14 @@
             {
               "description": "The region that says the page changed. Clipped, not hidden.",
               "name": "live",
+              "inheritedFrom": {
+                "name": "HelixBasePagination",
+                "module": "src/pagination/root/pagination-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on a first, previous, next or last control.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBasePagination",
                 "module": "src/pagination/root/pagination-root.ts"
@@ -54602,14 +54738,6 @@
           ],
           "cssParts": [
             {
-              "description": "The shape carrying the number or the check.",
-              "name": "marker",
-              "inheritedFrom": {
-                "name": "HelixBaseStep",
-                "module": "src/steps/step/step.ts"
-              }
-            },
-            {
               "description": "The name and its description.",
               "name": "body",
               "inheritedFrom": {
@@ -54618,8 +54746,8 @@
               }
             },
             {
-              "description": "The step's name, which is a `helix-button`.",
-              "name": "label",
+              "description": "What the stage holds, while it is open.",
+              "name": "content",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -54634,6 +54762,14 @@
               }
             },
             {
+              "description": "The step's name, which is a `helix-button`.",
+              "name": "label",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
               "description": "The half line arriving from the step before.",
               "name": "lead",
               "inheritedFrom": {
@@ -54642,16 +54778,24 @@
               }
             },
             {
-              "description": "The half line running on to the next.",
-              "name": "trail",
+              "description": "The glyph inside the marker: a tick, a dot, or an empty ring.",
+              "name": "mark",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
               }
             },
             {
-              "description": "What the stage holds, while it is open.",
-              "name": "content",
+              "description": "The shape carrying the number or the check.",
+              "name": "marker",
+              "inheritedFrom": {
+                "name": "HelixBaseStep",
+                "module": "src/steps/step/step.ts"
+              }
+            },
+            {
+              "description": "The half line running on to the next.",
+              "name": "trail",
               "inheritedFrom": {
                 "name": "HelixBaseStep",
                 "module": "src/steps/step/step.ts"
@@ -58013,6 +58157,14 @@
             {
               "description": "The remove button, when `dismissible`.",
               "name": "dismiss",
+              "inheritedFrom": {
+                "name": "HelixBaseTag",
+                "module": "src/tag/root/tag-root.ts"
+              }
+            },
+            {
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark",
               "inheritedFrom": {
                 "name": "HelixBaseTag",
                 "module": "src/tag/root/tag-root.ts"
@@ -63731,16 +63883,8 @@
           ],
           "cssParts": [
             {
-              "description": "The message's own surface.",
-              "name": "item",
-              "inheritedFrom": {
-                "name": "HelixBaseToastItem",
-                "module": "src/toast/item/toast-item.ts"
-              }
-            },
-            {
-              "description": "The severity mark, where the message has one.",
-              "name": "icon",
+              "description": "The region holding what to do about it.",
+              "name": "actions",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
@@ -63755,16 +63899,40 @@
               }
             },
             {
-              "description": "The region holding what to do about it.",
-              "name": "actions",
+              "description": "The control that asks to close.",
+              "name": "dismiss",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"
               }
             },
             {
-              "description": "The control that asks to close.",
-              "name": "dismiss",
+              "description": "The glyph on the dismiss control, where none is slotted.",
+              "name": "dismiss-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The severity mark, where the message has one.",
+              "name": "icon",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The severity glyph, where none is slotted.",
+              "name": "icon-mark",
+              "inheritedFrom": {
+                "name": "HelixBaseToastItem",
+                "module": "src/toast/item/toast-item.ts"
+              }
+            },
+            {
+              "description": "The message's own surface.",
+              "name": "item",
               "inheritedFrom": {
                 "name": "HelixBaseToastItem",
                 "module": "src/toast/item/toast-item.ts"

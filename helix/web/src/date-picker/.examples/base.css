@@ -36,23 +36,6 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-base-date-picker::part(previous) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-base-date-picker::part(next) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-base-date-picker::part(heading) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
 helix-base-date-picker::part(cell) {
   padding: 0.25rem 0.5rem;
 }
@@ -61,7 +44,30 @@ helix-base-date-picker::part(day) {
   padding: 0.25rem 0.5rem;
 }
 
-helix-base-icon::part(svg) {
+helix-base-date-picker::part(heading) {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-base-date-picker::part(next) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+helix-base-date-picker::part(next-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-date-picker::part(previous) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+helix-base-date-picker::part(previous-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;

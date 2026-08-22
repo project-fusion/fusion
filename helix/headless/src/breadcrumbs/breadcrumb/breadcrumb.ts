@@ -47,8 +47,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot end - After it, for a count or a mark.
  * @slot separator - Replaces the chevron shown before this item.
  *
- * @csspart separator - The separator preceding the item.
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
+ * @csspart separator - The separator preceding the item.
+ * @csspart separator-mark - The glyph between this crumb and the next, where none is slotted.
  */
 @customElement('helix-base-breadcrumb')
 export class HelixBaseBreadcrumb extends HelixElement {
@@ -93,7 +94,7 @@ export class HelixBaseBreadcrumb extends HelixElement {
    */
   protected renderSeparator(): TemplateResult {
     return html`<slot name="separator"
-      ><svg fill="currentColor" viewBox=${caretRight.viewBox}>
+      ><svg part="separator-mark" fill="currentColor" viewBox=${caretRight.viewBox}>
         ${unsafeSVG(caretRight.content)}
       </svg></slot
     >`

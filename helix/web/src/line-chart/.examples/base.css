@@ -78,6 +78,17 @@ helix-base-line-chart::part(line) {
   stroke-width: 2;
 }
 
+helix-base-line-chart::part(mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-line-chart::part(svg) {
+  display: block;
+  inline-size: 100%;
+}
+
 helix-base-line-chart::part(tooltip) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
@@ -85,14 +96,7 @@ helix-base-line-chart::part(tooltip) {
   padding: 0.5rem;
 }
 
-helix-base-line-chart::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-base-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  display: block;
+  inline-size: 100%;
 }
