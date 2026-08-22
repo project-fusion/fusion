@@ -71,6 +71,32 @@
      so a fixed figure is a rising tint as the surface darkens, and a dark
      interface is mostly large flat surfaces. The brand carries the hue; the
      grays hold everything else up. */
+  /* The second colour, said as a relationship rather than as a colour.
+   *
+   * **This is what one seed could not express.** A brand says what the product
+   * is; an accent says "and this other thing, which is not that". Written as an
+   * independent colour it drifts out of relation the moment somebody rethemes,
+   * which is the whole failure of a palette with two literals in it. Written as
+   * a rotation off the brand it stays in relation by construction: retheme the
+   * brand and the accent follows it round the wheel.
+   *
+   * `--helix-seed-accent-hue` is the angle, and 180 is the complement, which is
+   * the relationship a second colour usually means. 30 or so is analogous and
+   * reads as a shade of the same idea; 120 is a triad. A consumer who wants a
+   * genuinely independent second brand sets `--helix-seed-accent` outright and
+   * this whole derivation stands aside, which is the case the row also asked
+   * for and is one line rather than a second system.
+   *
+   * Lightness and chroma come from the brand unchanged, so the accent is as
+   * loud as the brand is and no louder. That is deliberate: an accent brighter
+   * than the thing it accents is a second primary, and the palette already has
+   * one of those. */
+  --helix-seed-accent-hue: 180;
+  --_helix-seed-accent: var(
+    --helix-seed-accent,
+    oklch(from var(--_helix-seed-brand) l c calc(h + var(--helix-seed-accent-hue)))
+  );
+
   --_helix-seed-neutral-chroma: var(--helix-seed-neutral-chroma, 0);
   --_helix-seed-neutral-hue: var(--helix-seed-neutral-hue, 258);
 
@@ -241,6 +267,16 @@
   --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.12) c h);
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
+
+  /* ------------------------------------------------------- accent ------ */
+  /* The same six steps the brand takes, from the accent seed, so `accent`
+     behaves everywhere `primary` does and a component needs no second recipe. */
+  --_helix-accent-500: var(--_helix-seed-accent);
+  --_helix-accent-600: oklch(from var(--_helix-seed-accent) calc(l - 0.05) c h);
+  --_helix-accent-700: oklch(from var(--_helix-seed-accent) calc(l - 0.1) c h);
+  --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.12) c h);
+  --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
+  --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
 
   /* ------------------------------------------------------- status ------ */
   --_helix-info-500: oklch(0.58 0.16 245);

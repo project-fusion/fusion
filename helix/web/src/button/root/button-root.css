@@ -94,6 +94,20 @@
   --_button-tone-hover: var(--helix-color-primary-hover);
 }
 
+/* The second emphasis, and it takes the same six declarations as the first
+   because a tone that behaves differently from the one beside it is a tone a
+   consumer has to learn separately. What it *is* comes from the palette: a
+   rotation off the brand seed rather than a colour of its own, so it stays in
+   relation when somebody rethemes. `--helix-seed-accent-hue` is the angle. */
+:host([tone="accent"]) {
+  --_button-edge: var(--helix-color-accent);
+  --_button-fill: var(--helix-color-accent-surface);
+  --_button-fill-hover: var(--helix-color-accent-surface-hover);
+  --_button-on-tone: var(--helix-color-foreground-on-accent);
+  --_button-tone: var(--helix-color-accent);
+  --_button-tone-hover: var(--helix-color-accent-hover);
+}
+
 :host([tone="danger"]),
 :host(:not([tone])[variant="danger"]) {
   --_button-edge: var(--helix-color-danger);

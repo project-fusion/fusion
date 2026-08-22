@@ -643,7 +643,7 @@ ring is declared here rather than inherited, because the base layer's
 | `labels` | - | `NodeList` | - | `HelixFormElement` | Labels associated with this control. |
 | `name` | `name` | `string` | `''` | `HelixFormElement` | Name submitted with the form. |
 | `shadowRootOptions` | - | `ShadowRootInit` | `{ ...HelixFormElement.shadowRootOptions, delegatesFocus: true, }` | `HelixBaseButton` | Moves focus to the inner control, so the host is never the focus target. |
-| `tone` | `tone` | `'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
+| `tone` | `tone` | `'accent' \| 'danger' \| 'neutral' \| 'primary' \| undefined` | - | - | What the button means, which decides its colour and nothing else. |
 | `type` | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | `HelixBaseButton` | What activating the button does to its form. |
 | `variant` | `variant` | `'danger' \| 'primary' \| 'secondary' \| 'tertiary' \| undefined` | - | - | One word for the four pairings anybody actually writes. |
 
@@ -5429,7 +5429,7 @@ the status colors gets the tints with them.
 | `appearance` | `appearance` | `'outlined' \| 'solid' \| 'subtle' \| undefined` | - | - | How much of the tone the tag wears. |
 | `dismissible` | `dismissible` | `boolean` | `false` | `MixinDismissible` | Whether it offers a control to take it away. |
 | `dismissLabel` | `dismiss-label` | `string` | `'Dismiss'` | `MixinDismissible` | Accessible name for that control. |
-| `tone` | `tone` | `'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | - | Which status the tag reports. |
+| `tone` | `tone` | `'accent' \| 'danger' \| 'info' \| 'neutral' \| 'primary' \| 'success' \| 'warning' \| undefined` | - | - | Which status the tag reports. |
 
 #### Methods
 

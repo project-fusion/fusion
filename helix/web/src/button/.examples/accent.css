@@ -1,0 +1,8 @@
+/* A second theme scope, so the pair below rethemes on its own and the pair
+   above does not. `[data-helix-theme]` re-derives the whole ramp at a subtree,
+   which is what makes the relationship visible: both the brand and the accent
+   move, and they move together. */
+.rethemed {
+  --helix-seed-accent-hue: 140;
+  --helix-seed-brand: oklch(0.58 0.19 20);
+}

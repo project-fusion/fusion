@@ -259,6 +259,17 @@
    * `--helix-color-primary` keeps its `light-dark` and is not the thing to fix:
    * twenty-five rules use it as text, where lightening in dark mode is exactly
    * right, and eight use it as a fill. One name was doing two jobs. */
+  /* The accent, step for step with primary, because a tone that behaves
+     differently from the one beside it is a tone a consumer has to learn
+     separately. See `--helix-seed-accent-hue` for what it is a relationship to
+     and how to break that relationship deliberately. */
+  --helix-color-accent: light-dark(var(--_helix-accent-500), var(--_helix-accent-400));
+  --helix-color-accent-hover: var(--_helix-accent-600);
+  --helix-color-accent-active: var(--_helix-accent-700);
+  --helix-color-accent-subtle: light-dark(var(--_helix-accent-50), var(--_helix-accent-900));
+  --helix-color-accent-surface: var(--_helix-accent-600);
+  --helix-color-accent-surface-hover: var(--_helix-accent-700);
+
   --helix-color-primary-surface: var(--_helix-brand-600);
   --helix-color-primary-surface-hover: var(--_helix-brand-700);
   --helix-color-focus-ring: var(--_helix-brand-500);

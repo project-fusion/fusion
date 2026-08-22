@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-161 semantic tokens in 15 categories, every one in exactly
+167 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -18,7 +18,7 @@ a consumer can reach for a rung we happen not to use. It is worth seeing
 because nothing else can see it, `check:tokens` asking only that every token
 *referenced* exists.
 
-Currently unread anywhere: `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-translucent-strong`.
+Currently unread anywhere: `--helix-color-accent-active`, `--helix-color-accent-subtle`, `--helix-color-info-surface`, `--helix-color-info-surface-hover`, `--helix-color-success-surface`, `--helix-color-success-surface-hover`, `--helix-color-warning-surface`, `--helix-color-warning-surface-hover`, `--helix-leading-loose`, `--helix-material-blur-sm`, `--helix-material-translucent-strong`.
 
 ## color
 
@@ -35,7 +35,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | 290 |
 | `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | 184 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | 120 |
-| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 34 |
+| `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | 36 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | 14 |
 | `--helix-color-foreground-inverse` | `light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))` | 8 |
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
@@ -45,6 +45,12 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 7 |
+| `--helix-color-accent` | `light-dark(var(--_helix-accent-500), var(--_helix-accent-400))` | 6 |
+| `--helix-color-accent-hover` | `var(--_helix-accent-600)` | 2 |
+| `--helix-color-accent-active` | `var(--_helix-accent-700)` | 0 |
+| `--helix-color-accent-subtle` | `light-dark(var(--_helix-accent-50), var(--_helix-accent-900))` | 0 |
+| `--helix-color-accent-surface` | `var(--_helix-accent-600)` | 2 |
+| `--helix-color-accent-surface-hover` | `var(--_helix-accent-700)` | 2 |
 | `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 4 |
 | `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 2 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 122 |

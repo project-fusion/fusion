@@ -68,6 +68,10 @@
 /* Added with `Announcement`'s rename, so one word means one set. `Tag` had five
    tones and the band had four, overlapping in three, which is two vocabularies
    wearing one name. */
+:host([tone="accent"]) {
+  --_tag-color: var(--helix-color-accent);
+}
+
 :host([tone="info"]) {
   --_tag-color: var(--helix-color-info);
 }

@@ -40,7 +40,7 @@ export class HelixTag extends HelixBaseTag {
    * the axis it should have held did not exist.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   /**
    * How much of the tone the tag wears.

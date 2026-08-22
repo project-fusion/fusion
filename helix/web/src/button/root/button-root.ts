@@ -79,7 +79,7 @@ export class HelixButton extends HelixBaseButton {
    * where the colour of a control means nothing in particular.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'neutral' | 'primary'
+  tone?: 'accent' | 'danger' | 'neutral' | 'primary'
 
   /**
    * One word for the four pairings anybody actually writes.

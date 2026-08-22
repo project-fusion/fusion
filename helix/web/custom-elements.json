@@ -5428,7 +5428,7 @@
               "kind": "field",
               "name": "tone",
               "type": {
-                "text": "'danger' | 'neutral' | 'primary' | undefined"
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
               },
               "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
               "attribute": "tone",
@@ -5808,7 +5808,7 @@
             {
               "name": "tone",
               "type": {
-                "text": "'danger' | 'neutral' | 'primary' | undefined"
+                "text": "'accent' | 'danger' | 'neutral' | 'primary' | undefined"
               },
               "description": "What the button means, which decides its colour and nothing else.\n\n- `neutral` is the resting state and is never written. The button is drawn\n  in the page's own ink.\n- `primary` is the brand colour, for the action a region is about.\n- `danger` says the action is destructive before the confirmation does. The\n  colour of the control is what a reader recognizes at a glance, where a red\n  word inside a neutral button is something they have to read first.\n\nThree and not six. `Tag` carries the full status set because a tag reports\na state, and a button performs an action: a success button and a warning\nbutton are not things anybody writes, and offering them invites a page\nwhere the colour of a control means nothing in particular.",
               "fieldName": "tone"
@@ -5925,6 +5925,10 @@
               {
                 "description": "The appearances and tones together, showing which two axes a button has.",
                 "slug": "default"
+              },
+              {
+                "description": "A second emphasis, derived from the brand rather than picked beside it.",
+                "slug": "accent"
               },
               {
                 "description": "Every fill against every tone.",
@@ -37721,24 +37725,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "The number formatter, built once per locale rather than per render.\n\n`Intl.NumberFormat` is expensive to construct and this depends on nothing\nbut `locale`, where a render builds one per page in the run. Keyed on the\nlocale so a change to it is picked up, which a plain lazy field would not\ndo. Same shape as the calendar's three date formatters, for the same\nreasons its own note gives.",
-              "inheritedFrom": {
-                "name": "HelixBasePagination",
-                "module": "src/pagination/root/pagination-root.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBasePagination",
@@ -38558,24 +38550,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "Built once per locale. Same reasoning as the calendar's date formatters.",
-              "inheritedFrom": {
-                "name": "HelixBasePaginationSize",
-                "module": "src/pagination/size/pagination-size.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBasePaginationSize",
@@ -38928,24 +38908,12 @@
             },
             {
               "kind": "field",
-              "name": "cachedFormat",
-              "type": {
-                "text": "{ format: Intl.NumberFormat; locale: string } | undefined"
-              },
-              "privacy": "private",
-              "description": "Built once per locale. Same reasoning as the calendar's date formatters.",
-              "inheritedFrom": {
-                "name": "HelixBasePaginationSummary",
-                "module": "src/pagination/summary/pagination-summary.ts"
-              }
-            },
-            {
-              "kind": "field",
               "name": "numbers",
               "type": {
                 "text": "(value: number) => string"
               },
               "privacy": "private",
+              "description": "Held across every component asking for the same locale.",
               "readonly": true,
               "inheritedFrom": {
                 "name": "HelixBasePaginationSummary",
@@ -57234,7 +57202,7 @@
               "kind": "field",
               "name": "tone",
               "type": {
-                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
               "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "attribute": "tone",
@@ -57399,7 +57367,7 @@
             {
               "name": "tone",
               "type": {
-                "text": "'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
+                "text": "'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined"
               },
               "description": "Which status the tag reports.\n\nThis was called `appearance`, and it never was one. Everywhere else in the\nlibrary `appearance` is a treatment (`outlined`, `elevated`, `plain`) and\n`tone` is semantic color, which is what these five are and what\n`helix-text` already calls them. One axis was wearing the other's name, and\nthe axis it should have held did not exist.",
               "fieldName": "tone"
@@ -71191,6 +71159,19 @@
               "privacy": "private",
               "readonly": true,
               "description": "The keys every player uses, bound to this element rather than the document.\n\nA video is not a command palette: its keys belong to it while a reader is\non it, and a page with two videos on it would otherwise have both answering\nthe same press.\n\nNothing is taken while focus is in a range. The scrubber and the volume are\nreal inputs and the arrows are already theirs, so intercepting would mean\nseeking twice for one press.",
+              "inheritedFrom": {
+                "name": "HelixBaseVideo",
+                "module": "src/video/root/video-root.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "cued",
+              "type": {
+                "text": "TextTrack | undefined"
+              },
+              "privacy": "private",
+              "description": "The track currently being listened to, so the next one can take it off.",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"
