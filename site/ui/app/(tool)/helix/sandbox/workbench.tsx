@@ -1348,6 +1348,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       {narrow && (
         <helix-drawer
           label="Examples"
+          material="glass"
           onhelix-close={() => setRailOpen(false)}
           onhelix-open={() => setRailOpen(true)}
           open={railOpen}

@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseDrawer } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './drawer-root.css.js'
 
 /**
@@ -26,6 +27,9 @@ import { styles } from './drawer-root.css.js'
  *
  * @event {HelixOpenEvent} helix-open - Fired when the drawer opens or closes.
  *
+ * @cssproperty --drawer-backdrop - Filter applied behind a `material="glass"` drawer.
+ *   Follows the theme's material policy; set it to override the strength on one drawer.
+ * @cssproperty --drawer-background-color - Surface behind the panel.
  * @cssproperty --drawer-border-color - Colour of the panel's edge.
  * @cssproperty --drawer-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
@@ -40,6 +44,23 @@ import { styles } from './drawer-root.css.js'
  */
 @customElement('helix-drawer')
 export class HelixDrawer extends HelixBaseDrawer {
+  /**
+   * Whether the panel is glass rather than opaque.
+   *
+   * **The same pair `Card` and `App Header` draw**, and one attribute for the
+   * same reason: a backdrop filter behind an opaque ground filters nothing and a
+   * translucent ground with no filter is a tint, so a consumer says what it
+   * wants rather than assembling it out of two hooks.
+   *
+   * A drawer is the case where the pair earns the most, because there is already
+   * something behind it worth seeing: the page it covers, under its own scrim.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
+   */
+  @property({ reflect: true })
+  material?: 'glass'
+
   static override styles: CSSResultGroup = styles
 }
 

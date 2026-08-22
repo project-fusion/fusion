@@ -22172,6 +22172,14 @@
           "name": "HelixDrawer",
           "cssProperties": [
             {
+              "description": "Filter applied behind a `material=\"glass\"` drawer. Follows the theme's material policy; set it to override the strength on one drawer.",
+              "name": "--drawer-backdrop"
+            },
+            {
+              "description": "Surface behind the panel.",
+              "name": "--drawer-background-color"
+            },
+            {
               "description": "Colour of the panel's edge.",
               "name": "--drawer-border-color"
             },
@@ -22249,6 +22257,16 @@
             }
           ],
           "members": [
+            {
+              "kind": "field",
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "attribute": "material",
+              "reflects": true
+            },
             {
               "kind": "field",
               "name": "open",
@@ -22598,48 +22616,15 @@
               }
             }
           ],
-          "superclass": {
-            "name": "HelixBaseDrawer",
-            "package": "@helix-io/headless"
-          },
-          "summary": "A panel that slides in from an edge.",
-          "helix": {
-            "category": "overlays",
-            "since": "0.1.0",
-            "status": "experimental",
-            "documentation": "https://helix.fusion.dev/components/drawer",
-            "aliases": [
-              "Sheet",
-              "Sidebar",
-              "Panel",
-              "Off-canvas"
-            ],
-            "tier": "styled",
-            "group": "Drawer",
-            "part": "Root",
-            "examples": [
-              {
-                "description": "A panel from the edge, opened by a button.",
-                "slug": "default"
-              },
-              {
-                "description": "The same drawer on the headless tier, with every rule written by hand.",
-                "slug": "base"
-              },
-              {
-                "description": "A panel beside the page rather than over it, with the page still usable behind it.",
-                "slug": "inline"
-              },
-              {
-                "description": "The four edges a drawer can arrive from.",
-                "slug": "placements"
-              }
-            ],
-            "source": "helix/web/src/drawer"
-          },
-          "tagName": "helix-drawer",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "material",
+              "type": {
+                "text": "'glass' | undefined"
+              },
+              "description": "Whether the panel is glass rather than opaque.\n\n**The same pair `Card` and `App Header` draw**, and one attribute for the\nsame reason: a backdrop filter behind an opaque ground filters nothing and a\ntranslucent ground with no filter is a tint, so a consumer says what it\nwants rather than assembling it out of two hooks.\n\nA drawer is the case where the pair earns the most, because there is already\nsomething behind it worth seeing: the page it covers, under its own scrim.\n\nAbsent is opaque, per the rule that a reflected property takes no default,\nso the stylesheet only describes the departure.",
+              "fieldName": "material"
+            },
             {
               "name": "open",
               "type": {
@@ -22704,6 +22689,51 @@
               }
             }
           ],
+          "superclass": {
+            "name": "HelixBaseDrawer",
+            "package": "@helix-io/headless"
+          },
+          "summary": "A panel that slides in from an edge.",
+          "helix": {
+            "category": "overlays",
+            "since": "0.1.0",
+            "status": "experimental",
+            "documentation": "https://helix.fusion.dev/components/drawer",
+            "aliases": [
+              "Sheet",
+              "Sidebar",
+              "Panel",
+              "Off-canvas"
+            ],
+            "tier": "styled",
+            "group": "Drawer",
+            "part": "Root",
+            "examples": [
+              {
+                "description": "A panel from the edge, opened by a button.",
+                "slug": "default"
+              },
+              {
+                "description": "The same drawer on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
+                "description": "A panel beside the page rather than over it, with the page still usable behind it.",
+                "slug": "inline"
+              },
+              {
+                "description": "Glass, so the page it covers stays visible under its own scrim.",
+                "slug": "material"
+              },
+              {
+                "description": "The four edges a drawer can arrive from.",
+                "slug": "placements"
+              }
+            ],
+            "source": "helix/web/src/drawer"
+          },
+          "tagName": "helix-drawer",
+          "customElement": true,
           "modulePath": "src/drawer/root/drawer-root.ts",
           "definitionPath": "src/drawer/root/drawer-root.ts"
         }

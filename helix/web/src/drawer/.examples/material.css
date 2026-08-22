@@ -1,0 +1,12 @@
+/* **The page is the point, so there has to be one.** Every other drawer example
+   opens over an empty preview, which is the one ground on which glass and opaque
+   are the same picture: a translucent panel over nothing is a panel. The prose
+   below is what the blur has to work on, and the heading is set large for the
+   reason `app-header`'s pair records, that a smooth fill blurs to itself and only
+   detail shows the filter doing anything. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+  padding: var(--helix-space-xl);
+}

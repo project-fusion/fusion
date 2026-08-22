@@ -28,6 +28,14 @@
  *   composite has to stop at a real opaque ground rather than assuming the
  *   document's, which is what the walk up does.
  *
+ * **A `::backdrop` is not walked, and a modal's scrim is one.** A drawer's wash
+ * over the page is painted by a pseudo-element, which has no node to composite,
+ * so a glass panel is measured over the page rather than over the scrimmed page.
+ * The scrim moves the ground toward the middle, so the figure this reports for a
+ * modal surface is the one before that: near enough on the panels here, and
+ * wrong in the optimistic direction, which is worth knowing before it is
+ * trusted on a translucent surface over a heavy scrim.
+ *
  * **Shadow boundaries are crossed on purpose**: the ink of a part inside a
  * component is exactly the reading that matters, and stopping at the host would
  * measure only what consumers wrote.

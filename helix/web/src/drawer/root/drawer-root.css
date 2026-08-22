@@ -195,6 +195,29 @@
   z-index: var(--helix-layer-overlay);
 }
 
+/* **Glass, and a drawer is where the pair earns the most.** `Card` and
+   `App Header` draw the same two declarations for the same reason: a filter
+   behind an opaque ground is invisible and a translucent ground over an
+   unfiltered page is a smear, so the component owns both.
+
+   What a drawer adds is something worth seeing through to. A card is glass over
+   whatever a consumer put behind it; a panel that slides over the page is glass
+   over the page, under the scrim that is already there to say the page is not
+   the thing being read. The blur is what keeps that from becoming a competing
+   picture.
+
+   On the panel rather than the host, because the panel is the surface: the host
+   paints nothing and a filter on it would sample the page and hand the result to
+   an element that covers none of it.
+
+   The strength is the theme's. `--helix-material-translucent` and
+   `--helix-material-backdrop` are what the policy moves, and the two hooks
+   override one drawer without touching the language. */
+:host([material="glass"]) [part="panel"] {
+  backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
+  background-color: var(--drawer-background-color, var(--helix-material-translucent));
+}
+
 :host(:not([placement])) [part="panel"],
 :host([placement="end"]) [part="panel"] {
   /* Square where it meets the window, curved where it meets the page. */

@@ -1945,6 +1945,7 @@ rest is flat and the movement is what says something happened.
 | --- | --- | --- | --- | --- | --- |
 | `defaultOpen` | `default-open` | `boolean` | `false` | `MixinControllerOpen` | Initial open state for uncontrolled use, where nothing declared one. |
 | `label` | `label` | `string` | `''` | `HelixBaseDrawer` | Accessible name for the panel. |
+| `material` | `material` | `'glass' \| undefined` | - | - | Whether the panel is glass rather than opaque. |
 | `modal` | `modal` | `boolean` | `true` | `HelixBaseDrawer` | Whether the drawer blocks the page behind it. |
 | `open` | `open` | `boolean` | - | `MixinControllerOpen` | Whether the element is open. |
 | `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom' \| undefined` | - | `HelixBaseDrawer` | Which edge the drawer comes from. |
@@ -1982,6 +1983,8 @@ rest is flat and the movement is what says something happened.
 
 | Property | Description |
 | --- | --- |
+| `--drawer-backdrop` | Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. |
+| `--drawer-background-color` | Surface behind the panel. |
 | `--drawer-border-color` | Colour of the panel's edge. |
 | `--drawer-border-width` | Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. |
 | `--drawer-inset` | Padding inside the panel. |

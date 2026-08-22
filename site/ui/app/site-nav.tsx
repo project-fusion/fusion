@@ -399,6 +399,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           before reading a link. */}
       <helix-drawer
         label="Site navigation"
+        material="glass"
         onhelix-close={() => setOpen(false)}
         onhelix-open={() => setOpen(true)}
         open={open}

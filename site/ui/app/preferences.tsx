@@ -98,6 +98,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
   return (
     <helix-drawer
       label="Preferences"
+      material="glass"
       onhelix-close={() => onOpenChange(false)}
       onhelix-open={() => onOpenChange(true)}
       open={open}

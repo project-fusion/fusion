@@ -4696,6 +4696,19 @@ export type HelixDrawerHelixCloseElementEvent =
   HelixDrawerElementEvent<HelixCloseEvent>;
 
 export type HelixDrawerProps = {
+  /** Whether the panel is glass rather than opaque.
+
+**The same pair `Card` and `App Header` draw**, and one attribute for the
+same reason: a backdrop filter behind an opaque ground filters nothing and a
+translucent ground with no filter is a tint, so a consumer says what it
+wants rather than assembling it out of two hooks.
+
+A drawer is the case where the pair earns the most, because there is already
+something behind it worth seeing: the page it covers, under its own scrim.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure. */
+  material?: HelixDrawer["material"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -4752,6 +4765,19 @@ not, rather than shown or hidden by CSS. */
 };
 
 export type HelixDrawerSolidJsProps = {
+  /** Whether the panel is glass rather than opaque.
+
+**The same pair `Card` and `App Header` draw**, and one attribute for the
+same reason: a backdrop filter behind an opaque ground filters nothing and a
+translucent ground with no filter is a tint, so a consumer says what it
+wants rather than assembling it out of two hooks.
+
+A drawer is the case where the pair earns the most, because there is already
+something behind it worth seeing: the page it covers, under its own scrim.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure. */
+  "prop:material"?: HelixDrawer["material"];
   /** Whether the element is open.
 
 One property, not two. Reading gives the real state whichever mode the
@@ -17359,6 +17385,18 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: Whether the panel is glass rather than opaque.
+   *
+   * **The same pair `Card` and `App Header` draw**, and one attribute for the
+   * same reason: a backdrop filter behind an opaque ground filters nothing and a
+   * translucent ground with no filter is a tint, so a consumer says what it
+   * wants rather than assembling it out of two hooks.
+   *
+   * A drawer is the case where the pair earns the most, because there is already
+   * something behind it worth seeing: the page it covers, under its own scrim.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -17432,6 +17470,8 @@ export type CustomElements = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-backdrop`: Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. (default: `undefined`)
+   * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
    * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
@@ -28645,6 +28685,18 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: Whether the panel is glass rather than opaque.
+   *
+   * **The same pair `Card` and `App Header` draw**, and one attribute for the
+   * same reason: a backdrop filter behind an opaque ground filters nothing and a
+   * translucent ground with no filter is a tint, so a consumer says what it
+   * wants rather than assembling it out of two hooks.
+   *
+   * A drawer is the case where the pair earns the most, because there is already
+   * something behind it worth seeing: the page it covers, under its own scrim.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
    * - `open`: Whether the element is open.
    *
    * One property, not two. Reading gives the real state whichever mode the
@@ -28718,6 +28770,8 @@ export type CustomElementsSolidJs = {
    *
    * CSS variables available for styling the component.
    *
+   * - `--drawer-backdrop`: Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. (default: `undefined`)
+   * - `--drawer-background-color`: Surface behind the panel. (default: `undefined`)
    * - `--drawer-border-color`: Colour of the panel's edge. (default: `undefined`)
    * - `--drawer-border-width`: Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. (default: `undefined`)
    * - `--drawer-inset`: Padding inside the panel. (default: `undefined`)
@@ -36903,6 +36957,10 @@ export type CustomCssProperties = {
   "--donut-chart-track-color"?: string;
   /** How thick the ring is drawn, derived from `hole`. */
   "--donut-chart-stroke"?: string;
+  /** Filter applied behind a `material="glass"` drawer. Follows the theme's material policy; set it to override the strength on one drawer. */
+  "--drawer-backdrop"?: string;
+  /** Surface behind the panel. */
+  "--drawer-background-color"?: string;
   /** Colour of the panel's edge. */
   "--drawer-border-color"?: string;
   /** Width of the panel's edge. Follows `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a theme says otherwise. */
