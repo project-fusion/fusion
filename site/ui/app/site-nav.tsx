@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixMegamenu } from '@helix-io/web'
+import type { HelixAppHeader, HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -64,6 +64,56 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [panelDown, setPanelDown] = useState(false)
 
   const panelRef = useRef<HelixMegamenu>(null)
+  const headerRef = useRef<HelixAppHeader>(null)
+
+  /* Whether the bar has something under it, read off the bar rather than
+     computed again.
+   *
+   * `AppHeader` already decides this, with a band around the threshold so a
+   * page that rubber-bands does not flicker, and it reflects the answer as
+   * `data-scrolled`. A second scroll listener here would be a second opinion on
+   * the same question and would eventually disagree with the first. */
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) {
+      return
+    }
+    const sync = () => setScrolled(header.hasAttribute('data-scrolled'))
+    sync()
+    const watch = new MutationObserver(sync)
+    watch.observe(header, { attributeFilter: ['data-scrolled'] })
+    return () => watch.disconnect()
+  }, [])
+
+  /* How far down the sheet reaches. The bar's own height at rest, and the
+     panel's bottom edge while one is down, which is the only number here the
+     app has to go and measure.
+   *
+   * **An effect and an observer, not a frame callback.** `helix-open` fires
+   * before the panel has moved, so the measurement cannot happen there, and the
+   * obvious repair is to defer it a frame. A `requestAnimationFrame` never runs
+   * in a background tab, so the sheet would open at the bar's own height and
+   * stay there until something else re-rendered: measured exactly that way
+   * here, where the panel reached 371 and the sheet held at 56.
+   *
+   * The effect's own call is synchronous after layout, which is the value that
+   * matters, and the observer keeps it true when the panel's content or the
+   * viewport changes under it. */
+  const [panelBottom, setPanelBottom] = useState(0)
+
+  useEffect(() => {
+    const panel = panelRef.current?.shadowRoot?.querySelector('[part="panel"]')
+    if (!panelDown || !panel) {
+      return
+    }
+    const measure = () => setPanelBottom(panel.getBoundingClientRect().bottom)
+    measure()
+    const watch = new ResizeObserver(measure)
+    watch.observe(panel)
+    return () => watch.disconnect()
+  }, [panelDown])
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
@@ -96,36 +146,26 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
 
   return (
     <>
+      {/* The one glass, under both the bar and the panel.
+
+          Always rendered and lit by an attribute rather than mounted on demand:
+          unmounted, it would vanish on the frame the panel began collapsing,
+          because nothing transitions out of the DOM. */}
+      <div
+        className="navGlass"
+        data-lit={scrolled || panelDown ? '' : undefined}
+        style={panelDown && panelBottom ? { blockSize: `${panelBottom}px` } : undefined}
+      />
+
       <helix-app-header
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
-        /* **A panel opening is the same event as scrolling, as far as the bar is
-         * concerned: something is now under it that has to stay legible.**
-         *
-         * So the bar asks for `glass` while a panel is down, and that one word
-         * covers both cases. Over a hero at the top, `transparent` has no fill,
-         * and switching to `glass` fades one in over the component's own
-         * `normal`, so the bar arrives with the panel. Scrolled, the bar is
-         * already glass, and `[material="glass"]` and
-         * `[material="transparent"][data-scrolled]` declare exactly the same
-         * two properties, so asking for it again changes nothing at all.
-         *
-         * **This replaces a sheet, and the sheet is the thing to explain.** The
-         * app used to paint one glass pane across the bar and the panel
-         * together, turning the surface off in both, because two
-         * `backdrop-filter` boxes blur differently and leave a line across the
-         * join. It works, and it costs a handover: two translucent layers
-         * cannot trade places by fading, since one glass is 72% coverage and
-         * every fade passes through something else. Held together they
-         * composite to 92% and the bar goes dark, crossed they dip to 59% and
-         * the page reads through, released early they fall to 45%. Four
-         * arrangements were built and all four were visible.
-         *
-         * The seam it was avoiding is not a seam here, because the panel starts
-         * exactly at the bar's bottom edge: measured at 57 against a bar bottom
-         * of 57, with and without a filter on the bar. Two glasses meeting on
-         * that line read as the bar continuing downward, which is what the
-         * panel's own comment says it is for. */
-        material={panelDown ? 'glass' : onHero ? 'transparent' : undefined}
+        /* Describes the page it is over, and nothing more. The sheet under it
+         * does the painting in both states, so this no longer decides whether
+         * the bar has glass: the hooks in `site.css` hold it clear at all
+         * times. Kept because it is still true, and because the day the sheet
+         * goes away this is what the bar falls back to. */
+        material={onHero ? 'transparent' : undefined}
+        ref={headerRef}
         sticky
       >
         <a data-link="quiet" href="/" slot="start">

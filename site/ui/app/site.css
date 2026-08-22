@@ -173,25 +173,19 @@
  * at `raised` so it sits over the page and under the bar: the masthead is
  * sticky at a higher layer and the panel is in the top layer, so both keep
  * their content above a single continuous blur. */
-/* The panel is glass, the same glass the bar above it is.
+/* The panel is a window onto the sheet, never a surface of its own.
  *
- * `Megamenu` defaults its band to the page's own colour, which is right for a
- * panel on a page and wrong for one hanging off a masthead: its own comment
- * says the band means to read as the header continuing downward, and it cannot
- * when the two are painted differently.
+ * Unconditional. Keyed to the open state it came off on the frame the collapse
+ * started, since `helix-close` fires before the panel moves, and the panel
+ * finished collapsing as an opaque rectangle of the page's colour. It is only
+ * ever on screen while open or collapsing, and the sheet covers both, so it
+ * never needs a ground here.
  *
- * Both hooks, matched to what `AppHeader` takes for `material="glass"`, so the
- * pair meet on the bar's bottom edge as one surface. The blur is the `lg` step
- * the scrolled bar uses rather than the library's `md`, for the same reason:
- * content runs under both of these for as long as they are up.
- *
- * **This is a fact about pairing the two, which is why it lives here.**
- * `Megamenu` does not know it is in a header and `AppHeader` does not know it
- * contains a panel, and coupling them in the library would be a dependency
- * between two things that are correctly independent. */
+ * Both hooks, because a second blur would be a blur of the sheet that is
+ * already blurring, which is the disagreement the sheet exists to prevent. */
 helix-megamenu {
-  --megamenu-backdrop: blur(var(--helix-material-blur-lg));
-  --megamenu-background: var(--helix-material-translucent);
+  --megamenu-backdrop: none;
+  --megamenu-background: transparent;
 }
 
 helix-app-header {
@@ -199,33 +193,72 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
-/* A scrolled bar has to stop the page being *read*, not stop it being seen.
+/* **The masthead never paints. One sheet does, for both of its jobs.**
  *
- * The first attempt at this raised the fill to 88%, which does stop the text
- * and also stops the glass: at that point the bar is a solid strip that happens
- * to be a fraction translucent, and the whole character of the thing is gone.
- * Opacity is the wrong instrument. It works by hiding what is behind, and the
- * entire idea of glass is that what is behind stays visible.
+ * `backdrop-filter` is clipped to its own element's box, so two of them meeting
+ * on a line do not agree: a 57 pixel bar clamps a 32 pixel blur at both edges
+ * and averages to a flat wash, while the panel hanging off its bottom edge is
+ * tall enough to keep the structure of whatever is behind it. Adjacency does
+ * not help. The two were measured meeting exactly, 57 against 57, and the
+ * division was still plainly visible, worse scrolled and still there at the top
+ * of a hero.
  *
- * Blur is the instrument. It keeps the colour, the movement and the shape of
- * what passes under the bar, and destroys only the part that was the problem,
- * which is that the shapes resolved into words. `--helix-material-blur-md` is
- * 16, which the library picks for a popover: something that sits briefly over
- * content holding still. A masthead has content running under it for the whole
- * session, so it takes the `lg` step at 32.
+ * A single element cannot span them from inside either component: the panel is
+ * a popover in the top layer so it cannot sit behind the bar, and the bar
+ * cannot grow to cover a panel whose height it does not know. So the app paints
+ * one sheet *under* both, at `raised`: the bar's content is above it at
+ * `sticky` and the panel's is above it in the top layer, and one blur serves
+ * the pair.
  *
- * The fill is left at the component's own default. It was never the fault.
+ * **The sheet does the scrolled state too, and that is what removes the
+ * handover.** Painted only while a panel was down, it had to trade places with
+ * the bar's own glass twice per interaction, and two translucent layers cannot
+ * trade by fading: one glass is 72% coverage and every arrangement passes
+ * through something else, 92% held, 59% crossed, 45% released early. Give the
+ * sheet both jobs and the bar has nothing to hand over, because it never had
+ * anything. */
+helix-app-header {
+  --app-header-backdrop: none;
+  --app-header-background: transparent;
+}
+
+/* The one glass. Sized by the app, which is the only place that knows both the
+ * bar's height and the panel's.
  *
- * **Both ways the bar can be glass, not just the scrolled one.** A panel
- * opening asks for `material="glass"` directly, and keyed only on
- * `data-scrolled` that state fell back to the library's `md`: measured at the
- * top of a hero with a panel down, the bar blurred at 16 while the band hanging
- * off its bottom edge blurred at 32, which is the seam across the join that
- * pairing them is meant to prevent. An unscrolled bar with nothing open is
- * still untouched, having no glass to sharpen. */
-helix-app-header[data-scrolled],
-helix-app-header[material="glass"] {
-  --app-header-backdrop: blur(var(--helix-material-blur-lg));
+ * `block-size` rather than a clip, because the sheet is a bare fixed box with
+ * no content to reflow: growing it is what the panel's reveal looks like from
+ * behind, and it lands on the panel's own bottom edge rather than approaching
+ * it. At rest it is exactly the bar.
+ *
+ * Hidden rather than only transparent when neither job is on, so an idle page
+ * is not running a full-screen blur behind nothing. Discrete, so it flips at
+ * the end of the fade rather than the start. */
+.navGlass {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent);
+  block-size: var(--helix-size-header);
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition:
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal) allow-discrete;
+  visibility: hidden;
+  z-index: var(--helix-layer-raised);
+}
+
+.navGlass[data-lit] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navGlass {
+    transition: none;
+  }
 }
 
 /* Every drawer here runs under that header. A drawer is `position: fixed` with
