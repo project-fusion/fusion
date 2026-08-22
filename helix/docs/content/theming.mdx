@@ -15,11 +15,41 @@ never find out. That is a config file, not a theming system.
 inputs, and every foreground and background pair meets its contrast target **by
 construction** rather than by audit.
 
+## Two ways to theme, and only one carries the guarantee
+
+They are both real and they are not the same thing, so they have different
+names.
+
+**Tuned** is the CSS path. Write a seed, the stylesheet re-derives, and nothing
+has to be installed or run:
+
+```css
+:root {
+  --helix-seed-brand: oklch(0.58 0.19 20);
+  --helix-seed-accent-hue: 140;
+  --helix-seed-chroma-scale: 0.4;
+}
+```
+
+It works at `:root` and on any `[data-helix-theme]` subtree, and nowhere else.
+A `var()` inside a custom property is substituted on the element the property is
+*declared* on, so the ramp has already resolved at the root and a seed written
+on a plain element is read by nothing. Naming the scope is what re-runs those
+declarations.
+
+**Tuned makes no contrast promise**, and cannot. CSS has no contrast function:
+`oklch(from …)` can step and rotate, and it cannot search for the lightness that
+clears a target. The figures baked into the ramp are exact for the seed that
+ships and approximate for any other.
+
+**Verified** is the engine. It solves rather than steps, measures every pair it
+emits, and hands back an artifact:
+
 ```ts
 import { deriveTheme, toCss } from '@helix-io/theme'
 
 const theme = deriveTheme({
-  brand: { chroma: 0.19, hue: 258, lightness: 0.58 },
+  brand: '#0b3d91',
   contrastTarget: 4.5, // 4.5 is WCAG AA, 7 is AAA
   scheme: 'light',
 })
@@ -30,6 +60,13 @@ if (theme.violations.length > 0) {
 
 console.log(toCss(theme))
 ```
+
+The emitted block carries the seeds as well as the tokens, so the halves the
+engine does not compute, the twenty-four series colours a chart reads, the
+spacing scale and the corner radii, re-derive from the same values the solver
+used. That is what stops the two paths disagreeing on the same page.
+
+Reach for tuned to try a colour. Reach for verified to ship one.
 
 ## Why OKLCH
 

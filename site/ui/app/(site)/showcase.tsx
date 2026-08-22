@@ -64,45 +64,37 @@ const BRAND = '#3b82f6'
 /**
  * Re-derives from one colour and puts the result on the panel.
  *
- * **All of it comes from the engine now.** This used to bridge a name the
- * engine emitted and the stylesheet did not read, step the primary's hover,
- * active and subtle by hand because nothing produced them, and solve the anchor
- * its own contrast-checked pair. Every one of those was a consumer covering for
- * a gap, and every one of them is gone: `deriveTheme` emits fourteen tokens
- * under the names the stylesheet actually reads, including the three surfaces a
- * dropdown, a recess and a raised card sit on.
+ * **All of it comes from the engine, including the seed.** This file used to
+ * carry a hand-written bridge and a comment explaining that the two derivations
+ * "do not talk to each other": `deriveTheme` computed tokens in JavaScript
+ * while the twenty-four series colours a chart reads computed themselves in CSS
+ * off `--_helix-seed-brand`, so setting the tokens moved the buttons and the
+ * tags and left every chart on the page the original blue. This wrote the
+ * private primitive itself to close the gap.
+ *
+ * The engine emits `seeds` now, so the bridge is gone and nothing here reaches
+ * past `helix/styles`'s public surface. `check:seeds` holds the two name sets
+ * to each other in both directions.
+ *
+ * **`data-helix-theme` is still set before the values, and that is not
+ * cosmetic.** A `var()` inside a custom property is substituted on the element
+ * the property is *declared* on, so the ramp has already resolved at `:root`
+ * and a seed written on a plain element is read by nothing. The attribute is
+ * what re-runs those declarations here.
  *
  * Scoped to the panel rather than the document, because the rest of the page is
  * not the demonstration.
  */
 const restyle = (node: HTMLElement, hex: string, scheme: ThemeIntent['scheme']): void => {
-  for (const token of deriveTheme({ brand: hexToOklch(hex), scheme }).tokens) {
+  const theme = deriveTheme({ brand: hexToOklch(hex), scheme })
+
+  node.dataset.helixTheme = ''
+  for (const token of theme.tokens) {
     node.style.setProperty(`--helix-${token.name}`, token.hex)
   }
-
-  /* **The seed as well, and it is what moves the charts.**
-
-     There are two derivations here and they do not talk to each other.
-     `deriveTheme` computes tokens in JavaScript. The series ramp the charts use
-     computes itself in CSS, `oklch(from var(--_helix-seed-brand) ...)`, so every
-     sparkline and every bar is a hue rotation off that primitive and off
-     nothing else. Setting the semantic tokens moved the buttons, the tags and
-     the surfaces, and left every chart on the page the original blue.
-
-     **Setting the seed alone does not fix it either, and that is the part worth
-     knowing.** A `var()` inside a custom property is substituted on the element
-     the property is *declared* on, so the ramp had already resolved at `:root`
-     and a seed on this panel was read by nothing. `data-helix-theme` is the
-     scope that re-runs those declarations here, and it is why the attribute is
-     set before the value.
-
-     `helix/styles` owns the primitives and nothing outside is meant to touch
-     them, which is the rule and is right. It is written to here because the
-     ramp has no other input, and that is the seam rather than an exception: a
-     theming solution has to drive the seed and let the CSS derive from it. The
-     name is the thing to revisit, not the direction. */
-  node.dataset.helixTheme = ''
-  node.style.setProperty('--_helix-seed-brand', hex)
+  for (const [name, value] of Object.entries(theme.seeds)) {
+    node.style.setProperty(`--helix-${name}`, value)
+  }
 }
 
 export function Showcase(): React.ReactElement {

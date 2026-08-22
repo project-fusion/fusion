@@ -82,6 +82,18 @@ export interface DerivedTheme {
    * from being invisible to anybody who only reads `violations`.
    */
   pairings: Pairing[]
+  /**
+   * The seed values a consumer must write for `helix/styles` to re-derive the
+   * halves this engine does not compute: the twenty-four series colours, the
+   * spacing scale and the corner radii.
+   *
+   * **Data rather than only a line of CSS**, because the two consumers apply it
+   * differently. `toCss` renders a block; a page theming one panel writes the
+   * properties onto that element. Both read this, so neither can hold a
+   * different opinion about what the seed is, which is exactly what the
+   * marketing site's hand-written bridge had become.
+   */
+  seeds: Record<string, string>
   tokens: DerivedToken[]
   /**
    * Pairings that failed their contrast target, pinned values included.
@@ -396,35 +408,65 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
   const statusIntent = resolved.status
   const allowance = statusIntent.allowance ?? 0
   const statusColors = new Map<StatusName, { color: Oklch; pinned: boolean }>()
+  /* **Every role resolved so far, which grows as the loop runs.** A status
+     rotated clear of the accent can land on the status decided before it: with
+     the shipped blue, `warning` moved to 47 to clear an accent at 80 and came
+     to rest 20 degrees from `danger`. Repairing against a fixed set answers one
+     collision by creating another, so the set accumulates and the order is the
+     declared one, which makes it deterministic. */
+  const settled: Oklch[] = []
   for (const name of Object.keys(STATUS_HUE) as StatusName[]) {
     const supplied = statusIntent[name]
     if (supplied !== undefined && (typeof supplied === 'string' || 'lightness' in supplied)) {
-      statusColors.set(name, { color: toOklch(supplied as Color), pinned: true })
+      const pinnedColor = toOklch(supplied as Color)
+      settled.push(pinnedColor)
+      statusColors.set(name, { color: pinnedColor, pinned: true })
       continue
     }
     const hue = (supplied as { hue?: number } | undefined)?.hue ?? STATUS_HUE[name]
     const chroma = policy(rawBrand.chroma)
     let resolvedHue = hue
     if (allowance > 0) {
-      /* Rotate away from the brand rather than toward it, one degree at a time,
-         and stop the moment it clears. Away is whichever direction increases
-         the separation, so a brand on either side of the status is handled by
-         the same loop. */
-      const away = ((hue - brand.hue + 540) % 360) - 180 >= 0 ? 1 : -1
+      /* **Against every role already decided, not against the brand alone.**
+         The first version measured the candidate against `primary` and nothing
+         else, so a status colliding with the *accent* was reported by
+         `collisions` and repaired by nothing: with the shipped blue the accent
+         is the complement at 80 degrees and `warning` is amber at 75, five
+         apart, and the allowance rotated past it without ever looking.
+
+         Found by the theme builder within a minute of it existing, which is
+         most of the argument for building a consumer before porting an API. */
+      const decided = [primary.raw, accentSteps.raw, ...settled]
+      const clears = (candidate: Oklch): boolean =>
+        decided.every(
+          (role) =>
+            perceptualDistance(fitToGamut(candidate), fitToGamut(role)) >= COLLISION_DISTANCE,
+        )
+
+      /* Both directions at each step rather than a direction chosen up front.
+         Away from one role can be toward another, so the only honest search is
+         to widen outward and take the first hue that clears everything. */
+      /* **A repair either works or it does not happen.** The first version kept
+         whatever hue it had reached when the allowance ran out, which is the
+         worst of both outcomes: with the shipped blue, `warning` walked the
+         full forty degrees to 115, came to rest in the greens, and still
+         collided. A warning that has stopped looking like a warning *and* is
+         still indistinguishable is worse than one that only collides, and
+         `collisions` is there to report the failure honestly. */
       for (let step = 0; step <= allowance; step += 1) {
-        resolvedHue = (hue + away * step + 360) % 360
-        const candidate = solveForAll({ chroma, hue: resolvedHue }, contrastTarget)
-        if (
-          perceptualDistance(fitToGamut(candidate), fitToGamut(primary.raw)) >= COLLISION_DISTANCE
-        ) {
+        const tries = step === 0 ? [hue] : [hue + step, hue - step]
+        const found = tries
+          .map((candidate) => (candidate + 360) % 360)
+          .find((candidate) => clears(solveForAll({ chroma, hue: candidate }, contrastTarget)))
+        if (found !== undefined) {
+          resolvedHue = found
           break
         }
       }
     }
-    statusColors.set(name, {
-      color: solveForAll({ chroma, hue: resolvedHue }, contrastTarget),
-      pinned: false,
-    })
+    const color = solveForAll({ chroma, hue: resolvedHue }, contrastTarget)
+    settled.push(color)
+    statusColors.set(name, { color, pinned: false })
   }
 
   /* **Every filled ground `foreground-on-accent` lands on, not just the brand's
@@ -601,7 +643,17 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     }
   }
 
-  return { collisions, intent: resolved, pairings, tokens, violations }
+  /* The brand seed is the *solved* primary rather than the colour handed in,
+     and that is what makes the two derivations agree: `helix/styles` builds its
+     ramp from the seed, so seeding it with the raw input would leave the CSS
+     primary and the engine's primary two different colours on the same page. */
+  const seeds: Record<string, string> = {
+    'seed-brand': oklchToHex(fitToGamut(primary.raw)),
+    'seed-density': String(resolved.density),
+    'seed-radii': `${resolved.radius}rem`,
+  }
+
+  return { collisions, intent: resolved, pairings, seeds, tokens, violations }
 }
 
 /**
@@ -658,15 +710,12 @@ const SHADOW_FLOATING = '0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, tr
  * `check:seeds` holds the two name sets to each other now, in both directions.
  */
 export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
-  const { density, namespace, radius } = theme.intent
+  const { namespace } = theme.intent
   const lines = theme.tokens.map((t) => `  --${namespace}-${t.name}: ${t.hex};`)
 
-  const brand = theme.tokens.find((t) => t.name === 'color-primary')
-  if (brand) {
-    lines.push(`  --${namespace}-seed-brand: ${brand.hex};`)
+  for (const [name, value] of Object.entries(theme.seeds)) {
+    lines.push(`  --${namespace}-${name}: ${value};`)
   }
-  lines.push(`  --${namespace}-seed-density: ${density};`)
-  lines.push(`  --${namespace}-seed-radii: ${radius}rem;`)
 
   /* **The separation policy, which is what makes the knob turn.** The audit
      that produced these tokens put every surface's edge and lift behind a hook

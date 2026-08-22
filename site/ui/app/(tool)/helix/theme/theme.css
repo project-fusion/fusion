@@ -1,0 +1,56 @@
+/**
+ * The theme builder.
+ *
+ * Beside the tool rather than in `site.css`, which is the shared sheet every
+ * page of the marketing site draws on. A tool's chrome is not site chrome, and
+ * a file two people are editing at once is a merge conflict waiting for
+ * whichever of them commits second.
+
+   A tool rather than a page: no centred column and no site chrome, for the
+   reason the sandbox already gives, that every row around it is a row taken
+   from the thing being examined. Controls on one side, the palette and its
+   audit on the other. */
+.themeBuilder {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+  min-block-size: 100dvh;
+  padding: var(--helix-space-xl);
+}
+
+@media (width < 60rem) {
+  .themeBuilder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.themeControls {
+  align-self: start;
+  position: sticky;
+  top: var(--helix-space-xl);
+}
+
+.themeResult {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-rows: auto auto;
+  min-inline-size: 0;
+}
+
+/* The preview paints its own page, because a theme's background is one of the
+   things being previewed and letting the site's show through would leave the
+   one surface every other pair is measured against out of the picture. */
+.themePreview {
+  background-color: var(--helix-color-background);
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  padding: var(--helix-space-xl);
+}
+
+.themeAudit {
+  min-inline-size: 0;
+}
+
+.themeAudit helix-code-block {
+  max-block-size: 24rem;
+}

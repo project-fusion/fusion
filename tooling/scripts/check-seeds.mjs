@@ -92,11 +92,14 @@ const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const uncommented = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
 
-/* Written `--${namespace}-seed-brand`, so the literal prefix is not there to
-   match on. Every emission ends in `seed-<name>:` and nothing else in this file
-   does, comments already being stripped. */
+/* **Two forms, because the seeds are data before they are CSS.** They are
+   declared as object keys, `'seed-brand': …`, and rendered into
+   `--${namespace}-seed-brand: …` from that one place, so the literal prefix is
+   never in the source to match on and the key may or may not carry a quote.
+   What both forms share is ending in `seed-<name>` followed by a colon, and
+   nothing else in this file does, comments already being stripped. */
 const emitted = new Set(
-  [...uncommented(read(ENGINE)).matchAll(/-seed-([a-z0-9-]+)\s*:/g)].map((m) => m[1]),
+  [...uncommented(read(ENGINE)).matchAll(/seed-([a-z0-9-]+)'?\s*:/g)].map((m) => m[1]),
 )
 
 const consumed = new Set()
