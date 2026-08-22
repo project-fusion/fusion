@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process'
 /**
  * Writes `docs/16-token-reference.md` from `tokens.css`.
  *
@@ -77,24 +78,56 @@ const walk = (dir, found = []) => {
     const path = join(dir, entry)
     if (statSync(path).isDirectory()) {
       walk(path, found)
-      /* Not the generated mirror of a stylesheet, which is the same file twice.
-       *
-       * `bun run styles` writes a `.css.ts` beside every `.css`, holding the
-       * same rules as a template literal, and it is gitignored. Counted as a
-       * `.ts` it doubles every number in this document, and *only after a build
-       * has run*: measured on one commit, `--helix-color-background` reads 63 in
-       * a fresh checkout and 105 once `.css.ts` exists. So the answer depended
-       * on build state, `check:tokens-reference` was red or green by accident,
-       * and regenerating this file from a clean tree wrote numbers CI would
-       * reject. `check-orphans` skips them for its own version of this. */
-    } else if (
-      !path.endsWith('.css.ts') &&
-      (path.endsWith('.css') || path.endsWith('.ts') || path.endsWith('.tsx'))
-    ) {
+      /* Generated files are filtered below, by asking git rather than by
+         matching names here. */
+    } else if (path.endsWith('.css') || path.endsWith('.ts') || path.endsWith('.tsx')) {
       found.push(path)
     }
   }
   return found
+}
+
+/**
+ * What git ignores, which is this repository's own record of what is generated.
+ *
+ * **A generated file is the sources counted again.** Three kinds were being
+ * counted. `bun run styles` writes a `.css.ts` beside every `.css` holding the
+ * same rules as a template literal, which doubled every stylesheet;
+ * `helix/web/elements.css` and `site/ui/public/sandbox/frame.css` are the style
+ * layers concatenated, and `frame.css` alone holds 238 reads that are copies of
+ * reads already counted in the files it was built from.
+ *
+ * Every one of them is gitignored, so they exist after a build and not before,
+ * and counting them made each number here a fact about whether somebody had run
+ * `bun run build` rather than about the library. Measured on one commit,
+ * changing nothing but build state: `--helix-color-background` read 63 in a
+ * fresh checkout and 105 after a build.
+ *
+ * A hand-kept ignore list is what let this happen: this script had one, it named
+ * `node_modules`, `dist` and `.next`, and it drifted from the two other places
+ * that also decide what is generated. `.gitignore` is the one place that has to
+ * be right for the repository to work at all, so it is the one to ask. One
+ * `git check-ignore` for the whole candidate list, rather than one per file.
+ */
+const generated = (paths) => {
+  if (paths.length === 0) {
+    return new Set()
+  }
+  try {
+    const answer = execFileSync('git', ['check-ignore', '--stdin'], {
+      encoding: 'utf8',
+      input: paths.join('\n'),
+    })
+    return new Set(answer.split('\n').filter(Boolean))
+  } catch (error) {
+    /* `check-ignore` exits 1 when it matched nothing, which is a clean tree
+       rather than a failure, and stdout still carries whatever did match. */
+    return new Set(
+      String(error.stdout ?? '')
+        .split('\n')
+        .filter(Boolean),
+    )
+  }
 }
 
 /* Every read of every token, across the tiers and the site. The declaration
@@ -103,7 +136,12 @@ const walk = (dir, found = []) => {
    not CSS only. */
 const reads = new Map()
 for (const root of ROOTS) {
-  for (const path of walk(root)) {
+  const found = walk(root)
+  const ignored = generated(found)
+  for (const path of found) {
+    if (ignored.has(path)) {
+      continue
+    }
     if (path.endsWith('tokens.css') || path.endsWith('primitives.css')) {
       continue
     }
