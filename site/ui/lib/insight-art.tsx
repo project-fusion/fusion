@@ -1,7 +1,11 @@
 import type { Topic } from './insights'
 
-/**
- * A still field for each topic, painted rather than run.
+/* A plain block and not a doc one, because the block below documents `Lobe` and
+   two doc comments in a row leave the first documenting nothing. Naming the
+   marker in prose is its own trap: written out, `check:orphans` reads the
+   mention as the thing and reports the comment it is explaining.
+
+   A still field for each topic, painted rather than run.
  *
  * **An image, not a shader.** `Aura` was here and drew the right thing at the
  * wrong cost: six live WebGL contexts on `/insights` and seven on the landing
