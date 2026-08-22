@@ -1409,12 +1409,12 @@
           "members": [
             {
               "kind": "field",
-              "name": "appearance",
+              "name": "material",
               "type": {
-                "text": "'flat' | 'material' | 'transparent' | undefined"
+                "text": "'glass' | 'transparent' | undefined"
               },
-              "description": "How much of what is behind the banner shows through it.\n\nOne axis, three points, and `flat` is the default and the absent attribute.\n\n- `flat` is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `material` is translucent and blurred, so content passing underneath\n  stays visible and goes soft. The page reads as one surface with a bar\n  floating over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the flat one. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
-              "attribute": "appearance",
+              "description": "What the banner is made of, which is how much of what is behind it shows\nthrough.\n\nOne axis, three points, and absent is opaque, per the rule that a reflected\nproperty takes no default.\n\n- Absent is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `glass` is translucent and blurred, so content passing underneath stays\n  visible and goes soft. The page reads as one surface with a bar floating\n  over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the glass. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**This was `appearance`, and it was filed under the wrong axis from the\nstart.** The library's test is the one `Card` states: `appearance` is how a\nthing is drawn, `tone` is what it means, `material` is what it is made of,\nand a property belongs to `material` when it can be true at the same time\nas the other two. Every value here varies exactly one quantity, and that\nquantity is translucency. The proof is inside the component rather than in\nthe argument: scrolled, `transparent` emits the same two declarations\n`glass` does, so two of the three points are the same material arriving at\ndifferent times.\n\n**One axis rather than two, and that is the whole reason it stays an\nenum.** The three are mutually exclusive: a bar cannot be opaque and\nsee-through. Splitting the glass out and leaving `appearance=\"transparent\"`\nbeside it would make `material=\"glass\" appearance=\"transparent\"` sayable,\nwhich is a state with nothing to mean, where an enum makes it unsayable.\n\nThe vocabulary got more coherent on the way. `flat` is a word about shape,\n`material` was a word about categories and `transparent` a word about\nlight; opaque, glass and transparent are three points in one language.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
+              "attribute": "material",
               "reflects": true
             },
             {
@@ -1424,7 +1424,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because following the reader is a decision about the page rather\nthan about the bar, and because a reflected `true` writes an attribute the\nserver's markup does not have. Every default here is the absent attribute.\n\nIt pairs with `appearance`: a bar that does not stick is only ever over the\ntop of the page, so `material` and `transparent` have nothing to be\ntranslucent against and `data-scrolled` never lands.",
+              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because following the reader is a decision about the page rather\nthan about the bar, and because a reflected `true` writes an attribute the\nserver's markup does not have. Every default here is the absent attribute.\n\nIt pairs with `material`: a bar that does not stick is only ever over the\ntop of the page, so `glass` and `transparent` have nothing to be\ntranslucent against and `data-scrolled` never lands.",
               "attribute": "sticky",
               "reflects": true
             },
@@ -1575,12 +1575,12 @@
           ],
           "attributes": [
             {
-              "name": "appearance",
+              "name": "material",
               "type": {
-                "text": "'flat' | 'material' | 'transparent' | undefined"
+                "text": "'glass' | 'transparent' | undefined"
               },
-              "description": "How much of what is behind the banner shows through it.\n\nOne axis, three points, and `flat` is the default and the absent attribute.\n\n- `flat` is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `material` is translucent and blurred, so content passing underneath\n  stays visible and goes soft. The page reads as one surface with a bar\n  floating over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the flat one. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
-              "fieldName": "appearance"
+              "description": "What the banner is made of, which is how much of what is behind it shows\nthrough.\n\nOne axis, three points, and absent is opaque, per the rule that a reflected\nproperty takes no default.\n\n- Absent is opaque. The page stops at the bar, which is what an application\n  wants: the bar is chrome and chrome does not need to be interesting.\n- `glass` is translucent and blurred, so content passing underneath stays\n  visible and goes soft. The page reads as one surface with a bar floating\n  over it.\n- `transparent` has no fill at all until something has scrolled under it,\n  and then it takes the glass. For a banner over a hero, where the art\n  should reach the top of the window and the bar should only become a\n  surface once it has to be legible over moving content.\n\n**This was `appearance`, and it was filed under the wrong axis from the\nstart.** The library's test is the one `Card` states: `appearance` is how a\nthing is drawn, `tone` is what it means, `material` is what it is made of,\nand a property belongs to `material` when it can be true at the same time\nas the other two. Every value here varies exactly one quantity, and that\nquantity is translucency. The proof is inside the component rather than in\nthe argument: scrolled, `transparent` emits the same two declarations\n`glass` does, so two of the three points are the same material arriving at\ndifferent times.\n\n**One axis rather than two, and that is the whole reason it stays an\nenum.** The three are mutually exclusive: a bar cannot be opaque and\nsee-through. Splitting the glass out and leaving `appearance=\"transparent\"`\nbeside it would make `material=\"glass\" appearance=\"transparent\"` sayable,\nwhich is a state with nothing to mean, where an enum makes it unsayable.\n\nThe vocabulary got more coherent on the way. `flat` is a word about shape,\n`material` was a word about categories and `transparent` a word about\nlight; opaque, glass and transparent are three points in one language.\n\n**`material` makes the header a containing block for `position: fixed`\ndescendants**, which is worth knowing and is narrower than it sounds. Every\noverlay in this library goes into the top layer through the popover API or\n`<dialog>`, and the top layer is not laid out against its DOM ancestors:\nmeasured, a popover inside a blurred bar opens at the window origin while a\nplain `position: fixed` child of the same bar opens at the bar's. So a\nmenu, a tooltip or a select in a material header is unaffected, and what is\ncaught is a consumer's own hand-positioned element.",
+              "fieldName": "material"
             },
             {
               "name": "sticky",
@@ -1588,7 +1588,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because following the reader is a decision about the page rather\nthan about the bar, and because a reflected `true` writes an attribute the\nserver's markup does not have. Every default here is the absent attribute.\n\nIt pairs with `appearance`: a bar that does not stick is only ever over the\ntop of the page, so `material` and `transparent` have nothing to be\ntranslucent against and `data-scrolled` never lands.",
+              "description": "Whether the banner sticks to the top of the viewport.\n\nOpt in, because following the reader is a decision about the page rather\nthan about the bar, and because a reflected `true` writes an attribute the\nserver's markup does not have. Every default here is the absent attribute.\n\nIt pairs with `material`: a bar that does not stick is only ever over the\ntop of the page, so `glass` and `transparent` have nothing to be\ntranslucent against and `data-scrolled` never lands.",
               "fieldName": "sticky"
             },
             {
@@ -1632,16 +1632,16 @@
                 "slug": "base"
               },
               {
-                "description": "No shadow and no blur, for a header that sits on the page rather than over it.",
-                "slug": "flat"
-              },
-              {
                 "description": "Blurred over what scrolls beneath it.",
-                "slug": "material"
+                "slug": "glass"
               },
               {
                 "description": "The navigation pulled to the start, beside the mark rather than centred.",
                 "slug": "navigation-at-the-start"
+              },
+              {
+                "description": "No shadow and no blur, for a header that sits on the page rather than over it.",
+                "slug": "opaque"
               },
               {
                 "description": "Held at the top while the page moves under it.",

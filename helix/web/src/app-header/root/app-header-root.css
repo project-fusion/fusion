@@ -1,19 +1,19 @@
-/* Flat by default: an ordinary surface, no translucency and no blur. Material is
-   opt-in through `appearance="material"`, because a filter makes the header a
+/* Opaque by default: an ordinary surface, no translucency and no blur. Glass is
+   opt-in through `material="glass"`, because a filter makes the header a
    containing block for `position: fixed` descendants, which traps any overlay
-   rendered inside it. Flat is both the quieter look and the one that does not
+   rendered inside it. Opaque is both the quieter look and the one that does not
    surprise.
 
    **No line under it by default, and never one that arrives on scroll.** There
    was a hairline that faded in once content ran underneath, which is the
    conventional answer to "the bar is over something now" and answers a question
-   the bar had already answered: `flat` is opaque and `material` is blurred, so
-   in both the content stops at the bar because it cannot be seen through it.
+   the bar had already answered: the default is opaque and `glass` is blurred,
+   so in both the content stops at the bar because it cannot be seen through it.
 
-   `transparent` is the one appearance where scrolling genuinely changes
+   `transparent` is the one material where scrolling genuinely changes
    something, and it says so the honest way: no surface at the top of the page,
-   and the material one when it needs to hide what is passing under it. That is
-   what `data-scrolled` is still for. The material rather than the flat fill,
+   and the glass when it needs to hide what is passing under it. That is what
+   `data-scrolled` is still for. The glass rather than the opaque fill,
    because a bar that is see-through over a hero and opaque a pixel later
    announces itself as a state machine.
 
@@ -65,7 +65,7 @@
  * Over the soft field these sit on that is nearly free: blurring a smooth
  * gradient returns very nearly the same gradient, and what the filter was
  * contributing at the top of a page is mostly the artifact. */
-:host([appearance="material"]) {
+:host([material="glass"]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }
@@ -74,11 +74,11 @@
  *
  * For a banner over a hero: the art reaches the top of the window and the bar
  * is only the wordmark and the navigation sitting on it. The moment anything
- * has scrolled under it, it takes the flat fill, because a bar over moving
- * content has to be readable and a hero is the one thing it is guaranteed not
- * to still be over.
+ * has scrolled under it, it takes the glass, because a bar over moving content
+ * has to be readable and a hero is the one thing it is guaranteed not to still
+ * be over.
  *
- * That switch is the whole reason this is worth an appearance rather than a
+ * That switch is the whole reason this is worth a material rather than a
  * consumer writing `--app-header-background: transparent`: the hook is one
  * value and this is two, keyed on a state only the component knows. The hook
  * still wins where it is set, in both states, which is how a consumer tints a
@@ -86,19 +86,19 @@
  *
  * Content color is the consumer's. A pale wordmark over a dark hero is
  * `data-color-mode` on the header, the same way the toast inverts itself. */
-:host([appearance="transparent"]) {
+:host([material="transparent"]) {
   background-color: var(--app-header-background, transparent);
 }
 
-/* Scrolled, it takes the material rather than the flat fill.
+/* Scrolled, it takes the glass rather than the opaque fill.
  *
- * The flat one was the safe answer and the wrong one: a bar that is see-through
+ * The opaque one was the safe answer and the wrong one: a bar that is see-through
  * at the top of a hero and opaque a pixel later announces itself as a state
  * machine. Glass is the same promise kept continuously, the content still stops
  * at the bar because it cannot be read through it, and what is passing under
  * stays legible as motion. The hook still wins where a consumer sets it, in
  * both states, which is how a scrolled bar gets tinted to match a hero. */
-:host([appearance="transparent"][data-scrolled]) {
+:host([material="transparent"][data-scrolled]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background, var(--helix-material-translucent));
 }

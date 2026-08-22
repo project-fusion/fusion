@@ -181,8 +181,8 @@ no shadow: the rule is the whole of it.
 
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
-| `appearance` | `appearance` | `'flat' \| 'material' \| 'transparent' \| undefined` | - | - | How much of what is behind the banner shows through it. |
 | `contentAlign` | `content-align` | `'start' \| undefined` | - | `HelixBaseAppHeader` | Where the middle region sits in the bar. |
+| `material` | `material` | `'glass' \| 'transparent' \| undefined` | - | - | What the banner is made of, which is how much of what is behind it shows through. |
 | `sticky` | `sticky` | `boolean` | `false` | - | Whether the banner sticks to the top of the viewport. |
 
 #### Slots

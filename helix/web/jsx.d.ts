@@ -614,19 +614,41 @@ state at all. */
 };
 
 export type HelixAppHeaderProps = {
-  /** How much of what is behind the banner shows through it.
+  /** What the banner is made of, which is how much of what is behind it shows
+through.
 
-One axis, three points, and `flat` is the default and the absent attribute.
+One axis, three points, and absent is opaque, per the rule that a reflected
+property takes no default.
 
-- `flat` is opaque. The page stops at the bar, which is what an application
+- Absent is opaque. The page stops at the bar, which is what an application
   wants: the bar is chrome and chrome does not need to be interesting.
-- `material` is translucent and blurred, so content passing underneath
-  stays visible and goes soft. The page reads as one surface with a bar
-  floating over it.
+- `glass` is translucent and blurred, so content passing underneath stays
+  visible and goes soft. The page reads as one surface with a bar floating
+  over it.
 - `transparent` has no fill at all until something has scrolled under it,
-  and then it takes the flat one. For a banner over a hero, where the art
+  and then it takes the glass. For a banner over a hero, where the art
   should reach the top of the window and the bar should only become a
   surface once it has to be legible over moving content.
+
+**This was `appearance`, and it was filed under the wrong axis from the
+start.** The library's test is the one `Card` states: `appearance` is how a
+thing is drawn, `tone` is what it means, `material` is what it is made of,
+and a property belongs to `material` when it can be true at the same time
+as the other two. Every value here varies exactly one quantity, and that
+quantity is translucency. The proof is inside the component rather than in
+the argument: scrolled, `transparent` emits the same two declarations
+`glass` does, so two of the three points are the same material arriving at
+different times.
+
+**One axis rather than two, and that is the whole reason it stays an
+enum.** The three are mutually exclusive: a bar cannot be opaque and
+see-through. Splitting the glass out and leaving `appearance="transparent"`
+beside it would make `material="glass" appearance="transparent"` sayable,
+which is a state with nothing to mean, where an enum makes it unsayable.
+
+The vocabulary got more coherent on the way. `flat` is a word about shape,
+`material` was a word about categories and `transparent` a word about
+light; opaque, glass and transparent are three points in one language.
 
 **`material` makes the header a containing block for `position: fixed`
 descendants**, which is worth knowing and is narrower than it sounds. Every
@@ -636,15 +658,15 @@ measured, a popover inside a blurred bar opens at the window origin while a
 plain `position: fixed` child of the same bar opens at the bar's. So a
 menu, a tooltip or a select in a material header is unaffected, and what is
 caught is a consumer's own hand-positioned element. */
-  appearance?: HelixAppHeader["appearance"];
+  material?: HelixAppHeader["material"];
   /** Whether the banner sticks to the top of the viewport.
 
 Opt in, because following the reader is a decision about the page rather
 than about the bar, and because a reflected `true` writes an attribute the
 server's markup does not have. Every default here is the absent attribute.
 
-It pairs with `appearance`: a bar that does not stick is only ever over the
-top of the page, so `material` and `transparent` have nothing to be
+It pairs with `material`: a bar that does not stick is only ever over the
+top of the page, so `glass` and `transparent` have nothing to be
 translucent against and `data-scrolled` never lands. */
   sticky?: HelixAppHeader["sticky"];
   /** Where the middle region sits in the bar.
@@ -684,19 +706,41 @@ box would have been setting `nav-align` to do it. The part is called
 };
 
 export type HelixAppHeaderSolidJsProps = {
-  /** How much of what is behind the banner shows through it.
+  /** What the banner is made of, which is how much of what is behind it shows
+through.
 
-One axis, three points, and `flat` is the default and the absent attribute.
+One axis, three points, and absent is opaque, per the rule that a reflected
+property takes no default.
 
-- `flat` is opaque. The page stops at the bar, which is what an application
+- Absent is opaque. The page stops at the bar, which is what an application
   wants: the bar is chrome and chrome does not need to be interesting.
-- `material` is translucent and blurred, so content passing underneath
-  stays visible and goes soft. The page reads as one surface with a bar
-  floating over it.
+- `glass` is translucent and blurred, so content passing underneath stays
+  visible and goes soft. The page reads as one surface with a bar floating
+  over it.
 - `transparent` has no fill at all until something has scrolled under it,
-  and then it takes the flat one. For a banner over a hero, where the art
+  and then it takes the glass. For a banner over a hero, where the art
   should reach the top of the window and the bar should only become a
   surface once it has to be legible over moving content.
+
+**This was `appearance`, and it was filed under the wrong axis from the
+start.** The library's test is the one `Card` states: `appearance` is how a
+thing is drawn, `tone` is what it means, `material` is what it is made of,
+and a property belongs to `material` when it can be true at the same time
+as the other two. Every value here varies exactly one quantity, and that
+quantity is translucency. The proof is inside the component rather than in
+the argument: scrolled, `transparent` emits the same two declarations
+`glass` does, so two of the three points are the same material arriving at
+different times.
+
+**One axis rather than two, and that is the whole reason it stays an
+enum.** The three are mutually exclusive: a bar cannot be opaque and
+see-through. Splitting the glass out and leaving `appearance="transparent"`
+beside it would make `material="glass" appearance="transparent"` sayable,
+which is a state with nothing to mean, where an enum makes it unsayable.
+
+The vocabulary got more coherent on the way. `flat` is a word about shape,
+`material` was a word about categories and `transparent` a word about
+light; opaque, glass and transparent are three points in one language.
 
 **`material` makes the header a containing block for `position: fixed`
 descendants**, which is worth knowing and is narrower than it sounds. Every
@@ -706,15 +750,15 @@ measured, a popover inside a blurred bar opens at the window origin while a
 plain `position: fixed` child of the same bar opens at the bar's. So a
 menu, a tooltip or a select in a material header is unaffected, and what is
 caught is a consumer's own hand-positioned element. */
-  "prop:appearance"?: HelixAppHeader["appearance"];
+  "prop:material"?: HelixAppHeader["material"];
   /** Whether the banner sticks to the top of the viewport.
 
 Opt in, because following the reader is a decision about the page rather
 than about the bar, and because a reflected `true` writes an attribute the
 server's markup does not have. Every default here is the absent attribute.
 
-It pairs with `appearance`: a bar that does not stick is only ever over the
-top of the page, so `material` and `transparent` have nothing to be
+It pairs with `material`: a bar that does not stick is only ever over the
+top of the page, so `glass` and `transparent` have nothing to be
 translucent against and `data-scrolled` never lands. */
   "prop:sticky"?: HelixAppHeader["sticky"];
   /** Where the middle region sits in the bar.
@@ -14185,19 +14229,41 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How much of what is behind the banner shows through it.
+   * - `material`: What the banner is made of, which is how much of what is behind it shows
+   * through.
    *
-   * One axis, three points, and `flat` is the default and the absent attribute.
+   * One axis, three points, and absent is opaque, per the rule that a reflected
+   * property takes no default.
    *
-   * - `flat` is opaque. The page stops at the bar, which is what an application
+   * - Absent is opaque. The page stops at the bar, which is what an application
    *   wants: the bar is chrome and chrome does not need to be interesting.
-   * - `material` is translucent and blurred, so content passing underneath
-   *   stays visible and goes soft. The page reads as one surface with a bar
-   *   floating over it.
+   * - `glass` is translucent and blurred, so content passing underneath stays
+   *   visible and goes soft. The page reads as one surface with a bar floating
+   *   over it.
    * - `transparent` has no fill at all until something has scrolled under it,
-   *   and then it takes the flat one. For a banner over a hero, where the art
+   *   and then it takes the glass. For a banner over a hero, where the art
    *   should reach the top of the window and the bar should only become a
    *   surface once it has to be legible over moving content.
+   *
+   * **This was `appearance`, and it was filed under the wrong axis from the
+   * start.** The library's test is the one `Card` states: `appearance` is how a
+   * thing is drawn, `tone` is what it means, `material` is what it is made of,
+   * and a property belongs to `material` when it can be true at the same time
+   * as the other two. Every value here varies exactly one quantity, and that
+   * quantity is translucency. The proof is inside the component rather than in
+   * the argument: scrolled, `transparent` emits the same two declarations
+   * `glass` does, so two of the three points are the same material arriving at
+   * different times.
+   *
+   * **One axis rather than two, and that is the whole reason it stays an
+   * enum.** The three are mutually exclusive: a bar cannot be opaque and
+   * see-through. Splitting the glass out and leaving `appearance="transparent"`
+   * beside it would make `material="glass" appearance="transparent"` sayable,
+   * which is a state with nothing to mean, where an enum makes it unsayable.
+   *
+   * The vocabulary got more coherent on the way. `flat` is a word about shape,
+   * `material` was a word about categories and `transparent` a word about
+   * light; opaque, glass and transparent are three points in one language.
    *
    * **`material` makes the header a containing block for `position: fixed`
    * descendants**, which is worth knowing and is narrower than it sounds. Every
@@ -14213,8 +14279,8 @@ export type CustomElements = {
    * than about the bar, and because a reflected `true` writes an attribute the
    * server's markup does not have. Every default here is the absent attribute.
    *
-   * It pairs with `appearance`: a bar that does not stick is only ever over the
-   * top of the page, so `material` and `transparent` have nothing to be
+   * It pairs with `material`: a bar that does not stick is only ever over the
+   * top of the page, so `glass` and `transparent` have nothing to be
    * translucent against and `data-scrolled` never lands.
    * - `content-align`/`contentAlign`: Where the middle region sits in the bar.
    *
@@ -25402,19 +25468,41 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `appearance`: How much of what is behind the banner shows through it.
+   * - `material`: What the banner is made of, which is how much of what is behind it shows
+   * through.
    *
-   * One axis, three points, and `flat` is the default and the absent attribute.
+   * One axis, three points, and absent is opaque, per the rule that a reflected
+   * property takes no default.
    *
-   * - `flat` is opaque. The page stops at the bar, which is what an application
+   * - Absent is opaque. The page stops at the bar, which is what an application
    *   wants: the bar is chrome and chrome does not need to be interesting.
-   * - `material` is translucent and blurred, so content passing underneath
-   *   stays visible and goes soft. The page reads as one surface with a bar
-   *   floating over it.
+   * - `glass` is translucent and blurred, so content passing underneath stays
+   *   visible and goes soft. The page reads as one surface with a bar floating
+   *   over it.
    * - `transparent` has no fill at all until something has scrolled under it,
-   *   and then it takes the flat one. For a banner over a hero, where the art
+   *   and then it takes the glass. For a banner over a hero, where the art
    *   should reach the top of the window and the bar should only become a
    *   surface once it has to be legible over moving content.
+   *
+   * **This was `appearance`, and it was filed under the wrong axis from the
+   * start.** The library's test is the one `Card` states: `appearance` is how a
+   * thing is drawn, `tone` is what it means, `material` is what it is made of,
+   * and a property belongs to `material` when it can be true at the same time
+   * as the other two. Every value here varies exactly one quantity, and that
+   * quantity is translucency. The proof is inside the component rather than in
+   * the argument: scrolled, `transparent` emits the same two declarations
+   * `glass` does, so two of the three points are the same material arriving at
+   * different times.
+   *
+   * **One axis rather than two, and that is the whole reason it stays an
+   * enum.** The three are mutually exclusive: a bar cannot be opaque and
+   * see-through. Splitting the glass out and leaving `appearance="transparent"`
+   * beside it would make `material="glass" appearance="transparent"` sayable,
+   * which is a state with nothing to mean, where an enum makes it unsayable.
+   *
+   * The vocabulary got more coherent on the way. `flat` is a word about shape,
+   * `material` was a word about categories and `transparent` a word about
+   * light; opaque, glass and transparent are three points in one language.
    *
    * **`material` makes the header a containing block for `position: fixed`
    * descendants**, which is worth knowing and is narrower than it sounds. Every
@@ -25430,8 +25518,8 @@ export type CustomElementsSolidJs = {
    * than about the bar, and because a reflected `true` writes an attribute the
    * server's markup does not have. Every default here is the absent attribute.
    *
-   * It pairs with `appearance`: a bar that does not stick is only ever over the
-   * top of the page, so `material` and `transparent` have nothing to be
+   * It pairs with `material`: a bar that does not stick is only ever over the
+   * top of the page, so `glass` and `transparent` have nothing to be
    * translucent against and `data-scrolled` never lands.
    * - `content-align`/`contentAlign`: Where the middle region sits in the bar.
    *

@@ -200,8 +200,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       />
 
       <helix-app-header
-        appearance={onHero ? 'transparent' : undefined}
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
+        material={onHero ? 'transparent' : undefined}
         sticky
         /* Follows the sheet exactly, and switches rather than fades.
          *
@@ -218,7 +218,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
          * exists to catch.
          *
          * At the top of a hero none of this shows, because
-         * `appearance="transparent"` has no fill to take back. Scrolled, where
+         * `material="transparent"` has no fill to take back. Scrolled, where
          * the same attribute takes the material, is the case with something to
          * see. */
         style={
