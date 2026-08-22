@@ -3285,6 +3285,8 @@ picked from what they are looking at.
 | Property | Attribute | Type | Default | From | Description |
 | --- | --- | --- | --- | --- | --- |
 | `active` | `data-active` | `boolean` | `false` | `HelixBaseOption` | Whether this is the option the keyboard is on. Written by the listbox. |
+| `alternate` | `alternate` | `string` | `''` | `HelixBaseOption` | A second destination for this row, taken with the modifier held. |
+| `alternateLabel` | `alternate-label` | `string` | `''` | `HelixBaseOption` | What the second destination is, for a reader who cannot see the footer. |
 | `disabled` | `disabled` | `boolean` | `false` | `HelixBaseOption` | Whether this choice can be made. |
 | `selected` | `selected` | `boolean` | `false` | `HelixBaseOption` | Whether this choice is currently chosen. Written by the listbox. |
 | `text` | - | `string` | - | `HelixBaseOption` | The words, for a listbox that has to match text against them. |

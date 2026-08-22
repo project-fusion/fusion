@@ -539,6 +539,15 @@ export class HelixCaretEvent extends CustomEvent<CaretDetail> {
 
 /** Detail carried by `helix-select`. */
 export interface SelectDetail {
+  /**
+   * Whether the reader took the row's second destination rather than its first.
+   *
+   * Absent everywhere but a command palette, where a row can carry two: the
+   * value alone would say which was taken, since the two differ, but only by
+   * comparing strings a consumer would have to keep in step with the markup.
+   * A flag says it outright.
+   */
+  alternate?: boolean
   /** Value of the item the reader chose. */
   value: string
 }

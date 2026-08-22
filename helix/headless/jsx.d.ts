@@ -6285,6 +6285,38 @@ export type HelixBaseOptionProps = {
   selected?: HelixBaseOption["selected"];
   /** Identifies this choice, and is what a form submits. */
   value?: HelixBaseOption["value"];
+  /** A second destination for this row, taken with the modifier held.
+
+**An attribute rather than a second row, which is the whole point.** A
+palette of eighty-eight components that offered each of them a reference
+page and a sandbox as separate entries would be a palette of a hundred and
+seventy-six, and one earns its keep by getting a reader to one thing in
+three keystrokes. The row already carries the first destination, so the
+second belongs beside it.
+
+Declared here and acted on by whatever owns the list, the same division
+selection already uses: an option says what it is and the listbox decides
+what happens. `Command` is the only owner that reads it today, because a
+select has one destination by definition.
+
+Absent is a row with one destination, which is nearly every row. */
+  alternate?: HelixBaseOption["alternate"];
+  /** What the second destination is, for a reader who cannot see the footer.
+
+A row with two destinations needs both said, or a screen reader is told
+about one of them and the other is a key nobody mentioned. It goes to
+`aria-description` rather than into the name: the name is the row's own
+words and stays what a reader searched for, and the second destination is a
+fact about what pressing a key would do, which is what a description is. */
+  "alternate-label"?: HelixBaseOption["alternateLabel"];
+  /** What the second destination is, for a reader who cannot see the footer.
+
+A row with two destinations needs both said, or a screen reader is told
+about one of them and the other is a key nobody mentioned. It goes to
+`aria-description` rather than into the name: the name is the row's own
+words and stays what a reader searched for, and the second destination is a
+fact about what pressing a key would do, which is what a description is. */
+  alternateLabel?: HelixBaseOption["alternateLabel"];
 
   /** Fired when this choice is made. */
   "onhelix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
@@ -6301,6 +6333,38 @@ export type HelixBaseOptionSolidJsProps = {
   "prop:selected"?: HelixBaseOption["selected"];
   /** Identifies this choice, and is what a form submits. */
   "prop:value"?: HelixBaseOption["value"];
+  /** A second destination for this row, taken with the modifier held.
+
+**An attribute rather than a second row, which is the whole point.** A
+palette of eighty-eight components that offered each of them a reference
+page and a sandbox as separate entries would be a palette of a hundred and
+seventy-six, and one earns its keep by getting a reader to one thing in
+three keystrokes. The row already carries the first destination, so the
+second belongs beside it.
+
+Declared here and acted on by whatever owns the list, the same division
+selection already uses: an option says what it is and the listbox decides
+what happens. `Command` is the only owner that reads it today, because a
+select has one destination by definition.
+
+Absent is a row with one destination, which is nearly every row. */
+  "prop:alternate"?: HelixBaseOption["alternate"];
+  /** What the second destination is, for a reader who cannot see the footer.
+
+A row with two destinations needs both said, or a screen reader is told
+about one of them and the other is a key nobody mentioned. It goes to
+`aria-description` rather than into the name: the name is the row's own
+words and stays what a reader searched for, and the second destination is a
+fact about what pressing a key would do, which is what a description is. */
+  "attr:alternate-label"?: HelixBaseOption["alternateLabel"];
+  /** What the second destination is, for a reader who cannot see the footer.
+
+A row with two destinations needs both said, or a screen reader is told
+about one of them and the other is a key nobody mentioned. It goes to
+`aria-description` rather than into the name: the name is the row's own
+words and stays what a reader searched for, and the second destination is a
+fact about what pressing a key would do, which is what a description is. */
+  "prop:alternateLabel"?: HelixBaseOption["alternateLabel"];
   /** Fired when this choice is made. */
   "on:helix-select"?: (e: HelixBaseOptionHelixSelectElementEvent) => void;
 
@@ -17625,6 +17689,28 @@ export type CustomElements = {
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
    * - `value`: Identifies this choice, and is what a form submits.
+   * - `alternate`: A second destination for this row, taken with the modifier held.
+   *
+   * **An attribute rather than a second row, which is the whole point.** A
+   * palette of eighty-eight components that offered each of them a reference
+   * page and a sandbox as separate entries would be a palette of a hundred and
+   * seventy-six, and one earns its keep by getting a reader to one thing in
+   * three keystrokes. The row already carries the first destination, so the
+   * second belongs beside it.
+   *
+   * Declared here and acted on by whatever owns the list, the same division
+   * selection already uses: an option says what it is and the listbox decides
+   * what happens. `Command` is the only owner that reads it today, because a
+   * select has one destination by definition.
+   *
+   * Absent is a row with one destination, which is nearly every row.
+   * - `alternate-label`/`alternateLabel`: What the second destination is, for a reader who cannot see the footer.
+   *
+   * A row with two destinations needs both said, or a screen reader is told
+   * about one of them and the other is a key nobody mentioned. It goes to
+   * `aria-description` rather than into the name: the name is the row's own
+   * words and stays what a reader searched for, and the second destination is a
+   * fact about what pressing a key would do, which is what a description is.
    * - `text`: The words, for a listbox that has to match text against them.
    *
    * Read from the rendered content rather than required as a property, because
@@ -28641,6 +28727,28 @@ export type CustomElementsSolidJs = {
    * - `data-active`/`active`: Whether this is the option the keyboard is on. Written by the listbox.
    * - `selected`: Whether this choice is currently chosen. Written by the listbox.
    * - `value`: Identifies this choice, and is what a form submits.
+   * - `alternate`: A second destination for this row, taken with the modifier held.
+   *
+   * **An attribute rather than a second row, which is the whole point.** A
+   * palette of eighty-eight components that offered each of them a reference
+   * page and a sandbox as separate entries would be a palette of a hundred and
+   * seventy-six, and one earns its keep by getting a reader to one thing in
+   * three keystrokes. The row already carries the first destination, so the
+   * second belongs beside it.
+   *
+   * Declared here and acted on by whatever owns the list, the same division
+   * selection already uses: an option says what it is and the listbox decides
+   * what happens. `Command` is the only owner that reads it today, because a
+   * select has one destination by definition.
+   *
+   * Absent is a row with one destination, which is nearly every row.
+   * - `alternate-label`/`alternateLabel`: What the second destination is, for a reader who cannot see the footer.
+   *
+   * A row with two destinations needs both said, or a screen reader is told
+   * about one of them and the other is a key nobody mentioned. It goes to
+   * `aria-description` rather than into the name: the name is the row's own
+   * words and stays what a reader searched for, and the second destination is a
+   * fact about what pressing a key would do, which is what a description is.
    * - `text`: The words, for a listbox that has to match text against them.
    *
    * Read from the rendered content rather than required as a property, because

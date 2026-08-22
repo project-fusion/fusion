@@ -185,6 +185,62 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
    * before this, from inside the shadow root, so nothing this element needs is
    * lost by ending it here.
    */
+  /**
+   * The row under the keyboard, read from the attribute the listbox writes.
+   *
+   * `data-active` rather than a reference the listbox hands over, because the
+   * options are this element's own light DOM children and the attribute is
+   * already published: asking the listbox would mean a second channel saying
+   * what the markup says.
+   */
+  private get activeOption(): (Element & { alternate?: string; value?: string }) | null {
+    return this.querySelector('[data-active]')
+  }
+
+  /**
+   * Takes the row's second destination, where the reader asked for it.
+   *
+   * **Command intercepts rather than Listbox reporting, and that is the whole
+   * design.** Enter belongs to the listbox: it owns the active row, it decides
+   * what choosing means, and it announces `helix-change`. Teaching it about a
+   * modifier would put a palette's idea of a second destination inside a
+   * control that is also a select and a combobox, neither of which has one.
+   *
+   * So this listens in the capture phase, before the listbox sees the key, and
+   * only for the one combination that means something here. Anything else falls
+   * straight through and the listbox behaves exactly as it always did.
+   *
+   * `mod` is Command on a Mac and Control elsewhere, which is what `hotkey`
+   * already means by it two methods up.
+   *
+   * The pointer takes the same path for the same reason: a modifier-click on a
+   * row is the same intent as a modifier-Enter on it, and both have to be
+   * stopped before the row announces its ordinary selection.
+   */
+  private readonly handleAlternate = (event: KeyboardEvent | MouseEvent): void => {
+    if (!(event.metaKey || event.ctrlKey) || !this.open) {
+      return
+    }
+    if (event instanceof KeyboardEvent && event.key !== 'Enter') {
+      return
+    }
+    const row =
+      event instanceof KeyboardEvent
+        ? this.activeOption
+        : (event.target as Element | null)?.closest?.(
+            '[data-active], helix-option, helix-base-option',
+          )
+    const alternate = (row as { alternate?: string } | null)?.alternate
+    if (row === null || row === undefined || !alternate) {
+      return
+    }
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    if (this.dispatchEvent(new HelixSelectEvent({ alternate: true, value: alternate }))) {
+      this.requestOpen(false)
+    }
+  }
+
   private readonly swallowOptionSelect = (event: Event): void => {
     if (event.target !== this) {
       event.stopImmediatePropagation()
@@ -194,12 +250,17 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.swallowOptionSelect)
+    /* Capture, so both reach this before the listbox and the row do. */
+    this.addEventListener('keydown', this.handleAlternate, { capture: true })
+    this.addEventListener('click', this.handleAlternate, { capture: true })
     document.addEventListener('keydown', this.handleHotkey)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.swallowOptionSelect)
+    this.removeEventListener('keydown', this.handleAlternate, { capture: true })
+    this.removeEventListener('click', this.handleAlternate, { capture: true })
     document.removeEventListener('keydown', this.handleHotkey)
   }
 

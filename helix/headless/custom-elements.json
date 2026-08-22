@@ -10578,10 +10578,26 @@
             },
             {
               "kind": "field",
-              "name": "swallowOptionSelect",
+              "name": "activeOption",
+              "type": {
+                "text": "(Element & { alternate?: string; value?: string }) | null"
+              },
+              "privacy": "private",
+              "description": "The row under the keyboard, read from the attribute the listbox writes.\n\n`data-active` rather than a reference the listbox hands over, because the\noptions are this element's own light DOM children and the attribute is\nalready published: asking the listbox would mean a second channel saying\nwhat the markup says.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "handleAlternate",
               "privacy": "private",
               "readonly": true,
-              "description": "Keeps an option's own announcement inside the palette.\n\nEvery option says `helix-select` when it is chosen, which is how the list\nhears it, and the list does not stop it: the options are light DOM children\nof this element, so it carried straight on out to the consumer. They then\nheard two selections for one command, an option's and the palette's, under\none event name and distinguishable only by looking at the target.\n\nThe one this element dispatches has itself as the target and is let past.\nCombobox stops the listbox's `helix-change` for the same reason.\n\n`stopImmediatePropagation`, not `stopPropagation`. The consumer's listener\nis on this same element, and stopping propagation only keeps an event off\nthe *next* node: every other listener already bound here still runs, so the\noption's selection reached the consumer anyway. The listbox hears it well\nbefore this, from inside the shadow root, so nothing this element needs is\nlost by ending it here."
+              "description": "Takes the row's second destination, where the reader asked for it.\n\n**Command intercepts rather than Listbox reporting, and that is the whole\ndesign.** Enter belongs to the listbox: it owns the active row, it decides\nwhat choosing means, and it announces `helix-change`. Teaching it about a\nmodifier would put a palette's idea of a second destination inside a\ncontrol that is also a select and a combobox, neither of which has one.\n\nSo this listens in the capture phase, before the listbox sees the key, and\nonly for the one combination that means something here. Anything else falls\nstraight through and the listbox behaves exactly as it always did.\n\n`mod` is Command on a Mac and Control elsewhere, which is what `hotkey`\nalready means by it two methods up.\n\nThe pointer takes the same path for the same reason: a modifier-click on a\nrow is the same intent as a modifier-Enter on it, and both have to be\nstopped before the row announces its ordinary selection."
+            },
+            {
+              "kind": "field",
+              "name": "swallowOptionSelect",
+              "privacy": "private",
+              "readonly": true
             },
             {
               "kind": "method",
@@ -27436,6 +27452,26 @@
             },
             {
               "kind": "field",
+              "name": "alternate",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A second destination for this row, taken with the modifier held.\n\n**An attribute rather than a second row, which is the whole point.** A\npalette of eighty-eight components that offered each of them a reference\npage and a sandbox as separate entries would be a palette of a hundred and\nseventy-six, and one earns its keep by getting a reader to one thing in\nthree keystrokes. The row already carries the first destination, so the\nsecond belongs beside it.\n\nDeclared here and acted on by whatever owns the list, the same division\nselection already uses: an option says what it is and the listbox decides\nwhat happens. `Command` is the only owner that reads it today, because a\nselect has one destination by definition.\n\nAbsent is a row with one destination, which is nearly every row.",
+              "attribute": "alternate"
+            },
+            {
+              "kind": "field",
+              "name": "alternateLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the second destination is, for a reader who cannot see the footer.\n\nA row with two destinations needs both said, or a screen reader is told\nabout one of them and the other is a key nobody mentioned. It goes to\n`aria-description` rather than into the name: the name is the row's own\nwords and stays what a reader searched for, and the second destination is a\nfact about what pressing a key would do, which is what a description is.",
+              "attribute": "alternate-label"
+            },
+            {
+              "kind": "field",
               "name": "text",
               "type": {
                 "text": "string"
@@ -27572,6 +27608,24 @@
               "default": "''",
               "description": "Identifies this choice, and is what a form submits.",
               "fieldName": "value"
+            },
+            {
+              "name": "alternate",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "A second destination for this row, taken with the modifier held.\n\n**An attribute rather than a second row, which is the whole point.** A\npalette of eighty-eight components that offered each of them a reference\npage and a sandbox as separate entries would be a palette of a hundred and\nseventy-six, and one earns its keep by getting a reader to one thing in\nthree keystrokes. The row already carries the first destination, so the\nsecond belongs beside it.\n\nDeclared here and acted on by whatever owns the list, the same division\nselection already uses: an option says what it is and the listbox decides\nwhat happens. `Command` is the only owner that reads it today, because a\nselect has one destination by definition.\n\nAbsent is a row with one destination, which is nearly every row.",
+              "fieldName": "alternate"
+            },
+            {
+              "name": "alternate-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "What the second destination is, for a reader who cannot see the footer.\n\nA row with two destinations needs both said, or a screen reader is told\nabout one of them and the other is a key nobody mentioned. It goes to\n`aria-description` rather than into the name: the name is the row's own\nwords and stays what a reader searched for, and the second destination is a\nfact about what pressing a key would do, which is what a description is.",
+              "fieldName": "alternateLabel"
             }
           ],
           "superclass": {
