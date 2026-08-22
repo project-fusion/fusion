@@ -110,9 +110,9 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-2xs` | `var(--_helix-scale-1)` | 145 |
 | `--helix-space-xs` | `var(--_helix-scale-2)` | 127 |
 | `--helix-space-sm` | `var(--_helix-scale-3)` | 129 |
-| `--helix-space-md` | `var(--_helix-scale-4)` | 80 |
+| `--helix-space-md` | `var(--_helix-scale-4)` | 81 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 64 |
-| `--helix-space-xl` | `var(--_helix-scale-8)` | 41 |
+| `--helix-space-xl` | `var(--_helix-scale-8)` | 42 |
 | `--helix-space-2xl` | `var(--_helix-scale-12)` | 43 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 20 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
@@ -214,12 +214,12 @@ Blur and translucency, for a surface that lets the page through.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 3 |
+| `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 4 |
 | `--helix-material-opacity` | `1` | 6 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 1 |
 | `--helix-material-blur-lg` | `32px` | 4 |
-| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 7 |
+| `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 8 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
 | `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 1 |
 
