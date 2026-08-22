@@ -295,11 +295,22 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
           <helix-table-row key={row.name}>
             <helix-table-cell header>
               <Code>{row.name}</Code>
+            </helix-table-cell>
+            <helix-table-cell>
+              <TypeText>{row.type}</TypeText>
+            </helix-table-cell>
+            <helix-table-cell>{row.default && <TypeText>{row.default}</TypeText>}</helix-table-cell>
+            <helix-table-cell>
+              <helix-text appearance="caption" tone="muted">
+                {first(row.description)}
+              </helix-text>
               {row.references.map((reference) => (
-                /* An anchor inside the tooltip rather than the tooltip alone.
-                   The bubble says which feature this is and the mark goes
-                   there, so a reader on a touch screen, where nothing hovers,
-                   still has the destination. */
+                /* At the end of the row rather than beside the name, because it
+                   is secondary to both and the name is what a reader scans.
+                   An anchor inside the tooltip rather than the tooltip alone:
+                   the bubble says which feature this is and the mark goes
+                   there, so a touch screen, where nothing hovers, still has the
+                   destination. */
                 <helix-tooltip
                   content={`${reference.label}. Opens the specification.`}
                   key={reference.url}
@@ -316,27 +327,6 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
                   </a>
                 </helix-tooltip>
               ))}
-            </helix-table-cell>
-            <helix-table-cell>
-              <TypeText>{row.type}</TypeText>
-            </helix-table-cell>
-            <helix-table-cell>
-              {/* A getter has no default and cannot be set, so the column that
-                would hold one says which of the two it is. Read only rather
-                than a dash, because a dash is what the settable ones with no
-                initialiser already show and the two are not the same. */}
-              {row.readonly ? (
-                <helix-text appearance="caption" tone="muted">
-                  Read only
-                </helix-text>
-              ) : (
-                row.default && <TypeText>{row.default}</TypeText>
-              )}
-            </helix-table-cell>
-            <helix-table-cell>
-              <helix-text appearance="caption" tone="muted">
-                {first(row.description)}
-              </helix-text>
             </helix-table-cell>
           </helix-table-row>
         ))}
@@ -371,7 +361,19 @@ function ElementApi({ element }: { element: Element }) {
         </helix-text>
       )}
 
-      <PropertyTable rows={element.properties} />
+      {/* Split, because the two answer different questions and a table that
+          mixes them answers neither. A reader opens Props to find out what they
+          may set on the tag; `AvatarGroup.avatars` sat there beside a slot for
+          avatars looking exactly like a second way to pass the same thing, and
+          assigning to it throws. Reads have no default and never will, so they
+          also do not want the column. */}
+      <PropertyTable rows={element.properties.filter((row) => !row.readonly)} />
+      <MemberTable
+        label="Read"
+        rows={element.properties
+          .filter((row) => row.readonly)
+          .map((row) => ({ description: row.description, name: row.name, type: row.type }))}
+      />
       <MemberTable label="Slot" rows={element.slots} typed={false} />
       <MemberTable
         label="Event"
