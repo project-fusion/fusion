@@ -15221,6 +15221,36 @@
             },
             {
               "kind": "method",
+              "name": "renderCopyIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark for the resting state, behind a seam a tier can move.\n\nTwo seams and not one taking the state, because the two marks are two\ndecisions: a tier changing the clipboard for a house glyph has no reason to\ntouch the confirmation, and the stylesheet already treats them separately,\nthe check holding its green through a hover where this one does not.",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderCopiedIcon",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "description": "The mark for the moment after a press, behind a seam of its own.\n\nBoth slots render and CSS shows one, which is why this is a slot rather\nthan a branch: swapping which slot exists would unassign the consumer's\ncontent on every press, and an element that leaves and re-enters the tree\nloses focus with it, so the button a reader just pressed would stop being\nthe focused element mid-press.",
+              "inheritedFrom": {
+                "name": "HelixBaseCopyButton",
+                "module": "src/copy-button/root/copy-button-root.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "renderTooltip",
               "privacy": "protected",
               "return": {

@@ -164,17 +164,36 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
       ?disabled=${this.isDisabled}
       @click=${this.handleCopy}
     >
-      ${
-        /* Both slots render and CSS shows one. Swapping which slot exists would
-           unassign the consumer's content on every press, and an element that
-           leaves and re-enters the tree loses focus with it: the button a
-           reader just pressed would stop being the focused element mid-press. */
-        ''
-      }
-      <slot name="copied" ?hidden=${!this.copied}>${HelixBaseCopyButton.icon(check)}</slot>
-      <slot ?hidden=${this.copied}>${HelixBaseCopyButton.icon(copy)}</slot>
+      ${this.renderCopiedIcon()} ${this.renderCopyIcon()}
       </button>`,
     )
+  }
+
+  /**
+   * The mark for the resting state, behind a seam a tier can move.
+   *
+   * Two seams and not one taking the state, because the two marks are two
+   * decisions: a tier changing the clipboard for a house glyph has no reason to
+   * touch the confirmation, and the stylesheet already treats them separately,
+   * the check holding its green through a hover where this one does not.
+   */
+  protected renderCopyIcon(): TemplateResult {
+    return html`<slot ?hidden=${this.copied}>${HelixBaseCopyButton.icon(copy)}</slot>`
+  }
+
+  /**
+   * The mark for the moment after a press, behind a seam of its own.
+   *
+   * Both slots render and CSS shows one, which is why this is a slot rather
+   * than a branch: swapping which slot exists would unassign the consumer's
+   * content on every press, and an element that leaves and re-enters the tree
+   * loses focus with it, so the button a reader just pressed would stop being
+   * the focused element mid-press.
+   */
+  protected renderCopiedIcon(): TemplateResult {
+    return html`<slot name="copied" ?hidden=${!this.copied}
+      >${HelixBaseCopyButton.icon(check)}</slot
+    >`
   }
 
   /**

@@ -20,6 +20,12 @@
  * property *is* the fallback, there is no markup to restyle, and no tier wants
  * to override a string. Only fallbacks containing elements are asked about.
  *
+ * **A call is not a property.** `CopyButton` drew both its marks as
+ * `${HelixBaseCopyButton.icon(copy)}`, a static helper returning a template,
+ * and the first version of this let it through on the shape of the expression:
+ * two pieces of markup a tier might want to redraw, exempted for looking like a
+ * reference. Parentheses are the test.
+ *
  * **Two things had to be got right to read this at all**, and both were wrong
  * first:
  *
@@ -113,8 +119,16 @@ for (const tier of TIERS) {
         continue
       }
       /* A property or two and nothing else is the content-property rule, not
-         markup a tier would want to draw differently. */
-      if (/^(\$\{[^{}]*\}|\s)+$/.test(body)) {
+         markup a tier would want to draw differently.
+         **A call is not a property**, which is the distinction that took a
+         second pass. `CopyButton` drew both its marks as
+         `${HelixBaseCopyButton.icon(copy)}`, a static helper returning a
+         template, and that read as a bare reference and was let through: two
+         pieces of markup a tier might well want to redraw, permitted by the
+         shape of the expression rather than by anything about them. No
+         parentheses is the test, so `${this.label}` and `${this.label || x}`
+         still pass and anything invoking something does not. */
+      if (/^(\$\{[^{}()]*\}|\s)+$/.test(body)) {
         bare += 1
         continue
       }
