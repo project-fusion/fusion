@@ -1,0 +1,22 @@
+<!-- @summary The same command on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-base-command
+  default-open
+  label="Commands"
+>
+  <helix-base-option value="new">New file</helix-base-option>
+  <helix-base-option value="open">Open folder</helix-base-option>
+  <helix-base-option value="save">Save all</helix-base-option>
+  <p slot="footer">
+    <helix-base-kbd>Cmd</helix-base-kbd>
+    <helix-base-kbd>K</helix-base-kbd>
+    to open,
+    <helix-base-kbd>Esc</helix-base-kbd>
+    to close
+  </p>
+</helix-base-command>

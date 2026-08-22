@@ -1,0 +1,27 @@
+<!-- @summary The same tree on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-base-tree
+  default-active="two"
+  label="Label"
+>
+  <helix-base-tree-item
+    default-open
+    value="one"
+  >
+    Item One
+    <helix-base-tree-item
+      slot="children"
+      value="two"
+    >Item Two</helix-base-tree-item>
+    <helix-base-tree-item
+      slot="children"
+      value="three"
+    >Item Three</helix-base-tree-item>
+  </helix-base-tree-item>
+  <helix-base-tree-item value="four">Item Four</helix-base-tree-item>
+</helix-base-tree>

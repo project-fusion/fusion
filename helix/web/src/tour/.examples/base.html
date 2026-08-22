@@ -1,0 +1,112 @@
+<!-- @summary The same tour on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+<div class="app">
+  <aside
+    class="rail"
+    id="rail"
+  >
+    <p>Project</p>
+    <p>Drafts</p>
+    <p>Published</p>
+    <p>Archive</p>
+  </aside>
+
+  <div class="main">
+    <header class="bar">
+      <helix-base-button id="publish">Publish</helix-base-button>
+      <helix-base-button id="preview">Preview</helix-base-button>
+      <helix-base-icon-button
+        id="settings"
+        label="Settings"
+      >
+        <helix-base-icon name="gear"></helix-base-icon>
+      </helix-base-icon-button>
+    </header>
+
+    <section
+      class="sheet"
+      id="sheet"
+    >
+      <h2>Quarterly review</h2>
+      <p>
+        A draft nobody has read yet. Everything below this line is the part you
+        are still writing.
+      </p>
+    </section>
+  </div>
+</div>
+
+<helix-base-button id="begin">Take the tour</helix-base-button>
+
+<helix-base-tour
+  id="tour"
+  label="Getting started"
+>
+  <helix-base-tour-stop
+    for="rail"
+    placement="right-start"
+  >
+    <helix-base-card>
+      <h3>Everything lives here</h3>
+      <p>
+        Drafts, published work and the archive. Nothing is ever deleted.
+      </p>
+    </helix-base-card>
+  </helix-base-tour-stop>
+
+  <helix-base-tour-stop for="sheet">
+    <helix-base-card>
+      <h3>Write in the open</h3>
+      <p>
+        Saved as you type. There is no save button because there is nothing to
+        press.
+      </p>
+    </helix-base-card>
+  </helix-base-tour-stop>
+
+  <helix-base-tour-stop
+    for="preview"
+    placement="bottom"
+  >
+    <helix-base-card>
+      <h3>See it as a reader would</h3>
+      <p>
+        Opens the same page anybody with the link gets.
+      </p>
+    </helix-base-card>
+  </helix-base-tour-stop>
+
+  <helix-base-tour-stop
+    for="publish"
+    placement="bottom-start"
+  >
+    <helix-base-card>
+      <h3>And when it is ready</h3>
+      <p>
+        Publishing is reversible. The archive keeps every version you ever had.
+      </p>
+    </helix-base-card>
+  </helix-base-tour-stop>
+</helix-base-tour>
+
+<script type="module">
+  /* Preview frame: a real page would remember it had been taken. Opening is the
+     page's business, the way a dialog's is. */
+  const tour = document.querySelector('#tour')
+  document.querySelector('#begin').addEventListener('click', () => {
+    tour.index = 0
+    tour.open = true
+  })
+  tour.addEventListener('helix-change', (event) => {
+    tour.index = Number(event.detail.value)
+  })
+</script>

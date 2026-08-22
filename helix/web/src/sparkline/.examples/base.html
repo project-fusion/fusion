@@ -1,0 +1,21 @@
+<!-- @summary The same sparkline on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="stack">
+  <helix-base-sparkline
+    label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
+    values="1240 1318 1102 1291 1244 1180 1102"
+  ></helix-base-sparkline>
+  <helix-base-sparkline
+    label="Uptime held above 99.9 percent every day for seven days"
+    values="99.94 99.99 99.91 100 99.97 99.99 99.98"
+  ></helix-base-sparkline>
+  <helix-base-sparkline
+    label="Latency climbed from 172ms to 212ms over seven days"
+    values="172 168 181 190 186 204 212"
+  ></helix-base-sparkline>
+</div>

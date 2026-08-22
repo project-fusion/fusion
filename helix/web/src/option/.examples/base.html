@@ -1,0 +1,32 @@
+<!-- @summary The same option on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<!-- Hand-written owner: `role="option"` requires one. -->
+<div
+  aria-label="Label"
+  class="listbox"
+  role="listbox"
+>
+  <helix-base-option
+    selected
+    value="one"
+  >Option One</helix-base-option>
+  <helix-base-option
+    data-active
+    value="two"
+  >Option Two</helix-base-option>
+  <helix-base-option value="three">Option Three</helix-base-option>
+  <helix-base-option
+    disabled
+    value="four"
+  >Option Four</helix-base-option>
+</div>

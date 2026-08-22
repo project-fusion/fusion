@@ -1,0 +1,26 @@
+<!-- @summary The same tabs on the headless tier, with every rule written by hand. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-base-tabs
+  default-active="one"
+  label="Label"
+>
+  <helix-base-tabs-tab value="one">Tab One</helix-base-tabs-tab>
+  <helix-base-tabs-tab value="two">Tab Two</helix-base-tabs-tab>
+  <helix-base-tabs-panel
+    slot="panels"
+    value="one"
+  >
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  </helix-base-tabs-panel>
+  <helix-base-tabs-panel
+    slot="panels"
+    value="two"
+  >
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  </helix-base-tabs-panel>
+</helix-base-tabs>

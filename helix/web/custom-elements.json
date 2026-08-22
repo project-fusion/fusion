@@ -1005,6 +1005,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same announcement on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "The four tones side by side, from neutral notice to danger.",
                 "slug": "tones"
               },
@@ -1452,6 +1456,10 @@
               {
                 "description": "A brand, a navigation, and actions on the right.",
                 "slug": "default"
+              },
+              {
+                "description": "The same app header on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "No shadow and no blur, for a header that sits on the page rather than over it.",
@@ -3002,6 +3010,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same avatar on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A source that fails, falling back to initials rather than a broken image.",
                 "slug": "broken-image"
               },
@@ -3352,6 +3364,10 @@
               {
                 "description": "The badge drawn as a count, a dot, and a standalone tag.",
                 "slug": "appearances"
+              },
+              {
+                "description": "The same badge on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A count past its maximum, which reads as a ceiling rather than a number.",
@@ -4073,6 +4089,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same bar chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Three series over the same categories, each taking the next series colour, with a legend reading the same table.",
                 "slug": "grouped"
               },
@@ -4517,6 +4537,10 @@
               {
                 "description": "A quotation with its source cited.",
                 "slug": "default"
+              },
+              {
+                "description": "The same blockquote on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/blockquote"
@@ -5100,6 +5124,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same breadcrumbs on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A trail whose crumbs are the links, with an icon on the first.",
                 "slug": "links"
               },
@@ -5333,6 +5361,10 @@
               {
                 "description": "Buttons joined into one control, sharing their edges.",
                 "slug": "default"
+              },
+              {
+                "description": "The same button group on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same set with the buttons kept apart.",
@@ -6001,6 +6033,10 @@
                 "slug": "as-link"
               },
               {
+                "description": "The same button on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Disabled across the appearances, so the difference is visible in each.",
                 "slug": "disabled"
               },
@@ -6282,6 +6318,10 @@
               {
                 "description": "A note set apart from the prose around it.",
                 "slug": "default"
+              },
+              {
+                "description": "The same callout on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The severities together, from a plain note to a danger.",
@@ -6592,6 +6632,10 @@
               {
                 "description": "A heading, some prose, and a footer, in the resting appearance.",
                 "slug": "default"
+              },
+              {
+                "description": "The same card on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Lifted off the page with a shadow rather than an outline.",
@@ -7333,6 +7377,10 @@
               {
                 "description": "Slides with controls and indicators, one at a time.",
                 "slug": "default"
+              },
+              {
+                "description": "The same carousel on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A carousel the page owns, so the slide it shows can be driven from elsewhere.",
@@ -8211,6 +8259,10 @@
               {
                 "description": "Several checkboxes under one label, each submitting itself.",
                 "slug": "default"
+              },
+              {
+                "description": "The same checkbox group on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A whole group disabled, and one member disabled inside a live group.",
@@ -9622,6 +9674,10 @@
               {
                 "description": "A block with no name and nothing to copy, which draws no header.",
                 "slug": "bare"
+              },
+              {
+                "description": "The same code block on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/code-block"
@@ -9876,6 +9932,10 @@
               {
                 "description": "A fragment of code inside a line of prose.",
                 "slug": "default"
+              },
+              {
+                "description": "The same code on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/code"
@@ -11039,6 +11099,10 @@
               {
                 "description": "A colour with an opacity, in a syntax that can carry one.",
                 "slug": "alpha"
+              },
+              {
+                "description": "The same color input on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Disabled, with the swatch still showing the value.",
@@ -12295,6 +12359,10 @@
               {
                 "description": "The picker with no syntax control, for where the format is decided already.",
                 "slug": "bare"
+              },
+              {
+                "description": "The same color picker on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Disabled, which is a picker that shows a colour and does not move.",
@@ -13966,6 +14034,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same combobox on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Opening with a value already chosen, which is what an edit form does.",
                 "slug": "chosen"
               },
@@ -14890,6 +14962,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same command on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Opened by a key from anywhere on the page.",
                 "slug": "hotkey"
               },
@@ -15681,6 +15757,10 @@
               {
                 "description": "A button that copies a string and confirms it for a moment.",
                 "slug": "default"
+              },
+              {
+                "description": "The same copy button on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/copy-button"
@@ -17181,6 +17261,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same date input on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A date within a window, with weekends refused.",
                 "slug": "bounded"
               },
@@ -18661,6 +18745,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same date picker on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A calendar that only goes as far as it is allowed.",
                 "slug": "bounded"
               },
@@ -19916,6 +20004,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same divider on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Rules that stop short of the edge, for a divider inside a padded box.",
                 "slug": "inset"
               },
@@ -20423,6 +20515,10 @@
               {
                 "description": "The same shares over a half circle, with the total in the opening.",
                 "slug": "arc"
+              },
+              {
+                "description": "The same donut chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The hole closed, which is a pie: the same drawing with its ring spanning the whole radius.",
@@ -21069,6 +21165,10 @@
               {
                 "description": "A panel from the edge, opened by a button.",
                 "slug": "default"
+              },
+              {
+                "description": "The same drawer on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A panel beside the page rather than over it, with the page still usable behind it.",
@@ -21999,6 +22099,10 @@
               {
                 "description": "A menu that replaces itself rather than opening sideways, for a narrow screen.",
                 "slug": "default"
+              },
+              {
+                "description": "The same drilldown on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/drilldown"
@@ -22310,6 +22414,10 @@
               {
                 "description": "Nothing to show, with a heading, an explanation and a way forward.",
                 "slug": "default"
+              },
+              {
+                "description": "The same empty on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Not announced, for an empty state that arrives with the page rather than after a search.",
@@ -23285,6 +23393,10 @@
               {
                 "description": "A drop zone that also takes a click, accepting several files.",
                 "slug": "default"
+              },
+              {
+                "description": "The same file input on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Disabled, which is a drop zone that refuses a drop.",
@@ -24815,6 +24927,10 @@
                 "slug": "appearances"
               },
               {
+                "description": "The same icon button on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Round or square, and lifted off the surface where it floats over content.",
                 "slug": "shapes"
               },
@@ -25049,6 +25165,10 @@
               {
                 "description": "One glyph at the resting size.",
                 "slug": "default"
+              },
+              {
+                "description": "The same icon on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same glyph at each step of the icon scale.",
@@ -25536,6 +25656,10 @@
               {
                 "description": "A picture with an aspect ratio held and its corners rounded.",
                 "slug": "default"
+              },
+              {
+                "description": "The same image on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A picture that never arrives says so, rather than leaving a hole.",
@@ -27355,6 +27479,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same input on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A field with a control to empty it.",
                 "slug": "clearable"
               },
@@ -27875,6 +28003,10 @@
               {
                 "description": "A key, and a chord of keys, as a reader would see them written.",
                 "slug": "default"
+              },
+              {
+                "description": "The same kbd on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/kbd"
@@ -28172,6 +28304,10 @@
               {
                 "description": "One entry per data column, named by the header row. The table is in the page and clipped, which is where a chart reads it from.",
                 "slug": "default"
+              },
+              {
+                "description": "The same legend on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same element reading rows instead of columns, which is what a donut needs and a bar chart does not.",
@@ -28833,6 +28969,10 @@
               {
                 "description": "A wash under the line, for one series read as a quantity rather than a shape.",
                 "slug": "area"
+              },
+              {
+                "description": "The same line chart on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The three curves over one series: joined, smoothed, and held until the next reading.",
@@ -29601,6 +29741,10 @@
               {
                 "description": "Rows with rules between them.",
                 "slug": "default"
+              },
+              {
+                "description": "The same list on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The list as plain rows, as rows with rules, and as separate cards.",
@@ -30917,6 +31061,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same listbox on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "The filter text owned by the page, for a list narrowed from a box outside it.",
                 "slug": "controlled-filter"
               },
@@ -31509,6 +31657,10 @@
               {
                 "description": "A spinner with a label read aloud rather than shown.",
                 "slug": "default"
+              },
+              {
+                "description": "The same loader on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A pulse rather than a spin, for a wait inside a small space.",
@@ -32253,6 +32405,10 @@
               {
                 "description": "A navigation whose items open a full-width panel of columns.",
                 "slug": "default"
+              },
+              {
+                "description": "The same megamenu on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A band from edge to edge, for a panel too wide to hang off one word.",
@@ -33711,6 +33867,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same menu on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Rows that navigate, as real anchors.",
                 "slug": "links"
               },
@@ -34478,6 +34638,10 @@
                 "slug": "bands"
               },
               {
+                "description": "The same meter on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A value past the maximum, which clamps rather than overflows.",
                 "slug": "beyond"
               },
@@ -34885,6 +35049,10 @@
               {
                 "description": "Links with the current page marked, and a mark that travels.",
                 "slug": "default"
+              },
+              {
+                "description": "The same navigation on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/navigation"
@@ -36117,6 +36285,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same number input on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A number in a range, and a number with a step.",
                 "slug": "bounded"
               },
@@ -36899,6 +37071,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same option on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Options under headings, for a list long enough to need them.",
                 "slug": "grouped"
               }
@@ -37501,6 +37677,10 @@
               {
                 "description": "Headings on a page, with the one in view marked as the page scrolls.",
                 "slug": "default"
+              },
+              {
+                "description": "The same outline on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same outline, scrolling smoothly and stopping clear of a sticky header.",
@@ -38456,6 +38636,10 @@
               {
                 "description": "Numbered pages with the current one marked.",
                 "slug": "default"
+              },
+              {
+                "description": "The same pagination on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Large counts written short, so a summary does not wrap at page nine hundred.",
@@ -40497,6 +40681,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same pin input on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "The boxes advance as you type, and the last one completes the code.",
                 "slug": "complete"
               },
@@ -41244,6 +41432,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same popover on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A popover opened by a button through the command attributes.",
                 "slug": "commanded"
               },
@@ -41623,6 +41815,10 @@
               {
                 "description": "How far along a task is, with the number shown.",
                 "slug": "default"
+              },
+              {
+                "description": "The same progress on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A bar that says its own number, in words the reader chose.",
@@ -42046,6 +42242,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same qr code on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A code in a brand colour, over a ground that keeps it scannable.",
                 "slug": "colored"
               },
@@ -42349,6 +42549,10 @@
               {
                 "description": "A pulled quotation with its attribution.",
                 "slug": "default"
+              },
+              {
+                "description": "The same quote on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/quote"
@@ -43704,6 +43908,10 @@
               {
                 "description": "One answer from several, with a hint under the question.",
                 "slug": "default"
+              },
+              {
+                "description": "The same radio on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Radios drawn as cards, for choices that need room to explain themselves.",
@@ -45066,6 +45274,10 @@
               {
                 "description": "A score out of five, set by pointer or by arrow key.",
                 "slug": "default"
+              },
+              {
+                "description": "The same rating on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A level rather than a judgement, which is what a plain circle says.",
@@ -47423,6 +47635,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same scroll area on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A row that runs past its box, and the edges that say which way.",
                 "slug": "horizontal"
               },
@@ -48495,6 +48711,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same select on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Disabled, and one option disabled inside a live select.",
                 "slug": "disabled"
               },
@@ -49092,6 +49312,10 @@
               {
                 "description": "The shape of content that has not arrived, in text, circle and block.",
                 "slug": "default"
+              },
+              {
+                "description": "The same skeleton on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/skeleton"
@@ -50128,6 +50352,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same slider on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Disabled, with the handle still showing where the value is.",
                 "slug": "disabled"
               },
@@ -50846,6 +51074,10 @@
               {
                 "description": "Three series in one line each, the mark on where every one of them ended.",
                 "slug": "default"
+              },
+              {
+                "description": "The same sparkline on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same seven readings drawn three ways, and each says something different about what happened between them.",
@@ -51753,6 +51985,10 @@
               {
                 "description": "A floating action button, and the few actions it fans out.",
                 "slug": "default"
+              },
+              {
+                "description": "The same speed dial on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The actions opening upward and to the side, further from the button that holds them.",
@@ -53042,6 +53278,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same splitter on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Where the divider may go, how far each nudge moves it, and a pane folded away.",
                 "slug": "bounds"
               },
@@ -53506,6 +53746,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same stat on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A figure with a trend beside it, up, down and flat.",
                 "slug": "directions"
               }
@@ -53963,6 +54207,10 @@
               {
                 "description": "A sequence with the third step current, so before and after both show.",
                 "slug": "active"
+              },
+              {
+                "description": "The same steps on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Steps that fold to the current one where there is no room for all of them.",
@@ -55257,6 +55505,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same switch on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Disabled on and disabled off, since the two look different.",
                 "slug": "disabled"
               },
@@ -56312,6 +56564,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same table on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "The track sizes written once on the table, rather than one width per column.",
                 "slug": "columns"
               }
@@ -57268,6 +57524,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same tabs on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A strip the page owns, answering the event and assigning `active`.",
                 "slug": "controlled"
               },
@@ -58021,6 +58281,10 @@
               {
                 "description": "The tag filled, outlined and subtle.",
                 "slug": "appearances"
+              },
+              {
+                "description": "The same tag on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Tags a reader can take off, which is what a filter bar holds.",
@@ -59206,6 +59470,10 @@
               {
                 "description": "A box that grows with what is typed into it rather than scrolling.",
                 "slug": "auto-grow"
+              },
+              {
+                "description": "The same textarea on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Disabled, filled and empty.",
@@ -60765,6 +61033,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same time input on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A time inside a window, moving in named steps.",
                 "slug": "bounded"
               },
@@ -62105,6 +62377,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same time picker on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "Working hours only, at half-hour steps.",
                 "slug": "business"
               },
@@ -62855,6 +63131,10 @@
               {
                 "description": "Events down a line, each with its own mark and time.",
                 "slug": "default"
+              },
+              {
+                "description": "The same timeline on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/timeline"
@@ -63708,6 +63988,10 @@
               {
                 "description": "A toast that leaves on its own, and one that waits to be dismissed.",
                 "slug": "auto-dismiss"
+              },
+              {
+                "description": "The same toast on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "Toasts over a dark page, taking their own colour mode.",
@@ -65075,6 +65359,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same toggle on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A whole group disabled, and one member disabled inside a live group.",
                 "slug": "disabled"
               },
@@ -65483,6 +65771,10 @@
               {
                 "description": "Controls in a row that arrow keys move between as one stop.",
                 "slug": "default"
+              },
+              {
+                "description": "The same toolbar on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A column of controls, where the arrow keys move up and down instead.",
@@ -66253,6 +66545,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same tooltip on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A tooltip that describes its target rather than naming it.",
                 "slug": "described"
               },
@@ -66958,6 +67254,10 @@
               {
                 "description": "Four stops across an app shell, each holding a card.",
                 "slug": "default"
+              },
+              {
+                "description": "The same tour on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "A path that opens a menu and a drawer to point at what is inside them.",
@@ -69160,6 +69460,10 @@
                 "slug": "default"
               },
               {
+                "description": "The same tree on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "The branch marker at either end of the row.",
                 "slug": "chevron-placement"
               },
@@ -69377,6 +69681,10 @@
               {
                 "description": "Four figures and all four ways a movement can land, two of them down.",
                 "slug": "default"
+              },
+              {
+                "description": "The same trend on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The same fall three times, and only one of them is bad news. Down is the direction the convention gets wrong.",
@@ -70645,6 +70953,10 @@
               {
                 "description": "Clips and the one player they take turns in.",
                 "slug": "default"
+              },
+              {
+                "description": "The same video playlist on the headless tier, with every rule written by hand.",
+                "slug": "base"
               },
               {
                 "description": "The list beside the player rather than under it.",
@@ -72267,6 +72579,10 @@
                 "slug": "ambient"
               },
               {
+                "description": "The same video on the headless tier, with every rule written by hand.",
+                "slug": "base"
+              },
+              {
                 "description": "A clip with subtitle tracks and the control that chooses between them.",
                 "slug": "captions"
               },
@@ -72939,6 +73255,10 @@
               {
                 "description": "Two thousand rows as JSON, of which only the visible ones exist.",
                 "slug": "default"
+              },
+              {
+                "description": "The same virtual list on the headless tier, with every rule written by hand.",
+                "slug": "base"
               }
             ],
             "source": "helix/web/src/virtual-list"

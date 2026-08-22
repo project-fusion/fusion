@@ -1,0 +1,42 @@
+/* What the headless tier asks a consumer to write for Pagination.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles` and a
+ * consumer taking that tier has none to reach for. No corner radius, because
+ * rounding says how a thing should feel and that is not this tier's to say; the
+ * exceptions are shapes that are round rather than softened.
+ *
+ * A part with no rule below is one the platform already renders acceptably. A
+ * wrong rule is worse than none: the first checkbox sheet painted a box and left
+ * the input at `appearance: auto`, so the browser drew its own control and
+ * nothing written for it was ever visible. */
+
+helix-base-pagination::part(list) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+helix-base-pagination::part(item) {
+  padding: 0.25rem 0.5rem;
+}
+
+helix-base-pagination::part(previous) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+helix-base-pagination::part(next) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* The keyboard reaches this, so the ring goes here. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-base-pagination::part(item):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
