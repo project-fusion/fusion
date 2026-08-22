@@ -69,11 +69,18 @@ export default function Home() {
           it never asks for the hit test and every control keeps its presses. It
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
-      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={1} terminus={0.4}></helix-aura>
+      <helix-aura
+        class="reelAura"
+        gain={0.55}
+        scale={1.7}
+        shape="flow"
+        speed={1}
+        terminus={0.4}
+      ></helix-aura>
       <div className="reelScrim" />
 
       <section className="hero">
-        <helix-flex class="shell heroShell" direction="column" gap="lg">
+        <helix-flex align="center" class="shell heroShell" direction="column" gap="lg">
           {/* A tag rather than a line of label text. The name is a thing, not a
               sentence about one, and a tag is what this library uses for a
               thing with a name. The line beside it says what we are made of,
@@ -107,7 +114,7 @@ export default function Home() {
           <helix-text as="p" class="heroLede measure" tone="muted">
             Take Helix and Cortex and go, or hire us to build with them.
           </helix-text>
-          <helix-flex data-density="lg" gap="sm" wrap>
+          <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
             <Link
               data-button="solid"
               data-button-fill="standard"
@@ -119,6 +126,26 @@ export default function Home() {
             <Link data-button data-button-fill="standard" href="/helix">
               Open Helix
             </Link>
+          </helix-flex>
+
+          {/* The shortest true path into the thing the page is about.
+              
+              Two buttons ask a reader to go somewhere and read; this asks them
+              to type one line and have the library. It is the only element in
+              the hero that is not a claim, which is why it is last and quiet:
+              a reader who is convinced does not need the buttons, and a reader
+              who is not will not start with a package name.
+
+              `CopyButton` rather than a code block with a button beside it,
+              because the whole line is the payload and the copy is the only
+              interaction it has. */}
+          <helix-flex align="center" class="heroInstall" gap="2xs">
+            <code>bun add @helix-io/web</code>
+            <helix-copy-button
+              copied-label="Copied"
+              label="Copy the install command"
+              value="bun add @helix-io/web"
+            ></helix-copy-button>
           </helix-flex>
         </helix-flex>
       </section>

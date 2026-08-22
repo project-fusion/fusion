@@ -153,14 +153,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <helix-text appearance="title" as="h2">
             Keep reading
           </helix-text>
-          {/* Quiet rather than the default link treatment. A bright underlined
+          {/* Quiet rather than the default link treatment: a bright underlined
               link beside a section heading competes with the heading, and this
-              one is an escape hatch under three rows that are themselves the
-              main way on. It takes the rows' arrow so the section has one
-              vocabulary for "goes somewhere". */}
-          <Link className="insightAll" data-link="quiet" href="/insights">
+              is an escape hatch under three rows that are themselves the main
+              way on. No arrow. The rows carry one because each of them is a
+              destination in a stack of destinations and the glyph says which
+              way they go; this sits beside a heading, where the same glyph is
+              decoration on a link that already reads as one. */}
+          <Link data-link="quiet" href="/insights">
             All insights
-            <helix-icon name="arrow-right"></helix-icon>
           </Link>
         </helix-flex>
 

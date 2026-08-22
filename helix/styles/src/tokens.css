@@ -796,9 +796,38 @@
   /* Used sparingly. Depth is a hairline border first; shadow is reserved for
      surfaces that genuinely float above the page. */
   --helix-shadow-none: none;
-  --helix-shadow-sm: 0 1px 2px color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent);
-  --helix-shadow-md: 0 4px 12px color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent);
-  --helix-shadow-lg: 0 12px 32px color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent);
+  /* **The ink is per mode, because the two modes are not the same problem.**
+   *
+   * One value served both, and it could not: a shadow is a dark ink at low
+   * alpha, which is the whole idea in light mode and close to nothing in dark.
+   * Measured on an elevated card, the `md` ink over white composites to rgb(230)
+   * and separates the card at 1.248; over black it composites to rgb(1) and
+   * separates it at 1.006.
+   *
+   * So the light values come down, since that is the mode where the shadow is
+   * doing the work and where too much of it reads as a drop rather than a lift.
+   * The dark values are left where they are: they already show almost nothing,
+   * and lowering them further would be tuning a thing nobody can see. Dark mode
+   * separating by *lift* at all is a real gap, and it needs a light ink rather
+   * than a smaller dark one, which is a bigger change than a number.
+   *
+   * `light-dark()` on the ink rather than on the shadow, because it takes
+   * colors and a shadow is a length list with a color in it. */
+  --_helix-shadow-ink-sm: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 5%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 8%, transparent)
+  );
+  --_helix-shadow-ink-md: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 6%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 10%, transparent)
+  );
+  --_helix-shadow-ink-lg: light-dark(
+    color-mix(in oklab, var(--_helix-neutral-950) 9%, transparent),
+    color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent)
+  );
+  --helix-shadow-sm: 0 1px 2px var(--_helix-shadow-ink-sm);
+  --helix-shadow-md: 0 4px 12px var(--_helix-shadow-ink-md);
+  --helix-shadow-lg: 0 12px 32px var(--_helix-shadow-ink-lg);
   /* The lift half of the separation policy above. Paired with
      `--helix-border-surface` and `--helix-border-floating`, and a theme moves
      the pair together: border-first sets the edge and clears the lift, and

@@ -350,8 +350,68 @@ helix-drawer {
 /* Above the light. Positioned, and that is the whole of the stacking:
    positioned elements with no `z-index` stack in tree order, and the order in
    the markup is already aura, scrim, words. */
+/* **Centred, so the light has something to be behind.**
+ *
+ * The column was left-aligned, which is right for a page of prose and wrong for
+ * this one: the hero is a claim over a field of moving light, and a claim
+ * pushed to one edge leaves the other two thirds of the field looking like
+ * space nobody used. Centred, the type sits in the light rather than beside it.
+ *
+ * The measure comes with it. A centred column that runs the full shell gives a
+ * reader a different left edge on every line, which is the failure centring is
+ * usually blamed for and is really a width problem: `.heroLede` already carries
+ * `.measure`, and the title balances its own lines. */
 .heroShell {
   position: relative;
+  text-align: center;
+}
+
+/* The install line: a command and the one thing you do with it.
+ *
+ * `surface` with a hairline rather than the code block's own treatment, because
+ * this is one line in a hero rather than a listing in a document, and at hero
+ * scale a filled block reads as a third button.
+ *
+ * The button pulls back by its own padding so the *line* is what the box is
+ * sized to. Left alone, a 40 control inside a chip built for 13px type sets the
+ * height of the whole thing and the command ends up floating in a control's
+ * worth of air. */
+.heroInstall {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+.heroInstall code {
+  color: var(--helix-color-foreground-muted);
+}
+
+.heroInstall helix-copy-button {
+  /* Sized to the line, not to a control.
+   *
+   * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
+   * control inside a chip built for 13px type sets the height of the whole
+   * thing: measured at 50 for a line whose text is 20. Through the component's
+   * own `--icon-button-size`, matched to the row's own line box, so the command
+   * is what the box is sized to and the button is something inside it.
+   *
+   * **Floored at 24, because tying a control to a type scale can shrink it out
+   * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
+   * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
+   * the size following the ramp everywhere the ramp is large enough and stops
+   * it following the ramp down past a floor that is not about type at all.
+   *
+   * The pull-back is separate and only handles the inline axis: the control's
+   * padding is hit area rather than space, so left alone the gap on the right
+   * came out larger than the inset on the left. */
+  --icon-button-radii: var(--helix-radii-xs);
+  --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
+
+  margin-inline-end: calc(var(--helix-space-2xs) * -1);
 }
 
 .heroTitle {
@@ -453,34 +513,15 @@ helix-drawer {
  * is what makes it an edge rather than a smudge: at these strengths the fill
  * alone fades in and a reader does not see a boundary they cannot locate.
  *
- * **Then the light, which is the hero's, painted rather than run.** The reel
- * opens under a live `Aura` and this is a gradient, which is the same trade the
- * insight cards were rewritten for: one closing band does not need a second
- * WebGL context to say the light came back.
- *
- * It rises from *below* the bottom edge, not from behind the button. A halo
- * centred on the call would put a primary wash under a primary fill and cost
- * the button the separation it needs, and it would also be the fourth thing on
- * the page competing to be looked at. Off the edge it reads as a horizon: the
- * page ends into light, and the button stays the only bright object in it.
- *
- * A background image and not a pseudo-element, so there is no stacking to
- * arrange. Backgrounds paint under content by definition, which is what the
- * lattice on `.designHero` needs a layer token, an `isolation` and a lift to
- * achieve, because that one has to be masked and this one does not.
- *
- * Mixing toward `transparent` rather than into the ground, which is the
- * `[data-button]` recipe and is load-bearing here: a mix into an opaque colour
- * collapses in dark mode, where 8% of the foreground into black is still black
- * at 8 bits. Toward transparent it composites over whatever the ground is, so
- * one declaration is right in both modes. */
+ * **The ground alone, with no light rising into it.** A radial wash of the
+ * brand came up from below the bottom edge here, echoing the hero's aura as a
+ * gradient rather than a second WebGL context. It read as a shadow: 26% of
+ * primary over a near-white band is a soft grey-blue smudge along the bottom,
+ * and a smudge under a call to action looks like a drop shadow that failed
+ * rather than like a horizon. The band is the ground and the button is the
+ * bright object, which is one idea instead of two. */
 .closing {
   background-color: light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface));
-  background-image: radial-gradient(
-    ellipse 68% 88% at 50% 116%,
-    color-mix(in oklab, var(--helix-color-primary) 26%, transparent) 0%,
-    transparent 72%
-  );
   text-align: center;
 }
 
@@ -789,6 +830,25 @@ helix-drawer {
  *
  * A class rather than an element selector, so this is a decision taken per
  * control. A form on this site should still show its labels. */
+/* The search sits on the hero's own band, so it takes the page's colour rather
+ * than the recessed one.
+ *
+ * `Input` fills with `--helix-color-surface-sunken`, which is the right guess
+ * and is a guess about its ground: sunken is one step *below the page*, and on
+ * a band that is already one step above it the control came out a single value
+ * from what it sits on and stopped reading as a field. Against the page colour
+ * it is a hole in the band in light mode and in dark alike, which is what a
+ * text input should look like.
+ *
+ * Through the component's own hook, which `check:grounds` exists to guarantee
+ * every component publishes. What is *not* systematic is a control noticing its
+ * ground by itself: `Button` solved that by filling with a percentage of the
+ * foreground, which composites over a page, a card or a panel and is right on
+ * all three, and the rest of the controls still name absolute tokens. Filed as 154. */
+.heroSearch {
+  --input-background-color: var(--helix-color-background);
+}
+
 .chromeControl::part(label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -2140,33 +2200,6 @@ helix-drawer helix-tree {
   position: fixed;
   transform-origin: 0 50%;
   z-index: var(--helix-layer-sticky);
-}
-
-/* The section's escape hatch, wearing the rows' arrow so the whole block has
-   one sign for "goes somewhere" rather than a link that says it in blue and
-   three rows that say it with a glyph. */
-.insightAll {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--helix-space-2xs);
-}
-
-.insightAll helix-icon {
-  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-.insightAll:hover helix-icon {
-  translate: var(--helix-space-2xs) 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .insightAll helix-icon {
-    transition: none;
-  }
-
-  .insightAll:hover helix-icon {
-    translate: none;
-  }
 }
 
 /* Larger than a section title and smaller than the hero's, which is the whole
