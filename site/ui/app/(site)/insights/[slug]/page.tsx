@@ -103,27 +103,30 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </helix-text>
         </helix-flex>
 
-        <helix-flex align="start" direction="column" gap="md">
-          <helix-flex align="center" data-density="sm" gap="xs" wrap>
-            <helix-tag tone="primary">{insight.topic}</helix-tag>
-            <helix-tag>{insight.kind}</helix-tag>
-          </helix-flex>
-
-          {/* Kept at the top rather than moved to the foot of the article.
-              Who wrote a thing is a credit and could sit anywhere, but "4 min
-              read" is a decision a reader makes *before* they start, and the
-              two are one row: splitting them to move half of it is worse than
-              either place. */}
-          <helix-flex align="center" class="insightByline" data-density="sm" gap="sm">
-            <helix-avatar name={insight.author} size="sm"></helix-avatar>
-            <helix-text appearance="body-strong">{insight.author}</helix-text>
-            <helix-divider orientation="vertical"></helix-divider>
-            <helix-text tone="muted">
-              <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-            </helix-text>
-            <helix-divider orientation="vertical"></helix-divider>
-            <helix-text tone="muted">{insight.minutes} min read</helix-text>
-          </helix-flex>
+        {/* One metadata line, not two stacked ones.
+            
+            The filing and the byline were separate rows, which made two short
+            strips of grey under the standfirst where the eye expects one: a row
+            of two chips is never long enough to look like a line, so the pair
+            read as a fragment above a fragment. They are one answer to one
+            question, which is what this piece is and who made it, so they are
+            one row, divided the way the row already divides everything else.
+            
+            The chips go last. Everything before them is about *this* post and
+            they are how it is filed with the others, which is the least urgent
+            thing here and the only part that leads somewhere else. */}
+        <helix-flex align="center" class="insightByline" data-density="sm" gap="sm" wrap>
+          <helix-avatar name={insight.author} size="sm"></helix-avatar>
+          <helix-text appearance="body-strong">{insight.author}</helix-text>
+          <helix-divider orientation="vertical"></helix-divider>
+          <helix-text tone="muted">
+            <time dateTime={insight.date}>{formatDate(insight.date)}</time>
+          </helix-text>
+          <helix-divider orientation="vertical"></helix-divider>
+          <helix-text tone="muted">{insight.minutes} min read</helix-text>
+          <helix-divider orientation="vertical"></helix-divider>
+          <helix-tag tone="primary">{insight.topic}</helix-tag>
+          <helix-tag>{insight.kind}</helix-tag>
         </helix-flex>
       </helix-flex>
 

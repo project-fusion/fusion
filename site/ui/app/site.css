@@ -1160,8 +1160,20 @@ helix-drawer {
   align-items: center;
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  margin-inline-start: var(--helix-space-2xs);
+  /* Pushed to the end of the row. The cell is a flex line, so `auto` takes
+     whatever is left over and the mark lands against the right edge however
+     long the description is. */
+  margin-inline-start: auto;
+  padding-inline-start: var(--helix-space-xs);
   vertical-align: middle;
+}
+
+/* No arrow. The base layer marks any `a[target="_blank"]` with one, which is
+   right for a link inside a sentence and wrong here: the mark is already an
+   icon saying the row has a reference, and a second glyph beside it says the
+   same thing twice in two visual languages. */
+.apiReference::after {
+  content: none;
 }
 
 .apiReference:hover,
@@ -1955,20 +1967,33 @@ helix-drawer helix-tree {
   text-align: start;
 }
 
-/* One declaration, because the recipe is doing the rest.
+/* One left edge, and it is the words that have to make it.
  *
- * A control has inset and the prose under it does not, so left on its own the
- * back step starts a space further in than the title, the labels and the byline
- * below it, and the reader gets two left edges to keep. Pulling back by exactly
- * the inset puts the *label* on the column, which is the edge that reads, and
- * leaves the hover wash overhanging it, which is what a ghost control is
- * supposed to do.
+ * The pull-back used to be one control inset, which put the *chevron* on the
+ * column and the label 29 past it. That is aligning the wrong thing: a reader
+ * does not align on an icon, they align on the text, so the masthead had a
+ * title and a standfirst at one edge and the only other words on the page at
+ * another. Measured at 24 for the title and 53 for the label.
  *
- * It is the padding token and not a guess: the recipe sets `padding-inline` to
- * `space-control`, so the two move together and there is nothing to keep in
- * sync. */
+ * So the pull-back is everything before the label: the control inset, the
+ * icon, and the gap between them. The label lands on 24 with the title and the
+ * chevron hangs into the margin, which is what a leading marker is supposed to
+ * do. It is the same idea as hanging punctuation, and the same idea the crumb
+ * this replaced used to get for free.
+ *
+ * **The cost is an uneven wash, and it is the right trade.** The fill now
+ * reaches 44 to the left of the column and 16 to the right, because everything
+ * that hangs has to stay inside the thing that lights up. That asymmetry shows
+ * only under a pointer, and only on a band of empty margin; the misalignment it
+ * buys out was visible all the time, to everyone, at rest.
+ *
+ * Every term is the token the recipe itself uses, so nothing here drifts if the
+ * control inset or the icon step changes. */
 .insightTrail {
-  margin-inline-start: calc(var(--helix-space-control) * -1);
+  margin-inline-start: calc(
+    -1 *
+    (var(--helix-space-control) + var(--helix-space-xs) + var(--helix-size-icon))
+  );
 }
 
 .insightLede {
