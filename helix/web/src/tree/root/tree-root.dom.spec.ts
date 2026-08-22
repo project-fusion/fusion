@@ -393,4 +393,67 @@ describe('a branch opening is announced, and can be owned', () => {
     await item.updateComplete
     expect(item.open).toBe(false)
   })
+
+  /* The documentation nav, which is where this was reported twice.
+   *
+   * `active` on the tree *is* controlled, answered by navigating, and the
+   * branch below it is seeded with `default-open` and owns itself. Those are
+   * two different properties on two different elements and the suspicion in
+   * #119 was that the first was reaching the second: a branch that would not
+   * close after a client route change, and did after a refresh.
+   *
+   * It does not reproduce, measured six ways on the running site, and the
+   * reason it cannot is worth pinning rather than leaving to a paragraph.
+   * `MixinControllerOpen` decides ownership from whether anything set `open`
+   * by the first update, and nothing here ever sets `open`: the nav writes
+   * `default-open`, which is a different property with a different name. A
+   * tree's `active` moving cannot make an item's `open` controlled. */
+  test('a controlled `active` on the tree leaves a seeded branch its own', async () => {
+    const tree = (await mount(
+      `<helix-tree active="b" label="R">
+        <helix-tree-item default-open value="a">A
+          <helix-tree-item slot="children" value="b">B</helix-tree-item>
+        </helix-tree-item>
+      </helix-tree>`,
+    )) as HTMLElement & { active: string; updateComplete: Promise<boolean> }
+    await tree.updateComplete
+    const item = tree.querySelector('helix-tree-item') as HTMLElement & {
+      open: boolean
+      toggleOpen(): boolean
+      updateComplete: Promise<boolean>
+    }
+    await item.updateComplete
+
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(false)
+  })
+
+  test('a branch a reader closed stays closed when the route moves under it', async () => {
+    /* The second half of the same report, and the one a fresh-load test cannot
+       see: `active` changing is what a client navigation looks like from the
+       tree's side, and it must not re-open what somebody collapsed. */
+    const tree = (await mount(
+      `<helix-tree active="b" label="R">
+        <helix-tree-item default-open value="a">A
+          <helix-tree-item slot="children" value="b">B</helix-tree-item>
+          <helix-tree-item slot="children" value="c">C</helix-tree-item>
+        </helix-tree-item>
+      </helix-tree>`,
+    )) as HTMLElement & { active: string; updateComplete: Promise<boolean> }
+    await tree.updateComplete
+    const item = tree.querySelector('helix-tree-item') as HTMLElement & {
+      open: boolean
+      toggleOpen(): boolean
+      updateComplete: Promise<boolean>
+    }
+    item.toggleOpen()
+    await item.updateComplete
+    expect(item.open).toBe(false)
+
+    tree.active = 'c'
+    await tree.updateComplete
+    await item.updateComplete
+    expect(item.open).toBe(false)
+  })
 })
