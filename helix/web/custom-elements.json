@@ -2274,6 +2274,10 @@
                 "slug": "particles"
               },
               {
+                "description": "The field answering a pointer, and how far its reach carries.",
+                "slug": "pointer"
+              },
+              {
                 "description": "Rays from a source above the frame, following the pointer.",
                 "slug": "rays"
               },
@@ -24573,6 +24577,10 @@
               {
                 "description": "Every fill against every tone.",
                 "slug": "appearances"
+              },
+              {
+                "description": "Round or square, and lifted off the surface where it floats over content.",
+                "slug": "shapes"
               }
             ],
             "source": "helix/web/src/icon-button"
@@ -25296,6 +25304,10 @@
               {
                 "description": "Anything can stand in while a picture is on its way, or before it has one. A source that arrives with the data is the common case, and the stand-in is what holds the ground until it does.",
                 "slug": "placeholder"
+              },
+              {
+                "description": "The candidate widths a browser chooses from, and the one picture worth fetching first.",
+                "slug": "responsive"
               }
             ],
             "source": "helix/web/src/image"
@@ -27117,6 +27129,10 @@
               {
                 "description": "A password with a control to show what was typed.",
                 "slug": "reveal"
+              },
+              {
+                "description": "The shape and length a value has to have, checked by the platform.",
+                "slug": "validation"
               }
             ],
             "source": "helix/web/src/input"
@@ -38065,6 +38081,10 @@
                 "slug": "default"
               },
               {
+                "description": "Large counts written short, so a summary does not wrap at page nine hundred.",
+                "slug": "compact-counts"
+              },
+              {
                 "description": "Just the arrows and a count, for a footer with no room.",
                 "slug": "compact"
               },
@@ -44625,6 +44645,10 @@
               {
                 "description": "Half marks, which is the case the value is a number for.",
                 "slug": "halves"
+              },
+              {
+                "description": "A rating as a form control, with help under it and a message when it is missing.",
+                "slug": "in-a-field"
               },
               {
                 "description": "A score being shown rather than asked for, which is not a control.",
@@ -52486,6 +52510,10 @@
                 "slug": "default"
               },
               {
+                "description": "Where the divider may go, how far each nudge moves it, and a pane folded away.",
+                "slug": "bounds"
+              },
+              {
                 "description": "A pane collapsed to a sliver, and the handle that brings it back.",
                 "slug": "collapsed"
               },
@@ -56688,6 +56716,10 @@
                 "slug": "default"
               },
               {
+                "description": "Arrow keys move between tabs without opening them, so a reader can look before choosing.",
+                "slug": "manual"
+              },
+              {
                 "description": "The tabs drawn as one segmented control.",
                 "slug": "segmented"
               },
@@ -58634,6 +58666,10 @@
               {
                 "description": "Required marked on the label, and what the browser says when it is skipped.",
                 "slug": "required"
+              },
+              {
+                "description": "How many lines it opens at, and the length it will take.",
+                "slug": "sizing"
               }
             ],
             "source": "helix/web/src/textarea"
@@ -65655,6 +65691,10 @@
               {
                 "description": "More than a line, for a tooltip that has something to explain.",
                 "slug": "rich-content"
+              },
+              {
+                "description": "The rest before it appears and the grace after, and how far it sits from its trigger.",
+                "slug": "timing"
               }
             ],
             "source": "helix/web/src/tooltip"
@@ -71578,6 +71618,10 @@
               {
                 "description": "A clip with a poster and the controls this library draws.",
                 "slug": "default"
+              },
+              {
+                "description": "A loop with no sound, which is the one video allowed to start on its own.",
+                "slug": "ambient"
               },
               {
                 "description": "A clip with subtitle tracks and the control that chooses between them.",
