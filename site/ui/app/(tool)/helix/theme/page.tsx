@@ -1,3 +1,5 @@
+import { getFamilies } from '../../../../lib/catalog'
+import { INSIGHTS } from '../../../../lib/insights'
 import { ThemeBuilder } from './builder'
 
 /**
@@ -20,5 +22,33 @@ export const metadata = {
 }
 
 export default function ThemePage() {
-  return <ThemeBuilder />
+  /* Built here, on a server, and handed down, the way the sandbox page and the
+     site layout both already do it: the catalogue reads the manifest off disk
+     and the insight registry is the whole of the writing, so a palette that
+     imported either would pull it into the browser to display a list of names.
+     What crosses is the list. */
+  const families = getFamilies()
+
+  return (
+    <ThemeBuilder
+      findable={[
+        {
+          group: 'Components',
+          items: families.map((family) => ({
+            alternate: `/helix/sandbox?family=${family.slug}`,
+            alternateLabel: 'Open in the sandbox',
+            href: `/helix/components/${family.slug}`,
+            label: family.label,
+          })),
+        },
+        {
+          group: 'Writing',
+          items: INSIGHTS.map((insight) => ({
+            href: `/insights/${insight.slug}`,
+            label: insight.title,
+          })),
+        },
+      ]}
+    />
+  )
 }

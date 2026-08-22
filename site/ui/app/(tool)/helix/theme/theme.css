@@ -3,54 +3,59 @@
  *
  * Beside the tool rather than in `site.css`, which is the shared sheet every
  * page of the marketing site draws on. A tool's chrome is not site chrome, and
- * a file two people are editing at once is a merge conflict waiting for
- * whichever of them commits second.
+ * a file two people are editing at once is a conflict waiting for whichever of
+ * them commits second.
+ *
+ * The shell, the header and the splitter body are the sandbox's, by class:
+ * `sandboxShell`, `workbenchHeader` and `workbenchBody`. Only what goes inside
+ * the panes is this file's.
+ */
 
-   A tool rather than a page: no centred column and no site chrome, for the
-   reason the sandbox already gives, that every row around it is a row taken
-   from the thing being examined. Controls on one side, the palette and its
-   audit on the other. */
-.themeBuilder {
-  display: grid;
-  gap: var(--helix-space-xl);
-  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
-  min-block-size: 100dvh;
-  padding: var(--helix-space-xl);
-}
-
-@media (width < 60rem) {
-  .themeBuilder {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
+/* The form. Its own scroller, because the pane is a fixed height and a theme
+   has more knobs than a short window has room for. */
 .themeControls {
-  align-self: start;
-  position: sticky;
-  top: var(--helix-space-xl);
+  block-size: 100%;
+  overflow-y: auto;
+  padding: var(--helix-space-lg);
 }
 
+/* The result: a preview that takes what it needs and an audit under it that
+   scrolls. Two rows rather than one scroller over both, so the preview stays
+   put while a reader reads the failures. */
 .themeResult {
+  block-size: 100%;
   display: grid;
-  gap: var(--helix-space-xl);
-  grid-template-rows: auto auto;
+  gap: var(--helix-space-lg);
+  grid-template-rows: auto minmax(0, 1fr);
   min-inline-size: 0;
+  padding: var(--helix-space-lg);
 }
 
-/* The preview paints its own page, because a theme's background is one of the
-   things being previewed and letting the site's show through would leave the
-   one surface every other pair is measured against out of the picture. */
+/* **The preview paints its own page**, because a theme's background is one of
+   the things being previewed: letting the site's show through would leave the
+   one surface every other pair is measured against out of the picture.
+
+   `color-scheme` follows the theme rather than the page, so a light theme
+   previewed on a dark site gets light form controls and light scrollbars inside
+   it rather than the reader's. */
 .themePreview {
   background-color: var(--helix-color-background);
+  /* A popover paints in the top layer, so nothing clips it and nothing reserves
+     space for it. Keeping it inside the picture is a matter of what it opens
+     over rather than how tall the picture is, which is why the floating panel
+     sits above the tags rather than under everything. */
+  min-block-size: 24rem;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-md);
   color: var(--helix-color-foreground);
-  padding: var(--helix-space-xl);
+  padding: var(--helix-space-lg);
 }
 
 .themeAudit {
-  min-inline-size: 0;
+  min-block-size: 0;
+  overflow-y: auto;
 }
 
 .themeAudit helix-code-block {
-  max-block-size: 24rem;
+  max-block-size: 20rem;
 }
