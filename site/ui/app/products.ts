@@ -106,7 +106,7 @@ export interface Product {
  * count tidy would be softening them by omission, which is the one thing the
  * stage labels exist to prevent.
  *
- * Cortex carries one destination and Helix carries two, and the asymmetry is
+ * Cortex carries one destination and Helix carries three, and the asymmetry is
  * the honest reporting rather than a gap to fill. Engram, Trace and Recall are
  * named in `CLAUDE.md` and none of them is built, so none of them is a row
  * here. The day one is, it is a row.
@@ -126,6 +126,15 @@ export const PRODUCTS: Product[] = [
         icon: 'microscope',
         summary: 'Edit an example with the source beside it.',
         title: 'Sandbox',
+      },
+      {
+        href: '/helix/theme',
+        /* The instrument set the other two rows read as: an atom for the
+           components, a microscope for the sandbox, a palette for the thing
+           that mixes one. */
+        icon: 'palette',
+        summary: 'Derive a palette and see every pair measured.',
+        title: 'Theme builder',
       },
     ],
     href: '/helix',
