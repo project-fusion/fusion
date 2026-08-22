@@ -295,6 +295,27 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
           <helix-table-row key={row.name}>
             <helix-table-cell header>
               <Code>{row.name}</Code>
+              {row.references.map((reference) => (
+                /* An anchor inside the tooltip rather than the tooltip alone.
+                   The bubble says which feature this is and the mark goes
+                   there, so a reader on a touch screen, where nothing hovers,
+                   still has the destination. */
+                <helix-tooltip
+                  content={`${reference.label}. Opens the specification.`}
+                  key={reference.url}
+                  placement="top"
+                >
+                  <a
+                    aria-label={`${row.name}: ${reference.label}`}
+                    className="apiReference"
+                    href={reference.url}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <helix-icon name="info" />
+                  </a>
+                </helix-tooltip>
+              ))}
             </helix-table-cell>
             <helix-table-cell>
               <TypeText>{row.type}</TypeText>

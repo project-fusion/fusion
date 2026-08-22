@@ -5618,6 +5618,14 @@
               "default": "''",
               "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "attribute": "command",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -5632,6 +5640,14 @@
               "default": "''",
               "description": "The id of the element the command is sent to.",
               "attribute": "commandfor",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -15582,6 +15598,14 @@
               "default": "''",
               "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "attribute": "command",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -15596,6 +15620,14 @@
               "default": "''",
               "description": "The id of the element the command is sent to.",
               "attribute": "commandfor",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -24721,6 +24753,14 @@
               "default": "''",
               "description": "What to send when the button is activated, and what to send it to.\n\nThe platform's invoker attributes, forwarded onto the inner `<button>`\nrather than left on the host: only a real button is recognized as an\ninvoker, so `commandfor` written on a custom element resolves nothing and\nthe trigger silently does nothing at all. A wrapper has to hand them down,\nthe same way `label` becomes `aria-label` in there.\n\n```html\n<helix-button commandfor=\"confirm\" command=\"--show\">Delete…</helix-button>\n```\n\n`commandFor` spells its attribute out, because Lit lowercases a property\nname to derive one rather than dash-casing it, and what a consumer writes\nis the platform's `commandfor`.",
               "attribute": "command",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"
@@ -24735,6 +24775,14 @@
               "default": "''",
               "description": "The id of the element the command is sent to.",
               "attribute": "commandfor",
+              "helix": {
+                "references": [
+                  {
+                    "label": "Invoker Commands",
+                    "url": "https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor"
+                  }
+                ]
+              },
               "inheritedFrom": {
                 "name": "HelixBaseButton",
                 "module": "src/button/root/button-root.ts"

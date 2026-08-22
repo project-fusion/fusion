@@ -1155,6 +1155,34 @@ helix-drawer {
   overflow-x: auto;
 }
 
+/* The mark beside a property built on a platform feature.
+ *
+ * Held back to the muted foreground and lifted on hover, because it is
+ * secondary to the row it sits in: a table where every annotated property
+ * carries a bright mark reads as a table of warnings.
+ *
+ * `1em`, so it tracks the identifier beside it rather than the page. */
+.apiReference {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  margin-inline-start: var(--helix-space-2xs);
+  vertical-align: middle;
+}
+
+.apiReference:hover,
+.apiReference:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
+/* Through the component's own hook, not a rule of ours. `.apiReference
+   helix-icon { block-size }` is a document rule, which beats a shadow one
+   whatever the specificity and whatever the layer, so it would have killed
+   `icon-root.css` rather than adjusted it. `check:overruled` said so. */
+.apiReference {
+  --icon-size: 1em;
+}
+
 .apiName {
   color: var(--helix-color-syntax-name);
 }

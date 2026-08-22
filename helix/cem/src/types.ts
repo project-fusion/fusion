@@ -33,6 +33,13 @@ export interface HelixMember extends Documented {
      * a consumer can take ownership of by declaring it.
      */
     controlled?: string[]
+    /**
+     * Where the platform feature this is built on is specified.
+     *
+     * Set from `@see <url> <label>` by `helix-references`. Present only on a
+     * member whose behaviour comes from something a reader may not have met.
+     */
+    references?: { label: string; url: string }[]
   }
   kind?: string
   privacy?: string

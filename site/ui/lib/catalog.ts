@@ -33,6 +33,8 @@ export interface PropertyDoc {
   name: string
   /** Whether it is a getter, so a reader is not invited to set it. */
   readonly: boolean
+  /** Where the platform feature this is built on is specified. */
+  references: { label: string; url: string }[]
   type: string
 }
 
@@ -101,6 +103,7 @@ interface RawNamed {
   kind?: string
   name?: string
   parameters?: { name?: string; type?: { text?: string } }[]
+  helix?: { references?: { label: string; url: string }[] }
   privacy?: string
   reactProp?: string
   readonly?: boolean
@@ -196,6 +199,10 @@ const properties = (rows: RawNamed[] | undefined): PropertyDoc[] =>
          pass the same thing, and there is no second way. A hundred and
          fifty-five of them. */
       readonly: row.readonly === true,
+      /* From `@reference` on the property. A row for `command` can say it is
+         the Invoker Commands API and point at where that is specified, which a
+         description sentence can gesture at and cannot carry. */
+      references: row.helix?.references ?? [],
       type: withoutUndefined(row.type?.text ?? ''),
     }))
 

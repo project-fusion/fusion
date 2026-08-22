@@ -12,6 +12,7 @@ import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
+import { references } from './plugins/references.js'
 import { source } from './plugins/source.js'
 import { stableOrder } from './plugins/stable-order.js'
 import { svelteTypes } from './plugins/svelte-types.js'
@@ -76,6 +77,7 @@ export const createHelixCemConfig = ({
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
     controlled(),
+    references(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
     // Before the JSX generator, which walks modules in order, so both the
@@ -171,6 +173,7 @@ export {
   jsxImports,
   metadata,
   reactEvents,
+  references,
   source,
   svelteTypes,
 }

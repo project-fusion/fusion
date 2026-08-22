@@ -84,11 +84,17 @@ export class HelixBaseButton extends HelixFormElement {
    * `commandFor` spells its attribute out, because Lit lowercases a property
    * name to derive one rather than dash-casing it, and what a consumer writes
    * is the platform's `commandfor`.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command Invoker Commands
    */
   @property()
   command = ''
 
-  /** The id of the element the command is sent to. */
+  /**
+   * The id of the element the command is sent to.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor Invoker Commands
+   */
   @property({ attribute: 'commandfor' })
   commandFor = ''
 
