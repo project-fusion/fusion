@@ -333,12 +333,30 @@ helix-drawer {
  *
  * The right stays clear on purpose. A scrim across the whole hero would be a
  * dimmer switch on the thing it was added to show. */
+/* **A wash behind the words, not a curtain across one side.**
+ *
+ * This ran `to right`: the page's own colour at full strength on the left edge,
+ * still 72% of it at 46%, and gone by 78%. That was correct for a hero whose
+ * words sat on the left, where the job is to keep type legible over moving
+ * light. It is wrong for a centred one twice over. It washes out the left three
+ * quarters of the field, which is why the light read as living in the top right
+ * corner, and in light mode the wash is white at full strength over a pale
+ * field, which is why there was almost nothing left to see.
+ *
+ * Centred on the words instead, measured rather than guessed: the hero column
+ * sits at 0.5 across and 0.25 down the two-screen box, spanning 0.125 to 0.375
+ * vertically, so the ellipse is placed there and sized to cover that band.
+ *
+ * Weaker, too. 70% behind the type is enough to hold it off a field that is
+ * itself only a wash, where 100% was protecting against a brightness the aura
+ * does not reach. What the field loses at the centre it gains everywhere else,
+ * and the everywhere else is now symmetric. */
 .reelScrim {
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--helix-color-background) 100%, transparent) 0%,
-    color-mix(in srgb, var(--helix-color-background) 72%, transparent) 46%,
-    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 78%
+  background: radial-gradient(
+    ellipse 62% 26% at 50% 25%,
+    color-mix(in srgb, var(--helix-color-background) 70%, transparent) 0%,
+    color-mix(in srgb, var(--helix-color-background) 34%, transparent) 55%,
+    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 100%
   );
   block-size: 200svh;
   inset-block-start: 0;
