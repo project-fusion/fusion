@@ -149,7 +149,14 @@ const DRAWN = new Set(['checkbox', 'radio', 'switch'])
    `::part(bar):nth-child(2)` were dropped at parse time, leaving four bars one
    colour. The styled tier does it from inside its own shadow root, where a
    plain attribute selector works. Nobody outside can. #138. */
-const CHART = new Set(['bar-chart', 'donut-chart', 'legend', 'line-chart', 'sparkline', 'trend'])
+/* `trend` is not one, and it was in this set for a whole pass. It is an arrow,
+   a metric and a judgement about which way is good news: no data source, no
+   `MixinChartSource`, no plot, and its only parts are `direction` and `icon`.
+   Being here bought it a six-shade series palette it never reads and paint
+   rules that matched nothing, which is dead CSS in a file whose whole job is to
+   show a consumer what has to be styled. The tell was available the whole time,
+   in the part list. */
+const CHART = new Set(['bar-chart', 'donut-chart', 'legend', 'line-chart', 'sparkline'])
 
 const chartRule = (part) => {
   if (part === 'svg') {
