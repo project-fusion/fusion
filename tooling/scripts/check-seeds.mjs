@@ -151,7 +151,11 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log(
-  `seeds: ${emitted.size} emitted, ${consumed.size} read, ` +
-    `${PLANNED.size} planned and each still read`,
-)
+/* **The planned count is only printed when there is one**, and that is not
+   cosmetic. `check:floors` reads the integers out of this line and fails on a
+   zero, on the grounds that a check with nothing to say should not report
+   success. An empty `PLANNED` is the *good* outcome here, meaning the engine
+   emits everything the stylesheet reads, so printing `0 planned` would turn
+   the day this row is finished into a red build. */
+const planned = PLANNED.size > 0 ? `, ${PLANNED.size} planned and each still read` : ''
+console.log(`seeds: ${emitted.size} emitted, ${consumed.size} read${planned}`)
