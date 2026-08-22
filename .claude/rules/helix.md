@@ -110,18 +110,30 @@ can. A colour, a spacing, a duration, an easing: those are the styled tier's,
 and a base component reaching for `--helix-*` to write one would be the
 dependency the tier split exists to prevent.
 
-**The leading underscore means the component writes it**, which is a different
-claim from the one it makes on `--_helix-*` primitives, where it means do not
-reach past the semantic layer. Both are "not yours to set" and only one is "not
-yours to read". Held at 100 out of 100 declarations, and never written down
-until now.
+**The underscore belongs on `web` and not on `headless`, and the test is
+whether the package contains a reader.** A styled sheet that writes
+`--_dialog-scrim` and reads it back three rules later has one: the value never
+leaves, and the underscore says so, the same way it does on `--_helix-*`
+primitives. Twenty-odd in `helix/web` are exactly that.
 
-**They are not declared, which is the gap.** `@cssproperty` appears once in the
-whole headless package, so none of these reaches the manifest or a docs page: a
-consumer on the headless tier, who needs `--_slider-fraction` precisely because
-they have no stylesheet from us, has no way to discover it and would have to
-recompute `(value - min) / (max - min)` themselves. That is the headless tier
-being less independently consumable than it claims. #137.
+**A tier that ships no stylesheet cannot have one.** `headless` has no CSS by
+definition, so every one of its 31 properties is read by somebody outside the
+package, always. There is no private case to mark, and marking them private
+tells the one consumer who has to read them that they may not. It was applied to
+all 31 anyway, uniformly and undocumented, because the sigil was copied from the
+primitives layer where it means something else.
+
+**They are also not declared.** `@cssproperty` appears once in the whole
+headless package, so none of these reaches the manifest or a docs page: a
+consumer on that tier, who needs the slider's fraction precisely because they
+have no stylesheet from us, has no way to discover it and would have to
+recompute `(value - min) / (max - min)` by hand. That is the tier being less
+independently consumable than it claims.
+
+**Several were named for privacy and are unfit to be public**, which is why this
+is a naming pass rather than a sed: `--_hue`, `--_saturation`, `--_brightness`,
+`--_color` and `--_marker-at` all need the family in front of them before
+anybody outside the component reads them. #137.
 
 ### A component that renders another names the public tag and imports it
 
