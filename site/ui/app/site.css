@@ -1122,6 +1122,35 @@ helix-drawer {
   overflow-wrap: break-word;
 }
 
+/* A union wraps between its members and never inside one, so the bar is always
+   at the start of a line rather than wherever the previous line ran out. It was
+   loose text between tokens: a four-member union came out as four lines each
+   trailing its own `|`, and a twelve-member one had the bar leading some lines
+   and trailing others, which reads as two different lists in one cell. */
+.apiTypeMember {
+  /* No `nowrap`, and that is the point rather than an omission. The bar is
+     attached to its member by margin rather than by a space, so there is no
+     break opportunity between them and they hold together without being told
+     to. `nowrap` would also stop a member longer than the column from breaking
+     at all: measured in an 83px Type cell, `| "particles"` overflowed with it
+     and wrapped inside itself without. */
+  display: inline;
+}
+
+.apiTypeBar {
+  color: var(--helix-color-foreground-subtle);
+  /* Space on both sides, and it has to be margin rather than a space in the
+     markup: the members are adjacent inline spans with no whitespace between
+     them, so text alone would run the bar into the value before it. That is
+     also what keeps a bar with its member, since a margin is not a break
+     opportunity and a space would be.
+     `2xs` on both sides. It was `0.35em`, which scales with the code type and
+     which `check:tokens` refused, correctly: the type column is one size, so
+     there is nothing for an em to track that a token does not. */
+  margin-inline: var(--helix-space-2xs);
+  opacity: 0.6;
+}
+
 /* A literal value is green. That is `syntax-tag` rather than `syntax-string`,
    which is navy in this GitHub-derived set: the token names describe an
    editor's grammar, and what is wanted here is the colour.
@@ -2475,27 +2504,7 @@ helix-drawer helix-tree {
   --option-radii: var(--helix-radii-sm);
 }
 
-/* **The field on an insight card: a still, not a shader.**
- *
- * The ratio is the gallery's, so a card here and a card on `/helix` are the same
- * object, and the height comes from the width rather than a fixed strip that
- * looks generous on a narrow card and mean on a wide one.
- *
- * `--card-media-block-size: auto` hands the height back to the element, which
- * is what `Card`'s default was written for: it sets a height because a chart has
- * no intrinsic shape, and a box carrying a ratio has one.
- *
- * The lobes come from the element's own `background-image`, since their
- * positions are the thing that differs per topic and a stylesheet cannot hold
- * five sets of them without five rules. What is here is everything they share:
- * the ground they sit on, which is also what shows before they paint. */
-.insightArt {
-  aspect-ratio: 16 / 10;
-  background-color: var(--helix-color-surface-sunken);
-  display: block;
-}
-
-/* A photograph, treated so that six of them read as one set.
+/* A photograph, treated so that any two of them read as one set.
  *
  * **The treatment is the design here, and the vendor is only supply.** Six
  * pictures chosen well are still six pictures until something ties them
@@ -2509,10 +2518,16 @@ helix-drawer helix-tree {
  * behind a hook: point `--insight-photo-filter` at a `sepia`/`hue-rotate` pair
  * or at `none` once there is something to look at.
  *
- * Everything else goes through the component's own hooks. The ratio is the
- * gallery's, matching the painted field beside it so a mixed grid keeps one
- * card shape, and the placeholder is the ground the field uses, so the box
- * before a picture lands is the same colour as a card that never had one. */
+ * The ratio is the gallery's rather than the file's, so a grid where some posts
+ * have pictures and some have none keeps one card shape, and two photographs of
+ * different proportions crop to the same box instead of stepping the row.
+ * Stated through the component's own hooks, both of them.
+ *
+ * `--card-media-block-size: auto` hands the height back to the element, which
+ * is what `Card`'s default was written for: it sets a height because a chart
+ * has no intrinsic shape, and a box carrying a ratio has one. On the card
+ * rather than on the picture, because it is the card's hook and it has to be
+ * set whether or not this particular post brought a file. */
 .insightPhoto {
   --image-aspect: 16 / 10;
   --image-placeholder-color: var(--helix-color-surface-sunken);
@@ -2522,56 +2537,4 @@ helix-drawer helix-tree {
 
 .insightCard helix-card {
   --card-media-block-size: auto;
-}
-
-/* ------------------------------------------------------------------ theme --
-   The theme builder, `(tool)/helix/theme`.
-
-   A tool rather than a page: no centred column and no site chrome, for the
-   reason the sandbox already gives, that every row around it is a row taken
-   from the thing being examined. Controls on one side, the palette and its
-   audit on the other. */
-.themeBuilder {
-  display: grid;
-  gap: var(--helix-space-xl);
-  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
-  min-block-size: 100dvh;
-  padding: var(--helix-space-xl);
-}
-
-@media (width < 60rem) {
-  .themeBuilder {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.themeControls {
-  align-self: start;
-  position: sticky;
-  top: var(--helix-space-xl);
-}
-
-.themeResult {
-  display: grid;
-  gap: var(--helix-space-xl);
-  grid-template-rows: auto auto;
-  min-inline-size: 0;
-}
-
-/* The preview paints its own page, because a theme's background is one of the
-   things being previewed and letting the site's show through would leave the
-   one surface every other pair is measured against out of the picture. */
-.themePreview {
-  background-color: var(--helix-color-background);
-  border-radius: var(--helix-radii-md);
-  color: var(--helix-color-foreground);
-  padding: var(--helix-space-xl);
-}
-
-.themeAudit {
-  min-inline-size: 0;
-}
-
-.themeAudit helix-code-block {
-  max-block-size: 24rem;
 }

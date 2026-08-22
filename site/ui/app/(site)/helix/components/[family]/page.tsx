@@ -158,12 +158,61 @@ function TypeText({ children }: { children: string }) {
      `"primary"` out of this table is putting it into HTML or JSX, where it is
      the wrong quote. Swapped on the way out rather than in the manifest, which
      should keep saying what the source says. */
-  const parts = children
-    .replace(/'([^']*)'/g, '"$1"')
-    .split(/("[^"]*"|[A-Za-z_$][\w$]*)/g)
-    .filter(Boolean)
+  const members = union(children.replace(/'([^']*)'/g, '"$1"'))
   return (
     <helix-text appearance="code" class="apiType">
+      {members.map((member, at) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
+        <span className="apiTypeMember" key={at}>
+          {at > 0 && <span className="apiTypeBar">|</span>}
+          {tokens(member)}
+        </span>
+      ))}
+    </helix-text>
+  )
+}
+
+/**
+ * A union split into its members, so a wrap can only happen between them.
+ *
+ * The bar was loose text between tokens, which put it wherever the line
+ * happened to end: a four-member union wrapped to four lines each trailing its
+ * own `|`, and a longer one wrapped with the bar leading some lines and
+ * trailing others, which reads as two different lists. Carried by the member it
+ * introduces, it is always at the start of the line.
+ *
+ * **Depth-aware, because a union can be inside a generic.**
+ * `Record<string, A | B>` is one member and splitting it on every bar would
+ * make it three. Quotes are tracked too: a literal may contain anything.
+ */
+const union = (type: string): string[] => {
+  const members: string[] = []
+  let depth = 0
+  let quoted = false
+  let from = 0
+  for (let at = 0; at < type.length; at += 1) {
+    const char = type[at]
+    if (char === '"') {
+      quoted = !quoted
+    } else if (quoted) {
+    } else if (char === '<' || char === '(' || char === '[' || char === '{') {
+      depth += 1
+    } else if (char === '>' || char === ')' || char === ']' || char === '}') {
+      depth -= 1
+    } else if (char === '|' && depth === 0) {
+      members.push(type.slice(from, at))
+      from = at + 1
+    }
+  }
+  members.push(type.slice(from))
+  return members.map((one) => one.trim()).filter(Boolean)
+}
+
+/** One member, coloured by what each token is. */
+function tokens(member: string) {
+  const parts = member.split(/("[^"]*"|[A-Za-z_$][\w$]*)/g).filter(Boolean)
+  return (
+    <>
       {parts.map((part, index) =>
         /^("|[A-Za-z_$])/.test(part) ? (
           // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
@@ -174,7 +223,7 @@ function TypeText({ children }: { children: string }) {
           part
         ),
       )}
-    </helix-text>
+    </>
   )
 }
 
