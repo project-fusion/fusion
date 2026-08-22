@@ -108,6 +108,24 @@ export function DocsNav({ active, entries }: { active: string; entries: readonly
             it. Seeding is what markup is for. */}
         <helix-tree-item default-open suppressHydrationWarning value="components">
           Components
+          {/* The way back to the index, and the only one in this header since
+              the wordmark went home. The `end` slot rather than an `href` on
+              the row: a branch that is a link gives its chevron the job of
+              opening it, and this row's whole job is opening. So the row still
+              toggles from anywhere, and one small target navigates.
+
+              Shown on hover *and* focus-within, which is not decoration: a
+              control that appears only under a pointer is one a keyboard
+              cannot reach, and this is a link in a navigation. */}
+          <a
+            aria-label="All components"
+            className="docsNavUp"
+            href="/helix"
+            slot="end"
+            title="All components"
+          >
+            <helix-icon name="list" />
+          </a>
           {entries.map((entry) => (
             <helix-tree-item
               href={`/helix/components/${entry.slug}`}

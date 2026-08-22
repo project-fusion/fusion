@@ -1167,6 +1167,47 @@ helix-code-block .tok-operator {
   position: sticky;
 }
 
+/* The way back to the component index, on the branch that holds them.
+ *
+ * **Hover and focus-within, not hover alone.** A control revealed only by a
+ * pointer is one a keyboard reader never finds, and this is a link in a
+ * navigation rather than an embellishment. `:focus-within` on the row is what
+ * puts it on screen when the link itself takes focus, since the link is the
+ * thing inside the row that can hold it.
+ *
+ * `opacity` rather than `display`, so the row's width does not change as a
+ * pointer crosses it: the label would shift under the reader at the moment
+ * they are aiming at it. The box is always there and only the ink arrives.
+ *
+ * Not `visibility: hidden`, which takes it out of the accessibility tree and
+ * would hide from a screen reader a link that is genuinely there. */
+.docsNavUp {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  opacity: 0;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+
+  --icon-size: var(--helix-size-icon-sm);
+}
+
+helix-tree-item:hover > .docsNavUp,
+helix-tree-item:focus-within > .docsNavUp {
+  opacity: 1;
+}
+
+.docsNavUp:hover {
+  color: var(--helix-color-foreground);
+}
+
+/* Named one selector at a time, for the reason `check:motion` exists: a reduce
+   rule written looser than the rule it answers loses on specificity. */
+@media (prefers-reduced-motion: reduce) {
+  .docsNavUp {
+    transition: none;
+  }
+}
+
 .docsRailTitle {
   display: block;
   padding-block-end: var(--helix-space-xs);

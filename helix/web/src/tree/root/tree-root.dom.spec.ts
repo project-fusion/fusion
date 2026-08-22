@@ -80,6 +80,43 @@ describe('tree selection can be refused', () => {
 })
 
 if (hasLayout()) {
+  describe('a link inside a branch row', () => {
+    /* Browser-only, and why is the point of it.
+     *
+     * The first version sat with the other tree tests and passed against a
+     * component that was broken: happy-dom does not carry a click on slotted
+     * light-DOM content up to the shadow element holding the slot, so the row
+     * handler never ran and nothing was asserted. In Chrome it runs, and the
+     * branch collapsed on the way out of the link.
+     *
+     * A spec that cannot see the fault it names is worse than none, because it
+     * reads as coverage. */
+    test('goes where it points and leaves the branch as it was', async () => {
+      const tree = (await mount(
+        `<helix-tree label="R">
+          <helix-tree-item default-open value="a">A
+            <a href="#elsewhere" id="aside" slot="end">Docs</a>
+            <helix-tree-item slot="children" value="b">B</helix-tree-item>
+          </helix-tree-item>
+        </helix-tree>`,
+      )) as HTMLElement
+      const item = tree.querySelector('helix-tree-item') as HTMLElement & {
+        open: boolean
+        updateComplete: Promise<boolean>
+      }
+      await item.updateComplete
+      expect(item.open).toBe(true)
+
+      const link = tree.querySelector('#aside') as HTMLAnchorElement
+      link.addEventListener('click', (event) => event.preventDefault())
+      link.click()
+      await item.updateComplete
+      expect(item.open).toBe(true)
+    })
+  })
+}
+
+if (hasLayout()) {
   describe('tree alignment', () => {
     const labelX = (item: Element): number =>
       (part(item as HTMLElement, 'label') as HTMLElement).getBoundingClientRect().x

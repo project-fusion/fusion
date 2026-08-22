@@ -240,17 +240,29 @@ export class HelixBaseTreeItem extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleRowClick = (event: MouseEvent): void => {
+    /* A press that landed on a link is that link's, whichever branch of this
+       runs. It was asked on one side and not the other, and the missing half
+       cost a feature: a row can hold a link in its `end` slot, which is what
+       the documentation sidebar puts there to get back to the index, and
+       pressing it collapsed the branch on the way out. Measured in Chrome,
+       `open` false and the route changed from the one press.
+
+       "There is nowhere else for the press to mean" was true of a row holding
+       a label, and a slot is somewhere else. */
+    const onLink = event.composedPath().some((node) => node instanceof HTMLAnchorElement)
+
     /* A branch that is also a link goes where it points, and its chevron is
-       what opens it. A branch that is not toggles from anywhere in the row,
-       because there is nowhere else for the press to mean. */
+       what opens it. A branch that is not toggles from anywhere in the row. */
     if (this.branch && this.href === '') {
-      this.toggleOpen()
+      if (!onLink) {
+        this.toggleOpen()
+      }
       return
     }
     this.select()
-    /* Unless the press already landed on the link, which would follow it twice
-       and, where a consumer's router is listening, route twice. */
-    if (!event.composedPath().some((node) => node instanceof HTMLAnchorElement)) {
+    /* Following it here as well would follow it twice and, where a consumer's
+       router is listening, route twice. */
+    if (!onLink) {
       this.follow()
     }
   }
