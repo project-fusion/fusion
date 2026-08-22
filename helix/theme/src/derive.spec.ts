@@ -234,6 +234,19 @@ describe('the chroma policy', () => {
     expect(danger?.value.chroma).toBeLessThanOrEqual(0.02)
   })
 
+  /* **The half the policy could not reach.** The engine applies chroma to every
+     colour it solves, and the twenty-four series colours are not among those:
+     they derive in CSS off the seed. Before this, a monotone theme emitted grey
+     buttons and left the charts vivid. */
+  test('the chroma policy reaches the seed the series ramp reads', () => {
+    expect(deriveTheme({ brand: BRAND, chroma: { scale: 0.4 } }).seeds['seed-chroma-scale']).toBe(
+      '0.4',
+    )
+    expect(deriveTheme({ brand: BRAND, chroma: { ceiling: 0 } }).seeds['seed-chroma-scale']).toBe(
+      '0',
+    )
+  })
+
   test('a pinned value keeps its chroma, the policy being about what we derive', () => {
     const theme = deriveTheme({
       brand: BRAND,

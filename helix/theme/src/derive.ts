@@ -800,8 +800,30 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      and that is what makes the two derivations agree: `helix/styles` builds its
      ramp from the seed, so seeding it with the raw input would leave the CSS
      primary and the engine's primary two different colours on the same page. */
+  /* **The chroma policy has to reach the seed, or half the palette never hears
+     about it.** The engine applies it to every colour it solves, and the
+     twenty-four series colours are not among those: they derive in CSS off the
+     seed, so a monotone theme emitted grey buttons and left the charts vivid.
+     Measured before this: saturation at 20 per cent, and a bar still painted
+     chroma 0.206.
+
+     `ceiling` is an absolute chroma and the seed is a multiplier, so a ceiling
+     is folded in against the loudest series the ramp holds, which measured at
+     0.277. Approximate by construction and it has to be: the ramp states a
+     different chroma per hue because sRGB is not chroma-uniform, and one
+     multiplier cannot honour eight ceilings exactly. What it does honour is the
+     direction and the extremes, so a ceiling of 0 gives grey charts. */
+  const LOUDEST_SERIES = 0.277
+  const chromaCeiling = resolved.chroma.ceiling
+  const chromaScale = resolved.chroma.scale ?? 1
+  const seriesScale =
+    chromaCeiling === undefined
+      ? chromaScale
+      : Math.min(chromaScale, chromaCeiling / LOUDEST_SERIES)
+
   const seeds: Record<string, string> = {
     'seed-brand': oklchToHex(fitToGamut(primary.raw)),
+    'seed-chroma-scale': String(Number(seriesScale.toFixed(3))),
     'seed-density': String(resolved.density),
     'seed-radii': `${resolved.radius}rem`,
   }

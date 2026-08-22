@@ -173,6 +173,7 @@
 }
 
 .themedFeatures,
+.themedChart,
 .themedSplit {
   padding-inline: var(--helix-space-2xl);
 }
@@ -277,6 +278,7 @@ helix-sandbox-editor {
 @container (width < 40rem) {
   .themedHero,
   .themedFeatures,
+  .themedChart,
   .themedSplit,
   .themedClose,
   .themedFooter {

@@ -192,6 +192,61 @@ export function ThemedPage() {
         </helix-grid>
       </section>
 
+      {/* **A chart, because the series ramp is a third of the palette and had
+          nothing on screen.** Twenty-four tokens rotate off the brand and not
+          one of them appeared in this preview, so a reader could move the
+          saturation and never see what it did to a chart.
+
+          It reads a table, which is the whole point of the component: the
+          accessible representation is markup a consumer wrote rather than an
+          `aria-label` generated from an array. The table is clipped rather than
+          hidden, so it stays in the accessibility tree. */}
+      <section className="themedChart">
+        <helix-card>
+          <helix-flex direction="column" gap="md">
+            <helix-text appearance="subheading" as="h2">
+              On-time arrivals
+            </helix-text>
+            <table data-hidden-visually id="arrivals">
+              <caption>On-time arrivals by month, as a percentage</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Month</th>
+                  <th scope="col">On time</th>
+                  <th scope="col">Recovered</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(
+                  [
+                    ['Jan', 91, 4],
+                    ['Feb', 88, 7],
+                    ['Mar', 94, 3],
+                    ['Apr', 96, 2],
+                    ['May', 93, 5],
+                    ['Jun', 98, 1],
+                  ] as const
+                ).map(([month, ontime, recovered]) => (
+                  <tr key={month}>
+                    <th scope="row">{month}</th>
+                    <td data-value={ontime}>{ontime}%</td>
+                    <td data-value={recovered}>{recovered}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {/* `gridlines` names an axis rather than being a boolean, which the
+                generated types caught: `value` draws the lines the bars are read
+                against and leaves the category axis alone. */}
+            <helix-bar-chart
+              for="arrivals"
+              gridlines="value"
+              label="On-time arrivals by month"
+            ></helix-bar-chart>
+          </helix-flex>
+        </helix-card>
+      </section>
+
       <section className="themedSplit">
         <helix-card>
           <helix-flex direction="column" gap="md">
@@ -199,9 +254,20 @@ export function ThemedPage() {
               <helix-text appearance="subheading" as="h2">
                 Today
               </helix-text>
-              <helix-tag appearance="subtle" tone="neutral">
-                Updated 14:02
-              </helix-tag>
+              {/* **A menu, which is where motion is most visible.** It is the
+                  one thing on this page that opens, and a character change moves
+                  every transition in the library: a reader needs something that
+                  actually transitions to judge it by. Anchored and in the top
+                  layer, so it opens over the page the way a real one does rather
+                  than pushing the card around. */}
+              <helix-menu label="Table actions" placement="bottom-end">
+                <helix-icon-button label="Table actions" slot="trigger">
+                  <helix-icon name="dots-three"></helix-icon>
+                </helix-icon-button>
+                <helix-menu-item>Export today</helix-menu-item>
+                <helix-menu-item>Subscribe to changes</helix-menu-item>
+                <helix-menu-item>Open in the planner</helix-menu-item>
+              </helix-menu>
             </helix-flex>
             <helix-table label="Shipments today">
               <helix-table-column slot="columns">Lane</helix-table-column>

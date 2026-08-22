@@ -79,7 +79,6 @@ const PLANNED = new Map([
   ['accent-hue', "#141: same, and the relationship is the stylesheet's to apply"],
   ['neutral-chroma', '#141: the engine takes the cast and derives from it directly'],
   ['neutral-hue', '#141: same'],
-  ['chroma-scale', '#141: the CSS series ramp reads it, the engine applies it before emitting'],
 ])
 
 const read = (path) => readFileSync(join(ROOT, path), 'utf8')
