@@ -98,11 +98,12 @@ still reports collapsed.
 **Setting a custom property is not styling, so the tier rule does not bar it.**
 A base component knows things CSS cannot compute (where a thumb sits, how deep
 a row is nested, a video's intrinsic ratio) and writing one into a
-`style="--_thing: 0.42"` hands it to whoever is drawing without reaching for a
-single token. Ten families already do it: `--_slider-fraction`,
-`--_splitter-position`, `--_tree-level`, `--_progress-fraction`,
-`--_meter-sweep`, `--_calendar-columns`, `--_hue`, `--_video-ratio`,
-`--_megamenu-top`.
+`style="--thing: 0.42"` hands it to whoever is drawing without reaching for a
+single token. Forty-one properties do it, across sixteen families and the two
+controllers in `core`: `--slider-fraction`, `--splitter-position`,
+`--tree-level`, `--progress-fraction`, `--meter-sweep`, `--color-picker-hue`,
+`--video-intrinsic-ratio`, `--indicator-x`, `--floating-arrow-x` and their
+kind.
 
 **The line is a fact against a decision.** A fraction, a position, an index, a
 level, a measured ratio, a count: the component computed it and nothing else
@@ -110,30 +111,40 @@ can. A colour, a spacing, a duration, an easing: those are the styled tier's,
 and a base component reaching for `--helix-*` to write one would be the
 dependency the tier split exists to prevent.
 
-**The underscore belongs on `web` and not on `headless`, and the test is
-whether the package contains a reader.** A styled sheet that writes
-`--_dialog-scrim` and reads it back three rules later has one: the value never
-leaves, and the underscore says so, the same way it does on `--_helix-*`
-primitives. Twenty-odd in `helix/web` are exactly that.
+**The underscore belongs where the package contains a reader.** A styled sheet
+that writes `--_dialog-scrim` and reads it back three rules later has one: the
+value never leaves, and the underscore says so, the same way it does on
+`--_helix-*` primitives. Twenty-odd in `helix/web` are exactly that.
 
-**A tier that ships no stylesheet cannot have one.** `headless` has no CSS by
-definition, so every one of its 31 properties is read by somebody outside the
-package, always. There is no private case to mark, and marking them private
-tells the one consumer who has to read them that they may not. It was applied to
-all 31 anyway, uniformly and undocumented, because the sigil was copied from the
-primitives layer where it means something else.
+**A package that ships no stylesheet cannot have one.** `headless` and `core`
+have no CSS by definition, so every property they write is read by somebody
+outside the package, always. There was no private case there to mark, and
+marking them told the one consumer who has to read them that they may not. All
+41 lost the sigil and gained an `@cssproperty`: 32 on the headless components
+that write them, 9 on the two controllers in `core`.
 
-**They are also not declared.** `@cssproperty` appears once in the whole
-headless package, so none of these reaches the manifest or a docs page: a
-consumer on that tier, who needs the slider's fraction precisely because they
-have no stylesheet from us, has no way to discover it and would have to
-recompute `(value - min) / (max - min)` by hand. That is the tier being less
-independently consumable than it claims.
+**`check:hooks` was what the underscore had been evading**, which is the part
+worth remembering. It pairs an `@cssproperty` with a rule that reads one, in
+both directions, and exempts `--_` names as a component talking to itself. Strip
+the sigil and every undeclared one fails immediately. The convention was not
+merely misleading, it was load-bearing.
 
-**Several were named for privacy and are unfit to be public**, which is why this
-is a naming pass rather than a sed: `--_hue`, `--_saturation`, `--_brightness`,
-`--_color` and `--_marker-at` all need the family in front of them before
-anybody outside the component reads them. #137.
+**It failed the other way too, and that finding outlived the rename.**
+`--floating-available-width` was written on every reposition of every floating
+panel and no rule has ever read it. A declared hook nothing reads is a promise
+on the API page with nothing behind it, so the write went rather than the check.
+
+**Name it for the family, not for the sigil.** Five had been named assuming
+privacy and could not simply be stripped: `--_hue` and `--_saturation` are
+`--color-picker-*` now, and `--_color` was written by two families meaning the
+same thing, so it split into `--color-input-swatch` and `--color-picker-swatch`.
+A public name cannot be shared.
+
+**Where the computed value and a consumer hook are a pair, keep both legible.**
+`var(--date-picker-columns, var(--_calendar-columns, 1))` was a request falling
+back to what the component chose, so the computed half is
+`--date-picker-column-count` rather than something that reads like a second
+opinion on the same setting.
 
 ### A component that renders another names the public tag and imports it
 
