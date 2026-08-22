@@ -1769,10 +1769,22 @@ helix-sandbox [slot="panel"]::part(panels) {
  * The content column keeps the clamp. That is the split: chrome sits at a fixed
  * inset because it runs the width of the window, and a column of prose gets air
  * beside it because it is a measure. */
+/* No rule above it, and the space is what separates it.
+ *
+ * The hairline was the second boundary in a row on the landing page, where the
+ * closing band's own ground already ends the page and the footer's line sat a
+ * few pixels under it. Removing the band's rule left this one doing the same
+ * job twice over.
+ *
+ * On every other route it was drawing an edge nobody asked for. A footer is a
+ * wordmark and two quiet lines after `space-xl` of air, at a weight and a size
+ * that already read as chrome rather than as content; a rule across the window
+ * announces it, which is the opposite of what the last thing on a page should
+ * do. What separates it is the space above it and the fact that nothing in it
+ * is the page. */
 .siteFooter {
   --site-inset: var(--helix-space-2xl);
 
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   padding-block: var(--helix-space-xl);
 }
 
