@@ -141,14 +141,19 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-toggle value="dark">Dark</helix-toggle>
         </helix-toggle-group>
 
+        {/* Base first, styled second, which is the order the tiers are in: styled
+            extends base, so reading left to right is reading outward. The
+            default is unchanged and is still styled, that being the tier almost
+            everyone consumes; where a control sits in a row and which of its
+            values is the resting one are different questions. */}
         <helix-toggle-group
           hint="Styled extends base, so it shows more."
           label="API reference"
           onhelix-change={(event) => chooseTier(event.detail.value as ApiTier)}
           value={tier}
         >
-          <helix-toggle value="styled">Styled</helix-toggle>
           <helix-toggle value="base">Base</helix-toggle>
+          <helix-toggle value="styled">Styled</helix-toggle>
         </helix-toggle-group>
       </helix-flex>
     </helix-drawer>

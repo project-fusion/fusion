@@ -880,13 +880,21 @@ helix-drawer {
   }
 }
 
-/* Air between one top-level section and the next.
+/* Anything the rail can send a reader to clears the masthead.
  *
- * They were `gap="2xl"` on the column, the same distance the API Reference puts
- * between two elements inside itself, so the page had one rhythm and no
- * hierarchy: Usage sat as far from Preview as Root sat from Group. A section
- * break should be the largest space on the page. */
-.docsMain > helix-flex > [id] {
+ * **A child combinator was the bug.** This read `.docsMain > helix-flex > [id]`
+ * and so reached the four top-level sections and not the API entries, which sit
+ * one level further in: measured on the Copy Button page, `usage`, `preview`,
+ * `api` and `examples` had 80px of margin and `helix-copy-button` and
+ * `helix-base-copy-button` had none. Click Root and the heading landed flush
+ * against the top of the window, behind a 57px sticky header, which is a
+ * destination a reader cannot see.
+ *
+ * Every section wrapper the outline targets is a `helix-flex` carrying an `id`,
+ * at whichever depth the page nests it, so that is what this asks for. Written
+ * as a descendant it cannot miss the next level somebody adds, which is the
+ * failure this had. */
+.docsMain helix-flex[id] {
   scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
