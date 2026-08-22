@@ -189,55 +189,44 @@ helix-megamenu {
   --megamenu-background: transparent;
 }
 
+/* **The sheet appears and leaves. Neither is a transition.**
+ *
+ * Three fading arrangements were built against the masthead's own fill and each
+ * has its own artifact, because two translucent layers cannot hand over by
+ * fading. One glass is 72% coverage: held together they composite to 92% and
+ * the bar goes visibly darker, crossed they dip to 59% and the page reads
+ * through, released early they fall to 45%. Every fade passes through a
+ * coverage that is not one glass.
+ *
+ * They are the same glass, so there is nothing to fade between.
+ *
+ * **`opacity` carries the switch: zero duration, and a delay that differs by
+ * direction.** Opening it flips at once, so the sheet is already painting on
+ * the frame the masthead stops. Closing, the flip waits one sheet-travel, so it
+ * holds at full until the panel has finished collapsing and the masthead has
+ * taken its fill back. Two rules rather than one, because a transition belongs
+ * to the state being moved *to* and these two states want different ones.
+ *
+ * **The closed clip covers the bar rather than nothing**, which is what makes
+ * the opening frame work: the sheet has to be over the masthead the instant it
+ * appears, not a fifth of the way into the reveal. From there the clip runs
+ * down with the panel, and that is the one thing here that is really animated.
+ *
+ * `visibility` stays discrete over the same travel, so an idle page is not
+ * running a full-screen blur behind something nobody can see. */
 .navGlass {
-  /* The same step the scrolled masthead takes, so the handover is invisible.
-     The bar blurs at `lg` and hands its painting to this sheet part way through
-     an open: at `md` the blur would visibly slacken at the moment it changed
-     hands, which is a tell that there are two things doing one job. */
   backdrop-filter: blur(var(--helix-material-blur-lg));
   background-color: var(--helix-material-translucent);
+  clip-path: inset(0 0 calc(100% - var(--helix-size-header)) 0);
   inset-block-start: 0;
   inset-inline: 0;
   opacity: 0;
   pointer-events: none;
   position: fixed;
-  /* `slow`, which is the panel's own duration and not the masthead's.
-     
-     The sheet had no transition at all: mounted and unmounted with the panel,
-     it appeared and vanished in a frame while the panel took 320ms to travel,
-     and the bar looked like it was answering a different event. The header's
-     `normal` would have been closer and still wrong, since what a reader is
-     watching is the panel. */
-  /* Collapsed to the top, the way the panel is, and not merely transparent.
-   *
-   * Fading alone left a faint dark rectangle standing where the panel used to
-   * be: the sheet keeps its full height throughout, so at the tail of the
-   * collapse the panel is a sliver and the glass is still a full-size pane at
-   * low opacity. Clipping it on the panel's own geometry means the two leave
-   * together and there is nothing behind to outlive the thing it was behind. */
-  clip-path: inset(0 0 100% 0);
-  /* **The opacity crosses the bar's, the clip follows the panel, and they are
-     not the same length on purpose.**
-
-     The fill used to fade over `slow` like everything else here, which put it
-     out of step with the thing it is taking over from: the masthead swaps its
-     own fill over `normal`, so at `slow` the sheet was still arriving long
-     after the bar had gone (a gap that showed the page through the bar) or,
-     held the other way, long enough for both to paint at once (two 72% fills
-     compositing to about 92%, a bar that goes dark and settles late).
-
-     Matched to `normal`, the two cross: the bar empties exactly as the sheet
-     fills, over one span, and the pair never sums to more or less than one
-     glass for long. The clip stays at `slow`, because that one is not a
-     handover at all. It is the sheet keeping pace with the panel's own travel,
-     and the panel takes `slow`. */
   transition:
     clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
-    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    opacity 0s var(--helix-duration-slow),
     visibility var(--helix-duration-slow) allow-discrete;
-  /* Hidden rather than only transparent, so an idle page is not running a
-     full-screen blur behind an invisible element. Discrete, so it flips at the
-     end of the fade rather than the start of it. */
   visibility: hidden;
   z-index: var(--helix-layer-raised);
 }
@@ -245,6 +234,10 @@ helix-megamenu {
 .navGlass[data-open] {
   clip-path: inset(0 0 0 0);
   opacity: 1;
+  transition:
+    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity 0s,
+    visibility var(--helix-duration-slow) allow-discrete;
   visibility: visible;
 }
 

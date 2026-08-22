@@ -84,7 +84,45 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
    * before it moves, which is the whole reason the bar can start changing on
    * the same frame the reveal starts. */
   const panelRef = useRef<HelixMegamenu>(null)
+  const glassRef = useRef<HTMLDivElement>(null)
   const [glassSize, setGlassSize] = useState(0)
+
+  /* Whether the sheet is the thing painting the masthead's strip.
+   *
+   * **The two swap, they do not fade into each other, and that is the fix.**
+   * Three fading arrangements were built and each has its own artifact, because
+   * two translucent layers cannot hand over by fading. One glass is 72%
+   * coverage: held together they composite to 92% and the bar goes visibly
+   * darker, crossed they dip to 59% and the page reads through, and released
+   * early they fall to 45%. Every fade passes through a coverage that is not
+   * one glass, and all three of those are visible.
+   *
+   * They are the same glass, so there is nothing to fade *between*. Switched,
+   * coverage goes 72% to 72% and there is no event to see.
+   *
+   * Up on the frame the panel opens, since the sheet is painting from that
+   * frame. Down one sheet-travel after the close begins, since the sheet holds
+   * at full until the panel has finished collapsing and only then flips off. */
+  const [sheetPaints, setSheetPaints] = useState(false)
+
+  useEffect(() => {
+    if (panelDown) {
+      setSheetPaints(true)
+      return
+    }
+    const glass = glassRef.current
+    if (!glass) {
+      setSheetPaints(false)
+      return
+    }
+    /* The sheet's own delay, read off it rather than written down twice, so the
+       two cannot drift and reduced motion resolves to zero and swaps at once. */
+    const style = getComputedStyle(glass)
+    const longest = (value: string) =>
+      Math.max(0, ...value.split(',').map((part) => Number.parseFloat(part) || 0))
+    const timer = setTimeout(() => setSheetPaints(false), longest(style.transitionDuration) * 1000)
+    return () => clearTimeout(timer)
+  }, [panelDown])
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
     const sync = () => setNarrow(query.matches)
@@ -157,6 +195,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
       <div
         className="navGlass"
         data-open={panelDown ? '' : undefined}
+        ref={glassRef}
         style={{ blockSize: `${glassSize}px` }}
       />
 
@@ -164,44 +203,31 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         appearance={onHero ? 'transparent' : undefined}
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
         sticky
-        /* Released the moment the collapse starts, and that is deliberate.
+        /* Follows the sheet exactly, and switches rather than fades.
          *
-         * Holding it until the sheet had gone was tried, to stop the bar
-         * carrying its own glass and the sheet's at once. It is worse, because
-         * the sheet is *fading* for the whole of that: hold the override and
-         * the bar's only fill drains away with it, leaving a see-through strip
-         * over live content, which is the thing a scrolled bar exists to
-         * prevent. A moment of doubled glass is the cheaper fault.
+         * **`transition: none` is half the fix and the easier half to miss.**
+         * Without it the bar still takes `normal` to empty, now over a sheet
+         * that arrived in one frame, which is the doubled glass again with
+         * extra steps. With it the bar stops painting on the frame the sheet
+         * starts and starts again on the frame the sheet stops, and since the
+         * two are the same glass a reader sees no event at all.
          *
-         * It is not even doubled for long. The header transitions
-         * `background-color` and `backdrop-filter` over `normal` while the
-         * sheet leaves over `slow`, so releasing here is a crossfade rather
-         * than a swap: the bar's own material comes up as the sheet goes down.
+         * Inline rather than in the stylesheet. It belongs to this exchange
+         * rather than to the element, and a document rule setting `transition`
+         * on a component that sets its own is exactly what `check:overruled`
+         * exists to catch.
          *
-         * At the top of a hero none of this is visible, because
-         * `appearance="transparent"` has no fill to take back and the override
-         * is a no-op. Scrolled, where the same attribute takes the material, is
-         * the only case with anything to see. */
-        /* **Swapped on the same frame the sheet starts arriving, because the
-         * two crossfade.**
-         *
-         * Three arrangements have been tried here and only one has no artifact.
-         * Releasing the bar first leaves a gap: the bar emptied over `normal`
-         * while the sheet filled over `slow`, so the faster of the two was the
-         * one leaving and for a moment neither painted, which showed the page
-         * through the masthead. Holding the bar until the sheet was full stacks
-         * them instead: two 72% fills composite to about 92%, so the bar went
-         * visibly darker for the length of its own fade and only settled when
-         * it finished.
-         *
-         * Neither is a timing bug. Overlap darkens and a gap shows through,
-         * and the only way to have neither is for the two to cross: one fading
-         * out exactly as the other fades in, over the same span. The sheet's
-         * opacity was moved to `normal` to match the bar, which is what makes
-         * this frame the right one to swap on. */
+         * At the top of a hero none of this shows, because
+         * `appearance="transparent"` has no fill to take back. Scrolled, where
+         * the same attribute takes the material, is the case with something to
+         * see. */
         style={
-          panelDown
-            ? { '--app-header-backdrop': 'none', '--app-header-background': 'transparent' }
+          sheetPaints
+            ? {
+                '--app-header-backdrop': 'none',
+                '--app-header-background': 'transparent',
+                transition: 'none',
+              }
             : undefined
         }
       >
