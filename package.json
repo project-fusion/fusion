@@ -55,6 +55,7 @@
     "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
     "rs:fmt": "cargo fmt --all",
     "rs:test": "cargo test --workspace",
+    "shot": "node tooling/scripts/shot.mjs",
     "specs": "bun tooling/scripts/build-specs.mjs",
     "specs:browser": "bun run specs && node tooling/scripts/run-browser-specs.mjs",
     "smoke": "node tooling/scripts/run-example-smoke.mjs",
