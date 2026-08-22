@@ -83,5 +83,5 @@ helix-base-toggle-group::part(indicator) {
   inset-block-start: 0;
   inset-inline-start: 0;
   position: absolute;
-  translate: var(--indicator-x, 0) calc(var(--indicator-height, 0px) - 2px);
+  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--indicator-height, 0px));
 }

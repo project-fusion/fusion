@@ -63,6 +63,13 @@ helix-base-icon::part(svg) {
   inline-size: 1em;
 }
 
+helix-base-progress::part(track) {
+  background-color: var(--_gray-fill);
+  block-size: 0.5rem;
+  display: block;
+  overflow: hidden;
+}
+
 helix-base-progress::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: 100%;

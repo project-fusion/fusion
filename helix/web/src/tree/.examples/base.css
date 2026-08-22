@@ -82,6 +82,14 @@ helix-base-tree-item::part(item):focus-visible {
   outline-offset: 2px;
 }
 
+/* The chevron is the toggle itself, not a glyph inside one. */
+helix-base-tree-item::part(toggle) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+  cursor: pointer;
+}
+
 helix-base-tree-item::part(row) {
   align-items: center;
   display: flex;

@@ -53,3 +53,9 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-qr-code::part(code) {
+  block-size: auto;
+  display: block;
+  inline-size: 100%;
+}

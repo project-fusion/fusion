@@ -62,3 +62,11 @@ helix-base-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+helix-base-meter::part(track) {
+  background-color: transparent;
+  block-size: auto;
+  fill: none;
+  stroke: var(--_gray-fill);
+  stroke-width: 8;
+}

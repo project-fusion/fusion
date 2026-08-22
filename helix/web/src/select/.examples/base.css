@@ -106,3 +106,9 @@ helix-base-select::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+helix-base-select::part(indicator) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
