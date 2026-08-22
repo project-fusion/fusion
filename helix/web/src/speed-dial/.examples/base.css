@@ -12,8 +12,9 @@
  * nothing written for it was ever visible. */
 
 helix-base-speed-dial::part(icon) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-speed-dial::part(trigger) {
@@ -35,8 +36,9 @@ helix-base-icon-button::part(button) {
 }
 
 helix-base-icon::part(svg) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-speed-dial-item::part(item) {
@@ -44,8 +46,9 @@ helix-base-speed-dial-item::part(item) {
 }
 
 helix-base-speed-dial-item::part(icon) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-speed-dial-item::part(label) {

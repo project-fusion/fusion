@@ -25,6 +25,12 @@ helix-base-number-input::part(control) {
   font: inherit;
 }
 
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */

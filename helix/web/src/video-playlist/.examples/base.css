@@ -18,8 +18,9 @@ helix-base-video-playlist::part(items) {
 }
 
 helix-base-video::part(icon) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-video::part(back) {
@@ -52,6 +53,31 @@ helix-base-video-playlist-item::part(item) {
 
 helix-base-video-playlist-item::part(label) {
   font-weight: 600;
+}
+
+helix-base-video-playlist-menu::part(icon) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-video-playlist-menu::part(menu) {
+  background-color: Canvas;
+  border: 1px solid;
+  color: CanvasText;
+  padding: 0.5rem;
+}
+
+helix-base-video-playlist-menu::part(trigger) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

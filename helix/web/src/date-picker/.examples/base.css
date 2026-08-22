@@ -34,3 +34,9 @@ helix-base-date-picker::part(cell) {
 helix-base-date-picker::part(day) {
   padding: 0.25rem 0.5rem;
 }
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}

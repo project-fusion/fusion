@@ -28,6 +28,7 @@ helix-base-timeline-item::part(rail) {
 }
 
 helix-base-icon::part(svg) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

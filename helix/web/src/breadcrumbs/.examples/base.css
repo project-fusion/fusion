@@ -16,3 +16,15 @@ helix-base-breadcrumbs::part(list) {
   display: flex;
   gap: 0.25rem;
 }
+
+helix-base-breadcrumb::part(separator) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}

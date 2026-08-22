@@ -24,6 +24,13 @@
 }
 
 helix-base-trend::part(icon) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

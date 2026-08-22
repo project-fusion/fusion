@@ -12,8 +12,15 @@
  * nothing written for it was ever visible. */
 
 helix-base-loader::part(svg) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-loader::part(mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-loader::part(track) {
@@ -24,7 +31,8 @@ helix-base-loader::part(track) {
   inline-size: 100%;
 }
 
-helix-base-loader::part(indicator) {
-  background-color: currentColor;
-  display: block;
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

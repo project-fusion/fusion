@@ -11,11 +11,6 @@
  * the input at `appearance: auto`, so the browser drew its own control and
  * nothing written for it was ever visible. */
 
-helix-base-badge::part(indicator) {
-  background-color: currentColor;
-  display: block;
-}
-
 helix-base-icon-button::part(button) {
   all: unset;
   box-sizing: border-box;
@@ -23,8 +18,9 @@ helix-base-icon-button::part(button) {
 }
 
 helix-base-icon::part(svg) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

@@ -11,7 +11,8 @@
  * the input at `appearance: auto`, so the browser drew its own control and
  * nothing written for it was ever visible. */
 
-helix-base-navigation::part(indicator) {
-  background-color: currentColor;
-  display: block;
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

@@ -18,12 +18,19 @@ helix-base-color-picker::part(controls) {
 }
 
 helix-base-color-picker::part(icon) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 helix-base-color-picker::part(actions) {
   align-items: center;
   display: flex;
   gap: 0.25rem;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

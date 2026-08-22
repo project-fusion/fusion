@@ -19,15 +19,16 @@ helix-base-progress::part(track) {
   inline-size: 100%;
 }
 
-helix-base-progress::part(indicator) {
-  background-color: currentColor;
-  display: block;
-}
-
 helix-base-progress::part(groove) {
   background-color: transparent;
   block-size: 0.5rem;
   border: 1px solid;
   display: block;
   inline-size: 100%;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }

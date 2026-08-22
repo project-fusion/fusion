@@ -15,11 +15,6 @@ helix-base-app-header::part(row) {
   padding: 0.25rem 0.5rem;
 }
 
-helix-base-navigation::part(indicator) {
-  background-color: currentColor;
-  display: block;
-}
-
 helix-base-icon-button::part(button) {
   all: unset;
   box-sizing: border-box;
@@ -27,8 +22,9 @@ helix-base-icon-button::part(button) {
 }
 
 helix-base-icon::part(svg) {
-  block-size: 0.75rem;
-  inline-size: 0.75rem;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

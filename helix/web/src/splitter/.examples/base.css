@@ -10,3 +10,15 @@
  * wrong rule is worse than none: the first checkbox sheet painted a box and left
  * the input at `appearance: auto`, so the browser drew its own control and
  * nothing written for it was ever visible. */
+
+helix-base-splitter::part(separator) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}

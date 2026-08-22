@@ -38,3 +38,15 @@ helix-base-bar-chart::part(tooltip) {
   color: CanvasText;
   padding: 0.5rem;
 }
+
+helix-base-bar-chart::part(mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}

@@ -11,11 +11,6 @@
  * the input at `appearance: auto`, so the browser drew its own control and
  * nothing written for it was ever visible. */
 
-helix-base-tabs::part(indicator) {
-  background-color: currentColor;
-  display: block;
-}
-
 helix-base-tabs-tab::part(tab) {
   padding: 0.25rem 0.5rem;
 }
@@ -25,6 +20,12 @@ helix-base-tabs-panel::part(panel) {
   border: 1px solid;
   color: CanvasText;
   padding: 0.5rem;
+}
+
+helix-base-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
