@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion-io/testing/dom'
+import { hasLayout, mount, part, registerDom, role } from '@fusion-io/testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -249,8 +249,21 @@ describe('carousel settling', () => {
     </helix-carousel>`)) as Carousel & { goTo(index: number): void }
     await host.updateComplete
     const track = part(host, 'track') as HTMLElement
+    /* Offsets past the track's own bleed, so a stated position is one the
+       scroller could really settle on.
+
+       The component reads a slide's edge as its offset less the track's leading
+       padding, because that padding is where a slide's shadow and focus ring
+       draw and `scrollLeft` does not count it. Stating the offsets as though
+       there were none put every edge 16px from the position this then settles
+       at, and a settle that is not exactly on an edge makes the component scroll
+       to correct it, stake `settling`, and swallow the next `scrollend`: the
+       drag after a drag stopped moving the index. Zero on happy-dom, which
+       computes no padding, so the numbers there are the ones they always
+       were. */
+    const bleed = Number.parseFloat(getComputedStyle(track).paddingLeft) || 0
     for (const [at, slide] of [...host.children].entries()) {
-      Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: at * 100 })
+      Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: at * 100 + bleed })
     }
     Object.defineProperty(track, 'offsetLeft', { configurable: true, value: 0 })
     /* And `scrollLeft`, which is the one that has to be stated in a browser.
@@ -407,3 +420,62 @@ describe('carousel across several slides at once', () => {
     expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
   })
 })
+
+/* The room the scroller keeps for whatever a slide draws outside itself, which
+   is the stylesheet's and so is tested here.
+
+   Browser only, and not for speed. happy-dom resolves nothing out of an adopted
+   stylesheet and reports `''` for every side of the track's padding, so the
+   number under test does not exist on that harness and neither does the
+   scrolling it has to survive. */
+if (hasLayout()) {
+  describe('the bleed the scroller keeps for a slide’s own edge', () => {
+    const wide = async (): Promise<HTMLElement> => {
+      const host = (await mount(`<helix-carousel label="Shots" per-view="2">
+        <div style="inline-size: 12rem">One</div>
+        <div style="inline-size: 12rem">Two</div>
+        <div style="inline-size: 12rem">Three</div>
+        <div style="inline-size: 12rem">Four</div>
+      </helix-carousel>`)) as HTMLElement & { updateComplete: Promise<unknown> }
+      await host.updateComplete
+      return host
+    }
+
+    const bleedOf = (track: HTMLElement): number =>
+      Number.parseFloat(getComputedStyle(track).paddingLeft)
+
+    test('the leading slide is inset by it at rest, not shaved by the clip edge', async () => {
+      /* The fault this is here for. A snap position aligns a slide to the
+         snapport, and with no `scroll-padding` that is the padding box, so the
+         leading slide snapped its own edge onto the edge the scroller clips at:
+         the track rested at `scrollLeft: 4` against a 4px bleed and the first
+         card was shaved with nobody having scrolled anything. */
+      const host = await wide()
+      const track = part(host, 'track') as HTMLElement
+      const bleed = bleedOf(track)
+      expect(bleed).toBeGreaterThan(0)
+      expect(track.scrollLeft).toBe(0)
+      const room =
+        host.children[0].getBoundingClientRect().left - track.getBoundingClientRect().left
+      expect(Math.round(room)).toBe(Math.round(bleed))
+    })
+
+    test('and the trailing slide keeps it with the track run to its end', async () => {
+      const host = await wide()
+      const track = part(host, 'track') as HTMLElement
+      track.scrollTo({ behavior: 'instant', left: track.scrollWidth })
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+      const last = host.children[host.children.length - 1].getBoundingClientRect()
+      const room = track.getBoundingClientRect().right - last.right
+      expect(Math.round(room)).toBe(Math.round(bleedOf(track)))
+    })
+
+    test('the bleed clears the shadow a slide is likely to carry', async () => {
+      // `--helix-shadow-md` is `0 4px 12px`, so it reaches 16px below the box
+      // it is on, which is the number the default is cut to.
+      const host = await wide()
+      const track = part(host, 'track') as HTMLElement
+      expect(bleedOf(track)).toBeGreaterThanOrEqual(16)
+    })
+  })
+}

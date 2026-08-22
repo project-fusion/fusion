@@ -7386,7 +7386,7 @@
               "name": "--carousel-block-size"
             },
             {
-              "description": "Room inside the scroller so a slide's own border or focus ring is not clipped by it.",
+              "description": "Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more.",
               "name": "--carousel-bleed"
             },
             {
@@ -7675,6 +7675,64 @@
               "type": {
                 "text": "goTo(index: number) => void"
               },
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "bleed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "track",
+                  "type": {
+                    "text": "HTMLElement"
+                  }
+                }
+              ],
+              "description": "The leading padding the track keeps for a slide to draw its own edge in.\n\nA styled track carries one so a slide's shadow and focus ring have\nsomewhere to go: a scroll container clips at its padding box, and a slide\nflush against that edge loses whatever it paints outside itself. The\nheadless tier has no stylesheet and so no padding, and this reads zero\nthere, which is why both tiers can share the arithmetic below.\n\nPhysical sides rather than logical, to match the physical `offsetLeft` and\n`offsetTop` it is subtracted from. The bleed is one length on all four\nsides, so the two agree whatever the writing mode; if that stops being\ntrue, this is the method that has to know.",
+              "inheritedFrom": {
+                "name": "HelixBaseCarousel",
+                "module": "src/carousel/root/carousel-root.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "edgeOf",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "slide",
+                  "type": {
+                    "text": "HTMLElement"
+                  }
+                },
+                {
+                  "name": "track",
+                  "type": {
+                    "text": "HTMLElement"
+                  }
+                },
+                {
+                  "name": "bleed",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Where a slide's leading edge sits, in the scroller's own coordinates.\n\n**Both directions go through here, because they have to agree.** The\noffsets are measured to the track's *border* box and `scrollTop` and\n`scrollLeft` are measured from its content box, so the two differ by the\nbleed: sending the carousel to a slide and reading back which slide it is\non used the same expression, and correcting one of them alone put a drag\none position off what the arrows did.\n\nUnsubtracted, the leading slide's own offset *is* the bleed, so scrolling\nto index 0 put its edge back on the clip edge. Measured on the insights\ncarousel: `scrollLeft` resting at 4 against a 4px bleed, the first card\nshaved, and no scrolling done to cause it.",
               "inheritedFrom": {
                 "name": "HelixBaseCarousel",
                 "module": "src/carousel/root/carousel-root.ts"
@@ -61560,6 +61618,10 @@
             {
               "description": "Fill behind the tag.",
               "name": "--tag-background-color"
+            },
+            {
+              "description": "Color of the edge, for a chip that separates by fill alone.",
+              "name": "--tag-border-color"
             },
             {
               "description": "Label color.",

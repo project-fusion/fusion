@@ -246,6 +246,57 @@ export class HelixBaseCarousel extends HelixElement {
     })
   }
 
+  /**
+   * The leading padding the track keeps for a slide to draw its own edge in.
+   *
+   * A styled track carries one so a slide's shadow and focus ring have
+   * somewhere to go: a scroll container clips at its padding box, and a slide
+   * flush against that edge loses whatever it paints outside itself. The
+   * headless tier has no stylesheet and so no padding, and this reads zero
+   * there, which is why both tiers can share the arithmetic below.
+   *
+   * Physical sides rather than logical, to match the physical `offsetLeft` and
+   * `offsetTop` it is subtracted from. The bleed is one length on all four
+   * sides, so the two agree whatever the writing mode; if that stops being
+   * true, this is the method that has to know.
+   */
+  private bleed(track: HTMLElement): number {
+    const style = getComputedStyle(track)
+    const read = Number.parseFloat(
+      this.orientation === 'vertical' ? style.paddingTop : style.paddingLeft,
+    )
+    /* Zero where there is no number to read, which is a harness rather than a
+       browser. happy-dom resolves nothing out of an adopted stylesheet and
+       returns `''` for every side of this, so `parseFloat` gives `NaN`, and a
+       `NaN` distance loses every comparison it is in: the nearest-slide search
+       below picked nothing and a reader's drag stopped moving the index at all.
+       Three specs caught it. A browser always answers with a used length, so
+       this arm is only ever the harness, and zero is the right answer there,
+       nothing being laid out or clipped in the first place. */
+    return Number.isNaN(read) ? 0 : read
+  }
+
+  /**
+   * Where a slide's leading edge sits, in the scroller's own coordinates.
+   *
+   * **Both directions go through here, because they have to agree.** The
+   * offsets are measured to the track's *border* box and `scrollTop` and
+   * `scrollLeft` are measured from its content box, so the two differ by the
+   * bleed: sending the carousel to a slide and reading back which slide it is
+   * on used the same expression, and correcting one of them alone put a drag
+   * one position off what the arrows did.
+   *
+   * Unsubtracted, the leading slide's own offset *is* the bleed, so scrolling
+   * to index 0 put its edge back on the clip edge. Measured on the insights
+   * carousel: `scrollLeft` resting at 4 against a 4px bleed, the first card
+   * shaved, and no scrolling done to cause it.
+   */
+  private edgeOf(slide: HTMLElement, track: HTMLElement, bleed: number): number {
+    return this.orientation === 'vertical'
+      ? slide.offsetTop - track.offsetTop - bleed
+      : slide.offsetLeft - track.offsetLeft - bleed
+  }
+
   private scrollToIndex(): void {
     const slide = this.slides[this.index]
     const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
@@ -259,9 +310,7 @@ export class HelixBaseCarousel extends HelixElement {
      * names `smooth` outright and overrides the property either way. A reader
      * who asked not to be moved was moved. */
     const vertical = this.orientation === 'vertical'
-    const target = vertical
-      ? slide.offsetTop - track.offsetTop
-      : slide.offsetLeft - track.offsetLeft
+    const target = this.edgeOf(slide, track, this.bleed(track))
 
     /* Already there, and saying so rather than asking anyway.
      *
@@ -381,12 +430,11 @@ export class HelixBaseCarousel extends HelixElement {
        could not get back to: dragged fully right, a four-across six reported
        the sixth slide and the dots jumped to an indicator that no longer
        existed. */
+    const bleed = this.bleed(track)
+    const at = this.orientation === 'vertical' ? track.scrollTop : track.scrollLeft
     const nearest = this.slides.slice(0, this.positions).reduce(
       (best, slide, index) => {
-        const distance =
-          this.orientation === 'vertical'
-            ? Math.abs(slide.offsetTop - track.offsetTop - track.scrollTop)
-            : Math.abs(slide.offsetLeft - track.offsetLeft - track.scrollLeft)
+        const distance = Math.abs(this.edgeOf(slide, track, bleed) - at)
         return distance < best.distance ? { distance, index } : best
       },
       { distance: Number.POSITIVE_INFINITY, index: this.index },

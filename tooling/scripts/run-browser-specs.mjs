@@ -15,7 +15,16 @@ import { readdir, readFile } from 'node:fs/promises'
  * Chromium and collects the results. No second suite, no rewriting: a spec
  * deleted from the source stops being reported here the same day.
  *
- * Run with `bun run specs:browser`, after `bun run specs`.
+ * Run with `bun run specs:browser`, after `bun run specs`. A family name limits
+ * it to that one: `bun run specs:browser carousel`.
+ *
+ * **The whole suite is eighty-eight families and twenty minutes**, which is
+ * fine for CI and is not a thing anybody runs while fixing one component. The
+ * absence of a filter is why a throwaway copy of this script got written during
+ * a carousel fix, and that copy left out the stylesheet below and reported
+ * three failures that were all the missing tokens: the same mistake this
+ * script's first run made, made again, because the fix lived in a comment here
+ * rather than in something reusable.
  *
  * Playwright rather than Puppeteer, for one reason worth naming: its GitHub
  * action installs the browser and its system libraries in one step, and a
@@ -69,12 +78,18 @@ const origin = `http://127.0.0.1:${server.address().port}`
 /* Only the family entry points. `Bun.build` with splitting also emits shared
    chunks, which are named with a hash and are imports rather than entries:
    loading one directly runs nothing and reports nothing. */
+const only = process.argv[2]
 const families = (await readdir(specs))
   .filter((file) => file.endsWith('.js') && !/-[a-z0-9]{8}\.js$/.test(file))
+  .filter((file) => only === undefined || file === `${only}.js`)
   .sort()
 
 if (families.length === 0) {
-  console.error('browser specs: no bundles. Run `bun run specs` first.')
+  console.error(
+    only === undefined
+      ? 'browser specs: no bundles. Run `bun run specs` first.'
+      : `browser specs: no bundle for \`${only}\`. Run \`bun run specs\` first, and check the name.`,
+  )
   process.exit(1)
 }
 

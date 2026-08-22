@@ -15166,7 +15166,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--carousel-block-size`: Height of a vertical track. (default: `undefined`)
-   * - `--carousel-bleed`: Room inside the scroller so a slide's own border or focus ring is not clipped by it. (default: `undefined`)
+   * - `--carousel-bleed`: Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. (default: `undefined`)
    * - `--carousel-gap`: Space between slides. (default: `undefined`)
    *
    * ## CSS Parts
@@ -22866,6 +22866,7 @@ export type CustomElements = {
    * CSS variables available for styling the component.
    *
    * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-border-color`: Color of the edge, for a chip that separates by fill alone. (default: `undefined`)
    * - `--tag-foreground-color`: Label color. (default: `undefined`)
    * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
    *
@@ -26358,7 +26359,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--carousel-block-size`: Height of a vertical track. (default: `undefined`)
-   * - `--carousel-bleed`: Room inside the scroller so a slide's own border or focus ring is not clipped by it. (default: `undefined`)
+   * - `--carousel-bleed`: Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. (default: `undefined`)
    * - `--carousel-gap`: Space between slides. (default: `undefined`)
    *
    * ## CSS Parts
@@ -34301,6 +34302,7 @@ export type CustomElementsSolidJs = {
    * CSS variables available for styling the component.
    *
    * - `--tag-background-color`: Fill behind the tag. (default: `undefined`)
+   * - `--tag-border-color`: Color of the edge, for a chip that separates by fill alone. (default: `undefined`)
    * - `--tag-foreground-color`: Label color. (default: `undefined`)
    * - `--tag-radii`: Corner radius of the tag. (default: `undefined`)
    *
@@ -36575,7 +36577,7 @@ export type CustomCssProperties = {
   "--card-shadow"?: string;
   /** Height of a vertical track. */
   "--carousel-block-size"?: string;
-  /** Room inside the scroller so a slide's own border or focus ring is not clipped by it. */
+  /** Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. */
   "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
@@ -37085,6 +37087,8 @@ export type CustomCssProperties = {
   "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
+  /** Color of the edge, for a chip that separates by fill alone. */
+  "--tag-border-color"?: string;
   /** Label color. */
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */

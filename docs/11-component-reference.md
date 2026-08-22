@@ -887,7 +887,7 @@ which is what a run of cards wants rather than a run of full-width panels.
 | Property | Description |
 | --- | --- |
 | `--carousel-block-size` | Height of a vertical track. |
-| `--carousel-bleed` | Room inside the scroller so a slide's own border or focus ring is not clipped by it. |
+| `--carousel-bleed` | Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. |
 | `--carousel-gap` | Space between slides. |
 
 ## Checkbox

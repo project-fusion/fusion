@@ -7270,7 +7270,7 @@ export type CustomCssProperties = {
   "--card-shadow"?: string;
   /** Height of a vertical track. */
   "--carousel-block-size"?: string;
-  /** Room inside the scroller so a slide's own border or focus ring is not clipped by it. */
+  /** Room inside the scroller so a slide's own shadow, border or focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more. */
   "--carousel-bleed"?: string;
   /** Space between slides. */
   "--carousel-gap"?: string;
@@ -7780,6 +7780,8 @@ export type CustomCssProperties = {
   "--table-template"?: string;
   /** Fill behind the tag. */
   "--tag-background-color"?: string;
+  /** Color of the edge, for a chip that separates by fill alone. */
+  "--tag-border-color"?: string;
   /** Label color. */
   "--tag-foreground-color"?: string;
   /** Corner radius of the tag. */

@@ -1,6 +1,7 @@
 :host {
   display: block;
 
+  --_carousel-bleed: var(--carousel-bleed, var(--helix-space-md));
   --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
   --_carousel-per-view: 1;
 }
@@ -231,7 +232,7 @@
    own momentum all work without any of them being reimplemented. The scrollbar
    is hidden because the controls are the affordance, and the track still
    scrolls by every other means. */
-/* **A hair of padding, so a slide's own edge is not shaved by the scroller.**
+/* **Room inside the scroller, so a slide's own edge is not shaved by it.**
  *
  * `overflow-x: auto` makes the other axis `auto` too, and a scroll container
  * clips at its padding box on both. A slide flush against that edge loses
@@ -239,16 +240,30 @@
  * and a focus ring on any of them came out a pixel short down one side, which
  * reads as a rendering fault rather than as a clip.
  *
+ * **Sized to clear a shadow rather than a hairline**, which is what it was and
+ * what was not enough. `--helix-shadow-md` is `0 4px 12px`, so it reaches 16px
+ * below the box it is on, and the 4px this held clipped every slide that
+ * carried one on all four sides at once. `--helix-space-md` is that 16px
+ * exactly. A slide on `--helix-shadow-lg` reaches 44px and wants
+ * `--carousel-bleed` raised, which is what the hook is for.
+ *
+ * **`scroll-padding` as well, or snapping takes the room straight back.** A
+ * snap position aligns a slide to the *snapport*, which is the scrollport inset
+ * by `scroll-padding` and, with none set, is the padding box: the leading slide
+ * snapped its own edge onto the clip edge and the first and last slides were
+ * shaved at rest no matter how much padding was here. Measured on the insights
+ * carousel, the track sat at `scrollLeft: 4` with 0px of leading room, which is
+ * the whole bleed scrolled away.
+ *
  * Padding rather than a margin on the slides, because `flex-basis` is a
  * percentage of the *content* box: the track gives the step away and the slides
- * divide what is left, so the per-view arithmetic is untouched. The smallest
- * step on the scale rather than the pixel or two this needs, because a raw
- * length here is the one thing `check:tokens` is for. */
+ * divide what is left, so the per-view arithmetic is untouched. */
 [part="track"] {
   display: flex;
   gap: var(--_carousel-gap);
   overflow-x: auto;
-  padding: var(--carousel-bleed, var(--helix-space-2xs));
+  padding: var(--_carousel-bleed);
+  scroll-padding: var(--_carousel-bleed);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
