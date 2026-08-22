@@ -12,7 +12,7 @@ import { styles } from './list-item.css.js'
  * hold their own width and the middle takes the rest.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *

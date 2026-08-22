@@ -13,7 +13,7 @@ import { styles } from './icon-root.css.js'
  * proportion as the button's own size changes.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Glyph, Symbol
  * @documentation https://helix.fusion.dev/components/icon

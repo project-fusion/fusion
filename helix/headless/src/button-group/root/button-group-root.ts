@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
  * elements and keep whatever appearance and size they were given.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Segmented buttons, Split button
  * @documentation https://helix.fusion.dev/components/button-group

@@ -17,7 +17,7 @@ import { styles } from './button-group-root.css.js'
  * therefore serves a consumer's own anchor styled as a button.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Segmented buttons, Split button
  * @documentation https://helix.fusion.dev/components/button-group

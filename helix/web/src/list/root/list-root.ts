@@ -14,7 +14,7 @@ import { styles } from './list-root.css.js'
  * decoration doing what emptiness already does.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Rows, Stack, Menu
  * @documentation https://helix.fusion.dev/components/list

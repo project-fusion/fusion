@@ -31,7 +31,7 @@ import { property } from 'lit/decorators.js'
  * row with `href` unset behaves exactly as it always did.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Row, Entry
  * @documentation https://helix.fusion.dev/components/list
  *

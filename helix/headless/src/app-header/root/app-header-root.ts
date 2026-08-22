@@ -30,7 +30,7 @@ import { property } from 'lit/decorators.js'
  * the host carries the material and `content` carries the measure.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://helix.fusion.dev/components/app-header

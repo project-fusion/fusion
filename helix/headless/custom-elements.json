@@ -1054,7 +1054,7 @@
           "helix": {
             "category": "navigation",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/app-header",
             "aliases": [
               "Masthead",
@@ -3232,7 +3232,7 @@
           "helix": {
             "category": "actions",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/button-group",
             "aliases": [
               "Segmented buttons",
@@ -18415,7 +18415,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/icon",
             "aliases": [
               "Glyph",
@@ -21833,7 +21833,7 @@
           "summary": "One row of a list.",
           "helix": {
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/list",
             "aliases": [
               "Row",
@@ -22000,7 +22000,7 @@
           "helix": {
             "category": "content",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/list",
             "aliases": [
               "Rows",
@@ -23596,7 +23596,7 @@
           "helix": {
             "category": "feedback",
             "since": "0.1.0",
-            "status": "experimental",
+            "status": "stable",
             "documentation": "https://helix.fusion.dev/components/loader",
             "aliases": [
               "Spinner",

@@ -32,7 +32,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * inside a button with no text.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Glyph, Symbol
  * @documentation https://helix.fusion.dev/components/icon

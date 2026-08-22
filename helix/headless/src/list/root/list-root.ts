@@ -11,7 +11,7 @@ import { property } from 'lit/decorators.js'
  * use a list rather than a stack of divs.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category content
  * @aliases Rows, Stack, Menu
  * @documentation https://helix.fusion.dev/components/list

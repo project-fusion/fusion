@@ -20,7 +20,7 @@ import { styles } from './app-header-root.css.js'
  * no shadow: the rule is the whole of it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://helix.fusion.dev/components/app-header
