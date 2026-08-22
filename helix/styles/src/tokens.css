@@ -836,15 +836,39 @@
   --helix-shadow-floating: var(--helix-shadow-lg);
 
   /* ======================================================== material ==== */
-  /* Translucency and blur, for surfaces that sit above content and should
-     acknowledge what is behind them: headers, popovers, sheets, command
-     palettes. Never for flat page content, where it reads as decoration. */
+  /* Translucency and blur: how much of what is behind a thing shows through it.
+   *
+   * **This said "never for flat page content, where it reads as decoration",
+   * and it was too narrow.** Two things made it so. Material became a theme
+   * policy rather than a per-component decision, and once a language says it is
+   * translucent, flat content following it is what makes it a language instead
+   * of a quirk of two headers. And the library was already doing it: a line
+   * chart's area is `opacity: 0.16` and a bar chart fades its inactive groups
+   * to 0.45, both hardcoded, both exactly this idea, neither reading a token.
+   *
+   * So the rule is not where it may be used but what it may be used for: a
+   * translucency that lets a reader see something they need, a gridline under a
+   * wash or a page under a header, is the material. A translucency that exists
+   * to look expensive is the decoration, and no token will tell the two apart.
+   *
+   * **What it costs is the guarantee, and that is the real constraint.**
+   * Contrast is measured against a known ground and a translucent one is not
+   * known, so anything reading these ends up `unverifiable` in the audit rather
+   * than passing. That is a reason to use it where seeing through matters and
+   * not everywhere. */
   /* The material half of the same policy: how much a surface above content
      admits what is behind it. `app-header` is translucent chrome by design and
      follows this; `megamenu` keeps its own `none`, because a band that sits on
      the page rather than over it is a per-instance choice and turning glass on
      for every one of them would be a visual change nobody asked for. */
   --helix-material-backdrop: blur(var(--helix-material-blur-md));
+  /* **The scalar the policy moves, where the others are values it sets.** A
+     line chart's area wash, a bar chart's faded group and a header's backdrop
+     are the same decision at three scales, and each of them held its own number
+     until this existed. Multiplied rather than replaced, so a component keeps
+     the strength it was drawn at and the theme moves all of them together: 1 is
+     what ships, below 1 is more see-through, above 1 more solid. */
+  --helix-material-opacity: 1;
   --helix-material-blur-sm: 8px;
   --helix-material-blur-md: 16px;
   --helix-material-blur-lg: 32px;

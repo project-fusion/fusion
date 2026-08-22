@@ -52,7 +52,11 @@
  * and gradients stacked over one another read as a third colour wherever they
  * cross rather than as two series that overlap. */
 [part="area"] {
-  opacity: var(--line-chart-area-opacity, 0.16);
+  /* The wash follows the theme's material policy rather than holding its own
+     number. 0.16 is the strength this chart was drawn at and the multiplier is
+     the language it is drawn in, so a glass theme thickens every wash on the
+     page together and an opaque one thins them. */
+  opacity: calc(var(--line-chart-area-opacity, 0.16) * var(--helix-material-opacity));
   stroke: none;
 }
 

@@ -1044,6 +1044,13 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
       `  --${namespace}-material-translucent: color-mix(in oklab, ` +
         `var(--${namespace}-color-surface) ${Math.round(opacity * 100)}%, transparent);`,
     )
+    /* **The scalar as well as the colour**, because the two halves of material
+       reach different things. The colour is what a translucent *surface* is
+       filled with; the scalar is what every wash drawn at its own strength gets
+       multiplied by, which is how a chart's area and a faded group follow the
+       same policy as a glass header. Emitting one and not the other left the
+       flat half of the language behind. */
+    lines.push(`  --${namespace}-material-opacity: ${Number(opacity.toFixed(3))};`)
   }
 
   return `${selector} {\n${lines.join('\n')}\n}\n`

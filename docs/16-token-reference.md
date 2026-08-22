@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-173 semantic tokens in 15 categories, every one in exactly
+174 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -215,6 +215,7 @@ Blur and translucency, for a surface that lets the page through.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 4 |
+| `--helix-material-opacity` | `1` | 2 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 3 |
 | `--helix-material-blur-lg` | `32px` | 2 |
