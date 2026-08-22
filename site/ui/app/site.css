@@ -1183,21 +1183,42 @@ helix-code-block .tok-operator {
  * would hide from a screen reader a link that is genuinely there. */
 .docsNavUp {
   align-items: center;
+  block-size: 1.5rem;
+  border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  opacity: 0;
-  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  inline-size: 1.5rem;
+  justify-content: center;
+  /* **Present at rest, and it was not.** Revealed only on hover it was reported
+     as simply absent, which is the same fault as a shortcut nobody is told
+     about: the reader has to already know it is there to find out it is there.
+     One quiet 24 square mark on one row is not clutter, and hover now raises
+     the emphasis rather than creating the control. */
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+
+  /* Off the chevron, which sits 4px away and is the same size and the same
+     grey. Reported as not being there at all: two 16px marks that close
+     together read as one smudge rather than as a control beside a control. */
+  margin-inline-end: var(--helix-space-xs);
 
   --icon-size: var(--helix-size-icon-sm);
 }
 
 helix-tree-item:hover > .docsNavUp,
 helix-tree-item:focus-within > .docsNavUp {
-  opacity: 1;
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground);
 }
 
-.docsNavUp:hover {
-  color: var(--helix-color-foreground);
+/* Its own hover is a step above the row's, so a pointer on the target says so
+   and the press has somewhere to land: 24 square rather than the 16 the glyph
+   occupies, which is under any reasonable target size. */
+.docsNavUp:hover,
+.docsNavUp:focus-visible {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-primary);
 }
 
 /* Named one selector at a time, for the reason `check:motion` exists: a reduce
