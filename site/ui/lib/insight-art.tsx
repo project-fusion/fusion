@@ -1,42 +1,75 @@
-import type { HelixAura } from '@helix-io/web'
 import type { Topic } from './insights'
 
 /**
- * A field of light for each topic, drawn by the same component as the hero.
+ * A still field for each topic, painted rather than run.
  *
- * **`Aura` rather than a drawing, which is the whole point.** The schematic this
- * replaced was five compositions in the gallery's vocabulary, and it read as
- * documentation: correct, legible, and the wrong register for writing. What the
- * hero does is atmosphere, and a card that opens onto the same light belongs to
- * the same publication.
+ * **An image, not a shader.** `Aura` was here and drew the right thing at the
+ * wrong cost: six live WebGL contexts on `/insights` and seven on the landing
+ * page, against a browser ceiling in the mid teens, so the gallery could not
+ * grow and every card carried a running program to be atmosphere behind a
+ * title. This is the same light, resolved once, as gradients the compositor
+ * already knows how to paint.
  *
- * **Per topic, and the shape is the only thing that varies.** Eleven are
- * available and five are used, one per topic, so two Engineering pieces are the
- * same field rather than two arbitrary ones. The rest of the knobs are held
- * still on purpose: a card is a thumbnail, and a field tuned per post is five
- * decisions nobody can defend later.
+ * **Per topic, and it is the same argument as before.** A field for every post
+ * is a field somebody makes before publishing, so the fifth post is illustrated
+ * and the fiftieth is not. Five cover every post there will be.
  *
- * **Slow and quiet, because this sits behind a title rather than under a
- * masthead.** `speed` is a third of the hero's and `gain` is under half, so the
- * card reads as a lit surface rather than as something competing with the words
- * on it. `Aura` stops on its own when it is off screen or the tab is in the
- * background, and answers `prefers-reduced-motion` with a single still frame,
- * so a page of these is not a page of running shaders.
+ * **Three lobes and a wash, which is what a still of the hero looks like.** The
+ * lobes are large, soft and off-centre, because an evenly lit rectangle reads as
+ * a swatch: light has to come from somewhere. Their positions are what differ
+ * per topic, so the five are recognisably the same instrument at different
+ * settings rather than five pictures.
+ *
+ * The seed colour is the series ramp, which follows a themed brand, and the
+ * ground underneath is `surface-sunken`, so a card that has not painted yet
+ * shows the recess it will fill rather than a white hole.
  */
-const FIELD: Record<
-  Topic,
-  { gain: number; scale: number; shape: NonNullable<HelixAura['shape']> }
-> = {
-  /* Braid: strands running together, which is what a company is. */
-  Company: { gain: 0.42, scale: 1.4, shape: 'braid' },
-  /* Lattice: a regular field, the thing a system is. */
-  'Design systems': { gain: 0.38, scale: 1.2, shape: 'lattice' },
-  /* Threads: many lines under tension, holding. */
-  Engineering: { gain: 0.4, scale: 1.3, shape: 'threads' },
-  /* Caustics: light gathered and focused, which is what reading a signal is. */
-  Intelligence: { gain: 0.44, scale: 1.5, shape: 'caustics' },
-  /* Aurora: a field that is entirely its own and owes nothing. */
-  Sovereignty: { gain: 0.4, scale: 1.6, shape: 'aurora' },
+const FIELD: Record<Topic, { lobes: [number, number, number][]; series: number }> = {
+  /* Rising to the right: strands gathering. */
+  Company: {
+    lobes: [
+      [18, 78, 62],
+      [58, 34, 54],
+      [88, 62, 46],
+    ],
+    series: 1,
+  },
+  /* Evenly spaced and level, which is what a system is. */
+  'Design systems': {
+    lobes: [
+      [16, 44, 52],
+      [50, 58, 56],
+      [84, 42, 52],
+    ],
+    series: 3,
+  },
+  /* Two anchors and a span between them, under tension. */
+  Engineering: {
+    lobes: [
+      [12, 30, 58],
+      [50, 76, 44],
+      [90, 28, 58],
+    ],
+    series: 5,
+  },
+  /* One source, and the field falling away from it. */
+  Intelligence: {
+    lobes: [
+      [24, 24, 70],
+      [62, 60, 44],
+      [92, 84, 36],
+    ],
+    series: 7,
+  },
+  /* Two whole fields, meeting but not merged. */
+  Sovereignty: {
+    lobes: [
+      [22, 50, 60],
+      [78, 50, 60],
+      [50, 96, 40],
+    ],
+    series: 8,
+  },
 }
 
 /**
@@ -49,14 +82,17 @@ const FIELD: Record<
  */
 export function InsightArt({ slot, topic }: { slot?: string; topic: Topic }) {
   const field = FIELD[topic]
+  const seed = `var(--helix-color-series-${field.series})`
+  const lobes = field.lobes
+    .map(
+      ([x, y, size], at) =>
+        `radial-gradient(${size}% ${size}% at ${x}% ${y}%, ` +
+        `color-mix(in oklab, ${seed} ${[46, 34, 24][at]}%, transparent) 0%, ` +
+        `transparent 70%)`,
+    )
+    .join(', ')
+
   return (
-    <helix-aura
-      class="insightArt"
-      gain={field.gain}
-      scale={field.scale}
-      shape={field.shape}
-      slot={slot}
-      speed={0.3}
-    ></helix-aura>
+    <div aria-hidden="true" className="insightArt" slot={slot} style={{ backgroundImage: lobes }} />
   )
 }
