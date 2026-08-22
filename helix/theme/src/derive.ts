@@ -109,6 +109,7 @@ const DEFAULTS = {
   density: 1,
   font: {},
   material: {},
+  motion: {},
   namespace: 'helix',
   neutral: {},
   radius: 0.5,
@@ -837,6 +838,27 @@ export const defaultPairings = (contrastTarget: number): PairingRequest[] =>
   )
 
 /**
+ * What each character does to the pace and to the curve.
+ *
+ * **Pace and curve together, because they are one decision.** A spring over
+ * 120ms is a twitch and a soft curve over 120ms is a fade, so a character that
+ * set the curve and left the duration alone would produce neither of the two
+ * things it names.
+ *
+ * `springy` takes the `spring` easing the stylesheet already ships rather than
+ * a bezier pretending to be one: a real overshoot needs more than two control
+ * points, which is what `linear()` with a sampled curve is for.
+ */
+const MOTION = {
+  gentle: { curve: 'cubic-bezier(0.4, 0, 0.2, 1)', pace: 1.35 },
+  snappy: { curve: 'cubic-bezier(0.3, 0, 0.1, 1)', pace: 0.7 },
+  springy: { curve: 'var(--helix-easing-spring)', pace: 1.1 },
+} as const
+
+/** The three durations a pace applies to. `instant` is 0 and is a statement. */
+const DURATIONS = { fast: 120, normal: 200, slow: 320 } as const
+
+/**
  * What each mechanism means for an edge.
  *
  * `fill` and `space` both come out as no edge and no lift, which is not a bug:
@@ -894,15 +916,34 @@ export const toCss = (theme: DerivedTheme, selector = ':root'): string => {
      weights, the leading and the tracking are a system rather than a choice.
      Emitted only when asked for, so an omitted face leaves the stylesheet's
      own stack standing rather than being replaced by a repeat of it. */
+  /* **`font-sans`, which is the name the stylesheet reads.** This emitted
+     `font-body` and nothing consumed it, so setting a body face changed the
+     headings, which take `font-display`, and left every other word on the page
+     alone. The intent field stays `body`, that being what a consumer means; the
+     token is what the token layer calls it, which is the same direction the
+     `foreground-on-accent` rename went. */
   const { body, display, mono } = theme.intent.font
   if (body) {
-    lines.push(`  --${namespace}-font-body: ${body};`)
+    lines.push(`  --${namespace}-font-sans: ${body};`)
   }
   if (display ?? body) {
     lines.push(`  --${namespace}-font-display: ${display ?? body};`)
   }
   if (mono) {
     lines.push(`  --${namespace}-font-mono: ${mono};`)
+  }
+
+  /* Emitted only where asked for, so a theme that says nothing about motion
+     leaves the stylesheet's own pace and curves standing. */
+  const { character, scale: pace } = theme.intent.motion
+  if (character || pace !== undefined) {
+    const multiplier = (character ? MOTION[character].pace : 1) * (pace ?? 1)
+    for (const [step, ms] of Object.entries(DURATIONS)) {
+      lines.push(`  --${namespace}-duration-${step}: ${Math.round(ms * multiplier)}ms;`)
+    }
+  }
+  if (character) {
+    lines.push(`  --${namespace}-easing-standard: ${MOTION[character].curve};`)
   }
 
   const { blur, opacity } = theme.intent.material

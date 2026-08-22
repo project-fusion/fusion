@@ -157,6 +157,26 @@ export interface ThemeIntent {
    */
   namespace?: string
   /**
+   * How the theme's motion feels.
+   *
+   * **The other axis with no input at all**, alongside the half of type that is
+   * a system: nine tokens, four durations and five curves, and a brand with a
+   * snappy voice and one with a gentle one reached them the same way, which is
+   * to say not at all.
+   *
+   * `character` sets the curve every component reaches for by default and
+   * carries a duration multiplier with it, because the two are one decision: a
+   * spring over 120ms is a twitch and a soft curve over 120ms is a fade. `scale`
+   * multiplies on top for a theme that wants the character and not the pace.
+   *
+   * `instant` is not scaled. It is 0 and means "do not animate", which is a
+   * statement rather than a duration.
+   */
+  motion?: {
+    character?: 'gentle' | 'snappy' | 'springy'
+    scale?: number
+  }
+  /**
    * The cast every grey carries.
    *
    * Chroma 0 is a dead grey and is the default, matching `primitives.css`,

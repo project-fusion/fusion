@@ -183,6 +183,37 @@ for (const name of [...new Set(modelNames)].sort()) {
   }
 }
 
+/* **Every other token `toCss` writes, which was the gap this check had.** It
+   held the seeds and the model's colour names and nothing else, so the whole
+   non-colour half of the emitted block was unguarded: separation, material,
+   type and motion. `--helix-font-body` shipped that way and nothing read it,
+   the token layer calling it `--helix-font-sans`, so setting a body face moved
+   the headings and left every other word on the page alone.
+
+   Read from the template literals rather than by running the engine, so the
+   check needs no colour math and sees a name even where nothing emits it under
+   the default intent. */
+const written = new Set(
+  [...uncommented(read(ENGINE)).matchAll(/`\s*--\$\{namespace\}-([a-z0-9-]+):/g)].map((m) => m[1]),
+)
+
+const declaredAll = new Set(
+  SHEETS.flatMap((sheet) => [
+    ...uncommented(read(sheet)).matchAll(/^\s*--helix-([a-z0-9-]+)\s*:/gm),
+  ]).map((m) => m[1]),
+)
+
+for (const name of [...written].sort()) {
+  if (name.startsWith('seed-') || declaredAll.has(name)) {
+    continue
+  }
+  problems.push(
+    `${ENGINE} writes \`--helix-${name}\` and no stylesheet declares it, so a ` +
+      'derived theme carrying it sets a property nothing reads. Either the token ' +
+      'layer should have the name or the engine should stop writing it.',
+  )
+}
+
 if (problems.length > 0) {
   console.error(`Seeds out of step (${problems.length}):\n\n  ${problems.join('\n\n  ')}\n`)
   process.exit(1)
@@ -197,5 +228,6 @@ if (problems.length > 0) {
 const planned = PLANNED.size > 0 ? `, ${PLANNED.size} planned and each still read` : ''
 console.log(
   `seeds: ${emitted.size} emitted, ${consumed.size} read${planned}; ` +
-    `${new Set(modelNames).size} model names, every one declared`,
+    `${new Set(modelNames).size} model names and ${written.size} written tokens, ` +
+    'every one declared',
 )

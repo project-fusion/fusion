@@ -132,6 +132,14 @@
 [part="indicator"] {
   background-color: var(--_indicator-color, transparent);
   block-size: var(--_indicator-block, var(--helix-border-thick));
+  /* **An edge as well as a fill**, because on a light page a fill alone could
+     not tell the mark from a hover. `surface-raised` is 0.97 and the hover wash
+     is five per cent of the foreground over the strip, which composites to
+     0.966: measured 0.004 apart in OKLCH lightness, so the only thing
+     separating the tab you are on from the tab under your pointer was a
+     `shadow-sm`. Transparent by default, so the bar and anything else that does
+     not want one is unaffected. */
+  border: var(--_indicator-border, 0) solid var(--_indicator-border-color, transparent);
   border-radius: var(--_indicator-radius, var(--helix-radii-none));
   box-shadow: var(--_indicator-shadow, none);
   inline-size: var(--indicator-width, 0);
@@ -223,7 +231,16 @@
    The same distinction the rest of the library makes. */
 :host(:not([appearance])) [part="indicator"] {
   --_indicator-block: var(--indicator-height, 0);
-  --_indicator-color: var(--helix-color-surface-raised);
+  /* **`overlay` with an edge, not `raised`.** This pill lies on the page with
+     nothing framing it, and `raised` put it a three per cent step off a white
+     strip: the same place the hover wash lands, so the selected tab and a
+     hovered one read as the same thing. `overlay` is what a surface over the
+     page takes, which is the distinction the rest of the library already draws
+     and which the segmented appearance below has always used. The border is
+     what carries it in light, where `overlay` is the strip's own white. */
+  --_indicator-border: var(--helix-border-thin);
+  --_indicator-border-color: var(--helix-color-border);
+  --_indicator-color: var(--helix-color-surface-overlay);
   --_indicator-radius: var(--helix-radii-sm);
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;

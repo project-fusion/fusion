@@ -109,6 +109,13 @@
   background-color: var(--helix-color-background);
   block-size: 100%;
   color: var(--helix-color-foreground);
+  /* **The page's own face, for the same reason it paints its own ground.** Most
+     components set `font-family: var(--helix-font-sans)` themselves and followed
+     a themed face immediately; Tag and Table Cell correctly inherit instead, and
+     what they inherited was the *site's* font, because this container had never
+     said otherwise. The base layer does this at the document root and a preview
+     is not one, so it says it here. */
+  font-family: var(--helix-font-sans);
   /* **A container, because the pane is not the window.** Everything inside
      answers to how wide the reader dragged the separator, and a media query
      would answer to the browser instead: at a 24 per cent form and a split
