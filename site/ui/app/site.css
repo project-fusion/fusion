@@ -2410,39 +2410,66 @@ helix-drawer helix-tree {
   --option-radii: var(--helix-radii-sm);
 }
 
-/* **The topic mark on an insight card.**
+/* **The topic composition on an insight card.**
  *
- * A band rather than a picture, and the height is the card's to give: `media`
- * is the one region that escapes the inset, and `--card-media-block-size` is
- * what sizes a drawing there, `auto` being an image's own shape and not
- * something a mark has.
+ * A picture rather than a band, and the height comes from the width: an
+ * `aspect-ratio` on the drawing means the art grows with the card instead of
+ * being a fixed strip that looks generous on a narrow card and mean on a wide
+ * one. 16/10 is the gallery's ratio, so a card here and a card on `/helix` are
+ * the same object.
  *
- * The ground is `surface-sunken`, so the band reads as a recess the mark sits
- * in rather than as a second card stacked on the first. One step, because the
- * card is already a step off the page and two would be a stack. */
-/* **No `inline-size` here.** It was `100%`, which is a document rule and beats
-   the card's own `slot[name="media"]::slotted(*) { inline-size: calc(100% +
-   inset * 2) }` whatever the specificity: measured, the band bled to the border
-   on the left and stopped 33px short on the right, which reads as a drawing
-   that failed to load rather than as a rule losing a fight. The card decides
-   how wide its media is. */
+ * `--card-media-block-size: auto` hands the height back to the drawing.
+ * `Card`'s media rule sets it for the reason its own comment gives, that a
+ * chart has no intrinsic shape and needs one from the box; an `<svg>` with an
+ * aspect ratio does have one, which is the case that rule's default was
+ * written for.
+ *
+ * The ground is `surface-sunken`, so the picture reads as a recess the card
+ * opens onto rather than a second card stacked on the first. */
 .insightArt {
+  aspect-ratio: 16 / 10;
   background-color: var(--helix-color-surface-sunken);
   display: block;
 }
 
 .insightCard helix-card {
-  --card-media-block-size: 5.5rem;
+  --card-media-block-size: auto;
 }
 
-/* Stroked and never filled, which is what holds the five marks together as a
-   set: they are the same weight of line on the same grid, and a fill would make
-   whichever one had it the odd member. `round` on both, so a truss and an arc
-   are drawn by the same pen. */
-.insightArt path {
+/* **The gallery's layer names, because it is the gallery's grammar.**
+ *
+ * A surface, a recess in it, ink at two weights and one solid mark. Five
+ * drawings built from the same six pieces read as a set; five drawn freely read
+ * as five decisions. Neutral throughout except the solid, which is the only
+ * thing that takes colour: an accent used to point rather than to decorate is
+ * what keeps a composition from becoming a diagram. */
+.insightArt .artSurface {
+  fill: var(--helix-color-surface-raised);
+}
+
+.insightArt .artSunken {
+  fill: var(--helix-color-border);
+}
+
+.insightArt .artSolid {
+  fill: var(--_insight-series);
+}
+
+.insightArt .artNode {
+  fill: var(--helix-color-surface-raised);
+  stroke: var(--helix-color-border);
+  stroke-width: 3;
+}
+
+.insightArt .artInk,
+.insightArt .artRule {
   fill: none;
-  stroke: var(--_insight-series);
+  stroke: var(--helix-color-border);
   stroke-linecap: round;
   stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.insightArt .artRule {
   stroke-width: 2;
 }

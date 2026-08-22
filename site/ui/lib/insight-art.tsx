@@ -1,53 +1,93 @@
+import type { ReactElement } from 'react'
 import type { Topic } from './insights'
 
 /**
- * A mark for each topic, drawn rather than photographed.
+ * A composition for each topic, in the same vocabulary the gallery draws
+ * components in.
  *
- * **One family, five members.** Every mark is built from the same primitives on
- * the same 120 by 48 field: strokes on a coarse grid, no fills, no glyphs. A set
- * assembled from unrelated pictures reads as five decisions; a set built from
- * one vocabulary reads as a series, which is what a topic is.
+ * **Per topic and not per insight, which is the decision worth stating.** A
+ * drawing for every post is a drawing somebody has to make before publishing,
+ * so the fifth post is illustrated and the fiftieth is not: art that scales with
+ * the writing is art nobody draws. Five compositions cover every post there will
+ * ever be, and a reader meeting two Engineering pieces sees a family rather than
+ * a repeat, which is what a topic is.
  *
- * **The series ramp rather than the brand.** `--helix-color-series-*` are the
- * palette's own way of saying "these are things being compared", which is
- * exactly what topics are, and they follow a themed seed: a page reskinned to
- * another brand takes these with it. `currentColor` would have tied every mark
- * to the card's text and made the set one colour.
+ * **The gallery's grammar, deliberately.** Surfaces, a recess, ink at two
+ * weights and one solid mark, laid out on a 320 by 200 field: the same pieces
+ * `ComponentArt` builds from, so a card on `/insights` and a card on `/helix`
+ * read as one publication rather than two design exercises. What differs is the
+ * subject, since a component drawing shows a control and this shows an idea.
  *
- * **`aria-hidden`, because the topic is already a tag on the card.** A mark that
- * announced itself would say the word a screen reader has just read, and there
- * is no information here that the tag does not carry.
+ * **The solid mark takes the series colour** and everything else is neutral.
+ * One accent per composition is what keeps five drawings a set: colour used to
+ * point rather than to decorate, and the ramp follows a themed seed so a
+ * reskinned page takes these with it.
  */
-const MARKS: Record<Topic, { series: number; paths: string[] }> = {
-  /* A rising set of steps: the company as the thing being built up. */
+const ART: Record<Topic, { series: number; body: ReactElement }> = {
+  /* Panels stacking upward, the last one solid: a thing being built up. */
   Company: {
-    paths: ['M8 40h16V28', 'M32 40h16V20', 'M56 40h16V12', 'M80 40h32'],
+    body: (
+      <>
+        <rect className="artSurface" height="52" rx="4" width="72" x="36" y="120" />
+        <rect className="artSurface" height="84" rx="4" width="72" x="124" y="88" />
+        <rect className="artSolid" height="116" rx="4" width="72" x="212" y="56" />
+        <path className="artRule" d="M20 180h280" />
+      </>
+    ),
     series: 1,
   },
-  /* A scale: the same shape at four sizes, which is what a token ramp is. */
+  /* One shape at four sizes on a shared baseline, which is what a ramp is. */
   'Design systems': {
-    paths: ['M12 24h8', 'M32 18h14', 'M58 12h22', 'M92 6h20', 'M12 36h100'],
+    body: (
+      <>
+        <rect className="artSurface" height="24" rx="3" width="24" x="40" y="132" />
+        <rect className="artSurface" height="40" rx="3" width="40" x="88" y="116" />
+        <rect className="artSurface" height="60" rx="4" width="60" x="152" y="96" />
+        <rect className="artSolid" height="84" rx="5" width="84" x="228" y="72" />
+        <path className="artRule" d="M20 168h280" />
+      </>
+    ),
     series: 3,
   },
-  /* A truss: members meeting at a joint, load carried by the arrangement. */
+  /* Members meeting at joints: load carried by the arrangement, not the parts. */
   Engineering: {
-    paths: ['M8 40h104', 'M8 40 32 12l24 28 24-28 24 28', 'M32 12h48'],
+    body: (
+      <>
+        <path className="artRule" d="M32 152h256" />
+        <path className="artInk" d="M32 152 96 56l64 96 64-96 64 96" />
+        <path className="artInk" d="M96 56h128" />
+        <circle className="artSolid" cx="160" cy="152" r="9" />
+        <circle className="artNode" cx="96" cy="56" r="7" />
+        <circle className="artNode" cx="224" cy="56" r="7" />
+      </>
+    ),
     series: 5,
   },
-  /* Concentric arcs leaving a point: a signal, and what reads it. */
+  /* A signal leaving one point and something further out reading it. */
   Intelligence: {
-    paths: [
-      'M20 40a12 12 0 0 1 12-12',
-      'M20 40a24 24 0 0 1 24-24',
-      'M20 40a36 36 0 0 1 36-36',
-      'M76 40h36',
-    ],
+    body: (
+      <>
+        <path className="artInk" d="M64 168a48 48 0 0 1 48-48" />
+        <path className="artInk" d="M64 168a88 88 0 0 1 88-88" />
+        <path className="artInk" d="M64 168a128 128 0 0 1 128-128" />
+        <circle className="artSolid" cx="64" cy="168" r="11" />
+        <rect className="artSurface" height="56" rx="4" width="76" x="212" y="60" />
+        <rect className="artSunken" height="12" rx="2" width="44" x="228" y="78" />
+      </>
+    ),
     series: 7,
   },
-  /* A closed boundary with one way through it, drawn as a gap rather than a
-     gate: the shape of a thing you can leave. */
+  /* Two panels and a clean break: the shape of a thing that comes apart whole. */
   Sovereignty: {
-    paths: ['M12 8h44', 'M68 8h40v32H68', 'M56 40H12V8', 'M56 24h12'],
+    body: (
+      <>
+        <rect className="artSurface" height="104" rx="4" width="108" x="32" y="56" />
+        <rect className="artSunken" height="12" rx="2" width="68" x="48" y="76" />
+        <rect className="artSunken" height="12" rx="2" width="48" x="48" y="100" />
+        <rect className="artSolid" height="104" rx="4" width="108" x="180" y="56" />
+        <path className="artRule" d="M160 40v136" />
+      </>
+    ),
     series: 8,
   },
 }
@@ -55,30 +95,22 @@ const MARKS: Record<Topic, { series: number; paths: string[] }> = {
 /**
  * The band across the top of an insight card.
  *
- * `slot` is a declared prop rather than a spread, because this renders an
- * `<svg>` and React types an intrinsic element's props from the element, not
- * from the component wrapping it: without it the attribute is refused at the
- * call site, and the mark would render inside the card's inset like content.
- *
- * Sized by the card rather than by itself: it goes in the `media` slot, which is
- * the one region that escapes the card's inset, and `--card-media-block-size`
- * is what gives a drawing a height, `auto` being an image's own shape and not a
- * thing a mark has.
+ * `slot` is a declared prop rather than a spread, because React types an
+ * intrinsic element's props from the element rather than from the component
+ * around it: without it the attribute is refused at the call site and the mark
+ * renders inside the card's inset like content.
  */
 export function InsightArt({ slot, topic }: { slot?: string; topic: Topic }) {
-  const mark = MARKS[topic]
+  const art = ART[topic]
   return (
     <svg
       aria-hidden="true"
       className="insightArt"
-      preserveAspectRatio="xMidYMid meet"
       slot={slot}
-      style={{ ['--_insight-series' as string]: `var(--helix-color-series-${mark.series})` }}
-      viewBox="0 0 120 48"
+      style={{ ['--_insight-series' as string]: `var(--helix-color-series-${art.series})` }}
+      viewBox="0 0 320 200"
     >
-      {mark.paths.map((d) => (
-        <path d={d} key={d} />
-      ))}
+      {art.body}
     </svg>
   )
 }
