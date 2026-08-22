@@ -27,6 +27,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { Family } from '../../../../lib/catalog'
 import { useElementRef } from '../../../../lib/use-element-ref'
 import { PreferencesDrawer } from '../../../preferences'
+import { type Findable, SiteFind } from '../../../site-find'
 import { Wordmark } from '../../../wordmark'
 import { readHashState, writeHashState } from './hash-state'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
@@ -41,6 +42,8 @@ import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state
 
 interface Props {
   families: Family[]
+  /** Where the palette can go, built on a server by the page above. */
+  findable?: Findable[]
 }
 
 /**
@@ -118,7 +121,7 @@ const resolve = (families: Family[], familySlug: string | null, exampleSlug: str
   return { example, family, withExamples }
 }
 
-export function SandboxWorkbench({ families }: Props) {
+export function SandboxWorkbench({ families, findable = [] }: Props) {
   const preview = useRef<HelixSandboxPreview>(null)
   const files = useRef<HelixToggleGroup>(null)
   /* Held as state, not as a ref: an effect observes the splitter's width and a
@@ -554,7 +557,12 @@ export function SandboxWorkbench({ families }: Props) {
         return // The dev server is restarting. Ask again on the next tick.
       }
       if (last !== null && text !== last) {
-        preview.current?.reload()
+        /* Guarded the same way and for the same reason as the terminal's
+           `clear` below: a method on an element that has not upgraded is not
+           there. This one is reached from a two second timer rather than from
+           mount, so the window has almost always closed by the time it runs,
+           which is exactly what makes it the harder one to notice. */
+        preview.current?.reload?.()
       }
       last = text
     }
@@ -598,9 +606,18 @@ export function SandboxWorkbench({ families }: Props) {
       if (preview.current) {
         preview.current.styles = carried?.css ?? example.css
       }
-      // Output belongs to the example that wrote it. Carrying it across reads
-      // as the new example having produced warnings it never produced.
-      terminal.current?.clear()
+      /* Output belongs to the example that wrote it. Carrying it across reads
+         as the new example having produced warnings it never produced.
+       *
+         **`clear?.()` and not `clear()`, because the element may not be an
+         element yet.** `?.` on the ref guards it being null, which is a
+         different question from whether what it points at has upgraded: the
+         registration import moved into an effect when #121 stopped React
+         reporting a hydration mismatch, so on a first paint there is a window
+         where `<helix-sandbox-terminal>` is an unknown element with no methods
+         on it at all. This effect runs inside that window and threw
+         `clear is not a function`, which took the whole page down. */
+      terminal.current?.clear?.()
     } else if (last.syntax !== syntax) {
       // The same text in the other language, so edits survive the switch.
       setMarkup((current) => {
@@ -936,6 +953,17 @@ export function SandboxWorkbench({ families }: Props) {
             looks, and on a phone, the way to the examples. The sandbox's own
             settings are in its toolbar. */}
         <helix-flex align="center" gap="2xs" slot="end">
+          {/* **The palette, which this header did not have and the site's did.**
+              A reader in the sandbox could reach nothing without going back to
+              the site first, which is the request that opened #128.
+
+              No trigger button: the site's header has room for one and a tool's
+              does not, and every row of chrome here is a row taken from the
+              thing being examined. The shortcut still works, because the
+              palette listens on the document rather than on whatever has
+              focus. */}
+          <SiteFind findable={findable} trigger={false} />
+
           {narrow && (
             <helix-button appearance="ghost" onClick={() => setRailOpen(true)}>
               Examples

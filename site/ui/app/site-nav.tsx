@@ -1,11 +1,12 @@
 'use client'
 
-import type { HelixCommand, HelixMegamenu } from '@helix-io/web'
+import type { HelixMegamenu } from '@helix-io/web'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { PreferencesDrawer } from './preferences'
 import { PRODUCTS } from './products'
+import { type Findable, SiteFind } from './site-find'
 import { stageAppearance, VERTICALS } from './verticals'
 import { Wordmark } from './wordmark'
 
@@ -28,55 +29,6 @@ import { Wordmark } from './wordmark'
 const SECTIONS = [
   { href: '/services', label: 'Services' },
   { href: '/insights', label: 'Insights' },
-]
-
-/**
- * Everywhere the palette can take a reader.
- *
- * The masthead shows two sections because a masthead is a place to stand, not
- * an index. A palette is the index, so it carries the pages a reader would
- * otherwise have to find by reading: the thesis, the trust page, the two
- * substrates, and the sections already on the bar.
- *
- * Written here rather than derived from a route manifest, because Next has no
- * such thing to read at runtime and a generated one would list every preview
- * and every slug. What belongs in a palette is a judgement about what somebody
- * would go looking for.
- *
- * Grouped by what a reader came for rather than by where the route sits: the
- * two substrates are things you take, the services are things you buy, and the
- * rest is things you read. A flat list of five was scannable and said nothing
- * about which of them were the same kind of answer.
- *
- * These are the pages a route manifest could not name usefully. Everything that
- * *is* enumerable, every component and every piece of writing, arrives as
- * `findable` from the layout, which can read the catalog and the registry
- * without either of them crossing into the browser.
- */
-const DESTINATIONS = [
-  {
-    group: 'Products',
-    items: [
-      { href: '/helix', label: 'Helix, the design system' },
-      { href: '/cortex', label: 'Cortex, memory and provenance' },
-      /* The workbench, not the component. `Sandbox` is a family like any other
-         and the catalogue already offers its reference page; this is the tool
-         that page describes, which nothing else in the palette could reach. */
-      { href: '/helix/sandbox', label: 'Sandbox, the component workbench' },
-    ],
-  },
-  {
-    group: 'Services',
-    items: [{ href: '/services', label: 'What you can buy today' }],
-  },
-  {
-    group: 'Reading',
-    items: [
-      { href: '/insights', label: 'Insights' },
-      { href: '/thesis', label: 'Thesis' },
-      { href: '/trust', label: 'Trust' },
-    ],
-  },
 ]
 
 /**
@@ -103,81 +55,11 @@ const DESTINATIONS = [
  * layout around. That is also why this component owns the header rather than
  * being slotted into one, and why the header is flat by default.
  */
-/**
- * A group with its items ordered by how well they answer what was typed.
- *
- * **Within a group and never across one**, which is what the component's own
- * model allows and is also the right answer: `Listbox` filters by *hiding*
- * rather than removing, so the order it draws is the order it is given, and
- * lifting a component above a curated destination would mean pulling it out of
- * the heading that says what it is. The groups the reader just gained would
- * become decoration.
- *
- * Three tiers, because they are the three things "car" can mean: a label that
- * *starts* with it is almost certainly what was meant, a word inside the label
- * starting with it is next, and the rest is a substring that happened to match.
- * Ties keep the order they arrived in, which for components is alphabetical and
- * for writing is newest first, so the fallback is never arbitrary.
- */
-const ranked =
-  (needle: string) =>
-  (section: Findable): Findable => {
-    const at = needle.toLowerCase()
-    const tier = (label: string): number => {
-      const text = label.toLowerCase()
-      if (text.startsWith(at)) {
-        return 0
-      }
-      return text.split(/[\s,]+/).some((word) => word.startsWith(at)) ? 1 : 2
-    }
-    return {
-      group: section.group,
-      items: section.items
-        .map((item, order) => ({ item, order, tier: tier(item.label) }))
-        .sort((a, b) => a.tier - b.tier || a.order - b.order)
-        .map((one) => one.item),
-    }
-  }
-
-/** A group of places the palette can go, as the layout hands them down. */
-export interface Findable {
-  group: string
-  items: { href: string; label: string }[]
-}
-
 export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const pathname = usePathname()
-  const router = useRouter()
   const [narrow, setNarrow] = useState(false)
   const [open, setOpen] = useState(false)
-  const [findOpen, setFindOpen] = useState(false)
-  const [needle, setNeedle] = useState('')
-  const palette = useRef<HelixCommand>(null)
 
-  /* **Bound here rather than as a prop, and the reason is worth keeping.**
-   *
-   * `helix-filter` is composed, so it does cross out of the palette's shadow
-   * root, but it is dispatched by the *listbox* inside it. `HelixElement`
-   * repairs a React `on` prop by reading it at the moment the element itself
-   * dispatches, which is what makes `onhelix-select` work on this same element:
-   * an event merely passing through the host on its way up never calls the
-   * host's own `dispatchEvent`, so nothing is there to do the repair and the
-   * prop is recorded and never bound. Measured: typing narrowed the list and
-   * the handler never ran.
-   *
-   * An effect is what the area rules leave for exactly this, a listener for
-   * something the component did not raise itself. */
-  useEffect(() => {
-    const node = palette.current
-    if (!node) {
-      return
-    }
-    const watch = (event: Event) => {
-      setNeedle(((event as CustomEvent<{ value: string }>).detail.value ?? '').trim())
-    }
-    node.addEventListener('helix-filter', watch)
-    return () => node.removeEventListener('helix-filter', watch)
-  }, [])
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
@@ -424,24 +306,11 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           </helix-navigation>
         )}
 
-        {/* **A button as well as a shortcut, because a shortcut nobody is told
-            about is a feature for whoever wrote it.** The key is the fast path
-            and the button is how a reader finds out there is one: it carries
-            the keys it answers to, which is the only place on the page that
-            says so. Hidden on a narrow screen, where there is no keyboard to
-            press them with and the drawer is the way through. */}
-        {!narrow && (
-          <helix-button
-            appearance="outlined"
-            class="siteFind"
-            onClick={() => setFindOpen(true)}
-            slot="end"
-          >
-            <helix-icon name="magnifying-glass" slot="start"></helix-icon>
-            Search
-            <helix-kbd slot="end">⌘K</helix-kbd>
-          </helix-button>
-        )}
+        {/* The trigger and the palette both, from the one component the
+            workbench renders too. Hidden on a narrow screen, where there is no
+            keyboard to press the shortcut with and the drawer is the way
+            through. */}
+        {!narrow && <SiteFind findable={findable} />}
 
         <helix-tooltip content="Preferences" placement="bottom" slot="end">
           <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
@@ -455,90 +324,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           </helix-button>
         )}
       </helix-app-header>
-
-      {/* **The palette listens for its own hotkey from the document**, so it
-          answers from wherever the reader is, including from inside another
-          field. `open` is controlled here because the button opens it too, and
-          a controlled property that is not answered is a control that goes
-          quiet: both events are bound.
-
-          The handler is typed structurally rather than by the generated
-          `HelixCommandHelixSelectElementEvent`, which is a global in
-          `jsx.d.ts` and not importable by name. A hyphenated JSX prop is
-          exempt from checking on an intrinsic element anyway, so the annotation
-          is here to give `detail` a shape rather than to be enforced.
-
-          `helix-select` fires once with the chosen value and the palette
-          forgets it, which is what a command is. Routing is the consumer's job,
-          so the value is the href and this is the only thing that knows it. */}
-      <helix-command
-        class="siteCommand"
-        label="Search"
-        onhelix-close={() => {
-          setFindOpen(false)
-          setNeedle('')
-        }}
-        onhelix-open={() => setFindOpen(true)}
-        onhelix-select={(event: { detail: { value: string } }) => {
-          setFindOpen(false)
-          router.push(event.detail.value)
-        }}
-        open={findOpen}
-        placeholder="Search the site"
-        ref={palette}
-      >
-        {/* **The catalogue arrives when it is asked for.**
-            88 components and every article is the whole of what a palette can
-            reach and none of what it should open with: a reader summoning it
-            sees a hundred rows before typing a character, and a list nobody
-            scans is a list that has to be searched anyway. So the curated few
-            stand at rest, and everything enumerable appears on the first
-            keystroke, which is when a name is a filter rather than an
-            inventory.
-
-            `helix-filter` is the signal, dispatched by the listbox before it
-            narrows and bubbling out through the palette. Cleared on close, so a
-            second visit opens the way the first did. */}
-        {[...DESTINATIONS, ...(needle === '' ? [] : findable.map(ranked(needle)))].map(
-          (section) => (
-            <helix-option-group key={section.group} label={section.group}>
-              {section.items.map((one) => (
-                <helix-option key={one.href} value={one.href}>
-                  {one.label}
-                </helix-option>
-              ))}
-            </helix-option-group>
-          ),
-        )}
-        {/* **Three hints, and each one is a group rather than a clause.**
-            They were a single sentence with commas doing the separating, which
-            asks a reader to parse punctuation to find out where one key's job
-            ends and the next begins. A key and the word for what it does are
-            one object; the space between objects is what says so, and a comma
-            in a legend of six words is the wrong instrument for it.
-
-            The verb alone, too: "to move" reads as prose and "Move" reads as a
-            label, and a footer under a list of commands is labelling, not
-            narrating. */}
-        <div className="siteCommandHints" slot="footer">
-          <span>
-            <helix-kbd>↑</helix-kbd>
-            <helix-kbd>↓</helix-kbd>
-            Move
-          </span>
-          <span>
-            <helix-kbd>↵</helix-kbd>
-            Go
-          </span>
-          <span>
-            <helix-kbd>Esc</helix-kbd>
-            Close
-          </span>
-        </div>
-        <helix-text appearance="caption" class="siteCommandMark" slot="footer">
-          Fusion
-        </helix-text>
-      </helix-command>
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
