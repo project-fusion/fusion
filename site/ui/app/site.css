@@ -1206,18 +1206,21 @@ helix-code-block .tok-operator {
   --icon-size: var(--helix-size-icon-sm);
 }
 
-helix-tree-item:hover > .docsNavUp,
-helix-tree-item:focus-within > .docsNavUp {
-  background-color: var(--helix-color-surface-sunken);
-  color: var(--helix-color-foreground);
-}
-
-/* Its own hover is a step above the row's, so a pointer on the target says so
-   and the press has somewhere to land: 24 square rather than the 16 the glyph
-   occupies, which is under any reasonable target size. */
+/* Its own hover and focus, and nothing keyed on the row.
+ *
+ * **A rule reaching in from `helix-tree-item` is one `check:overruled` fails
+ * on, and it is right to.** `tree-item.css` colours `slot[name="start"]`
+ * slotted content and not the end slot, so a document rule setting `color`
+ * under that element kills nothing *today*: give the end slot a colour
+ * tomorrow and it would, silently, because a document rule wins whatever the
+ * specificity and whatever the layer.
+ *
+ * There is nothing to key on the row anyway now that the mark is present at
+ * rest: the row-hover step existed to create the control, and what is left is
+ * a pointer on the target saying so. Fewer rules and no collision. */
 .docsNavUp:hover,
 .docsNavUp:focus-visible {
-  background-color: var(--helix-color-surface-raised);
+  background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-primary);
 }
 
