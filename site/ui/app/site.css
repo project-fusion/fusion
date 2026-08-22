@@ -1977,8 +1977,22 @@ helix-drawer helix-tree {
    `align-content: stretch` on this band alone, overriding the centring every
    other band wants, or its rows cluster in the middle instead of dividing the
    height. */
+/* **The ground the panel sits on, and the panel needs one.**
+ *
+ * The stage is `surface`, which is white in the light theme, and the page is
+ * white: measured, the two were the same `#ffffff` and the only thing between
+ * them was a shadow at 0.14 alpha. A white panel is the right call and it only
+ * reads against something, so the band takes the recess the panel used to be.
+ *
+ * `surface-sunken` works in both directions, which is why it is one declaration
+ * rather than a light-only exception: it is `#e5e8ed` under a white panel, and
+ * in the dark it is a step below the `#16181c` the panel takes, so the panel is
+ * lighter than its ground either way. The old arrangement had it the other way
+ * round, the panel sunken and the page plain, which is what a recess is and is
+ * why the comments further down still say so. */
 .showcaseBand {
   align-content: stretch;
+  background-color: var(--helix-color-surface-sunken);
   block-size: calc(100svh - var(--helix-size-header));
 }
 
@@ -2017,9 +2031,8 @@ helix-drawer helix-tree {
   padding-block: var(--helix-space-2xl);
 }
 
-/* Sunken, which is the one surface token that reads as behind the page rather
-   than on it, so the cards sit in a recess and the panel reads as a thing being
-   looked into.
+/* The panel, which is the near surface now rather than the recess: the band
+   behind it holds the sunken ground and this sits on top of it.
  *
  * Masked at the foot rather than cut. A hard edge says the layout ran out; a
  * fade says there is more, which there is. `mask-image` and not a gradient

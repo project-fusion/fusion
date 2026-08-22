@@ -40,29 +40,6 @@ const REASONS = [
   },
 ]
 
-const questions = [
-  {
-    answer:
-      'Nothing you depend on stops working. You hold your own keys, your own data, and your own hardware. We may operate a control plane, never a chokepoint. If a product cannot pass that test, it is not one of ours.',
-    question: 'What happens if Fusion shuts down tomorrow?',
-  },
-  {
-    answer:
-      'Rust for the backend and the substrate cores, TypeScript for everything on the front. Interfaces ship as web components, so the framework above them is a choice rather than a commitment.',
-    question: 'What is the stack?',
-  },
-  {
-    answer:
-      'Two, and neither is a product. Helix is the design system and Cortex is the memory and provenance layer. Everything else is built on top of them.',
-    question: 'How many substrates are there?',
-  },
-  {
-    answer:
-      'Cheap intelligence and cheap energy are arriving at the same time. That pairing is what moves sovereignty from a principle you agree with to a thing you can run. Personal first, then organizational, then national.',
-    question: 'Why now?',
-  },
-]
-
 export default function Home() {
   return (
     <div className="reel">
@@ -92,13 +69,7 @@ export default function Home() {
           it never asks for the hit test and every control keeps its presses. It
           stops itself in a background tab, and where WebGL is refused it draws
           nothing and the page is the type it always was. */}
-      <helix-aura
-        class="reelAura"
-        gain={0.55}
-        scale={1.7}
-        speed={0.45}
-        terminus={0.61}
-      ></helix-aura>
+      <helix-aura class="reelAura" gain={0.55} scale={1.7} speed={1} terminus={0.4}></helix-aura>
       <div className="reelScrim" />
 
       <section className="hero">
@@ -373,27 +344,6 @@ export default function Home() {
 
       <section className="band reveal">
         <helix-flex class="shell" direction="column" gap="xl">
-          <helix-text as="h2" class="sectionTitle measure">
-            Questions
-          </helix-text>
-          {/* Framed, because this one sits directly on the page. */}
-          <helix-accordion appearance="outlined">
-            {questions.map((entry) => (
-              <helix-accordion-item key={entry.question}>
-                <helix-text appearance="body-strong" slot="summary">
-                  {entry.question}
-                </helix-text>
-                <helix-text class="measure" tone="muted">
-                  {entry.answer}
-                </helix-text>
-              </helix-accordion-item>
-            ))}
-          </helix-accordion>
-        </helix-flex>
-      </section>
-
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="xl">
           <helix-flex align="center" gap="md" justify="between" wrap>
             <helix-flex direction="column" gap="sm">
               <helix-text appearance="label" tone="subtle">
@@ -462,30 +412,6 @@ export default function Home() {
 
       {/* The story, last and short. It is why the work compounds rather than
           why anyone should buy it, and a reader who wants it can follow it. */}
-      <section className="band reveal">
-        <helix-flex class="shell" direction="column" gap="lg">
-          <helix-text appearance="label" tone="subtle">
-            Where this goes
-          </helix-text>
-          <helix-text as="h2" class="sectionTitle measure">
-            Software now. The rest of the stack after.
-          </helix-text>
-          <helix-text as="p" class="measure" tone="muted">
-            Each engagement that feeds Helix or Cortex makes the next one faster, which is why we
-            take the work we take. Energy and hardware are further out and we say so. Behind all of
-            it is one rule: nothing we build should create a dependency you cannot leave.
-          </helix-text>
-          <helix-flex data-density="lg" gap="sm" wrap>
-            <Link data-button href="/thesis">
-              Read the thesis
-            </Link>
-            <Link data-button href="/trust">
-              The trust bar
-            </Link>
-          </helix-flex>
-        </helix-flex>
-      </section>
-
       <section className="band closing reveal">
         <helix-flex align="center" class="shell" direction="column" gap="lg">
           <helix-text as="h2" class="sectionTitle">
