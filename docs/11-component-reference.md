@@ -453,6 +453,7 @@ it is measured against.
 | `gridlines` | `gridlines` | `'both' \| 'category' \| 'value' \| undefined` | - | `HelixBaseBarChart` | Which rules are drawn across the plot, if any. |
 | `label` | `label` | `string` | `''` | `MixinChartSource` | The drawing's name, for a pointer resting on it. |
 | `lines` | `lines` | `string \| undefined` | - | `HelixBaseBarChart` | Which series are drawn as a line instead of as columns, by name. |
+| `material` | `material` | `'glass' \| 'gradient' \| undefined` | - | - | What the columns are made of. |
 | `named` | - | `string` | - | `MixinChartSource` | What to call the drawing, the consumer's word or the table's own. |
 | `pointer` | - | - | `new ChartPointerController(this)` | `MixinChartSource` | Which reading a pointer is nearest, for a tooltip to sit on. |
 | `readings` | - | `number` | - | `MixinChartSource` | How many readings there are, which is what the pointer maps onto. |
@@ -467,6 +468,8 @@ it is measured against.
 | `axis` | One scale's numbers, drawn only when `secondary` splits them. |
 | `band` | The slot the pointer is resting in. |
 | `bar` | One column. |
+| `bar-wash-end` | The far stop of a bar's gradient, where one is used. |
+| `bar-wash-start` | The stop of a bar's gradient at its base. |
 | `baseline` | The rule the columns stand on. |
 | `gridline` | One rule across the plot, under `gridlines`. |
 | `group` | One category's columns, together. |
@@ -495,6 +498,7 @@ it is measured against.
 | `--bar-chart-bar-radius` | Corner radius at the far end of a column. |
 | `--bar-chart-block-size` | Height of the drawing. |
 | `--bar-chart-gap` | Space between the drawing and its labels. |
+| `--chart-bar-wash` | The gradient a bar would take, named per bar so the styled tier can point `fill` at it. Drawn whatever the treatment and used only where `material="gradient"` asks for it. |
 | `--bar-chart-axis` | The colour of a single-series axis, taken from that series. |
 | `--bar-chart-secondary` | The colour of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138. |
 

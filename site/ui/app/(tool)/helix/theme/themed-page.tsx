@@ -242,10 +242,13 @@ export function ThemedPage() {
             {/* `gridlines` names an axis rather than being a boolean, which the
                 generated types caught: `value` draws the lines the bars are read
                 against and leaves the category axis alone. */}
+            {/* Gradient, so the chart is in the same language as the glass card
+                it sits in rather than the one opaque slab on the page. */}
             <helix-bar-chart
               for="arrivals"
               gridlines="value"
               label="On-time arrivals by month"
+              material="gradient"
             ></helix-bar-chart>
           </helix-flex>
         </helix-card>

@@ -215,7 +215,7 @@ Blur and translucency, for a surface that lets the page through.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md))` | 6 |
-| `--helix-material-opacity` | `1` | 6 |
+| `--helix-material-opacity` | `1` | 12 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 3 |
 | `--helix-material-blur-lg` | `32px` | 2 |

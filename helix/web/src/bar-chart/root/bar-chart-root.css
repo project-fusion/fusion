@@ -553,3 +553,35 @@
 [part="axis"][data-axis="secondary"] {
   color: var(--bar-chart-secondary, var(--helix-color-foreground-subtle));
 }
+
+/* **Glass, so a chart is in the same language as the page around it.** A glass
+   header over opaque columns reads as two designs sharing a window, which is
+   what a material policy exists to stop. The gridlines read through, which is
+   the thing translucency is *for* here rather than decoration: it is the same
+   test the material note settled on.
+
+   Scaled by the policy, so a language that is more see-through everywhere is
+   more see-through here too. */
+:host([material="glass"]) [part="bar"] {
+  fill-opacity: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* **Gradient, into the wash the headless tier already draws.** One per series,
+   coloured through `--chart-series` so the stops read a token that tier never
+   names, and pointed at per bar because CSS cannot build a fragment id from a
+   variable. */
+:host([material="gradient"]) [part="bar"] {
+  fill: var(--chart-bar-wash);
+}
+
+[part="bar-wash-start"] {
+  stop-color: var(--chart-series);
+  stop-opacity: calc(1 * var(--helix-material-opacity));
+}
+
+/* The far stop keeps some colour rather than fading to nothing: a column that
+   reaches transparent has no edge at its base and stops reading as a column. */
+[part="bar-wash-end"] {
+  stop-color: var(--chart-series);
+  stop-opacity: calc(0.35 * var(--helix-material-opacity));
+}

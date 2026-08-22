@@ -670,7 +670,33 @@ export function ThemeBuilder({ findable }: { findable: Findable[] }) {
                 the values, and the attribute is what makes `helix/styles` re-run
                 its own declarations here so the series ramp and the scales
                 re-derive. */}
-            <div className="themePreview" data-helix-theme data-theme="preview" slot="preview">
+            {/* **`color-scheme`, because a theme has one and the preview has to be
+                in it.** The engine emits an explicit value for every token it
+                computes, so those were right; everything it does not emit falls
+                back to the stylesheet's `light-dark()`, which resolves against
+                the *reader's* scheme rather than the theme's. Previewing a light
+                theme on the dark site, `--helix-material-translucent` gave the
+                dark half and a glass card came out near-black on a white page.
+
+                **`data-color-mode` as well as `color-scheme`, because the two
+                are read by different things.** `color-scheme` is what the
+                platform resolves `light-dark()` against; `data-color-mode` is
+                what this site's build actually keys on, Lightning CSS rewriting
+                `light-dark()` into a custom-property shim before a browser sees
+                it, which `tokens.css` records. Setting only the first left a
+                glass card resolving dark inside a light theme.
+
+                Set here rather than emitted, for the reason `tokens.css` gives:
+                a theme scope re-derives colour, and which half that colour is
+                written in is a fact about the surface it is shown on. */}
+            <div
+              className="themePreview"
+              data-color-mode={scheme}
+              data-helix-theme
+              data-theme="preview"
+              slot="preview"
+              style={{ colorScheme: scheme }}
+            >
               <ThemedPage />
             </div>
 

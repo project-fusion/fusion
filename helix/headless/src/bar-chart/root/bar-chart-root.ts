@@ -55,7 +55,12 @@ const HEIGHT = 100
  * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
  * @csspart band - The slot the pointer is resting in.
  * @csspart bar - One column.
+ * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
+ * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The rule the columns stand on.
+ * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
+ *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
+ *   `material="gradient"` asks for it.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart group - One category's columns, together.
  * @csspart label - One category's name.
@@ -368,7 +373,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         ? svg`<rect
             data-series=${seriesIndex(tone)}
             height=${thickness}
-            style="--chart-series: var(--chart-series-${seriesIndex(tone)})"
+            style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
             part="bar"
             width=${size}
             x=${along}
@@ -377,7 +382,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         : svg`<rect
             data-series=${seriesIndex(tone)}
             height=${size}
-            style="--chart-series: var(--chart-series-${seriesIndex(tone)})"
+            style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
             part="bar"
             width=${thickness}
             x=${across}
@@ -396,6 +401,34 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
+        ${
+          /* **One gradient per series, rendered whether or not anything points
+             at it.** A `<defs>` entry draws nothing on its own, and this tier's
+             business is elements while which fill a bar takes is the styled
+             tier's: `material="gradient"` there switches `fill` to
+             `--chart-bar-wash` and this is what it would find.
+
+             Coloured through the series property rather than an attribute, so
+             the stops read a token this tier never names. The id resolves
+             within the shadow root, so two charts on a page carrying the same
+             ids stay independent, which the sparkline measured before relying
+             on it. */
+          svg`<defs>
+            ${series.map(
+              (_, index) => svg`<linearGradient
+                id="helix-bar-wash-${seriesIndex(index)}"
+                style="--chart-series: var(--chart-series-${seriesIndex(index)})"
+                x1="0"
+                x2=${sideways ? '1' : '0'}
+                y1="0"
+                y2=${sideways ? '0' : '1'}
+              >
+                <stop offset="0" part="bar-wash-start" />
+                <stop offset="1" part="bar-wash-end" />
+              </linearGradient>`,
+            )}
+          </defs>`
+        }
         ${this.renderGridlines(y, domain, sideways, categories.length)}
         ${
           sideways

@@ -1,6 +1,7 @@
 import { customElement } from '@helix-io/core'
 import { HelixBaseBarChart } from '@helix-io/headless'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../chart/series.css.js'
 import { styles } from './bar-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -30,6 +31,30 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-bar-chart')
 export class HelixBarChart extends HelixBaseBarChart {
+  /**
+   * What the columns are made of.
+   *
+   * **A third axis on the chart, not on the bar.** A bar is a mark inside a
+   * drawing and nobody writes markup for one; the chart is what a consumer
+   * addresses, so the choice belongs here and reaches every column at once.
+   *
+   * `glass` lets the gridlines read through the columns, which is what puts a
+   * chart in the same language as a glass header rather than leaving it the one
+   * opaque slab on the page. `gradient` fades each column toward its base, into
+   * the wash the headless tier draws whether or not anything points at it.
+   *
+   * Absent is solid, per the rule that a reflected property takes no default,
+   * so the stylesheet describes only the departure. The strength is the
+   * theme's: `glass` scales with `--helix-material-opacity`, so a language that
+   * is more see-through everywhere is more see-through here.
+   *
+   * Styled rather than headless, because what a bar is filled with is a
+   * treatment and this tier is where treatments live. The gradient it points at
+   * is drawn below, which is an element and therefore that tier's business.
+   */
+  @property({ reflect: true })
+  material?: 'glass' | 'gradient'
+
   static override styles: CSSResultGroup = [seriesStyles, styles]
 }
 
