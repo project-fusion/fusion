@@ -661,7 +661,15 @@ export class HelixBaseListbox extends MixinCollection(
   }
 
   private linkActive(): void {
-    const list = this.renderRoot.querySelector('[part="items"]')
+    /* Whichever element the reader is actually in. `aria-activedescendant` is
+       read from the focused element, so pointing the list at the active option
+       says nothing while focus is in the filter, which is where it now stays.
+       A filterable list announces from its field and a plain one from its
+       items, for the same reason the arrows are forwarded in one and not the
+       other. */
+    const list = this.renderRoot.querySelector(
+      this.filterable ? '[part="search-field"]' : '[part="items"]',
+    )
     if (!list || !('ariaActiveDescendantElement' in list)) {
       return
     }
@@ -746,24 +754,28 @@ export class HelixBaseListbox extends MixinCollection(
     if (!MOVES.has(event.key)) {
       return
     }
-    event.preventDefault()
-    const items = this.renderRoot.querySelector<HTMLElement>('[part="items"]')
-    items?.focus()
-    /* `composed`, or it reaches nothing.
-     *
-     * A synthetic event that only bubbles stops at the shadow boundary, and the
-     * handler this is aimed at is on the host: the re-dispatch did nothing at
-     * all and the arrows worked only because the original press was also left
-     * to bubble, which is a coincidence rather than a mechanism. `cancelable`
-     * too, since the handler at the other end prevents it. */
-    items?.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-        key: event.key,
-      }),
-    )
+    /* **Forwarded, because the reader is in the field.** `navigate` says the
+       rule this has to follow: a listbox and a combobox differ by which element
+       the focus is in, not by a mode, and a reader typing into a filter is in
+       the second case whether or not the field belongs to this element. So the
+       arrows move the highlight and Enter takes it, which is what Enter already
+       does by bubbling to the host handler.
+
+       **What was here instead moved focus to `[part="items"]` and re-dispatched
+       the key.** Both halves of that were wrong, and measured on a bare
+       `<helix-listbox filterable>` one Down produced: two `helix-change` events,
+       `a` then `b`, and a highlight on the *second* option. Focus on the list
+       meant moving chose, so a single press committed a value the reader was
+       arrowing past; and the original press went on bubbling to the same host
+       handler the re-dispatch had already reached, so every key was handled
+       twice and the list advanced two rows for one press. In `Command` that
+       reads as a palette that navigates away the moment a reader presses Down.
+
+       `stopPropagation` is what closes the second half: the field handled the
+       key, so it must not arrive at the host as well. The move keys are the
+       only ones taken, so Enter, Tab and every character still pass. */
+    event.stopPropagation()
+    this.navigate(event)
   }
 
   /**

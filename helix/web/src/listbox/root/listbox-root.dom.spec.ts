@@ -207,6 +207,58 @@ describe('listbox filtering', () => {
   })
 })
 
+describe('the keyboard in a filterable list', () => {
+  /* Presses into the search field, which is where a reader of a filterable list
+     is: not on the host, which is what every other keyboard test here uses. The
+     difference is the whole subject of this block. */
+  const into = async (host: Updatable, key: string): Promise<void> => {
+    field(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+    await settle(host)
+  }
+
+  test('an arrow moves one option, and moves it once', async () => {
+    /* Measured before this was true: one Down advanced two rows, because the
+       field moved focus to `[part="items"]` and re-dispatched the key there,
+       and the original press then went on bubbling to the same host handler.
+       Two handlings, one press. */
+    const host = (await list('filterable')) as Updatable
+    await into(host, 'ArrowDown')
+    expect(options(host).map((option) => option.active)).toEqual([true, false, false])
+    await into(host, 'ArrowDown')
+    expect(options(host).map((option) => option.active)).toEqual([false, true, false])
+    await into(host, 'ArrowUp')
+    expect(options(host).map((option) => option.active)).toEqual([true, false, false])
+  })
+
+  test('moving is not choosing, because the reader is in a field', async () => {
+    /* The rule `navigate` states: a listbox and a combobox differ by which
+       element the focus is in. A reader typing into a filter is in the second
+       case, so the arrows move a highlight and Enter takes it. Measured before
+       this: the first Down committed a value, which in `Command` meant a
+       palette that navigated away on the first arrow press. */
+    const host = (await list('filterable')) as Updatable & { value: string }
+    const chosen: string[] = []
+    host.addEventListener('helix-change', (event) => {
+      chosen.push((event as CustomEvent<{ value: string }>).detail.value)
+      event.preventDefault()
+    })
+
+    await into(host, 'ArrowDown')
+    await into(host, 'ArrowDown')
+    expect(chosen).toEqual([])
+
+    await into(host, 'Enter')
+    expect(chosen).toEqual(['two'])
+  })
+
+  test('focus stays in the field, so the next character still lands there', async () => {
+    const host = (await list('filterable')) as Updatable
+    field(host).focus()
+    await into(host, 'ArrowDown')
+    expect(host.shadowRoot?.activeElement).toBe(field(host))
+  })
+})
+
 /* Only in a real engine. `ariaActiveDescendantElement` is an element reference,
    which happy-dom does not implement, and the component feature-tests it: under
    a shim the guard declines and there is nothing to assert. `hasLayout` stands
@@ -259,6 +311,31 @@ if (hasLayout()) {
         ariaActiveDescendantElement?: Element | null
       }
       expect(list.ariaActiveDescendantElement?.getRootNode()).toBe(document)
+    })
+  })
+}
+
+/* Same engine requirement as the block above, for the same property. */
+if (hasLayout()) {
+  describe('a filterable list announces from its field', () => {
+    test('the field points at the option the keyboard is on', async () => {
+      /* `aria-activedescendant` is read from the *focused* element. Focus stays
+         in the filter now, so pointing `[part="items"]` at the active option
+         would be announcing to an element nobody is in: the list would move a
+         highlight and a screen reader would hear none of it. */
+      const host = (await list('filterable')) as Updatable
+      const says = (): string =>
+        (
+          field(host) as HTMLInputElement & {
+            ariaActiveDescendantElement?: (Element & { value?: string }) | null
+          }
+        ).ariaActiveDescendantElement?.value ?? ''
+
+      field(host).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+      )
+      await settle(host)
+      expect(says()).toBe('one')
     })
   })
 }
