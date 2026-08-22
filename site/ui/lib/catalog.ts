@@ -263,13 +263,25 @@ const examplesOf = (slug: string, declared: RawDeclaration['helix']): Example[] 
       const slugged = file.replace(/\.html$/, '')
       const stylesheet = join(dir, `${slugged}.css`)
       const html = readFileSync(join(dir, file), 'utf8').trim()
+      /* Which styled example this one is the headless twin of. `base` is the
+         twin of `default`, and `<name>.base` of `<name>`. */
+      const mirrored = slugged === 'base' ? 'default' : slugged.replace(/\.base$/, '')
       return {
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         description: described.get(slugged) ?? '',
         html,
-        // The canonical example reads as "Preview": it is the component's
-        // headline, not a named variant sitting beside the others.
-        label: slugged === 'default' ? 'Preview' : startCase(slugged),
+        /* The canonical example reads as "Preview": it is the component's
+           headline, not a named variant sitting beside the others.
+
+           **A base example takes the name of the one it mirrors**, so the two
+           tiers show the same list rather than a list that changes its labels
+           when a reader changes a preference. `base.html` is the headless
+           twin of `default.html` and reads "Preview" like it; a later
+           `cards.base.html` would read "Cards". Only one of a pair is ever on
+           screen, the tier deciding which, so there is nothing to disambiguate
+           and a differing name would be the only thing suggesting they are
+           different examples. */
+        label: mirrored === 'default' ? 'Preview' : startCase(mirrored),
         slug: slugged,
         tier: (html.includes('<helix-base-') ? 'headless' : 'styled') as 'headless' | 'styled',
       }
