@@ -77,7 +77,20 @@ const walk = (dir, found = []) => {
     const path = join(dir, entry)
     if (statSync(path).isDirectory()) {
       walk(path, found)
-    } else if (path.endsWith('.css') || path.endsWith('.ts') || path.endsWith('.tsx')) {
+      /* Not the generated mirror of a stylesheet, which is the same file twice.
+       *
+       * `bun run styles` writes a `.css.ts` beside every `.css`, holding the
+       * same rules as a template literal, and it is gitignored. Counted as a
+       * `.ts` it doubles every number in this document, and *only after a build
+       * has run*: measured on one commit, `--helix-color-background` reads 63 in
+       * a fresh checkout and 105 once `.css.ts` exists. So the answer depended
+       * on build state, `check:tokens-reference` was red or green by accident,
+       * and regenerating this file from a clean tree wrote numbers CI would
+       * reject. `check-orphans` skips them for its own version of this. */
+    } else if (
+      !path.endsWith('.css.ts') &&
+      (path.endsWith('.css') || path.endsWith('.ts') || path.endsWith('.tsx'))
+    ) {
       found.push(path)
     }
   }
