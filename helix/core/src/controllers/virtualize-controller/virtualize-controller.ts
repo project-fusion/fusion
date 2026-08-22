@@ -51,14 +51,29 @@ export interface Window {
  * track, so the room the absent rows would have taken is left as padding before
  * and after. A reader dragging that thumb is dragging against the real length.
  *
- * **What it does not do, because the platform will not let it here.** True
+ * **What it does not do, and the reason is narrower than it first looks.** True
  * virtualization means never creating the rows that are not on screen, and that
- * needs the set as *data*. Neither channel is open: a consumer's items arrive
- * as light-DOM children, which exist by the time this could decide not to
- * create them, and an `items` property cannot survive React hydration, which
- * skips every property it would have to apply imperatively (see
- * `bindReactHandler`, and the note in the rules that objects and functions have
- * that bug and are not fixed).
+ * needs the set as *data*. Two channels are shut: a consumer's items arrive as
+ * light-DOM children, which exist by the time this could decide not to create
+ * them, and an `items` property cannot survive React hydration, which skips
+ * every property it would have to apply imperatively (see `bindReactHandler`,
+ * and the note in the rules that objects and functions have that bug and are
+ * not fixed).
+ *
+ * **A third is open, and this said otherwise until 21 Aug 2026.** Data as *text*
+ * in the markup, a `<script type="application/json">` child or an attribute, is
+ * neither a property nor a node per row: React's hydration bug cannot touch text
+ * it renders as a child, a server emits it, and the node count is one. The
+ * charts already read data out of the document this way, `for="<id>"` at a real
+ * `<table>`, so the pattern is in the library rather than being invented for
+ * this.
+ *
+ * So the thing actually blocked is the *row template*. Turning an item into
+ * markup wants either a render function, which is a function property and dies
+ * on the same bug, or a `<template>` with named holes, which survives because it
+ * is markup and which no component here asks anyone to write. That is a decision
+ * about what this library is willing to look like, not a platform limit, and it
+ * is open at #71.
  *
  * So what this buys is the expensive half rather than all of it: the rows
  * outside the window are not laid out and not painted, which is where the time
