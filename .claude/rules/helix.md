@@ -146,27 +146,49 @@ back to what the component chose, so the computed half is
 `--date-picker-column-count` rather than something that reads like a second
 opinion on the same setting.
 
-### A component that renders another names the public tag and imports it
+### A component that renders another interpolates the tag and imports it
 
 A custom element registers on import. A tag nobody imported is not an error and
 not a warning: it is an inert unknown element, laying out as an empty inline
 box. A panel built around one looks like a panel that failed to open.
 
-So a template names the **public** tag, `helix-date-picker` rather than
-`helix-base-date-picker`, and **each tier side-effect imports its own version of
-it**. A consumer on the styled tier then gets the styled calendar; one on the
-headless tier brings a calendar of their own under that name. Select does this
-for its listbox and Pagination for its select.
+So a template names **no tag at all**. It interpolates one:
 
-**Both tiers, not just the one with the tag in it.** A styled component extends
-the headless class and almost never overrides `render`, so it inherits the
-template and the obligation with it, while having no `<helix-…>` of its own to
-remind anyone. Date Input shipped without the styled import for exactly that
-reason, and every example still looked right, because the sandbox and the docs
-site import the whole barrel. That is the condition under which this failure is
-invisible: it appears only for the consumer who imports one component.
+```ts
+protected renderPicker(): TemplateResult {
+  const picker = this.tag('date-picker')
+  return html`<${picker} part="picker"></${picker}>`
+}
+```
 
-`bun run check:composed` enforces both halves.
+`tag()` prefixes the name with the class's `tier`, which is `helix-base-` on
+`HelixElement` and `helix-` on every styled component. One template, and each
+tier renders its own children. The styled subclass declares it in one line:
+
+```ts
+static override tier = 'helix-'
+```
+
+**The headless tier may not name a styled tag.** It is the dependency the tiers
+exist to prevent: `helix/headless` composing `helix-select` renders an element it
+does not ship, cannot test the composition (there is no `helix-select` on that
+tier to test against), and leaves the base tier broken for anyone who imports
+only it. Forty-two sites across sixteen families did this, on the argument that
+each tier imports its own element under one name, which holds only while nobody
+imports both, and the docs site imports both.
+
+**Both tiers import, not just the one with the tag in it.** A styled component
+extends the headless class and almost never overrides `render`, so it inherits
+the template and the obligation with it, while having no tag of its own to
+remind anyone. The import path is relative, so the same line in each tier
+registers that tier's element. Date Input shipped without the styled import for
+exactly that reason, and every example still looked right, because the sandbox
+and the docs site import the whole barrel. That is the condition under which this
+failure is invisible: it appears only for the consumer who imports one component.
+
+`bun run check:composed` enforces all three: no literal tag in a template with a
+tier below it, `tier` overridden wherever a base template interpolates, and the
+family imported by both tiers.
 
 ## Server rendering
 

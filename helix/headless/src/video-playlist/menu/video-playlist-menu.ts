@@ -6,8 +6,9 @@ import {
   HelixSelectEvent,
 } from '@helix-io/core'
 import { list } from '@helix-io/icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import type { HelixBaseVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { HelixBaseVideoPlaylist } from '../root/video-playlist-root.js'
 import '../../menu/index.js'
@@ -185,12 +186,12 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
   /** The menu itself, behind a method so a styled tier can render another one. */
   protected renderMenu(): TemplateResult {
     const active = this.playlist?.active
-    return html`<helix-menu part="menu" label=${this.label} placement=${this.placement}>
+    return html`<${this.tag('menu')} part="menu" label=${this.label} placement=${this.placement}>
       <slot name="trigger" slot="trigger">
         <button part="trigger" type="button" aria-label=${this.label}>${drawIcon(list)}</button>
       </slot>
       ${this.entries.map(
-        (entry) => html`<helix-menu-item
+        (entry) => html`<${this.tag('menu-item')}
           part="entry"
           value=${entry.value}
           aria-checked=${entry.value === active ? 'true' : 'false'}
@@ -224,9 +225,9 @@ export class HelixBaseVideoPlaylistMenu extends HelixElement {
               : html`<img alt="" part="poster" slot="start" src=${entry.poster} />`
           }
           ${entry.text}
-        </helix-menu-item>`,
+        </${this.tag('menu-item')}>`,
       )}
-    </helix-menu>`
+    </${this.tag('menu')}>`
   }
 }
 

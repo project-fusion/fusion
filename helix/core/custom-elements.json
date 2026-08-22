@@ -2366,6 +2366,35 @@
           "members": [
             {
               "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-base-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-base-pagination-size` composes `helix-base-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/web` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently."
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object."
+            },
+            {
+              "kind": "field",
               "name": "internals",
               "type": {
                 "text": "ElementInternals"
@@ -2544,6 +2573,43 @@
               },
               "description": "Labels associated with this control.",
               "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "tier",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'helix-base-'",
+              "description": "The prefix this tier registers its elements under.\n\n**A component that renders another renders its own tier's version of it**,\nso `helix-base-pagination-size` composes `helix-base-select` and\n`helix-pagination-size` composes `helix-select`. One template says\n`${this.tag('select')}` and each tier answers with its own name.\n\nIt was the public tag in both tiers, on the argument that each imports its\nown element under that name. That works and costs three things: the name\nmeans two different things depending on what a consumer imported, the\nheadless tier composes an element it does not ship, and the composition\ncannot be tested there at all, because there is no `helix-select` on that\ntier to test it against. Thirty-nine specs had to be moved back to\n`helix/web` for exactly that reason.\n\n**A prefix rather than an override per composition**, which was the first\nplan and does not compile. An override re-renders the fragment from the\nsubclass, and the fragment reads members the base keeps private:\n`PaginationSize` alone would have had to widen `options`, `current` and\n`handleChange` to `protected` so a subclass could say the same thing again.\nSixteen families of that is a lot of encapsulation spent on saying one\nword differently.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "tag",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "StaticValue"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "One composed tag, as a static value a template can interpolate.\n\n`unsafeStatic` is safe by construction: the name is a literal in our own\nsource and the prefix is one of two strings this class defines. Called per\nrender and not cached, which costs nothing, because `static-html` keys its\ntemplate cache on the joined string rather than on the object.",
+              "inheritedFrom": {
+                "name": "HelixElement",
+                "module": "src/helix-element/helix-element.ts"
+              }
             },
             {
               "kind": "field",

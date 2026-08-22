@@ -7,8 +7,9 @@ import {
   restoreValue,
 } from '@helix-io/core'
 import { trash } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import '../../tag/index.js'
 
 /**
@@ -370,14 +371,14 @@ export class HelixBaseFileInput extends MixinField(HelixFormElement) {
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderMeta(file: File): TemplateResult {
-    return html`<helix-tag part="size">${size(file.size, this.locale)}</helix-tag>
-      <helix-tag part="kind">${kind(file)}</helix-tag>`
+    return html`<${this.tag('tag')} part="size">${size(file.size, this.locale)}</${this.tag('tag')}>
+      <${this.tag('tag')} part="kind">${kind(file)}</${this.tag('tag')}>`
   }
 
   protected override render(): TemplateResult {

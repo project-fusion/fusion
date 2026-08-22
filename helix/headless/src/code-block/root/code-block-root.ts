@@ -1,6 +1,7 @@
 import { customElement, HelixElement } from '@helix-io/core'
-import { html, nothing, type TemplateResult } from 'lit'
+import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 
 /**
@@ -112,17 +113,17 @@ export class HelixBaseCodeBlock extends HelixElement {
    *
    * A method rather than a fragment inline, so a tier above can render its own
    * copy control, wrap this one, or pass it something the base does not know
-   * about, without reimplementing the whole template to do it. The public tag
-   * rather than the base one: a consumer on the styled tier gets the styled
-   * button, and one on the headless tier brings a button of their own under
-   * that name.
+   * about, without reimplementing the whole template to do it. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base button, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderCopyButton(): TemplateResult {
-    return html`<helix-copy-button
+    return html`<${this.tag('copy-button')}
       part="copy"
       label="Copy code"
       .value=${this.text}
-    ></helix-copy-button>`
+    ></${this.tag('copy-button')}>`
   }
 }
 

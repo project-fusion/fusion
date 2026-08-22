@@ -41,6 +41,8 @@ import { styles } from './file-input-root.css.js'
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixBaseFileInput {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [glyphStyles, fieldStyles, fieldStackedStyles, styles]
 }
 

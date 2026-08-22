@@ -44,6 +44,8 @@ export class HelixVideoPlaylistMenu extends HelixBaseVideoPlaylistMenu {
      inside a 24x24 button, filling it edge to edge beside a 16x16 fullscreen
      icon: right colour, right button, right position, and half again too big.
      Nothing failed, because a missing rule is not an error. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 

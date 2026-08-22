@@ -7,12 +7,13 @@ import {
   MixinField,
   PopoverController,
 } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-/* Side-effect import, because this renders `<helix-color-picker>` in its own shadow
-   root and a custom element registers on import. The public tag rather than the
-   base one: a consumer on the styled tier gets the styled picker, and one on the
-   headless tier brings a picker of their own under that name. */
+import { html } from 'lit/static-html.js'
+/* Side-effect import, because this renders a picker in its own shadow root and
+   a custom element registers on import. The path is relative, so this registers
+   the base picker and the styled file's identical import registers the styled
+   one; `tier` picks which name the template asks for. */
 import '../../color-picker/index.js'
 import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js'
 
@@ -341,13 +342,13 @@ export class HelixBaseColorInput extends MixinControllerOpen(
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderPicker(): TemplateResult {
-    return html`<helix-color-picker
+    return html`<${this.tag('color-picker')}
       part="picker"
       ?invalid=${this.resolvedFeedback !== ''}
       ?alpha=${this.alpha}
@@ -360,7 +361,7 @@ export class HelixBaseColorInput extends MixinControllerOpen(
       @helix-change=${this.handlePickerChange}
       @helix-sample-start=${this.handleSampleStart}
       @helix-sample-end=${this.handleSampleEnd}
-    ></helix-color-picker>`
+    ></${this.tag('color-picker')}>`
   }
 
   protected override render(): TemplateResult {

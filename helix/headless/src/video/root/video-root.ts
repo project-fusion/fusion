@@ -24,13 +24,12 @@ import {
   speakerHigh,
   speakerX,
 } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-/* Side-effect, and the public tag rather than the base one: a consumer on the
-   styled tier gets the styled menu, and one on the headless tier brings their
-   own under that name. Both tiers import it, because this tier writes the tag
-   and the styled tier inherits the template without having one of its own to
-   remind anyone. */
+import { html } from 'lit/static-html.js'
+/* Side-effect, for the menu rows this renders. Both tiers import it, because
+   this tier writes the template and the styled tier inherits it without having
+   a copy of its own to remind anyone. */
 import '../../menu/index.js'
 
 /**
@@ -963,7 +962,7 @@ export class HelixBaseVideo extends HelixElement {
          a frame without the permission is the common case, and the fix is on
          the frame rather than here, so the message has to say which. */
       console.warn(
-        '<helix-video> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".',
+        `<${this.localName}> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".`,
         error,
       )
     }
@@ -1300,74 +1299,74 @@ export class HelixBaseVideo extends HelixElement {
         ${drawIcon(closedCaptioning)}
       </button>`
     }
-    return html`<helix-menu part="captions-menu" label="Subtitles" placement="top-end">
+    return html`<${this.tag('menu')} part="captions-menu" label="Subtitles" placement="top-end">
       <button part="captions" slot="trigger" type="button" aria-label="Subtitles">
         ${drawIcon(closedCaptioning)}
       </button>
-      <helix-menu-item
+      <${this.tag('menu-item')}
         value="off"
         aria-checked=${this.captionIndex < 0 ? 'true' : 'false'}
         role="menuitemradio"
         @helix-select=${() => this.showCaption(-1)}
       >
         Off
-      </helix-menu-item>
+      </${this.tag('menu-item')}>
       ${tracks.map(
-        (track, at) => html`<helix-menu-item
+        (track, at) => html`<${this.tag('menu-item')}
           value=${track.language || String(at)}
           aria-checked=${this.captionIndex === at ? 'true' : 'false'}
           role="menuitemradio"
           @helix-select=${() => this.showCaption(at)}
         >
           ${track.label || track.language}
-        </helix-menu-item>`,
+        </${this.tag('menu-item')}>`,
       )}
-    </helix-menu>`
+    </${this.tag('menu')}>`
   }
 
   /* `protected` rather than `private`: the method was already the seam and a
      tier above simply could not reach it. */
   protected renderOverflowItem(one: string): TemplateResult {
     if (one === 'remote') {
-      return html`<helix-menu-item
+      return html`<${this.tag('menu-item')}
         value="remote"
         @helix-select=${() => void this.promptRemote()}
       >
         ${drawIcon(airplay, { slot: 'start' })}
         Play on another device
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
     if (one === 'speed') {
-      return html`<helix-menu-item value="speed" @helix-select=${() => this.cycleSpeed()}>
+      return html`<${this.tag('menu-item')} value="speed" @helix-select=${() => this.cycleSpeed()}>
         ${drawIcon(gauge, { slot: 'start' })}
         Playback speed: ${this.rate}x
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
     if (one === 'rewind' || one === 'forward') {
       const back = one === 'rewind'
-      return html`<helix-menu-item
+      return html`<${this.tag('menu-item')}
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
         ${drawIcon(back ? arrowCounterClockwise : arrowClockwise, { slot: 'start' })}
         ${back ? `Back ${SKIP_SECONDS} seconds` : `Forward ${SKIP_SECONDS} seconds`}
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
     if (one === 'previous') {
-      return html`<helix-menu-item value="previous" @helix-select=${() => this.skip(true)}>
+      return html`<${this.tag('menu-item')} value="previous" @helix-select=${() => this.skip(true)}>
         ${drawIcon(skipBack, { slot: 'start' })}
         Previous
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
     if (one === 'next') {
-      return html`<helix-menu-item value="next" @helix-select=${() => this.skip(false)}>
+      return html`<${this.tag('menu-item')} value="next" @helix-select=${() => this.skip(false)}>
         ${drawIcon(skipForward, { slot: 'start' })}
         Next
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
     if (one === 'download') {
       const local = this.localFile
-      return html`<helix-menu-item
+      return html`<${this.tag('menu-item')}
         ?download=${local}
         href=${this.src}
         rel=${local ? nothing : 'noreferrer'}
@@ -1376,12 +1375,12 @@ export class HelixBaseVideo extends HelixElement {
       >
         ${drawIcon(download, { slot: 'start' })}
         Download
-      </helix-menu-item>`
+      </${this.tag('menu-item')}>`
     }
-    return html`<helix-menu-item value="pip" @helix-select=${() => void this.togglePip()}>
+    return html`<${this.tag('menu-item')} value="pip" @helix-select=${() => void this.togglePip()}>
       ${drawIcon(pictureInPicture, { slot: 'start' })}
       Picture in picture
-    </helix-menu-item>`
+    </${this.tag('menu-item')}>`
   }
 
   /* `protected` rather than `private`: the method was already the seam and a
@@ -1449,12 +1448,12 @@ export class HelixBaseVideo extends HelixElement {
       ${
         this.overflow.length === 0
           ? nothing
-          : html`<helix-menu part="overflow" label="More controls" placement="top-end">
+          : html`<${this.tag('menu')} part="overflow" label="More controls" placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label="More controls">
                 ${drawIcon(dotsThreeVertical)}
               </button>
               ${this.overflow.map((one) => this.renderOverflowItem(one))}
-            </helix-menu>`
+            </${this.tag('menu')}>`
       }
       ${
         /* Whatever else belongs on this bar, put here by whoever knows.

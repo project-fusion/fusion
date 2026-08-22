@@ -50,6 +50,8 @@ import { styles } from './color-input-root.css.js'
  */
 @customElement('helix-color-input')
 export class HelixColorInput extends HelixBaseColorInput {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 

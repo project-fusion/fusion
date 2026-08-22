@@ -21,6 +21,8 @@ import '../../copy-button/index.js'
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixBaseCodeBlock {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

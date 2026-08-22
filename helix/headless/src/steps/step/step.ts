@@ -1,12 +1,13 @@
 import { customElement, HelixElement, HelixSelectEvent, hostAria } from '@helix-io/core'
 import { check, circle, record } from '@helix-io/icons'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import type { PropertyValues, TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-/* Side-effect import, because this renders `<helix-button>` and a custom element
-   registers on import. The public tag rather than the base one: a consumer on the
-   styled tier gets the styled button, and one on the headless tier brings a button
-   of their own under that name. `check:composed` enforces it, in both tiers. */
+import { html } from 'lit/static-html.js'
+/* Side-effect import, because this renders a button and a custom element
+   registers on import. The path is relative, so this registers the base button
+   and the styled file's identical import registers the styled one; `tier` picks
+   which name the template asks for. `check:composed` enforces both. */
 import '../../button/index.js'
 
 /**
@@ -147,20 +148,20 @@ export class HelixBaseStep extends HelixElement {
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderLabel(): TemplateResult {
-    return html`<helix-button
+    return html`<${this.tag('button')}
       part="label"
       appearance="ghost"
       ?disabled=${this.disabled}
       @click=${this.select}
     >
       <slot></slot>
-    </helix-button>`
+    </${this.tag('button')}>`
   }
 
   protected override render(): TemplateResult {

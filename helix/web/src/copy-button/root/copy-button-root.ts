@@ -22,6 +22,8 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-copy-button')
 export class HelixCopyButton extends MixinControlSurface(HelixBaseCopyButton) {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [HelixIconButton.styles, styles].flat()
 }
 

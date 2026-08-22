@@ -28,6 +28,8 @@ import '../../button/index.js'
  */
 @customElement('helix-tour-stop')
 export class HelixTourStop extends HelixBaseTourStop {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

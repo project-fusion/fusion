@@ -8,12 +8,13 @@ import {
   PopoverController,
 } from '@helix-io/core'
 import { clock } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
-   custom element registers on import. The public tags rather than the base ones,
-   the arrangement Date Input has with its calendar. */
+   custom element registers on import. Base elements here and styled ones in the
+   styled file, the arrangement Date Input has with its calendar. */
 import '../../icon/index.js'
 import '../../tag/index.js'
 import '../../time-picker/index.js'
@@ -444,13 +445,13 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderPicker(): TemplateResult {
-    return html`<helix-time-picker
+    return html`<${this.tag('time-picker')}
       part="picker"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
@@ -462,7 +463,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
       step=${this.step}
       .value=${this.picked}
       @helix-change=${this.handlePicked}
-    ></helix-time-picker>`
+    ></${this.tag('time-picker')}>`
   }
 
   /**
@@ -470,13 +471,13 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderTag(at: string): TemplateResult {
-    return html`<helix-tag
+    return html`<${this.tag('tag')}
                   part="time"
                   dismissible
                   dismiss-label=${`Remove ${this.written(at)}`}
@@ -485,7 +486,7 @@ export class HelixBaseTimeInput extends MixinControllerOpen(
                     event.stopPropagation()
                     this.removeTime(at)
                   }}
-                  >${this.written(at)}</helix-tag
+                  >${this.written(at)}</${this.tag('tag')}
                 >`
   }
 

@@ -18,6 +18,8 @@ import { styles } from './step.css.js'
  */
 @customElement('helix-step')
 export class HelixStep extends HelixBaseStep {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

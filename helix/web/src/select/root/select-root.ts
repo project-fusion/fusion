@@ -44,6 +44,8 @@ import '../../option/index.js'
  */
 @customElement('helix-select')
 export class HelixSelect extends HelixBaseSelect {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 

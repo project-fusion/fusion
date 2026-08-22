@@ -52,6 +52,8 @@ import { styles } from './color-picker-root.css.js'
  */
 @customElement('helix-color-picker')
 export class HelixColorPicker extends HelixBaseColorPicker {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 

@@ -37,6 +37,8 @@ import { styles } from './combobox-root.css.js'
  */
 @customElement('helix-combobox')
 export class HelixCombobox extends HelixBaseCombobox {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 

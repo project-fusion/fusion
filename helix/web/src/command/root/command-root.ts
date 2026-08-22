@@ -28,6 +28,8 @@ import { styles } from './command-root.css.js'
  */
 @customElement('helix-command')
 export class HelixCommand extends HelixBaseCommand {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

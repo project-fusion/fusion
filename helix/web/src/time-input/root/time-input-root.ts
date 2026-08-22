@@ -41,6 +41,8 @@ import { styles } from './time-input-root.css.js'
  */
 @customElement('helix-time-input')
 export class HelixTimeInput extends HelixBaseTimeInput {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 

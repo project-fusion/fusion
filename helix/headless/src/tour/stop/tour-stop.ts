@@ -6,8 +6,9 @@ import {
   type Placement,
   PopoverController,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import type { PropertyValues, TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 
 /**
@@ -162,28 +163,28 @@ export class HelixBaseTourStop extends HelixElement {
    */
   protected renderActions(): TemplateResult {
     return html`<slot name="actions">
-      <helix-button part="skip" appearance="ghost" @click=${() => this.ask('skip')}>
+      <${this.tag('button')} part="skip" appearance="ghost" @click=${() => this.ask('skip')}>
         ${this.skipLabel}
-      </helix-button>
+      </${this.tag('button')}>
       ${
         this.first
           ? ''
-          : html`<helix-button
+          : html`<${this.tag('button')}
               part="back"
               appearance="outlined"
               @click=${() => this.ask('back')}
             >
               ${this.backLabel}
-            </helix-button>`
+            </${this.tag('button')}>`
       }
-      <helix-button
+      <${this.tag('button')}
         part="next"
         appearance="solid"
         tone="primary"
         @click=${() => this.ask('next')}
       >
         ${this.last ? this.doneLabel : this.nextLabel}
-      </helix-button>
+      </${this.tag('button')}>
     </slot>`
   }
 

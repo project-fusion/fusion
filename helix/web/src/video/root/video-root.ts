@@ -76,6 +76,8 @@ export class HelixVideo extends HelixBaseVideo {
   @property({ reflect: true })
   appearance?: 'plain' | 'solid'
 
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }
 

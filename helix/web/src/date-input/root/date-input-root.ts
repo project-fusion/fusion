@@ -47,6 +47,8 @@ import { styles } from './date-input-root.css.js'
  */
 @customElement('helix-date-input')
 export class HelixDateInput extends HelixBaseDateInput {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }
 

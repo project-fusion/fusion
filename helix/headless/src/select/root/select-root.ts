@@ -8,9 +8,10 @@ import {
   PopoverController,
 } from '@helix-io/core'
 import { caretDown } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
 import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
 import '../../listbox/index.js'
 
@@ -277,12 +278,13 @@ export class HelixBaseSelect extends MixinControllerOpen(
    *
    * A method rather than a fragment inline, so a tier above can render its own
    * list, wrap this one, or pass it a property the base does not know about,
-   * without reimplementing the whole template. The public tag rather than the
-   * base one: a consumer on the styled tier gets the styled listbox, and one on
-   * the headless tier brings a listbox of their own under that name.
+   * without reimplementing the whole template. The tag is interpolated rather
+   * than written, so `tier` resolves it: this renders the base listbox, and a
+   * styled subclass that sets `tier` renders the styled one from the same
+   * template.
    */
   protected renderListbox(): TemplateResult {
-    return html`<helix-listbox
+    return html`<${this.tag('listbox')}
       empty-text=${this.emptyText}
       loading-text=${this.loadingText}
       ?loading=${this.loading}
@@ -300,7 +302,7 @@ export class HelixBaseSelect extends MixinControllerOpen(
            changes no property, so nothing else would schedule the update
            that fixes it. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
-    </helix-listbox>`
+    </${this.tag('listbox')}>`
   }
 
   /**

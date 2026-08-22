@@ -5,14 +5,13 @@ import {
   HelixElement,
   requestControlledChange,
 } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-/* Side-effect imports, because this renders `<helix-select>` and
-   `<helix-option>` in its own shadow root and a custom element registers on
-   import. Same arrangement `Select` uses for the listbox it renders, down to
-   naming the public tags rather than the base ones: a consumer on the styled
-   tier gets the styled select, and one on the headless tier has to bring a
-   select of their own under that name. */
+import { html } from 'lit/static-html.js'
+/* Side-effect imports, because this renders a select and an option in its own
+   shadow root and a custom element registers on import. The paths are relative,
+   so this registers the base pair and the styled file's identical imports
+   register the styled pair; `tier` picks which names the template asks for. */
 import '../../option/index.js'
 import '../../select/index.js'
 
@@ -205,13 +204,23 @@ export class HelixBasePaginationSize extends HelixElement {
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them.
+   *
+   * **The tags are interpolated, so each tier renders its own.** They were
+   * written out as `<helix-select>` on the argument that each tier imports its
+   * own element under that name, which works and costs more than it looks: the
+   * name means two different things depending on what a consumer imported, this
+   * tier composes an element it does not ship, and the composition cannot be
+   * tested here at all, since there is no `helix-select` on this tier to test it
+   * against. `tier` resolves the name instead, and the styled subclass changes
+   * it in one line rather than reimplementing this method. A tier that renders
+   * its own elements is a tier that stands alone, which is the claim the package
+   * makes.
    */
   protected renderSelect(): TemplateResult {
-    return html`<helix-select
+    const select = this.tag('select')
+    const option = this.tag('option')
+    return html`<${select}
       part="control"
       exportparts="label, trigger, value"
       label=${this.label}
@@ -219,9 +228,9 @@ export class HelixBasePaginationSize extends HelixElement {
       @helix-change=${this.handleChange}
     >
       ${this.options.map(
-        (size) => html`<helix-option value=${String(size)}>${this.numbers(size)}</helix-option>`,
+        (size) => html`<${option} value=${String(size)}>${this.numbers(size)}</${option}>`,
       )}
-    </helix-select>`
+    </${select}>`
   }
 
   protected override render(): TemplateResult | typeof nothing {

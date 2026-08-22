@@ -5,13 +5,14 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@helix-io/core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import type { PropertyValues, TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import type { HelixBaseListbox } from '../../listbox/root/listbox-root.js'
 /* Side-effect imports, because this renders both in its own shadow root and a
-   custom element registers on import. The public tags rather than the base
-   ones: a consumer on the styled tier gets the styled pair, and one on the
-   headless tier brings their own under those names. */
+   custom element registers on import. The paths are relative, so this registers
+   the base pair and the styled file's identical imports register the styled
+   pair; `tier` picks which names the template asks for. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
 
@@ -292,13 +293,13 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderDialog(): TemplateResult {
-    return html`<helix-dialog
+    return html`<${this.tag('dialog')}
       exportparts="dialog"
       label=${this.label}
       .open=${this.open}
@@ -308,7 +309,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
         }
       }}
     >
-      <helix-listbox
+      <${this.tag('listbox')}
         part="listbox"
         exportparts="items, empty, search, search-field"
         aria-label=${this.label}
@@ -318,7 +319,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
         @helix-change=${this.handleChange}
       >
         <slot></slot>
-      </helix-listbox>
+      </${this.tag('listbox')}>
       <div ?hidden=${!this.footed} part="footer" slot="footer">
         <slot
           name="footer"
@@ -327,7 +328,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
           }}
         ></slot>
       </div>
-    </helix-dialog>`
+    </${this.tag('dialog')}>`
   }
 
   protected override render(): TemplateResult {

@@ -36,6 +36,8 @@ import { styles } from './time-picker-root.css.js'
  */
 @customElement('helix-time-picker')
 export class HelixTimePicker extends HelixBaseTimePicker {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

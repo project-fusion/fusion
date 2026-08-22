@@ -29,6 +29,11 @@ import { styles } from './pagination-size.css.js'
  */
 @customElement('helix-pagination-size')
 export class HelixPaginationSize extends HelixBasePaginationSize {
+  /* So the seam renders `helix-select` and `helix-option` rather than the base
+     pair the headless tier composes. One word, and the template stays in one
+     place. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

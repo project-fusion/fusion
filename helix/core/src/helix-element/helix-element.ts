@@ -1,4 +1,5 @@
 import { type CSSResultOrNative, css, LitElement } from 'lit'
+import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
 import { helixEventNames } from '../events/events.js'
 
 /**
@@ -291,6 +292,44 @@ const bindReactHandler = (host: EventTarget, event: Event): void => {
  * @documentation https://helix.fusion.dev/core/helix-element
  */
 export class HelixElement extends LitElement {
+  /**
+   * The prefix this tier registers its elements under.
+   *
+   * **A component that renders another renders its own tier's version of it**,
+   * so `helix-base-pagination-size` composes `helix-base-select` and
+   * `helix-pagination-size` composes `helix-select`. One template says
+   * `${this.tag('select')}` and each tier answers with its own name.
+   *
+   * It was the public tag in both tiers, on the argument that each imports its
+   * own element under that name. That works and costs three things: the name
+   * means two different things depending on what a consumer imported, the
+   * headless tier composes an element it does not ship, and the composition
+   * cannot be tested there at all, because there is no `helix-select` on that
+   * tier to test it against. Thirty-nine specs had to be moved back to
+   * `helix/web` for exactly that reason.
+   *
+   * **A prefix rather than an override per composition**, which was the first
+   * plan and does not compile. An override re-renders the fragment from the
+   * subclass, and the fragment reads members the base keeps private:
+   * `PaginationSize` alone would have had to widen `options`, `current` and
+   * `handleChange` to `protected` so a subclass could say the same thing again.
+   * Sixteen families of that is a lot of encapsulation spent on saying one
+   * word differently.
+   */
+  static tier = 'helix-base-'
+
+  /**
+   * One composed tag, as a static value a template can interpolate.
+   *
+   * `unsafeStatic` is safe by construction: the name is a literal in our own
+   * source and the prefix is one of two strings this class defines. Called per
+   * render and not cached, which costs nothing, because `static-html` keys its
+   * template cache on the joined string rather than on the object.
+   */
+  protected tag(name: string): StaticValue {
+    return unsafeStatic(`${(this.constructor as typeof HelixElement).tier}${name}`)
+  }
+
   /**
    * The element's semantics, set without touching the DOM.
    *

@@ -4,12 +4,13 @@ import {
   HelixFormElement,
   MixinControllerValue,
 } from '@helix-io/core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 /* Side-effect imports, because this renders these in its own shadow root and a
-   custom element registers on import. The public tags rather than the base ones:
-   a consumer on the styled tier gets the styled elements, and one on the
-   headless tier brings their own under those names. */
+   custom element registers on import. The paths are relative, so this registers
+   the base elements and the styled file's identical imports register the styled
+   ones; `tier` picks which names the template asks for. */
 import '../../listbox/index.js'
 import '../../option/index.js'
 
@@ -488,7 +489,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     value: string,
     barred: (one: string) => boolean = () => false,
   ): TemplateResult {
-    return html`<helix-listbox
+    return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
       exportparts="items"
@@ -502,11 +503,11 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     >
       ${values.map(
         (one) =>
-          html`<helix-option part="option" value=${one} ?disabled=${barred(one)}
-            >${written(one)}</helix-option
+          html`<${this.tag('option')} part="option" value=${one} ?disabled=${barred(one)}
+            >${written(one)}</${this.tag('option')}
           >`,
       )}
-    </helix-listbox>`
+    </${this.tag('listbox')}>`
   }
 
   private renderSpinner(): TemplateResult {
@@ -558,13 +559,13 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderList(): TemplateResult {
-    return html`<helix-listbox
+    return html`<${this.tag('listbox')}
       part="list"
       exportparts="items, empty"
       aria-label=${this.label}
@@ -576,15 +577,15 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     >
       ${this.times.map((minutes) => {
         const at = fromMinutes(minutes)
-        return html`<helix-option
+        return html`<${this.tag('option')}
           part="option"
           value=${at}
           ?disabled=${this.barred(at)}
           data-between=${this.between(at) ? '' : nothing}
-          >${writeTime(at, this.locale)}</helix-option
+          >${writeTime(at, this.locale)}</${this.tag('option')}
         >`
       })}
-    </helix-listbox>`
+    </${this.tag('listbox')}>`
   }
 
   protected override render(): TemplateResult {

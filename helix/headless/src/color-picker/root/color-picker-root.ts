@@ -11,12 +11,13 @@ import {
   MixinControllerValue,
 } from '@helix-io/core'
 import { eyedropper } from '@helix-io/icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-/* Side-effect import, because this renders `<helix-slider>` in its own shadow
-   root and a custom element registers on import. The public tag rather than the
-   base one: a consumer on the styled tier gets the styled slider, and one on the
-   headless tier brings a slider of their own under that name. */
+import { html } from 'lit/static-html.js'
+/* Side-effect import, because this renders a slider in its own shadow root and
+   a custom element registers on import. The path is relative, so this registers
+   the base slider and the styled file's identical import registers the styled
+   one; `tier` picks which name the template asks for. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'
@@ -390,7 +391,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
     max: number,
     value: number,
   ): TemplateResult {
-    return html`<helix-slider
+    return html`<${this.tag('slider')}
       part="channel"
       data-channel=${channel}
       label=${label}
@@ -400,7 +401,7 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
       ?disabled=${this.isDisabled}
       @helix-input=${(event: Event) => this.takeChannel(channel, event)}
       @helix-change=${(event: Event) => this.takeChannel(channel, event)}
-    ></helix-slider>`
+    ></${this.tag('slider')}>`
   }
 
   /**
@@ -438,38 +439,38 @@ export class HelixBaseColorPicker extends MixinControllerValue(HelixFormElement)
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The
-   * public tag rather than the base one: a consumer on the styled tier gets the
-   * styled element, and one on the headless tier brings their own under that
-   * name.
+   * out, without reimplementing the whole template to do any of them. The tag is
+   * interpolated rather than written, so `tier` resolves it: this renders the
+   * base element, and a styled subclass that sets `tier` renders the styled one
+   * from the same template.
    */
   protected renderTools(): TemplateResult {
-    return html`<helix-button-group part="actions" label="Color tools">
+    return html`<${this.tag('button-group')} part="actions" label="Color tools">
                 ${
                   this.sampling && !this.noEyedropper
-                    ? html`<helix-button
+                    ? html`<${this.tag('button')}
                         part="eyedropper"
                         aria-label="Sample a color from the screen"
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
                         ${drawIcon(eyedropper)}
-                      </helix-button>`
+                      </${this.tag('button')}>`
                     : nothing
                 }
                 ${
                   this.noFormat
                     ? nothing
-                    : html`<helix-button
+                    : html`<${this.tag('button')}
                         part="format"
                         aria-label=${`Syntax: ${this.format ?? 'hex'}. Change it.`}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
                         ${this.format ?? 'hex'}
-                      </helix-button>`
+                      </${this.tag('button')}>`
                 }
-              </helix-button-group>`
+              </${this.tag('button-group')}>`
   }
 
   protected override render(): TemplateResult {

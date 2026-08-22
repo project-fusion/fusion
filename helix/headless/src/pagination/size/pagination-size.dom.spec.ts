@@ -12,7 +12,7 @@ const control = (host: HTMLElement): HTMLElement & { value: string } =>
   part(host, 'control') as HTMLElement & { value: string }
 
 const options = (host: HTMLElement): string[] =>
-  [...(host.shadowRoot?.querySelectorAll('helix-option') ?? [])].map(
+  [...(host.shadowRoot?.querySelectorAll('helix-base-option') ?? [])].map(
     (one) => one.getAttribute('value') ?? '',
   )
 
@@ -32,23 +32,29 @@ describe('pagination size', () => {
     /* It was native first, on the argument that the platform's menu is a wheel
        on a phone. What that leaves out is a library with two dropdowns that are
        identical closed and different open, met in the same footer. */
-    const it = await mount('<helix-pagination-size></helix-pagination-size>')
-    expect(control(it).tagName).toBe('HELIX-SELECT')
+    const it = await mount('<helix-base-pagination-size></helix-base-pagination-size>')
+    expect(control(it).tagName).toBe('HELIX-BASE-SELECT')
   })
 
   test('offers the sizes it was given, in order', async () => {
-    const it = await mount('<helix-pagination-size sizes="10,25,50"></helix-pagination-size>')
+    const it = await mount(
+      '<helix-base-pagination-size sizes="10,25,50"></helix-base-pagination-size>',
+    )
     expect(options(it)).toEqual(['10', '25', '50'])
   })
 
   test('anything that is not a size is dropped rather than offered', async () => {
     // An option that cannot mean anything is worse than a shorter list.
-    const it = await mount('<helix-pagination-size sizes="10, ,x,-5,25"></helix-pagination-size>')
+    const it = await mount(
+      '<helix-base-pagination-size sizes="10, ,x,-5,25"></helix-base-pagination-size>',
+    )
     expect(options(it)).toEqual(['10', '25'])
   })
 
   test('falls back to the first offered where nothing named one', async () => {
-    const it = await mount('<helix-pagination-size sizes="20,40"></helix-pagination-size>')
+    const it = await mount(
+      '<helix-base-pagination-size sizes="20,40"></helix-base-pagination-size>',
+    )
     expect(control(it).value).toBe('20')
   })
 
@@ -56,7 +62,7 @@ describe('pagination size', () => {
     /* Nothing here reconstructs the association. `Select` renders the label and
        gives the trigger the id it points at, and that pairing has its own
        specs one component over. */
-    const it = await mount('<helix-pagination-size></helix-pagination-size>')
+    const it = await mount('<helix-base-pagination-size></helix-base-pagination-size>')
     const select = control(it)
     const label = select.shadowRoot?.querySelector('[part="label"]') as HTMLLabelElement
     const trigger = select.shadowRoot?.querySelector('[part="trigger"]') as HTMLElement
@@ -66,7 +72,7 @@ describe('pagination size', () => {
 
   test('moves itself when nothing declared the value', async () => {
     const it = (await mount(
-      '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
+      '<helix-base-pagination-size default-value="10" sizes="10,25"></helix-base-pagination-size>',
     )) as Size
     control(it).dispatchEvent(choose(it, '25'))
     await it.updateComplete
@@ -78,7 +84,7 @@ describe('pagination size', () => {
        have heard two per change, one of them carrying `Select`'s idea of what a
        name and a value are. */
     const it = (await mount(
-      '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
+      '<helix-base-pagination-size default-value="10" sizes="10,25"></helix-base-pagination-size>',
     )) as Size
     const heard: string[] = []
     it.addEventListener('helix-change', (event) => {
@@ -95,7 +101,7 @@ describe('pagination size', () => {
 
   test('announces before it moves, so a listener can refuse', async () => {
     const it = (await mount(
-      '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
+      '<helix-base-pagination-size default-value="10" sizes="10,25"></helix-base-pagination-size>',
     )) as Size
     let announced = ''
     it.addEventListener('helix-change', (event) => {
@@ -113,7 +119,7 @@ describe('pagination size', () => {
        `requestControlledChange` cannot get ahead of. Lit skips a property
        binding whose value has not changed, so nothing else would undo it. */
     const it = (await mount(
-      '<helix-pagination-size default-value="10" sizes="10,25"></helix-pagination-size>',
+      '<helix-base-pagination-size default-value="10" sizes="10,25"></helix-base-pagination-size>',
     )) as Size
     it.addEventListener('helix-change', (event) => event.preventDefault())
     control(it).value = '25'
@@ -125,7 +131,7 @@ describe('pagination size', () => {
 
   test('declaring `value` hands it over: it announces and applies nothing', async () => {
     const it = (await mount(
-      '<helix-pagination-size sizes="10,25" value="10"></helix-pagination-size>',
+      '<helix-base-pagination-size sizes="10,25" value="10"></helix-base-pagination-size>',
     )) as Size
     let announced = ''
     it.addEventListener('helix-change', (event) => {
@@ -144,7 +150,7 @@ describe('pagination size with nothing to offer', () => {
        and cannot use, which is worse than an absence. Falling back to the
        built-in list was the other answer and it is a component overruling a
        consumer who said "none". */
-    const it = await mount('<helix-pagination-size sizes=""></helix-pagination-size>')
+    const it = await mount('<helix-base-pagination-size sizes=""></helix-base-pagination-size>')
     expect(part(it, 'control')).toBeNull()
     expect(
       (it as unknown as { internals: { states: Set<string> } }).internals.states.has('empty'),

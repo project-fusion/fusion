@@ -1,8 +1,9 @@
 import { customElement, HelixCopyEvent } from '@helix-io/core'
 import { check, copy } from '@helix-io/icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
 import { HelixBaseIconButton } from '../../icon-button/root/icon-button-root.js'
 import '../../tooltip/index.js'
 
@@ -206,9 +207,9 @@ export class HelixBaseCopyButton extends HelixBaseIconButton {
    * Rendering the button here as well would make all three a rewrite.
    */
   protected renderTooltip(control: TemplateResult): TemplateResult {
-    return html`<helix-tooltip content=${this.says} exportparts="tooltip">
+    return html`<${this.tag('tooltip')} content=${this.says} exportparts="tooltip">
       ${control}
-    </helix-tooltip>`
+    </${this.tag('tooltip')}>`
   }
 }
 
