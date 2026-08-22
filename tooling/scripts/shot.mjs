@@ -37,6 +37,32 @@
  * so a component is the whole frame instead of a tenth of one. `--pad` widens
  * the box, which is what a shadow or a focus ring needs to be in the picture at
  * all: the box stops at the border edge and both of those draw outside it.
+ *
+ * **A component is worth looking at in a state, and page load is not one of
+ * them.** A closed select, an unhovered card and an unfocused button are the
+ * three least interesting frames a component has, so `--click`, `--press` and
+ * `--eval` put it somewhere first:
+ *
+ * ```
+ * bun run shot / --click 'helix-select' --select helix-select --pad 40
+ * bun run shot / --press 'Tab Tab' --select 'helix-button' --pad 12
+ * bun run shot / --eval 'document.querySelector("helix-carousel").goTo(2)' --wait 900
+ * ```
+ *
+ * `--press` rather than a `--focus` flag, because a focus ring is `:focus-visible`
+ * and that answers to how focus arrived: `element.focus()` moves it without
+ * drawing anything, and a real Tab is the only way to photograph the ring a
+ * keyboard reader actually sees.
+ *
+ * `--eval` prints what it returns, so this measures as well as photographs,
+ * which is worth having in one command: a screenshot showing 16px of room is
+ * worth more beside the number than on its own.
+ *
+ * **`--frame` reaches into the sandbox**, which the docs site needs and which is
+ * the first thing this could not do. A component's examples are rendered in an
+ * iframe, so the reference page for Carousel has no `helix-carousel` in its own
+ * document, and every selector here has to be resolved against the frame rather
+ * than the page.
  */
 import { mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -62,7 +88,12 @@ if (target === undefined || target.startsWith('--')) {
       '  --scheme <light|dark>\n' +
       '  --full              the whole scrollable page\n' +
       '  --out <name.png>    default is built from the path\n' +
-      '  --wait <ms>         extra settling time after load (default 400)\n',
+      '  --wait <ms>         extra settling time after load (default 400)\n' +
+      '  --frame <substring> resolve everything against the iframe whose URL contains this\n' +
+      '  --click <css>       click it before shooting, to open what is closed\n' +
+      '  --hover <css>       hover it before shooting\n' +
+      '  --press <keys>      press these in order, "Tab Tab", for a real focus ring\n' +
+      '  --eval <js>         run in the page before shooting, and print what it returns\n',
   )
   process.exit(1)
 }
@@ -111,11 +142,93 @@ try {
   /* Fonts before pixels. A page shot mid-swap is a page with the fallback's
      metrics, which moves every line of text in it. */
   await page.evaluate(() => document.fonts.ready)
+
+  /* Everything below resolves against this, which is the page unless a frame
+     was named. The sandbox is the case that needs it. */
+  const where = flag('frame')
+  const scope = where === undefined ? page : page.frames().find((one) => one.url().includes(where))
+  if (scope === undefined) {
+    console.error(
+      `shot: no frame whose URL contains \`${where}\`. This page has ` +
+        `${page.frames().length}: ${page
+          .frames()
+          .map((one) => one.url())
+          .join(', ')}`,
+    )
+    process.exit(1)
+  }
+
+  /* The first *visible* match, not the first match.
+   *
+   * A real page has hidden copies of things: a nav that also exists collapsed
+   * for small screens, a skip link, a dialog rendered closed. `a[href="/services"]`
+   * matches one of those on the home page before it matches the one in the
+   * masthead, and `.first()` then spends thirty seconds waiting for something
+   * that will never be visible. Nobody photographing a page means the copy they
+   * cannot see. */
+  const visible = (css) => scope.locator(css).filter({ visible: true }).first()
+
+  /* Put it in a state before photographing it, in the order somebody would: the
+     thing that opens, then the keys, then anything neither can say. */
+  const reach = async (what, css, act) => {
+    try {
+      await act(visible(css))
+    } catch {
+      /* A sentence rather than a thirty-second Playwright timeout and a stack,
+         for the reason `--select` gives: a selector that finds nothing is
+         usually a selector, and the default timeout spends half a minute before
+         saying so. */
+      console.error(`shot: nothing to ${what} at \`${css}\` on ${url}.`)
+      process.exit(1)
+    }
+  }
+  const click = flag('click')
+  if (click !== undefined) {
+    await reach('click', click, (one) => one.click({ timeout: 5000 }))
+  }
+  const hover = flag('hover')
+  if (hover !== undefined) {
+    await reach('hover', hover, (one) => one.hover({ timeout: 5000 }))
+  }
+  const press = flag('press')
+  if (press !== undefined) {
+    for (const key of press.split(/\s+/).filter(Boolean)) {
+      await page.keyboard.press(key)
+    }
+  }
+  const script = flag('eval')
+  if (script !== undefined) {
+    /* An expression first, then the same text as a function body.
+     *
+     * Wrapped in an async function either way, so `await` works. `return ${…}`
+     * alone is what this did and it takes only half of what anybody types: a
+     * bare expression returns its value, and the moment the script declares
+     * anything, `return const c = …` is a syntax error before it runs. The body
+     * form takes statements and returns whatever the last one chose to, so the
+     * two together take both without asking which was meant. */
+    let answer
+    try {
+      answer = await scope.evaluate(`(async () => (${script}))()`)
+    } catch {
+      try {
+        answer = await scope.evaluate(`(async () => { ${script} })()`)
+      } catch (error) {
+        console.error(`shot: --eval did not run.\n  ${String(error).split('\n')[0]}`)
+        process.exit(1)
+      }
+    }
+    /* Reported, so this measures as well as photographs. `undefined` is what a
+       statement returns and is not worth a line. */
+    if (answer !== undefined && answer !== null) {
+      console.log(typeof answer === 'string' ? answer : JSON.stringify(answer))
+    }
+  }
+
   await page.waitForTimeout(Number(flag('wait', '400')))
 
   const file = join(out, name)
   if (select !== undefined) {
-    const element = page.locator(select).first()
+    const element = visible(select)
     try {
       await element.waitFor({ state: 'visible', timeout: 5000 })
     } catch {
