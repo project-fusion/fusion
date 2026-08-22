@@ -84,6 +84,26 @@
   flex: 1 1 0;
 }
 
+/* How long the rule is, and only a vertical one can be asked.
+ *
+ * A vertical divider takes its height from the row it is in, which is right in a
+ * toolbar and wrong in a byline: three facts separated by hairlines want a rule
+ * the height of the text, not of the tallest thing beside it. Measured on the
+ * insight byline, 28px against a 14px line.
+ *
+ * `auto` is today's arrangement said out loud, so nothing moves without asking.
+ * A horizontal divider has no equivalent: its length is the width it is given,
+ * which a consumer sets on the box the way they would any other block.
+ *
+ * The site had this as `block-size` on the element, which is a document rule
+ * against a shadow one and therefore not a fight the component can lose
+ * gracefully: it wins outright, whatever the component says, and
+ * `check:overruled` fails on it for that reason. A hook is the same effect
+ * through the published door. */
+:host([orientation="vertical"]) {
+  block-size: var(--divider-length, auto);
+}
+
 :host([orientation="vertical"]) [part="line"] {
   flex: 1 1 0;
   inline-size: var(--_divider-thickness);

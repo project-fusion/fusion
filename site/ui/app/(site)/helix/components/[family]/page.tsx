@@ -313,7 +313,12 @@ export default async function FamilyDocs({ params }: { params: Promise<{ family:
       <DocsNav active={family.slug} entries={families} />
 
       <article className="docsMain">
-        <helix-flex direction="column" gap="2xl">
+        {/* `3xl`, the top of the scale, because a section break should be the
+            largest space on the page: at `2xl` Usage sat as far from Preview as
+            Root sat from Group, so the page had one rhythm and no hierarchy.
+            Said on the element rather than in `site.css`, which was overriding
+            this very attribute from the document and winning silently. */}
+        <helix-flex direction="column" gap="3xl">
           <helix-flex direction="column" gap="md">
             {/* Title and its actions on one line. The ellipsis holds everything
                 that is about the *document* rather than about the component, so

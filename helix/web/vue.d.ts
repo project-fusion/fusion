@@ -7338,6 +7338,8 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
+  /** How long a vertical rule is. Horizontal takes its width. */
+  "--divider-length"?: string;
   /** Off the far end only. */
   "--divider-inset-end"?: string;
   /** Off the near end only. */

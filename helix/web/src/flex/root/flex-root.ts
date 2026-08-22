@@ -38,7 +38,7 @@ export class HelixFlex extends HelixElement {
 
   /** Space between items, named on the space scale. */
   @property({ reflect: true })
-  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /** Alignment across the direction. */
   @property({ reflect: true })

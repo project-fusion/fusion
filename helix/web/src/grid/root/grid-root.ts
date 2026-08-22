@@ -41,7 +41,7 @@ export class HelixGrid extends HelixElement {
 
   /** Space between cells, named on the space scale. */
   @property({ reflect: true })
-  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /** Alignment of each cell within its row. */
   @property({ reflect: true })

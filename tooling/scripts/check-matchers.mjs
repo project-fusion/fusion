@@ -72,9 +72,7 @@ const specs = (root) => {
    problem rather than this script's, and reading one list keeps the two from
    disagreeing about which is authoritative. */
 const harness = readFileSync(HARNESS, 'utf8')
-const declared = new Set(
-  [...harness.matchAll(/^ {2}(to[A-Za-z]+)(\??):/gm)].map((one) => one[1]),
-)
+const declared = new Set([...harness.matchAll(/^ {2}(to[A-Za-z]+)(\??):/gm)].map((one) => one[1]))
 if (declared.size === 0) {
   console.error(`matchers: read no matcher names out of ${HARNESS}, so this checked nothing.`)
   process.exit(1)

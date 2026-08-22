@@ -17061,6 +17061,7 @@ export type CustomElements = {
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
@@ -28279,6 +28280,7 @@ export type CustomElementsSolidJs = {
    * - `--divider-thickness`: Thickness of the rule. (default: `undefined`)
    * - `--divider-color`: Color of the rule. (default: `undefined`)
    * - `--divider-inset`: Space taken off both ends of it. (default: `undefined`)
+   * - `--divider-length`: How long a vertical rule is. Horizontal takes its width. (default: `undefined`)
    * - `--divider-inset-end`: Off the far end only. (default: `undefined`)
    * - `--divider-inset-start`: Off the near end only. (default: `undefined`)
    * - `--divider-thickness`: How heavy the rule is. (default: `undefined`)
@@ -36608,6 +36610,8 @@ export type CustomCssProperties = {
   "--divider-thickness"?: string;
   /** Space taken off both ends of it. */
   "--divider-inset"?: string;
+  /** How long a vertical rule is. Horizontal takes its width. */
+  "--divider-length"?: string;
   /** Off the far end only. */
   "--divider-inset-end"?: string;
   /** Off the near end only. */

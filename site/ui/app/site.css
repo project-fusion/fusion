@@ -890,10 +890,6 @@ helix-drawer {
   scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
-.docsMain > helix-flex {
-  gap: var(--helix-space-3xl);
-}
-
 .docsMain {
   /* Fills its track, then caps.
    *
@@ -1704,9 +1700,11 @@ helix-drawer helix-tree {
 }
 
 /* The dividers in the byline are hairlines between three facts, so they take
-   the height of the text rather than the row. */
+   the height of the text rather than the row. Through the component's own hook:
+   `block-size` here is a document rule against a shadow one, which wins outright
+   whatever the component says, and is what `check:overruled` fails on. */
 .insightByline helix-divider {
-  block-size: 1em;
+  --divider-length: 1em;
 }
 
 /* A row that is a link, ruled from the next one. Cards were tried here and are
@@ -1970,10 +1968,6 @@ helix-drawer helix-tree {
 
   .showcaseSplit {
     block-size: auto;
-  }
-
-  .showcaseSplit helix-divider {
-    display: none;
   }
 
   .showcaseStage {

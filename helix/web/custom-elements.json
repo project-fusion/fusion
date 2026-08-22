@@ -19608,6 +19608,10 @@
               "name": "--divider-inset"
             },
             {
+              "description": "How long a vertical rule is. Horizontal takes its width.",
+              "name": "--divider-length"
+            },
+            {
               "description": "Off the far end only.",
               "name": "--divider-inset-end"
             },
@@ -23541,7 +23545,7 @@
               "kind": "field",
               "name": "gap",
               "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | undefined"
               },
               "description": "Space between items, named on the space scale.",
               "attribute": "gap",
@@ -23671,7 +23675,7 @@
             {
               "name": "gap",
               "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | undefined"
               },
               "description": "Space between items, named on the space scale.",
               "fieldName": "gap"
@@ -23846,7 +23850,7 @@
               "kind": "field",
               "name": "gap",
               "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | undefined"
               },
               "description": "Space between cells, named on the space scale.",
               "attribute": "gap",
@@ -23964,7 +23968,7 @@
             {
               "name": "gap",
               "type": {
-                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined"
+                "text": "'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | undefined"
               },
               "description": "Space between cells, named on the space scale.",
               "fieldName": "gap"

@@ -1824,6 +1824,7 @@ tall that is.
 | `--divider-thickness` | Thickness of the rule. |
 | `--divider-color` | Color of the rule. |
 | `--divider-inset` | Space taken off both ends of it. |
+| `--divider-length` | How long a vertical rule is. Horizontal takes its width. |
 | `--divider-inset-end` | Off the far end only. |
 | `--divider-inset-start` | Off the near end only. |
 | `--divider-thickness` | How heavy the rule is. |
@@ -2231,7 +2232,7 @@ behavior separate from styling, and this is entirely styling.
 | --- | --- | --- | --- | --- | --- |
 | `align` | `align` | `'start' \| 'center' \| 'end' \| 'stretch' \| 'baseline' \| undefined` | - | - | Alignment across the direction. |
 | `direction` | `direction` | `'row' \| 'column' \| undefined` | - | - | Whether items run across or down. |
-| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| undefined` | - | - | Space between items, named on the space scale. |
+| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl' \| undefined` | - | - | Space between items, named on the space scale. |
 | `inline` | `inline` | `boolean` | `false` | - | Flows with surrounding text instead of taking the full width. |
 | `justify` | `justify` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| undefined` | - | - | Distribution along the direction. |
 | `wrap` | `wrap` | `boolean` | `false` | - | Whether items wrap onto more lines. |
@@ -2263,7 +2264,7 @@ Presentation only, so there is no headless tier.
 | --- | --- | --- | --- | --- | --- |
 | `align` | `align` | `'start' \| 'center' \| 'end' \| 'stretch' \| undefined` | - | - | Alignment of each cell within its row. |
 | `columns` | `columns` | `number \| undefined` | - | - | Fixed number of equal columns. |
-| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| undefined` | - | - | Space between cells, named on the space scale. |
+| `gap` | `gap` | `'none' \| '2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl' \| undefined` | - | - | Space between cells, named on the space scale. |
 | `min` | `min` | `string` | `''` | - | Minimum column width, filling as many as fit. |
 
 #### Slots

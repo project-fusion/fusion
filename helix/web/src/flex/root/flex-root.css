@@ -40,6 +40,22 @@
   gap: var(--helix-space-2xl);
 }
 
+/* `3xl` is the top of the space scale, and the pair stops where it does.
+ *
+ * A layout could reach it only by a document rule setting `gap` on the element,
+ * which is a document rule against a shadow one: it wins outright, the `gap`
+ * attribute beside it becomes dead text, and `check:overruled` fails on it. The
+ * docs column had exactly that, `gap="2xl"` written on the element and `3xl`
+ * applied over it, so the markup said one thing and the page did another.
+ *
+ * `Grid` takes it in the same commit, unasked. A pair of layout components whose
+ * scales differ by one step is a worse arrangement than either of them alone:
+ * the difference is invisible until somebody writes the value on the wrong one
+ * and gets nothing. */
+:host([gap="3xl"]) {
+  gap: var(--helix-space-3xl);
+}
+
 /* `align` is a legacy HTML presentational attribute, and the browser applies it
    to any element that carries one, including this one.
  *
