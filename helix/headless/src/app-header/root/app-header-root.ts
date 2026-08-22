@@ -67,8 +67,36 @@ export class HelixBaseAppHeader extends HelixElement {
   @property({ attribute: 'content-align', reflect: true })
   contentAlign?: 'start'
 
+  /* Whether the bar currently believes the page has moved, kept alongside the
+     attribute so a scroll that changes nothing writes nothing. */
+  private scrolled = false
+
+  /**
+   * A band rather than a line, so the fill cannot flicker at the boundary.
+   *
+   * **`scrollY > 0` is a threshold with no width, and a threshold with no width
+   * is a switch sitting exactly where scroll positions cluster.** Zero is not a
+   * quiet place: rubber-banding overshoots past it and comes back, scroll
+   * anchoring nudges by a pixel when an image or a font lands, and a
+   * `scroll-behavior: smooth` jump settles by oscillating around its target.
+   * Every one of those crossings toggled the attribute, and the fill and the
+   * blur are both transitioned, so each toggle started a fresh animation in the
+   * opposite direction. What a reader sees is a bar that shimmers, and text
+   * legible through it for as long as the fill is part way in.
+   *
+   * Eight pixels to take the fill, two to give it back. Asymmetric on purpose:
+   * the bar should look attached to the top of the page for as long as it
+   * honestly is, so leaving is nearly the whole way back, and arriving needs
+   * enough travel to mean the reader moved rather than the layout did.
+   */
   private readonly handleScroll = (): void => {
-    this.toggleAttribute('data-scrolled', window.scrollY > 0)
+    const y = window.scrollY
+    const next = this.scrolled ? y > 2 : y > 8
+    if (next === this.scrolled) {
+      return
+    }
+    this.scrolled = next
+    this.toggleAttribute('data-scrolled', next)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

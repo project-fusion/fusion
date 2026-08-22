@@ -240,6 +240,31 @@ helix-app-header {
   --app-header-max-inline-size: none;
 }
 
+/* A scrolled bar has to stop the page, and 72% does not.
+ *
+ * `--helix-material-translucent` is the library's glass, and it is right for
+ * what it was drawn for: a popover, a sheet, a command palette, all of which
+ * sit briefly over content that is holding still. A sticky masthead is the
+ * opposite case. Content runs under it for the whole session, and 28% of
+ * high-contrast text is legible even blurred: what a reader sees is words
+ * sliding behind the bar, which is the thing the component's own note says
+ * cannot happen, that "the content still stops at the bar because it cannot be
+ * read through it".
+ *
+ * Raised through the hook the component publishes, and only on this site for
+ * now. The same reasoning probably belongs in `AppHeader` itself, since it is
+ * about what a sticky bar is rather than about this page, but that moves the
+ * glass on every consumer and this is a change that has to be looked at rather
+ * than measured.
+ *
+ * Selected on `data-scrolled`, which the component reflects, so the unscrolled
+ * bar is untouched. The panel's own override is an inline style and still wins
+ * over this, which is what keeps the sheet doing the painting while a megamenu
+ * is down. */
+helix-app-header[data-scrolled] {
+  --app-header-background: color-mix(in oklab, var(--helix-color-background) 88%, transparent);
+}
+
 /* Every drawer here runs under that header. A drawer is `position: fixed` with
    `inset-block: 0`, so it spans the strip the header occupies and its first
    line of content would land behind one.
