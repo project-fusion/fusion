@@ -173,78 +173,25 @@
  * at `raised` so it sits over the page and under the bar: the masthead is
  * sticky at a higher layer and the panel is in the top layer, so both keep
  * their content above a single continuous blur. */
-/* The panel is a window onto the glass, never a surface of its own.
+/* The panel is glass, the same glass the bar above it is.
  *
- * Stated here rather than inline on the element, and unconditionally, because
- * the condition was the bug: keyed to the open state it came off on the frame
- * the collapse started, since `helix-close` fires before the panel moves, and
- * the panel finished its collapse as an opaque rectangle of the page's own
- * colour. Black, on a dark page.
+ * `Megamenu` defaults its band to the page's own colour, which is right for a
+ * panel on a page and wrong for one hanging off a masthead: its own comment
+ * says the band means to read as the header continuing downward, and it cannot
+ * when the two are painted differently.
  *
- * Both hooks, because a backdrop filter is clipped to its own element's box: a
- * second blur here would be a blur of the sheet that is already blurring, and
- * the whole reason there is a sheet is that two of them do not agree. */
+ * Both hooks, matched to what `AppHeader` takes for `material="glass"`, so the
+ * pair meet on the bar's bottom edge as one surface. The blur is the `lg` step
+ * the scrolled bar uses rather than the library's `md`, for the same reason:
+ * content runs under both of these for as long as they are up.
+ *
+ * **This is a fact about pairing the two, which is why it lives here.**
+ * `Megamenu` does not know it is in a header and `AppHeader` does not know it
+ * contains a panel, and coupling them in the library would be a dependency
+ * between two things that are correctly independent. */
 helix-megamenu {
-  --megamenu-backdrop: none;
-  --megamenu-background: transparent;
-}
-
-/* **The sheet appears and leaves. Neither is a transition.**
- *
- * Three fading arrangements were built against the masthead's own fill and each
- * has its own artifact, because two translucent layers cannot hand over by
- * fading. One glass is 72% coverage: held together they composite to 92% and
- * the bar goes visibly darker, crossed they dip to 59% and the page reads
- * through, released early they fall to 45%. Every fade passes through a
- * coverage that is not one glass.
- *
- * They are the same glass, so there is nothing to fade between.
- *
- * **`opacity` carries the switch: zero duration, and a delay that differs by
- * direction.** Opening it flips at once, so the sheet is already painting on
- * the frame the masthead stops. Closing, the flip waits one sheet-travel, so it
- * holds at full until the panel has finished collapsing and the masthead has
- * taken its fill back. Two rules rather than one, because a transition belongs
- * to the state being moved *to* and these two states want different ones.
- *
- * **The closed clip covers the bar rather than nothing**, which is what makes
- * the opening frame work: the sheet has to be over the masthead the instant it
- * appears, not a fifth of the way into the reveal. From there the clip runs
- * down with the panel, and that is the one thing here that is really animated.
- *
- * `visibility` stays discrete over the same travel, so an idle page is not
- * running a full-screen blur behind something nobody can see. */
-.navGlass {
-  backdrop-filter: blur(var(--helix-material-blur-lg));
-  background-color: var(--helix-material-translucent);
-  clip-path: inset(0 0 calc(100% - var(--helix-size-header)) 0);
-  inset-block-start: 0;
-  inset-inline: 0;
-  opacity: 0;
-  pointer-events: none;
-  position: fixed;
-  transition:
-    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
-    opacity 0s var(--helix-duration-slow),
-    visibility var(--helix-duration-slow) allow-discrete;
-  visibility: hidden;
-  z-index: var(--helix-layer-raised);
-}
-
-.navGlass[data-open] {
-  clip-path: inset(0 0 0 0);
-  opacity: 1;
-  transition:
-    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
-    opacity 0s,
-    visibility var(--helix-duration-slow) allow-discrete;
-  visibility: visible;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .navGlass {
-    transition: none;
-  }
+  --megamenu-backdrop: blur(var(--helix-material-blur-lg));
+  --megamenu-background: var(--helix-material-translucent);
 }
 
 helix-app-header {
@@ -269,10 +216,15 @@ helix-app-header {
  *
  * The fill is left at the component's own default. It was never the fault.
  *
- * Selected on `data-scrolled`, which the component reflects, so the unscrolled
- * bar is untouched. The panel's override is an inline style and still wins over
- * this, which keeps the sheet doing the painting while a megamenu is down. */
-helix-app-header[data-scrolled] {
+ * **Both ways the bar can be glass, not just the scrolled one.** A panel
+ * opening asks for `material="glass"` directly, and keyed only on
+ * `data-scrolled` that state fell back to the library's `md`: measured at the
+ * top of a hero with a panel down, the bar blurred at 16 while the band hanging
+ * off its bottom edge blurred at 32, which is the seam across the join that
+ * pairing them is meant to prevent. An unscrolled bar with nothing open is
+ * still untouched, having no glass to sharpen. */
+helix-app-header[data-scrolled],
+helix-app-header[material="glass"] {
   --app-header-backdrop: blur(var(--helix-material-blur-lg));
 }
 

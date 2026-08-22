@@ -63,66 +63,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [panelDown, setPanelDown] = useState(false)
 
-  /* How far down the glass reaches while a panel is open.
-   *
-   * **One filter, not two, and this is what it costs.** `backdrop-filter` is
-   * clipped to its own element's box, so a bar and a panel each running their
-   * own blur produce two different results and a line across the join: a 57
-   * pixel box clamps a 16 pixel blur at both edges and averages flat, while the
-   * tall panel keeps its structure. Turning the bar's filter off and keeping its
-   * fill only moved the tell: the strip then showed the page sharp above a
-   * boundary and blurred below it, which over text is worse.
-   *
-   * Neither component can span the other. The panel is a `popover` in the top
-   * layer, so it cannot sit behind the bar, and the bar cannot grow to cover a
-   * panel whose height it does not know. So the app paints one glass sheet
-   * across both and turns the surface off in each: the bar's content is above
-   * it at the sticky layer, and the panel's is above it in the top layer, so
-   * both stay legible over a single continuous blur.
-   *
-   * Read from the panel after it has laid out, because `helix-open` fires
-   * before it moves, which is the whole reason the bar can start changing on
-   * the same frame the reveal starts. */
   const panelRef = useRef<HelixMegamenu>(null)
-  const glassRef = useRef<HTMLDivElement>(null)
-  const [glassSize, setGlassSize] = useState(0)
 
-  /* Whether the sheet is the thing painting the masthead's strip.
-   *
-   * **The two swap, they do not fade into each other, and that is the fix.**
-   * Three fading arrangements were built and each has its own artifact, because
-   * two translucent layers cannot hand over by fading. One glass is 72%
-   * coverage: held together they composite to 92% and the bar goes visibly
-   * darker, crossed they dip to 59% and the page reads through, and released
-   * early they fall to 45%. Every fade passes through a coverage that is not
-   * one glass, and all three of those are visible.
-   *
-   * They are the same glass, so there is nothing to fade *between*. Switched,
-   * coverage goes 72% to 72% and there is no event to see.
-   *
-   * Up on the frame the panel opens, since the sheet is painting from that
-   * frame. Down one sheet-travel after the close begins, since the sheet holds
-   * at full until the panel has finished collapsing and only then flips off. */
-  const [sheetPaints, setSheetPaints] = useState(false)
-
-  useEffect(() => {
-    if (panelDown) {
-      setSheetPaints(true)
-      return
-    }
-    const glass = glassRef.current
-    if (!glass) {
-      setSheetPaints(false)
-      return
-    }
-    /* The sheet's own delay, read off it rather than written down twice, so the
-       two cannot drift and reduced motion resolves to zero and swaps at once. */
-    const style = getComputedStyle(glass)
-    const longest = (value: string) =>
-      Math.max(0, ...value.split(',').map((part) => Number.parseFloat(part) || 0))
-    const timer = setTimeout(() => setSheetPaints(false), longest(style.transitionDuration) * 1000)
-    return () => clearTimeout(timer)
-  }, [panelDown])
   useEffect(() => {
     const query = window.matchMedia('(max-width: 48rem)')
     const sync = () => setNarrow(query.matches)
@@ -154,82 +96,37 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
 
   return (
     <>
-      {/* No line under the bar until the page moves.
-       
-          **The bar and the panel are one surface, and that is the app's call
-          rather than either component's.** The band paints the same ground the
-          header does and says in its own comment that it means to read as the
-          header continuing downward. It cannot when the two are painted
-          differently, which is exactly what happened while the bar was
-          transparent over a hero and the band was opaque: the band appeared to
-          start from nothing.
-       
-          Neither component can fix it. `Megamenu` does not know it is in a
-          header, `AppHeader` does not know it contains a panel, and coupling
-          them in the library would be a dependency between two things that are
-          correctly independent. This is the one place that knows both.
-       
-          So while a panel is down the bar takes `material`, and the panel is
-          given the same fill and the same blur through `--megamenu-background`
-          and `--megamenu-backdrop`. Both glass together, rather than one of
-          each with a seam down the join.
-
-          **The panel's half of that is unconditional now, and it is a fix.**
-          It was applied only while `panelDown`, which is cleared by
-          `helix-close`, and that event is documented as firing *before* the
-          panel closes. So the transparency came off on the frame the collapse
-          began and the panel spent the whole of it painting
-          `--helix-color-background`: a solid rectangle shrinking upward, black
-          on a dark page. The panel is only ever on screen while it is open or
-          collapsing, and the glass covers both, so it never needs a ground of
-          its own here and the state it was keyed to was the wrong state. `AppHeader` transitions its own
-          `background-color` over `--helix-duration-normal`, which is the
-          duration the panel's reveal runs for, so they move together without
-          either being told about the other. */}
-      {/* Always rendered, and opened by an attribute rather than by mounting.
-          
-          Unmounted on close, the sheet vanished on the frame the panel began
-          collapsing: nothing transitions out of the DOM. So it stays, and
-          `data-open` drives a fade over the same duration the panel's own
-          clip-path runs for. */}
-      <div
-        className="navGlass"
-        data-open={panelDown ? '' : undefined}
-        ref={glassRef}
-        style={{ blockSize: `${glassSize}px` }}
-      />
-
       <helix-app-header
         data-color-mode={pathname === '/preview/scale' ? 'dark' : undefined}
-        material={onHero ? 'transparent' : undefined}
+        /* **A panel opening is the same event as scrolling, as far as the bar is
+         * concerned: something is now under it that has to stay legible.**
+         *
+         * So the bar asks for `glass` while a panel is down, and that one word
+         * covers both cases. Over a hero at the top, `transparent` has no fill,
+         * and switching to `glass` fades one in over the component's own
+         * `normal`, so the bar arrives with the panel. Scrolled, the bar is
+         * already glass, and `[material="glass"]` and
+         * `[material="transparent"][data-scrolled]` declare exactly the same
+         * two properties, so asking for it again changes nothing at all.
+         *
+         * **This replaces a sheet, and the sheet is the thing to explain.** The
+         * app used to paint one glass pane across the bar and the panel
+         * together, turning the surface off in both, because two
+         * `backdrop-filter` boxes blur differently and leave a line across the
+         * join. It works, and it costs a handover: two translucent layers
+         * cannot trade places by fading, since one glass is 72% coverage and
+         * every fade passes through something else. Held together they
+         * composite to 92% and the bar goes dark, crossed they dip to 59% and
+         * the page reads through, released early they fall to 45%. Four
+         * arrangements were built and all four were visible.
+         *
+         * The seam it was avoiding is not a seam here, because the panel starts
+         * exactly at the bar's bottom edge: measured at 57 against a bar bottom
+         * of 57, with and without a filter on the bar. Two glasses meeting on
+         * that line read as the bar continuing downward, which is what the
+         * panel's own comment says it is for. */
+        material={panelDown ? 'glass' : onHero ? 'transparent' : undefined}
         sticky
-        /* Follows the sheet exactly, and switches rather than fades.
-         *
-         * **`transition: none` is half the fix and the easier half to miss.**
-         * Without it the bar still takes `normal` to empty, now over a sheet
-         * that arrived in one frame, which is the doubled glass again with
-         * extra steps. With it the bar stops painting on the frame the sheet
-         * starts and starts again on the frame the sheet stops, and since the
-         * two are the same glass a reader sees no event at all.
-         *
-         * Inline rather than in the stylesheet. It belongs to this exchange
-         * rather than to the element, and a document rule setting `transition`
-         * on a component that sets its own is exactly what `check:overruled`
-         * exists to catch.
-         *
-         * At the top of a hero none of this shows, because
-         * `material="transparent"` has no fill to take back. Scrolled, where
-         * the same attribute takes the material, is the case with something to
-         * see. */
-        style={
-          sheetPaints
-            ? {
-                '--app-header-backdrop': 'none',
-                '--app-header-background': 'transparent',
-                transition: 'none',
-              }
-            : undefined
-        }
       >
         <a data-link="quiet" href="/" slot="start">
           <Wordmark />
@@ -260,13 +157,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
               /* Both fire before the panel moves and both are cancelable, so
                  the bar starts changing on the same frame the reveal starts
                  rather than a frame behind it. */
-              onhelix-open={() => {
-                setPanelDown(true)
-                requestAnimationFrame(() => {
-                  const panel = panelRef.current?.shadowRoot?.querySelector('[part="panel"]')
-                  setGlassSize(panel ? panel.getBoundingClientRect().bottom : 0)
-                })
-              }}
+              onhelix-open={() => setPanelDown(true)}
               ref={panelRef}
               suppressHydrationWarning
             >
