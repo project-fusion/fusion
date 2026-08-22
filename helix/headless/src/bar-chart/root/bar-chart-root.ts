@@ -481,7 +481,7 @@ export class HelixBaseBarChart extends MixinChartSource(HelixElement) {
     </div>`
   }
 
-  /**
+  /*
    * The category names, as HTML beside the drawing rather than inside it.
    *
    * Inside, they would scale with the box: an `<svg>` that fills its container

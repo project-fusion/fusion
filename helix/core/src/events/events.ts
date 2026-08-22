@@ -13,7 +13,7 @@
  *    dispatch cannot disagree about the string.
  */
 
-/**
+/*
  * Names are `helix-{verb}`, lowercase and prefixed.
  *
  * The prefix is what stops a collision with a native name: an event dispatched

@@ -1,7 +1,3 @@
-'use client'
-
-import { useEffect, useRef } from 'react'
-
 /**
  * The plates, moving.
  *
@@ -12,6 +8,9 @@ import { useEffect, useRef } from 'react'
  * **It is an enhancement.** The still behind the canvas stays if the context
  * fails to start.
  */
+'use client'
+
+import { useEffect, useRef } from 'react'
 
 /** Length of the Watch piece, in seconds. */
 export const FILM_DURATION = 48

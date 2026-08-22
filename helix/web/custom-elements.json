@@ -45932,7 +45932,8 @@
                 "type": {
                   "text": "void"
                 }
-              }
+              },
+              "description": "Sends the current source to the frame, once it is listening."
             },
             {
               "kind": "method",
@@ -72020,6 +72021,7 @@
               },
               "privacy": "private",
               "default": "false",
+              "description": "Whether anything on the network offers to play this.",
               "inheritedFrom": {
                 "name": "HelixBaseVideo",
                 "module": "src/video/root/video-root.ts"

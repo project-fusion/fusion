@@ -1,9 +1,3 @@
-export const metadata = {
-  description:
-    'The finite checklist every Fusion product clears before it ships, and an honest account of what has been tested so far.',
-  title: 'Trust',
-}
-
 /**
  * The bar, published as a finite list.
  *
@@ -17,6 +11,11 @@ export const metadata = {
  * is worth having at all: none of it has been exercised yet, because nothing
  * has shipped. Saying so is the same discipline the stage labels are.
  */
+export const metadata = {
+  description:
+    'The finite checklist every Fusion product clears before it ships, and an honest account of what has been tested so far.',
+  title: 'Trust',
+}
 
 /** What has to be true before anything carries the name. */
 const BAR = [

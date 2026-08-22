@@ -115,7 +115,7 @@ const THICKNESS: Record<string, number> = {
  */
 @customElement('helix-base-donut-chart')
 export class HelixBaseDonutChart extends MixinChartSource(HelixElement) {
-  /** The slices, in table order, with anything negative dropped. */
+  /* The slices, in table order, with anything negative dropped. */
   /**
    * The pointer is not mapped across this one.
    *

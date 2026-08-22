@@ -205,7 +205,7 @@ export class PopoverController implements ReactiveController {
     }
   }
 
-  /**
+  /*
    * Leaves the top layer when the host does.
    *
    * An element removed while its popover is showing is removed from the top

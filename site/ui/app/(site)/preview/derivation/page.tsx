@@ -1,7 +1,3 @@
-import '../../../preview.css'
-
-export const metadata = { title: 'Direction A: Derivation' }
-
 /**
  * Direction A. One value, and everything follows from it.
  *
@@ -17,6 +13,9 @@ export const metadata = { title: 'Direction A: Derivation' }
  * stylesheet adds is the display type and the computed wash, which is the one
  * thing no component can know.
  */
+import '../../../preview.css'
+
+export const metadata = { title: 'Direction A: Derivation' }
 
 /** What actually derives from the constraint, in the order it derives. */
 const DERIVED = [

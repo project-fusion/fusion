@@ -1,11 +1,3 @@
-import { stageAppearance, VERTICALS } from '../../verticals'
-
-export const metadata = {
-  description:
-    'Sovereignty is the goal, abundance is the mechanism, and the same stack runs from one person to one country.',
-  title: 'Thesis',
-}
-
 /**
  * The company's argument, at length.
  *
@@ -20,6 +12,13 @@ export const metadata = {
  * product that are not in `verticals.ts`, and a page that claims them would be
  * describing a different company.
  */
+import { stageAppearance, VERTICALS } from '../../verticals'
+
+export const metadata = {
+  description:
+    'Sovereignty is the goal, abundance is the mechanism, and the same stack runs from one person to one country.',
+  title: 'Thesis',
+}
 
 /** The layers, and which of them anyone can use today. */
 const STACK = [

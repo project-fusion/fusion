@@ -445,13 +445,13 @@ export class HelixBaseVideo extends HelixElement {
   @state()
   private rate = 1
 
-  /** Whether anything on the network offers to play this. */
   /** Whether the reader has been still long enough for the bar to go. */
   @state()
   private idle = false
 
   private idleTimer?: ReturnType<typeof setTimeout>
 
+  /** Whether anything on the network offers to play this. */
   @state()
   private remoteAvailable = false
 

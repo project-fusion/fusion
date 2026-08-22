@@ -655,7 +655,7 @@ export class HelixAura extends HelixElement {
     this.last = 0
   }
 
-  /**
+  /*
    * One axis, wandering around its set value.
    *
    * Two sines at an irrational ratio rather than one, so a single axis has no

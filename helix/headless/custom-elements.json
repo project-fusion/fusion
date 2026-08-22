@@ -53282,7 +53282,8 @@
                 "text": "boolean"
               },
               "privacy": "private",
-              "default": "false"
+              "default": "false",
+              "description": "Whether anything on the network offers to play this."
             },
             {
               "kind": "field",

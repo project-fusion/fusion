@@ -376,7 +376,7 @@ const runThese = async (
 /* The DOM helpers. Same names and same behavior as the node harness, minus the
    parts that only existed to paper over happy-dom. */
 
-/** Nothing to install: this is a browser, and it brought its own DOM. */
+/* Nothing to install: this is a browser, and it brought its own DOM. */
 /** What a control may report: a field's value, a set of them, or nothing. */
 type FormValue = File | FormData | string | null
 

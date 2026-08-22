@@ -2,7 +2,7 @@ import type { Plugin } from '@custom-elements-manifest/analyzer'
 
 export type { Plugin }
 
-/**
+/*
  * Manifest types are declared structurally here rather than imported from
  * `custom-elements-manifest/schema`.
  *

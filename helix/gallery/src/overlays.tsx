@@ -689,7 +689,7 @@ export const overlaysArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** A panel that opens against a trigger and holds anything. */
+  /* A panel that opens against a trigger and holds anything. */
   /**
    * The thing being pointed at, lit, and the panel that says why.
    *

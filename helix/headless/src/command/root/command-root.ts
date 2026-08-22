@@ -166,7 +166,7 @@ export class HelixBaseCommand extends MixinControllerOpen(HelixElement) {
     this.requestOpen(false)
   }
 
-  /**
+  /*
    * Keeps an option's own announcement inside the palette.
    *
    * Every option says `helix-select` when it is chosen, which is how the list

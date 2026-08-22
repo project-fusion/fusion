@@ -169,7 +169,7 @@ export const formsArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** More than one of them is the answer, and only those carry a band. */
+  /* More than one of them is the answer, and only those carry a band. */
   /**
    * The field an `Input` draws, with a button welded to each end.
    *

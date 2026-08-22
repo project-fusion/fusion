@@ -3,7 +3,7 @@ import { styleMap } from 'lit/directives/style-map.js'
 import { seriesIndex } from '../../mixins/mixin-chart-source/mixin-chart-source.js'
 import type { Row } from '../read-series/read-series.js'
 
-/**
+/*
  * What a pointer resting on a reading shows, as markup every chart can use.
  *
  * **A function rather than a method on `MixinChartSource`, and that is forced.**

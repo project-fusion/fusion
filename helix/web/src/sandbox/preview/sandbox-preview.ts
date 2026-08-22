@@ -167,7 +167,6 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private static readonly target = '*'
 
-  /** Sends the current source to the frame, once it is listening. */
   /** Set while a coalesced send is waiting, so only one is ever queued. */
   private pending: ReturnType<typeof setTimeout> | undefined
 
@@ -189,6 +188,7 @@ export class HelixSandboxPreview extends HelixElement {
     }, SETTLE)
   }
 
+  /** Sends the current source to the frame, once it is listening. */
   private send(): void {
     if (!this.ready) {
       return

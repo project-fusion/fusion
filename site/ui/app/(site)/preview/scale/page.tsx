@@ -1,11 +1,3 @@
-import { stageAppearance, VERTICALS } from '../../../verticals'
-import { CinematicMode } from './cinematic-mode'
-import { ScaleLadder } from './ladder'
-import { OceanWorld } from './ocean-world'
-import '../../../preview.css'
-
-export const metadata = { title: 'Candidate: scale' }
-
 /**
  * A cinematic reading of the thesis, built the way the reference is built.
  *
@@ -16,6 +8,13 @@ export const metadata = { title: 'Candidate: scale' }
  * thesis rather than a device borrowed to look like one. The counted row holds
  * only things that are true.
  */
+import { stageAppearance, VERTICALS } from '../../../verticals'
+import { CinematicMode } from './cinematic-mode'
+import { ScaleLadder } from './ladder'
+import { OceanWorld } from './ocean-world'
+import '../../../preview.css'
+
+export const metadata = { title: 'Candidate: scale' }
 
 /** Only quantities that are true today. */
 const COUNTED = [

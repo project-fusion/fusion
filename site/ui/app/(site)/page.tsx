@@ -1,11 +1,3 @@
-import Link from 'next/link'
-import { InsightArt } from '../../lib/insight-art'
-import { formatDate, INSIGHTS } from '../../lib/insights'
-import { PRODUCTS } from '../products'
-import { SERVICES } from '../services'
-import { stageAppearance } from '../verticals'
-import { Showcase } from './showcase'
-
 /**
  * The Fusion landing page.
  *
@@ -20,6 +12,13 @@ import { Showcase } from './showcase'
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
  */
+import Link from 'next/link'
+import { InsightArt } from '../../lib/insight-art'
+import { formatDate, INSIGHTS } from '../../lib/insights'
+import { PRODUCTS } from '../products'
+import { SERVICES } from '../services'
+import { stageAppearance } from '../verticals'
+import { Showcase } from './showcase'
 
 /** Why choose this over an agency starting from a blank file. */
 const REASONS = [

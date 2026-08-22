@@ -1,10 +1,3 @@
-import { SERVICES } from '../../../services'
-import { stageAppearance } from '../../../verticals'
-import '../../../preview.css'
-import '../../../today.css'
-
-export const metadata = { title: 'Candidate: today' }
-
 /**
  * What we do, why us, what it costs, and where it goes.
  *
@@ -19,6 +12,12 @@ export const metadata = { title: 'Candidate: today' }
  * what it always was to them, which is that they are not acquiring a
  * dependency. The philosophy is the last band and it is a link.
  */
+import { SERVICES } from '../../../services'
+import { stageAppearance } from '../../../verticals'
+import '../../../preview.css'
+import '../../../today.css'
+
+export const metadata = { title: 'Candidate: today' }
 
 /** The reasons to choose this over an agency that starts from a blank file. */
 const WHY = [

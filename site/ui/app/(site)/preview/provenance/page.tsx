@@ -1,7 +1,3 @@
-import '../../../preview.css'
-
-export const metadata = { title: 'Direction B: Provenance' }
-
 /**
  * Direction B. Every claim carries where it came from.
  *
@@ -17,6 +13,9 @@ export const metadata = { title: 'Direction B: Provenance' }
  * Composed from Helix: every row is a `Flex`, the closing block is a `Card`,
  * the rules are `Divider`s and every word is a `Text`.
  */
+import '../../../preview.css'
+
+export const metadata = { title: 'Direction B: Provenance' }
 
 /** Each claim, and the file it is derived from. */
 const CLAIMS = [

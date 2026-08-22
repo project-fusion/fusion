@@ -467,7 +467,7 @@ export class HelixBaseTimePicker extends MixinControllerValue(HelixFormElement) 
     this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
   }
 
-  /** One wheel, which is a listbox like the whole list is. */
+  /* One wheel, which is a listbox like the whole list is. */
   /**
    * One wheel.
    *

@@ -36,7 +36,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * was scaling the whole drawing instead of the rule that is its subject.
  */
 export const contentArt: Record<string, ReactNode> = {
-  /** Rows read as a set, divided by a rule and nothing else. */
+  /* Rows read as a set, divided by a rule and nothing else. */
   /**
    * Shafts of light fanning from a source above the frame.
    *
@@ -107,7 +107,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /** A passage set off by a rule and an indent. Two lines is a passage. */
+  /* A passage set off by a rule and an indent. Two lines is a passage. */
   /**
    * Four columns standing on a rule, at four different heights.
    *
@@ -247,7 +247,7 @@ export const contentArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /**
+  /*
    * One rule, and the two groups it makes.
    *
    * One line either side, not two. The subject is the rule; the lines are only
@@ -1002,7 +1002,7 @@ export const contentArt: Record<string, ReactNode> = {
    *
    * It moves on hover, because that is the one thing a splitter does.
    */
-  /**
+  /*
    * A bounded box with rows running past its bottom edge, and the edge saying so.
    *
    * The subject is the fade rather than the scrolling. What this component adds
