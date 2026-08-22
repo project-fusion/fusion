@@ -126,6 +126,20 @@ export const INKS: Ink[] = [
     grounds: [...PAGE_SURFACES],
     name: 'color-focus-ring',
   },
+  /* **The one place the brand appears as itself.** Everywhere else it is
+     solved: `primary` moves its lightness to clear 4.5 as text, and
+     `primary-surface` moves further still to carry white on a fill. A mark is
+     neither, and under WCAG 1.4.11 a graphic answers to 3:1, so it can sit far
+     closer to the colour the consumer actually typed.
+
+     Which is also what makes it worth a token rather than a reuse of
+     `primary`: a reader who picks a bright yellow and sees olive buttons has no
+     way to find their own colour anywhere on the page otherwise. */
+  {
+    contrast: 'component',
+    grounds: [...PAGE_SURFACES],
+    name: 'color-brand-mark',
+  },
 ]
 
 /**

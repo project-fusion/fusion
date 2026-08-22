@@ -125,6 +125,18 @@
   padding-block-end: var(--helix-space-xl);
 }
 
+/* The mark. One shape, one fill, and the fill is the whole point: it is the
+   brand at the 3:1 a graphic owes, where every other use of the brand on the
+   page has been solved for a word. */
+.themedMark {
+  aspect-ratio: 1;
+  background-color: var(--helix-color-brand-mark);
+  block-size: var(--helix-size-icon-md);
+  clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);
+  display: block;
+  flex: 0 0 auto;
+}
+
 /* Full bleed inside the preview, the way a real page's header is. */
 .themedHeader {
   --app-header-max-inline-size: none;

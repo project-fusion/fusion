@@ -648,6 +648,37 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
      control can sit on any of them. */
   const focusRing = solveForAll({ chroma: brand.chroma, hue: brand.hue }, 3)
 
+  /* **The brand as a mark: the nearest legible lightness, not the most legible
+     one.** A graphic answers to 3:1 under WCAG 1.4.11 rather than the 4.5 a word
+     does, so a mark can sit close to the colour a consumer actually chose, and
+     that closeness is the whole point of the token.
+
+     `solveForAll` is the wrong solver for it and measurably so. It keeps the
+     candidate with the best worst case, which for `#c1272d` chose a lightness
+     0.133 away when `primary` had landed 0.025 away: the mark travelled further
+     than the text it was supposed to stay closer than. So this walks outward
+     from the brand's own lightness and takes the first step that clears, which
+     is the same shape as the accent's search and reads the same way.
+
+     Nothing inside the walk clears for a brand that cannot be seen on any page
+     surface at any lightness, and the last candidate stands: `pairings` reports
+     it rather than the token quietly claiming a legibility it does not have. */
+  const brandMark = ((): Oklch => {
+    const sample = { chroma: brand.chroma, hue: brand.hue }
+    const clears = (lightness: number): boolean =>
+      surfaces.every((ground) => contrastRatio(fitToGamut({ ...sample, lightness }), ground) >= 3)
+
+    const asked = brand.lightness
+    for (let step = 0; step <= 100; step += 1) {
+      const tries = step === 0 ? [asked] : [asked - step / 100, asked + step / 100]
+      const found = tries.filter((l) => l >= 0 && l <= 1).find(clears)
+      if (found !== undefined) {
+        return { ...sample, lightness: found }
+      }
+    }
+    return { ...sample, lightness: asked }
+  })()
+
   const tokens: DerivedToken[] = [
     token('color-background', rawBackground),
     token('color-surface', rawSurface),
@@ -692,6 +723,7 @@ export const deriveTheme = (intent: ThemeIntent): DerivedTheme => {
     token('color-surface-inverse', surfaceInverse),
     token('color-foreground-inverse', foregroundInverse, 'derived', surfaceInverse),
     token('color-focus-ring', focusRing, 'derived', background),
+    token('color-brand-mark', brandMark, 'derived', background),
   ]
 
   /* A pinned token replaces one output and is verified like anything else.

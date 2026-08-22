@@ -246,6 +246,41 @@ describe('the chroma policy', () => {
   })
 })
 
+describe('the brand as a mark', () => {
+  /* The point of the token: everywhere else the brand is solved for a word, and
+     a reader who picks a colour should be able to find it somewhere. */
+  test('a brand that is already legible is kept exactly', () => {
+    for (const brand of ['#3b82f6', '#c1272d']) {
+      const theme = deriveTheme({ brand })
+      const mark = theme.tokens.find((t) => t.name === 'color-brand-mark')
+      expect(mark?.value.lightness, brand).toBeCloseTo(hexToOklch(brand).lightness, 3)
+    }
+  })
+
+  /* And it moves when it must: a bright yellow cannot clear 3:1 on a white page
+     at its own lightness, whatever anybody would prefer. */
+  test('a brand that cannot be seen is moved until it can', () => {
+    const theme = deriveTheme({ brand: '#ffe100' })
+    const mark = theme.tokens.find((t) => t.name === 'color-brand-mark')
+    expect(mark?.value.lightness).toBeLessThan(hexToOklch('#ffe100').lightness)
+  })
+
+  /* Nearest rather than most legible, which is the correction measurement
+     forced: solving it the way every other ink is solved sent `#c1272d`'s mark
+     0.133 away when `primary` had landed 0.025 away, so the mark travelled
+     further than the text it exists to stay closer than. */
+  test('it lands no further from the brand than primary does', () => {
+    for (const brand of ['#3b82f6', '#c1272d', '#16a34a', '#ffe100']) {
+      const theme = deriveTheme({ brand })
+      const asked = hexToOklch(brand).lightness
+      const away = (name: string) =>
+        Math.abs((theme.tokens.find((t) => t.name === name)?.value.lightness ?? 0) - asked)
+
+      expect(away('color-brand-mark'), brand).toBeLessThanOrEqual(away('color-primary') + 0.001)
+    }
+  })
+})
+
 describe('the accent', () => {
   test('a relation holds its angle exactly when told not to yield', () => {
     const theme = deriveTheme({

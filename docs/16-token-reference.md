@@ -3,7 +3,7 @@
 *Generated from [`helix/styles/src/tokens.css`](../helix/styles/src/tokens.css) by
 `bun run tokens`. Do not edit.*
 
-172 semantic tokens in 15 categories, every one in exactly
+173 semantic tokens in 15 categories, every one in exactly
 one. These are the whole of what a component or an app may use. The primitive
 layer underneath (`--_helix-neutral-500` and its kind) is `helix/styles`'s own
 business and `check:tokens` fails on any reference to it from outside.
@@ -41,7 +41,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-surface-media` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))` | 6 |
 | `--helix-color-foreground-media` | `light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))` | 8 |
 | `--helix-color-border` | `light-dark(var(--_helix-neutral-300), var(--_helix-neutral-700))` | 220 |
-| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 157 |
+| `--helix-color-primary` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 158 |
 | `--helix-color-primary-hover` | `var(--_helix-brand-600)` | 10 |
 | `--helix-color-primary-active` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-primary-subtle` | `light-dark(var(--_helix-brand-50), var(--_helix-brand-900))` | 7 |
@@ -54,6 +54,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-primary-surface` | `var(--_helix-brand-600)` | 6 |
 | `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | 4 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | 122 |
+| `--helix-color-brand-mark` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | 1 |
 | `--helix-color-syntax-callable` | `light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )` | 3 |
 | `--helix-color-syntax-comment` | `light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )` | 2 |
 | `--helix-color-syntax-constant` | `light-dark( var(--_helix-syntax-constant-light), var(--_helix-syntax-constant-dark) )` | 2 |
@@ -277,10 +278,10 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-loader-md` | `calc(1.5rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-sm` | `calc(1rem * var(--_helix-seed-density))` | 2 |
 | `--helix-size-loader-lg` | `calc(2rem * var(--_helix-seed-density))` | 8 |
-| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 22 |
+| `--helix-size-header` | `calc(3.5rem * var(--_helix-seed-density))` | 23 |
 | `--helix-size-icon` | `var(--helix-size-icon-md)` | 90 |
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 46 |
-| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 15 |
+| `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 16 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 82 |
 | `--helix-size-focus-ring` | `var(--helix-border-thick)` | 138 |
 | `--helix-size-focus-offset` | `2px` | 114 |
@@ -293,6 +294,6 @@ Position in the stack. Positional, never named after a component.
 |---|---|---|
 | `--helix-layer-base` | `0` | 8 |
 | `--helix-layer-raised` | `10` | 34 |
-| `--helix-layer-sticky` | `100` | 6 |
+| `--helix-layer-sticky` | `100` | 7 |
 | `--helix-layer-overlay` | `1000` | 4 |
 | `--helix-layer-toast` | `1200` | 2 |

@@ -20,9 +20,21 @@ export function ThemedPage() {
   return (
     <div className="themedPage">
       <helix-app-header className="themedHeader">
-        <helix-text appearance="label" slot="start">
-          Northwind
-        </helix-text>
+        {/* **A mark, because it is the one place the brand appears as itself.**
+            Everywhere else on this page the brand is solved for a word: the
+            button fill has to carry white and the link colour has to clear the
+            page as text. `--helix-color-brand-mark` answers to the 3:1 a graphic
+            owes rather than the 4.5 a word does, so a reader who picks a colour
+            can find it here even when every button has moved away from it.
+
+            Drawn rather than pictured: a mark that is one shape and one fill is
+            CSS, and an asset would need loading, sizing and a licence to say the
+            same thing. `aria-hidden`, the name beside it being the accessible
+            one, so a screen reader is not told the company twice. */}
+        <helix-flex align="center" gap="xs" slot="start">
+          <span aria-hidden="true" className="themedMark" />
+          <helix-text appearance="label">Halyard</helix-text>
+        </helix-flex>
         {/* Plain anchors carrying `data-navigation-item`, which is the base
             layer's helper for exactly this: `helix-navigation` is the landmark
             and takes whatever is slotted into it, and there is no item element
@@ -168,9 +180,9 @@ export function ThemedPage() {
               <helix-table-column slot="columns">State</helix-table-column>
               {(
                 [
-                  { name: 'Northwind', state: 'success', target: '4.5:1', word: 'Passing' },
+                  { name: 'Halyard', state: 'success', target: '4.5:1', word: 'Passing' },
                   {
-                    name: 'Northwind dark',
+                    name: 'Halyard dark',
                     state: 'warning',
                     target: '4.5:1',
                     word: 'One collision',
