@@ -2007,12 +2007,19 @@ helix-drawer helix-tree {
   text-wrap: balance;
 }
 
-/* The dividers in the byline are hairlines between three facts, so they take
-   the height of the text rather than the row. Through the component's own hook:
-   `block-size` here is a document rule against a shadow one, which wins outright
-   whatever the component says, and is what `check:overruled` fails on. */
-.insightByline helix-divider {
-  --divider-length: 1em;
+/* The avatar sized to sit inside the chip that carries it.
+ *
+ * `Avatar`'s own `sm` is 24, which is exactly the height of a tag at this
+ * density, so slotted as a prefix it filled the chip edge to edge and pushed it
+ * taller than the four beside it. Through the component's own hook, at the
+ * tag's text size, so the two move together if the ramp does.
+ *
+ * The 0.75 the prefix slot puts on everything it holds is left alone. It is
+ * there because a prefix is a category qualifying a label and should not
+ * outshout it, and that reasoning survives the thing being a face rather than a
+ * word: this is a byline, not a profile. */
+.insightByline helix-avatar {
+  --avatar-size: calc(var(--helix-text-xs) * 1.4);
 }
 
 /* A row that is a link. Cards were tried here and are wrong at the foot of an

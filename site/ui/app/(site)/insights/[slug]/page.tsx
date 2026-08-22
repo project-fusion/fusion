@@ -103,28 +103,29 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </helix-text>
         </helix-flex>
 
-        {/* One metadata line, not two stacked ones.
+        {/* One metadata line, and every fact on it is a tag.
             
-            The filing and the byline were separate rows, which made two short
-            strips of grey under the standfirst where the eye expects one: a row
-            of two chips is never long enough to look like a line, so the pair
-            read as a fragment above a fragment. They are one answer to one
-            question, which is what this piece is and who made it, so they are
-            one row, divided the way the row already divides everything else.
+            It was text with hairlines between it and two chips on the end,
+            which made one row out of two vocabularies: the same kind of fact,
+            the byline and the filing, drawn as two different kinds of object.
+            As tags they are one set, and the dividers go with the change,
+            because a chip already has an edge and a rule between two of them is
+            a third boundary in a row that only has two.
             
-            The chips go last. Everything before them is about *this* post and
-            they are how it is filed with the others, which is the least urgent
-            thing here and the only part that leads somewhere else. */}
-        <helix-flex align="center" class="insightByline" data-density="sm" gap="sm" wrap>
-          <helix-avatar name={insight.author} size="sm"></helix-avatar>
-          <helix-text appearance="body-strong">{insight.author}</helix-text>
-          <helix-divider orientation="vertical"></helix-divider>
-          <helix-text tone="muted">
+            `outlined` for the facts about this post, which is the appearance
+            `Tag` documents for exactly this case: a dense set of them filled
+            would turn a row into a mosaic. The subject keeps its wash, so the
+            one tag that leads somewhere else is the one that looks like it
+            does, and the kind stays neutral beside it. */}
+        <helix-flex align="center" class="insightByline" data-density="sm" gap="xs" wrap>
+          <helix-tag appearance="outlined">
+            <helix-avatar name={insight.author} slot="prefix"></helix-avatar>
+            {insight.author}
+          </helix-tag>
+          <helix-tag appearance="outlined">
             <time dateTime={insight.date}>{formatDate(insight.date)}</time>
-          </helix-text>
-          <helix-divider orientation="vertical"></helix-divider>
-          <helix-text tone="muted">{insight.minutes} min read</helix-text>
-          <helix-divider orientation="vertical"></helix-divider>
+          </helix-tag>
+          <helix-tag appearance="outlined">{insight.minutes} min read</helix-tag>
           <helix-tag tone="primary">{insight.topic}</helix-tag>
           <helix-tag>{insight.kind}</helix-tag>
         </helix-flex>
