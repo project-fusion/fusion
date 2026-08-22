@@ -218,7 +218,7 @@ Blur and translucency, for a surface that lets the page through.
 | `--helix-material-opacity` | `1` | 6 |
 | `--helix-material-blur-sm` | `8px` | 0 |
 | `--helix-material-blur-md` | `16px` | 1 |
-| `--helix-material-blur-lg` | `32px` | 4 |
+| `--helix-material-blur-lg` | `32px` | 3 |
 | `--helix-material-translucent` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 72%, transparent )` | 8 |
 | `--helix-material-translucent-strong` | `color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )` | 0 |
 | `--helix-material-border` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )` | 1 |
@@ -231,8 +231,8 @@ How long something takes.
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 2 |
 | `--helix-duration-fast` | `var(--_helix-ms-120)` | 177 |
-| `--helix-duration-normal` | `var(--_helix-ms-200)` | 68 |
-| `--helix-duration-slow` | `var(--_helix-ms-320)` | 17 |
+| `--helix-duration-normal` | `var(--_helix-ms-200)` | 70 |
+| `--helix-duration-slow` | `var(--_helix-ms-320)` | 13 |
 
 ## easing
 
@@ -240,9 +240,9 @@ The shape of the curve it takes it along.
 
 | Token | Value | Reads |
 |---|---|---|
-| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 161 |
+| `--helix-easing-standard` | `var(--_helix-curve-standard)` | 162 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
-| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 31 |
+| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 30 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 1 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 4 |
 
