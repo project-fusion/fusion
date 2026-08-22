@@ -173,6 +173,22 @@
  * at `raised` so it sits over the page and under the bar: the masthead is
  * sticky at a higher layer and the panel is in the top layer, so both keep
  * their content above a single continuous blur. */
+/* The panel is a window onto the glass, never a surface of its own.
+ *
+ * Stated here rather than inline on the element, and unconditionally, because
+ * the condition was the bug: keyed to the open state it came off on the frame
+ * the collapse started, since `helix-close` fires before the panel moves, and
+ * the panel finished its collapse as an opaque rectangle of the page's own
+ * colour. Black, on a dark page.
+ *
+ * Both hooks, because a backdrop filter is clipped to its own element's box: a
+ * second blur here would be a blur of the sheet that is already blurring, and
+ * the whole reason there is a sheet is that two of them do not agree. */
+helix-megamenu {
+  --megamenu-backdrop: none;
+  --megamenu-background: transparent;
+}
+
 .navGlass {
   backdrop-filter: blur(var(--helix-material-blur-md));
   background-color: var(--helix-material-translucent);

@@ -134,7 +134,17 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           So while a panel is down the bar takes `material`, and the panel is
           given the same fill and the same blur through `--megamenu-background`
           and `--megamenu-backdrop`. Both glass together, rather than one of
-          each with a seam down the join. `AppHeader` transitions its own
+          each with a seam down the join.
+
+          **The panel's half of that is unconditional now, and it is a fix.**
+          It was applied only while `panelDown`, which is cleared by
+          `helix-close`, and that event is documented as firing *before* the
+          panel closes. So the transparency came off on the frame the collapse
+          began and the panel spent the whole of it painting
+          `--helix-color-background`: a solid rectangle shrinking upward, black
+          on a dark page. The panel is only ever on screen while it is open or
+          collapsing, and the glass covers both, so it never needs a ground of
+          its own here and the state it was keyed to was the wrong state. `AppHeader` transitions its own
           `background-color` over `--helix-duration-normal`, which is the
           duration the panel's reveal runs for, so they move together without
           either being told about the other. */}
@@ -197,11 +207,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 })
               }}
               ref={panelRef}
-              style={
-                panelDown
-                  ? { '--megamenu-backdrop': 'none', '--megamenu-background': 'transparent' }
-                  : undefined
-              }
               suppressHydrationWarning
             >
               {/* The trigger is slotted, and it has to be.
