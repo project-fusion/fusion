@@ -82,9 +82,16 @@ export default function Home() {
             <helix-tag>Fusion Development Group</helix-tag>
           </helix-flex>
           <helix-text as="h1" class="heroTitle">
-            The two hardest layers of a modern product, already built
+            Interface and intelligence, already built
           </helix-text>
-          {/* **The title is the reader's problem and this is the answer to it.**
+          {/* **Half the words it had, because a hero is read standing up.** The
+              title carried nine words and the lede three sentences, one of
+              which named both substrates and their jobs before a reader had
+              asked what either was. The names are one click away in the band
+              below and on the bar above; what the hero owes is the shape of the
+              offer, which is: these exist, and there are two ways to use them.
+
+              **The title is the reader's problem and the lede is the answer.**
               Both lines were about us before: a discipline we practise, then
               the two audiences we serve. Neither told a reader what they get.
               The interface and the intelligence layers are the expensive part of
@@ -98,8 +105,7 @@ export default function Home() {
               being shown a present. `/thesis` is where it belongs and where it
               still is. */}
           <helix-text as="p" class="heroLede measure" tone="muted">
-            Helix is the design system. Cortex is the memory and provenance layer. Use them
-            yourself, or have us build with them.
+            Take Helix and Cortex and go, or hire us to build with them.
           </helix-text>
           <helix-flex data-density="lg" gap="sm" wrap>
             <Link
@@ -220,8 +226,7 @@ export default function Home() {
               The part you can buy today
             </helix-text>
             <helix-text as="p" class="measure" tone="muted">
-              Interface and intelligence work the substrates make faster to do well. It starts with
-              a two week audit, and every price is stated in full, because an offer you cannot
+              It starts with a two week audit, and every price is published: an offer you cannot
               compare is not an offer.
             </helix-text>
           </helix-flex>
@@ -327,8 +332,14 @@ export default function Home() {
             <helix-text appearance="label" tone="subtle">
               Why us
             </helix-text>
+            {/* **"You are hiring the people who built the tools" was the hero's
+                fork said a second time**, and by this point a reader has met it
+                twice already. What only this section can say is what the
+                engagement is actually like, which is what its four cards
+                answer: the system exists, that makes it faster, you keep it,
+                and we say what is not done. */}
             <helix-text as="h2" class="sectionTitle measure">
-              You are hiring the people who built the tools
+              How the work goes
             </helix-text>
           </helix-flex>
 
@@ -423,9 +434,7 @@ export default function Home() {
             Take on the work
           </helix-text>
           <helix-text as="p" class="measure" tone="muted">
-            We take on interface and intelligence work the substrates make faster to do well. If
-            that is what you need, say so plainly and we will tell you whether we are the right
-            people for it.
+            Tell us what you need built. We will say plainly whether we are the right people for it.
           </helix-text>
           <a
             data-button="solid"
